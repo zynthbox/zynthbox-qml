@@ -31,28 +31,27 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 
-ZComponents.MainRowLayout {
+Kirigami.ScrollablePage {
     id: root
+    title: qsTr("Info")
+    property string selectorId: "info"
     Component.onCompleted: autoHideTimer.restart()
-    Kirigami.ScrollablePage {
-		id: page
-		title: qsTr("Info")
-        Kirigami.Heading {
-			level: 3
-			wrapMode: Text.Wrap
-			text: zynthian.info.text
-			onTextChanged: {
-				autoHideTimer.restart()
-				page.flickable.contentY = page.flickable.contentHeight - page.flickable.height
-			}
-			Timer {
-				id: autoHideTimer
-				interval: 3000
-				onTriggered: {
-					print("autohidetimer triggered")
-					zynthian.info.back_action()
-				}
-			}
-		}
+    Kirigami.Heading {
+        level: 3
+        wrapMode: Text.Wrap
+        text: zynthian.info.text
+        onTextChanged: {
+            autoHideTimer.restart()
+            root.flickable.contentY = root.flickable.contentHeight - root.flickable.height
+        }
+        Timer {
+            id: autoHideTimer
+            interval: 3000
+            onTriggered: {
+                print("autohidetimer triggered")
+                zynthian.info.back_action()
+            }
+        }
     }
 }
+

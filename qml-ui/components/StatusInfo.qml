@@ -30,223 +30,223 @@ import org.kde.kirigami 2.4 as Kirigami
 
 
 Item {
-	id: root
-	implicitWidth: Kirigami.Units.gridUnit * 10
+    id: root
+    implicitWidth: Kirigami.Units.gridUnit * 10
 
 
-	Connections {
-		target: zynthian.status_information
-		onStatus_changed: {
-			let signalA = Math.max(0, 1 + zynthian.status_information.peakA / zynthian.status_information.rangedB);
-			lowSignalARect.width = Math.min(signalA, zynthian.status_information.high) * root.width;
-			mediumSignalARect.width = Math.min(signalA, zynthian.status_information.over) * root.width;
-			highSignalARect.width = Math.min(signalA, 1) * root.width;
+    Connections {
+        target: zynthian.status_information
+        onStatus_changed: {
+            let signalA = Math.max(0, 1 + zynthian.status_information.peakA / zynthian.status_information.rangedB);
+            lowSignalARect.width = Math.min(signalA, zynthian.status_information.high) * root.width;
+            mediumSignalARect.width = Math.min(signalA, zynthian.status_information.over) * root.width;
+            highSignalARect.width = Math.min(signalA, 1) * root.width;
 
-			signalA = Math.max(0, 1 + zynthian.status_information.holdA / zynthian.status_information.rangedB);
-			let holdAX = Math.floor(Math.min(signalA, 1) * root.width);
-			holdSignalARect.x = holdAX;
-			if (holdAX === 0) {
-				holdSignalARect.opacity = 0;
-			} else {
-				holdSignalARect.opacity = 1;
-			}
+            signalA = Math.max(0, 1 + zynthian.status_information.holdA / zynthian.status_information.rangedB);
+            let holdAX = Math.floor(Math.min(signalA, 1) * root.width);
+            holdSignalARect.x = holdAX;
+            if (holdAX === 0) {
+                holdSignalARect.opacity = 0;
+            } else {
+                holdSignalARect.opacity = 1;
+            }
 
-			let signalB = Math.max(0, 1 + zynthian.status_information.peakB / zynthian.status_information.rangedB);
-			lowSignalBRect.width = Math.min(signalB, zynthian.status_information.high) * root.width;
-			mediumSignalBRect.width = Math.min(signalB, zynthian.status_information.over) * root.width;
-			highSignalBRect.width = Math.min(signalB, 1) * root.width;
+            let signalB = Math.max(0, 1 + zynthian.status_information.peakB / zynthian.status_information.rangedB);
+            lowSignalBRect.width = Math.min(signalB, zynthian.status_information.high) * root.width;
+            mediumSignalBRect.width = Math.min(signalB, zynthian.status_information.over) * root.width;
+            highSignalBRect.width = Math.min(signalB, 1) * root.width;
 
 
-			signalB = Math.max(0, 1 + zynthian.status_information.holdB / zynthian.status_information.rangedB);
-			let holdBX = Math.floor(Math.min(signalB, 1) * root.width);
-			holdSignalBRect.x = holdBX;
-			if (holdBX === 0) {
-				holdSignalBRect.opacity = 0;
-			} else {
-				holdSignalBRect.opacity = 1;
-			}
-		}
-	}
+            signalB = Math.max(0, 1 + zynthian.status_information.holdB / zynthian.status_information.rangedB);
+            let holdBX = Math.floor(Math.min(signalB, 1) * root.width);
+            holdSignalBRect.x = holdBX;
+            if (holdBX === 0) {
+                holdSignalBRect.opacity = 0;
+            } else {
+                holdSignalBRect.opacity = 1;
+            }
+        }
+    }
 
-	ColumnLayout {
-		anchors.fill: parent
+    ColumnLayout {
+        anchors.fill: parent
 
-		Item {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-			Rectangle {
-				id: holdSignalARect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-				}
-				opacity: 0
-				implicitWidth: Kirigami.Units.smallSpacing
-				color: "#da4453"
-				Behavior on x {
-					XAnimator {
-						duration: Kirigami.Units.shortDuration
-						easing.type: Easing.InOutQuad
-					}
-				}
-				Behavior on opacity {
-					OpacityAnimator {
-						duration: Kirigami.Units.longDuration
-						easing.type: Easing.InOutQuad
-					}
-				}
-			}
-			Rectangle {
-				id: highSignalARect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#da4453"
-			}
-			Rectangle {
-				id: mediumSignalARect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#fbbb4c"
-			}
-			Rectangle {
-				id: lowSignalARect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#11d116"
-			}
-		}
+            Rectangle {
+                id: holdSignalARect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                opacity: 0
+                implicitWidth: Kirigami.Units.smallSpacing
+                color: "#da4453"
+                Behavior on x {
+                    XAnimator {
+                        duration: Kirigami.Units.shortDuration
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+                Behavior on opacity {
+                    OpacityAnimator {
+                        duration: Kirigami.Units.longDuration
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+            }
+            Rectangle {
+                id: highSignalARect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#da4453"
+            }
+            Rectangle {
+                id: mediumSignalARect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#fbbb4c"
+            }
+            Rectangle {
+                id: lowSignalARect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#11d116"
+            }
+        }
 
-		Item {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-			Rectangle {
-				id: holdSignalBRect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-				}
-				opacity: 0
-				implicitWidth: Kirigami.Units.smallSpacing
-				color: "#da4453"
-				Behavior on x {
-					XAnimator {
-						duration: Kirigami.Units.shortDuration
-						easing.type: Easing.InOutQuad
-					}
-				}
-				Behavior on opacity {
-					OpacityAnimator {
-						duration: Kirigami.Units.longDuration
-						easing.type: Easing.InOutQuad
-					}
-				}
-			}
-			Rectangle {
-				id: highSignalBRect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#da4453"
-			}
-			Rectangle {
-				id: mediumSignalBRect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#fbbb4c"
-			}
-			Rectangle {
-				id: lowSignalBRect
-				anchors {
-					top: parent.top
-					bottom: parent.bottom
-					left: parent.left
-				}
-				color: "#11d116"
-			}
-		}
-	}
+            Rectangle {
+                id: holdSignalBRect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                opacity: 0
+                implicitWidth: Kirigami.Units.smallSpacing
+                color: "#da4453"
+                Behavior on x {
+                    XAnimator {
+                        duration: Kirigami.Units.shortDuration
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+                Behavior on opacity {
+                    OpacityAnimator {
+                        duration: Kirigami.Units.longDuration
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+            }
+            Rectangle {
+                id: highSignalBRect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#da4453"
+            }
+            Rectangle {
+                id: mediumSignalBRect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#fbbb4c"
+            }
+            Rectangle {
+                id: lowSignalBRect
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                }
+                color: "#11d116"
+            }
+        }
+    }
 
-	RowLayout {
-		id: statusIconsLayout
-		anchors {
-			right: parent.right
-			bottom: parent.bottom
-		}
-		height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
-		Kirigami.Icon {
-			Layout.fillHeight: true
-			Layout.preferredWidth: height
-			source: "dialog-warning-symbolic"
-			color: Kirigami.Theme.negativeTextColor
-			visible: zynthian.status_information.xrun
-		}
-		Kirigami.Icon {
-			Layout.fillHeight: true
-			Layout.preferredWidth: height
-			source: "preferences-system-power"
-			visible: zynthian.status_information.undervoltage
-		}
-		Kirigami.Icon {
-			Layout.fillHeight: true
-			Layout.preferredWidth: height
-			color: Kirigami.Theme.textColor
-			source: {
-				switch(zynthian.status_information.audio_recorder) {
-				case "PLAY":
-					return "media-playback-start-symbolic";
-				case "REC":
-				default:
-					return "media-record-symbolic";
-				}
-			}
-			QQC2.Label {
-				anchors {
-					right: parent.right
-					bottom: parent.bottom
-				}
-				font.pointSize: 6
-				text: qsTr("Audio")
-			}
-			visible: zynthian.status_information.audio_recorder.length > 0
-		}
-		Kirigami.Icon {
-			Layout.fillHeight: true
-			Layout.preferredWidth: height
-			color: Kirigami.Theme.textColor
-			source: {
-				switch(zynthian.status_information.audio_recorder) {
-				case "PLAY":
-					return "media-playback-start-symbolic";
-				case "REC":
-				default:
-					return "media-record-symbolic";
-				}
-			}
-			QQC2.Label {
-				anchors {
-					right: parent.right
-					bottom: parent.bottom
-				}
-				font.pointSize: 6
-				text: "Midi"
-			}
-			visible: zynthian.status_information.midi_recorder.length > 0
-		}
-	}
+    RowLayout {
+        id: statusIconsLayout
+        anchors {
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            source: "dialog-warning-symbolic"
+            color: Kirigami.Theme.negativeTextColor
+            visible: zynthian.status_information.xrun
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            source: "preferences-system-power"
+            visible: zynthian.status_information.undervoltage
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            color: Kirigami.Theme.textColor
+            source: {
+                switch(zynthian.status_information.audio_recorder) {
+                case "PLAY":
+                    return "media-playback-start-symbolic";
+                case "REC":
+                default:
+                    return "media-record-symbolic";
+                }
+            }
+            QQC2.Label {
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                font.pointSize: 6
+                text: qsTr("Audio")
+            }
+            visible: zynthian.status_information.audio_recorder.length > 0
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            color: Kirigami.Theme.textColor
+            source: {
+                switch(zynthian.status_information.audio_recorder) {
+                case "PLAY":
+                    return "media-playback-start-symbolic";
+                case "REC":
+                default:
+                    return "media-record-symbolic";
+                }
+            }
+            QQC2.Label {
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                font.pointSize: 6
+                text: "Midi"
+            }
+            visible: zynthian.status_information.midi_recorder.length > 0
+        }
+    }
 }

@@ -36,12 +36,13 @@ Kirigami.AbstractApplicationWindow {
     id: root
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
+    readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
 
     width: screen.width
     height: screen.height
 
     header: ZComponents.Breadcrumb {
-        layerManager: layerManager
+        layerManager: screensLayer.layers
         leftHeaderControl: QQC2.Button {
                 implicitWidth: height
                 icon.name: "go-home"
@@ -49,60 +50,13 @@ Kirigami.AbstractApplicationWindow {
             }
         rightHeaderControl: ZComponents.StatusInfo {}
     }
-
-    pageStack: mainRowLayout
-    ZComponents.LayerManager {
-        id: layerManager
+    pageStack: screensLayer
+    ScreensLayer {
+        id: screensLayer
+        parent: root.contentItem
         anchors.fill: parent
-        initialItem: MainScreensLayout {
-            id: mainRowLayout
-
-            readonly property ZComponents.LayerManager layers: layerManager
-
-            ZComponents.SelectorPage {
-                id: mainPage
-                iconName: "go-home"
-                implicitWidth: mainRowLayout.width
-                selectorId: "main"
-                //FIXME: find something more generic
-                onCurrentScreenIdRequested: zynthian.current_screen_id = selectorId
-            }
-            ZComponents.SelectorPage {
-                id: layersPage
-                implicitWidth: mainRowLayout.width/3
-                header.visible: true
-                selectorId: "layer"
-                //FIXME: find something more generic
-                onCurrentScreenIdRequested: zynthian.current_screen_id = selectorId
-            }
-            ZComponents.SelectorPage {
-                id: banksPage
-                leftPadding: 0
-                rightPadding: 0
-                implicitWidth: mainRowLayout.width/3
-                header.visible: true
-                selectorId: "bank"
-                //FIXME: find something more generic
-                onCurrentScreenIdRequested: zynthian.current_screen_id = selectorId
-            }
-            ZComponents.SelectorPage {
-                id: presetsPage
-                implicitWidth: mainRowLayout.width/3
-                header.visible: true
-                selectorId: "preset"
-                //FIXME: find something more generic
-                onCurrentScreenIdRequested: zynthian.current_screen_id = selectorId
-            }
-            Pages.ControlPage {
-                id: controlPage
-                implicitWidth: mainRowLayout.width
-                //FIXME: find something more generic
-                onCurrentScreenIdRequested: zynthian.current_screen_id = 'control'
-            }
-        }
+        initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer'), root.pageScreenMapping.pageForScreen('control')]
     }
-
-    //[mainPage, layersPage, banksPage, presetsPage, controlPage]
 
     CustomTheme {}
 
@@ -117,28 +71,8 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    // FIXME: this stuff with a newer Kirigami should be done with a PageRouter?
-    function ensureVisible(page) {
-        mainRowLayout.activateItem(page)
-    }
-
-    function makeLastVisible(page) {
-        mainRowLayout.ensureLastVisibleItem(page)
-    }
-
-    function show_modal(item) {
-        if (layerManager.depth > 1) {
-            layerManager.replace(item);
-        } else {
-            layerManager.push(item);
-        }
-    }
-
-    function close_modal(item) {
-        layerManager.pop(mainRowLayout);
-    }
-
     ModalScreensLayer {
+        id: modalScreensLayer
         visible: false
     }
 
@@ -165,16 +99,17 @@ Kirigami.AbstractApplicationWindow {
         anchors.fill: parent
     }
 
+    //FIXME: reimplement this toolbar
     footer: ColumnLayout {
         spacing: 0
         QQC2.ToolBar {
             Layout.fillWidth: true
-            visible: layerManager.depth === 1 && mainRowLayout.currentPage === 1
+            visible: screensLayer.layers.depth === 1 && screensLayer.currentIndex === 1
 
             contentItem: RowLayout {
                 QQC2.ToolButton {
                     //Layout.fillWidth: true
-                    implicitWidth: backButton.width
+                    Layout.preferredWidth: root.width/4
                     text: qsTr("Synth")
                     onClicked: zynthian.layer.select_engine()
                 }
@@ -186,47 +121,53 @@ Kirigami.AbstractApplicationWindow {
         QQC2.ToolBar {
             Layout.fillWidth: true
             contentItem: RowLayout {
+                spacing: 0
                 QQC2.ToolButton {
                     id: backButton
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: root.width/4
                     text: qsTr("Back")
-                    enabled: mainRowLayout.currentPage > 0 || layerManager.depth > 1
+                    enabled: screensLayer.currentIndex > 0 || screensLayer.layers.depth > 1
                     opacity: enabled ? 1 : 0.3
-                    onClicked: zynthan.go_back()
+                    onClicked: {
+                        if (root.currentPage && root.currentPage.previousScreen.length > 0) {
+                            if (screensLayer.layers.depth > 1) {
+                                zynthian.current_modal_screen_id = root.currentPage.previousScreen;
+                            } else {
+                                zynthian.current_screen_id = root.currentPage.previousScreen;
+                            }
+                        } else {
+                            zynthian.go_back();
+                        }
+                    }
                 }
                 QQC2.ToolButton {
-                    Layout.fillWidth: true
-                    enabled: layersPage.visible
+                    Layout.preferredWidth: root.width/4
+                    //enabled: layersPage.visible
                     opacity: enabled ? 1 : 0.3
                     text: qsTr("Layers")
-                    onClicked: root.ensureVisible(layersPage)
+                    onClicked: zynthian.current_screen_id = "layer"
                 }
                 QQC2.ToolButton {
-                    Layout.fillWidth: true
-                    text: mainRowLayout.currentPage === 1 ? qsTr("Favorites") : qsTr("Presets")
-                    enabled: presetsPage.visible
+                    Layout.preferredWidth: root.width/4
+                    text: screensLayer.currentIndex === 1 ? qsTr("Favorites") : qsTr("Presets")
+                    //enabled: presetsPage.visible
                     opacity: enabled ? 1 : 0.3
-                    checkable: mainRowLayout.currentPage === 1
-                    checked: mainRowLayout.currentPage === 1 && zynthian.preset.show_only_favorites
-                    onClicked: root.ensureVisible(presetsPage)
+                    checkable: screensLayer.currentIndex === 1
+                    checked: screensLayer.currentIndex === 1 && zynthian.preset.show_only_favorites
+                    onClicked: zynthian.current_screen_id = "preset"
                     onCheckedChanged: {
-                        if (mainRowLayout.currentPage === 1) {
+                        if (screensLayer.currentIndex === 1) {
                             zynthian.preset.show_only_favorites = checked
                         }
                     }
                 }
                 QQC2.ToolButton {
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: root.width/4
                     text: qsTr("Edit")
-                    enabled: controlPage.visible
+                    //enabled: controlPage.visible
                     opacity: enabled ? 1 : 0.3
-                    onClicked: root.ensureVisible(controlPage)
+                    onClicked: zynthian.current_screen_id = "control"
                 }
-                /*QQC2.ToolButton {
-                    Layout.fillWidth: true
-                    text: qsTr("Quit")
-                    onClicked: Qt.quit();
-                }*/
             }
         }
     }

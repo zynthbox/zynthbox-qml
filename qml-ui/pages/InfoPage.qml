@@ -34,7 +34,7 @@ import "../components" as ZComponents
 Kirigami.ScrollablePage {
     id: root
     title: qsTr("Info")
-    property string selectorId: "info"
+    property string screenId: "info"
     Component.onCompleted: autoHideTimer.restart()
     Kirigami.Heading {
         level: 3

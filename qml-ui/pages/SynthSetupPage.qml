@@ -23,36 +23,17 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.11
+import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import QtQuick.Window 2.1
-import org.kde.kirigami 2.6 as Kirigami
+import org.kde.kirigami 2.4 as Kirigami
 
-import "components" as ZComponents
-import "pages" as Pages
+import "../components" as ZComponents
 
-ZComponents.MainRowLayout {
-    id: root
-    data: [
-        Connections {
-            target: zynthian
-            onCurrent_screen_idChanged: {
-                print("SCREEN ID CHANGED: "+zynthian.current_screen_id);
-                // FIXME: remove special case
-              //  if (zynthian.current_screen_id === "control") {
-               //     zynthian.current_screen_id = "preset";
-              // }
-                var i;
-                for (i in root.items) {
-                    let child = root.items[i];
-                    if (child.selectorId === zynthian.current_screen_id) {
-                        root.activateItem(child);
-                        return;
-                    }
-                }
-                print("Non managed screen " + zynthian.current_screen_id)
-            }
-        }
-    ]
+ZComponents.MultiSelectorPage {
+    screenIds: ["layer", "bank", "preset"]
+    previousScreen: "main"
+    onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
 }
+
+

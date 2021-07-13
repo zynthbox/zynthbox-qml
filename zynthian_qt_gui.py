@@ -578,12 +578,16 @@ class zynthian_gui(QObject):
 		self.lock.acquire()
 		self.hide_screens(exclude=screen)
 		self.screens[screen].show()
+		screen_scanged = self.active_screen != screen
+		modal_screen_scanged = self.modal_screen != None
 		self.active_screen = screen
 		self.modal_screen = None
 		self.modal_screen_back = None
 		self.lock.release()
-		self.current_screen_id_changed.emit()
-		self.current_modal_screen_id_changed.emit()
+		if screen_scanged:
+			self.current_screen_id_changed.emit()
+		if modal_screen_scanged:
+			self.current_modal_screen_id_changed.emit()
 
 
 	def show_active_screen(self):
@@ -1810,7 +1814,7 @@ class zynthian_gui(QObject):
 		if action != None:
 			zyngui.callable_ui_action(action)
 
-	@Slot(void)
+	@Slot('void')
 	def go_back(self):
 		# switch 1 means going back TODO: instead of magic numbers their functions should be moved in slots?
 		self.zynswitch_short(1)

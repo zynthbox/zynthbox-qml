@@ -55,12 +55,27 @@ Kirigami.PageRow {
                     return;
                 }
 
-                var i;
-                for (i in root.items) {
-                    let child = root.items[i];
-                    if (child.selectorId === zynthian.current_modal_screen_id) {
-                        root.currentINdex = i;
-                        return;
+                for (var i = 0; i < root.depth; ++i) {
+                    let child = root.get(i);
+                    if (child.hasOwnProperty("screenId")) {
+                        if (child.screenId === zynthian.current_modal_screen_id) {
+                            root.currentIndex = i;
+                            return;
+                        }
+                    // It's a MultiSelectorPage
+                    } else if (child.hasOwnProperty("screenIds")) {
+                        var j; // if (.. in ..) doesn't work
+                        for (j in child.screenIds) {
+                            let id = child.screenIds[j];
+                            if (id === zynthian.current_modal_screen_id) {
+                                root.currentIndex = i;
+                                return;
+                            }
+                        }
+                        if (zynthian.current_modal_screen_id in child.screenIds) {
+                            root.currentIndex = i;
+                            return;
+                        }
                     }
                 }
                 let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);

@@ -35,6 +35,8 @@ import "pages" as Pages
 Kirigami.AbstractApplicationWindow {
     id: root
 
+    readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
+
     width: screen.width
     height: screen.height
 
@@ -48,11 +50,14 @@ Kirigami.AbstractApplicationWindow {
         rightHeaderControl: ZComponents.StatusInfo {}
     }
 
+    pageStack: mainRowLayout
     ZComponents.LayerManager {
         id: layerManager
         anchors.fill: parent
         initialItem: MainScreensLayout {
             id: mainRowLayout
+
+            readonly property ZComponents.LayerManager layers: layerManager
 
             ZComponents.SelectorPage {
                 id: mainPage
@@ -133,45 +138,9 @@ Kirigami.AbstractApplicationWindow {
         layerManager.pop(mainRowLayout);
     }
 
-    Connections {
-        target: zynthian
-
-        onCurrent_modal_screen_idChanged: {
-            switch (zynthian.current_modal_screen_id) {
-            case "confirm":
-                confirmDialog.open();
-                break;
-            case "engine":
-                 root.show_modal(Qt.resolvedUrl("./pages/LayerCreation.qml"));
-                break;
-            case "layer_options":
-                 root.show_modal(Qt.resolvedUrl("./pages/LayerOptionsPage.qml"));
-                break;
-            case "snapshot":
-                 root.show_modal(Qt.resolvedUrl("./pages/SnapshotPage.qml"));
-                break;
-            case "audio_recorder":
-                 root.show_modal(Qt.resolvedUrl("./pages/AudioRecorderPage.qml"));
-                break;
-            case "midi_recorder":
-                 root.show_modal(Qt.resolvedUrl("./pages/MidiRecorderPage.qml"));
-                break;
-            case "admin":
-                 root.show_modal(Qt.resolvedUrl("./pages/AdminPage.qml"));
-                break;
-            case "info":
-                 root.show_modal(Qt.resolvedUrl("./pages/InfoPage.qml"));
-                break;
-            case "":
-                root.close_modal();
-                break;
-            default:
-                print("Non managed modal screen " + zynthian.current_modal_screen_id)
-                break;
-            }
-        }
+    ModalScreensLayer {
+        visible: false
     }
-
 
     QQC2.Dialog {
         id: confirmDialog
@@ -223,19 +192,7 @@ Kirigami.AbstractApplicationWindow {
                     text: qsTr("Back")
                     enabled: mainRowLayout.currentPage > 0 || layerManager.depth > 1
                     opacity: enabled ? 1 : 0.3
-                    onClicked: {
-                        if (layerManager.depth > 1) {
-                            if (layerManager.currentItem.hasOwnProperty("currentIndex")
-                                && layerManager.currentItem.currentIndex > 0
-                            ) {
-                                layerManager.currentItem.currentIndex -= 1;
-                            } else {
-                                layerManager.pop();
-                            }
-                        } else {
-                            mainRowLayout.goToPreviousPage();
-                        }
-                    }
+                    onClicked: zynthan.go_back()
                 }
                 QQC2.ToolButton {
                     Layout.fillWidth: true

@@ -30,18 +30,8 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "../components" as ZComponents
 
-ZComponents.MainRowLayout {
-    id: root
-
-    ZComponents.SelectorPage {
-        implicitWidth: root.width
-
-        selectorId: "layer_options"
-
-        onItemActivated: {
-            //applicationWindow().makeLastVisible(layersPage)
-           // applicationWindow().pageStack.layers.pop()
-        }
-    }
+ZComponents.SelectorPage {
+    selectorId: "layer_options"
 }
+
 

@@ -1289,7 +1289,7 @@ class zynthian_gui(QObject):
 				# Back to screen-1 by default ...
 				if screen_back is None:
 					j = self.screens_sequence.index(self.active_screen)-1
-					if j<0: 
+					if j<0:
 						if len(self.screens['layer'].layers)>0 and self.curlayer:
 							j = len(self.screens_sequence)-1
 						else:
@@ -1810,6 +1810,10 @@ class zynthian_gui(QObject):
 		if action != None:
 			zyngui.callable_ui_action(action)
 
+	@Slot(void)
+	def go_back(self):
+		# switch 1 means going back TODO: instead of magic numbers their functions should be moved in slots?
+		self.zynswitch_short(1)
 
 	#------------------------------------------------------------------
 	# Engine OSC callbacks => No concurrency!! 

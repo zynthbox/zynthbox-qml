@@ -124,7 +124,7 @@ while true; do
 
 	#HACK
 	rm ../config/keybinding.yaml
-	cp zynthian_envars.sh ../config
+	#cp zynthian_envars.sh ../config
 
 	./zynthian_qt_gui.py
 	status=$?

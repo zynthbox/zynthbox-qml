@@ -36,7 +36,7 @@ Kirigami.Page {
     // title: "Control"
 
     property alias screenId: mainView.screenId
-    property string iconName
+    property string previousScreen
 
     signal currentScreenIdRequested()
     signal itemActivated(int index)
@@ -49,7 +49,7 @@ Kirigami.Page {
         }
     }
 
-    bottomPadding: Kirigami.Units.smallSpacing
+    bottomPadding: Kirigami.Units.largeSpacing
     contentItem: RowLayout {
         ColumnLayout {
             Layout.maximumWidth: Math.floor(root.width / 4)

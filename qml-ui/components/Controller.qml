@@ -127,7 +127,7 @@ Card {
                     anchors {
                         horizontalCenter: parent.horizontalCenter
                         bottom: parent.bottom
-                        bottomMargin: -parent.height / 4
+                        bottomMargin: parent.height / 4
                     }
                     text: root.controller ? root.controller.value_print : ""
                 }

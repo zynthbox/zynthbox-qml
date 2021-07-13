@@ -718,7 +718,7 @@ class zynthian_gui(QObject):
 
 	def layer_control(self, layer=None):
 		modal = False
-		logging.error("0000 "+str(time.time_ns()/1000))
+		logging.error("0000 "+str(time.time_ns()/1000000))
 		if layer is not None:
 			if layer in self.screens['layer'].root_layers:
 				self._curlayer = None
@@ -733,10 +733,10 @@ class zynthian_gui(QObject):
 			if zynthian_gui_config.automatically_show_control_page and self.curlayer.get_preset_name():
 				self.show_screen('control')
 			else:
-				logging.error("1111 "+str(time.time_ns()/1000))
+				logging.error("1111 "+str(time.time_ns()/1000000))
 				if self.curlayer.get_preset_name():
 					self.screens['control'].show()
-				logging.error("2222 "+str(time.time_ns()/1000))
+				logging.error("2222 "+str(time.time_ns()/1000000))
 
 				if self.screens['layer'].auto_next_screen:
 					if modal:
@@ -748,11 +748,11 @@ class zynthian_gui(QObject):
 						self.show_modal('layer')
 					else:
 						self.show_screen('layer')
-				logging.error("3333 "+str(time.time_ns()/1000))
+				logging.error("3333 "+str(time.time_ns()/1000000))
 				# If there is only one bank, jump to preset selection
 				if len(self.curlayer.bank_list)<=1:
 					self.screens['bank'].select_action(0)
-				logging.error("4444 "+str(time.time_ns()/1000))
+				logging.error("4444 "+str(time.time_ns()/1000000))
 
 
 	def show_control(self):

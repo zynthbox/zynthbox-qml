@@ -2224,7 +2224,7 @@ if __name__ == "__main__":
 	palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
 	app.setPalette(palette)
 
-	zyngui.show_screen('layer')
+	zyngui.show_screen('main')
 	zyngui.screens['preset'].disable_show_fav_presets()
 
 	engine.rootContext().setContextProperty("zynthian", zyngui)

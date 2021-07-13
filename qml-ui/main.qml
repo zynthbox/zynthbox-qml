@@ -129,7 +129,7 @@ Kirigami.AbstractApplicationWindow {
                     enabled: screensLayer.currentIndex > 0 || screensLayer.layers.depth > 1
                     opacity: enabled ? 1 : 0.3
                     onClicked: {
-                        if (root.currentPage && root.currentPage.previousScreen.length > 0) {
+                        if (root.currentPage && root.currentPage.hasOwnProperty("previousScreen") && root.currentPage.previousScreen.length > 0) {
                             if (screensLayer.layers.depth > 1) {
                                 zynthian.current_modal_screen_id = root.currentPage.previousScreen;
                             } else {

@@ -37,6 +37,10 @@ Kirigami.PageRow {
     defaultColumnWidth: width
     globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 
+    Component.onCompleted: {
+		zynthian.current_screen_id_changed()
+	}
+
     data: [
         Connections {
             target: zynthian

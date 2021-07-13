@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.SelectorPage {
-    selectorId: "layer_options"
+    screenId: "layer_options"
 }
 
 

@@ -28,25 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-MainRowLayout {
-    id: root
-    width: 500
-    height: 200
-    Repeater {
-        model: 10
-        Rectangle {
-            id: rectangle
-            property string title: "Page " + index
-            color: index == root.currentIndex ? "red" : "green"
-            radius: 20
-            implicitWidth: Math.floor(root.width / 3)
-            ColumnLayout {
-                anchors.centerIn: parent
-                QQC2.Button {
-                    text: "Grow"
-                    onClicked: rectangle.implicitWidth += 10
-                }
-            }
-        }
-    }
+import "../components" as ZComponents
+
+ZComponents.SelectorPage {
+    screenId: "main"
 }

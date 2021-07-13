@@ -35,7 +35,7 @@ Kirigami.Page {
     title: zynthian.control.selector_path_element
     // title: "Control"
 
-    property alias selectorId: mainView.selectorId
+    property alias screenId: mainView.screenId
     property string iconName
 
     signal currentScreenIdRequested()
@@ -65,7 +65,7 @@ Kirigami.Page {
         }
         ZComponents.SelectorView {
             id: mainView
-            selectorId: "control"
+            screenId: "control"
             Layout.fillWidth: true
             Layout.fillHeight: true
             onCurrentScreenIdRequested: root.currentScreenIdRequested()

@@ -37,9 +37,9 @@ QQC2.ScrollView {
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
 
-    property string selectorId
+    property string screenId
     //TODO: Bind the base selector type to qml?
-    readonly property QtObject selector: selectorId.length > 0 ? zynthian[selectorId] : null
+    readonly property QtObject selector: screenId.length > 0 ? zynthian[screenId] : null
     signal currentScreenIdRequested()
     signal itemActivated(int index)
     signal itemActivatedSecondary(int index)

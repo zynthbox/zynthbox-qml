@@ -35,20 +35,20 @@ Kirigami.Page {
     visible: true
     title: root.selector.selector_path_element
 
-    property string iconName
+    property string previousScreen
     property alias view: view.view
     property alias model: view.model
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
 
-    property alias selectorId: view.selectorId
+    property alias screenId: view.screenId
     //TODO: Bind the base selector type to qml?
     property alias selector: view.selector
     signal currentScreenIdRequested()
     signal itemActivated(int index)
     signal itemActivatedSecondary(int index)
 
-    bottomPadding: Kirigami.Units.smallSpacing
+    bottomPadding: Kirigami.Units.largeSpacing
     Component.onCompleted: view.forceActiveFocus()
 
     onFocusChanged: {

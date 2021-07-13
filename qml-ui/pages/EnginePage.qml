@@ -31,5 +31,5 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.SelectorPage {
-    selectorId: "engine"
+    screenId: "engine"
 }

@@ -33,8 +33,29 @@ QQC2.ToolBar {
     property alias leftHeaderControl: leftHeaderControl.contentItem
     property alias rightHeaderControl: rightHeaderControl.contentItem
     property QQC2.StackView layerManager
-    readonly property Item pageRow: layerManager.currentItem
+    readonly property Item pageRow: layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
 
+    onPageRowChanged: syncConnection.syncBreadCrumb()
+    Component.onCompleted: syncConnection.syncBreadCrumb()
+    Connections {
+        id: syncConnection
+        target: root.pageRow
+        onDepthChanged: syncBreadCrumb()
+        function syncBreadCrumb() {
+            breadcrumbModel.clear();
+            for (var i = 0; i < root.pageRow.depth; ++i) {
+                let page = root.pageRow.get(i);
+                if (page.hasOwnProperty("screenIds")) {
+                    for (var j = 0; j < page.screenIds.length; ++j) {
+                        let id = page.screenIds[j];
+                        breadcrumbModel.append({"screenId": id});
+                    }
+                } else {
+                    breadcrumbModel.append({"screenId": page.screenId});
+                }
+            }
+        }
+    }
     contentItem: RowLayout {
         QQC2.Control {
             id: leftHeaderControl
@@ -53,10 +74,12 @@ QQC2.ToolBar {
                 id: breadcrumbLayout
                 spacing: 0
                 Repeater {
-                    model: root.pageRow.visibleItems.length
+                    model: ListModel {
+                        id: breadcrumbModel
+                    }
                     QQC2.ToolButton {
                         id: toolButton
-                        text: (index > 0 ? "> " : "") + root.pageRow.visibleItems[index].title
+                        text: (index > 0 ? "> " : "") + zynthian[model.screenId].selector_path_element
                         // HACK to hide home button as there is already one
                         visible: index > 0 || root.layerManager.depth > 1
                         checked: root.pageRow.currentIndex === index
@@ -86,7 +109,11 @@ QQC2.ToolBar {
                             }
                         }
                         onClicked: {
-                            root.pageRow.currentIndex = index
+                            if (root.layerManager.depth > 1) {
+                                zynthian.current_modal_screen_id = model.screenId;
+                            } else {
+                                zynthian.current_screen_id = model.screenId;
+                            }
                         }
                         onCheckedChanged: {
                             if (checked) {

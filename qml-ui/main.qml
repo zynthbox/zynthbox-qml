@@ -37,6 +37,9 @@ Kirigami.AbstractApplicationWindow {
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
+    function showConfirmationDialog() {
+        confirmDialog.open()
+    }
 
     width: screen.width
     height: screen.height
@@ -146,9 +149,9 @@ Kirigami.AbstractApplicationWindow {
                     opacity: enabled ? 1 : 0.3
                     text: qsTr("Layers")
                     onClicked: {
-						zynthian.current_screen_id = "layer"
-						screensLayer.currentIndex = 1;
-					}
+                        zynthian.current_screen_id = "layer"
+                        screensLayer.currentIndex = 1;
+                    }
                 }
                 QQC2.ToolButton {
                     Layout.preferredWidth: root.width/4

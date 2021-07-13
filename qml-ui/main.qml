@@ -145,7 +145,10 @@ Kirigami.AbstractApplicationWindow {
                     //enabled: layersPage.visible
                     opacity: enabled ? 1 : 0.3
                     text: qsTr("Layers")
-                    onClicked: zynthian.current_screen_id = "layer"
+                    onClicked: {
+						zynthian.current_screen_id = "layer"
+						screensLayer.currentIndex = 1;
+					}
                 }
                 QQC2.ToolButton {
                     Layout.preferredWidth: root.width/4

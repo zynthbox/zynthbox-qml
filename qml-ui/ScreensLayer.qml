@@ -38,8 +38,8 @@ Kirigami.PageRow {
     globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
 
     Component.onCompleted: {
-		zynthian.current_screen_id_changed()
-	}
+        zynthian.current_screen_id_changed()
+    }
 
     data: [
         Connections {

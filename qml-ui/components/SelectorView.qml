@@ -74,35 +74,7 @@ QQC2.ScrollView {
 
         model: root.selector.selector_list
 
-        delegate: Kirigami.BasicListItem {
-            width: view.width
-            label: model.display
-            reserveSpaceForIcon: false
-
-            checkable: false
-            checked: root.currentIndex === index
-            highlighted: root.currentIndex === index
-            activeBackgroundColor: view.activeFocus ? Kirigami.Theme.highlightColor : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4)
-            onClicked: {
-                let oldCurrent_screen_id = zynthian.current_screen_id;
-                root.selector.current_index = index;
-                root.selector.activate_index(index);
-                root.itemActivated(index)
-                // if the activation didn't explicitly ask for a new screen, set the current as this
-                if (zynthian.current_screen_id === oldCurrent_screen_id) {
-                    root.currentScreenIdRequested()
-                }
-            }
-            onPressAndHold: {
-                let oldCurrent_screen_id = zynthian.current_screen_id;
-                root.selector.current_index = index;
-                root.selector.activate_index_secondary(index);
-                root.itemActivatedSecondary(index)
-                if (zynthian.current_screen_id === oldCurrent_screen_id) {
-                    root.currentScreenIdRequested()
-                }
-            }
-        }
+        delegate: SelectorDelegate {}
     }
 
     background: Rectangle {
@@ -112,23 +84,23 @@ QQC2.ScrollView {
             : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
         radius: Kirigami.Units.gridUnit/2
         Kirigami.Separator {
-			anchors {
-				left: parent.left
-				right: parent.right
-				top: parent.top
-				topMargin: parent.radius
-			}
-			visible: !view.atYBeginning
-		}
-		Kirigami.Separator {
-			anchors {
-				left: parent.left
-				right: parent.right
-				bottom: parent.bottom
-				bottomMargin: parent.radius
-			}
-			visible: !view.atYEnd
-		}
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                topMargin: parent.radius
+            }
+            visible: !view.atYBeginning
+        }
+        Kirigami.Separator {
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+                bottomMargin: parent.radius
+            }
+            visible: !view.atYEnd
+        }
     }
 }
 

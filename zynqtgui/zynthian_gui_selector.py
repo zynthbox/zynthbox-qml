@@ -128,7 +128,8 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.list_model.set_entries(self.list_data)
 		return self.list_model
 
-	# TODO: remove?
+	# TODO: should become load/reload or something like that
+	@Slot('void')
 	def show(self):
 		self.fill_list()
 		self.set_selector()

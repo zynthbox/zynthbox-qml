@@ -30,16 +30,12 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "../components" as ZComponents
 
-Kirigami.Page {
+ZComponents.ScreenPage {
     id: root
     title: zynthian.control.selector_path_element
-    // title: "Control"
 
-    property alias screenId: mainView.screenId
-    property string previousScreen
+    screenId: "control"
 
-    signal currentScreenIdRequested()
-    signal itemActivated(int index)
     Component.onCompleted: {
         mainView.forceActiveFocus()
     }
@@ -65,10 +61,11 @@ Kirigami.Page {
         }
         ZComponents.SelectorView {
             id: mainView
-            screenId: "control"
+            screenId: root.screenId
             Layout.fillWidth: true
             Layout.fillHeight: true
-            onCurrentScreenIdRequested: root.currentScreenIdRequested()
+            onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
+			onItemActivated: root.itemActivated(root.screenId, index)
         }
         ColumnLayout {
             Layout.maximumWidth: Math.floor(root.width / 4)

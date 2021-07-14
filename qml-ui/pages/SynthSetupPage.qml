@@ -31,6 +31,34 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.MultiSelectorPage {
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Synths")
+            onTriggered: zynthian.layer.select_engine()
+        },
+        Kirigami.Action {
+            text: qsTr("Effects")
+            Kirigami.Action {
+                text: qsTr("Add Audio-FX")
+                onTriggered: {
+                    zynthian.layer_options.show() //FIXME: that show() method should change name
+                    zynthian.layer_options.audiofx_add()
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Add MIDI-FX")
+                onTriggered: {
+                    zynthian.layer_options.show() //FIXME: that show() method should change name
+                    zynthian.layer_options.midifx_add()
+                }
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Edit")
+            onTriggered: zynthian.current_screen_id = "control"
+        }
+    ]
+
     screenIds: ["layer", "bank", "preset"]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId

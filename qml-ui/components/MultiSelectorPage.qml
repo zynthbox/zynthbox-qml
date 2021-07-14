@@ -29,18 +29,13 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.5 as Kirigami
 
 
-Kirigami.Page {
+ScreenPage {
     id: root
 
     visible: true
     title: qsTr("Synth")
 
     property var screenIds: []
-    property string previousScreen
-
-    signal currentScreenIdRequested(string screenId)
-    signal itemActivated(string screenId, int index)
-    signal itemActivatedSecondary(string screenId, int index)
 
     bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: focusConnection.syncFocus()

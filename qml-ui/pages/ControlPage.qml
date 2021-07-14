@@ -49,7 +49,7 @@ Kirigami.Page {
         }
     }
 
-    bottomPadding: Kirigami.Units.largeSpacing
+    bottomPadding: Kirigami.Units.gridUnit
     contentItem: RowLayout {
         ColumnLayout {
             Layout.maximumWidth: Math.floor(root.width / 4)

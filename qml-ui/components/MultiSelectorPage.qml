@@ -42,7 +42,7 @@ Kirigami.Page {
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
 
-    bottomPadding: Kirigami.Units.largeSpacing
+    bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: focusConnection.syncFocus()
 
     onFocusChanged: {
@@ -73,7 +73,7 @@ Kirigami.Page {
 
     contentItem: RowLayout {
         id: layout
-        spacing: Kirigami.Units.largeSpacing
+        spacing: Kirigami.Units.gridUnit
         Repeater {
             model: root.screenIds
             delegate: ColumnLayout {

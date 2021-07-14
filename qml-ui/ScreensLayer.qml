@@ -60,13 +60,9 @@ Kirigami.PageRow {
 
                 for (var i = 0; i < root.depth; ++i) {
                     let child = root.get(i);
-                    if (child.hasOwnProperty("screenId")) {
-                        if (child.screenId === zynthian.current_screen_id) {
-                            root.currentIndex = i;
-                            return;
-                        }
+
                     // It's a MultiSelectorPage
-                    } else if (child.hasOwnProperty("screenIds")) {
+                    if (child.hasOwnProperty("screenIds")) {
                         var j; // if (.. in ..) doesn't work
                         for (j in child.screenIds) {
                             let id = child.screenIds[j];
@@ -76,6 +72,11 @@ Kirigami.PageRow {
                             }
                         }
                         if (zynthian.current_screen_id in child.screenIds) {
+                            root.currentIndex = i;
+                            return;
+                        }
+                    } else if (child.hasOwnProperty("screenId")) {
+                        if (child.screenId === zynthian.current_screen_id) {
                             root.currentIndex = i;
                             return;
                         }

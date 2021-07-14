@@ -29,24 +29,18 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.5 as Kirigami
 
 
-Kirigami.Page {
+ScreenPage {
     id: root
 
     visible: true
     title: root.selector.selector_path_element
 
-    property string previousScreen
-    property alias view: view.view
-    property alias model: view.model
+    //TODO: Bind the base selector type to qml?
+    readonly property alias selector: view.selector
+
+    readonly property alias view: view.view
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
-
-    property alias screenId: view.screenId
-    //TODO: Bind the base selector type to qml?
-    property alias selector: view.selector
-    signal currentScreenIdRequested()
-    signal itemActivated(int index)
-    signal itemActivatedSecondary(int index)
 
     bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: view.forceActiveFocus()
@@ -57,20 +51,14 @@ Kirigami.Page {
         }
     }
 
-    header: Kirigami.Heading {
-        level: 2
-        text: root.selector.caption
-        leftPadding: root.leftPadding + Kirigami.Units.largeSpacing
-        visible: false
-    }
-
     contentItem: SelectorView {
         id: view
-        //Layout.fillHeight: true
-        //Layout.maximumWidth: Math.floor(root.width / 4) * 3
-        //Layout.minimumWidth: Layout.maximumWidth
-        onCurrentScreenIdRequested: root.currentScreenIdRequested()
-        onItemActivated: root.itemActivated(index)
-        onItemActivatedSecondary: root.itemActivatedSecondary(index)
+
+        screenId: root.screenId
+        implicitHeight: 1
+
+        onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
+        onItemActivated: root.itemActivated(root.screenId, index)
+        onItemActivatedSecondary: root.itemActivatedSecondary(root.screenId, index)
     }
 }

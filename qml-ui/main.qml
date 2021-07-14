@@ -37,8 +37,21 @@ Kirigami.AbstractApplicationWindow {
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
+
     function showConfirmationDialog() {
         confirmDialog.open()
+    }
+
+    function goBack() {
+        if (root.currentPage && root.currentPage.hasOwnProperty("previousScreen") && root.currentPage.previousScreen.length > 0) {
+            if (screensLayer.layers.depth > 1) {
+                zynthian.current_modal_screen_id = root.currentPage.previousScreen;
+            } else {
+                zynthian.current_screen_id = root.currentPage.previousScreen;
+            }
+        } else {
+            zynthian.go_back();
+        }
     }
 
     width: screen.width
@@ -103,7 +116,11 @@ Kirigami.AbstractApplicationWindow {
         anchors.fill: parent
     }
 
+    footer: ZComponents.ActionBar {
+        currentPage: root.currentPage
+    }
     //FIXME: reimplement this toolbar
+    /*
     footer: ColumnLayout {
         spacing: 0
         QQC2.ToolBar {
@@ -177,6 +194,6 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
         }
-    }
+    }*/
 }
 

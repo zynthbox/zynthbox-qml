@@ -30,6 +30,8 @@ import logging
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
+from PySide2.QtCore import Qt, Slot
+
 #------------------------------------------------------------------------------
 # Zynthian Layer Options GUI Class
 #------------------------------------------------------------------------------
@@ -301,6 +303,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 	# FX-Chain management
 
+	@Slot('void')
 	def audiofx_add(self):
 		midi_chan=self.layer.midi_chan
 		self.zyngui.screens['layer'].add_fxchain_layer(midi_chan)
@@ -364,6 +367,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 	# MIDI-Chain management
 
+	@Slot('void')
 	def midifx_add(self):
 		midi_chan=self.layer.midi_chan
 		self.zyngui.screens['layer'].add_midichain_layer(midi_chan)

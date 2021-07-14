@@ -26,17 +26,24 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.5 as Kirigami
 
-import "../components" as ZComponents
 
-ZComponents.SelectorPage {
-    screenId: "main"
-    backAction.visible: false
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Synth Setup")
-            onTriggered: zynthian.current_screen_id = "layer"
-        }
-    ]
+Kirigami.Page {
+    id: root
+
+    property Kirigami.Action backAction: Kirigami.Action {
+		text: qsTr("Back")
+		onTriggered: applicationWindow().goBack()
+	}
+    property string previousScreen
+
+    property string screenId
+
+    signal currentScreenIdRequested(string screenId)
+    signal itemActivated(string screenId, int index)
+    signal itemActivatedSecondary(string screenId, int index)
+
+    bottomPadding: Kirigami.Units.gridUnit
+
 }

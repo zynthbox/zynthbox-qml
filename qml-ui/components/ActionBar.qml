@@ -28,15 +28,26 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../components" as ZComponents
+QQC2.ToolBar {
+    id: root
 
-ZComponents.SelectorPage {
-    screenId: "main"
-    backAction.visible: false
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Synth Setup")
-            onTriggered: zynthian.current_screen_id = "layer"
+    property Item currentPage
+    background.opacity: 0.4
+    padding: Kirigami.Units.smallSpacing
+
+    contentItem: RowLayout {
+        spacing: Kirigami.Units.smallSpacing
+        ActionButton {
+            kirigamiAction: root.currentPage && root.currentPage.backAction ? root.currentPage.backAction : null
         }
-    ]
+        ActionButton {
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
+        }
+        ActionButton {
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 1 ? root.currentPage.contextualActions[1] : null
+        }
+        ActionButton {
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
+        }
+    }
 }

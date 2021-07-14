@@ -27,7 +27,7 @@ import sys
 import logging
 from datetime import datetime
 
-from PySide2.QtCore import Qt, Property, Signal, Slot, QObject, QStringListModel, QTimer
+from PySide2.QtCore import Qt, Property, Signal, Slot, QObject, QByteArray, QTimer, QAbstractListModel
 
 # Zynthian specific modules
 from zyngine import zynthian_controller
@@ -36,6 +36,53 @@ from . import zynthian_gui_config
 from . import zynthian_gui_controller
 
 import traceback
+
+
+#------------------------------------------------------------------------------
+# Model Class for the selector list
+#------------------------------------------------------------------------------
+
+class selector_list_model(QAbstractListModel):
+	DISPLAY = Qt.DisplayRole
+	ACTION_ID = Qt.UserRole + 1
+	ENTRY_INDEX = Qt.UserRole + 3
+
+	def __init__(self, parent=None):
+		super(selector_list_model, self).__init__(parent)
+		self.entries = []
+
+	def set_entries(self, entries):
+		self.beginResetModel()
+		self.entries = entries
+		self.endResetModel()
+
+	def roleNames(self):
+		keys = {
+			selector_list_model.DISPLAY : QByteArray(b'display'),
+			selector_list_model.ACTION_ID : QByteArray(b'action_id'),
+			selector_list_model.ENTRY_INDEX : QByteArray(b'entry_index'),
+			}
+		return keys
+
+	def rowCount(self, index):
+		return len(self.entries)
+
+	def data(self, index, role):
+		if not index.isValid():
+			return None
+
+		if index.row() > len(self.entries):
+			return None
+
+		entry = self.entries[index.row()]
+		if role == selector_list_model.DISPLAY:
+			return entry[2]
+		elif role == selector_list_model.ACTION_ID:
+			return entry[0]
+		elif role == selector_list_model.ENTRY_INDEX:
+			return entry[1]
+		else:
+			return None
 
 #------------------------------------------------------------------------------
 # Zynthian Listbox Selector GUI Class
@@ -56,7 +103,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 		last_index_change_ts = datetime.min
 		self.selector_caption=selcap
-		self.list_model = QStringListModel()
+		self.list_model = selector_list_model(self)
 
 		self.auto_activation_timer = QTimer(self)
 		self.auto_activation_timer.setInterval(300)
@@ -65,11 +112,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.screen_at_timer_start = None
 
 	def get_selector_list(self):
-		l = []
-		for item in self.list_data:
-			l.append(item[2])
-
-		self.list_model.setStringList(l)
+		self.list_model.set_entries(self.list_data)
 		return self.list_model
 
 	# TODO: remove?
@@ -113,9 +156,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 
 	def fill_list(self):
+		self.list_model.set_entries(self.list_data)
 		self.select()
 		self.last_index_change_ts = datetime.min
-		self.selector_list_changed.emit()
 
 
 	def update_list(self):
@@ -264,12 +307,11 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 				self.zyngui.zynswitch_defered('L',2)
 
 
-	selector_list_changed = Signal()
 	current_index_changed = Signal()
 	selector_path_changed = Signal()
 	selector_path_element_changed = Signal()
 
-	selector_list = Property(QObject, get_selector_list, notify = selector_list_changed)
+	selector_list = Property(QObject, get_selector_list, constant = True)
 	current_index = Property(int, get_current_index, set_current_index, notify = current_index_changed)
 	selector_path = Property(str, get_selector_path, notify = selector_path_changed)
 	selector_path_element = Property(str, get_selector_path_element, notify = selector_path_element_changed)

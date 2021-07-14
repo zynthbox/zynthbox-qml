@@ -27,7 +27,7 @@ import sys
 import logging
 from datetime import datetime
 
-from PySide2.QtCore import Qt, Property, Signal, Slot, QObject, QByteArray, QTimer, QAbstractListModel
+from PySide2.QtCore import Qt, Property, Signal, Slot, QObject, QByteArray, QTimer, QAbstractListModel, QModelIndex
 
 # Zynthian specific modules
 from zyngine import zynthian_controller
@@ -52,9 +52,22 @@ class selector_list_model(QAbstractListModel):
 		self.entries = []
 
 	def set_entries(self, entries):
-		self.beginResetModel()
-		self.entries = entries
-		self.endResetModel()
+		was_empty = len(self.entries) == 0
+
+		if len(entries) > len(self.entries):
+			self.beginInsertRows(QModelIndex(), len(self.entries), len(entries)-1)
+			self.entries = entries
+			self.endInsertRows()
+		elif len(entries) < len(self.entries):
+			self.beginRemoveRows(QModelIndex(), len(entries), len(self.entries)-1)
+			self.entries = entries
+			self.endRemoveRows()
+		else:
+			self.entries = entries
+
+		if not was_empty:
+			self.dataChanged.emit(self.index(0,0), self.index(min(len(entries), len(self.entries)) - 1, 0))
+
 
 	def roleNames(self):
 		keys = {

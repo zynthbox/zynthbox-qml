@@ -36,6 +36,7 @@ Kirigami.PageRow {
     id: root
     defaultColumnWidth: width
     globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
+    separatorVisible: false
 
     data: [
         Connections {

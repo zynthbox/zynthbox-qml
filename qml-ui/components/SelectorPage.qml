@@ -48,7 +48,7 @@ Kirigami.Page {
     signal itemActivated(int index)
     signal itemActivatedSecondary(int index)
 
-    bottomPadding: Kirigami.Units.largeSpacing
+    bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: view.forceActiveFocus()
 
     onFocusChanged: {

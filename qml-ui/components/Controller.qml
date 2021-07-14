@@ -38,6 +38,20 @@ Card {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
+    readonly property string valueType: {
+        //FIXME: Ugly heuristics
+        if (!root.controller) {
+            return "int";
+        }
+        if (root.controller.value_type === "int" && root.controller.max_value - root.controller.value0 === 1) {
+            return "bool";
+        }
+        if (root.controller.value_print === "on" || root.controller.value_print === "off") {
+            return "bool";
+        }
+        return root.controller.value_type;
+    }
+
     contentItem: ColumnLayout {
         Kirigami.Heading {
             text: root.controller ? root.controller.title : ""
@@ -58,10 +72,10 @@ Card {
                 }
                 stepSize: root.controller ? (root.controller.step_size === 0 ? 1 : root.controller.step_size) : 0
                 value: root.controller ? root.controller.value : 0
-                from: 0
+                from: root.controller ? root.controller.value0 : 0
                 to: root.controller ? root.controller.max_value : 0
-                scale: root.controller ? root.controller.value_type !== "bool" : 0
-                enabled: root.controller && root.controller.value_type !== "bool"
+                scale: root.valueType !== "bool"
+                enabled: root.valueType !== "bool"
                 onMoved: root.controller.value = value
 
                 // HACK on the default style dial
@@ -99,17 +113,21 @@ Card {
                     }
                     onPositionChanged: {
                         let delta = mouse.y - startY;
-                        root.controller.value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta/(Kirigami.Units.gridUnit*10))));
+                        let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
+                        if (root.valueType === "int" || root.valueType === "bool") {
+                            value = Math.round(value);
+                        }
+                        root.controller.value = value;
                     }
                 }
             }
             QQC2.Switch {
                 id: switchControl
                 anchors.fill: parent
-                scale: root.controller ? root.controller.value_type === "bool" : 0
-                enabled: root.controller && root.controller.value_type === "bool"
-                checked: root.controller && root.controller.value !== 0
-                onToggled: root.controller.value = checked ? 1 : 0
+                scale: root.valueType === "bool"
+                enabled: root.valueType === "bool"
+                checked: root.controller && root.controller.value !== root.controller.value0
+                onToggled: root.controller.value = checked ? root.controller.max_value : root.controller.value0
 
                 // HACK for default style
                 Binding {
@@ -134,10 +152,10 @@ Card {
             }
         }
 
-        /* just for debug purposes
-        QQC2.Label {
-			text: "t"+ root.controller.value_type + " s" + root.controller.step_size + " f"+ root.controller.value0 + "\n t" + root.controller.max_value + " v" +root.controller.value
-		}*/
+        // just for debug purposes
+        /*QQC2.Label {
+            text: "t"+ root.controller.value_type + " s" + root.controller.step_size + " f"+ root.controller.value0 + "\n t" + root.controller.max_value + " v" +root.controller.value
+        }*/
         QQC2.Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter

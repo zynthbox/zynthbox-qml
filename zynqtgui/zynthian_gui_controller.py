@@ -105,7 +105,7 @@ class zynthian_gui_controller(QObject):
 			try:
 				if self.zctrl.ticks:
 					if self.selmode:
-						i = val
+						i = int(val)
 						valplot=self.scale_plot*val
 						val=self.zctrl.ticks[i]
 					elif self.inverted:

@@ -90,6 +90,7 @@ Kirigami.AbstractApplicationWindow {
         contentItem: Kirigami.Heading {
             level: 2
             text: zynthian.confirm.text
+            wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }

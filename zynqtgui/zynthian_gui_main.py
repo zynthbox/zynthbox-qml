@@ -55,13 +55,13 @@ class zynthian_gui_main(zynthian_gui_selector):
 			self.list_data.append((self.auto_eq,0,"Auto EQ (alpha)"))
 
 		# Snapshot Management
-		self.list_data.append((None,0,"-----------------------------"))
+		self.list_data.append((None,0,""))
 		self.list_data.append((self.load_snapshot,0,"Load Snapshot"))
 		if len(self.zyngui.screens['layer'].layers)>0:
 			self.list_data.append((self.save_snapshot,0,"Save Snapshot"))
 			self.list_data.append((self.clean_all,0,"CLEAN ALL"))
 
-		self.list_data.append((None,0,"-----------------------------"))
+		self.list_data.append((None,0,""))
 		self.list_data.append((self.admin,0,"Admin"))
 
 		super().fill_list()

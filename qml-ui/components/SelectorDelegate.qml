@@ -34,9 +34,8 @@ Kirigami.BasicListItem {
     label: model.display
     reserveSpaceForIcon: false
 
-    checkable: false
-    checked: ListView.isCurrentItem
-    highlighted: checked
+    enabled: model.action_id !== undefined
+    highlighted: ListView.isCurrentItem
 
     activeBackgroundColor: (ListView.view.activeFocus && !pressed || !ListView.view.activeFocus && pressed)
         ? Kirigami.Theme.highlightColor

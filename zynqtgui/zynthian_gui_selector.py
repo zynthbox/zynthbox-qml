@@ -119,7 +119,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.list_model = selector_list_model(self)
 
 		self.auto_activation_timer = QTimer(self)
-		self.auto_activation_timer.setInterval(300)
+		self.auto_activation_timer.setInterval(250)
 		self.auto_activation_timer.setSingleShot(True)
 		self.auto_activation_timer.timeout.connect(self.auto_activation_timeout)
 		self.screen_at_timer_start = None

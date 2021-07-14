@@ -130,7 +130,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 			if self.layer.engine.type!='MIDI Tool': 
 				# Add separator
-				self.list_data.append((None,None,"-----------------------------"))
+				self.list_data.append((None,None,""))
 
 				# Add Audio-FX options
 				if self.layer.midi_chan is not None:
@@ -150,7 +150,7 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 
 			if self.layer.engine.type in ('MIDI Synth', 'MIDI Tool', 'Special') and self.layer.engine.nickname!='MD':
 				# Add separator
-				self.list_data.append((None,None,"-----------------------------"))
+				self.list_data.append((None,None,""))
 
 				# Add MIDI-FX options
 				if self.layer.midi_chan is not None:

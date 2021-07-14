@@ -80,18 +80,17 @@ Kirigami.Page {
                 property alias view: view
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                // NOTE: this is to make fillWidth always partition the space in equal sizes
+                implicitWidth: 1
+                Layout.preferredWidth: 1
                 Kirigami.Heading {
                     level: 2
                     text: view.selector.caption
-                    //leftPadding: root.leftPadding + Kirigami.Units.largeSpacing
-                    //visible: false
                 }
                 SelectorView {
                     id: view
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    //Layout.maximumWidth: Math.floor(root.width / 4) * 3
-                    //Layout.minimumWidth: Layout.maximumWidth
                     screenId: modelData
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)

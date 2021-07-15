@@ -39,10 +39,10 @@ ZComponents.MultiSelectorPage {
         Kirigami.Action {
             text: qsTr("Effects")
             Kirigami.Action {
-                text: qsTr("Add Audio-FX")
+                text: qsTr("Audio-FX")
                 onTriggered: {
                     zynthian.layer_options.show() //FIXME: that show() method should change name
-                    zynthian.layer_options.audiofx_add()
+                    zynthian.show_modal("layer_effects")
                 }
             }
             Kirigami.Action {

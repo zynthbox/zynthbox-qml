@@ -87,6 +87,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.zyngine_counter = 0
 		self.zyngines = OrderedDict()
 		self.set_engine_type("MIDI Synth")
+		self.only_categories = False
+		self.single_category = None
 
 
 	def set_engine_type(self, etype):
@@ -129,17 +131,24 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		
 		for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
 			# Add category header...
-			if cat:
+			if cat and self.single_category == None:
 				if self.engine_type=="MIDI Synth":
-					self.list_data.append((None,len(self.list_data),"> LV2 {}".format(cat)))
+					if self.only_categories:
+						self.list_data.append((cat,len(self.list_data),"LV2 {}".format(cat)))
+					else:
+						self.list_data.append((None,len(self.list_data),"> LV2 {}".format(cat)))
 				else:
-					self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
+					if self.only_categories:
+						self.list_data.append((cat,len(self.list_data),format(cat)))
+					else:
+						self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
-			# Add engines on this category...
-			for eng, info in infos.items():
-				# For some engines, check if needed channels are free ...
-				if eng not in self.check_channels_engines or all(chan in self.zyngui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
-					self.list_data.append((eng,len(self.list_data),info[1],info[0]))
+			if not self.only_categories and (self.single_category == None or self.single_category == cat):
+				# Add engines on this category...
+				for eng, info in infos.items():
+					# For some engines, check if needed channels are free ...
+					if eng not in self.check_channels_engines or all(chan in self.zyngui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
+						self.list_data.append((eng,len(self.list_data),info[1],info[0]))
 
 		# Display help if no engines are enabled ...
 		if len(self.list_data)==0:

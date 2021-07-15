@@ -81,7 +81,7 @@ ScreenPage {
                 Layout.preferredWidth: 1
                 Kirigami.Heading {
                     level: 2
-                    text: root.screenTitles.length >= index ? root.screenTitles[index] : view.selector.caption
+                    text: root.screenTitles.length > index ? root.screenTitles[index] : view.selector.caption
                 }
                 SelectorView {
                     id: view

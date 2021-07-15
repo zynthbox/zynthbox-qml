@@ -5,7 +5,7 @@
 # 
 # Zynthian GUI Option Selector Class
 # 
-# Copyright (C) 2015-2020 Fernando Moyano <jofemodo@zynthian.org>
+# Copyright (C) 2021 Marco Martin <mart@kde.org>
 #
 #******************************************************************************
 # 
@@ -27,43 +27,51 @@ import sys
 import logging
 
 # Zynthian specific modules
-from . import zynthian_gui_selector
+from . import zynthian_gui_engine
 
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_option(zynthian_gui_selector):
+class zynthian_gui_effect_types(zynthian_gui_engine):
 
 	def __init__(self, parent = None):
-		super(zynthian_gui_option, self).__init__('Option', parent)
-		self.title = ""
-		self.options = []
-		self.cb_select = None
+		super(zynthian_gui_effect_types, self).__init__(parent)
 
+		self.selector_caption = "FX Type"
 
-	def config(self, title, options, cb_select):
-		self.title = title
-		self.options = options
-		self.cb_select = cb_select
+		if self.zyngui.curlayer:
+			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+		self.only_categories = True
 
-
-	def fill_list(self):
-		i=0
-		self.list_data=[]
-		for k,v in self.options.items():
-			self.list_data.append((v,i,k))
-			i += 1
-		super().fill_list()
-
+	def show(self):
+		if self.zyngui.curlayer:
+			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+		super().show()
+		self.select_action(self.index)
 
 	def select_action(self, i, t='S'):
-		if self.cb_select:
-			self.cb_select(self.list_data[i][0])
+		if i is not None and self.list_data[i][0]:
+			self.zyngui.screens['layer_effect_chooser'].single_category = self.list_data[i][0]
+			self.zyngui.screens['layer_effect_chooser'].show()
+		self.set_select_path()
 
+	def back_action(self):
+		self.zyngui.show_modal('layer_effects')
+
+	def index_supports_immediate_activation(self, index=None):
+		return True
+
+	def select_category_by_name(self, cat):
+		for i, item in enumerate(self.list_data):
+			if item[2] == cat:
+				self.activate_index(i)
+				return
 
 	def set_select_path(self):
-		self.select_path = self.title
-		super().set_select_path()
+		self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX > " + self.list_data[self.index][2]
+		self.select_path_element = self.list_data[self.index][2]
+		self.selector_path_changed.emit()
+		self.selector_path_element_changed.emit()
 
 #------------------------------------------------------------------------------

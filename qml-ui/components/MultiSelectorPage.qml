@@ -36,6 +36,7 @@ ScreenPage {
     title: qsTr("Synth")
 
     property var screenIds: []
+    property var screenTitles: []
 
     bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: focusConnection.syncFocus()
@@ -80,7 +81,7 @@ ScreenPage {
                 Layout.preferredWidth: 1
                 Kirigami.Heading {
                     level: 2
-                    text: view.selector.caption
+                    text: root.screenTitles.length >= index ? root.screenTitles[index] : view.selector.caption
                 }
                 SelectorView {
                     id: view

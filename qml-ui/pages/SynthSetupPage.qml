@@ -60,6 +60,7 @@ ZComponents.MultiSelectorPage {
     ]
 
     screenIds: ["layer", "bank", "preset"]
+    screenTitles: [qsTr("Voices"), qsTr("Banks"), qsTr("Presets")]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
 }

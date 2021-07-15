@@ -99,9 +99,6 @@ from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
 #from zynqtgui.zynthian_gui_selector import zynthian_gui_selector as 
 
 from pathlib import Path
-from layerswrapper import LayersController
-from layerswrapper import LayersListModel
-from controlwrapper import ControlWrapper, ControllerWrapper
 
 
 #-------------------------------------------------------------------------------

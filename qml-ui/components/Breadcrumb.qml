@@ -72,6 +72,7 @@ QQC2.ToolBar {
 
             RowLayout {
                 id: breadcrumbLayout
+                height: breadcrumbFlickable.height
                 spacing: 0
                 Repeater {
                     model: ListModel {
@@ -79,11 +80,24 @@ QQC2.ToolBar {
                     }
                     QQC2.ToolButton {
                         id: toolButton
-                        text: (index > 0 ? "> " : "") + zynthian[model.screenId].selector_path_element
+                        Layout.fillHeight: true
+                        text: zynthian[model.screenId].selector_path_element
                         // HACK to hide home button as there is already one
                         visible: index > 0 || root.layerManager.depth > 1
-                        checked: root.pageRow.currentIndex === index
-                        opacity: checked ? 1 : 0.8
+                        checked: model.screenId === zynthian.current_screen_id;
+                        rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
+                        background: Item {
+                            Image {
+                                id: breadcrumbSeparator
+                                anchors {
+                                    right: parent.right
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+                                source: "img/breadcrumb-separator.svg"
+                            }
+                        }
+                        opacity: checked ? 1 : 0.5
                         checkable: false
                         font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                         Connections {

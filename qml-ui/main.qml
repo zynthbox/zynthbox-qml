@@ -60,10 +60,27 @@ Kirigami.AbstractApplicationWindow {
     header: ZComponents.Breadcrumb {
         layerManager: screensLayer.layers
         leftHeaderControl: QQC2.Button {
-                implicitWidth: height
-                icon.name: "go-home"
-                onClicked: zynthian.current_screen_id = 'main'
+            id: homeButton
+            implicitWidth: height
+            icon.name: "go-home"
+            onClicked: zynthian.current_screen_id = 'main'
+            checkable: false
+            checked: zynthian.current_screen_id === 'main'
+            opacity: checked ? 1 : 0.5
+            rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
+            background: Item {
+                Image {
+                    id: breadcrumbSeparator
+                    parent: homeButton.background
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    source: "components/img/breadcrumb-separator.svg"
+                }
             }
+        }
         rightHeaderControl: ZComponents.StatusInfo {}
     }
     pageStack: screensLayer

@@ -68,6 +68,9 @@ from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
+from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
+from zynqtgui.zynthian_gui_effect_types import zynthian_gui_effect_types
+from zynqtgui.zynthian_gui_layer_effect_chooser import zynthian_gui_layer_effect_chooser
 from zynqtgui.zynthian_gui_engine import zynthian_gui_engine
 from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan
 from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
@@ -484,6 +487,9 @@ class zynthian_gui(QObject):
 		self.screens['engine'] = zynthian_gui_engine(self)
 		self.screens['layer'] = zynthian_gui_layer(self)
 		self.screens['layer_options'] = zynthian_gui_layer_options(self)
+		self.screens['layer_effects'] = zynthian_gui_layer_effects(self)
+		self.screens['effect_types'] = zynthian_gui_effect_types(self)
+		self.screens['layer_effect_chooser'] = zynthian_gui_layer_effect_chooser(self)
 		self.screens['snapshot'] = zynthian_gui_snapshot(self)
 		self.screens['midi_chan'] = zynthian_gui_midi_chan(self)
 		self.screens['midi_cc'] = zynthian_gui_midi_cc(self)
@@ -591,6 +597,7 @@ class zynthian_gui(QObject):
 		self.show_screen()
 
 
+	@Slot(str)
 	def show_modal(self, screen, mode=None):
 		if screen=="alsa_mixer":
 			if self.modal_screen!=screen and self.screens['layer'].amixer_layer:
@@ -2025,6 +2032,15 @@ class zynthian_gui(QObject):
 	def get_layer_options(self):
 		return self.screens['layer_options']
 
+	def get_layer_effects(self):
+		return self.screens['layer_effects']
+
+	def get_effect_types(self):
+		return self.screens['effect_types']
+
+	def get_layer_effect_chooser(self):
+		return self.screens['layer_effect_chooser']
+
 	def get_admin(self):
 		return self.screens['admin']
 
@@ -2056,7 +2072,7 @@ class zynthian_gui(QObject):
 	status_info_changed = Signal()
 
 	current_screen_id = Property(str, get_current_screen_id, show_screen, notify = current_screen_id_changed)
-	current_modal_screen_id = Property(str, get_current_modal_screen_id, notify = current_modal_screen_id_changed)
+	current_modal_screen_id = Property(str, get_current_modal_screen_id, show_modal, notify = current_modal_screen_id_changed)
 
 	is_loading = Property(bool, get_is_loading, notify = is_loading_changed)
 
@@ -2071,6 +2087,9 @@ class zynthian_gui(QObject):
 	engine = Property(QObject, get_engine, constant = True)
 	layer = Property(QObject, get_layer, constant = True)
 	layer_options = Property(QObject, get_layer_options, constant = True)
+	layer_effects = Property(QObject, get_layer_effects, constant = True)
+	effect_types = Property(QObject, get_effect_types, constant = True)
+	layer_effect_chooser = Property(QObject, get_layer_effect_chooser, constant = True)
 	admin = Property(QObject, get_admin, constant = True)
 	snapshot = Property(QObject, get_snapshot, constant = True)
 	midi_chan = Property(QObject, get_midi_chan, constant = True)

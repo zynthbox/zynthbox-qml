@@ -67,6 +67,9 @@ QtObject {
 		"midi_recorder": "MidiRecorderPage.qml",
 		"admin": "AdminPage.qml",
 		"info": "InfoPage.qml",
-		"option": "OptionPage.qml"
+		"option": "OptionPage.qml",
+		"layer_effects": "FXSetupPage.qml",
+		"effect_types": "FXSetupPage.qml",
+		"layer_effect_chooser": "FXSetupPage.qml"
 	}
 }

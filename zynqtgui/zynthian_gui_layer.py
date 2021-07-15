@@ -328,7 +328,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.zyngui.show_modal('engine')
 
 
-	def add_layer_engine(self, eng, midi_chan=None):
+	def add_layer_engine(self, eng, midi_chan=None, select=True):
 		self.add_layer_eng=eng
 
 		if eng=='MD':
@@ -349,7 +349,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.show_modal('midi_chan')
 
 		else:
-			self.add_layer_midich(midi_chan)
+			self.add_layer_midich(midi_chan, select)
 
 
 	def add_layer_midich(self, midich, select=True):

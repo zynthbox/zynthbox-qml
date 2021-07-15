@@ -61,9 +61,9 @@ from zyngine import zynthian_midi_filter
 #from zyngine import zynthian_engine_transport
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthian_gui_controller import zynthian_gui_controller
-#from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
+from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
-#from zynqtgui.zynthian_gui_option import zynthian_gui_option
+from zynqtgui.zynthian_gui_option import zynthian_gui_option
 from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
@@ -480,7 +480,7 @@ class zynthian_gui(QObject):
 		self.screens['info'] = zynthian_gui_info(self)
 		self.screens['confirm'] = zynthian_gui_confirm(self)
 		#self.screens['keyboard'] = zynthian_gui_keyboard(self)
-		#self.screens['option'] = zynthian_gui_option(self)
+		self.screens['option'] = zynthian_gui_option(self)
 		self.screens['engine'] = zynthian_gui_engine(self)
 		self.screens['layer'] = zynthian_gui_layer(self)
 		self.screens['layer_options'] = zynthian_gui_layer_options(self)
@@ -2010,6 +2010,9 @@ class zynthian_gui(QObject):
 	def get_confirm(self):
 		return self.screens['confirm']
 
+	def get_option(self):
+		return self.screens['option']
+
 	def get_main(self):
 		return self.screens['main']
 
@@ -2063,6 +2066,7 @@ class zynthian_gui(QObject):
 
 	info = Property(QObject, get_info, constant = True)
 	confirm = Property(QObject, get_confirm, constant = True)
+	option = Property(QObject, get_option, constant = True)
 	main = Property(QObject, get_main, constant = True)
 	engine = Property(QObject, get_engine, constant = True)
 	layer = Property(QObject, get_layer, constant = True)

@@ -36,11 +36,11 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_option(zynthian_gui_selector):
 
-	def __init__(self):
+	def __init__(self, parent = None):
+		super(zynthian_gui_option, self).__init__('Option', parent)
 		self.title = ""
 		self.options = []
 		self.cb_select = None
-		super().__init__("Option", True)
 
 
 	def config(self, title, options, cb_select):

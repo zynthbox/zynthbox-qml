@@ -81,7 +81,7 @@ QQC2.ToolBar {
                     QQC2.ToolButton {
                         id: toolButton
                         Layout.fillHeight: true
-                        text: zynthian[model.screenId].selector_path_element
+                        text: zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path
                         // HACK to hide home button as there is already one
                         visible: index > 0 || root.layerManager.depth > 1
                         checked: model.screenId === zynthian.current_screen_id;

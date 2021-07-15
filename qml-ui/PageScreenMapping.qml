@@ -67,5 +67,6 @@ QtObject {
 		"midi_recorder": "MidiRecorderPage.qml",
 		"admin": "AdminPage.qml",
 		"info": "InfoPage.qml",
+		"option": "OptionPage.qml"
 	}
 }

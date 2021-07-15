@@ -31,10 +31,10 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 
-Kirigami.ScrollablePage {
+ZComponents.ScrollableScreenPage {
     id: root
     title: qsTr("Info")
-    property string screenId: "info"
+    screenId: "info"
     Component.onCompleted: autoHideTimer.restart()
     Kirigami.Heading {
         level: 3

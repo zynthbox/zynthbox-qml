@@ -34,7 +34,7 @@ ZComponents.MultiSelectorPage {
 
     screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
     previousScreen: "layer"
-    //onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
+    onCurrentScreenIdRequested: zynthian.show_modal(screenId)
 }
 
 

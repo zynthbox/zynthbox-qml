@@ -85,6 +85,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		else:
 			self.zyngui.curlayer.toggle_preset_fav(self.list_data[i])
 			self.update_list()
+			self.zyngui.screens['bank'].fill_list()
 
 	def index_supports_immediate_activation(self, index=None):
 		return True

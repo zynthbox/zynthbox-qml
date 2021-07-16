@@ -37,7 +37,7 @@ Kirigami.BasicListItem {
     enabled: model.action_id !== undefined
     highlighted: ListView.isCurrentItem
 
-    implicitHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
+    //implicitHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
 
     activeBackgroundColor: (ListView.view.activeFocus && !pressed || !ListView.view.activeFocus && pressed)
         ? Kirigami.Theme.highlightColor

@@ -47,6 +47,8 @@ Kirigami.PageRow {
                 if (zynthian.current_modal_screen_id === "confirm") {
                     applicationWindow().showConfirmationDialog();
                     return;
+                } else {
+                    applicationWindow().hideConfirmationDialog();
                 }
 
                 // No modal screen anymore

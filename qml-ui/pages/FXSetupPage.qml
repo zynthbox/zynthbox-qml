@@ -34,7 +34,12 @@ ZComponents.MultiSelectorPage {
 
     screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
     previousScreen: "layer"
-    onCurrentScreenIdRequested: zynthian.show_modal(screenId)
+    onCurrentScreenIdRequested: {
+        //FIXME: why this workaround?
+        if (zynthian.current_screen_id != "confirm") {
+            zynthian.show_modal(screenId)
+        }
+    }
 }
 
 

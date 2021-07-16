@@ -48,8 +48,18 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 	def show(self):
 		if self.zyngui.curlayer:
 			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+			self.reset_index = False
 		super().show()
-		self.select_action(self.index)
+
+		if self.zyngui.screens['layer_effects'].audiofx_layer != None and self.zyngui.get_current_screen_id() != 'effect_types':
+			cat = self.engine_info[self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer)][3]
+			for i, item in enumerate(self.list_data):
+				if item[2] == cat:
+					self.activate_index(i)
+					return
+		if self.zyngui.screens['layer_effect_chooser'].single_category == "    ":
+			self.zyngui.screens['layer_effect_chooser'].single_category == self.list_data[0][0]
+		self.zyngui.screens['layer_effect_chooser'].show()
 
 
 	def select_action(self, i, t='S'):
@@ -68,13 +78,6 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 
 	def index_supports_immediate_activation(self, index=None):
 		return True
-
-
-	def select_category_by_name(self, cat):
-		for i, item in enumerate(self.list_data):
-			if item[2] == cat:
-				self.activate_index(i)
-				return
 
 
 	def set_select_path(self):

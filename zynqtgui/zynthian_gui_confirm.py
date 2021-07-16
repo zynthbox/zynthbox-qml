@@ -88,13 +88,6 @@ class zynthian_gui_confirm(QObject):
 		self.zyngui.close_modal()
 
 
-	def cb_yes_push(self, event):
-		self.zyngui.zynswitch_defered('S',3)
-
-
-	def cb_no_push(self, event):
-		self.zyngui.zynswitch_defered('S',1)
-
 	@Slot()
 	def accept(self):
 		self.zyngui.zynswitch_defered('S',3)

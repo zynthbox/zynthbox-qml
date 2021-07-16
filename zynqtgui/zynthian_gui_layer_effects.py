@@ -65,11 +65,15 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 				self.list_data.append((self.audiofx_layer_action, sl, bullet + sl.engine.get_path(sl)))
 				sl0 = sl
 
-		self.list_data.append(('ADD-AUDIOFX',len(self.list_data),"Add Audio-FX"))
-		self.list_data.append(('CLEAR-AUDIOFX',len(self.list_data),"Remove All Audio-FX"))
+
+		if len(self.audiofx_layers) > 0:
+			self.list_data.append(('ADD-SERIAL-AUDIOFX',len(self.list_data),"Add Serial Audio-FX"))
+			self.list_data.append(('ADD-PARALLEL-AUDIOFX',len(self.list_data),"Add Parallel Audio-FX"))
+			self.list_data.append(('CLEAR-AUDIOFX',len(self.list_data),"Remove All Audio-FX"))
+		else:
+			self.list_data.append(('ADD-SERIAL-AUDIOFX',len(self.list_data),"Add Audio-FX"))
 
 		super().fill_list()
-		self.select_action(0)
 
 
 	def next_action(self):
@@ -79,27 +83,26 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		if self.list_data[i][0] == 'CLEAR-AUDIOFX':
 			self.audiofx_reset()
 			return
-		elif self.list_data[i][0] == 'ADD-AUDIOFX':
-			self.zyngui.screens['effect_types'].index = -1
-			self.zyngui.screens['effect_types'].show()
-			self.zyngui.screens['layer_effect_chooser'].single_category = "    "
-			self.zyngui.screens['layer_effect_chooser'].show()
+		elif self.list_data[i][0] == 'ADD-SERIAL-AUDIOFX':
+			self.zyngui.screens['layer_effect_chooser'].layer_chain_parallel = False
+
+		elif self.list_data[i][0] == 'ADD-PARALLEL-AUDIOFX':
+			self.zyngui.screens['layer_effect_chooser'].layer_chain_parallel = True
+
 
 		if i < len(self.audiofx_layers):
 			self.audiofx_layer = self.audiofx_layers[i]
-
 		else:
 			self.audiofx_layer = None
 
 		if self.audiofx_layer != None:
-			self.zyngui.screens['effect_types'].select_category_by_name(self.zyngui.screens['effect_types'].engine_info[self.audiofx_layer.engine.get_path(self.audiofx_layer)][3])
+			self.zyngui.screens['effect_types'].show()
 
 
 	def index_supports_immediate_activation(self, index=None):
 		return index >= 0 and index < len(self.audiofx_layers)
 
 	def audiofx_layer_action(self, layer, t='S'):
-		self.index = 0
 		self.audiofx_layer = layer
 		self.audiofx_layer_index = self.zyngui.screens['layer'].layers.index(layer)
 		self.show()
@@ -114,8 +117,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			i = self.zyngui.screens['layer'].layers.index(sl)
 			self.zyngui.screens['layer'].remove_layer(i)
 
-		self.reset()
-		self.show()
+		self.fill_list()
 
 
 	def set_select_path(self):

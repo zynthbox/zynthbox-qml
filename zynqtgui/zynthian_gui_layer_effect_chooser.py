@@ -39,31 +39,59 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 		super(zynthian_gui_layer_effect_chooser, self).__init__(parent)
 
 		self.selector_caption = "FX"
+		self.layer_chain_parallel = False
 
 		self.single_category = "    " # Hack to get an empty list
 		if self.zyngui.curlayer:
 			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 
-	def select_action(self, i, t='S'):
-		if i is not None and self.list_data[i][0]:
-			self.zyngui.start_loading()
-			if self.zyngui.screens['layer_effects'].audiofx_layer != None:
-				self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens['layer_effects'].audiofx_layer)
-
-			else:
-				self.zyngui.screens['layer'].replace_layer_index = None
-			self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zyngui.curlayer.midi_chan, False)
-			self.zyngui.screens['layer'].replace_layer_index = None
-			self.zyngui.screens['layer_effects'].show()
-			self.zyngui.stop_loading()
-
-	def back_action(self):
-		return 'effect_types'
 
 	def show(self):
 		if self.zyngui.curlayer:
 			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+			self.reset_index = False
+
 		super().show()
+
+		if self.zyngui.screens['layer_effects'].audiofx_layer != None:
+			for i, item in enumerate(self.list_data):
+				if item[0] == self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer):
+					self.select(i)
+					return
+
+				self.select(0)
+		else:
+			self.select(-1)
+
+
+	def select_action(self, i, t='S'):
+		if i is not None and self.list_data[i][0]:
+			self.zyngui.start_loading()
+			if self.zyngui.screens['layer_effects'].audiofx_layer != None and self.zyngui.screens['layer_effects'].audiofx_layer in self.zyngui.screens['layer'].layers:
+				self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens['layer_effects'].audiofx_layer)
+
+			else:
+				self.zyngui.screens['layer'].replace_layer_index = None
+
+			self.zyngui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
+
+			self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zyngui.curlayer.midi_chan, False)
+
+			self.zyngui.screens['layer_effects'].show()
+
+			if self.zyngui.screens['layer'].replace_layer_index is None:
+				self.zyngui.screens['layer_effects'].select_action(len(self.zyngui.screens['layer_effects'].audiofx_layers) - 1)
+			else:
+				self.zyngui.screens['layer_effects'].select_action(self.zyngui.screens['layer'].replace_layer_index)
+
+			self.zyngui.screens['layer'].replace_layer_index = None
+
+			self.zyngui.stop_loading()
+
+
+	def back_action(self):
+		return 'effect_types'
+
 
 	def set_select_path(self):
 		self.select_path = "FX"

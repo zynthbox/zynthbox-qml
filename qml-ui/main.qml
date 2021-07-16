@@ -41,6 +41,9 @@ Kirigami.AbstractApplicationWindow {
     function showConfirmationDialog() {
         confirmDialog.open()
     }
+    function hideConfirmationDialog() {
+        confirmDialog.close()
+    }
 
     function goBack() {
         if (root.currentPage && root.currentPage.hasOwnProperty("previousScreen") && root.currentPage.previousScreen.length > 0) {
@@ -114,6 +117,7 @@ Kirigami.AbstractApplicationWindow {
         x: root.width / 2 - width / 2
         y: root.height / 2 - height / 2
         dim: true
+        modal: true
         width: Math.round(Math.max(implicitWidth, root.width * 0.8))
         height: Math.round(Math.max(implicitHeight, root.height * 0.8))
         contentItem: Kirigami.Heading {
@@ -151,81 +155,5 @@ Kirigami.AbstractApplicationWindow {
     footer: ZComponents.ActionBar {
         currentPage: root.currentPage
     }
-    //FIXME: reimplement this toolbar
-    /*
-    footer: ColumnLayout {
-        spacing: 0
-        QQC2.ToolBar {
-            Layout.fillWidth: true
-            visible: screensLayer.layers.depth === 1 && screensLayer.currentIndex === 1
-
-            contentItem: RowLayout {
-                QQC2.ToolButton {
-                    //Layout.fillWidth: true
-                    Layout.preferredWidth: root.width/4
-                    text: qsTr("Synth")
-                    onClicked: zynthian.layer.select_engine()
-                }
-                Item {
-                    Layout.fillWidth: true
-                }
-            }
-        }
-        QQC2.ToolBar {
-            Layout.fillWidth: true
-            contentItem: RowLayout {
-                spacing: 0
-                QQC2.ToolButton {
-                    id: backButton
-                    Layout.preferredWidth: root.width/4
-                    text: qsTr("Back")
-                    enabled: screensLayer.currentIndex > 0 || screensLayer.layers.depth > 1
-                    opacity: enabled ? 1 : 0.3
-                    onClicked: {
-                        if (root.currentPage && root.currentPage.hasOwnProperty("previousScreen") && root.currentPage.previousScreen.length > 0) {
-                            if (screensLayer.layers.depth > 1) {
-                                zynthian.current_modal_screen_id = root.currentPage.previousScreen;
-                            } else {
-                                zynthian.current_screen_id = root.currentPage.previousScreen;
-                            }
-                        } else {
-                            zynthian.go_back();
-                        }
-                    }
-                }
-                QQC2.ToolButton {
-                    Layout.preferredWidth: root.width/4
-                    //enabled: layersPage.visible
-                    opacity: enabled ? 1 : 0.3
-                    text: qsTr("Layers")
-                    onClicked: {
-                        zynthian.current_screen_id = "layer"
-                        screensLayer.currentIndex = 1;
-                    }
-                }
-                QQC2.ToolButton {
-                    Layout.preferredWidth: root.width/4
-                    text: screensLayer.currentIndex === 1 ? qsTr("Favorites") : qsTr("Presets")
-                    //enabled: presetsPage.visible
-                    opacity: enabled ? 1 : 0.3
-                    checkable: screensLayer.currentIndex === 1
-                    checked: screensLayer.currentIndex === 1 && zynthian.preset.show_only_favorites
-                    onClicked: zynthian.current_screen_id = "preset"
-                    onCheckedChanged: {
-                        if (screensLayer.currentIndex === 1) {
-                            zynthian.preset.show_only_favorites = checked
-                        }
-                    }
-                }
-                QQC2.ToolButton {
-                    Layout.preferredWidth: root.width/4
-                    text: qsTr("Edit")
-                    //enabled: controlPage.visible
-                    opacity: enabled ? 1 : 0.3
-                    onClicked: zynthian.current_screen_id = "control"
-                }
-            }
-        }
-    }*/
 }
 

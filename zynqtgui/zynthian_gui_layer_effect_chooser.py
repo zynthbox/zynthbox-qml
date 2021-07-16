@@ -95,6 +95,8 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 	def set_select_path(self):
 		self.select_path = "FX"
+		if self.zyngui.screens['layer_effects'].audiofx_layer != None:
+			self.select_path = self.engine_info[self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer)][0]
 		self.selector_path_changed.emit()
 		self.selector_path_element_changed.emit()
 

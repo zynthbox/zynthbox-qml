@@ -72,6 +72,8 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			self.list_data.append(('CLEAR-AUDIOFX',len(self.list_data),"Remove All Audio-FX"))
 		else:
 			self.list_data.append(('ADD-SERIAL-AUDIOFX',len(self.list_data),"Add Audio-FX"))
+			self.select_action(0)
+			self.zyngui.screens['effect_types'].select_action(0)
 
 		super().fill_list()
 
@@ -80,6 +82,9 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		return 'effect_types'
 
 	def select_action(self, i, t='S'):
+		if i < 0 or i >= len(self.list_data):
+			return
+
 		if self.list_data[i][0] == 'CLEAR-AUDIOFX':
 			self.audiofx_reset()
 			return
@@ -92,6 +97,8 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		if i < len(self.audiofx_layers):
 			self.audiofx_layer = self.audiofx_layers[i]
+			if t is 'B':
+				self.zyngui.show_confirm("Do you really want to remove This effect?", self.fx_remove_confirmed)
 		else:
 			self.audiofx_layer = None
 
@@ -111,12 +118,24 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.zyngui.show_confirm("Do you really want to remove all audio-FXs for this layer?", self.audiofx_reset_confirmed)
 
 
+	def fx_remove_confirmed(self, params=None):
+		logging.error("REMOVING {}".format(self.audiofx_layer))
+		if self.audiofx_layer is None:
+			return
+		i = self.zyngui.screens['layer'].layers.index(self.audiofx_layer)
+		self.zyngui.screens['layer'].remove_layer(i)
+
+		self.audiofx_layer = None
+		self.fill_list()
+
+
 	def audiofx_reset_confirmed(self, params=None):
 		# Remove all layers
 		for sl in self.audiofx_layers:
 			i = self.zyngui.screens['layer'].layers.index(sl)
 			self.zyngui.screens['layer'].remove_layer(i)
 
+		self.audiofx_layer = None
 		self.fill_list()
 
 

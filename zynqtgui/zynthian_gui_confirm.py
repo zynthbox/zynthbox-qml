@@ -90,7 +90,8 @@ class zynthian_gui_confirm(QObject):
 
 	@Slot()
 	def accept(self):
-		self.zyngui.zynswitch_defered('S',3)
+		self.switch_select() #FIXME need to call it directly otherwise calling it from another thread causes problems to Qt models
+		#self.zyngui.zynswitch_defered('S',3)
 
 	@Slot()
 	def reject(self):

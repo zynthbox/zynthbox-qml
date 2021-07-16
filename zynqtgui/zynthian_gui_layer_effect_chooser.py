@@ -58,7 +58,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 			self.zyngui.stop_loading()
 
 	def back_action(self):
-		self.zyngui.show_modal('effect_types')
+		return 'effect_types'
 
 	def show(self):
 		if self.zyngui.curlayer:

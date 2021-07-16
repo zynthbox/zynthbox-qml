@@ -73,7 +73,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 
 	def next_action(self):
-		self.zyngui.show_modal('effect_types')
+		return 'effect_types'
 
 	def select_action(self, i, t='S'):
 		if self.list_data[i][0] == 'CLEAR-AUDIOFX':

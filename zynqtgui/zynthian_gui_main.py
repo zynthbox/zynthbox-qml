@@ -73,7 +73,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 			self.last_action()
 
 	def next_action(self):
-		self.layers()
+		return "layer"
 
 	def layers(self):
 		logging.info("Layers")

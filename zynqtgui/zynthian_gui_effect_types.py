@@ -44,11 +44,13 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 		self.only_categories = True
 
+
 	def show(self):
 		if self.zyngui.curlayer:
 			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 		super().show()
 		self.select_action(self.index)
+
 
 	def select_action(self, i, t='S'):
 		if i is not None and self.list_data[i][0]:
@@ -56,17 +58,24 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 			self.zyngui.screens['layer_effect_chooser'].show()
 		self.set_select_path()
 
+
 	def back_action(self):
-		self.zyngui.show_modal('layer_effects')
+		return 'layer_effects'
+
+	def next_action(self):
+		return 'layer_effect_chooser'
+
 
 	def index_supports_immediate_activation(self, index=None):
 		return True
+
 
 	def select_category_by_name(self, cat):
 		for i, item in enumerate(self.list_data):
 			if item[2] == cat:
 				self.activate_index(i)
 				return
+
 
 	def set_select_path(self):
 		self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX > " + self.list_data[self.index][2]

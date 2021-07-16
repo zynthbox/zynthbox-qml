@@ -103,6 +103,7 @@ from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
 
 from pathlib import Path
 
+import traceback
 
 #-------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
@@ -1043,18 +1044,36 @@ class zynthian_gui(QObject):
 			self.toggle_modal("stepseq")
 
 		elif cuia == "NEXT_SCREEN":
-			# Try to call next_action method:
+			screen_next = None
+			# If modal screen ...
 			if self.modal_screen:
+				logging.debug("CLOSE MODAL => " + self.modal_screen)
+
+				# Try to call modal next_action method:
 				try:
-					self.screens[self.modal_screen].next_action()
+					screen_next = self.screens[self.modal_screen].next_action()
+					logging.debug("SCREEN NEXT => " + screen_next)
 				except:
 					pass
+
 			else:
 				try:
-					self.screens[self.active_screen].next_action()
-					logging.error(self.screens[self.active_screen].next_action)
+					screen_next = self.screens[self.active_screen].next_action()
 				except:
 					pass
+
+				# Back to screen-1 by default ...
+				if screen_next is None:
+					j = self.screens_sequence.index(self.active_screen) + 1
+					screen_next = self.screens_sequence[j]
+
+			if screen_next:
+				logging.debug("GOING TO NEXT SCREEN => {}".format(screen_next))
+				if screen_next in self.screens_sequence:
+					self.show_screen(screen_next)
+				else:
+					self.show_modal(screen_next)
+					self.modal_screen_next = None
 
 		elif cuia == "LAYER_ONE":
 			self.screens['layer'].activate_layer(0)

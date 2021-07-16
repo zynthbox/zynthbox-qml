@@ -93,10 +93,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			self.show()
 
 	def next_action(self):
-		if self.zyngui.modal_screen == "preset":
-			self.zyngui.show_modal('preset')
-		else:
-			self.zyngui.show_screen('preset')
+		return "preset"
 
 	def index_supports_immediate_activation(self, index=None):
 		return True

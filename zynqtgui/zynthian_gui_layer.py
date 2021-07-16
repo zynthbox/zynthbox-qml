@@ -138,7 +138,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.zyngui.stop_loading()
 
 	def next_action(self):
-		self.zyngui.show_screen("bank")
+		return "bank"
 
 	def index_supports_immediate_activation(self, index=None):
 		return index >= 0 and index < len(self.root_layers)

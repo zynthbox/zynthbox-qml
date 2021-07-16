@@ -111,7 +111,6 @@ Kirigami.AbstractApplicationWindow {
 
     QQC2.Dialog {
         id: confirmDialog
-        standardButtons: QQC2.Dialog.Yes | QQC2.Dialog.No
         x: root.width / 2 - width / 2
         y: root.height / 2 - height / 2
         dim: true
@@ -126,6 +125,22 @@ Kirigami.AbstractApplicationWindow {
         }
         onAccepted: zynthian.confirm.accept()
         onRejected: zynthian.confirm.reject()
+        footer: QQC2.Control {
+            padding: Kirigami.Units.smallSpacing
+            contentItem: RowLayout {
+                spacing: Kirigami.Units.smallSpacing
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("No")
+                    onClicked: confirmDialog.reject()
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("Yes")
+                    onClicked: confirmDialog.accept()
+                }
+            }
+        }
     }
 
     ZComponents.ModalLoadingOverlay {

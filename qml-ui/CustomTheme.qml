@@ -36,55 +36,10 @@ QtObject {
     property bool darkMode: true
 
     onDarkModeChanged: {
-        if (darkMode) {
-            syncDarkTheme();
-        } else {
-            syncLightTheme();
-        }
+        syncColors();
     }
 
-    function syncLightTheme() {
-        Kirigami.Theme.textColor = "#31363b"
-        Kirigami.Theme.disabledTextColor = "#9931363b"
-
-        Kirigami.Theme.highlightColor = applicationWindow().palette.highlight
-        Kirigami.Theme.highlightedTextColor = "#eff0fa"
-        Kirigami.Theme.backgroundColor = "#eff0f1"
-        Kirigami.Theme.activeTextColor = "#0176D3"
-        Kirigami.Theme.linkColor = applicationWindow().palette.highlight
-        Kirigami.Theme.visitedLinkColor = applicationWindow().palette.highlight
-
-        Kirigami.Theme.negativeTextColor = "#DA4453"
-        Kirigami.Theme.neutralTextColor = "#F67400"
-        Kirigami.Theme.positiveTextColor = "#27AE60"
-
-        Kirigami.Theme.buttonTextColor = "#31363b"
-        Kirigami.Theme.buttonBackgroundColor = "#eff0f1"
-        Kirigami.Theme.buttonHoverColor = applicationWindow().palette.highlight
-        Kirigami.Theme.buttonFocusColor = applicationWindow().palette.highlight
-
-        Kirigami.Theme.viewTextColor = "#31363b"
-        Kirigami.Theme.viewBackgroundColor = "#fcfcfc"
-        Kirigami.Theme.viewHoverColor = applicationWindow().palette.highlight
-        Kirigami.Theme.viewFocusColor = applicationWindow().palette.highlight
-
-        Kirigami.Theme.selectionTextColor = "#eff0fa"
-        Kirigami.Theme.selectionBackgroundColor = applicationWindow().palette.highlight
-        Kirigami.Theme.selectionHoverColor = applicationWindow().palette.highlight
-        Kirigami.Theme.selectionFocusColor = applicationWindow().palette.highlight
-
-        Kirigami.Theme.tooltipTextColor = "#eff0f1"
-        Kirigami.Theme.tooltipBackgroundColor = "#31363b"
-        Kirigami.Theme.tooltipHoverColor = applicationWindow().palette.highlight
-        Kirigami.Theme.tooltipFocusColor = applicationWindow().palette.highlight
-
-        Kirigami.Theme.complementaryTextColor = "#eff0f1"
-        Kirigami.Theme.complementaryBackgroundColor = "#31363b"
-        Kirigami.Theme.complementaryHoverColor = applicationWindow().palette.highlight
-        Kirigami.Theme.complementaryFocusColor = applicationWindow().palette.highlight
-    }
-
-    function syncDarkTheme() {
+    function syncColors() {
         Kirigami.Theme.textColor = applicationWindow().palette.windowText
         Kirigami.Theme.disabledTextColor = "#a1a9b1"
 
@@ -126,6 +81,6 @@ QtObject {
     }
 
     Component.onCompleted: {
-        root.syncDarkTheme()
+        root.syncColors()
     }
 }

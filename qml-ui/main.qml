@@ -30,6 +30,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
 import "components" as ZComponents
+import "components/private" as ZComponentsPrivate
 import "pages" as Pages
 
 Kirigami.AbstractApplicationWindow {
@@ -61,8 +62,9 @@ Kirigami.AbstractApplicationWindow {
     height: screen.height
 
     header: ZComponents.Breadcrumb {
+        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
         layerManager: screensLayer.layers
-        leftHeaderControl: QQC2.Button {
+        leftHeaderControl: ZComponentsPrivate.BreadcrumbButton {
             id: homeButton
             implicitWidth: height
             icon.name: "go-home"
@@ -70,19 +72,7 @@ Kirigami.AbstractApplicationWindow {
             checkable: false
             checked: zynthian.current_screen_id === 'main'
             opacity: checked ? 1 : 0.5
-            rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
-            background: Item {
-                Image {
-                    id: breadcrumbSeparator
-                    parent: homeButton.background
-                    anchors {
-                        right: parent.right
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    source: "components/img/breadcrumb-separator.svg"
-                }
-            }
+            //rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
         }
         rightHeaderControl: ZComponents.StatusInfo {}
     }
@@ -94,7 +84,13 @@ Kirigami.AbstractApplicationWindow {
         initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer'), root.pageScreenMapping.pageForScreen('control')]
     }
 
-    CustomTheme {}
+    CustomTheme {
+        id: customTheme
+    }
+
+    background: Rectangle {
+        color: customTheme.Kirigami.Theme.backgroundColor
+    }
 
     Instantiator {
         model: zynthian.keybinding.key_sequences_model
@@ -154,6 +150,7 @@ Kirigami.AbstractApplicationWindow {
 
     footer: ZComponents.ActionBar {
         currentPage: root.currentPage
+        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
 }
 

@@ -28,6 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
+
 QQC2.ToolBar {
     id: root
     property alias leftHeaderControl: leftHeaderControl.contentItem
@@ -78,28 +80,13 @@ QQC2.ToolBar {
                     model: ListModel {
                         id: breadcrumbModel
                     }
-                    QQC2.ToolButton {
+                    BreadcrumbButton {
                         id: toolButton
-                        Layout.fillHeight: true
                         text: zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path
                         // HACK to hide home button as there is already one
                         visible: index > 0 || root.layerManager.depth > 1
                         checked: model.screenId === zynthian.current_screen_id;
-                        rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
-                        background: Item {
-                            Image {
-                                id: breadcrumbSeparator
-                                anchors {
-                                    right: parent.right
-                                    top: parent.top
-                                    bottom: parent.bottom
-                                }
-                                source: "img/breadcrumb-separator.svg"
-                            }
-                        }
-                        opacity: checked ? 1 : 0.5
                         checkable: false
-                        font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                         Connections {
                             target: breadcrumbFlickable
                             onWidthChanged: toolButton.ensureBounds()

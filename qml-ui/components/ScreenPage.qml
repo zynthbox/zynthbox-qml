@@ -46,4 +46,15 @@ Kirigami.Page {
 
     bottomPadding: Kirigami.Units.gridUnit
 
+    Component.onCompleted: {
+        //HACK to disable kirigami automatic toolbars in that old version
+        var i
+        for (i in root.children) {
+            let child = root.children[i];
+            // Duck type Loaders
+            if (child.hasOwnProperty("active") && child.hasOwnProperty("source")) {
+                child.active = false;
+            }
+        }
+    }
 }

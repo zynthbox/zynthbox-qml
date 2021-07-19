@@ -28,6 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
+
 QQC2.ToolBar {
     id: root
 
@@ -38,15 +40,19 @@ QQC2.ToolBar {
     contentItem: RowLayout {
         spacing: Kirigami.Units.smallSpacing
         ActionButton {
+            Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.backAction ? root.currentPage.backAction : null
         }
         ActionButton {
+            Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
         }
         ActionButton {
+            Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 1 ? root.currentPage.contextualActions[1] : null
         }
         ActionButton {
+            Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
         }
     }

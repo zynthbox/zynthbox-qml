@@ -28,26 +28,25 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
 
-Kirigami.BasicListItem {
+QQC2.ItemDelegate {
+    id: delegate
     width: ListView.view.width
-    label: model.display
-    reserveSpaceForIcon: false
+    text: model.display
 
     enabled: model.action_id !== undefined
+
+    topPadding: Kirigami.Units.largeSpacing
+    leftPadding: Kirigami.Units.largeSpacing
+    bottomPadding: Kirigami.Units.largeSpacing
+    rightPadding: Kirigami.Units.largeSpacing
     highlighted: ListView.isCurrentItem
 
     //implicitHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
 
-    activeBackgroundColor: (ListView.view.activeFocus && !pressed || !ListView.view.activeFocus && pressed)
-        ? Kirigami.Theme.highlightColor
-        : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4)
-
-    Behavior on activeBackgroundColor {
-        ColorAnimation {
-            duration: Kirigami.Units.shortDuration
-            easing.type: Easing.InOutQuad
-        }
+    background: DelegateBackground {
+        delegate: delegate
     }
 
     onClicked: {

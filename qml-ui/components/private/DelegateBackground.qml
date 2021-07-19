@@ -28,23 +28,26 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "private"
+Rectangle {
+    property QQC2.ItemDelegate delegate
 
-//NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
-QQC2.Control {
-    id: root
+    readonly property real leftPadding: Kirigami.Units.largeSpacing
+    readonly property real rightPadding: Kirigami.Units.largeSpacing
+    readonly property real topPadding: Kirigami.Units.largeSpacing
+    readonly property real bottomPadding: Kirigami.Units.largeSpacing
 
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
 
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
+    color: !delegate.ListView.isCurrentItem && !delegate.pressed
+        ? "transparent"
+        : ((delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed)
+                ? Kirigami.Theme.highlightColor
+                : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
 
-    // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.activeFocus
+    Behavior on color {
+        ColorAnimation {
+            duration: Kirigami.Units.shortDuration
+            easing.type: Easing.InOutQuad
+        }
     }
 }
+

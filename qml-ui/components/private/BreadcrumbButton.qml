@@ -28,23 +28,23 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "private"
-
-//NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
-QQC2.Control {
+QQC2.ToolButton {
     id: root
-
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
-
-    // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.activeFocus
+    Layout.fillHeight: true
+    rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
+    background: Item {
+        Image {
+            id: breadcrumbSeparator
+            anchors {
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+            source: "../img/breadcrumb-separator.svg"
+        }
     }
+    opacity: checked ? 1 : 0.5
+    font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
 }
+
+

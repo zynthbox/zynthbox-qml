@@ -27,24 +27,12 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
-import "private"
-
-//NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
-QQC2.Control {
-    id: root
-
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
-
-    // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.activeFocus
-    }
+PlasmaCore.FrameSvgItem {
+    property QQC2.ItemDelegate delegate
+    visible: delegate.ListView.isCurrentItem || delegate.pressed
+    imagePath: "widgets/viewitem"
+    prefix: (delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed) ? "selected+hover" : "hover"
 }
+

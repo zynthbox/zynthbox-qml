@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
 
 QQC2.ScrollView {
     id: root
@@ -52,12 +53,14 @@ QQC2.ScrollView {
         }
     }
 
-    leftPadding: 1
-    rightPadding: 1
-    topPadding: Kirigami.Units.gridUnit/2
-    bottomPadding: Kirigami.Units.gridUnit/2
+    leftPadding: background.leftPadding
+    rightPadding: background.rightPadding
+    topPadding: background.topPadding
+    bottomPadding: background.bottomPadding
 
     QQC2.ScrollBar.horizontal.visible: false
+
+    QQC2.ScrollBar.vertical.x: root.width - QQC2.ScrollBar.vertical.width - root.rightPadding
 
     ListView {
         id: view
@@ -77,12 +80,10 @@ QQC2.ScrollView {
         delegate: SelectorDelegate {}
     }
 
-    background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-        border.color: view.activeFocus
-            ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.5)
-            : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
-        radius: Kirigami.Units.gridUnit/2
+    background: SelectorViewBackground {
+        id: background
+        highlighted: view.activeFocus
+
         Kirigami.Separator {
             anchors {
                 left: parent.left
@@ -90,6 +91,8 @@ QQC2.ScrollView {
                 top: parent.top
                 topMargin: parent.radius
             }
+            color: Kirigami.Theme.textColor
+            opacity: 0.4
             visible: !view.atYBeginning
         }
         Kirigami.Separator {
@@ -99,6 +102,8 @@ QQC2.ScrollView {
                 bottom: parent.bottom
                 bottomMargin: parent.radius
             }
+            color: Kirigami.Theme.textColor
+            opacity: 0.4
             visible: !view.atYEnd
         }
     }

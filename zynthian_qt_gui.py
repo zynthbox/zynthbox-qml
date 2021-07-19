@@ -44,6 +44,7 @@ import sched
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
+from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine
 
 
@@ -2225,7 +2226,7 @@ def delete_window():
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-	app = QGuiApplication(sys.argv)
+	app = QApplication(sys.argv)
 	engine = QQmlApplicationEngine()
 
 	logging.info("STARTING ZYNTHIAN-UI ...")
@@ -2252,6 +2253,11 @@ if __name__ == "__main__":
 	palette.setColor(QPalette.Text, QColor(zynthian_gui_config.color_tx))
 	palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
 	app.setPalette(palette)
+
+	font = app.font()
+	font.setPointSize(12)
+	font.setFamily("Roboto")
+	app.setFont(font)
 
 	zyngui.show_screen('main')
 	zyngui.screens['preset'].disable_show_fav_presets()

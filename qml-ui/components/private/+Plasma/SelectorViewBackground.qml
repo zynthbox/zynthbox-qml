@@ -27,24 +27,30 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.plasma.core 2.0 as PlasmaCore
 
-import "private"
+PlasmaCore.FrameSvgItem {
+    property bool highlighted
 
-//NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
-QQC2.Control {
-    id: root
+    readonly property real leftPadding: margins.left + focusFrame.margins.left
+    readonly property real rightPadding: margins.right + focusFrame.margins.right
+    readonly property real topPadding: margins.top + focusFrame.margins.top
+    readonly property real bottomPadding: margins.bottom + focusFrame.margins.bottom
 
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
-
-    // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.activeFocus
+    imagePath: "widgets/background"
+    colorGroup: PlasmaCore.Theme.ViewColorGroup
+    PlasmaCore.FrameSvgItem {
+        id: focusFrame
+        anchors {
+            fill: parent
+            leftMargin: parent.margins.left
+            topMargin: parent.margins.top
+            rightMargin: parent.margins.right
+            bottomMargin: parent.margins.bottom
+        }
+        visible: parent.highlighted
+        imagePath: "widgets/lineedit"
+        prefix: "focus"
     }
 }
+

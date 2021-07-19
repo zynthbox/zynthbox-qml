@@ -23,7 +23,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 ******************************************************************************
 */
 
-import QtQuick 2.1
+import QtQuick 2.11
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
@@ -67,9 +67,12 @@ Card {
             QQC2.Dial {
                 id: dial
                 anchors {
-                    fill: parent
+                    top: parent.top
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
                     margins: Kirigami.Units.largeSpacing
                 }
+                width: height
                 stepSize: root.controller ? (root.controller.step_size === 0 ? 1 : root.controller.step_size) : 0
                 value: root.controller ? root.controller.value : 0
                 from: root.controller ? root.controller.value0 : 0
@@ -145,9 +148,37 @@ Card {
                     anchors {
                         horizontalCenter: parent.horizontalCenter
                         bottom: parent.bottom
-                        bottomMargin: parent.height / 4
+                        //bottomMargin: Kirigami.Units.gridUnit * 2
                     }
                     text: root.controller ? root.controller.value_print : ""
+                }
+                indicator: Rectangle {
+                    implicitWidth: Kirigami.Units.gridUnit * 5
+                    implicitHeight: Kirigami.Units.gridUnit * 2
+                    x: parent.width/2 - width/2
+                    y: parent.height/2 - height/2
+                    radius: height
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: switchControl.checked ? Kirigami.Theme.highlightColor : irigami.Theme.BackgroundColor
+                    border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                    Rectangle {
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                        width: height
+                        radius: height
+                        color: Kirigami.Theme.BackgroundColor
+                        x: switchControl.checked ? parent.width - width : 0
+                        Behavior on x {
+                            XAnimator {
+                                duration: Kirigami.Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    }
                 }
             }
         }

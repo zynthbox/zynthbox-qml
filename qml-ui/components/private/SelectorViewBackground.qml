@@ -28,23 +28,18 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "private"
+Rectangle {
+    property bool highlighted
 
-//NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
-QQC2.Control {
-    id: root
+    readonly property real leftPadding: 1
+    readonly property real rightPadding: 1
+    readonly property real topPadding: Kirigami.Units.gridUnit/2
+    readonly property real bottomPadding: Kirigami.Units.gridUnit/2
 
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-
-    leftPadding: background.leftPadding
-    rightPadding: background.rightPadding
-    topPadding: background.topPadding
-    bottomPadding: background.bottomPadding
-
-    // This is done for performance reasons
-    background: CardBackground {
-        id: background
-        highlighted: root.activeFocus
-    }
+    color: Kirigami.Theme.backgroundColor
+    border.color: highlighted
+            ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.5)
+            : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+    radius: Kirigami.Units.gridUnit/2
 }
+

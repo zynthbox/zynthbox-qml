@@ -30,6 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.plasma.core 2.0 as PlasmaCore
 
 PlasmaCore.FrameSvgItem {
+    id: root
     property bool highlighted
 
     readonly property real leftPadding: margins.left + focusFrame.margins.left
@@ -39,6 +40,35 @@ PlasmaCore.FrameSvgItem {
 
     imagePath: "widgets/background"
     colorGroup: PlasmaCore.Theme.ViewColorGroup
+
+    Timer { //HACK AND BUG WORKAROUND
+		id: updateTimer
+		interval: 200
+		onTriggered: {
+            root.imagePath = "invalid"
+            root.imagePath = "widgets/background"
+			root.margins.marginsChanged()
+		}
+	}
+    Connections {
+        target: theme
+        onThemeChangedProxy: {
+			updateTimer.restart()
+        }
+    }
+
+    PlasmaCore.FrameSvgItem {
+        anchors {
+            fill: parent
+            leftMargin: parent.margins.left
+            topMargin: parent.margins.top
+            rightMargin: parent.margins.right
+            bottomMargin: parent.margins.bottom
+        }
+        imagePath: "widgets/lineedit"
+        prefix: "base"
+        opacity: 0.4
+    }
     PlasmaCore.FrameSvgItem {
         id: focusFrame
         anchors {

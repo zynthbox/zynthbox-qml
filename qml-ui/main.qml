@@ -68,10 +68,15 @@ Kirigami.AbstractApplicationWindow {
             id: homeButton
             implicitWidth: height
             icon.name: "go-home"
+            icon.color: customTheme.Kirigami.Theme.textColor
             onClicked: zynthian.current_screen_id = 'main'
             checkable: false
             checked: zynthian.current_screen_id === 'main'
             opacity: checked ? 1 : 0.5
+            contentItem: Kirigami.Icon {
+				source: homeButton.icon.name
+				color: homeButton.icon.color
+			}
             //rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
         }
         rightHeaderControl: ZComponents.StatusInfo {}

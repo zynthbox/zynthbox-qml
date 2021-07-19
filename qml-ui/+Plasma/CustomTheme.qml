@@ -59,8 +59,8 @@ QtObject {
         Kirigami.Theme.viewHoverColor = theme.viewHoverColor
         Kirigami.Theme.viewFocusColor = theme.viewFocusColor
 
-        Kirigami.Theme.selectionTextColor = theme.selectionTextColor
-        Kirigami.Theme.selectionBackgroundColor = theme.selectionBackgroundColor
+        Kirigami.Theme.selectionTextColor = theme.highlightedTextColor
+        Kirigami.Theme.selectionBackgroundColor = theme.highlightColor
         Kirigami.Theme.selectionHoverColor = theme.selectionHoverColor
         Kirigami.Theme.selectionFocusColor = theme.selectionFocusColor
 
@@ -80,6 +80,6 @@ QtObject {
     }
     property Connections __connections: Connections {
         target: theme
-        onThemeChangedProxy: root.syncColors
+        onThemeChangedProxy: root.syncColors()
     }
 }

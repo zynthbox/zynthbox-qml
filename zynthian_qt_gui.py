@@ -100,7 +100,8 @@ from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
 
 #from zynqtgui.zynthian_gui_control_osc_browser import zynthian_gui_osc_browser
 
-#from zynqtgui.zynthian_gui_selector import zynthian_gui_selector as 
+from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
+
 
 from pathlib import Path
 
@@ -517,6 +518,7 @@ class zynthian_gui(QObject):
 			#self.screens['autoeq'] = zynthian_gui_autoeq(self)
 		#if "zynseq" in zynthian_gui_config.experimental_features:
 			#self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
+		self.screens['theme_chooser'] = zynthian_gui_theme_chooser(self)
 
 		# Init Auto-connector
 		zynautoconnect.start()
@@ -2085,6 +2087,10 @@ class zynthian_gui(QObject):
 	def get_midi_recorder(self):
 		return self.screens['midi_recorder']
 
+	def get_theme_chooser(self):
+		return self.screens['theme_chooser']
+
+
 
 	current_screen_id_changed = Signal()
 	current_modal_screen_id_changed = Signal()
@@ -2118,7 +2124,7 @@ class zynthian_gui(QObject):
 	control = Property(QObject, get_control, constant = True)
 	audio_recorder = Property(QObject, get_audio_recorder, constant = True)
 	midi_recorder = Property(QObject, get_midi_recorder, constant = True)
-
+	theme_chooser = Property(QObject, get_theme_chooser, constant = True)
 
 
 #------------------------------------------------------------------------------

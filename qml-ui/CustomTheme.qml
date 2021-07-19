@@ -33,12 +33,6 @@ import org.kde.kirigami 2.0 as Kirigami
 QtObject {
     id: root
 
-    property bool darkMode: true
-
-    onDarkModeChanged: {
-        syncColors();
-    }
-
     function syncColors() {
         Kirigami.Theme.textColor = applicationWindow().palette.windowText
         Kirigami.Theme.disabledTextColor = "#a1a9b1"

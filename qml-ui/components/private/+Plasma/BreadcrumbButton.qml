@@ -33,9 +33,14 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 QQC2.ToolButton {
     id: root
     Layout.fillHeight: true
+    Kirigami.Theme.inherit: false
+    Kirigami.Theme.colorSet: Kirigami.Theme.Window
     leftPadding: rightPadding
     rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
-    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding
+    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
+    contentItem: QQC2.Label {
+        text: root.text
+    }
     background: Item {
         PlasmaCore.Svg {
             id: buttonSvg
@@ -44,7 +49,7 @@ QQC2.ToolButton {
 
         PlasmaCore.SvgItem {
             anchors {
-                right: parent.right
+                right: parent.left
                 top: parent.top
                 bottom: parent.bottom
             }

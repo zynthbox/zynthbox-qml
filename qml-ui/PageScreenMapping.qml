@@ -70,6 +70,7 @@ QtObject {
 		"option": "OptionPage.qml",
 		"layer_effects": "FXSetupPage.qml",
 		"effect_types": "FXSetupPage.qml",
-		"layer_effect_chooser": "FXSetupPage.qml"
+		"layer_effect_chooser": "FXSetupPage.qml",
+		"theme_chooser": "ThemePage.qml"
 	}
 }

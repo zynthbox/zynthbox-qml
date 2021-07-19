@@ -34,8 +34,8 @@ import "private"
 QQC2.Control {
     id: root
 
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
+//     Kirigami.Theme.inherit: false
+//     Kirigami.Theme.colorSet: Kirigami.Theme.View
 
     leftPadding: background.leftPadding
     rightPadding: background.rightPadding

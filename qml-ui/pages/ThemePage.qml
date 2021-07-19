@@ -31,13 +31,5 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.SelectorPage {
-    screenId: "admin"
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Themes")
-            onTriggered: zynthian.show_modal("theme_chooser")
-        }
-    ]
-
-
+    screenId: "theme_chooser"
 }

@@ -21,7 +21,7 @@ Item {
         radius: height
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        color: switchControl.checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.BackgroundColor
+        color: switchControl.checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
         border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.4)
     }
 

@@ -83,29 +83,6 @@ QQC2.ScrollView {
     background: SelectorViewBackground {
         id: background
         highlighted: view.activeFocus
-
-        Kirigami.Separator {
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                topMargin: parent.radius
-            }
-            color: Kirigami.Theme.textColor
-            opacity: 0.4
-            visible: !view.atYBeginning
-        }
-        Kirigami.Separator {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-                bottomMargin: parent.radius
-            }
-            color: Kirigami.Theme.textColor
-            opacity: 0.4
-            visible: !view.atYEnd
-        }
     }
 }
 

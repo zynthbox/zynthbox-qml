@@ -34,8 +34,9 @@ QQC2.ToolBar {
     id: root
 
     property Item currentPage
-    background.opacity: 0.4
     padding: Kirigami.Units.smallSpacing
+
+    position: QQC2.ToolBar.Footer
 
     contentItem: RowLayout {
         spacing: Kirigami.Units.smallSpacing

@@ -32,6 +32,7 @@ import org.kde.newstuff 1.0 as NewStuff
 import "../components" as ZComponents
 
 ZComponents.SelectorPage {
+    screenId: "theme_downloader"
     view.model: NewStuff.ItemsModel {
         id: newStuffModel
         engine: newStuffEngine.engine

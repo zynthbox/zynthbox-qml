@@ -256,6 +256,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def select(self, index=None):
 		if index is None: index=self.index
+		# Ignore invalid indexes
+		if index < 0 or index >= len(self.list_data):
+			return
 		self.index = index
 		if self.zselector and self.zselector.value != self.index:
 			self.zselector.set_value(self.index, True, False)

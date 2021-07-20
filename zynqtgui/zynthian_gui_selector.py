@@ -68,6 +68,9 @@ class selector_list_model(QAbstractListModel):
 		if not was_empty:
 			self.dataChanged.emit(self.index(0,0), self.index(min(len(entries), len(self.entries)) - 1, 0))
 
+		self.count_changed.emit()
+
+
 
 	def roleNames(self):
 		keys = {
@@ -78,6 +81,9 @@ class selector_list_model(QAbstractListModel):
 		return keys
 
 	def rowCount(self, index):
+		return len(self.entries)
+
+	def get_count(self):
 		return len(self.entries)
 
 	def data(self, index, role):
@@ -96,6 +102,13 @@ class selector_list_model(QAbstractListModel):
 			return entry[1]
 		else:
 			return None
+
+
+	count_changed = Signal()
+
+	count = Property(int, get_count, notify = count_changed)
+
+
 
 #------------------------------------------------------------------------------
 # Zynthian Listbox Selector GUI Class
@@ -173,11 +186,19 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.list_model.set_entries(self.list_data)
 		self.select()
 		self.last_index_change_ts = datetime.min
+		self.effective_count_changed.emit()
 
 
 	def update_list(self):
 		self.fill_list()
 		self.set_selector()
+
+	# This to allow subclasses to override the property without redeclaring
+	def get_effective_count_prop(self):
+		return self.get_effective_count()
+
+	def get_effective_count(self):
+		return self.list_model.get_count()
 
 	# TODO: remove?
 	def refresh_loading(self):
@@ -324,9 +345,11 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	current_index_changed = Signal()
 	selector_path_changed = Signal()
 	selector_path_element_changed = Signal()
+	effective_count_changed = Signal()
 
 	selector_list = Property(QObject, get_selector_list, constant = True)
 	current_index = Property(int, get_current_index, set_current_index, notify = current_index_changed)
+	effective_count = Property(int, get_effective_count_prop, notify = effective_count_changed)
 	selector_path = Property(str, get_selector_path, notify = selector_path_changed)
 	selector_path_element = Property(str, get_selector_path_element, notify = selector_path_element_changed)
 	caption = Property(str, get_caption, constant = True)

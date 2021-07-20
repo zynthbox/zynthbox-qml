@@ -99,6 +99,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		super().fill_list()
 
+	def get_effective_count(self):
+		return len(self.root_layers)
 
 	def select_action(self, i, t='S'):
 		self.index = i

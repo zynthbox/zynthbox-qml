@@ -33,15 +33,21 @@ import "../components" as ZComponents
 
 ZComponents.SelectorPage {
     screenId: "theme_downloader"
+    title: qsTr("Theme Downloader")
     view.model: NewStuff.ItemsModel {
         id: newStuffModel
         engine: newStuffEngine.engine
     }
-    view.delegate: NewStuff.NewStuffItem {
-        listModel: newStuffModel
+    view.delegate: newStuffDelegate
+    Component {
+        id: newStuffDelegate
+        NewStuff.NewStuffItem {
+            listModel: newStuffModel
+        }
     }
     NewStuff.Engine {
         id: newStuffEngine
-        configFile: "yakuake.knsrc"
+        // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
+        configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
     }
 }

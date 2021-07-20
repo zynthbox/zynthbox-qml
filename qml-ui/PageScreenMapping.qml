@@ -71,6 +71,7 @@ QtObject {
 		"layer_effects": "FXSetupPage.qml",
 		"effect_types": "FXSetupPage.qml",
 		"layer_effect_chooser": "FXSetupPage.qml",
-		"theme_chooser": "ThemePage.qml"
+		"theme_chooser": "ThemePage.qml",
+		"theme_downloader": "ThemeDownloaderPage.qml"
 	}
 }

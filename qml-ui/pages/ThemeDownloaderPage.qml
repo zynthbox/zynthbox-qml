@@ -27,15 +27,20 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.newstuff 1.0 as NewStuff
 
 import "../components" as ZComponents
 
 ZComponents.SelectorPage {
-    screenId: "theme_chooser"
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Get New Themes")
-            onTriggered: zynthian.show_modal("theme_downloader")
-        }
-    ]
+    view.model: NewStuff.ItemsModel {
+        id: newStuffModel
+        engine: newStuffEngine.engine
+    }
+    view.delegate: NewStuff.NewStuffItem {
+        listModel: newStuffModel
+    }
+    NewStuff.Engine {
+        id: newStuffEngine
+        configFile: "yakuake.knsrc"
+    }
 }

@@ -77,6 +77,8 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		super().fill_list()
 
+	def get_effective_count(self):
+		return len(self.audiofx_layers)
 
 	def next_action(self):
 		return 'effect_types'

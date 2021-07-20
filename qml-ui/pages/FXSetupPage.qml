@@ -33,6 +33,8 @@ import "../components" as ZComponents
 ZComponents.MultiSelectorPage {
 
     screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
+    screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.effect_types.selector_list.count), qsTr("FX (%1)").arg(zynthian.layer_effect_chooser.selector_list.count)]
+
     previousScreen: "layer"
     onCurrentScreenIdRequested: {
         //FIXME: why this workaround?

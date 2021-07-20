@@ -525,6 +525,7 @@ class zynthian_gui(QObject):
 		#if "zynseq" in zynthian_gui_config.experimental_features:
 			#self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
 		self.screens['theme_chooser'] = zynthian_gui_theme_chooser(self)
+		self.screens['theme_downloader'] = zynthian_gui_selector(self)
 
 		# Init Auto-connector
 		zynautoconnect.start()
@@ -2093,6 +2094,9 @@ class zynthian_gui(QObject):
 	def get_theme_chooser(self):
 		return self.screens['theme_chooser']
 
+	def get_theme_downloader(self):
+		return self.screens['theme_downloader']
+
 
 
 	current_screen_id_changed = Signal()
@@ -2128,6 +2132,7 @@ class zynthian_gui(QObject):
 	audio_recorder = Property(QObject, get_audio_recorder, constant = True)
 	midi_recorder = Property(QObject, get_midi_recorder, constant = True)
 	theme_chooser = Property(QObject, get_theme_chooser, constant = True)
+	theme_downloader = Property(QObject, get_theme_downloader, constant = True)
 
 
 #------------------------------------------------------------------------------

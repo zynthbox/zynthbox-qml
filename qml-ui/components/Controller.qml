@@ -124,60 +124,38 @@ Card {
                     }
                 }
             }
-            QQC2.Switch {
-                id: switchControl
+            MouseArea {
                 anchors.fill: parent
                 scale: root.valueType === "bool"
                 enabled: root.valueType === "bool"
-                checked: root.controller && root.controller.value !== root.controller.value0
-                onToggled: root.controller.value = checked ? root.controller.max_value : root.controller.value0
+                onClicked: root.controller.value = root.controller.value == root.controller.value0 ? root.controller.max_value : root.controller.value0
+                QQC2.Switch {
+                    id: switchControl
+                    anchors.centerIn: parent
+                    width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
+                    height: Kirigami.Units.gridUnit * 3
+                    checked: root.controller && root.controller.value !== root.controller.value0
+                    onToggled: root.controller.value = checked ? root.controller.max_value : root.controller.value0
 
-                // HACK for default style
-                Binding {
-                    target: switchControl.indicator
-                    property: "color"
-                    value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
-                }
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: Kirigami.Units.longDuration
-                        easing.type: Easing.InOutQuad
+                    // HACK for default style
+                    Binding {
+                        target: switchControl.indicator
+                        property: "color"
+                        value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
                     }
-                }
-                Kirigami.Heading {
-                    anchors {
-                        horizontalCenter: parent.horizontalCenter
-                        bottom: parent.bottom
-                        //bottomMargin: Kirigami.Units.gridUnit * 2
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: Kirigami.Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
                     }
-                    text: root.controller ? root.controller.value_print : ""
-                }
-                indicator: Rectangle {
-                    implicitWidth: Kirigami.Units.gridUnit * 5
-                    implicitHeight: Kirigami.Units.gridUnit * 2
-                    x: parent.width/2 - width/2
-                    y: parent.height/2 - height/2
-                    radius: height
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: switchControl.checked ? Kirigami.Theme.highlightColor : irigami.Theme.BackgroundColor
-                    border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
-                    Rectangle {
+                    Kirigami.Heading {
                         anchors {
-                            top: parent.top
-                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                            top: parent.bottom
+                            //bottomMargin: Kirigami.Units.gridUnit * 2
                         }
-                        border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
-                        width: height
-                        radius: height
-                        color: Kirigami.Theme.BackgroundColor
-                        x: switchControl.checked ? parent.width - width : 0
-                        Behavior on x {
-                            XAnimator {
-                                duration: Kirigami.Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
+                        text: root.controller ? root.controller.value_print : ""
                     }
                 }
             }

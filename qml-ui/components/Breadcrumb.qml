@@ -37,6 +37,7 @@ QQC2.ToolBar {
     property QQC2.StackView layerManager
     readonly property Item pageRow: layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
 
+    position: QQC2.ToolBar.Header
     onPageRowChanged: syncConnection.syncBreadCrumb()
     Component.onCompleted: syncConnection.syncBreadCrumb()
     Connections {

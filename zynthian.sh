@@ -113,8 +113,9 @@ while true; do
 
 	# Start Zynthian GUI & Synth Engine
 	export QT_QUICK_CONTROLS_MOBILE=1
-	export QT_QUICK_CONTROLS_STYLE=Plasma
+	export QT_QUICK_CONTROLS_STYLE=Zynthian-Plasma
 	export QT_FILE_SELECTORS=Plasma
+	export QT_QUICK_CONTROLS_STYLE_PATH=./qtquick-controls-style
 	#export QT_SCALE_FACTOR=1.2
 	#Qt5.11 didn't support this var yet
 	#export QT_QPA_SYSTEM_ICON_THEME=breeze

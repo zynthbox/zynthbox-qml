@@ -2232,7 +2232,7 @@ def delete_window():
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-	app = QApplication(sys.argv)
+	app = QGuiApplication(sys.argv)
 	engine = QQmlApplicationEngine()
 
 	logging.info("STARTING ZYNTHIAN-UI ...")

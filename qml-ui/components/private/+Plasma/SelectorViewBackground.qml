@@ -33,54 +33,95 @@ PlasmaCore.FrameSvgItem {
     id: root
     property bool highlighted
 
-    readonly property real leftPadding: margins.left + focusFrame.margins.left
-    readonly property real rightPadding: margins.right + focusFrame.margins.right
-    readonly property real topPadding: margins.top + focusFrame.margins.top
-    readonly property real bottomPadding: margins.bottom + focusFrame.margins.bottom
+    readonly property real leftPadding: margins.left
+    readonly property real rightPadding: margins.right
+    readonly property real topPadding: margins.top
+    readonly property real bottomPadding: margins.bottom
 
     imagePath: "widgets/background"
-    colorGroup: PlasmaCore.Theme.ViewColorGroup
+    //colorGroup: PlasmaCore.Theme.ViewColorGroup
 
     Timer { //HACK AND BUG WORKAROUND
-		id: updateTimer
-		interval: 200
-		onTriggered: {
+        id: updateTimer
+        interval: 200
+        onTriggered: {
             root.imagePath = "invalid"
             root.imagePath = "widgets/background"
-			root.margins.marginsChanged()
-		}
-	}
+            root.margins.marginsChanged()
+        }
+    }
     Connections {
         target: theme
         onThemeChangedProxy: {
-			updateTimer.restart()
+            updateTimer.restart()
         }
     }
 
-    PlasmaCore.FrameSvgItem {
+    //PlasmaCore.FrameSvgItem {
+        //anchors {
+            //fill: parent
+            //leftMargin: parent.margins.left
+            //topMargin: parent.margins.top
+            //rightMargin: parent.margins.right
+            //bottomMargin: parent.margins.bottom
+        //}
+        //imagePath: "widgets/lineedit"
+        //prefix: "base"
+        //opacity: 0.4
+    //}
+    //PlasmaCore.FrameSvgItem {
+        //id: focusFrame
+        //anchors {
+            //fill: parent
+            //leftMargin: parent.margins.left
+            //topMargin: parent.margins.top
+            //rightMargin: parent.margins.right
+            //bottomMargin: parent.margins.bottom
+        //}
+        //visible: parent.highlighted
+        //imagePath: "widgets/lineedit"
+        //prefix: "focus"
+    //}
+
+    Rectangle {
         anchors {
-            fill: parent
-            leftMargin: parent.margins.left
+			fill: parent
+			leftMargin: parent.margins.left
             topMargin: parent.margins.top
             rightMargin: parent.margins.right
             bottomMargin: parent.margins.bottom
-        }
-        imagePath: "widgets/lineedit"
-        prefix: "base"
-        opacity: 0.4
-    }
-    PlasmaCore.FrameSvgItem {
-        id: focusFrame
-        anchors {
-            fill: parent
-            leftMargin: parent.margins.left
-            topMargin: parent.margins.top
-            rightMargin: parent.margins.right
-            bottomMargin: parent.margins.bottom
-        }
+		}
         visible: parent.highlighted
-        imagePath: "widgets/lineedit"
-        prefix: "focus"
+        color: "transparent"
+        border.color: Kirigami.Theme.highlightColor
+        radius: Kirigami.Units.smallSpacing
+    }
+
+    Kirigami.Separator {
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+            topMargin: root.margins.top
+            leftMargin: root.margins.left
+            rightMargin: root.margins.right
+        }
+        color: Kirigami.Theme.textColor
+        opacity: 0.4
+        visible: !view.atYBeginning
+    }
+    Kirigami.Separator {
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+            bottomMargin: root.margins.bottom
+            leftMargin: root.margins.left
+            rightMargin: root.margins.right
+        }
+        color: Kirigami.Theme.textColor
+        opacity: 0.4
+        visible: !view.atYEnd
     }
 }
 

@@ -74,9 +74,9 @@ Kirigami.AbstractApplicationWindow {
             checked: zynthian.current_screen_id === 'main'
             opacity: checked ? 1 : 0.5
             contentItem: Kirigami.Icon {
-				source: homeButton.icon.name
-				color: homeButton.icon.color
-			}
+                source: homeButton.icon.name
+                color: homeButton.icon.color
+            }
             //rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
         }
         rightHeaderControl: ZComponents.StatusInfo {}
@@ -94,7 +94,10 @@ Kirigami.AbstractApplicationWindow {
     }
 
     background: Rectangle {
-        color: customTheme.Kirigami.Theme.backgroundColor
+        Kirigami.Theme.inherit: false
+        // TODO: this should eventually go to Window and the panels to View
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        color: Kirigami.Theme.backgroundColor
     }
 
     Instantiator {
@@ -131,7 +134,10 @@ Kirigami.AbstractApplicationWindow {
         onAccepted: zynthian.confirm.accept()
         onRejected: zynthian.confirm.reject()
         footer: QQC2.Control {
-            padding: Kirigami.Units.smallSpacing
+            leftPadding: confirmDialog.leftPadding
+            topPadding: Kirigami.Units.largeSpacing
+            rightPadding: confirmDialog.rightPadding
+            bottomPadding: confirmDialog.bottomPadding
             contentItem: RowLayout {
                 spacing: Kirigami.Units.smallSpacing
                 QQC2.Button {

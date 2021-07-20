@@ -1272,7 +1272,8 @@ class zynthian_gui(QObject):
 			if self.screens[self.modal_screen].switch(i, 'S'):
 				return
 
-		self.start_loading()
+		if i != 1: #HACK to not show loading screen when just going back
+			self.start_loading()
 
 		# Standard 4 ZynSwitches
 		if i==0:

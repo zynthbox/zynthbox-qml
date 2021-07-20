@@ -68,6 +68,7 @@ from zynqtgui.zynthian_gui_option import zynthian_gui_option
 from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
+from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_effect_types import zynthian_gui_effect_types
@@ -493,6 +494,7 @@ class zynthian_gui(QObject):
 		self.screens['option'] = zynthian_gui_option(self)
 		self.screens['engine'] = zynthian_gui_engine(self)
 		self.screens['layer'] = zynthian_gui_layer(self)
+		#self.screens['layer'] = zynthian_gui_fixed_layers(self)
 		self.screens['layer_options'] = zynthian_gui_layer_options(self)
 		self.screens['layer_effects'] = zynthian_gui_layer_effects(self)
 		self.screens['effect_types'] = zynthian_gui_effect_types(self)

@@ -198,9 +198,10 @@ class zynthian_layer:
 				preset_list.append(v[1])
 
 		elif self.bank_info:
-			for preset in self.engine.get_preset_list(self.bank_info):
+			for i, preset in enumerate(self.engine.get_preset_list(self.bank_info)):
 				if self.engine.is_preset_fav(preset):
 					preset[2] = "*" + preset[2]
+				preset[2] = "{} - ".format(i+1) + preset[2]
 				preset_list.append(preset)
 
 		else:

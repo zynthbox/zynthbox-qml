@@ -183,6 +183,8 @@ class zynthian_engine_zynaddsubfx(zynthian_engine):
 
 	@staticmethod
 	def _get_preset_list(bank):
+		if bank[0] == "*FAVS*":
+			return
 		preset_list=[]
 		preset_dir=bank[0]
 		index=0

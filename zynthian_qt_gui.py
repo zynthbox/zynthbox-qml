@@ -42,7 +42,7 @@ import sched
 
 
 # Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer, QEventLoop
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
 from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine
@@ -316,6 +316,10 @@ class zynthian_gui(QObject):
 		self.info_timer.timeout.connect(self.hide_info)
 		# HACK: in order to start the timer from the proper thread
 		self.current_modal_screen_id_changed.connect(self.info_timer.start)
+
+		self.deferred_loading_timer = QTimer(self)
+		self.info_timer.setInterval(0)
+		self.info_timer.timeout.connect(self.is_loading_changed)
 
 		self.curlayer = None
 		self._curlayer = None
@@ -1362,13 +1366,6 @@ class zynthian_gui(QObject):
 				else:
 					self.enter_midi_learn_mode()
 
-			elif self.active_screen=='bank':
-				self.screens['preset'].enable_only_favs()
-				self.show_screen('preset')
-
-			elif self.active_screen=='preset':
-				self.screens['preset'].toggle_only_favs()
-
 			elif len(self.screens['layer'].layers)>0:
 				self.enter_midi_learn_mode()
 				self.show_modal("zs3_learn")
@@ -1663,6 +1660,9 @@ class zynthian_gui(QObject):
 		self.loading=self.loading+1
 		if self.loading<1: self.loading=1
 		self.is_loading_changed.emit()
+		# FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
+		self.deferred_loading_timer.start()
+		QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
 		#logging.debug("START LOADING %d" % self.loading)
 
 

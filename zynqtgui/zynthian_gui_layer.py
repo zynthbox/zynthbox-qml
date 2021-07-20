@@ -104,7 +104,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def select_action(self, i, t='S'):
 		self.index = i
-		self.zyngui.start_loading()
 
 		if self.list_data[i][0] is None:
 			pass
@@ -137,7 +136,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			elif t=='B':
 				self.layer_options()
 		self.zyngui.screens['bank'].show()
-		self.zyngui.stop_loading()
 
 	def next_action(self):
 		return "bank"

@@ -34,16 +34,18 @@ Rectangle {
     property bool open
 
     z: 999999
-    color: Qt.rgba(0, 0,0, 0.3)
+    color: Qt.rgba(0, 0,0, 0.8)
 
     QQC2.BusyIndicator {
         anchors.centerIn: parent
         running: zynthian.is_loading
+        width: Kirigami.Units.gridUnit * 3
+        height: width
     }
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            print("Overlay blocing clicks")
+            print("Overlay blocking clicks")
         }
     }
 
@@ -63,16 +65,20 @@ Rectangle {
             PropertyChanges {
                 target: root
                 opacity: 0
-                visible: false
             }
         }
     ]
     transitions: Transition {
-        NumberAnimation {
-            target: root
-            property: "opacity"
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutQuad
+        SequentialAnimation {
+            NumberAnimation {
+                target: root
+                property: "opacity"
+                duration: Kirigami.Units.longDuration
+                easing.type: Easing.InOutQuad
+            }
+            ScriptAction {
+                script: root.visible = zynthian.is_loading
+            }
         }
     }
 }

@@ -93,7 +93,7 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 				self.apply_default_font()
 				return
 
-		font_config_path = theme_path + "/fonts"
+		font_config_path = theme_path + "/zynthian-config"
 		if not Path(font_config_path).exists():
 			self.apply_default_font()
 			return
@@ -108,7 +108,8 @@ class zynthian_gui_theme_chooser(zynthian_gui_selector):
 		if font_file is None:
 			self.apply_default_font()
 			return
-		font_file_path = theme_path + "/" + font_file
+		# TODO: support more files
+		font_file_path = theme_path + "/fonts/" + font_file
 		if not Path(font_file_path).exists():
 			self.apply_default_font()
 			return

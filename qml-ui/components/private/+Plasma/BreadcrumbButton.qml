@@ -35,16 +35,27 @@ QQC2.ToolButton {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    leftPadding: rightPadding
+    leftPadding: rightPadding/2
     rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing
     implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
-    contentItem: QQC2.Label {
-        text: root.text
-    }
     background: Item {
         PlasmaCore.Svg {
             id: buttonSvg
-            imagePath: Qt.resolvedUrl("../img/breadcrumb-background.svg")
+            imagePath: "widgets/breadcrumb"
+            Component.onCompleted: {
+                if (!buttonSvg.isValid()) {
+                    buttonSvg.imagePath = Qt.resolvedUrl("../img/breadcrumb.svg")
+                }
+            }
+        }
+         Connections {
+            target: theme
+            onThemeChangedProxy: {
+                buttonSvg.imagePath = "widgets/breadcrumb"
+                if (!buttonSvg.isValid()) {
+                    buttonSvg.imagePath = Qt.resolvedUrl("../img/breadcrumb.svg")
+                }
+            }
         }
 
         PlasmaCore.SvgItem {
@@ -53,8 +64,9 @@ QQC2.ToolButton {
                 top: parent.top
                 bottom: parent.bottom
             }
+            width: naturalSize.width * (height/naturalSize.height)
             svg: buttonSvg
-            elementId: "left"
+            elementId: root.checked ? "focus-left" : "left"
         }
         PlasmaCore.SvgItem {
             anchors {
@@ -64,7 +76,7 @@ QQC2.ToolButton {
                 bottom: parent.bottom
             }
             svg: buttonSvg
-            elementId: "center"
+            elementId: root.checked ? "focus-center" : "center"
         }
         PlasmaCore.SvgItem {
             id: breadcrumbSeparator
@@ -73,11 +85,12 @@ QQC2.ToolButton {
                 top: parent.top
                 bottom: parent.bottom
             }
+            width: naturalSize.width * (height/naturalSize.height)
             svg: buttonSvg
-            elementId: "right"
+            elementId: root.checked ? "focus-right" : "right"
         }
     }
-    opacity: checked ? 1 : 0.5
+    contentItem.opacity: checked ? 1 : 0.5
     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
 }
 

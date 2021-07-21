@@ -73,7 +73,7 @@ QQC2.ToolBar {
             id: breadcrumbFlickable
             Layout.fillWidth: true
             Layout.fillHeight: true
-            //clip: true
+            clip: true
             contentHeight: height
             contentWidth: breadcrumbLayout.width
 

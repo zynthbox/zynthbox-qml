@@ -54,11 +54,10 @@ ZComponents.SelectorPage {
     Component {
         id: newStuffDelegate
         ZComponents.SelectorDelegate {
-            width: ListView.view.width
-            display: QQC2.AbstractButton.TextBesideIcon
-            text: model.name
-            icon.source: model.previewsSmall.length > 0 ? model.previewsSmall[0] : "";
-
+            selector: ListView.view.parent.selector
+            onCurrentScreenIdRequested: ListView.view.parent.currentScreenIdRequested()
+            onItemActivated: ListView.view.parent.itemActivated(index)
+            onItemActivatedSecondary: ListView.view.parent.itemActivatedSecondary(index)
             Kirigami.Icon {
                 id: updateAvailableBadge;
                 opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;

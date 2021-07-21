@@ -1,5 +1,6 @@
 [KNewStuff3]
+Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
-Categories=Plasma Theme
+Categories=Zynthian Themes
+XdgTargetDir=plasma/desktoptheme
 Uncompress=always
-StandardResource=tmp

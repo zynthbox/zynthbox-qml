@@ -45,12 +45,16 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
 		self.audiofx_layer = None
 		self.audiofx_layers = None
 		self.newstuff_model_changed.connect(self.fill_list)
+		self.newstuff_model_data = None
 
 
 	def fill_list(self):
 		self.list_data=[]
-		for index in self.newstuff_model_data.rowCount():
-			self.list_data.append((self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0)),index,""))
+		if self.newstuff_model_data:
+			if self.newstuff_model_data.rowCount() > 0:
+				for index in range(self.newstuff_model_data.rowCount()):
+					display_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
+					self.list_data.append((display_name,index,display_name))
 
 		super().fill_list()
 

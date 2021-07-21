@@ -62,7 +62,7 @@ Kirigami.AbstractApplicationWindow {
     height: screen.height
 
     header: ZComponents.Breadcrumb {
-        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
+        //height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
         layerManager: screensLayer.layers
         leftHeaderControl: ZComponentsPrivate.BreadcrumbButton {
             id: homeButton
@@ -161,7 +161,7 @@ Kirigami.AbstractApplicationWindow {
 
     footer: ZComponents.ActionBar {
         currentPage: root.currentPage
-        height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
+       // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
 }
 

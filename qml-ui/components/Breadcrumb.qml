@@ -37,6 +37,8 @@ QQC2.ToolBar {
     property QQC2.StackView layerManager
     readonly property Item pageRow: layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
 
+    leftPadding: 0
+    rightPadding: 0
     position: QQC2.ToolBar.Header
     onPageRowChanged: syncConnection.syncBreadCrumb()
     Component.onCompleted: syncConnection.syncBreadCrumb()
@@ -60,8 +62,10 @@ QQC2.ToolBar {
         }
     }
     contentItem: RowLayout {
+		spacing: 0
         QQC2.Control {
             id: leftHeaderControl
+            z: 999
             Layout.fillHeight: true
             visible: contentItem !== null
         }
@@ -139,6 +143,7 @@ QQC2.ToolBar {
         }
         QQC2.Control {
             id: rightHeaderControl
+            z: 999
             Layout.fillHeight: true
             visible: contentItem !== null
         }

@@ -77,7 +77,12 @@ QQC2.ScrollView {
 
         model: root.selector.selector_list
 
-        delegate: SelectorDelegate {}
+        delegate: SelectorDelegate {
+            selector: root.selector
+            onCurrentScreenIdRequested: root.currentScreenIdRequested()
+            onItemActivated: root.itemActivated(index)
+            onItemActivatedSecondary: root.itemActivatedSecondary(index)
+        }
 
         Kirigami.Separator {
             parent: view

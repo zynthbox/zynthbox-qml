@@ -81,11 +81,18 @@ Card {
                 enabled: root.valueType !== "bool"
                 onMoved: root.controller.value = value
 
-                // HACK on the default style dial
-                Component.onCompleted: {
-                    dial.background.color = Kirigami.Theme.highlightColor
-                    dial.handle.color = Kirigami.Theme.highlightColor
-                }
+
+                // HACK for default style
+				Binding {
+					target: dial.background
+					property: "color"
+					value: Kirigami.Theme.highlightColor
+				}
+				Binding {
+					target: dial.handle
+					property: "color"
+					value: Kirigami.Theme.highlightColor
+				}
                 Kirigami.Heading {
                     anchors.centerIn: parent
                     text: root.controller ? root.controller.value_print :  ""
@@ -138,11 +145,11 @@ Card {
                     onToggled: root.controller.value = checked ? root.controller.max_value : root.controller.value0
 
                     // HACK for default style
-                    Binding {
+                   /* Binding {
                         target: switchControl.indicator
                         property: "color"
                         value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
-                    }
+                    }*/
                     Behavior on scale {
                         NumberAnimation {
                             duration: Kirigami.Units.longDuration

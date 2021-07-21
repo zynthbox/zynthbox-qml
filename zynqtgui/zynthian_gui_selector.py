@@ -185,9 +185,8 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 
 	def fill_list(self):
-		if self.list_model == None:
-			self.list_model = selector_list_model(self)
-		self.list_model.set_entries(self.list_data)
+		if self.list_model != None:
+			self.list_model.set_entries(self.list_data)
 		self.select()
 		self.last_index_change_ts = datetime.min
 		self.effective_count_changed.emit()

@@ -30,24 +30,59 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.kde.newstuff 1.0 as NewStuff
 
 import "../components" as ZComponents
+import "../components/private/" as ZComponentsPrivate
 
 ZComponents.SelectorPage {
     screenId: "theme_downloader"
     title: qsTr("Theme Downloader")
-    view.model: NewStuff.ItemsModel {
-        id: newStuffModel
-        engine: newStuffEngine.engine
-    }
     view.delegate: newStuffDelegate
-    Component {
-        id: newStuffDelegate
-        NewStuff.NewStuffItem {
-            listModel: newStuffModel
-        }
+    onItemActivated: {
+        console.log("Activated item " + index + " on screen " + screenId );
+    }
+    Component.onCompleted: {
+        selector.newstuff_model = newStuffModel;
     }
     NewStuff.Engine {
         id: newStuffEngine
         // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
         configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
+    }
+    NewStuff.ItemsModel {
+        id: newStuffModel
+        engine: newStuffEngine.engine
+    }
+    Component {
+        id: newStuffDelegate
+        ZComponents.SelectorDelegate {
+            width: ListView.view.width
+            display: QQC2.AbstractButton.TextBesideIcon
+            text: model.name
+            icon.source: model.previewsSmall.length > 0 ? model.previewsSmall[0] : "";
+
+            Kirigami.Icon {
+                id: updateAvailableBadge;
+                opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
+                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                anchors {
+                    bottom: parent.bottom;
+                    right: parent.right;
+                    top: parent.top;
+                }
+                width: height;
+                source: "vcs-update-required";
+            }
+            Kirigami.Icon {
+                id: installedBadge;
+                opacity: (model.status == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
+                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                anchors {
+                    bottom: parent.bottom;
+                    right: parent.right;
+                    top: parent.top;
+                }
+                width: height;
+                source: "vcs-normal";
+            }
+        }
     }
 }

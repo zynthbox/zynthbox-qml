@@ -2,9 +2,9 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Main Class and Program for Zynthian GUI
+Download page for ZYnthian themes
 
-Copyright (C) 2021 Marco Martin <mart@kde.org>
+Copyright (C) 2021 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
 ******************************************************************************
 
@@ -37,7 +37,7 @@ ZComponents.SelectorPage {
     title: qsTr("Theme Downloader")
     view.delegate: newStuffDelegate
     onItemActivated: {
-        console.log("Activated item " + index + " on screen " + screenId );
+        proxyView.currentIndex = index;
     }
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
@@ -51,6 +51,43 @@ ZComponents.SelectorPage {
         id: newStuffModel
         engine: newStuffEngine.engine
     }
+    ListView {
+        id: proxyView
+        anchors {
+            top: view.top
+            left: view.right
+            bottom: view.bottom
+        }
+        width: 2
+        model: newStuffModel
+        delegate: Item {
+            property int status: model.status;
+            property string name: model.name;
+            property string summary: model.summary;
+            // ...etc for the various roles. Would be nice if we could use the .index and .data functions
+            // so we could just slap this info into the normal delegate, that way we wouldn't need this
+            // proxy, but oh well, it's cheap enough, so...
+            // Setting these to make sure they're basically really large and we don't end up polling the model for more items than the not-proxy view has
+            width: ListView.view.width
+            height: ListView.view.height
+        }
+    }
+    contextualActions: [
+        Kirigami.Action {
+            enabled: view.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus)
+            text: proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install"); // if UpdateableStatus, say Update, if UpdateableStatus enabled = false
+            onTriggered: {
+                newStuffModel.installItem(view.currentIndex);
+            }
+        },
+        Kirigami.Action {
+            enabled: view.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus)
+            text: qsTr("Remove");
+            onTriggered: {
+                newStuffModel.uninstallItem(view.currentIndex);
+            }
+        }
+    ]
     Component {
         id: newStuffDelegate
         ZComponents.SelectorDelegate {

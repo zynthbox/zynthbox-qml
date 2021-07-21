@@ -102,6 +102,7 @@ from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
 #from zynqtgui.zynthian_gui_control_osc_browser import zynthian_gui_osc_browser
 
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
+from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 
 
 from pathlib import Path
@@ -525,7 +526,7 @@ class zynthian_gui(QObject):
 		#if "zynseq" in zynthian_gui_config.experimental_features:
 			#self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
 		self.screens['theme_chooser'] = zynthian_gui_theme_chooser(self)
-		self.screens['theme_downloader'] = zynthian_gui_selector(self)
+		self.screens['theme_downloader'] = zynthian_gui_newstuff(self)
 
 		# Init Auto-connector
 		zynautoconnect.start()

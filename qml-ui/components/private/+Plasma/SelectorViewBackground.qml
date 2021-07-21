@@ -57,40 +57,14 @@ PlasmaCore.FrameSvgItem {
         }
     }
 
-    //PlasmaCore.FrameSvgItem {
-        //anchors {
-            //fill: parent
-            //leftMargin: parent.margins.left
-            //topMargin: parent.margins.top
-            //rightMargin: parent.margins.right
-            //bottomMargin: parent.margins.bottom
-        //}
-        //imagePath: "widgets/lineedit"
-        //prefix: "base"
-        //opacity: 0.4
-    //}
-    //PlasmaCore.FrameSvgItem {
-        //id: focusFrame
-        //anchors {
-            //fill: parent
-            //leftMargin: parent.margins.left
-            //topMargin: parent.margins.top
-            //rightMargin: parent.margins.right
-            //bottomMargin: parent.margins.bottom
-        //}
-        //visible: parent.highlighted
-        //imagePath: "widgets/lineedit"
-        //prefix: "focus"
-    //}
-
     Rectangle {
         anchors {
-			fill: parent
-			leftMargin: parent.margins.left
+            fill: parent
+            leftMargin: parent.margins.left
             topMargin: parent.margins.top
             rightMargin: parent.margins.right
             bottomMargin: parent.margins.bottom
-		}
+        }
         visible: parent.highlighted
         color: "transparent"
         border.color: Kirigami.Theme.highlightColor

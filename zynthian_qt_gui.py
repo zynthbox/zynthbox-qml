@@ -2263,10 +2263,11 @@ if __name__ == "__main__":
 	palette.setColor(QPalette.HighlightedText, zynthian_gui_config.color_tx)
 	app.setPalette(palette)
 
-	font = app.font()
-	font.setPointSize(12)
-	font.setFamily("Roboto")
-	app.setFont(font)
+	zyngui.screens['theme_chooser'].apply_font()
+	#font = app.font()
+	#font.setPointSize(12)
+	#font.setFamily("Roboto")
+	#app.setFont(font)
 
 	zyngui.show_screen('main')
 	zyngui.screens['preset'].disable_show_fav_presets()

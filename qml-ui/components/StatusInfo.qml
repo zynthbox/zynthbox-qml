@@ -83,7 +83,7 @@ Item {
                 }
                 opacity: 0
                 implicitWidth: Kirigami.Units.smallSpacing
-                color: "#da4453"
+                color: Kirigami.Theme.negativeTextColor
                 Behavior on x {
                     XAnimator {
                         duration: Kirigami.Units.shortDuration
@@ -104,7 +104,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#da4453"
+                color: Kirigami.Theme.negativeTextColor
             }
             Rectangle {
                 id: mediumSignalARect
@@ -113,7 +113,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#fbbb4c"
+                color: Kirigami.Theme.neutralTextColor
             }
             Rectangle {
                 id: lowSignalARect
@@ -122,7 +122,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#11d116"
+                color: Kirigami.Theme.positiveTextColor
             }
         }
 
@@ -138,7 +138,7 @@ Item {
                 }
                 opacity: 0
                 implicitWidth: Kirigami.Units.smallSpacing
-                color: "#da4453"
+                color: Kirigami.Theme.negativeTextColor
                 Behavior on x {
                     XAnimator {
                         duration: Kirigami.Units.shortDuration
@@ -159,7 +159,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#da4453"
+                color: Kirigami.Theme.negativeTextColor
             }
             Rectangle {
                 id: mediumSignalBRect
@@ -168,7 +168,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#fbbb4c"
+                color: Kirigami.Theme.neutralTextColor
             }
             Rectangle {
                 id: lowSignalBRect
@@ -177,7 +177,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
-                color: "#11d116"
+                color: Kirigami.Theme.positiveTextColor
             }
         }
     }

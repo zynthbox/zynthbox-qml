@@ -78,6 +78,29 @@ QQC2.ScrollView {
         model: root.selector.selector_list
 
         delegate: SelectorDelegate {}
+
+        Kirigami.Separator {
+            parent: view
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+            }
+            color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
+            opacity: 1
+            visible: !view.atYBeginning
+        }
+        Kirigami.Separator {
+            parent: view
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
+            opacity: 1
+            visible: !view.atYEnd
+        }
     }
 
     background: SelectorViewBackground {

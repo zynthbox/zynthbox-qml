@@ -39,6 +39,7 @@ PlasmaCore.FrameSvgItem {
     readonly property real bottomPadding: margins.bottom
 
     imagePath: "widgets/background"
+    prefix: highlighted ? ["focus", ""] : ""
     //colorGroup: PlasmaCore.Theme.ViewColorGroup
 
     Timer { //HACK AND BUG WORKAROUND
@@ -65,37 +66,10 @@ PlasmaCore.FrameSvgItem {
             rightMargin: parent.margins.right
             bottomMargin: parent.margins.bottom
         }
-        visible: parent.highlighted
+        visible: parent.highlighted && parent.usedPrefix !== "focus"
         color: "transparent"
         border.color: Kirigami.Theme.highlightColor
         radius: Kirigami.Units.smallSpacing
-    }
-
-    Kirigami.Separator {
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-            topMargin: root.margins.top
-            leftMargin: root.margins.left
-            rightMargin: root.margins.right
-        }
-        color: Kirigami.Theme.textColor
-        opacity: 0.4
-        visible: !view.atYBeginning
-    }
-    Kirigami.Separator {
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-            bottomMargin: root.margins.bottom
-            leftMargin: root.margins.left
-            rightMargin: root.margins.right
-        }
-        color: Kirigami.Theme.textColor
-        opacity: 0.4
-        visible: !view.atYEnd
     }
 }
 

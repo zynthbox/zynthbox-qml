@@ -45,34 +45,49 @@ QtObject {
         Kirigami.Theme.linkColor = theme.linkColor
         Kirigami.Theme.visitedLinkColor = theme.visitedLinkColor
 
-        Kirigami.Theme.negativeTextColor = "#DA4453"
-        Kirigami.Theme.neutralTextColor = "#F67400"
-        Kirigami.Theme.positiveTextColor = "#27AE60"
+        Kirigami.Theme.negativeTextColor = theme.negativeTextColor
+        Kirigami.Theme.neutralTextColor = theme.neutralTextColor
+        Kirigami.Theme.positiveTextColor = theme.positiveTextColor
 
         Kirigami.Theme.buttonTextColor = theme.buttonTextColor
         Kirigami.Theme.buttonBackgroundColor = theme.buttonBackgroundColor
         Kirigami.Theme.buttonHoverColor = theme.buttonHoverColor
         Kirigami.Theme.buttonFocusColor = theme.buttonFocusColor
+        Kirigami.Theme.buttonNegativeTextColor = theme.buttonNegativeTextColor
+        Kirigami.Theme.buttonNeutralTextColor = theme.buttonNeutralTextColor
+        Kirigami.Theme.buttonPositiveTextColor = theme.buttonPositiveTextColor
 
         Kirigami.Theme.viewTextColor = theme.viewTextColor
         Kirigami.Theme.viewBackgroundColor = theme.viewBackgroundColor
         Kirigami.Theme.viewHoverColor = theme.viewHoverColor
         Kirigami.Theme.viewFocusColor = theme.viewFocusColor
+        Kirigami.Theme.viewNegativeTextColor = theme.viewNegativeTextColor
+        Kirigami.Theme.viewNeutralTextColor = theme.viewNeutralTextColor
+        Kirigami.Theme.viewPositiveTextColor = theme.viewPositiveTextColor
 
         Kirigami.Theme.selectionTextColor = theme.highlightedTextColor
         Kirigami.Theme.selectionBackgroundColor = theme.highlightColor
         Kirigami.Theme.selectionHoverColor = theme.selectionHoverColor
         Kirigami.Theme.selectionFocusColor = theme.selectionFocusColor
+        Kirigami.Theme.selectionNegativeTextColor = theme.selectionNegativeTextColor
+        Kirigami.Theme.selectionNeutralTextColor = theme.selectionNeutralTextColor
+        Kirigami.Theme.selectionPositiveTextColor = theme.selectionPositiveTextColor
 
         Kirigami.Theme.tooltipTextColor = theme.tooltipTextColor
         Kirigami.Theme.tooltipBackgroundColor = theme.tooltipBackgroundColor
         Kirigami.Theme.tooltipHoverColor = theme.tooltipHoverColor
         Kirigami.Theme.tooltipFocusColor = theme.tooltipFocusColor
+        Kirigami.Theme.tooltipNegativeTextColor = theme.tooltipNegativeTextColor
+        Kirigami.Theme.tooltipNeutralTextColor = theme.tooltipNeutralTextColor
+        Kirigami.Theme.tooltipPositiveTextColor = theme.tooltipPositiveTextColor
 
         Kirigami.Theme.complementaryTextColor = theme.complementaryTextColor
         Kirigami.Theme.complementaryBackgroundColor = theme.complementaryBackgroundColor
         Kirigami.Theme.complementaryHoverColor = theme.complementaryHoverColor
         Kirigami.Theme.complementaryFocusColor = theme.complementaryFocusColor
+        Kirigami.Theme.complementaryNegativeTextColor = theme.complementaryNegativeTextColor
+        Kirigami.Theme.complementaryNeutralTextColor = theme.complementaryNeutralTextColor
+        Kirigami.Theme.complementaryPositiveTextColor = theme.complementaryPositiveTextColor
     }
 
     Component.onCompleted: {

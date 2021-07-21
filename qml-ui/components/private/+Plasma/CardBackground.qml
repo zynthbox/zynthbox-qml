@@ -39,7 +39,9 @@ PlasmaCore.FrameSvgItem {
 
     imagePath: "widgets/background"
     //colorGroup: PlasmaCore.Theme.ViewColorGroup
-    PlasmaCore.FrameSvgItem {
+    prefix: highlighted ? ["focus", ""] : ""
+
+    Rectangle {
         anchors {
             fill: parent
             leftMargin: parent.margins.left
@@ -47,9 +49,10 @@ PlasmaCore.FrameSvgItem {
             rightMargin: parent.margins.right
             bottomMargin: parent.margins.bottom
         }
-        visible: parent.highlighted
-        imagePath: "widgets/lineedit"
-        prefix: "focus"
+        visible: parent.highlighted && parent.usedPrefix !== "focus"
+        color: "transparent"
+        border.color: Kirigami.Theme.highlightColor
+        radius: Kirigami.Units.smallSpacing
     }
 }
 

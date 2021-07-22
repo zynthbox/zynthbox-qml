@@ -43,6 +43,12 @@ QQC2.ItemDelegate {
     rightPadding: Kirigami.Units.largeSpacing
     highlighted: ListView.isCurrentItem
 
+    property string screenId
+    property QtObject selector
+    signal currentScreenIdRequested(string screenId)
+    signal itemActivated(string screenId, int index)
+    signal itemActivatedSecondary(string screenId, int index)
+
     //implicitHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
 
     background: DelegateBackground {
@@ -51,21 +57,21 @@ QQC2.ItemDelegate {
 
     onClicked: {
         let oldCurrent_screen_id = zynthian.current_screen_id;
-        root.selector.current_index = index;
-        root.selector.activate_index(index);
-        root.itemActivated(index)
+        delegate.selector.current_index = index;
+        delegate.selector.activate_index(index);
+        delegate.itemActivated(delegate.screenId, index);
         // if the activation didn't explicitly ask for a new screen, set the current as this
         if (zynthian.current_screen_id === oldCurrent_screen_id) {
-            root.currentScreenIdRequested()
+            delegate.currentScreenIdRequested(screenId);
         }
     }
     onPressAndHold: {
         let oldCurrent_screen_id = zynthian.current_screen_id;
-        root.selector.current_index = index;
-        root.selector.activate_index_secondary(index);
-        root.itemActivatedSecondary(index)
+        delegate.selector.current_index = index;
+        delegate.selector.activate_index_secondary(index);
+        delegate.itemActivatedSecondary(delegate.screenId, index);
         if (zynthian.current_screen_id === oldCurrent_screen_id) {
-            root.currentScreenIdRequested()
+            delegate.currentScreenIdRequested(screenId);
         }
     }
 }

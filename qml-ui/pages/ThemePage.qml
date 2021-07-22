@@ -32,4 +32,10 @@ import "../components" as ZComponents
 
 ZComponents.SelectorPage {
     screenId: "theme_chooser"
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Get New Themes")
+            onTriggered: zynthian.show_modal("theme_downloader")
+        }
+    ]
 }

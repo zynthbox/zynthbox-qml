@@ -66,7 +66,7 @@ QQC2.ToolButton {
             }
             width: naturalSize.width * (height/naturalSize.height)
             svg: buttonSvg
-            elementId: root.highlighted ? "focus-left" : "left"
+            elementId: root.highlighted || root.pressed ? "focus-left" : "left"
         }
         PlasmaCore.SvgItem {
             anchors {
@@ -76,7 +76,7 @@ QQC2.ToolButton {
                 bottom: parent.bottom
             }
             svg: buttonSvg
-            elementId: root.highlighted ? "focus-center" : "center"
+            elementId: root.highlighted || root.pressed ? "focus-center" : "center"
         }
         PlasmaCore.SvgItem {
             id: breadcrumbSeparator
@@ -87,7 +87,7 @@ QQC2.ToolButton {
             }
             width: naturalSize.width * (height/naturalSize.height)
             svg: buttonSvg
-            elementId: root.highlighted ? "focus-right" : "right"
+            elementId: root.highlighted || root.pressed ? "focus-right" : "right"
         }
     }
     contentItem.opacity: checked ? 1 : 0.5

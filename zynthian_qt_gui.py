@@ -223,7 +223,7 @@ class zynthian_gui_status_data(QObject):
 
 class zynthian_gui(QObject):
 
-	screens_sequence = ("main","layer","bank","preset","control")
+	screens_sequence = ("main","layer","bank","preset","control", "layer_effects")
 
 	note2cuia = {
 		"0": "POWER_OFF",
@@ -587,7 +587,7 @@ class zynthian_gui(QObject):
 			else:
 				screen = "main"
 		logging.error(screen)
-		traceback.print_stack(None, 8)
+
 		if screen=="layer" or screen=="bank"  or screen=="preset"  or screen=="control" :
 			self.restore_curlayer()
 

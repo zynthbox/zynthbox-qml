@@ -92,9 +92,8 @@ QQC2.ToolBar {
                         Layout.fillWidth: true
                         text: (zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path).replace("Jalv/", "") //HACK for name shortening
                         // HACK to hide home button as there is already one
-                        visible: index > 1 || root.layerManager.depth > 1
-                        checked: model.screenId === zynthian.current_screen_id;
-                        checkable: false
+                        visible: (index > 1 || root.layerManager.depth > 1) && text.length > 0
+                        highlighted: model.screenId === zynthian.current_screen_id;
 
                         onClicked: {
                             if (root.layerManager.depth > 1) {

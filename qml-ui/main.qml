@@ -73,14 +73,12 @@ Kirigami.AbstractApplicationWindow {
 				icon.color: customTheme.Kirigami.Theme.textColor
 				rightPadding: Kirigami.Units.largeSpacing*2
 				onClicked: zynthian.current_screen_id = 'main'
-				checkable: false
-				checked: zynthian.current_screen_id === 'main'
+				highlighted: zynthian.current_screen_id === 'main'
 			}
 			ZComponentsPrivate.BreadcrumbButton {
 				text: zynthian.layer.selector_path_element + "ˬ"
 				onClicked: layersMenu.visible = true
-				checkable: false
-				checked: zynthian.current_screen_id === 'layer'
+				highlighted: zynthian.current_screen_id === 'layer'
 				ZComponentsPrivate.ActionsMenu {
 					id: layersMenu
 					property list<Kirigami.Action> intActions: [

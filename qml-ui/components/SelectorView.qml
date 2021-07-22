@@ -111,7 +111,7 @@ QQC2.ScrollView {
 
     background: SelectorViewBackground {
         id: background
-        highlighted: view.activeFocus
+        highlighted: view.activeFocus || zynthian.current_screen_id === root.screenId
     }
 }
 

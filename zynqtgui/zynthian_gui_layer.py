@@ -51,6 +51,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		super(zynthian_gui_layer, self).__init__('Layer', parent)
 		self.layers = []
 		self.root_layers = []
+		self.layer_midi_map = {}
 		self.amixer_layer = None
 		self.add_layer_eng = None
 		self.replace_layer_index = None
@@ -76,12 +77,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def fill_list(self):
 		self.list_data=[]
+		self.layer_midi_map = {}
 
 		# Get list of root layers
 		self.root_layers=self.get_fxchain_roots()
 
 		for i,layer in enumerate(self.root_layers):
 			self.list_data.append((str(i+1),i,layer.get_presetpath()))
+			self.layer_midi_map[layer.midi_chan] = layer
 
 		# Add separator
 		if len(self.root_layers)>0:
@@ -185,6 +188,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if len(self.root_layers) == 0 or i < 0 or i >= len(self.root_layers):
 			return
 		self.activate_index(i)
+
+	@Slot(int)
+	def activate_midican_layer(self, midi_chan):
+		if midi_chan in self.layer_midi_map:
+			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
+		else:
+			self.replace_layer_index = None
+			self.layer_chain_parallel = False
+			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
+			self.zyngui.screens['engine'].midi_chan = midi_chan
+			self.layer_index_replace_engine = None
+			self.zyngui.show_modal('engine')
 
 	def next(self, control=True):
 		self.zyngui.restore_curlayer()

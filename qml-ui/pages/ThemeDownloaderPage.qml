@@ -33,6 +33,7 @@ import "../components" as ZComponents
 import "../components/private/" as ZComponentsPrivate
 
 ZComponents.SelectorPage {
+    id: component
     screenId: "theme_downloader"
     title: qsTr("Theme Downloader")
     view.delegate: newStuffDelegate
@@ -91,10 +92,11 @@ ZComponents.SelectorPage {
     Component {
         id: newStuffDelegate
         ZComponents.SelectorDelegate {
+            screenId: component.screenId
             selector: ListView.view.parent.selector
-            onCurrentScreenIdRequested: ListView.view.parent.currentScreenIdRequested()
-            onItemActivated: ListView.view.parent.itemActivated(index)
-            onItemActivatedSecondary: ListView.view.parent.itemActivatedSecondary(index)
+            onCurrentScreenIdRequested: ListView.view.parent.currentScreenIdRequested(screenId)
+            onItemActivated: ListView.view.parent.itemActivated(screenId, index)
+            onItemActivatedSecondary: ListView.view.parent.itemActivatedSecondary(screenId, index)
             Kirigami.Icon {
                 id: updateAvailableBadge;
                 opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;

@@ -52,40 +52,19 @@ ZComponents.SelectorPage {
         id: newStuffModel
         engine: newStuffEngine.engine
     }
-    ListView {
-        id: proxyView
-        anchors {
-            top: view.top
-            left: view.right
-            bottom: view.bottom
-        }
-        width: 2
-        model: newStuffModel
-        delegate: Item {
-            property int status: model.status;
-            property string name: model.name;
-            property string summary: model.summary;
-            // ...etc for the various roles. Would be nice if we could use the .index and .data functions
-            // so we could just slap this info into the normal delegate, that way we wouldn't need this
-            // proxy, but oh well, it's cheap enough, so...
-            // Setting these to make sure they're basically really large and we don't end up polling the model for more items than the not-proxy view has
-            width: ListView.view.width
-            height: ListView.view.height
-        }
-    }
     contextualActions: [
         Kirigami.Action {
-            enabled: view.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus)
+            enabled: proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus)
             text: proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install"); // if UpdateableStatus, say Update, if UpdateableStatus enabled = false
             onTriggered: {
-                newStuffModel.installItem(view.currentIndex);
+                newStuffModel.installItem(proxyView.currentIndex);
             }
         },
         Kirigami.Action {
-            enabled: view.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus)
+            enabled: proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus)
             text: qsTr("Remove");
             onTriggered: {
-                newStuffModel.uninstallItem(view.currentIndex);
+                newStuffModel.uninstallItem(proxyView.currentIndex);
             }
         }
     ]
@@ -120,6 +99,138 @@ ZComponents.SelectorPage {
                 }
                 width: height;
                 source: "vcs-normal";
+            }
+        }
+    }
+    ListView {
+        id: proxyView
+        anchors {
+            top: view.top
+            right: view.right
+            bottom: view.bottom
+        }
+        width: component.width / 3
+        interactive: false
+        pixelAligned: true
+        model: newStuffModel
+        onCurrentIndexChanged: {
+            positionViewAtIndex(currentIndex, ListView.Beginning);
+        }
+        delegate: Item {
+            property int status: model.status;
+            property string name: model.name;
+            property string summary: model.summary;
+            // ...etc for the various roles. Would be nice if we could use the .index and .data functions
+            // so we could just slap this info into the normal delegate, that way we wouldn't need this
+            // proxy, but oh well, it's cheap enough, so...
+
+            // We're using this as our de-facto single-item view, so just make these the full size of the ListView
+            width: ListView.view.width
+            height: ListView.view.height
+            ZComponents.Card {
+                anchors.fill: parent;
+                ColumnLayout {
+                    opacity: busyInstallingStuff.running ? 0.3 : 1
+                    Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                    anchors {
+                        fill: parent;
+                        margins: Kirigami.Units.largeSpacing;
+                    }
+                    Item {
+                        id: previewContainer;
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Image {
+                            id: previewImage;
+                            anchors {
+                                fill: parent;
+                                margins: Kirigami.Units.smallSpacing;
+                            }
+                            verticalAlignment: Image.AlignTop
+                            asynchronous: true;
+                            fillMode: Image.PreserveAspectFit;
+                            source: model.previews.length > 0 ? model.previews[0] : "";
+                            Kirigami.Icon {
+                                id: updateAvailableBadge;
+                                opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
+                                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                                anchors {
+                                    bottom: parent.bottom;
+                                    right: parent.right;
+                                    margins: -Kirigami.Units.smallSpacing;
+                                }
+                                height: Kirigami.Units.iconSizes.smallMedium;
+                                width: height;
+                                source: "vcs-update-required";
+                            }
+                            Kirigami.Icon {
+                                id: installedBadge;
+                                opacity: (model.status == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
+                                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                                anchors {
+                                    bottom: parent.bottom;
+                                    right: parent.right;
+                                    margins: -Kirigami.Units.smallSpacing;
+                                }
+                                height: Kirigami.Units.iconSizes.smallMedium;
+                                width: height;
+                                source: "vcs-normal";
+                            }
+                        }
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        text: model.summary
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 5
+                        elide: Text.ElideRight
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        visible: model.version.length > 0
+                        text: qsTr("Version %1").arg(model.version)
+                        elide: Text.ElideRight
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        text: qsTr("Released on %1").arg(model.releaseDate.toLocaleDateString())
+                        elide: Text.ElideRight
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        text: qsTr("By %1").arg(model.author["name"])
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        QQC2.Label {
+                            text: qsTr("Rated as")
+                        }
+                        ZComponents.Rating {
+                            Layout.fillWidth: true
+                            rating: model.rating
+                        }
+                    }
+                }
+            }
+            QQC2.BusyIndicator {
+                id: busyInstallingStuff
+                anchors {
+                    verticalCenter: parent.verticalCenter;
+                    right: parent.right;
+                    rightMargin: Kirigami.Units.largeSpacing + Kirigami.Units.iconSizes.large;
+                }
+                opacity: (model.status == NewStuff.ItemsModel.InstallingStatus || model.status == NewStuff.ItemsModel.UpdatingStatus) ? 1 : 0;
+                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                running: opacity > 0;
+                QQC2.Label {
+                    anchors {
+                        verticalCenter: parent.verticalCenter;
+                        right: parent.left;
+                        rightMargin: Kirigami.Units.smallSpacing;
+                    }
+                    text: (model.status == NewStuff.ItemsModel.InstallingStatus) ? "Installing" : ((model.status == NewStuff.ItemsModel.UpdatingStatus) ? "Updating" : "");
+                    width: paintedWidth;
+                }
             }
         }
     }

@@ -39,6 +39,7 @@ QQC2.Menu
         property Kirigami.Action kirigamiAction
         visible: kirigamiAction.visible === undefined || kirigamiAction.visible
         height: visible ? implicitHeight : 0
+        width: parent.width
 
         text: kirigamiAction.text
         icon.name: kirigamiAction.icon.name

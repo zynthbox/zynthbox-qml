@@ -54,15 +54,15 @@ ZComponents.SelectorPage {
     }
     contextualActions: [
         Kirigami.Action {
-            enabled: proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus)
-            text: proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install"); // if UpdateableStatus, say Update, if UpdateableStatus enabled = false
+            enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DownloadableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.DeletedStatus))
+            text: proxyView.currentItem ? (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus ? qsTr("Update") : qsTr("Install")) : ""
             onTriggered: {
                 newStuffModel.installItem(proxyView.currentIndex);
             }
         },
         Kirigami.Action {
-            enabled: proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus)
-            text: qsTr("Remove");
+            enabled: proxyView.currentItem && (proxyView.currentIndex > -1 && (proxyView.currentItem.status == NewStuff.ItemsModel.UpdateableStatus || proxyView.currentItem.status == NewStuff.ItemsModel.InstalledStatus))
+            text: proxyView.currentItem ? qsTr("Remove") : ""
             onTriggered: {
                 newStuffModel.uninstallItem(proxyView.currentIndex);
             }

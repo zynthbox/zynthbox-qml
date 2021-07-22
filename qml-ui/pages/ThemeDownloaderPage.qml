@@ -155,7 +155,7 @@ ZComponents.SelectorPage {
                                 opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
                                 Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                                 anchors {
-                                    bottom: parent.bottom;
+                                    top: parent.top;
                                     right: parent.right;
                                     margins: -Kirigami.Units.smallSpacing;
                                 }
@@ -168,7 +168,7 @@ ZComponents.SelectorPage {
                                 opacity: (model.status == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
                                 Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                                 anchors {
-                                    bottom: parent.bottom;
+                                    top: parent.top;
                                     right: parent.right;
                                     margins: -Kirigami.Units.smallSpacing;
                                 }
@@ -215,18 +215,20 @@ ZComponents.SelectorPage {
             QQC2.BusyIndicator {
                 id: busyInstallingStuff
                 anchors {
-                    verticalCenter: parent.verticalCenter;
-                    right: parent.right;
-                    rightMargin: Kirigami.Units.largeSpacing + Kirigami.Units.iconSizes.large;
+                    horizontalCenter: parent.horizontalCenter;
+                    bottom: parent.verticalCenter
+                    bottomMargin: Kirigami.Units.largeSpacing
                 }
+                height: Kirigami.Units.gridUnit * 3
+                width: height
                 opacity: (model.status == NewStuff.ItemsModel.InstallingStatus || model.status == NewStuff.ItemsModel.UpdatingStatus) ? 1 : 0;
                 Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                 running: opacity > 0;
                 QQC2.Label {
                     anchors {
-                        verticalCenter: parent.verticalCenter;
-                        right: parent.left;
-                        rightMargin: Kirigami.Units.smallSpacing;
+                        horizontalCenter: parent.horizontalCenter;
+                        top: parent.bottom
+                        topMargin: Kirigami.Units.largeSpacing
                     }
                     text: (model.status == NewStuff.ItemsModel.InstallingStatus) ? "Installing" : ((model.status == NewStuff.ItemsModel.UpdatingStatus) ? "Updating" : "");
                     width: paintedWidth;

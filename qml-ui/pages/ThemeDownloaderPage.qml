@@ -112,6 +112,7 @@ ZComponents.SelectorPage {
         width: component.width / 3
         interactive: false
         pixelAligned: true
+        clip: true
         model: newStuffModel
         onCurrentIndexChanged: {
             positionViewAtIndex(currentIndex, ListView.Beginning);

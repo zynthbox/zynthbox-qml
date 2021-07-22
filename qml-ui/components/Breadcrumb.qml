@@ -69,17 +69,19 @@ QQC2.ToolBar {
             Layout.fillHeight: true
             visible: contentItem !== null
         }
-        Flickable {
-            id: breadcrumbFlickable
+        Item {
+            id: breadcrumbParent
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
-            contentHeight: height
-            contentWidth: breadcrumbLayout.width
 
             RowLayout {
                 id: breadcrumbLayout
-                height: breadcrumbFlickable.height
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                width: Math.min(implicitWidth, parent.width)
                 spacing: 0
                 Repeater {
                     model: ListModel {
@@ -87,33 +89,13 @@ QQC2.ToolBar {
                     }
                     BreadcrumbButton {
                         id: toolButton
-                        text: zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path
+                        Layout.fillWidth: true
+                        text: (zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path).replace("Jalv/", "") //HACK for name shortening
                         // HACK to hide home button as there is already one
                         visible: index > 1 || root.layerManager.depth > 1
                         checked: model.screenId === zynthian.current_screen_id;
                         checkable: false
-                        Connections {
-                            target: breadcrumbFlickable
-                            onWidthChanged: toolButton.ensureBounds()
-                        }
-                        function ensureBounds() {
-                            if (!checked || breadcrumbFlickable.width === 0) {
-                                return;
-                            }
 
-                            if (x < breadcrumbFlickable.contentX) {
-                                breadcrumbSlideAnim.stop();
-                                breadcrumbSlideAnim.from = breadcrumbFlickable.contentX;
-                                breadcrumbSlideAnim.to = x;
-                                breadcrumbSlideAnim.start();
-                            } else if (x + width - breadcrumbFlickable.contentX >  breadcrumbFlickable.width) {
-                                breadcrumbSlideAnim.stop();
-                                breadcrumbSlideAnim.from = breadcrumbFlickable.contentX;
-                                breadcrumbSlideAnim.to = Math.min(breadcrumbLayout.width - breadcrumbFlickable.width, x - breadcrumbFlickable.width + width);
-
-                                breadcrumbSlideAnim.start();
-                            }
-                        }
                         onClicked: {
                             if (root.layerManager.depth > 1) {
                                 zynthian.current_modal_screen_id = model.screenId;
@@ -121,26 +103,11 @@ QQC2.ToolBar {
                                 zynthian.current_screen_id = model.screenId;
                             }
                         }
-                        onCheckedChanged: {
-                            if (checked) {
-                                ensureBounds();
-                            }
-                        }
                     }
                 }
             }
-            NumberAnimation {
-                id: breadcrumbSlideAnim
-                target: breadcrumbFlickable
-                property: "contentX"
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
         }
-        Kirigami.Separator {
-            Layout.fillHeight: true
-            visible: !breadcrumbFlickable.atXEnd
-        }
+
         QQC2.Control {
             id: rightHeaderControl
             z: 999

@@ -36,13 +36,12 @@ ZComponents.MultiSelectorPage {
     screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.effect_types.selector_list.count), qsTr("FX (%1)").arg(zynthian.layer_effect_chooser.selector_list.count)]
 
     previousScreen: "layer"
-    onCurrentScreenIdRequested: {
-        //FIXME: why this workaround?
-        //if (zynthian.current_screen_id != "confirm") {
-            //zynthian.show_modal(screenId)
-        //}
-
-    }
+    Component.onCompleted: {
+		zynthian.preset.next_screen = "layer_effects"
+	}
+	Component.onDestruction: {
+		zynthian.preset.next_screen = "control"
+	}
 }
 
 

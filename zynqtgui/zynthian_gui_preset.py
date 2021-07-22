@@ -48,6 +48,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	def __init__(self, parent = None):
 		super(zynthian_gui_preset, self).__init__('Preset', parent)
+		self.next_screen_prop = 'control'
 		self.show()
       
       
@@ -91,7 +92,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		return True
 
 	def next_action(self):
-		return 'control'
+		return self.next_screen_prop
 
 	#def back_action(self):
 		#if self.show_fav_presets:
@@ -157,10 +158,15 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					self.select_path_element = self.zyngui.curlayer.preset_name
 		super().set_select_path()
 
+	def set_next_screen(self, screen):
+		self.next_screen_prop = screen
+		self.next_screen_changed.emit()
 
 	show_only_favorites_changed = Signal()
+	next_screen_changed = Signal()
 
 	show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify = show_only_favorites_changed)
+	next_screen = Property(str, next_action, set_next_screen, notify = next_screen_changed)
 
 
 #------------------------------------------------------------------------------

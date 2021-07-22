@@ -38,6 +38,7 @@ ZComponents.ScreenPage {
 
     Component.onCompleted: {
         mainView.forceActiveFocus()
+        zynthian.preset.next_screen = "control"
     }
     onFocusChanged: {
         if (focus) {

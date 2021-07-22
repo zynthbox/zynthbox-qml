@@ -24,6 +24,7 @@ T.Switch {
     hoverEnabled: true
 
     indicator: SwitchIndicator {
+		control: control
         LayoutMirroring.enabled: control.mirrored
         LayoutMirroring.childrenInherit: true
         anchors {

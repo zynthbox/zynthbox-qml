@@ -162,11 +162,13 @@ Kirigami.AbstractApplicationWindow {
             contentItem: RowLayout {
                 spacing: Kirigami.Units.smallSpacing
                 QQC2.Button {
+                    implicitWidth: 1
                     Layout.fillWidth: true
                     text: qsTr("No")
                     onClicked: confirmDialog.reject()
                 }
                 QQC2.Button {
+                    implicitWidth: 1
                     Layout.fillWidth: true
                     text: qsTr("Yes")
                     onClicked: confirmDialog.accept()

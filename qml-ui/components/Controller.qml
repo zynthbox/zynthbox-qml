@@ -136,6 +136,12 @@ Card {
                 scale: root.valueType === "bool"
                 enabled: root.valueType === "bool"
                 onClicked: root.controller.value = root.controller.value == root.controller.value0 ? root.controller.max_value : root.controller.value0
+                Behavior on scale {
+                        NumberAnimation {
+                            duration: Kirigami.Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
                 QQC2.Switch {
                     id: switchControl
                     anchors.centerIn: parent
@@ -150,12 +156,7 @@ Card {
                         property: "color"
                         value: switchControl.checked ? Kirigami.Theme.highlightColor : switchControl.palette.midlight
                     }*/
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: Kirigami.Units.longDuration
-                            easing.type: Easing.InOutQuad
-                        }
-                    }
+
                     Kirigami.Heading {
                         anchors {
                             horizontalCenter: parent.horizontalCenter

@@ -175,7 +175,13 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 	def select_action(self, i, t='S'):
 		if i is not None and self.list_data[i][0]:
-			self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
+			if self.midi_chan is None:
+				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
+			else:
+				self.zyngui.start_loading()
+				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
+				self.zyngui.show_screen('layer')
+				self.zyngui.stop_loading()
 
 
 	def start_engine(self, eng):

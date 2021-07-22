@@ -1092,17 +1092,17 @@ class zynthian_gui(QObject):
 					self.modal_screen_next = None
 
 		elif cuia == "LAYER_ONE":
-			self.screens['layer'].activate_layer(0)
+			self.screens['layer'].activate_midican_layer(0)
 		elif cuia == "LAYER_TWO":
-			self.screens['layer'].activate_layer(1)
+			self.screens['layer'].activate_midican_layer(1)
 		elif cuia == "LAYER_THREE":
-			self.screens['layer'].activate_layer(2)
+			self.screens['layer'].activate_midican_layer(2)
 		elif cuia == "LAYER_FOUR":
-			self.screens['layer'].activate_layer(3)
+			self.screens['layer'].activate_midican_layer(3)
 		elif cuia == "LAYER_FIVE":
-			self.screens['layer'].activate_layer(4)
+			self.screens['layer'].activate_midican_layer(4)
 		elif cuia == "LAYER_SIX":
-			self.screens['layer'].activate_layer(5)
+			self.screens['layer'].activate_midican_layer(5)
 
 
 

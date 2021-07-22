@@ -180,6 +180,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['layer_options'].reset()
 			self.zyngui.show_modal('layer_options')
 
+	@Slot(int)
 	def activate_layer(self, i):
 		if len(self.root_layers) == 0 or i < 0 or i >= len(self.root_layers):
 			return

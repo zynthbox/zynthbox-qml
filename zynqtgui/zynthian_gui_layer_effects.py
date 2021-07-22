@@ -96,6 +96,8 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		elif self.list_data[i][0] == 'ADD-PARALLEL-AUDIOFX':
 			self.zyngui.screens['layer_effect_chooser'].layer_chain_parallel = True
 
+		logging.error("AUDIOFXLAYERRSSSSSS" + str(i))
+		logging.error(self.audiofx_layers)
 
 		if i < len(self.audiofx_layers):
 			self.audiofx_layer = self.audiofx_layers[i]
@@ -106,6 +108,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		if self.audiofx_layer != None:
 			self.zyngui.screens['effect_types'].show()
+		self.set_select_path()
 
 
 	def index_supports_immediate_activation(self, index=None):
@@ -144,7 +147,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 	def set_select_path(self):
 		self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
 		if len(self.audiofx_layers) > 0:
-			self.select_path_element = "FX {}".format(min(self.index, len(self.audiofx_layers) - 1))
+			self.select_path_element = "FX {}".format(min(self.index, len(self.audiofx_layers) - 1) + 1)
 		else:
 			self.select_path_element = "Choose Audio-FX"
 		super().set_select_path()

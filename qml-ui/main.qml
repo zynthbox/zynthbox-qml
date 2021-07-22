@@ -77,7 +77,7 @@ Kirigami.AbstractApplicationWindow {
 				checked: zynthian.current_screen_id === 'main'
 			}
 			ZComponentsPrivate.BreadcrumbButton {
-				text: zynthian.layer.selector_path_element
+				text: zynthian.layer.selector_path_element + "ˬ"
 				onClicked: layersMenu.visible = true
 				checkable: false
 				checked: zynthian.current_screen_id === 'layer'

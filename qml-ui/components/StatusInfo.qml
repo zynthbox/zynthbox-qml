@@ -81,6 +81,7 @@ Item {
                     top: parent.top
                     bottom: parent.bottom
                 }
+                radius: 3
                 opacity: 0
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -104,6 +105,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.negativeTextColor
             }
             Rectangle {
@@ -113,6 +115,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.neutralTextColor
             }
             Rectangle {
@@ -122,6 +125,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.positiveTextColor
             }
         }
@@ -136,6 +140,7 @@ Item {
                     top: parent.top
                     bottom: parent.bottom
                 }
+                radius: 3
                 opacity: 0
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -159,6 +164,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.negativeTextColor
             }
             Rectangle {
@@ -168,6 +174,7 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.neutralTextColor
             }
             Rectangle {
@@ -177,76 +184,77 @@ Item {
                     bottom: parent.bottom
                     left: parent.left
                 }
+                radius: 3
                 color: Kirigami.Theme.positiveTextColor
             }
         }
-    }
 
-    RowLayout {
-        id: statusIconsLayout
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-        }
-        height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
-        Kirigami.Icon {
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            source: "dialog-warning-symbolic"
-            color: Kirigami.Theme.negativeTextColor
-            visible: zynthian.status_information.xrun
-        }
-        Kirigami.Icon {
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            source: "preferences-system-power"
-            visible: zynthian.status_information.undervoltage
-        }
-        Kirigami.Icon {
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            color: Kirigami.Theme.textColor
-            source: {
-                switch(zynthian.status_information.audio_recorder) {
-                case "PLAY":
-                    return "media-playback-start-symbolic";
-                case "REC":
-                default:
-                    return "media-record-symbolic";
-                }
+        RowLayout {
+            id: statusIconsLayout
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
             }
-            QQC2.Label {
-                anchors {
-                    right: parent.right
-                    bottom: parent.bottom
-                }
-                font.pointSize: 6
-                text: qsTr("Audio")
+            height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
+            Kirigami.Icon {
+                Layout.fillHeight: true
+                Layout.preferredWidth: height
+                source: "dialog-warning-symbolic"
+                color: Kirigami.Theme.negativeTextColor
+                visible: zynthian.status_information.xrun
             }
-            visible: zynthian.status_information.audio_recorder.length > 0
-        }
-        Kirigami.Icon {
-            Layout.fillHeight: true
-            Layout.preferredWidth: height
-            color: Kirigami.Theme.textColor
-            source: {
-                switch(zynthian.status_information.audio_recorder) {
-                case "PLAY":
-                    return "media-playback-start-symbolic";
-                case "REC":
-                default:
-                    return "media-record-symbolic";
-                }
+            Kirigami.Icon {
+                Layout.fillHeight: true
+                Layout.preferredWidth: height
+                source: "preferences-system-power"
+                visible: zynthian.status_information.undervoltage
             }
-            QQC2.Label {
-                anchors {
-                    right: parent.right
-                    bottom: parent.bottom
+            Kirigami.Icon {
+                Layout.fillHeight: true
+                Layout.preferredWidth: height
+                color: Kirigami.Theme.textColor
+                source: {
+                    switch(zynthian.status_information.audio_recorder) {
+                    case "PLAY":
+                        return "media-playback-start-symbolic";
+                    case "REC":
+                    default:
+                        return "media-record-symbolic";
+                    }
                 }
-                font.pointSize: 6
-                text: "Midi"
+                QQC2.Label {
+                    anchors {
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                    font.pointSize: 6
+                    text: qsTr("Audio")
+                }
+                visible: zynthian.status_information.audio_recorder.length > 0
             }
-            visible: zynthian.status_information.midi_recorder.length > 0
+            Kirigami.Icon {
+                Layout.fillHeight: true
+                Layout.preferredWidth: height
+                color: Kirigami.Theme.textColor
+                source: {
+                    switch(zynthian.status_information.audio_recorder) {
+                    case "PLAY":
+                        return "media-playback-start-symbolic";
+                    case "REC":
+                    default:
+                        return "media-record-symbolic";
+                    }
+                }
+                QQC2.Label {
+                    anchors {
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                    font.pointSize: 6
+                    text: "Midi"
+                }
+                visible: zynthian.status_information.midi_recorder.length > 0
+            }
         }
     }
 }

@@ -55,7 +55,10 @@ QtObject {
 		"layer": "SynthSetupPage.qml",
 		"bank": "SynthSetupPage.qml",
 		"preset": "SynthSetupPage.qml",
-		"control": "ControlPage.qml"
+		"control": "ControlPage.qml",
+		"layer_effects": "FXSetupPage.qml",
+		"effect_types": "FXSetupPage.qml",
+		"layer_effect_chooser": "FXSetupPage.qml"
 	}
 
 	readonly property var modalScreens: {
@@ -68,9 +71,6 @@ QtObject {
 		"admin": "AdminPage.qml",
 		"info": "InfoPage.qml",
 		"option": "OptionPage.qml",
-		"layer_effects": "FXSetupPage.qml",
-		"effect_types": "FXSetupPage.qml",
-		"layer_effect_chooser": "FXSetupPage.qml",
 		"theme_chooser": "ThemePage.qml",
 		"theme_downloader": "ThemeDownloaderPage.qml"
 	}

@@ -143,6 +143,10 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 	def set_select_path(self):
 		self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
+		if len(self.audiofx_layers) > 0:
+			self.select_path_element = "FX {}".format(min(self.index, len(self.audiofx_layers) - 1))
+		else:
+			self.select_path_element = "Choose Audio-FX"
 		super().set_select_path()
 
 #------------------------------------------------------------------------------

@@ -64,11 +64,14 @@ Kirigami.AbstractApplicationWindow {
     header: ZComponents.Breadcrumb {
         //height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
         layerManager: screensLayer.layers
+        pageRow: screensLayer
+        modalPageRow: modalScreensLayer
         leftHeaderControl: ZComponentsPrivate.BreadcrumbButton {
             id: homeButton
             implicitWidth: height
             icon.name: "go-home"
             icon.color: customTheme.Kirigami.Theme.textColor
+            rightPadding: Kirigami.Units.gridUnit
             onClicked: zynthian.current_screen_id = 'main'
             checkable: false
             checked: zynthian.current_screen_id === 'main'
@@ -81,6 +84,11 @@ Kirigami.AbstractApplicationWindow {
         parent: root.contentItem
         anchors.fill: parent
         initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer')]
+    }
+
+    ModalScreensLayer {
+        id: modalScreensLayer
+        visible: false
     }
 
     CustomTheme {
@@ -103,11 +111,6 @@ Kirigami.AbstractApplicationWindow {
             onActivated: zynthian.process_keybinding_shortcut(model.display)
             onActivatedAmbiguously: zynthian.process_keybinding_shortcut(model.display)
         }
-    }
-
-    ModalScreensLayer {
-        id: modalScreensLayer
-        visible: false
     }
 
     QQC2.Dialog {

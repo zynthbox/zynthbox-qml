@@ -58,6 +58,9 @@ Kirigami.PageRow {
                 if (zynthian.current_screen_id === zynthian.current_modal_screen_id) {
                     return;
                 }
+                if (root.layers.depth > 1) {
+                    root.layers.pop(root)
+                }
 
                 for (var i = 0; i < root.depth; ++i) {
                     let child = root.get(i);
@@ -85,6 +88,7 @@ Kirigami.PageRow {
                 }
                 let file = applicationWindow().pageScreenMapping.pageForScreen(zynthian.current_screen_id);
                 if (file.length > 0) {
+					root.currentIndex = 1 // HACK to replace whatever page after the 3 columns layers page
                     root.push(file);
                 } else {
                     print("Non managed screen " + zynthian.current_screen_id);

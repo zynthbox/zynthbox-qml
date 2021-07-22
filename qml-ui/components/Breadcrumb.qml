@@ -35,52 +35,32 @@ QQC2.ToolBar {
     property alias leftHeaderControl: leftHeaderControl.contentItem
     property alias rightHeaderControl: rightHeaderControl.contentItem
     property QQC2.StackView layerManager
-    //readonly property Item pageRow: layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
-    property Kirigami.PageRow pageRow
-    property Kirigami.PageRow modalPageRow
+    readonly property Item pageRow: layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
 
-    property int hiddenTopItems: 1
     leftPadding: 0
     rightPadding: 0
     position: QQC2.ToolBar.Header
     onPageRowChanged: syncConnection.syncBreadCrumb()
     Component.onCompleted: syncConnection.syncBreadCrumb()
-
     Connections {
         id: syncConnection
         target: root.pageRow
         onDepthChanged: syncBreadCrumb()
         function syncBreadCrumb() {
             breadcrumbModel.clear();
-            let fillCrumbs = function(pageRow) {
-                for (var i = 0; i < pageRow.depth; ++i) {
-                    let page = pageRow.get(i);
-                    if (page.hasOwnProperty("screenIds")) {
-                        for (var j = 0; j < page.screenIds.length; ++j) {
-                            let id = page.screenIds[j];
-                            breadcrumbModel.append({"screenId": id, "modal": pageRow === root.modalPageRow});
-                        }
-                    } else {
-                        breadcrumbModel.append({"screenId": page.screenId, "modal": pageRow === root.modalPageRow});
+            for (var i = 0; i < root.pageRow.depth; ++i) {
+                let page = root.pageRow.get(i);
+                if (page.hasOwnProperty("screenIds")) {
+                    for (var j = 0; j < page.screenIds.length; ++j) {
+                        let id = page.screenIds[j];
+                        breadcrumbModel.append({"screenId": id});
                     }
+                } else {
+                    breadcrumbModel.append({"screenId": page.screenId});
                 }
-            }
-
-            fillCrumbs(root.pageRow)
-            if (root.layerManager.depth > 1) {
-                fillCrumbs(root.modalPageRow)
             }
         }
     }
-    Connections {
-        target: root.modalPageRow
-        onDepthChanged: syncConnection.syncBreadCrumb()
-    }
-    Connections {
-        target: root.layerManager
-        onDepthChanged: syncConnection.syncBreadCrumb()
-    }
-
     contentItem: RowLayout {
         spacing: 0
         QQC2.Control {
@@ -109,7 +89,7 @@ QQC2.ToolBar {
                         id: toolButton
                         text: zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path
                         // HACK to hide home button as there is already one
-                        visible: index >= root.hiddenTopItems
+                        visible: index > 1 || root.layerManager.depth > 1
                         checked: model.screenId === zynthian.current_screen_id;
                         checkable: false
                         Connections {
@@ -135,7 +115,7 @@ QQC2.ToolBar {
                             }
                         }
                         onClicked: {
-                            if (model.modal) {
+                            if (root.layerManager.depth > 1) {
                                 zynthian.current_modal_screen_id = model.screenId;
                             } else {
                                 zynthian.current_screen_id = model.screenId;

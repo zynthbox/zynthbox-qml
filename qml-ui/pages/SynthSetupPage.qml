@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.MultiSelectorPage {
+	id: root
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Synths")
@@ -53,6 +54,12 @@ ZComponents.MultiSelectorPage {
     screenTitles: [qsTr("Layers (%1)").arg(zynthian.layer.effective_count || qsTr("None")), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
+
+    onItemActivated: {
+		if (zynthian.current_screen_id === "layer") {
+			applicationWindow().pageStack.pop(root)
+		}
+	}
 }
 
 

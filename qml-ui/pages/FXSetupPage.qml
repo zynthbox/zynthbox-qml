@@ -38,9 +38,10 @@ ZComponents.MultiSelectorPage {
     previousScreen: "layer"
     onCurrentScreenIdRequested: {
         //FIXME: why this workaround?
-        if (zynthian.current_screen_id != "confirm") {
-            zynthian.show_modal(screenId)
-        }
+        //if (zynthian.current_screen_id != "confirm") {
+            //zynthian.show_modal(screenId)
+        //}
+
     }
 }
 

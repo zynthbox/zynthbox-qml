@@ -46,18 +46,6 @@ Kirigami.AbstractApplicationWindow {
         confirmDialog.close()
     }
 
-    function goBack() {
-        if (root.currentPage && root.currentPage.hasOwnProperty("previousScreen") && root.currentPage.previousScreen.length > 0) {
-            if (screensLayer.layers.depth > 1) {
-                zynthian.current_modal_screen_id = root.currentPage.previousScreen;
-            } else {
-                zynthian.current_screen_id = root.currentPage.previousScreen;
-            }
-        } else {
-            zynthian.go_back();
-        }
-    }
-
     width: screen.width
     height: screen.height
 
@@ -65,53 +53,53 @@ Kirigami.AbstractApplicationWindow {
         //height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
         layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
-			spacing: 0
-			ZComponentsPrivate.BreadcrumbButton {
-				id: homeButton
-				implicitWidth: height
-				icon.name: "go-home"
-				icon.color: customTheme.Kirigami.Theme.textColor
-				rightPadding: Kirigami.Units.largeSpacing*2
-				onClicked: zynthian.current_screen_id = 'main'
-				highlighted: zynthian.current_screen_id === 'main'
-			}
-			ZComponentsPrivate.BreadcrumbButton {
-				text: zynthian.layer.selector_path_element + "ˬ"
-				onClicked: layersMenu.visible = true
-				highlighted: zynthian.current_screen_id === 'layer'
-				ZComponentsPrivate.ActionsMenu {
-					id: layersMenu
-					property list<Kirigami.Action> intActions: [
-						Kirigami.Action {
-							text: "1#"
-							onTriggered: zynthian.layer.activate_layer(0)
-						},
-						Kirigami.Action {
-							text: "2#"
-							onTriggered: zynthian.layer.activate_layer(1)
-						},
-						Kirigami.Action {
-							text: "3#"
-							onTriggered: zynthian.layer.activate_layer(2)
-						},
-						Kirigami.Action {
-							text: "4#"
-							onTriggered: zynthian.layer.activate_layer(3)
-						},
-						Kirigami.Action {
-							text: "5#"
-							onTriggered: zynthian.layer.activate_layer(4)
-						},
-						Kirigami.Action {
-							text: "6#"
-							onTriggered: zynthian.layer.activate_layer(5)
-						}
-					]
-					actions: intActions
-					y: parent.height
-				}
-			}
-		}
+            spacing: 0
+            ZComponentsPrivate.BreadcrumbButton {
+                id: homeButton
+                implicitWidth: height
+                icon.name: "go-home"
+                icon.color: customTheme.Kirigami.Theme.textColor
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: zynthian.current_screen_id = 'main'
+                highlighted: zynthian.current_screen_id === 'main'
+            }
+            ZComponentsPrivate.BreadcrumbButton {
+                text: zynthian.layer.selector_path_element + "ˬ"
+                onClicked: layersMenu.visible = true
+                highlighted: zynthian.current_screen_id === 'layer'
+                ZComponentsPrivate.ActionsMenu {
+                    id: layersMenu
+                    property list<Kirigami.Action> intActions: [
+                        Kirigami.Action {
+                            text: "1#"
+                            onTriggered: zynthian.layer.activate_layer(0)
+                        },
+                        Kirigami.Action {
+                            text: "2#"
+                            onTriggered: zynthian.layer.activate_layer(1)
+                        },
+                        Kirigami.Action {
+                            text: "3#"
+                            onTriggered: zynthian.layer.activate_layer(2)
+                        },
+                        Kirigami.Action {
+                            text: "4#"
+                            onTriggered: zynthian.layer.activate_layer(3)
+                        },
+                        Kirigami.Action {
+                            text: "5#"
+                            onTriggered: zynthian.layer.activate_layer(4)
+                        },
+                        Kirigami.Action {
+                            text: "6#"
+                            onTriggered: zynthian.layer.activate_layer(5)
+                        }
+                    ]
+                    actions: intActions
+                    y: parent.height
+                }
+            }
+        }
         rightHeaderControl: ZComponents.StatusInfo {}
     }
     pageStack: screensLayer

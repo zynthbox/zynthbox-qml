@@ -80,6 +80,9 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 	def get_effective_count(self):
 		return len(self.audiofx_layers)
 
+	def back_action(self):
+		return 'preset'
+
 	def next_action(self):
 		return 'effect_types'
 
@@ -95,9 +98,6 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		elif self.list_data[i][0] == 'ADD-PARALLEL-AUDIOFX':
 			self.zyngui.screens['layer_effect_chooser'].layer_chain_parallel = True
-
-		logging.error("AUDIOFXLAYERRSSSSSS" + str(i))
-		logging.error(self.audiofx_layers)
 
 		if i < len(self.audiofx_layers):
 			self.audiofx_layer = self.audiofx_layers[i]
@@ -124,7 +124,6 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 
 	def fx_remove_confirmed(self, params=None):
-		logging.error("REMOVING {}".format(self.audiofx_layer))
 		if self.audiofx_layer is None:
 			return
 		i = self.zyngui.screens['layer'].layers.index(self.audiofx_layer)

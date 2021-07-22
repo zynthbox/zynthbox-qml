@@ -586,7 +586,8 @@ class zynthian_gui(QObject):
 				screen = self.active_screen
 			else:
 				screen = "main"
-
+		logging.error(screen)
+		traceback.print_stack(None, 8)
 		if screen=="layer" or screen=="bank"  or screen=="preset"  or screen=="control" :
 			self.restore_curlayer()
 
@@ -756,14 +757,18 @@ class zynthian_gui(QObject):
 						self.show_modal('bank')
 					else:
 						self.show_screen('bank')
-				else:
+				elif self.active_screen == 'main' or (self.modal_screen == None and self.active_screen == None):
 					if modal:
 						self.show_modal('layer')
 					else:
 						self.show_screen('layer')
+				else:
+					self.screens['layer'].show()
 				# If there is only one bank, jump to preset selection
 				if len(self.curlayer.bank_list)<=1:
 					self.screens['bank'].select_action(0)
+				self.screens['layer_effects'].show()
+				self.screens['layer_effects'].select_action(0)
 
 
 	def show_control(self):

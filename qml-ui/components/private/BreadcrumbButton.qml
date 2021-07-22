@@ -43,7 +43,7 @@ QQC2.ToolButton {
             source: "../img/breadcrumb-separator.svg"
         }
     }
-    opacity: checked ? 1 : 0.5
+    opacity: highlighted ? 1 : 0.5
     font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
 }
 

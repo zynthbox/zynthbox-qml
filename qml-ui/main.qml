@@ -80,7 +80,7 @@ Kirigami.AbstractApplicationWindow {
         id: screensLayer
         parent: root.contentItem
         anchors.fill: parent
-        initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer'), root.pageScreenMapping.pageForScreen('control')]
+        initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer')]
     }
 
     CustomTheme {

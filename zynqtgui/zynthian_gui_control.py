@@ -486,7 +486,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				self.select_path = (self.zyngui.curlayer.get_basepath() + "/CTRL MIDI-Learn")
 			else:
 				self.select_path = (self.zyngui.curlayer.get_presetpath())
-			self.select_path_element = self.zyngui.curlayer.preset_name
+			self.select_path_element = "EDIT"
 		super().set_select_path()
 
 

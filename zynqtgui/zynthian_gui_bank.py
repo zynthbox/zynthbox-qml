@@ -101,7 +101,10 @@ class zynthian_gui_bank(zynthian_gui_selector):
 	def set_select_path(self):
 		if self.zyngui.curlayer:
 			self.select_path = self.zyngui.curlayer.get_basepath()
-			self.select_path_element = self.zyngui.curlayer.get_basepath()
+			if self.zyngui.curlayer is None:
+				self.select_path_element = "Banks"
+			else:
+				self.select_path_element = str(self.zyngui.curlayer.engine.name)
 			super().set_select_path()
 
 

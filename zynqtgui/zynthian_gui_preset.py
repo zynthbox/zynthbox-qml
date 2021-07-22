@@ -148,7 +148,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.select_path_element = "Favorites"
 			else:
 				self.select_path = self.zyngui.curlayer.get_bankpath()
-				self.select_path_element = self.zyngui.curlayer.bank_name
+				if self.zyngui.curlayer is None:
+					self.select_path_element = "Presets"
+				else:
+					self.select_path_element = self.zyngui.curlayer.preset_name
 		super().set_select_path()
 
 

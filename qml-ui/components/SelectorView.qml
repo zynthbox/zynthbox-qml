@@ -41,9 +41,9 @@ QQC2.ScrollView {
     property string screenId
     //TODO: Bind the base selector type to qml?
     readonly property QtObject selector: screenId.length > 0 ? zynthian[screenId] : null
-    signal currentScreenIdRequested()
-    signal itemActivated(int index)
-    signal itemActivatedSecondary(int index)
+    signal currentScreenIdRequested(string screenId)
+    signal itemActivated(string screenId, int index)
+    signal itemActivatedSecondary(string screenId, int index)
 
     Component.onCompleted: view.forceActiveFocus()
     onActiveFocusChanged: {
@@ -77,7 +77,13 @@ QQC2.ScrollView {
 
         model: root.selector.selector_list
 
-        delegate: SelectorDelegate {}
+        delegate: SelectorDelegate {
+            screenId: root.screenId
+            selector: root.selector
+            onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+            onItemActivated: root.itemActivated(screenId, index)
+            onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+        }
 
         Kirigami.Separator {
             parent: view

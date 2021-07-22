@@ -35,8 +35,8 @@ QQC2.ToolButton {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    leftPadding: rightPadding/2
-    rightPadding: breadcrumbSeparator.width
+    leftPadding: 0
+    rightPadding: breadcrumbSeparator.width/2
     implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding + Kirigami.Units.gridUnit
     background: Item {
         PlasmaCore.Svg {

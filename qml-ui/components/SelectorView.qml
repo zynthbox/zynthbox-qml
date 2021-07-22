@@ -48,7 +48,7 @@ QQC2.ScrollView {
     Component.onCompleted: view.forceActiveFocus()
     onActiveFocusChanged: {
         if (activeFocus) {
-            root.currentScreenIdRequested();
+            root.currentScreenIdRequested(root.screenId);
             view.forceActiveFocus()
         }
     }
@@ -71,7 +71,7 @@ QQC2.ScrollView {
 
         onActiveFocusChanged: {
             if (activeFocus) {
-                root.currentScreenIdRequested();
+                root.currentScreenIdRequested(root.screenId);
             }
         }
 

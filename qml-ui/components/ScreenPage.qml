@@ -34,7 +34,7 @@ Kirigami.Page {
 
     property Kirigami.Action backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: applicationWindow().goBack()
+        onTriggered: zynthian.go_back()
     }
     property string previousScreen
 

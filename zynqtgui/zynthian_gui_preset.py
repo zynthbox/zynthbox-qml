@@ -90,6 +90,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def index_supports_immediate_activation(self, index=None):
 		return True
 
+	def next_action(self):
+		return 'control'
+
 	#def back_action(self):
 		#if self.show_fav_presets:
 			#self.disable_show_fav_presets()

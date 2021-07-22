@@ -55,11 +55,6 @@ ZComponents.MultiSelectorPage {
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
 
-    onItemActivated: {
-		if (zynthian.current_screen_id === "layer") {
-			applicationWindow().pageStack.pop(root)
-		}
-	}
 }
 
 

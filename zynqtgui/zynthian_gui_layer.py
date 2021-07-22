@@ -1385,7 +1385,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def set_select_path(self):
 		self.select_path = "Layers"
-		self.select_path_element = "Layers"
+		#self.select_path_element = str(zyngui.curlayer.engine.name)
+		if self.zyngui.curlayer is None:
+			self.select_path_element = "Layers"
+		else:
+			self.select_path_element = "{}#".format(self.zyngui.curlayer.midi_chan)
 		super().set_select_path()
 
 

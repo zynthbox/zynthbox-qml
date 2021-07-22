@@ -62,7 +62,7 @@ QQC2.ToolBar {
         }
     }
     contentItem: RowLayout {
-		spacing: 0
+        spacing: 0
         QQC2.Control {
             id: leftHeaderControl
             z: 999

@@ -44,7 +44,7 @@ import sched
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer, QEventLoop
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
-from PySide2.QtWidgets import QApplication
+#from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine
 
 

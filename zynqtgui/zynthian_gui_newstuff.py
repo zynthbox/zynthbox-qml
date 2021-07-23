@@ -53,8 +53,13 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
 		if self.newstuff_model_data:
 			if self.newstuff_model_data.rowCount() > 0:
 				for index in range(self.newstuff_model_data.rowCount()):
-					display_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
-					self.list_data.append((display_name,index,display_name))
+					entry_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
+					# 285 is StatusRole in NewStuff's model
+					entry_status = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285)
+					# element 0 is action_id
+					# element 1 is entry_index
+					# element 2 is the display role
+					self.list_data.append((entry_status,index,entry_name))
 
 		super().fill_list()
 

@@ -55,7 +55,7 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
 				for index in range(self.newstuff_model_data.rowCount()):
 					entry_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
 					# 285 is StatusRole in NewStuff's model
-					entry_status = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285)
+					entry_status = 0 #int(self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285))
 					# element 0 is action_id
 					# element 1 is entry_index
 					# element 2 is the display role

@@ -182,6 +182,11 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		# during hte event processing done while the spinner is running, sometimes a spurious secondary action is invked...
+		# this causes a second invisible layer to be added, causing the sound of two engines at a time to be heard.
+		#FIXME: this needs a proper solution
+		if t != 'S':
+			return
 		if i is not None and self.list_data[i][0]:
 			if self.midi_chan is None:
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], None)
@@ -189,6 +194,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 				self.zyngui.start_loading()
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
 				self.zyngui.show_screen('layer')
+				self.zyngui.screens['layer'].select_action(self.zyngui.screens['layer'].index)
 				self.zyngui.stop_loading()
 
 	def select_by_engine(self, eng):

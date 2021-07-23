@@ -197,7 +197,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.replace_layer_index = None
 			self.layer_chain_parallel = False
 			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
-			self.zyngui.screens['engine'].midi_chan = midi_chan
+			self.zyngui.screens['engine'].set_midi_channel(midi_chan)
 			self.layer_index_replace_engine = None
 			self.zyngui.show_modal('engine')
 
@@ -298,7 +298,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.layer_chain_parallel = False
 		self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
 		self.layer_index_replace_engine = self.index
-		self.zyngui.screens['engine'].midi_chan = self.layers[self.index].midi_chan
+		self.zyngui.screens['engine'].set_midi_channel(self.layers[self.index].midi_chan)
 		self.zyngui.show_modal('engine')
 
 

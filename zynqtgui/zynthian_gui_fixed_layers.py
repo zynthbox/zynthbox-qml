@@ -71,7 +71,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_layer):
 			self.layer_chain_parallel = False
 			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
 			self.layer_index_replace_engine = self.index
-			self.zyngui.screens['engine'].midi_chan = self.index
+			self.zyngui.screens['engine'].set_midi_channel(self.index)
 			self.zyngui.show_modal('engine')
 
 

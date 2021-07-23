@@ -64,7 +64,9 @@ Kirigami.AbstractApplicationWindow {
                 highlighted: zynthian.current_screen_id === 'main'
             }
             ZComponentsPrivate.BreadcrumbButton {
-                text: zynthian.layer.selector_path_element + "ˬ"
+                text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
+                        ? (zynthian.engine.midi_channel + 1) + "#ˬ"
+                        : zynthian.layer.selector_path_element + "ˬ"
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer'
                 ZComponentsPrivate.ActionsMenu {

@@ -47,6 +47,27 @@ ZComponents.SelectorPage {
         id: newStuffEngine
         // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
         configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
+        property bool isLoading: false
+        onIsLoadingChanged: {
+            if (isLoading) {
+                zynthian.start_loading();
+            } else {
+                zynthian.stop_loading();
+            }
+        }
+        onMessage: {
+            applicationWindow().showPassiveNotification(message);
+        }
+        onBusyMessage: {
+            if (!isLoading) { isLoading = true; }
+            applicationWindow().showPassiveNotification(message);
+        }
+        onIdleMessage: {
+            if (isLoading) { isLoading = false; }
+        }
+        onErrorMessage: {
+            zynthian.comfirm.show(message)
+        }
     }
     NewStuff.ItemsModel {
         id: newStuffModel

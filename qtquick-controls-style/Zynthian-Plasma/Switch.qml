@@ -24,7 +24,7 @@ T.Switch {
     hoverEnabled: true
 
     indicator: SwitchIndicator {
-		control: control
+        control: control
         LayoutMirroring.enabled: control.mirrored
         LayoutMirroring.childrenInherit: true
         anchors {
@@ -33,7 +33,6 @@ T.Switch {
         }
         width: control.text.length > 0 ? implicitWidth : parent.width
         height: control.text.length > 0 ? implicitHeight : parent.height
-        control: control
     }
 
     contentItem: Label {

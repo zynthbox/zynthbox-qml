@@ -39,6 +39,8 @@ from zyngine.zynthian_engine_jalv import *
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+
 #------------------------------------------------------------------------------
 # Zynthian Engine Selection GUI Class
 #------------------------------------------------------------------------------
@@ -90,22 +92,28 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.only_categories = False
 		self.single_category = None
 
+	def set_midi_channel(self, chan):
+		self.midi_chan = chan
+		self.midi_channel_changed.emit()
+
+	def get_midi_channel(self):
+		return self.midi_chan
 
 	def set_engine_type(self, etype):
 		self.engine_type = etype
-		self.midi_chan = None
+		self.set_midi_channel(None)
 		self.reset_index = True
 
 
 	def set_fxchain_mode(self, midi_chan):
 		self.engine_type = "Audio Effect"
-		self.midi_chan = midi_chan
+		self.set_midi_channel(midi_chan)
 		self.reset_index = True
 
 
 	def set_midichain_mode(self, midi_chan):
 		self.engine_type = "MIDI Tool"
-		self.midi_chan = midi_chan
+		self.set_midi_channel(midi_chan)
 		self.reset_index = True
 		self.init_engine_info()
 
@@ -229,5 +237,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.select_path = "Engine"
 		self.select_path_element = "Engine"
 		super().set_select_path()
+
+
+	midi_channel_changed = Signal()
+
+	midi_channel = Property(int, get_midi_channel, set_midi_channel, notify = midi_channel_changed)
 
 #------------------------------------------------------------------------------

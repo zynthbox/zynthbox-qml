@@ -48,22 +48,17 @@ ZComponents.SelectorPage {
         // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
         configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
         property bool isLoading: false
-        onIsLoadingChanged: {
-            if (isLoading) {
-                zynthian.start_loading();
-            } else {
-                zynthian.stop_loading();
-            }
-        }
+        property string message
         onMessage: {
             applicationWindow().showPassiveNotification(message);
         }
         onBusyMessage: {
             if (!isLoading) { isLoading = true; }
-            applicationWindow().showPassiveNotification(message);
+            newStuffEngine.message = message;
         }
         onIdleMessage: {
             if (isLoading) { isLoading = false; }
+            newStuffEngine.message = "";
         }
         onErrorMessage: {
             zynthian.comfirm.show(message)
@@ -252,7 +247,7 @@ ZComponents.SelectorPage {
                 running: opacity > 0;
                 QQC2.Label {
                     anchors {
-                        horizontalCenter: parent.horizontalCenter;
+                        horizontalCenter: parent.horizontalCenter
                         top: parent.bottom
                         topMargin: Kirigami.Units.largeSpacing
                     }
@@ -260,6 +255,38 @@ ZComponents.SelectorPage {
                     width: paintedWidth;
                 }
             }
+        }
+    }
+    Rectangle {
+        id: busyWithEngineStuff
+        anchors {
+            bottom: view.bottom
+            right: view.right
+            left: view.left
+            margins: Kirigami.Units.smallSpacing
+        }
+        height: Kirigami.Units.gridUnit * 5
+        opacity: newStuffEngine.isLoading ? 1 : 0;
+        Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+        color: Qt.rgba(0, 0, 0, 0.8)
+        QQC2.BusyIndicator {
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+                topMargin: Kirigami.Units.largeSpacing
+            }
+            height: Kirigami.Units.gridUnit * 3
+            width: height
+            running: parent.opacity > 0;
+        }
+        QQC2.Label {
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: parent.bottom
+                bottomMargin: Kirigami.Units.largeSpacing
+            }
+            text: newStuffEngine.message
+            width: paintedWidth
         }
     }
 }

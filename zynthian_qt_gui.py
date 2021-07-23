@@ -586,7 +586,6 @@ class zynthian_gui(QObject):
 				screen = self.active_screen
 			else:
 				screen = "main"
-		logging.error(screen)
 
 		if screen=="layer" or screen=="bank"  or screen=="preset"  or screen=="control" :
 			self.restore_curlayer()

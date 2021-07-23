@@ -300,6 +300,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.layer_index_replace_engine = self.index
 		self.zyngui.screens['engine'].set_midi_channel(self.layers[self.index].midi_chan)
 		self.zyngui.show_modal('engine')
+		self.zyngui.screens['engine'].select_by_engine(self.layers[self.index].engine.nickname)
 
 
 	def add_fxchain_layer(self, midi_chan):

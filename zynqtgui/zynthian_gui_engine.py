@@ -191,6 +191,11 @@ class zynthian_gui_engine(zynthian_gui_selector):
 				self.zyngui.show_screen('layer')
 				self.zyngui.stop_loading()
 
+	def select_by_engine(self, eng):
+		for i, val in enumerate(self.list_data):
+			if eng == val[0]:
+				self.select(i)
+				return
 
 	def start_engine(self, eng):
 		if eng not in self.zyngines:

@@ -78,24 +78,28 @@ ZComponents.SelectorPage {
             onItemActivatedSecondary: ListView.view.parent.itemActivatedSecondary(screenId, index)
             Kirigami.Icon {
                 id: updateAvailableBadge;
-                opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
+                // We're filling the selector model's action_id with the newstuff status id
+                // A bit of a hack, but action_id is more a generic data container than anything else
+                opacity: (model.action_id == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
                 Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                 anchors {
                     bottom: parent.bottom;
                     right: parent.right;
                     top: parent.top;
+                    rightMargin: proxyView.width + Kirigami.Units.smallSpacing
                 }
                 width: height;
                 source: "vcs-update-required";
             }
             Kirigami.Icon {
                 id: installedBadge;
-                opacity: (model.status == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
+                opacity: (model.action_id == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
                 Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                 anchors {
                     bottom: parent.bottom;
                     right: parent.right;
                     top: parent.top;
+                    rightMargin: proxyView.width + Kirigami.Units.smallSpacing
                 }
                 width: height;
                 source: "vcs-normal";

@@ -46,6 +46,7 @@ class selector_list_model(QAbstractListModel):
 	DISPLAY = Qt.DisplayRole
 	ACTION_ID = Qt.UserRole + 1
 	ENTRY_INDEX = Qt.UserRole + 3
+	ICON = Qt.UserRole + 4
 
 	def __init__(self, parent=None):
 		super(selector_list_model, self).__init__(parent)
@@ -77,6 +78,7 @@ class selector_list_model(QAbstractListModel):
 			selector_list_model.DISPLAY : QByteArray(b'display'),
 			selector_list_model.ACTION_ID : QByteArray(b'action_id'),
 			selector_list_model.ENTRY_INDEX : QByteArray(b'entry_index'),
+			selector_list_model.ICON : QByteArray(b'icon'),
 			}
 		return keys
 
@@ -100,6 +102,13 @@ class selector_list_model(QAbstractListModel):
 			return entry[0]
 		elif role == selector_list_model.ENTRY_INDEX:
 			return entry[1]
+		elif role == selector_list_model.ICON:
+			if len(entry) > 3 and entry[3] != None and 'icon' in entry[3]:
+				logging.error(entry[3])
+				logging.error(entry[3]['icon'])
+				return entry[3]['icon']
+			else:
+				return None
 		else:
 			return None
 

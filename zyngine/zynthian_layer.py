@@ -201,7 +201,9 @@ class zynthian_layer:
 			try:
 				for i, preset in enumerate(self.engine.get_preset_list(self.bank_info)):
 					if self.engine.is_preset_fav(preset):
-						preset[2] = "*" + preset[2]
+						preset[3] = {"icon": "starred-symbolic"}
+					else:
+						preset[3] = {"icon": "non-starred-symbolic"}
 					preset[2] = "{} - ".format(i+1) + preset[2]
 					preset_list.append(preset)
 			except:

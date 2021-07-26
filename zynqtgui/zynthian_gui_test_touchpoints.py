@@ -1,6 +1,6 @@
 from . import zynthian_qt_gui_base
 
-class zynthian_gui_play_grid(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_test_touchpoints(zynthian_qt_gui_base.ZynGui):
   def __init__(self, parent = None):
     super().__init__(parent)
 

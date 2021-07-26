@@ -31,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../components" as ZComponents
 
 ZComponents.ScreenPage {
-    screenId: "play_grid"
+    screenId: "test_touchpoints"
 
     MultiPointTouchArea {
         anchors.fill: parent

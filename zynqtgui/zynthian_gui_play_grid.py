@@ -1,5 +1,14 @@
-from . import zynthian_gui_selector
+from . import zynthian_qt_gui_base
 
-class zynthian_gui_play_grid(zynthian_gui_selector):
+class zynthian_gui_play_grid(zynthian_qt_gui_base.ZynGui):
   def __init__(self, parent = None):
-    super(zynthian_gui_play_grid, self).__init__('Play Grid', parent)
+    super().__init__(parent)
+
+  def show(self):
+    pass
+
+  def zyncoder_read(self):
+    pass
+
+  def refresh_loading(self):
+    pass

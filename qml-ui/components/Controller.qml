@@ -83,21 +83,21 @@ Card {
 
 
                 // HACK for default style
-				Binding {
-					target: dial.background
-					property: "color"
-					value: Kirigami.Theme.highlightColor
-				}
-				Binding {
-					target: dial.handle
-					property: "color"
-					value: Kirigami.Theme.highlightColor
-				}
+                Binding {
+                    target: dial.background
+                    property: "color"
+                    value: Kirigami.Theme.highlightColor
+                }
+                Binding {
+                    target: dial.handle
+                    property: "color"
+                    value: Kirigami.Theme.highlightColor
+                }
                 Kirigami.Heading {
                     anchors.centerIn: parent
                     text: root.controller ? root.controller.value_print :  ""
                 }
-                Behavior on value {
+                /*Behavior on value {
                     enabled: !dialMouse.pressed
                     NumberAnimation {
                         duration: Kirigami.Units.longDuration
@@ -109,7 +109,7 @@ Card {
                         duration: Kirigami.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
-                }
+                }*/
                 //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
                 MouseArea {
                     id: dialMouse
@@ -136,12 +136,12 @@ Card {
                 scale: root.valueType === "bool"
                 enabled: root.valueType === "bool"
                 onClicked: root.controller.value = root.controller.value == root.controller.value0 ? root.controller.max_value : root.controller.value0
-                Behavior on scale {
-                        NumberAnimation {
-                            duration: Kirigami.Units.longDuration
-                            easing.type: Easing.InOutQuad
-                        }
+                /*Behavior on scale {
+                    NumberAnimation {
+                        duration: Kirigami.Units.longDuration
+                        easing.type: Easing.InOutQuad
                     }
+                }*/
                 QQC2.Switch {
                     id: switchControl
                     anchors.centerIn: parent

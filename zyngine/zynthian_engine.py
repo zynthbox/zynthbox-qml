@@ -476,7 +476,6 @@ class zynthian_engine(zynthian_basic_engine):
 					self.preset_favs = json.load(f, object_pairs_hook=OrderedDict)
 			except:
 				self.preset_favs = OrderedDict()
-
 		else:
 			logging.warning("Can't load preset favorites until the engine have a nickname!")
 

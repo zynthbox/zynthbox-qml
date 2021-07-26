@@ -56,7 +56,7 @@ QQC2.ItemDelegate {
     }
     contentItem: RowLayout {
 		QQC2.Label {
-			text: (model.show_numbers ? (index + 1) + " - " : "") +  delegate.text
+			text: (model.show_numbers ? (index + 1) + " - " : "") + delegate.text
 			Layout.fillWidth: true
 			elide: Text.ElideRight
 		}

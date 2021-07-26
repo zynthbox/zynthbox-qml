@@ -33,10 +33,60 @@ import "../components" as ZComponents
 ZComponents.SelectorPage {
     screenId: "play_grid"
 
+    MultiPointTouchArea {
+        anchors.fill: parent
+        touchPoints: [
+            TouchPoint { id: point0 },
+            TouchPoint { id: point1 },
+            TouchPoint { id: point2 },
+            TouchPoint { id: point3 },
+            TouchPoint { id: point4 }
+        ]
+    }
+
     Rectangle {
-        width: 200
-        height: 200
-        anchors.centerIn: parent
-        color: "#2196f3"
+        width: 50
+        height: 50
+        x: point0.x
+        y: point0.y
+
+        border.width: 4
+        border.color: "red"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point1.x
+        y: point1.y
+
+        border.width: 4
+        border.color: "green"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point2.x
+        y: point2.y
+
+        border.width: 4
+        border.color: "blue"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point3.x
+        y: point3.y
+
+        border.width: 4
+        border.color: "yellow"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point4.x
+        y: point4.y
+
+        border.width: 4
+        border.color: "orange"
     }
 }

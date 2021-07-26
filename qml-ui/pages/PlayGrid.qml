@@ -30,7 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "../components" as ZComponents
 
-ZComponents.SelectorPage {
+ZComponents.ScreenPage {
     screenId: "play_grid"
 
     MultiPointTouchArea {

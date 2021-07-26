@@ -97,16 +97,18 @@ class selector_list_model(QAbstractListModel):
 
 		entry = self.entries[index.row()]
 		if role == selector_list_model.DISPLAY:
-			return entry[2]
+			if isinstance(entry[2], str):
+				return entry[2]
+			elif isinstance(entry[2], dict) and 'text' in entry[2]:
+				return entry[2]['text']
+
 		elif role == selector_list_model.ACTION_ID:
 			return entry[0]
 		elif role == selector_list_model.ENTRY_INDEX:
 			return entry[1]
 		elif role == selector_list_model.ICON:
-			if len(entry) > 3 and entry[3] != None and 'icon' in entry[3]:
-				logging.error(entry[3])
-				logging.error(entry[3]['icon'])
-				return entry[3]['icon']
+			if isinstance(entry[2], dict) and 'icon' in entry[2]:
+				return entry[2]['icon']
 			else:
 				return None
 		else:

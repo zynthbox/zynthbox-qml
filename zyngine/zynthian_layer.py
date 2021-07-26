@@ -200,11 +200,6 @@ class zynthian_layer:
 		elif self.bank_info:
 			try:
 				for i, preset in enumerate(self.engine.get_preset_list(self.bank_info)):
-					if self.engine.is_preset_fav(preset):
-						preset[3] = {"icon": "starred-symbolic"}
-					else:
-						preset[3] = {"icon": "non-starred-symbolic"}
-					preset[2] = "{} - ".format(i+1) + preset[2]
 					preset_list.append(preset)
 			except:
 				pass
@@ -229,11 +224,9 @@ class zynthian_layer:
 			last_preset_name=self.preset_name
 			
 			preset_id = str(self.preset_list[i][0])
-			preset_name = self.preset_list[i][2]
+			preset_name = self.preset_list[i][2]['text']
 
 			if preset_id in self.engine.preset_favs:
-				if preset_name[0]=='*':
-					preset_name=preset_name[1:]
 				bank_name = self.engine.preset_favs[preset_id][0][2]
 				if bank_name!=self.bank_name:
 					self.set_bank_by_name(bank_name)

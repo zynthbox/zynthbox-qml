@@ -64,7 +64,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 		self.list_data=[]
 		for i, item in enumerate(self.zyngui.curlayer.preset_list):
-			item[2] = {"text": item[2],
+			item[2] = {"text": "{} - {}".format(i + 1, item[2]),
 			           "icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic"}
 			#logging.error(item)
 			self.list_data.append(item)

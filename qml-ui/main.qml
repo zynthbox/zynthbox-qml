@@ -65,40 +65,21 @@ Kirigami.AbstractApplicationWindow {
             }
             ZComponentsPrivate.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
-                        ? (zynthian.engine.midi_channel + 1) + "#ˬ"
+                        ? (zynthian.engine.midi_channel + 1) + "ˬ"
                         : zynthian.layer.selector_path_element + "ˬ"
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer'
-                ZComponentsPrivate.ActionsMenu {
+                QQC2.Menu {
                     id: layersMenu
-                    property list<Kirigami.Action> intActions: [
-                        Kirigami.Action {
-                            text: "1#"
-                            onTriggered: zynthian.layer.activate_midican_layer(0)
-                        },
-                        Kirigami.Action {
-                            text: "2#"
-                            onTriggered: zynthian.layer.activate_midican_layer(1)
-                        },
-                        Kirigami.Action {
-                            text: "3#"
-                            onTriggered: zynthian.layer.activate_midican_layer(2)
-                        },
-                        Kirigami.Action {
-                            text: "4#"
-                            onTriggered: zynthian.layer.activate_midican_layer(3)
-                        },
-                        Kirigami.Action {
-                            text: "5#"
-                            onTriggered: zynthian.layer.activate_midican_layer(4)
-                        },
-                        Kirigami.Action {
-                            text: "6#"
-                            onTriggered: zynthian.layer.activate_midican_layer(5)
-                        }
-                    ]
-                    actions: intActions
                     y: parent.height
+                    Repeater {
+                        model: zynthian.fixed_layers.selector_list
+                        delegate: QQC2.MenuItem {
+                            text: model.display
+                            width: parent.width
+                            onClicked: zynthian.fixed_layers.activate_index(index)
+                        }
+                    }
                 }
             }
         }

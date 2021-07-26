@@ -53,6 +53,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 		self.list_data.append((self.midi_recorder,0,"MIDI Recorder"))
 		if "autoeq" in zynthian_gui_config.experimental_features:
 			self.list_data.append((self.auto_eq,0,"Auto EQ (alpha)"))
+		self.list_data.append((self.play_grid,0,"Play Grid"))
 
 		# Snapshot Management
 		self.list_data.append((None,0,""))
@@ -111,6 +112,11 @@ class zynthian_gui_main(zynthian_gui_selector):
 	def midi_recorder(self):
 		logging.info("MIDI Recorder")
 		self.zyngui.show_modal("midi_recorder")
+
+
+	def play_grid(self):
+		logging.info("Play Grid")
+		self.zyngui.show_modal("play_grid")
 
 
 	def alsa_mixer(self):

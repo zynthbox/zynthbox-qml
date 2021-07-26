@@ -93,6 +93,7 @@ from zynqtgui.zynthian_gui_keybinding import zynthian_gui_keybinding
 from zynqtgui.zynthian_gui_main import zynthian_gui_main
 from zynqtgui.zynthian_gui_audio_recorder import zynthian_gui_audio_recorder
 from zynqtgui.zynthian_gui_midi_recorder import zynthian_gui_midi_recorder
+from zynqtgui.zynthian_gui_play_grid import zynthian_gui_play_grid
 #if "autoeq" in zynthian_gui_config.experimental_features:
 	#from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
 #if "zynseq" in zynthian_gui_config.experimental_features:
@@ -521,6 +522,7 @@ class zynthian_gui(QObject):
 		#self.screens['alsa_mixer'] = self.screens['control']
 		self.screens['audio_recorder'] = zynthian_gui_audio_recorder(self)
 		self.screens['midi_recorder'] = zynthian_gui_midi_recorder(self)
+		self.screens['play_grid'] = zynthian_gui_play_grid(self)
 		#if "autoeq" in zynthian_gui_config.experimental_features:
 			#self.screens['autoeq'] = zynthian_gui_autoeq(self)
 		#if "zynseq" in zynthian_gui_config.experimental_features:
@@ -2095,6 +2097,9 @@ class zynthian_gui(QObject):
 
 	def get_midi_recorder(self):
 		return self.screens['midi_recorder']
+
+	def get_play_grid(self):
+		return self.screens['play_grid']
 
 	def get_theme_chooser(self):
 		return self.screens['theme_chooser']

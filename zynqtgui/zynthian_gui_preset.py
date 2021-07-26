@@ -62,12 +62,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.set_select_path()
 			self.zyngui.curlayer.load_preset_list()
 
-		self.list_data=[]
-		for i, item in enumerate(self.zyngui.curlayer.preset_list):
-			item[2] = {"text": "{} - {}".format(i + 1, item[2]),
-			           "icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic"}
-			#logging.error(item)
+		self.list_data = []
+		self.list_metadata = []
+		for item in self.zyngui.curlayer.preset_list:
 			self.list_data.append(item)
+			self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
+							  "show_numbers": True})
 
 		super().fill_list()
 
@@ -155,7 +155,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		if self.zyngui.curlayer:
 			if self.zyngui.curlayer.show_fav_presets:
 				self.select_path = (self.zyngui.curlayer.get_basepath() + " > Favorites")
-				self.select_path_element = "Favorites"
+				if self.zyngui.curlayer is None:
+					self.select_path_element = "Favorites"
+				else:
+					self.select_path_element = self.zyngui.curlayer.preset_name
 			else:
 				self.select_path = self.zyngui.curlayer.get_bankpath()
 				if self.zyngui.curlayer is None:

@@ -495,7 +495,7 @@ class zynthian_gui(QObject):
 		self.screens['option'] = zynthian_gui_option(self)
 		self.screens['engine'] = zynthian_gui_engine(self)
 		self.screens['layer'] = zynthian_gui_layer(self)
-		#self.screens['layer'] = zynthian_gui_fixed_layers(self)
+		self.screens['fixed_layers'] = zynthian_gui_fixed_layers(self)
 		self.screens['layer_options'] = zynthian_gui_layer_options(self)
 		self.screens['layer_effects'] = zynthian_gui_layer_effects(self)
 		self.screens['effect_types'] = zynthian_gui_effect_types(self)
@@ -2060,6 +2060,9 @@ class zynthian_gui(QObject):
 	def get_layer(self):
 		return self.screens['layer']
 
+	def get_fixed_layers(self):
+		return self.screens['fixed_layers']
+
 	def get_layer_options(self):
 		return self.screens['layer_options']
 
@@ -2124,6 +2127,7 @@ class zynthian_gui(QObject):
 	main = Property(QObject, get_main, constant = True)
 	engine = Property(QObject, get_engine, constant = True)
 	layer = Property(QObject, get_layer, constant = True)
+	fixed_layers = Property(QObject, get_fixed_layers, constant = True)
 	layer_options = Property(QObject, get_layer_options, constant = True)
 	layer_effects = Property(QObject, get_layer_effects, constant = True)
 	effect_types = Property(QObject, get_effect_types, constant = True)

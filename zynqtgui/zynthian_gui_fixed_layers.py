@@ -34,45 +34,33 @@ from . import zynthian_gui_selector
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_fixed_layers(zynthian_gui_layer):
+class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 	def __init__(self, parent = None):
-		super(zynthian_gui_fixed_layers, self).__init__(parent)
+		super(zynthian_gui_fixed_layers, self).__init__('Layer', parent)
 
 		self.fixed_layers_count = 6
-		self.layer_map = {}
+		self.show()
+
 
 	def fill_list(self):
 		self.list_data=[]
 
-		# Get list of root layers
-		self.root_layers=self.get_fxchain_roots()
-
-		self.layer_map = {}
-		for layer in self.root_layers:
-			self.layer_map[layer.midi_chan] = layer
-
 		for i in range(6): #FIXME
-			if i in self.layer_map:
-				self.list_data.append((str(i+1),i,self.layer_map[i].get_presetpath()))
+			if i in self.zyngui.screens['layer'].layer_midi_map:
+				layer = self.zyngui.screens['layer'].layer_midi_map[i]
+				if layer.preset_name is None:
+					self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
+				else:
+					self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
 			else:
-				self.list_data.append((str(i+1),i, "{}#  - -  ".format(i+1)))
+				self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
 
-		zynthian_gui_selector.fill_list(self)
+		super().fill_list()
 
 
 	def select_action(self, i, t='S'):
-		if i in self.layer_map:
-			layer = self.layer_map[i]
-			self.zyngui.layer_control(layer)
-		else:
-			self.add_layer_eng = None
-			self.replace_layer_index = None
-			self.layer_chain_parallel = False
-			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
-			self.layer_index_replace_engine = self.index
-			self.zyngui.screens['engine'].set_midi_channel(self.index)
-			self.zyngui.show_modal('engine')
+		self.zyngui.screens['layer'].activate_midican_layer(i)
 
 
 	def back_action(self):
@@ -85,5 +73,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_layer):
 	def index_supports_immediate_activation(self, index=None):
 		return False
 
+	def set_select_path(self):
+		self.select_path = "Layers"
+		#self.select_path_element = str(zyngui.curlayer.engine.name)
+		if self.zyngui.curlayer is None:
+			self.select_path_element = "Layers"
+		else:
+			self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
+		super().set_select_path()
 
 #------------------------------------------------------------------------------

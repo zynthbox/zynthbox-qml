@@ -139,6 +139,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
 		self.list_data.append((None,0,"-----------------------------"))
 		self.list_data.append((self.test_audio,0,"Test Audio"))
 		self.list_data.append((self.test_midi,0,"Test MIDI"))
+		self.list_data.append((self.test_touchpoints,0,"Test Touchpoints"))
 		self.list_data.append((None,0,"-----------------------------"))
 		self.list_data.append((self.zyngui.calibrate_touchscreen,0,"Calibrate Touchscreen"))
 		if self.is_update_available():
@@ -724,6 +725,12 @@ class zynthian_gui_admin(zynthian_gui_selector):
 		logging.info("TESTING MIDI")
 		self.zyngui.show_info("TEST MIDI")
 		self.killable_start_command(["aplaymidi -p 14 {}/mid/test.mid".format(self.data_dir)])
+
+
+	def test_touchpoints(self):
+		logging.info("Testing Touchpoints")
+		self.zyngui.show_modal("test_touchpoints")
+
 
 	# TODO enable again update of everything
 	def update_software(self):

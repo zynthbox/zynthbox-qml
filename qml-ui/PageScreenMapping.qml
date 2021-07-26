@@ -59,7 +59,6 @@ QtObject {
 		"layer_effects": "FXSetupPage.qml",
 		"effect_types": "FXSetupPage.qml",
 		"layer_effect_chooser": "FXSetupPage.qml",
-		"play_grid": "PlayGrid.qml"
 	}
 
 	readonly property var modalScreens: {
@@ -74,6 +73,6 @@ QtObject {
 		"option": "OptionPage.qml",
 		"theme_chooser": "ThemePage.qml",
 		"theme_downloader": "ThemeDownloaderPage.qml",
-		"play_grid": "PlayGrid.qml"
+		"test_touchpoints": "TestTouchpoints.qml"
 	}
 }

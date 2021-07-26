@@ -372,6 +372,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def add_layer_midich(self, midich, select=True):
 		if self.add_layer_eng:
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
+			self.add_layer_eng = None
 
 			if not self.layer_index_replace_engine == None and len(self.layers) > self.index:
 				layer = self.layers[self.layer_index_replace_engine]

@@ -47,24 +47,29 @@ class selector_list_model(QAbstractListModel):
 	ACTION_ID = Qt.UserRole + 1
 	ENTRY_INDEX = Qt.UserRole + 3
 	ICON = Qt.UserRole + 4
+	SHOW_NUMBERS = Qt.UserRole + 5
 
 	def __init__(self, parent=None):
 		super(selector_list_model, self).__init__(parent)
 		self.entries = []
+		self.metadata = []
 
-	def set_entries(self, entries):
+	def set_entries(self, entries, metadata):
 		was_empty = len(self.entries) == 0
 
 		if len(entries) > len(self.entries):
 			self.beginInsertRows(QModelIndex(), len(self.entries), len(entries)-1)
 			self.entries = entries
+			self.metadata = metadata
 			self.endInsertRows()
 		elif len(entries) < len(self.entries):
 			self.beginRemoveRows(QModelIndex(), len(entries), len(self.entries)-1)
 			self.entries = entries
+			self.metadata = metadata
 			self.endRemoveRows()
 		else:
 			self.entries = entries
+			self.metadata = metadata
 
 		if not was_empty:
 			self.dataChanged.emit(self.index(0,0), self.index(min(len(entries), len(self.entries)) - 1, 0))
@@ -79,6 +84,7 @@ class selector_list_model(QAbstractListModel):
 			selector_list_model.ACTION_ID : QByteArray(b'action_id'),
 			selector_list_model.ENTRY_INDEX : QByteArray(b'entry_index'),
 			selector_list_model.ICON : QByteArray(b'icon'),
+			selector_list_model.SHOW_NUMBERS : QByteArray(b'show_numbers'),
 			}
 		return keys
 
@@ -87,6 +93,24 @@ class selector_list_model(QAbstractListModel):
 
 	def get_count(self):
 		return len(self.entries)
+
+	def get_metadata(self, index, role_label):
+		if len(self.entries) != len(self.metadata):
+			return None
+
+		if not index.isValid():
+			return None
+
+		if index.row() > len(self.metadata):
+			return None
+
+		metadata_entry = self.metadata[index.row()]
+		if isinstance(metadata_entry, dict) and role_label in metadata_entry:
+			return metadata_entry[role_label]
+		else:
+			return None
+
+
 
 	def data(self, index, role):
 		if not index.isValid():
@@ -97,20 +121,15 @@ class selector_list_model(QAbstractListModel):
 
 		entry = self.entries[index.row()]
 		if role == selector_list_model.DISPLAY:
-			if isinstance(entry[2], str):
-				return entry[2]
-			elif isinstance(entry[2], dict) and 'text' in entry[2]:
-				return entry[2]['text']
-
+			return entry[2]
 		elif role == selector_list_model.ACTION_ID:
 			return entry[0]
 		elif role == selector_list_model.ENTRY_INDEX:
 			return entry[1]
 		elif role == selector_list_model.ICON:
-			if isinstance(entry[2], dict) and 'icon' in entry[2]:
-				return entry[2]['icon']
-			else:
-				return None
+			return self.get_metadata(index, 'icon')
+		elif role == selector_list_model.SHOW_NUMBERS:
+			return self.get_metadata(index, 'show_numbers')
 		else:
 			return None
 
@@ -132,6 +151,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 		self.index = 0
 		self.list_data = []
+		self.list_metadata = []
 		self.zselector = None
 		self.zselector_hiden = False
 		self.only_favs = True
@@ -151,7 +171,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def get_selector_list(self):
 		if self.list_model == None:
 			self.list_model = selector_list_model(self)
-		self.list_model.set_entries(self.list_data)
+		self.list_model.set_entries(self.list_data, self.list_metadata)
 		return self.list_model
 
 	# TODO: should become load/reload or something like that
@@ -197,7 +217,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def fill_list(self):
 		if self.list_model != None:
-			self.list_model.set_entries(self.list_data)
+			self.list_model.set_entries(self.list_data, self.list_metadata)
 		self.select()
 		self.last_index_change_ts = datetime.min
 		self.effective_count_changed.emit()

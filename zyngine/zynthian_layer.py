@@ -199,7 +199,7 @@ class zynthian_layer:
 
 		elif self.bank_info:
 			try:
-				for i, preset in enumerate(self.engine.get_preset_list(self.bank_info)):
+				for preset in self.engine.get_preset_list(self.bank_info):
 					preset_list.append(preset)
 			except:
 				pass
@@ -224,7 +224,7 @@ class zynthian_layer:
 			last_preset_name=self.preset_name
 			
 			preset_id = str(self.preset_list[i][0])
-			preset_name = self.preset_list[i][2]['text']
+			preset_name = self.preset_list[i][2]
 
 			if preset_id in self.engine.preset_favs:
 				bank_name = self.engine.preset_favs[preset_id][0][2]

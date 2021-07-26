@@ -193,8 +193,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
 			else:
 				self.zyngui.start_loading()
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
-				self.zyngui.show_screen('layer')
-				self.zyngui.screens['layer'].select_action(self.zyngui.screens['layer'].index)
 				self.zyngui.stop_loading()
 
 	def select_by_engine(self, eng):

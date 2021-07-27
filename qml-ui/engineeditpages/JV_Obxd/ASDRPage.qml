@@ -2,9 +2,9 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Download page for ZYnthian themes
+Main Class and Program for Zynthian GUI
 
-Copyright (C) 2021 Dan Leinir Turthra Jensen <admin@leinir.dk>
+Copyright (C) 2021 Marco Martin <mart@kde.org>
 
 ******************************************************************************
 
@@ -24,13 +24,27 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
+import QtQuick.Layouts 1.4
+import QtQuick.Controls 2.2 as QQC2
+import org.kde.kirigami 2.4 as Kirigami
 
-import "../components" as ZComponents
+import "../../components" as ZComponents
 
-ZComponents.NewStuffPage {
-    id: component
-    screenId: "theme_downloader"
-    title: qsTr("Theme Downloader")
-    // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-themes.knsrc").toString().slice(7)
+
+GridLayout {
+    rows: 2
+    columns: 2
+    ZComponents.Controller {
+        controller: zynthian.control.controller_by_category("Obxd#14", 0)
+    }
+    ZComponents.Controller {
+        controller: zynthian.control.controller_by_category("Obxd#14", 2)
+    }
+    ZComponents.Controller {
+        controller: zynthian.control.controller_by_category("Obxd#14", 1)
+    }
+    ZComponents.Controller {
+        controller: zynthian.control.controller_by_category("Obxd#14", 3)
+    }
 }
+

@@ -91,7 +91,8 @@ QQC2.StackView {
 
     replaceEnter: Transition {
         ParallelAnimation {
-            OpacityAnimator {
+            NumberAnimation {
+                property: "opacity"
                 from: 0
                 to: 1
                 duration: Kirigami.Units.longDuration

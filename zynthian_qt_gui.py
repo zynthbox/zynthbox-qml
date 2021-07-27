@@ -2110,7 +2110,9 @@ class zynthian_gui(QObject):
 	def get_theme_downloader(self):
 		return self.screens['theme_downloader']
 
-
+	@Property(QObject, constant=True)
+	def test_touchpoints(self):
+		return self.screens['test_touchpoints']
 
 	current_screen_id_changed = Signal()
 	current_modal_screen_id_changed = Signal()

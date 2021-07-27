@@ -103,6 +103,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if 'fixed_layers' in self.zyngui.screens:
 			self.zyngui.screens['fixed_layers'].fill_list()
 
+		# Should be emitted only when the actual curlayer or its engine change
+		self.engine_nick_changed.emit()
+
 		super().fill_list()
 
 	def get_effective_count(self):
@@ -1415,6 +1418,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		else:
 			self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
 		super().set_select_path()
+
+
+	def get_engine_nick(self):
+		return self.zyngui.curlayer.engine.nickname
+
+
+
+	engine_nick_changed = Signal()
+
+	engine_nick = Property(str, get_engine_nick, notify = engine_nick_changed)
 
 
 #------------------------------------------------------------------------------

@@ -29,6 +29,7 @@ import tkinter
 from time import sleep
 from string import Template
 from datetime import datetime
+from pathlib import Path
 
 # Zynthian specific modules
 from zyngine import zynthian_controller
@@ -57,6 +58,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		self.zgui_controllers=[]
 		self.zgui_controllers_map={}
+
+		self.zgui_custom_controllers=[]
+		self.zgui_custom_controllers_map={}
+		self.custom_controller_id_start = 100
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -120,6 +125,32 @@ class zynthian_gui_control(zynthian_gui_selector):
 			return None
 		return self.zgui_controllers[index]
 
+	@Slot(str, int, result=QObject)
+	def controller_by_category(self, cat, index):
+		controllers = self.zyngui.curlayer.get_ctrl_screens()
+		if cat in controllers:
+			controllers_cat = controllers[cat]
+			if index < 0 or index >= len(controllers_cat):
+				return None
+
+			zctrl = controllers[cat][index]
+			if zctrl in self.zgui_custom_controllers_map:
+				return self.zgui_custom_controllers_map[zctrl]
+			else:
+				self.set_custom_zcontroller(len(self.zgui_custom_controllers), zctrl)
+			return self.zgui_custom_controllers_map[zctrl]
+		else:
+			return None
+
+	def get_custom_control_page(self):
+		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_")
+		# TODO: also search for stuff installed in ~/.local
+		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/main.qml"
+		if Path(path).exists():
+			return path
+		else:
+			return None
+
 	def lock_controllers(self):
 		self.controllers_lock = True
 
@@ -131,6 +162,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def set_controller_screen(self):
 		#Get Mutex Lock 
 		#self.zyngui.lock.acquire()
+
+		# Destroy all the custom controllers
+		self.zgui_custom_controllers_map={}
+		for gctrl in self.zgui_custom_controllers:
+			gctrl.deleteLater()
+		self.zgui_custom_controllers=[]
 
 		#Get screen info
 		if self.index < len(self.list_data):
@@ -174,6 +211,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		self.lock_controllers()
 
+		self.controllers_count_changed.emit()
+		self.custom_control_page_changed.emit()
 		#Release Mutex Lock
 		#self.zyngui.lock.release()
 
@@ -186,6 +225,15 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.zgui_controllers.append(zynthian_gui_controller(i, ctrl, self))
 			self.controllers_count_changed.emit()
 		self.zgui_controllers_map[ctrl]=self.zgui_controllers[i]
+
+
+	def set_custom_zcontroller(self, i, ctrl):
+		if i < len(self.zgui_custom_controllers):
+			self.zgui_custom_controllers[i].config(ctrl)
+			self.zgui_custom_controllers[i].show()
+		else:
+			self.zgui_custom_controllers.append(zynthian_gui_controller(i + self.custom_controller_id_start, ctrl, self))
+		self.zgui_custom_controllers_map[ctrl]=self.zgui_custom_controllers[i]
 
 
 	def set_xyselect_controllers(self):
@@ -492,7 +540,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 	controllers_count_changed = Signal()
+	custom_control_page_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
+	custom_control_page = Property(str, get_custom_control_page, notify = custom_control_page_changed)
 
 #------------------------------------------------------------------------------

@@ -36,6 +36,20 @@ ZComponents.ScreenPage {
     rightPadding: 0
     topPadding: 0
     bottomPadding: 0
+
+    QtObject {
+        id: privateProps
+
+        property var gridKeys: [
+            [49,50,51,52,53,54,55,56],
+            [41,42,43,44,45,46,47,48],
+            [33,34,35,36,37,38,39,40],
+            [25,26,27,28,29,30,31,32],
+            [17,18,19,20,21,22,23,24],
+            [9,10,11,12,13,14,15,16],
+            [1,2,3,4,5,6,7,8],
+        ]
+    }
     
     RowLayout {
         anchors.fill: parent
@@ -47,18 +61,21 @@ ZComponents.ScreenPage {
 
             color: "transparent"
 
-            GridLayout {
+            ColumnLayout {
                 anchors.margins: 5
                 anchors.fill: parent
-                rows: 7
-                columns: 8
 
                 Repeater {
-                    model: Array.from(Array(parent.rows*parent.columns).keys()).reverse()
-                    delegate: QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        text: modelData+1
+                    model: privateProps.gridKeys
+                    delegate: RowLayout {
+                        Repeater {
+                            model: privateProps.gridKeys[index]
+                            delegate: QQC2.Button {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                text: modelData
+                            }
+                        }
                     }
                 }
             }

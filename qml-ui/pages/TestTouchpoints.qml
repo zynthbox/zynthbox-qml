@@ -32,61 +32,45 @@ import "../components" as ZComponents
 
 ZComponents.ScreenPage {
     screenId: "test_touchpoints"
-
-    MultiPointTouchArea {
+    
+    RowLayout {
         anchors.fill: parent
-        touchPoints: [
-            TouchPoint { id: point0 },
-            TouchPoint { id: point1 },
-            TouchPoint { id: point2 },
-            TouchPoint { id: point3 },
-            TouchPoint { id: point4 }
-        ]
-    }
+        spacing: 12
 
-    Rectangle {
-        width: 50
-        height: 50
-        x: point0.x
-        y: point0.y
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        border.width: 4
-        border.color: "red"
-    }
-    Rectangle {
-        width: 50
-        height: 50
-        x: point1.x
-        y: point1.y
+            color: "#f5f5f5"
+            radius: 4
+            border.width: 1
+            border.color: "#ccc"
 
-        border.width: 4
-        border.color: "green"
-    }
-    Rectangle {
-        width: 50
-        height: 50
-        x: point2.x
-        y: point2.y
+            GridLayout {
+                anchors.margins: 5
+                anchors.fill: parent
+                rows: 7
+                columns: 7
 
-        border.width: 4
-        border.color: "blue"
-    }
-    Rectangle {
-        width: 50
-        height: 50
-        x: point3.x
-        y: point3.y
+                Repeater {
+                    model: parent.rows*parent.columns
+                    delegate: QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        text: index+1
+                    }
+                }
+            }
+        }
 
-        border.width: 4
-        border.color: "yellow"
-    }
-    Rectangle {
-        width: 50
-        height: 50
-        x: point4.x
-        y: point4.y
+        Rectangle {
+            Layout.preferredWidth: 320
+            Layout.fillHeight: true
 
-        border.width: 4
-        border.color: "orange"
+            color: "#f5f5f5"
+            radius: 4
+            border.width: 1
+            border.color: "#ccc"
+        }
     }
 }

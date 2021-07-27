@@ -36,9 +36,34 @@ ZComponents.ScreenPage {
 
     screenId: "control"
 
+    backAction: Kirigami.Action {
+        text: qsTr("Back")
+        onTriggered: {
+            if (stack.depth > 2) {
+                stack.pop();
+            } else {
+                zynthian.go_back()
+            }
+        }
+    }
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Switch View")
+            onTriggered: {
+                if (stack.depth > 1) {
+                    stack.pop();
+                } else {
+                    //HACK
+                    stack.push(Qt.resolvedUrl("../engineeditpages/" + zynthian.layer.engine_nick.replace("/", "_") + "/main.qml"), {"stack": stack});
+                }
+            }
+        }
+    ]
     Component.onCompleted: {
         mainView.forceActiveFocus()
         zynthian.preset.next_screen = "control"
+        //HACK
+        stack.push(Qt.resolvedUrl("../engineeditpages/" + zynthian.layer.engine_nick.replace("/", "_") + "/main.qml"), {"stack": stack});
     }
     onFocusChanged: {
         if (focus) {
@@ -47,36 +72,40 @@ ZComponents.ScreenPage {
     }
 
     bottomPadding: Kirigami.Units.gridUnit
-    contentItem: RowLayout {
-        ColumnLayout {
-            Layout.maximumWidth: Math.floor(root.width / 4)
-            Layout.minimumWidth: Layout.maximumWidth
-            Layout.fillHeight: true
-            ZComponents.Controller {
-                // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
-                controller: zynthian.control.controllers_count > 0 ? zynthian.control.controller(0) : null
+    contentItem: ZComponents.Stack {
+        id: stack
+        initialItem: RowLayout {
+            id: defaultPage
+            ColumnLayout {
+                Layout.maximumWidth: Math.floor(root.width / 4)
+                Layout.minimumWidth: Layout.maximumWidth
+                Layout.fillHeight: true
+                ZComponents.Controller {
+                    // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
+                    controller: zynthian.control.controllers_count > 0 ? zynthian.control.controller(0) : null
+                }
+                ZComponents.Controller {
+                    controller: zynthian.control.controllers_count > 1 ? zynthian.control.controller(1) : null
+                }
             }
-            ZComponents.Controller {
-                controller: zynthian.control.controllers_count > 1 ? zynthian.control.controller(1) : null
+            ZComponents.SelectorView {
+                id: mainView
+                screenId: root.screenId
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
+                onItemActivated: root.itemActivated(root.screenId, index)
             }
-        }
-        ZComponents.SelectorView {
-            id: mainView
-            screenId: root.screenId
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            onCurrentScreenIdRequested: root.currentScreenIdRequested(root.screenId)
-			onItemActivated: root.itemActivated(root.screenId, index)
-        }
-        ColumnLayout {
-            Layout.maximumWidth: Math.floor(root.width / 4)
-            Layout.minimumWidth: Layout.maximumWidth
-            Layout.fillHeight: true
-            ZComponents.Controller {
-                controller: zynthian.control.controllers_count > 2 ? zynthian.control.controller(2) : null
-            }
-            ZComponents.Controller {
-                controller: zynthian.control.controllers_count > 3 ? zynthian.control.controller(3) : null
+            ColumnLayout {
+                Layout.maximumWidth: Math.floor(root.width / 4)
+                Layout.minimumWidth: Layout.maximumWidth
+                Layout.fillHeight: true
+                ZComponents.Controller {
+                    controller: zynthian.control.controllers_count > 2 ? zynthian.control.controller(2) : null
+                }
+                ZComponents.Controller {
+                    controller: zynthian.control.controllers_count > 3 ? zynthian.control.controller(3) : null
+                }
             }
         }
     }

@@ -37,6 +37,7 @@ Card {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
+    visible: controller !== null
 
     readonly property string valueType: {
         //FIXME: Ugly heuristics
@@ -46,7 +47,8 @@ Card {
         if (root.controller.value_type === "int" && root.controller.max_value - root.controller.value0 === 1) {
             return "bool";
         }
-        if (root.controller.value_print === "on" || root.controller.value_print === "off") {
+        if (root.controller.value_print === "on" || root.controller.value_print === "off" ||
+			root.controller.value_print === "On" || root.controller.value_print === "Off") {
             return "bool";
         }
         return root.controller.value_type;

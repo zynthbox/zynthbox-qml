@@ -49,12 +49,12 @@ ZComponents.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Switch View")
+            visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {
                 if (stack.depth > 1) {
                     stack.pop();
-                } else {
-                    //HACK
-                    stack.push(Qt.resolvedUrl("../engineeditpages/" + zynthian.layer.engine_nick.replace("/", "_") + "/main.qml"), {"stack": stack});
+                } else if (zynthian.control.custom_control_page.length > 0) {
+                    stack.push(zynthian.control.custom_control_page, {"stack": stack});
                 }
             }
         }
@@ -63,7 +63,18 @@ ZComponents.ScreenPage {
         mainView.forceActiveFocus()
         zynthian.preset.next_screen = "control"
         //HACK
-        stack.push(Qt.resolvedUrl("../engineeditpages/" + zynthian.layer.engine_nick.replace("/", "_") + "/main.qml"), {"stack": stack});
+        if (zynthian.control.custom_control_page.length > 0) {
+            stack.push(zynthian.control.custom_control_page, {"stack": stack});
+        }
+    }
+    Connections {
+        target: zynthian.control
+        onCustom_control_pageChanged: {
+            stack.pop(defaultPage);
+            if (zynthian.control.custom_control_page.length > 0) {
+                stack.push(zynthian.control.custom_control_page, {"stack": stack});
+            }
+        }
     }
     onFocusChanged: {
         if (focus) {

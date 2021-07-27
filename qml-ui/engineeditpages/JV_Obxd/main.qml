@@ -56,7 +56,7 @@ Item { //TODO: componentize
 			QQC2.Button {
 				Layout.fillWidth: true
 				Layout.fillHeight: true
-				text: qsTr("ASDR")
+				text: qsTr("ADSR")
 				autoExclusive: true
 				checkable: true
 				onCheckedChanged: {

@@ -74,6 +74,9 @@ ZComponents.ScreenPage {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: modelData
+                                onClicked: {
+                                    focus = false
+                                }
                             }
                         }
                     }

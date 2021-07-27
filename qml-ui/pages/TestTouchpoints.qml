@@ -34,8 +34,8 @@ ZComponents.ScreenPage {
     screenId: "test_touchpoints"
     leftPadding: 0
     rightPadding: 0
-    topPadding: 0
-    bottomPadding: 0
+    topPadding: 5
+    bottomPadding: 5
 
     QtObject {
         id: privateProps
@@ -62,12 +62,15 @@ ZComponents.ScreenPage {
             color: "transparent"
 
             ColumnLayout {
-                anchors.margins: 5
                 anchors.fill: parent
+                spacing: 0
+                anchors.margins: 5
 
                 Repeater {
                     model: privateProps.gridKeys
                     delegate: RowLayout {
+                        Layout.margins: 2.5
+
                         Repeater {
                             model: privateProps.gridKeys[index]
                             delegate: QQC2.Button {

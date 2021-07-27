@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Main Class and Program for Zynthian GUI
+Test Touchpoints Page 
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 
@@ -78,7 +78,7 @@ ZComponents.ScreenPage {
                                 Layout.fillHeight: true
                                 text: modelData
                                 onClicked: {
-                                    focus = false
+                                    focus = false                                
                                 }
                             }
                         }

@@ -35,62 +35,121 @@ Item { //TODO: componentize
 
     property QQC2.StackView stack
 
+    RowLayout {
+		anchors.fill: parent
+		ColumnLayout {
+			Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+			Layout.fillHeight: true
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("Main")
+				autoExclusive: true
+				checkable: true
+				checked: true
+				onCheckedChanged: {
+					if (checked) {
+						internalStack.replace(mainPage)
+					}
+				}
+			}
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("ADSR")
+				autoExclusive: true
+				checkable: true
+				onCheckedChanged: {
+					if (checked) {
+						internalStack.replace(Qt.resolvedUrl("ADSRPage.qml"))
+					}
+				}
+			}
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("Filter")
+				autoExclusive: true
+				checkable: true
+				onCheckedChanged: {
+					if (checked) {
+						internalStack.replace(Qt.resolvedUrl("FilterPage.qml"))
+					}
+				}
+			}
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("OSC")
+				autoExclusive: true
+				checkable: true
+			}
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("LFO")
+				autoExclusive: true
+				checkable: true
+			}
+			QQC2.Button {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: qsTr("Mix")
+				autoExclusive: true
+				checkable: true
+			}
+		}
+		ZComponents.Stack {
+			id: internalStack
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+			clip: true
+
+			initialItem: mainPage
+		}
+	}
+
     GridLayout {
-        anchors.fill: parent
+        id: mainPage
+        visible: false
         rows: 2
         columns: 4
-        // ASDR
-        ZComponents.Controller {
-            implicitWidth: 1
-            implicitHeight: 1
-            controller: zynthian.control.controller_by_category("Obxd#14", 0)
-        }
-        ZComponents.Controller {
-            implicitWidth: 1
-            implicitHeight: 1
-            controller: zynthian.control.controller_by_category("Obxd#14", 2)
-        }
-        ZComponents.Controller {
-            implicitWidth: 1
-            implicitHeight: 1
-            controller: zynthian.control.controller_by_category("Obxd#14", 1)
-        }
-        ZComponents.Controller {
-            implicitWidth: 1
-            implicitHeight: 1
-            controller: zynthian.control.controller_by_category("Obxd#14", 3)
-        }
 
-        /*ZComponents.Card {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            contentItem: ColumnLayout {
-                Kirigami.Heading {
-                    text: qsTr("ASDR")
-                    level:2
-                }
-                QQC2.Button {
-                    text: "open"
-                    onClicked: stack.push(Qt.resolvedUrl("./ASDRPage.qml"))
-                }
-            }
-        }*/
-
-        // Cutoff
-        ZComponents.Controller {
+        ZComponents.Card {
             implicitWidth: 1
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller: zynthian.control.controller_by_category("Obxd#12", 2)
         }
-        // Resonance
-        ZComponents.Controller {
+        ZComponents.Card {
             implicitWidth: 1
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller: zynthian.control.controller_by_category("Obxd#12", 1)
+        }
+        ZComponents.Card {
+            implicitWidth: 1
+            implicitHeight: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        ZComponents.Card {
+            implicitWidth: 1
+            implicitHeight: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        ZComponents.Card {
+            implicitWidth: 1
+            implicitHeight: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        ZComponents.Card {
+            implicitWidth: 1
+            implicitHeight: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
         ZComponents.Card {
             implicitWidth: 1

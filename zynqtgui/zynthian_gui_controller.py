@@ -71,17 +71,19 @@ class zynthian_gui_controller(QObject):
 		self.ctrl_midi_bind=None
 
 		self.index=indx
-		self.row=zynthian_gui_config.ctrl_pos[indx][0]
-		self.col=zynthian_gui_config.ctrl_pos[indx][1]
-		self.sticky=zynthian_gui_config.ctrl_pos[indx][2]
+		#self.row=zynthian_gui_config.ctrl_pos[indx][0]
+		#self.col=zynthian_gui_config.ctrl_pos[indx][1]
+		#self.sticky=zynthian_gui_config.ctrl_pos[indx][2]
 
 		# Setup Controller and Zyncoder
 		self.config(zctrl)
-		self.show()
+		self.calculate_plot_values()
 
 
 	def show(self):
-		self.calculate_plot_values()
+		#logging.error("SHOWING")
+		#self.calculate_plot_values()
+		return
 
 	def hide(self):
 		return
@@ -196,8 +198,9 @@ class zynthian_gui_controller(QObject):
 		return self.ctrl_title
 
 	def write_value(self, v):
+		logging.error("WRITING VALUE")
 		self.set_value(v, True)
-		self.zctrl.set_value(v)
+		self.calculate_plot_values()
 
 	def get_value(self):
 		return self.ctrl_value
@@ -403,6 +406,8 @@ class zynthian_gui_controller(QObject):
 			logging.error("%s" % err)
 
 	def set_value(self, v, set_zyncoder=False, send_zyncoder=True):
+		if set_zyncoder:
+			logging.error("SETTING VALUE {} {} {} {}".format(v, set_zyncoder, send_zyncoder, self.get_title()))
 		if v>self.ctrl_max_value:
 			v=self.ctrl_max_value
 		elif v<0:

@@ -36,20 +36,6 @@ ZComponents.ScreenPage {
     rightPadding: 0
     topPadding: 5
     bottomPadding: 5
-
-    QtObject {
-        id: privateProps
-
-        property var gridKeys: [
-            [49,50,51,52,53,54,55,56],
-            [41,42,43,44,45,46,47,48],
-            [33,34,35,36,37,38,39,40],
-            [25,26,27,28,29,30,31,32],
-            [17,18,19,20,21,22,23,24],
-            [9,10,11,12,13,14,15,16],
-            [1,2,3,4,5,6,7,8],
-        ]
-    }
     
     RowLayout {
         anchors.fill: parent
@@ -67,18 +53,24 @@ ZComponents.ScreenPage {
                 anchors.margins: 5
 
                 Repeater {
-                    model: privateProps.gridKeys
+                    model: zynthian.test_touchpoints.notesModel.rowCount()
                     delegate: RowLayout {
+                        property var row: index
+
                         Layout.margins: 2.5
 
                         Repeater {
-                            model: privateProps.gridKeys[index]
+                            model: zynthian.test_touchpoints.notesModel.columnCount(zynthian.test_touchpoints.notesModel.index(index, 0))
                             delegate: QQC2.Button {
+                                property var column: index
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: modelData
+                                text: zynthian.test_touchpoints.notesModel.data(zynthian.test_touchpoints.notesModel.index(row, column), Qt.DisplayRole)
                                 onClicked: {
-                                    focus = false                                
+                                    focus = false
+                                    zynthian.test_touchpoints.play_sound("C4");
+                                    console.log(row, column, Qt.DisplayRole, zynthian.test_touchpoints.notesModel.data(zynthian.test_touchpoints.notesModel.index(row, column), Qt.DisplayRole));
                                 }
                             }
                         }

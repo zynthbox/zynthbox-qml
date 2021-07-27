@@ -77,7 +77,7 @@ ZComponents.ScreenPage {
                                 onClicked: {
                                     focus = false
                                     zynthian.playgrid.play_sound("C4");
-                                    console.log(notesGridModel.row, notesGridModel.column);
+                                    console.log(row, column, notesGridModel.roles['note'], notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note']));
                                 }
                             }
                         }
@@ -87,7 +87,7 @@ ZComponents.ScreenPage {
         }
 
         Rectangle {
-            Layout.preferredWidth: 320
+            Layout.preferredWidth: 160
             Layout.fillHeight: true
 
             color: "transparent"

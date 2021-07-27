@@ -263,7 +263,7 @@ ZComponents.SelectorPage {
             }
         }
     }
-    Rectangle {
+    Item {
         id: busyWithEngineStuff
         anchors {
             bottom: view.bottom
@@ -274,7 +274,18 @@ ZComponents.SelectorPage {
         height: Kirigami.Units.gridUnit * 5
         opacity: newStuffEngine.isLoading ? 1 : 0;
         Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
-        color: Qt.rgba(0, 0, 0, 0.8)
+        ZComponentsPrivate.CardBackground {
+            anchors {
+                top: parent.top
+                left: busyWithEngineStuffLabel.left
+                right: busyWithEngineStuffLabel.right
+                bottom: parent.bottom
+                topMargin: -Kirigami.Units.largeSpacing
+                leftMargin: -Kirigami.Units.gridUnit * 2.5
+                rightMargin: -Kirigami.Units.gridUnit * 2.5
+                bottomMargin: -Kirigami.Units.largeSpacing
+            }
+        }
         QQC2.BusyIndicator {
             anchors {
                 horizontalCenter: parent.horizontalCenter
@@ -286,6 +297,7 @@ ZComponents.SelectorPage {
             running: parent.opacity > 0;
         }
         QQC2.Label {
+            id: busyWithEngineStuffLabel
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 bottom: parent.bottom

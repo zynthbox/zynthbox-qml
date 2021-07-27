@@ -32,32 +32,33 @@ import "../components" as ZComponents
 
 ZComponents.ScreenPage {
     screenId: "test_touchpoints"
+    leftPadding: 0
+    rightPadding: 0
+    topPadding: 0
+    bottomPadding: 0
     
     RowLayout {
         anchors.fill: parent
-        spacing: 12
+        spacing: 0
 
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            color: "#f5f5f5"
-            radius: 4
-            border.width: 1
-            border.color: "#ccc"
+            color: "transparent"
 
             GridLayout {
                 anchors.margins: 5
                 anchors.fill: parent
                 rows: 7
-                columns: 7
+                columns: 8
 
                 Repeater {
-                    model: parent.rows*parent.columns
+                    model: Array.from(Array(parent.rows*parent.columns).keys()).reverse()
                     delegate: QQC2.Button {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        text: index+1
+                        text: modelData+1
                     }
                 }
             }
@@ -67,10 +68,7 @@ ZComponents.ScreenPage {
             Layout.preferredWidth: 320
             Layout.fillHeight: true
 
-            color: "#f5f5f5"
-            radius: 4
-            border.width: 1
-            border.color: "#ccc"
+            color: "transparent"
         }
     }
 }

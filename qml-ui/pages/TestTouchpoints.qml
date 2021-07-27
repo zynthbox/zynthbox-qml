@@ -32,58 +32,61 @@ import "../components" as ZComponents
 
 ZComponents.ScreenPage {
     screenId: "test_touchpoints"
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 5
-    bottomPadding: 5
-    
-    RowLayout {
+
+    MultiPointTouchArea {
         anchors.fill: parent
-        spacing: 0
+        touchPoints: [
+            TouchPoint { id: point0 },
+            TouchPoint { id: point1 },
+            TouchPoint { id: point2 },
+            TouchPoint { id: point3 },
+            TouchPoint { id: point4 }
+        ]
+    }
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+    Rectangle {
+        width: 50
+        height: 50
+        x: point0.x
+        y: point0.y
 
-            color: "transparent"
+        border.width: 4
+        border.color: "red"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point1.x
+        y: point1.y
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
-                anchors.margins: 5
+        border.width: 4
+        border.color: "green"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point2.x
+        y: point2.y
 
-                Repeater {
-                    model: zynthian.test_touchpoints.notesModel.rowCount()
-                    delegate: RowLayout {
-                        property var row: index
+        border.width: 4
+        border.color: "blue"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point3.x
+        y: point3.y
 
-                        Layout.margins: 2.5
+        border.width: 4
+        border.color: "yellow"
+    }
+    Rectangle {
+        width: 50
+        height: 50
+        x: point4.x
+        y: point4.y
 
-                        Repeater {
-                            model: zynthian.test_touchpoints.notesModel.columnCount(zynthian.test_touchpoints.notesModel.index(index, 0))
-                            delegate: QQC2.Button {
-                                property var column: index
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                text: zynthian.test_touchpoints.notesModel.data(zynthian.test_touchpoints.notesModel.index(row, column), Qt.DisplayRole)
-                                onClicked: {
-                                    focus = false
-                                    zynthian.test_touchpoints.play_sound("C4");
-                                    console.log(row, column, Qt.DisplayRole, zynthian.test_touchpoints.notesModel.data(zynthian.test_touchpoints.notesModel.index(row, column), Qt.DisplayRole));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            Layout.preferredWidth: 320
-            Layout.fillHeight: true
-
-            color: "transparent"
-        }
+        border.width: 4
+        border.color: "orange"
     }
 }

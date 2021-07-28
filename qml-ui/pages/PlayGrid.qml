@@ -35,17 +35,7 @@ ZComponents.ScreenPage {
     leftPadding: 0
     rightPadding: 0
     topPadding: 5
-    bottomPadding: 5
-    
-    ListModel {
-        id: gridModel
-        
-        ListElement { row: 3; column: 3; text: "3x3" }
-        ListElement { row: 4; column: 4; text: "4x4" }
-        ListElement { row: 5; column: 8; text: "5x8" }
-        ListElement { row: 0; column: 0; text: "Custom" }
-    }
-    
+    bottomPadding: 5    
     
     RowLayout {
         anchors.fill: parent
@@ -173,10 +163,18 @@ ZComponents.ScreenPage {
                         zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
                     }
                 }
-            }
+            }            
             
-            
-            RowLayout {
+            RowLayout {    
+                ListModel {
+                    id: gridModel
+                    
+                    ListElement { row: 3; column: 3; text: "3x3" }
+                    ListElement { row: 4; column: 4; text: "4x4" }
+                    ListElement { row: 5; column: 8; text: "5x8" }
+                    ListElement { row: 0; column: 0; text: "Custom" }
+                }   
+
                 QQC2.Label {
                     Layout.preferredWidth: rightPanel.textElementWidth
                     text: "Grid"
@@ -235,6 +233,35 @@ ZComponents.ScreenPage {
                     currentIndex: 0
                     onActivated: {
                         zynthian.playgrid.columns = currentText;
+                    }
+                }
+            }            
+            
+            RowLayout {    
+                ListModel {
+                    id: scaleModel
+                    
+                    ListElement { scale: "major"; text: "Major" }
+                    // ListElement { scale: "minor"; text: "Minor" }
+                    ListElement { scale: "chromatic"; text: "Chromatic" }
+                }
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Scale"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: scaleModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 0
+
+                    onActivated: {
+                        zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                        console.log(zynthian.playgrid.scale)
                     }
                 }
             }

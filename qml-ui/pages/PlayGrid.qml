@@ -77,7 +77,12 @@ ZComponents.ScreenPage {
 
                                     Text {
                                         anchors.centerIn: parent
-                                        text: note.name + note.octave
+                                        text: {
+                                            if (scaleModel.get(comboScale.currentIndex).scale == "major")
+                                                return note.name
+                                            else
+                                                return note.name + note.octave
+                                        }
                                     }
                                 }
                                 
@@ -107,8 +112,97 @@ ZComponents.ScreenPage {
             Layout.maximumWidth: Layout.preferredWidth
             Layout.fillHeight: true
             Layout.margins: 8
+            
+            RowLayout {
+                id: optionScale
+
+                ListModel {
+                    id: scaleModel
+                    
+                    ListElement { scale: "major"; text: "Major" }
+                    // ListElement { scale: "minor"; text: "Minor" }
+                    ListElement { scale: "chromatic"; text: "Chromatic" }
+                }
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Scale"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    id: comboScale
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: scaleModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 0
+
+                    onActivated: {
+                        if (scaleModel.get(currentIndex).scale === 'major') {
+                            optionTranspose.visible = false;
+                            optionOctave.visible = false;
+                            optionGrid.visible = false;
+                            optionKey.visible = true;
+                            zynthian.playgrid.startingNote = 36;
+                        } else {
+                            optionTranspose.visible = true;
+                            optionOctave.visible = true;
+                            optionGrid.visible = true;
+                            optionKey.visible = false;
+                            zynthian.playgrid.startingNote = 36;
+                        }
+
+                        zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                        console.log(zynthian.playgrid.scale)
+                    }
+                }
+            }
 
             RowLayout {
+                id: optionKey
+                visible: true
+
+                ListModel {
+                    id: keyModel
+                    
+                    ListElement { note: 36; text: "C" }
+                    ListElement { note: 37; text: "C#" }
+                    ListElement { note: 38; text: "D" }
+                    ListElement { note: 39; text: "D#" }
+                    ListElement { note: 40; text: "E" }
+                    ListElement { note: 41; text: "F" }
+                    ListElement { note: 42; text: "F#" }
+                    ListElement { note: 43; text: "G" }
+                    ListElement { note: 44; text: "G#" }
+                    ListElement { note: 45; text: "A" }
+                    ListElement { note: 46; text: "A#" }
+                    ListElement { note: 47; text: "B" }
+                }
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Key"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: keyModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 0
+
+                    onActivated: {
+                        zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
+                    }
+                }
+            }
+
+            RowLayout {
+                id: optionTranspose
+                visible: false
+
                 QQC2.Label {
                     Layout.preferredWidth: rightPanel.textElementWidth
                     text: "Transpose"
@@ -138,6 +232,9 @@ ZComponents.ScreenPage {
             }
             
             RowLayout {
+                id: optionOctave
+                visible: false
+
                 QQC2.Label {
                     Layout.preferredWidth: rightPanel.textElementWidth
                     text: "Octave"
@@ -166,6 +263,9 @@ ZComponents.ScreenPage {
             }            
             
             RowLayout {    
+                id: optionGrid
+                visible: false
+
                 ListModel {
                     id: gridModel
                     
@@ -192,11 +292,11 @@ ZComponents.ScreenPage {
                         var data = gridModel.get(currentIndex)
 
                         if (data.row === 0 && data.column === 0) {
-                            customGrid.visible = true
+                            optionCustomGrid.visible = true
                             zynthian.playgrid.rows = customRows.currentText;
                             zynthian.playgrid.columns = customColumns.currentText;
                         } else {
-                            customGrid.visible = false;
+                            optionCustomGrid.visible = false;
                             zynthian.playgrid.rows = data.row;
                             zynthian.playgrid.columns = data.column;
                         }
@@ -204,8 +304,8 @@ ZComponents.ScreenPage {
                 }
             }
 
-            RowLayout {
-                id: customGrid
+            RowLayout {                
+                id: optionCustomGrid
                 visible: false
 
                 QQC2.Label {
@@ -235,36 +335,8 @@ ZComponents.ScreenPage {
                         zynthian.playgrid.columns = currentText;
                     }
                 }
-            }            
-            
-            RowLayout {    
-                ListModel {
-                    id: scaleModel
-                    
-                    ListElement { scale: "major"; text: "Major" }
-                    // ListElement { scale: "minor"; text: "Minor" }
-                    ListElement { scale: "chromatic"; text: "Chromatic" }
-                }
-
-                QQC2.Label {
-                    Layout.preferredWidth: rightPanel.textElementWidth
-                    text: "Scale"
-                    font.pointSize: rightPanel.textSize
-                }
-                QQC2.ComboBox {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: rightPanel.cellSize
-                    model: scaleModel
-                    textRole: "text"
-                    displayText: currentText
-                    currentIndex: 0
-
-                    onActivated: {
-                        zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
-                        console.log(zynthian.playgrid.scale)
-                    }
-                }
             }
         }
     }
 }
+            

@@ -27,7 +27,6 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import Zynthian.QmlUI 1.0 as QmlUI
 
 import "../components" as ZComponents
 
@@ -37,10 +36,6 @@ ZComponents.ScreenPage {
     rightPadding: 0
     topPadding: 5
     bottomPadding: 5
-
-    QmlUI.PlayGridNotesGridModel {
-        id: notesGridModel
-    }
     
     RowLayout {
         anchors.fill: parent
@@ -58,17 +53,17 @@ ZComponents.ScreenPage {
                 anchors.margins: 5
 
                 Repeater {
-                    model: notesGridModel.rowCount()
+                    model: zynthian.playgrid.model
                     delegate: RowLayout {
                         property var row: index
 
                         Layout.margins: 2.5
 
                         Repeater {
-                            model: notesGridModel.columnCount(notesGridModel.index(index, 0))
+                            model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
                             delegate: QQC2.Button {
                                 property var column: index
-                                property var note: notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note'])
+                                property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
@@ -86,6 +81,10 @@ ZComponents.ScreenPage {
                                     }
                                 }
 
+                                onClicked: {
+                                    console.log(row, column, zynthian.playgrid.model.roles['note'], zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note']))
+                                }
+                 
                                 onPressed: {
                                     focus = true;
                                     note.on();
@@ -101,62 +100,62 @@ ZComponents.ScreenPage {
             }
         }
 
-        Rectangle {
+        ColumnLayout {
             Layout.preferredWidth: 160
             Layout.fillHeight: true
 
-            // RowLayout {
-            //     Layout.alignment: Qt.AlignHCenter
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
 
-            //     QQC2.Button {
-            //         text: "-"
-            //         onClicked: {         
-            //             console.log("Transpose -1", notesGridModel.startingNote);
+                QQC2.Button {
+                    text: "-"
+                    onClicked: {         
+                        console.log("Transpose -1", zynthian.playgrid.startingNote);
 
-            //             if (notesGridModel.startingNote - 1 > 0) {
-            //                 notesGridModel.startingNote--;
-            //             } else {
-            //                 notesGridModel.startingNote = 0;
-            //             }
-            //         }
-            //     }
-            //     Text {
-            //         text: "Transpose"
-            //     }
-            //     QQC2.Button {
-            //         text: "+"
-            //         onClicked: {                               
-            //             console.log("Transpose +1", notesGridModel.startingNote);                 
-            //             notesGridModel.startingNote--;
-            //         }
-            //     }
-            // }
+                        if (zynthian.playgrid.startingNote - 1 > 0) {
+                            zynthian.playgrid.startingNote--;
+                        } else {
+                            zynthian.playgrid.startingNote = 0;
+                        }
+                    }
+                }
+                Text {
+                    text: "Transpose"
+                }
+                QQC2.Button {
+                    text: "+"
+                    onClicked: {                               
+                        console.log("Transpose +1", zynthian.playgrid.startingNote);                 
+                        zynthian.playgrid.startingNote++;
+                    }
+                }
+            }
             
-            // RowLayout {
-            //     Layout.alignment: Qt.AlignHCenter
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
 
-            //     QQC2.Button {
-            //         text: "-"
-            //         onClicked: {
-            //             console.log("Octave -1", notesGridModel.startingNote);
-            //             if (notesGridModel.startingNote - 12 > 0) {
-            //                 notesGridModel.startingNote = notesGridModel.startingNote - 12;
-            //             } else {
-            //                 notesGridModel.startingNote = 0;
-            //             }
-            //         }
-            //     }
-            //     Text {
-            //         text: "Octave"
-            //     }
-            //     QQC2.Button {
-            //         text: "+"
-            //         onClicked: {
-            //             console.log("Octave +1", notesGridModel.startingNote);
-            //             notesGridModel.startingNote = notesGridModel.startingNote + 12;
-            //         }
-            //     }
-            // }
+                QQC2.Button {
+                    text: "-"
+                    onClicked: {
+                        console.log("Octave -1", zynthian.playgrid.startingNote);
+                        if (zynthian.playgrid.startingNote - 12 > 0) {
+                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                        } else {
+                            zynthian.playgrid.startingNote = 0;
+                        }
+                    }
+                }
+                Text {
+                    text: "Octave"
+                }
+                QQC2.Button {
+                    text: "+"
+                    onClicked: {
+                        console.log("Octave +1", zynthian.playgrid.startingNote);
+                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    }
+                }
+            }
         }
     }
 }

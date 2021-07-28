@@ -131,10 +131,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def __get_model__(self):
     return self.__model__
 
-  @Signal
-  def __model_changed__(self):
-    pass
-
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     grid_notes = []
@@ -191,6 +187,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
   @Signal
   def __starting_note_changed__(self):
+    pass
+
+  @Signal
+  def __model_changed__(self):
     pass
   
   rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)

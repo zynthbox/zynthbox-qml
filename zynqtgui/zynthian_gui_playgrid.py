@@ -3,7 +3,7 @@
 #******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 # 
-# Zynthian Test Touchpoints: A Test page to test multi
+# Zynthian PlayGrid: A page to play ntoes with buttons
 # 
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

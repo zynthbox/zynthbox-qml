@@ -99,7 +99,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
   @Property(dict, constant=True)
   def roles(self):
     return {
-      b'note': self.NoteRole
+      b'note': zynthian_gui_grid_notes_model.NoteRole
     }
 
 
@@ -107,6 +107,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   __rows__: int = 5
   __columns__: int = 8
   __starting_note__: int = 36
+  __scale__ = 'major'
 
   def __init__(self, parent = None):
     super(zynthian_gui_playgrid, self).__init__(parent)
@@ -128,18 +129,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def refresh_loading(self):
     pass
 
-  def __get_model__(self):
-    return self.__model__
-
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    major_scale = [2, 2, 1, 2, 2, 2, 1]
+    minor_scale = [2, 1, 2, 2, 1, 2, 2]
+    scale_index = 0
     grid_notes = []
+    col = self.__starting_note__
 
     for row in range(0, self.__rows__):
       row_data = []
-      multiplier = row*self.__columns__
 
-      for col in range(multiplier + self.__starting_note__, multiplier + self.__columns__ + self.__starting_note__):
+      for i in range(0, self.__columns__):
         row_data.append(Note(
           name=note_int_to_str_map[col%12],
           octave=col//12,
@@ -147,11 +148,31 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
           midi_port=self.__midi_port__,
           parent=self
         ))
+
+        if i != (self.__columns__ - 1):
+          if self.__scale__ == 'chromatic':
+            col += 1
+          elif self.__scale__ == 'major':
+            if scale_index >= len(major_scale):
+              scale_index = 0
+
+            col += major_scale[scale_index]
+            scale_index += 1
       
       grid_notes.insert(0, row_data)
+
+      if self.__scale__ == 'major':
+        for i in range(0, 3):
+          col += major_scale[scale_index%7]
+          scale_index = (scale_index+1)%7
+        
+        col -= 12
     
     self.__model__.set_grid(grid_notes)
     self.__model_changed__.emit()
+
+  def __get_model__(self):
+    return self.__model__
 
   def __get_rows__(self):
     return self.__rows__
@@ -161,6 +182,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
   def __get_starting_note__(self):
     return self.__starting_note__
+
+  def __get_scale__(self):
+    return self.__scale__
 
   def __set_rows__(self, rows):
     self.__rows__ = rows
@@ -175,6 +199,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def __set_starting_note__(self, note):
     self.__starting_note__ = note
     self.__starting_note_changed__.emit()
+    self.__populate_grid__()
+
+  def __set_scale__(self, scale: str):
+    self.__scale__ = scale
     self.__populate_grid__()
 
   @Signal
@@ -192,8 +220,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   @Signal
   def __model_changed__(self):
     pass
+
+  @Signal
+  def __scale_changed__(self):
+    pass
   
   rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
   columns = Property(int, __get_columns__, __set_columns__, notify=__columns_changed__)
   startingNote = Property(int, __get_starting_note__, __set_starting_note__, notify=__starting_note_changed__)
   model = Property(QAbstractItemModel, __get_model__, notify=__model_changed__)
+  scale = Property(str, __get_scale__, __set_scale__, notify=__scale_changed__)

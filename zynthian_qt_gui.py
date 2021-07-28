@@ -1467,14 +1467,17 @@ class zynthian_gui(QObject):
 
 	def zyncoder_thread_task(self):
 		while not self.exit_flag:
-			self.zyncoder_read()
-			self.zynmidi_read()
-			self.osc_receive()
-			self.plot_zctrls()
-			time.sleep(0.04)
-			if self.zynread_wait_flag:
+			if not self.zynread_wait_flag: #FIXME: poor man's mutex? actually works only with this one FIXME: REVERT
+				self.zyncoder_read()
+				self.zynmidi_read()
+				self.osc_receive()
+				self.plot_zctrls()
+				time.sleep(0.04)
+			else:
 				time.sleep(0.3)
-				self.zynread_wait_flag=False
+			#if self.zynread_wait_flag:
+				#time.sleep(0.3)
+				#self.zynread_wait_flag=False
 
 
 	def zyncoder_read(self):

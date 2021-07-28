@@ -41,6 +41,7 @@ from . import zynthian_gui_config
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
+import traceback
 
 #------------------------------------------------------------------------------
 # Controller GUI Class
@@ -90,6 +91,9 @@ class zynthian_gui_controller(QObject):
 
 
 	def calculate_plot_values(self):
+		# FIXME: probably what's needed would be an actual threading semaphore?
+		self.zyngui.zynread_wait_flag = True
+
 		if self.ctrl_value>self.ctrl_max_value:
 			self.ctrl_value=self.ctrl_max_value
 
@@ -151,6 +155,7 @@ class zynthian_gui_controller(QObject):
 					val = self.zctrl.value_min*pow(self.scale_value, self.ctrl_value/self.n_values)
 				else:
 					val = self.zctrl.value_min+self.ctrl_value*self.scale_value
+
 				self.zctrl.set_value(val)
 				if self.format_print and val<1000 and val>-1000:
 					self.ctrl_value_print = self.format_print.format(val)
@@ -158,6 +163,8 @@ class zynthian_gui_controller(QObject):
 					self.ctrl_value_print = str(int(val))
 
 		self.value_print_changed.emit()
+
+		self.zyngui.zynread_wait_flag = False
 		#print("VALUE: %s" % self.ctrl_value)
 		#print("VALUE PLOT: %s" % self.ctrl_value_plot)
 		#print("VALUE PRINT: %s" % self.ctrl_value_print)
@@ -198,7 +205,6 @@ class zynthian_gui_controller(QObject):
 		return self.ctrl_title
 
 	def write_value(self, v):
-		logging.error("WRITING VALUE")
 		self.set_value(v, True)
 		self.calculate_plot_values()
 
@@ -406,8 +412,6 @@ class zynthian_gui_controller(QObject):
 			logging.error("%s" % err)
 
 	def set_value(self, v, set_zyncoder=False, send_zyncoder=True):
-		if set_zyncoder:
-			logging.error("SETTING VALUE {} {} {} {}".format(v, set_zyncoder, send_zyncoder, self.get_title()))
 		if v>self.ctrl_max_value:
 			v=self.ctrl_max_value
 		elif v<0:

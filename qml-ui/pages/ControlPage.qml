@@ -39,7 +39,7 @@ ZComponents.ScreenPage {
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: {
-            if (stack.depth > 2) {
+            if (stack.depth > 1) {
                 stack.pop();
             } else {
                 zynthian.go_back()
@@ -51,10 +51,12 @@ ZComponents.ScreenPage {
             text: qsTr("Switch View")
             visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {
-                if (stack.depth > 1) {
-                    stack.pop();
+                if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
+					stack.clear();
+                    stack.replace(defaultPage);
                 } else if (zynthian.control.custom_control_page.length > 0) {
-                    stack.push(zynthian.control.custom_control_page, {"stack": stack});
+					stack.clear();
+                    stack.replace(zynthian.control.custom_control_page, {"stack": stack});
                 }
             }
         }
@@ -65,6 +67,8 @@ ZComponents.ScreenPage {
         //HACK
         if (zynthian.control.custom_control_page.length > 0) {
             stack.push(zynthian.control.custom_control_page, {"stack": stack});
+        } else {
+            stack.push(defaultPage);
         }
     }
     Connections {
@@ -88,8 +92,12 @@ ZComponents.ScreenPage {
     bottomPadding: Kirigami.Units.gridUnit
     contentItem: ZComponents.Stack {
         id: stack
-        initialItem: RowLayout {
-            id: defaultPage
+    }
+
+    Component {
+        id: defaultPage
+        RowLayout {
+            objectName: "defaultPage"
             ColumnLayout {
                 Layout.maximumWidth: Math.floor(root.width / 4)
                 Layout.minimumWidth: Layout.maximumWidth

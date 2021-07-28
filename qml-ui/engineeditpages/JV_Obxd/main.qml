@@ -158,7 +158,7 @@ Item { //TODO: componentize
             Layout.fillHeight: true
         }
         // VOLUME
-        ZComponents.Controller {
+        ZComponents.SliderController {
             implicitWidth: 1
             implicitHeight: 1
             Layout.fillWidth: true

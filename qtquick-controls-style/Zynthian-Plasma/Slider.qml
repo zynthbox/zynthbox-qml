@@ -27,7 +27,7 @@ T.Slider {
     handle: Item {
         property bool horizontal: control.orientation === Qt.Horizontal
         x: Math.round(control.leftPadding + (horizontal ? control.visualPosition * (control.availableWidth - width) : (control.availableWidth - width) / 2))
-        y: Math.round(control.topPadding + (horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight - height)))
+        y: Math.round(control.topPadding + (horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight) - height/2))
 
         width: grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").width : firstHandle.width
         height: grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").height : firstHandle.height
@@ -78,7 +78,7 @@ T.Slider {
             height: Math.max(margins.top + margins.bottom,
                              parent.horizontal
                              ? parent.height
-                             : parent.height - control.visualPosition * (parent.height + control.handle.height) + control.handle.height/2)
+                             : parent.height - control.visualPosition * parent.height)
         }
 
         Repeater {

@@ -113,25 +113,34 @@ Item { //TODO: componentize
         id: mainPage
         visible: false
         rows: 2
-        columns: 4
+        columns: 2
 
         // VoiceCount
-        ZComponents.DialController {
+        ZComponents.SpinBoxController {
             title: qsTr("Voices")
             implicitWidth: 1
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
             controller: zynthian.control.controller_by_category("Obxd#2", 0)
+            spinBox.stepSize: Math.round(spinBox.to / 7)
+            spinBox.textFromValue: function(value, locale) {
+                return Math.round(spinBox.realValue / (200 / 7)) + 1
+            }
         }
         // Octave
-        ZComponents.DialController {
+        ZComponents.SpinBoxController {
             title: qsTr("Transpose")
             implicitWidth: 1
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
             controller: zynthian.control.controller_by_category("Obxd#2", 1)
+            spinBox.stepSize: 10000
+            spinBox.textFromValue: function(value, locale) {
+                let val = Math.round((spinBox.realValue - 100) / 100)
+                return (val > 0 ? "+" : "") + val
+            }
         }
         // Tune
         ZComponents.DialController {
@@ -141,6 +150,7 @@ Item { //TODO: componentize
             Layout.fillWidth: true
             Layout.fillHeight: true
             controller: zynthian.control.controller_by_category("Obxd#2", 2)
+            valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
         }
         // VOLUME
         ZComponents.SliderController {
@@ -150,6 +160,7 @@ Item { //TODO: componentize
             Layout.fillWidth: true
             Layout.fillHeight: true
             controller: zynthian.control.controller_by_category("Obxd#1", 3)
+            valueLabel: Math.round(value / 2)
         }
     }
 }

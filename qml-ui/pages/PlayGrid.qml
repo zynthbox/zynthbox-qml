@@ -27,7 +27,6 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
-import Zynthian.QmlUI 1.0 as QmlUI
 
 import "../components" as ZComponents
 
@@ -36,11 +35,7 @@ ZComponents.ScreenPage {
     leftPadding: 0
     rightPadding: 0
     topPadding: 5
-    bottomPadding: 5
-
-    QmlUI.PlayGridNotesGridModel {
-        id: notesGridModel
-    }
+    bottomPadding: 5    
     
     RowLayout {
         anchors.fill: parent
@@ -58,17 +53,17 @@ ZComponents.ScreenPage {
                 anchors.margins: 5
 
                 Repeater {
-                    model: notesGridModel.rowCount()
+                    model: zynthian.playgrid.model
                     delegate: RowLayout {
                         property var row: index
 
                         Layout.margins: 2.5
 
                         Repeater {
-                            model: notesGridModel.columnCount(notesGridModel.index(index, 0))
+                            model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
                             delegate: QQC2.Button {
                                 property var column: index
-                                property var note: notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note'])
+                                property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
@@ -82,10 +77,15 @@ ZComponents.ScreenPage {
 
                                     Text {
                                         anchors.centerIn: parent
-                                        text: note.name + note.octave
+                                        text: {
+                                            if (scaleModel.get(comboScale.currentIndex).scale == "major")
+                                                return note.name
+                                            else
+                                                return note.name + note.octave
+                                        }
                                     }
                                 }
-
+                                
                                 onPressed: {
                                     focus = true;
                                     note.on();
@@ -101,62 +101,242 @@ ZComponents.ScreenPage {
             }
         }
 
-        Rectangle {
-            Layout.preferredWidth: 160
-            Layout.fillHeight: true
-
-            // RowLayout {
-            //     Layout.alignment: Qt.AlignHCenter
-
-            //     QQC2.Button {
-            //         text: "-"
-            //         onClicked: {         
-            //             console.log("Transpose -1", notesGridModel.startingNote);
-
-            //             if (notesGridModel.startingNote - 1 > 0) {
-            //                 notesGridModel.startingNote--;
-            //             } else {
-            //                 notesGridModel.startingNote = 0;
-            //             }
-            //         }
-            //     }
-            //     Text {
-            //         text: "Transpose"
-            //     }
-            //     QQC2.Button {
-            //         text: "+"
-            //         onClicked: {                               
-            //             console.log("Transpose +1", notesGridModel.startingNote);                 
-            //             notesGridModel.startingNote--;
-            //         }
-            //     }
-            // }
+        ColumnLayout {
+            property var textSize: 10
+            property var textElementWidth: 80
+            property var cellSize: 30
             
-            // RowLayout {
-            //     Layout.alignment: Qt.AlignHCenter
+            id: rightPanel
+          
+            Layout.preferredWidth: 160
+            Layout.maximumWidth: Layout.preferredWidth
+            Layout.fillHeight: true
+            Layout.margins: 8
+            
+            RowLayout {
+                id: optionScale
 
-            //     QQC2.Button {
-            //         text: "-"
-            //         onClicked: {
-            //             console.log("Octave -1", notesGridModel.startingNote);
-            //             if (notesGridModel.startingNote - 12 > 0) {
-            //                 notesGridModel.startingNote = notesGridModel.startingNote - 12;
-            //             } else {
-            //                 notesGridModel.startingNote = 0;
-            //             }
-            //         }
-            //     }
-            //     Text {
-            //         text: "Octave"
-            //     }
-            //     QQC2.Button {
-            //         text: "+"
-            //         onClicked: {
-            //             console.log("Octave +1", notesGridModel.startingNote);
-            //             notesGridModel.startingNote = notesGridModel.startingNote + 12;
-            //         }
-            //     }
-            // }
+                ListModel {
+                    id: scaleModel
+                    
+                    ListElement { scale: "major"; text: "Major" }
+                    // ListElement { scale: "minor"; text: "Minor" }
+                    ListElement { scale: "chromatic"; text: "Chromatic" }
+                }
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Scale"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    id: comboScale
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: scaleModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 0
+
+                    onActivated: {
+                        if (scaleModel.get(currentIndex).scale === 'major') {
+                            optionTranspose.visible = false;
+                            optionOctave.visible = false;
+                            optionGrid.visible = false;
+                            optionKey.visible = true;
+                            zynthian.playgrid.startingNote = 36;
+                        } else {
+                            optionTranspose.visible = true;
+                            optionOctave.visible = true;
+                            optionGrid.visible = true;
+                            optionKey.visible = false;
+                            zynthian.playgrid.startingNote = 36;
+                        }
+
+                        zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                        console.log(zynthian.playgrid.scale)
+                    }
+                }
+            }
+
+            RowLayout {
+                id: optionKey
+                visible: true
+
+                ListModel {
+                    id: keyModel
+                    
+                    ListElement { note: 36; text: "C" }
+                    ListElement { note: 37; text: "C#" }
+                    ListElement { note: 38; text: "D" }
+                    ListElement { note: 39; text: "D#" }
+                    ListElement { note: 40; text: "E" }
+                    ListElement { note: 41; text: "F" }
+                    ListElement { note: 42; text: "F#" }
+                    ListElement { note: 43; text: "G" }
+                    ListElement { note: 44; text: "G#" }
+                    ListElement { note: 45; text: "A" }
+                    ListElement { note: 46; text: "A#" }
+                    ListElement { note: 47; text: "B" }
+                }
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Key"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: keyModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 0
+
+                    onActivated: {
+                        zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
+                    }
+                }
+            }
+
+            RowLayout {
+                id: optionTranspose
+                visible: false
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Transpose"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    
+                    text: "-"
+                    onClicked: {         
+                        if (zynthian.playgrid.startingNote - 1 > 0) {
+                            zynthian.playgrid.startingNote--;
+                        } else {
+                            zynthian.playgrid.startingNote = 0;
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    text: "+"
+                    onClicked: {                               
+                        zynthian.playgrid.startingNote++;
+                    }
+                }
+            }
+            
+            RowLayout {
+                id: optionOctave
+                visible: false
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Octave"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    text: "-"
+                    onClicked: {
+                        if (zynthian.playgrid.startingNote - 12 > 0) {
+                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                        } else {
+                            zynthian.playgrid.startingNote = 0;
+                        }
+                    }
+                }
+                QQC2.Button {                    
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    text: "+"
+                    onClicked: {
+                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    }
+                }
+            }            
+            
+            RowLayout {    
+                id: optionGrid
+                visible: false
+
+                ListModel {
+                    id: gridModel
+                    
+                    ListElement { row: 3; column: 3; text: "3x3" }
+                    ListElement { row: 4; column: 4; text: "4x4" }
+                    ListElement { row: 5; column: 8; text: "5x8" }
+                    ListElement { row: 0; column: 0; text: "Custom" }
+                }   
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Grid"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: gridModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 2
+
+                    onActivated: {
+                        var data = gridModel.get(currentIndex)
+
+                        if (data.row === 0 && data.column === 0) {
+                            optionCustomGrid.visible = true
+                            zynthian.playgrid.rows = customRows.currentText;
+                            zynthian.playgrid.columns = customColumns.currentText;
+                        } else {
+                            optionCustomGrid.visible = false;
+                            zynthian.playgrid.rows = data.row;
+                            zynthian.playgrid.columns = data.column;
+                        }
+                    }
+                }
+            }
+
+            RowLayout {                
+                id: optionCustomGrid
+                visible: false
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Custom Grid"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    id: customRows
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: [3,4,5,6,7,8,9]
+                    displayText: currentText
+                    currentIndex: 0
+                    onActivated: {
+                        zynthian.playgrid.rows = currentText;
+                    }
+                }
+                QQC2.ComboBox {
+                    id: customColumns
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: [3,4,5,6,7,8,9]
+                    displayText: currentText
+                    currentIndex: 0
+                    onActivated: {
+                        zynthian.playgrid.columns = currentText;
+                    }
+                }
+            }
         }
     }
 }
+            

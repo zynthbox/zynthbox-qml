@@ -40,8 +40,6 @@ ZComponents.ScreenPage {
 
     QmlUI.PlayGridNotesGridModel {
         id: notesGridModel
-        row: 7
-        column: 8
     }
     
     RowLayout {
@@ -70,16 +68,17 @@ ZComponents.ScreenPage {
                             model: notesGridModel.columnCount(notesGridModel.index(index, 0))
                             delegate: QQC2.Button {
                                 property var column: index
+                                property var note: notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note'])
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                                text: notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note'])
+                                text: note.name
                                 onPressed: {
-                                    zynthian.playgrid.note_on("C4");
+                                    note.on();
                                 }
                                 onReleased: {
-                                    focus = false
-                                    zynthian.playgrid.note_off("C4");
+                                    focus = false;
+                                    note.off();
                                 }
                             }
                         }

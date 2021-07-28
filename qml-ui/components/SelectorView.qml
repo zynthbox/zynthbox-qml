@@ -60,7 +60,7 @@ QQC2.ScrollView {
 
     QQC2.ScrollBar.horizontal.visible: false
 
-    QQC2.ScrollBar.vertical.x: view.x + view.width //root.width - QQC2.ScrollBar.vertical.width - root.rightPadding
+    QQC2.ScrollBar.vertical.x: view.x + view.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
 
     ListView {
         id: view

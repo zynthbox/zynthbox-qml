@@ -66,21 +66,29 @@ GridLayout {
         }
     }
 
-    SliderController {
+    ZComponents.SliderController {
         id: attackController
+        implicitHeight: 1
         controller: zynthian.control.controller_by_category("Obxd#14", 0)
+        onValueChanged: canvas.requestPaint()
     }
-    SliderController {
+    ZComponents.SliderController {
         id: decayController
+        implicitHeight: 1
         controller: zynthian.control.controller_by_category("Obxd#14", 1)
+        onValueChanged: canvas.requestPaint()
     }
-    SliderController {
+    ZComponents.SliderController {
         id: sustainController
+        implicitHeight: 1
         controller: zynthian.control.controller_by_category("Obxd#14", 2)
+        onValueChanged: canvas.requestPaint()
     }
-    SliderController {
+    ZComponents.SliderController {
         id: releaseController
+        implicitHeight: 1
         controller: zynthian.control.controller_by_category("Obxd#14", 3)
+        onValueChanged: canvas.requestPaint()
     }
 }
 

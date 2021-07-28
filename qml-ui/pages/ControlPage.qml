@@ -52,10 +52,10 @@ ZComponents.ScreenPage {
             visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {
                 if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
-					stack.clear();
+                    stack.clear();
                     stack.replace(defaultPage);
                 } else if (zynthian.control.custom_control_page.length > 0) {
-					stack.clear();
+                    stack.clear();
                     stack.replace(zynthian.control.custom_control_page, {"stack": stack});
                 }
             }
@@ -102,11 +102,13 @@ ZComponents.ScreenPage {
                 Layout.maximumWidth: Math.floor(root.width / 4)
                 Layout.minimumWidth: Layout.maximumWidth
                 Layout.fillHeight: true
-                ZComponents.Controller {
+                ZComponents.ControllerLoader {
+                    Layout.preferredHeight: 1
                     // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
                     controller: zynthian.control.controllers_count > 0 ? zynthian.control.controller(0) : null
                 }
-                ZComponents.Controller {
+                ZComponents.ControllerLoader {
+                    Layout.preferredHeight: 1
                     controller: zynthian.control.controllers_count > 1 ? zynthian.control.controller(1) : null
                 }
             }
@@ -122,10 +124,12 @@ ZComponents.ScreenPage {
                 Layout.maximumWidth: Math.floor(root.width / 4)
                 Layout.minimumWidth: Layout.maximumWidth
                 Layout.fillHeight: true
-                ZComponents.Controller {
+                ZComponents.ControllerLoader {
+                    Layout.preferredHeight: 1
                     controller: zynthian.control.controllers_count > 2 ? zynthian.control.controller(2) : null
                 }
-                ZComponents.Controller {
+                ZComponents.ControllerLoader {
+                    Layout.preferredHeight: 1
                     controller: zynthian.control.controllers_count > 3 ? zynthian.control.controller(3) : null
                 }
             }

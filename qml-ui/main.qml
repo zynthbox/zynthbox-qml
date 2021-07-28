@@ -51,6 +51,7 @@ Kirigami.AbstractApplicationWindow {
 
     header: ZComponents.Breadcrumb {
         //height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
+        visible: root.controlsVisible
         layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
             spacing: 0
@@ -167,6 +168,7 @@ Kirigami.AbstractApplicationWindow {
 
     footer: ZComponents.ActionBar {
         currentPage: root.currentPage
+        visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
 }

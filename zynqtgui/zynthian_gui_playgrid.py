@@ -32,7 +32,7 @@ from . import zynthian_qt_gui_base
 
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
-  NoteRole = Qt.UserRole + 1
+  NoteRole = Qt.DisplayRole
 
   __row__: int = 0
   __column__: int = 0
@@ -127,5 +127,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     pass
 
   @Slot(str, result=None)
-  def play_sound(self, note: str):
+  def note_on(self, note: str):
     self.__port__.send(mido.Message('note_on', note=60))
+
+  @Slot(str, result=None)
+  def note_off(self, note: str):
+    self.__port__.send(mido.Message('note_off', note=60))

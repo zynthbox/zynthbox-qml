@@ -74,10 +74,12 @@ ZComponents.ScreenPage {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 text: notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note'])
-                                onClicked: {
+                                onPressed: {
+                                    zynthian.playgrid.note_on("C4");
+                                }
+                                onReleased: {
                                     focus = false
-                                    zynthian.playgrid.play_sound("C4");
-                                    console.log(row, column, notesGridModel.roles['note'], notesGridModel.data(notesGridModel.index(row, column), notesGridModel.roles['note']));
+                                    zynthian.playgrid.note_off("C4");
                                 }
                             }
                         }

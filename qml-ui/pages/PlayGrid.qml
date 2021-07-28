@@ -37,6 +37,16 @@ ZComponents.ScreenPage {
     topPadding: 5
     bottomPadding: 5
     
+    ListModel {
+        id: gridModel
+        
+        ListElement { row: 3; column: 3; text: "3x3" }
+        ListElement { row: 4; column: 4; text: "4x4" }
+        ListElement { row: 5; column: 8; text: "5x8" }
+        ListElement { row: 0; column: 0; text: "Custom" }
+    }
+    
+    
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -97,13 +107,27 @@ ZComponents.ScreenPage {
         }
 
         ColumnLayout {
+            property var textSize: 10
+            property var textElementWidth: 80
+            property var cellSize: 30
+            
+            id: rightPanel
+          
             Layout.preferredWidth: 160
+            Layout.maximumWidth: Layout.preferredWidth
             Layout.fillHeight: true
+            Layout.margins: 8
 
             RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Transpose"
+                    font.pointSize: rightPanel.textSize
+                }
                 QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    
                     text: "-"
                     onClicked: {         
                         if (zynthian.playgrid.startingNote - 1 > 0) {
@@ -113,10 +137,9 @@ ZComponents.ScreenPage {
                         }
                     }
                 }
-                Text {
-                    text: "Transpose"
-                }
                 QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
                     text: "+"
                     onClicked: {                               
                         zynthian.playgrid.startingNote++;
@@ -125,9 +148,14 @@ ZComponents.ScreenPage {
             }
             
             RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Octave"
+                    font.pointSize: rightPanel.textSize
+                }
                 QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
                     text: "-"
                     onClicked: {
                         if (zynthian.playgrid.startingNote - 12 > 0) {
@@ -137,13 +165,76 @@ ZComponents.ScreenPage {
                         }
                     }
                 }
-                Text {
-                    text: "Octave"
-                }
-                QQC2.Button {
+                QQC2.Button {                    
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
                     text: "+"
                     onClicked: {
                         zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    }
+                }
+            }
+            
+            
+            RowLayout {
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Grid"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: gridModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: 2
+
+                    onActivated: {
+                        var data = gridModel.get(currentIndex)
+
+                        if (data.row === 0 && data.column === 0) {
+                            customGrid.visible = true
+                            zynthian.playgrid.rows = customRows.currentText;
+                            zynthian.playgrid.columns = customColumns.currentText;
+                        } else {
+                            customGrid.visible = false;
+                            zynthian.playgrid.rows = data.row;
+                            zynthian.playgrid.columns = data.column;
+                        }
+                    }
+                }
+            }
+
+            RowLayout {
+                id: customGrid
+                visible: false
+
+                QQC2.Label {
+                    Layout.preferredWidth: rightPanel.textElementWidth
+                    text: "Custom Grid"
+                    font.pointSize: rightPanel.textSize
+                }
+                QQC2.ComboBox {
+                    id: customRows
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: [3,4,5,6,7,8,9]
+                    displayText: currentText
+                    currentIndex: 0
+                    onActivated: {
+                        zynthian.playgrid.rows = currentText;
+                    }
+                }
+                QQC2.ComboBox {
+                    id: customColumns
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: rightPanel.cellSize
+                    model: [3,4,5,6,7,8,9]
+                    displayText: currentText
+                    currentIndex: 0
+                    onActivated: {
+                        zynthian.playgrid.columns = currentText;
                     }
                 }
             }

@@ -80,11 +80,7 @@ ZComponents.ScreenPage {
                                         text: note.name + note.octave
                                     }
                                 }
-
-                                onClicked: {
-                                    console.log(row, column, zynthian.playgrid.model.roles['note'], zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note']))
-                                }
-                 
+                                
                                 onPressed: {
                                     focus = true;
                                     note.on();
@@ -110,8 +106,6 @@ ZComponents.ScreenPage {
                 QQC2.Button {
                     text: "-"
                     onClicked: {         
-                        console.log("Transpose -1", zynthian.playgrid.startingNote);
-
                         if (zynthian.playgrid.startingNote - 1 > 0) {
                             zynthian.playgrid.startingNote--;
                         } else {
@@ -125,7 +119,6 @@ ZComponents.ScreenPage {
                 QQC2.Button {
                     text: "+"
                     onClicked: {                               
-                        console.log("Transpose +1", zynthian.playgrid.startingNote);                 
                         zynthian.playgrid.startingNote++;
                     }
                 }
@@ -137,7 +130,6 @@ ZComponents.ScreenPage {
                 QQC2.Button {
                     text: "-"
                     onClicked: {
-                        console.log("Octave -1", zynthian.playgrid.startingNote);
                         if (zynthian.playgrid.startingNote - 12 > 0) {
                             zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
                         } else {
@@ -151,7 +143,6 @@ ZComponents.ScreenPage {
                 QQC2.Button {
                     text: "+"
                     onClicked: {
-                        console.log("Octave +1", zynthian.playgrid.startingNote);
                         zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
                     }
                 }

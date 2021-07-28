@@ -33,7 +33,7 @@ import "private"
 AbstractController {
     id: root
 
-    property alias switch: switchControl
+    property alias switchControl: switchControl
 
     control: MouseArea {
         anchors.fill: parent

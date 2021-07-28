@@ -32,6 +32,7 @@ import "private"
 
 AbstractController {
     id: root
+    property alias valueLabel: valueLabel.text
 
     property alias value: dial.value
     property alias from: dial.from
@@ -68,6 +69,7 @@ AbstractController {
             value: Kirigami.Theme.highlightColor
         }
         Kirigami.Heading {
+            id: valueLabel
             anchors.centerIn: parent
             text: root.controller ? root.controller.value_print :  ""
         }

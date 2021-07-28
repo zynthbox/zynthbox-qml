@@ -32,6 +32,8 @@ import "private"
 
 AbstractController {
     id: root
+    property alias valueLabel: valueLabel.text
+
     property alias value: slider.value
     property alias from: slider.from
     property alias to: slider.to
@@ -55,6 +57,7 @@ AbstractController {
             onMoved: root.controller.value = value
         }
         Kirigami.Heading {
+			id: valueLabel
             level: 2
             text: root.controller ? root.controller.value_print : ""
             Layout.fillWidth: true

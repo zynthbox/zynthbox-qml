@@ -25,6 +25,7 @@
 
 import mido
 import typing
+import logging
 
 from PySide2.QtCore import Slot, QAbstractItemModel, Qt, QModelIndex, QObject, Property, Signal
 from PySide2.QtQml import qmlRegisterType
@@ -32,9 +33,10 @@ from . import zynthian_qt_gui_base
 
 
 class Note(QObject):
-  def __init__(self, name: str, midi_note: int, midi_port, parent:QObject = None):
+  def __init__(self, name: str, octave: int, midi_note: int, midi_port, parent:QObject = None):
     super(Note, self).__init__(parent)
     self.__note_name__ = name
+    self.__octave__ = octave
     self.__midi_note__ = midi_note
     self.__midi_port__ = midi_port
     self.__midi_note_on_msg__ = mido.Message('note_on', note=self.__midi_note__)
@@ -51,6 +53,10 @@ class Note(QObject):
   @Property(str, constant=True)
   def name(self):
     return self.__note_name__
+
+  @Property(int, constant=True)
+  def octave(self):
+    return self.__octave__
 
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
@@ -76,8 +82,6 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     return roles
 
   def data(self, index: QModelIndex, role: int) -> Note:
-    print(index.isValid(), role)
-
     if not index.isValid():
       return None
     
@@ -95,23 +99,27 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
   def index(self, row: int, column: int, parent: QModelIndex = None):
     return self.createIndex(row, column)
 
-  def __get_note_str_from_int__(self, note: int) -> str:
-    return '{note_str}{octave}'.format(note_str=self.__note_int_to_str_map__[note%12], octave=note//12)
-
   def __populate_grid__(self) -> None:
+    self.__grid_notes__ = []
+
     for row in range(0, self.__rows__):
       row_data = []
       multiplier = row*self.__columns__
 
       for col in range(multiplier + self.__starting_note__, multiplier + self.__columns__ + self.__starting_note__):
         row_data.append(Note(
-          name=self.__get_note_str_from_int__(col),
+          name=self.__note_int_to_str_map__[col%12],
+          octave=col//12,
           midi_note=col,
           midi_port=self.__midi_port__,
           parent=self
         ))
       
       self.__grid_notes__.insert(0, row_data)
+    
+    self.dataChanged.emit(self.index(0,0), self.index(self.__rows__, self.__columns__))
+    self.__rows_changed__.emit()
+    self.__columns_changed__.emit()
 
   def __get_rows__(self):
     return self.__rows__
@@ -133,6 +141,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
   def __set_starting_note__(self, note):
     self.__starting_note__ = note
     self.__starting_note_changed__.emit()
+    self.__populate_grid__()
 
 
   @Property(dict, constant=True)

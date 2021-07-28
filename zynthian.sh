@@ -126,6 +126,9 @@ while true; do
 
 	#HACK
 	rm ../config/keybinding.yaml
+	#HACK 2
+	mkdir -p /root/.local/share/plasma/desktoptheme/zynthian
+	cp -auR zynthian-plasma-theme/* /root/.local/share/plasma/desktoptheme/zynthian/
 	#cp zynthian_envars.sh ../config
 
 	./zynthian_qt_gui.py

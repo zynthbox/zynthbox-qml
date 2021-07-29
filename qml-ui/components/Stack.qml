@@ -53,7 +53,7 @@ QQC2.StackView {
             }
             YAnimator {
                 from: 0
-                to: height/2
+                to: Kirigami.Units.gridUnit * 2
                 duration: Kirigami.Units.longDuration
                 easing.type: Easing.InCubic
             }
@@ -71,7 +71,7 @@ QQC2.StackView {
                 easing.type: Easing.InOutCubic
             }
             YAnimator {
-                from: height/2
+                from: Kirigami.Units.gridUnit * 2
                 to: 0
                 duration: Kirigami.Units.longDuration
                 easing.type: Easing.OutCubic
@@ -99,7 +99,7 @@ QQC2.StackView {
                 easing.type: Easing.InOutCubic
             }
             YAnimator {
-                from: height/2
+                from: Kirigami.Units.gridUnit * 2
                 to: 0
                 duration: Kirigami.Units.longDuration
                 easing.type: Easing.OutCubic
@@ -117,7 +117,7 @@ QQC2.StackView {
             }
             YAnimator {
                 from: 0
-                to: -height/2
+                to: -Kirigami.Units.gridUnit * 2
                 duration: Kirigami.Units.longDuration
                 easing.type: Easing.InOutCubic
             }

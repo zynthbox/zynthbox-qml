@@ -30,49 +30,23 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "../../components" as ZComponents
 
-TabbedControlView {
-    id: root
 
-    property QQC2.StackView stack
-
-    tabActions: [
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Main")
-			page: "MainView.qml"
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("Tune && Volume")
-				page: "MainView.qml"
-			}
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("Voice Pan")
-				page: "VoicePanView.qml"
-			}
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("ADSR")
-			page: "ADSRView.qml"
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Filter")
-			page: "FilterView.qml"
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("General")
-				page: "FilterView.qml"
-			}
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("Filter ADSR")
-				page: "FilterADSRView.qml"
-			}
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("OSC")
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("LFO")
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Mix")
-		}
-	]
-
+ZComponents.ADSRControlView {
+    attackController {
+        category: "Obxd#14"
+        index: 0
+    }
+    decayController {
+        category: "Obxd#14"
+        index: 1
+    }
+    sustainController {
+        category: "Obxd#14"
+        index: 2
+    }
+    releaseController {
+        category: "Obxd#14"
+        index: 3
+    }
 }
+

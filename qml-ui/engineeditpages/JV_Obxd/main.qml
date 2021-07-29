@@ -135,10 +135,10 @@ Item { //TODO: componentize
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller: zynthian.control.controller_by_category("Obxd#2", 1)
-            spinBox.stepSize: 10000
+            controller: zynthian.control.controller_by_category("Obxd#2", 2)
+            spinBox.stepSize: 5000
             spinBox.textFromValue: function(value, locale) {
-                let val = Math.round((spinBox.realValue - 100) / 100)
+                let val = Math.round((spinBox.realValue - 100) / 50)
                 return (val > 0 ? "+" : "") + val
             }
         }
@@ -149,7 +149,7 @@ Item { //TODO: componentize
             implicitHeight: 1
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller: zynthian.control.controller_by_category("Obxd#2", 2)
+            controller: zynthian.control.controller_by_category("Obxd#2", 1)
             valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
         }
         // VOLUME

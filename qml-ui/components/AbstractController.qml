@@ -28,13 +28,14 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
 import "../"
 
 Card {
     id: root
 
     // instance of zynthian_gui_controller.py, TODO: should be registered in qml?
-    property QtObject controller
+    property ControllerGroup controller: ControllerGroup {}
 
     // Those are automatically binded by default,
     property alias title: heading.text
@@ -42,7 +43,7 @@ Card {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
-    visible: controller !== null
+    visible: controller.ctrl !== null
 
     property alias control: contentItem.contentItem
 
@@ -50,7 +51,7 @@ Card {
     contentItem: ColumnLayout {
         Kirigami.Heading {
             id: heading
-            text: root.controller ? root.controller.title : ""
+            text: root.controller.ctrl ? root.controller.ctrl.title : ""
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
@@ -73,7 +74,7 @@ Card {
             visible: text.length > 0
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
-            text: root.controller ? root.controller.midi_bind : ""
+            text: root.controller.ctrl ? root.controller.ctrl.midi_bind : ""
         }
     }
 }

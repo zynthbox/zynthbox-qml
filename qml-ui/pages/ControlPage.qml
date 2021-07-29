@@ -105,11 +105,11 @@ ZComponents.ScreenPage {
                 ZComponents.ControllerLoader {
                     Layout.preferredHeight: 1
                     // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
-                    controller: zynthian.control.controllers_count > 0 ? zynthian.control.controller(0) : null
+                    controller.index: 0
                 }
                 ZComponents.ControllerLoader {
                     Layout.preferredHeight: 1
-                    controller: zynthian.control.controllers_count > 1 ? zynthian.control.controller(1) : null
+                    controller.index: 1
                 }
             }
             ZComponents.SelectorView {
@@ -126,11 +126,11 @@ ZComponents.ScreenPage {
                 Layout.fillHeight: true
                 ZComponents.ControllerLoader {
                     Layout.preferredHeight: 1
-                    controller: zynthian.control.controllers_count > 2 ? zynthian.control.controller(2) : null
+                    controller.index: 2
                 }
                 ZComponents.ControllerLoader {
                     Layout.preferredHeight: 1
-                    controller: zynthian.control.controllers_count > 3 ? zynthian.control.controller(3) : null
+                    controller.index: 3
                 }
             }
         }

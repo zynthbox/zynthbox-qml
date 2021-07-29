@@ -110,6 +110,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 				i += 1
 				j += 1
 		self.index = self.zyngui.curlayer.get_active_screen_index()
+		self.controllers_changed.emit()
 		super().fill_list()
 
 
@@ -273,6 +274,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.zselector: self.zselector.hide()
 		self.set_controller_screen()
 		self.set_select_path()
+		self.controllers_changed.emit()
 
 
 	def set_xyselect_mode(self, xctrl_i, yctrl_i):
@@ -539,6 +541,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 
+	controllers_changed = Signal()
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()
 

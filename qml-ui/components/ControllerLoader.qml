@@ -28,12 +28,12 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import "private"
 
 Loader {
     id: root
 
-    // instance of zynthian_gui_controller.py, TODO: should be registered in qml?
-    property QtObject controller
+    readonly property ControllerGroup controller: ControllerGroup {}
 
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -41,17 +41,17 @@ Loader {
 
     readonly property string valueType: {
         //FIXME: Ugly heuristics
-        if (!root.controller) {
+        if (!root.controller.ctrl) {
             return "int";
         }
-        if (root.controller.value_type === "int" && root.controller.max_value - root.controller.value0 === 1) {
+        if (root.controller.ctrl.value_type === "int" && root.controller.ctrl.max_value - root.controller.ctrl.value0 === 1) {
             return "bool";
         }
-        if (root.controller.value_print === "on" || root.controller.value_print === "off" ||
-            root.controller.value_print === "On" || root.controller.value_print === "Off") {
+        if (root.controller.ctrl.value_print === "on" || root.controller.ctrl.value_print === "off" ||
+            root.controller.ctrl.value_print === "On" || root.controller.ctrl.value_print === "Off") {
             return "bool";
         }
-        return root.controller.value_type;
+        return root.controller.ctrl.value_type;
     }
 
     onValueTypeChanged: {

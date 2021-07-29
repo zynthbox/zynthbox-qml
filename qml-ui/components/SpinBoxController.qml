@@ -42,11 +42,11 @@ AbstractController {
             height: width/3
 
             readonly property real realValue: value / 100
-            stepSize: root.controller ? (root.controller.step_size === 0 ? 10 : root.controller.step_size * 10) : 0
-            value: root.controller ? root.controller.value * 100 : 0
-            from: root.controller ? root.controller.value0 * 100 : 0
-            to: root.controller ? root.controller.max_value * 100 : 0
-            onValueModified: root.controller.value = realValue
+            stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 10 : root.controller.ctrl.step_size * 10) : 0
+            value: root.controller.ctrl ? root.controller.ctrl.value * 100 : 0
+            from: root.controller.ctrl ? root.controller.ctrl.value0 * 100 : 0
+            to: root.controller.ctrl ? root.controller.ctrl.max_value * 100 : 0
+            onValueModified: root.controller.ctrl.value = realValue
             font: heading.font
             contentItem: Kirigami.Heading {
                 id: heading

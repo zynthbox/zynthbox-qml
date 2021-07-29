@@ -45,7 +45,7 @@ GridLayout {
             onPaint: {
                 var ctx = getContext("2d");
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = Kirigami.Theme.textColor
+                ctx.strokeStyle = Kirigami.Theme.highlightColor
                 let piece = width / 4;
                 let top = Kirigami.Units.gridUnit
                 let bottom = height - Kirigami.Units.gridUnit * 2

@@ -66,12 +66,15 @@ ZComponents.TabbedControlView {
         },
         ZComponents.TabbedControlViewAction {
             text: qsTr("OSC")
+            page: Qt.resolvedUrl("OSCView.qml")
         },
         ZComponents.TabbedControlViewAction {
             text: qsTr("LFO")
+            page: Qt.resolvedUrl("LFOView.qml")
         },
         ZComponents.TabbedControlViewAction {
             text: qsTr("Mix")
+            page: Qt.resolvedUrl("MixView.qml")
         }
     ]
 

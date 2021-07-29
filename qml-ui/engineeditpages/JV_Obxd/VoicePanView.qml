@@ -30,61 +30,91 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import "../../components" as ZComponents
 
-
 GridLayout {
     id: root
     visible: false
     rows: 2
-    columns: 2
+    columns: 4
 
-    // VoiceCount
-    ZComponents.MultiSwitchController {
-        title: qsTr("Voices")
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller.category: "Obxd#2"
-        controller.index: 0
-        stepSize: Math.round(multiSwitch.to / 7)
-        valueLabel: Math.round(multiSwitch.value / (200 / 7)) + 1
-    }
-    // Octave
-    ZComponents.MultiSwitchController {
-        title: qsTr("Transpose")
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller.category: "Obxd#2"
-        controller.index: 2
-        stepSize: 50
-        valueLabel: {
-            let val = Math.round((multiSwitch.value - 100) / 50)
-            return (val > 0 ? "+" : "") + val
+        controller {
+            category: "Obxd#16"
+            index: 3
         }
     }
-    // Tune
     ZComponents.DialController {
-        title: qsTr("Tune")
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller.category: "Obxd#2"
-        controller.index: 1
-        valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
+        controller {
+            category: "Obxd#17"
+            index: 0
+        }
     }
-    // VOLUME
-    ZComponents.SliderController {
-        title: qsTr("Volume")
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller.category: "Obxd#1"
-        controller.index: 3
-        valueLabel: Math.round(value / 2)
+        controller {
+            category: "Obxd#17"
+            index: 1
+        }
+    }
+    ZComponents.DialController {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        controller {
+            category: "Obxd#17"
+            index: 2
+        }
+    }
+    ZComponents.DialController {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        controller {
+            category: "Obxd#17"
+            index: 3
+        }
+    }
+    ZComponents.DialController {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        controller {
+            category: "Obxd#18"
+            index: 0
+        }
+    }
+    ZComponents.DialController {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        controller {
+            category: "Obxd#18"
+            index: 1
+        }
+    }
+    ZComponents.DialController {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        controller {
+            category: "Obxd#18"
+            index: 2
+        }
     }
 }
 

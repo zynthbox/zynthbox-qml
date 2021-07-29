@@ -52,11 +52,9 @@ ZComponents.ScreenPage {
             visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {
                 if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
-                    stack.clear();
                     stack.replace(defaultPage);
                 } else if (zynthian.control.custom_control_page.length > 0) {
-                    stack.clear();
-                    stack.replace(zynthian.control.custom_control_page, {"stack": stack});
+                    stack.replace(zynthian.control.custom_control_page);
                 }
             }
         }
@@ -66,7 +64,7 @@ ZComponents.ScreenPage {
         zynthian.preset.next_screen = "control"
         //HACK
         if (zynthian.control.custom_control_page.length > 0) {
-            stack.push(zynthian.control.custom_control_page, {"stack": stack});
+            stack.push(zynthian.control.custom_control_page);
         } else {
             stack.push(defaultPage);
         }
@@ -75,10 +73,8 @@ ZComponents.ScreenPage {
         target: zynthian.control
         onCustom_control_pageChanged: {
             if (zynthian.control.custom_control_page.length > 0) {
-                stack.clear()
-                stack.replace(zynthian.control.custom_control_page, {"stack": stack});
+                stack.replace(zynthian.control.custom_control_page);
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
-                stack.clear();
                 stack.replace(defaultPage);
             }
         }

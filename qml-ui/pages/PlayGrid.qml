@@ -35,7 +35,11 @@ ZComponents.ScreenPage {
     leftPadding: 0
     rightPadding: 0
     topPadding: 5
-    bottomPadding: 5    
+    bottomPadding: 5
+
+    Component.onCompleted: {
+        applicationWindow().controlsVisible = false
+    }
     
     RowLayout {
         anchors.fill: parent

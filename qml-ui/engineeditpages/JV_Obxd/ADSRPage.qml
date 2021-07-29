@@ -46,6 +46,16 @@ GridLayout {
                 var ctx = getContext("2d");
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = Kirigami.Theme.highlightColor
+                var grd = ctx.createLinearGradient(0, 0, 0, height)
+                grd.addColorStop(0, Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                            Kirigami.Theme.highlightColor.g,
+                                            Kirigami.Theme.highlightColor.b,
+                                            0.4))
+                grd.addColorStop(0.8, Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                            Kirigami.Theme.highlightColor.g,
+                                            Kirigami.Theme.highlightColor.b,
+                                            0))
+                ctx.fillStyle = grd;
                 let piece = width / 4;
                 let top = Kirigami.Units.gridUnit
                 let bottom = height - Kirigami.Units.gridUnit * 2
@@ -61,7 +71,9 @@ GridLayout {
                            top + bottom * (1 - sustainController.slider.value/sustainController.slider.to));
                 ctx.lineTo(piece * 3 + piece * (releaseController.slider.value/releaseController.slider.to),
                            top + bottom);
+                //ctx.closePath();
                 ctx.stroke();
+                ctx.fill();
             }
         }
     }

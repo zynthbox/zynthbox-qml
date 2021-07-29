@@ -136,6 +136,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def refresh_loading(self):
     pass
 
+  ###
+  # The grid generation logic follows Ableton's grid mapping which is :
+  #   Horizontally  : 1 Half Note per cell
+  #   Vertically    : 5 Half Notes per cell
+  ###
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     scale_mode_map = {
@@ -143,14 +148,22 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
       'major': [2, 2, 1, 2, 2, 2, 1],
       'minor': [2, 1, 2, 2, 1, 2, 2]
     }
-    scale_index = 0
     grid_notes = []
+
+    # Scale index is the index of the current note in scale from scale_mode_map
+    # This value is used to calculate the next note in current scale
+    scale_index = 0
+
+    # col value denotes the midi note number of the note to be
+    # inserted in the grid
+    # Starts with the selected key's midi note
     col = self.__starting_note__
 
     for row in range(0, self.__rows__):
       row_data = []
 
       for i in range(0, self.__columns__):
+        # Create a Note Object representing a Music Note for current cell
         row_data.append(Note(
           name=note_int_to_str_map[col%12],
           scale_index=scale_index,
@@ -160,14 +173,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
           parent=self
         ))
 
+        # Cycle scale index value to 0 if it reaches the end of scale mode map 
         if scale_index >= len(scale_mode_map[self.__scale__]):
           scale_index = 0
 
+        # Calculate the next note value using the scale mode map and scale index
         col += scale_mode_map[self.__scale__][scale_index]
         scale_index += 1
     
+      # Prepend the generated row to grid as the grid direction should be bottom to top
       grid_notes.insert(0, row_data)
 
+      # If scale mode is not chromatic, calculate the next row's starting note
       if self.__scale__ != 'chromatic':
         col = row_data[0].get_midi_note()
         scale_index = row_data[0].get_scale_index()

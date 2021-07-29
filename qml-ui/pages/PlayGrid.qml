@@ -157,20 +157,18 @@ ZComponents.ScreenPage {
                     currentIndex: 1
 
                     onActivated: {
-                        if (scaleModel.get(currentIndex).scale === 'major') {
-                            optionTranspose.visible = false;
-                            optionOctave.visible = false;
-                            optionKey.visible = true;
-                            zynthian.playgrid.startingNote = 36;
-                        } else {
-                            optionTranspose.visible = true;
-                            optionOctave.visible = true;
+                        if (scaleModel.get(currentIndex).scale === 'chromatic') {
                             optionKey.visible = false;
-                            zynthian.playgrid.startingNote = 36;
+                            optionOctave.visible = true;
+                            optionTranspose.visible = true;
+                        } else {
+                            optionKey.visible = true;
+                            optionOctave.visible = true;
+                            optionTranspose.visible = false;
                         }
 
+                        zynthian.playgrid.startingNote = 36;
                         zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
-                        console.log(zynthian.playgrid.scale)
                     }
                 }
             }
@@ -250,7 +248,7 @@ ZComponents.ScreenPage {
             
             RowLayout {
                 id: optionOctave
-                visible: false
+                visible: true
 
                 QQC2.Label {
                     Layout.preferredWidth: rightPanel.textElementWidth

@@ -33,14 +33,33 @@ from . import zynthian_qt_gui_base
 
 
 class Note(QObject):
-  def __init__(self, name: str, octave: int, midi_note: int, midi_port, parent:QObject = None):
+  def __init__(self, name: str, scale_index: int, octave: int, midi_note: int, midi_port, parent:QObject = None):
     super(Note, self).__init__(parent)
     self.__note_name__ = name
+    self.__scale_index__ = scale_index
     self.__octave__ = octave
+    self.__is_playing__ = False
     self.__midi_note__ = midi_note
     self.__midi_port__ = midi_port
     self.__midi_note_on_msg__ = mido.Message('note_on', note=self.__midi_note__)
     self.__midi_note_off_msg__ = mido.Message('note_off', note=self.__midi_note__)
+  
+  def get_midi_note(self):
+    return self.__midi_note__
+  
+  def get_scale_index(self):
+    return self.__scale_index__
+
+  def get_is_playing(self):
+    return self.__is_playing__
+
+  def set_is_playing(self, playing: bool):
+    self.__is_playing__ = playing
+    self.__is_playing_changed__.emit()
+
+  @Signal
+  def __is_playing_changed__(self):
+    pass
   
   @Slot(None)
   def on(self):
@@ -57,6 +76,8 @@ class Note(QObject):
   @Property(int, constant=True)
   def octave(self):
     return self.__octave__
+  
+  isPlaying = Property(bool, get_is_playing, set_is_playing, notify=__is_playing_changed__)
 
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
@@ -95,6 +116,13 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
   def set_grid(self, grid):
     self.__grid_notes__ = grid
+  
+  def highlight_playing_note(self, playingNote: Note, highlight: bool = True):
+    for row in self.__grid_notes__:
+      for note in row:
+        if note.get_midi_note() == playingNote.get_midi_note():
+          note.set_is_playing(highlight)
+
 
   @Property(dict, constant=True)
   def roles(self):
@@ -107,7 +135,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   __rows__: int = 5
   __columns__: int = 8
   __starting_note__: int = 36
-  __scale__ = 'major'
+  __scale__ = 'ionian'
 
   def __init__(self, parent = None):
     super(zynthian_gui_playgrid, self).__init__(parent)
@@ -129,44 +157,67 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def refresh_loading(self):
     pass
 
+  ###
+  # The grid generation logic follows Ableton's grid mapping which is :
+  #   Horizontally  : 1 Half Note per cell
+  #   Vertically    : 5 Half Notes per cell
+  ###
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    major_scale = [2, 2, 1, 2, 2, 2, 1]
-    minor_scale = [2, 1, 2, 2, 1, 2, 2]
-    scale_index = 0
+    scale_mode_map = {
+      'chromatic':  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      'ionian':     [2, 2, 1, 2, 2, 2, 1],
+      'dorian':     [2, 1, 2, 2, 2, 1, 2],
+      'phrygian':   [1, 2, 2, 2, 1, 2, 2],
+      'lydian':     [2, 2, 2, 1, 2, 2, 1],
+      'mixolydian': [2, 2, 1, 2, 2, 1, 2],
+      'aeolian':    [2, 1, 2, 2, 1, 2, 2],
+      'locrian':    [1, 2, 2, 1, 2, 2, 2]
+    }
     grid_notes = []
+
+    # Scale index is the index of the current note in scale from scale_mode_map
+    # This value is used to calculate the next note in current scale
+    scale_index = 0
+
+    # col value denotes the midi note number of the note to be
+    # inserted in the grid
+    # Starts with the selected key's midi note
     col = self.__starting_note__
 
     for row in range(0, self.__rows__):
       row_data = []
 
       for i in range(0, self.__columns__):
+        # Create a Note Object representing a Music Note for current cell
         row_data.append(Note(
           name=note_int_to_str_map[col%12],
+          scale_index=scale_index,
           octave=col//12,
           midi_note=col,
           midi_port=self.__midi_port__,
           parent=self
         ))
 
-        if i != (self.__columns__ - 1):
-          if self.__scale__ == 'chromatic':
-            col += 1
-          elif self.__scale__ == 'major':
-            if scale_index >= len(major_scale):
-              scale_index = 0
+        # Cycle scale index value to 0 if it reaches the end of scale mode map 
+        if scale_index >= len(scale_mode_map[self.__scale__]):
+          scale_index = 0
 
-            col += major_scale[scale_index]
-            scale_index += 1
-      
+        # Calculate the next note value using the scale mode map and scale index
+        col += scale_mode_map[self.__scale__][scale_index]
+        scale_index += 1
+    
+      # Prepend the generated row to grid as the grid direction should be bottom to top
       grid_notes.insert(0, row_data)
 
-      if self.__scale__ == 'major':
+      # If scale mode is not chromatic, calculate the next row's starting note
+      if self.__scale__ != 'chromatic':
+        col = row_data[0].get_midi_note()
+        scale_index = row_data[0].get_scale_index()
+
         for i in range(0, 3):
-          col += major_scale[scale_index%7]
-          scale_index = (scale_index+1)%7
-        
-        col -= 12
+          col += scale_mode_map[self.__scale__][scale_index%len(scale_mode_map[self.__scale__])]
+          scale_index = (scale_index+1)%len(scale_mode_map[self.__scale__])
     
     self.__model__.set_grid(grid_notes)
     self.__model_changed__.emit()
@@ -224,6 +275,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   @Signal
   def __scale_changed__(self):
     pass
+
+  @Slot(Note, bool)
+  def highlightPlayingNotes(self, note: Note, highlight: bool):
+    self.__model__.highlight_playing_note(note, highlight)
+
   
   rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
   columns = Property(int, __get_columns__, __set_columns__, notify=__columns_changed__)

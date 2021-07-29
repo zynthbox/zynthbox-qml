@@ -63,6 +63,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.zgui_custom_controllers_map={}
 		self.custom_controller_id_start = 100
 
+		self.last_custom_control_page = None
+
 		# xyselect mode vars
 		self.xyselect_mode=False
 		self.x_zctrl=None
@@ -144,12 +146,16 @@ class zynthian_gui_control(zynthian_gui_selector):
 			return None
 
 	def get_custom_control_page(self):
+		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+			return None
 		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_")
 		# TODO: also search for stuff installed in ~/.local
 		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/main.qml"
 		if Path(path).exists():
+			self.last_custom_control_page = path
 			return path
 		else:
+			self.last_custom_control_page = None
 			return None
 
 	def lock_controllers(self):
@@ -213,7 +219,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.lock_controllers()
 
 		self.controllers_count_changed.emit()
-		self.custom_control_page_changed.emit()
+
+		if self.last_custom_control_page != self.get_custom_control_page():
+			self.custom_control_page_changed.emit()
 		#Release Mutex Lock
 		#self.zyngui.lock.release()
 

@@ -32,96 +32,59 @@ import "../../components" as ZComponents
 
 GridLayout {
     rows: 2
-    columns: 4
+    columns: 3
 
-    // KeyFollow
-    ZComponents.DialController {
+    // o1mix
+    ZComponents.SliderController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
         controller {
-            category: "Obxd#12"
+            category: "Obxd#11"
             index: 1
         }
     }
-    // Resonance
-    ZComponents.DialController {
+    // o2mix
+    ZComponents.SliderController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
         controller {
-            category: "Obxd#12"
-            index: 1
-        }
-    }
-    // Cutoff
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#12"
+            category: "Obxd#11"
             index: 2
         }
     }
-    // MultiMode
-    ZComponents.DialController {
+    // noisemix
+    ZComponents.SliderController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
         controller {
-            category: "Obxd#12"
-            index: 2
-        }
-    }
-
-    // Warm
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#13"
-            index: 0
-        }
-    }
-    // FourPole
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#13"
-            index: 1
-        }
-    }
-    // Bandpassblend
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#13"
-            index: 2
-        }
-    }
-    // Filter env amount
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#13"
+            category: "Obxd#11"
             index: 3
         }
     }
+    ZComponents.Card {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+    }
+    ZComponents.Card {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+    }
+    ZComponents.Card {
+        implicitWidth: 1
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+    }
+
 }
 

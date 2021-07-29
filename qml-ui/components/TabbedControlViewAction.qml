@@ -28,43 +28,17 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import "private"
 
-TabbedControlView {
+// FIXME: replace with Kirigami.PagePoolAction when frameworks will be recent enough
+Kirigami.Action {
     id: root
 
-    property QQC2.StackView stack
-
-    tabActions: [
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Main")
-			page: "MainPage.qml"
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("Tune && Volume")
-				page: "MainPage.qml"
-			}
-			ZComponents.TabbedControlViewAction {
-				text: qsTr("Voice Pan")
-				page: "VoicePanView.qml"
-			}
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("ADSR")
-			page: "ADSRPage.qml"
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Filter")
-			page: "FilterPage.qml"
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("OSC")
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("LFO")
-		},
-		ZComponents.TabbedControlViewAction {
-			text: qsTr("Mix")
-		}
-	]
+    enabled: page.length > 0
+    checkable: true
+    /**
+     * Url or filename of the page this action will load
+     */
+    property string page
 
 }

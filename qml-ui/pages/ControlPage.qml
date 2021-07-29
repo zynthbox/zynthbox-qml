@@ -74,12 +74,12 @@ ZComponents.ScreenPage {
     Connections {
         target: zynthian.control
         onCustom_control_pageChanged: {
-            if (stack.depth == 1) {
-                return;
-            }
-            stack.pop(defaultPage);
             if (zynthian.control.custom_control_page.length > 0) {
-                stack.push(zynthian.control.custom_control_page, {"stack": stack});
+                stack.clear()
+                stack.replace(zynthian.control.custom_control_page, {"stack": stack});
+            } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
+                stack.clear();
+                stack.replace(defaultPage);
             }
         }
     }

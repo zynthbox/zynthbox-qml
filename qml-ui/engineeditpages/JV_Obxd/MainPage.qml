@@ -45,7 +45,7 @@ ColumnLayout {
             columns: 2
 
             // VoiceCount
-            ZComponents.SpinBoxController {
+            ZComponents.MultiSwitchController {
                 title: qsTr("Voices")
                 implicitWidth: 1
                 implicitHeight: 1
@@ -53,13 +53,11 @@ ColumnLayout {
                 Layout.fillHeight: true
                 controller.category: "Obxd#2"
                 controller.index: 0
-                spinBox.stepSize: Math.round(spinBox.to / 7)
-                spinBox.textFromValue: function(value, locale) {
-                    return Math.round(spinBox.realValue / (200 / 7)) + 1
-                }
+                stepSize: Math.round(multiSwitch.to / 7)
+                valueLabel: Math.round(multiSwitch.value / (200 / 7)) + 1
             }
             // Octave
-            ZComponents.SpinBoxController {
+            ZComponents.MultiSwitchController {
                 title: qsTr("Transpose")
                 implicitWidth: 1
                 implicitHeight: 1
@@ -67,9 +65,9 @@ ColumnLayout {
                 Layout.fillHeight: true
                 controller.category: "Obxd#2"
                 controller.index: 2
-                spinBox.stepSize: 5000
-                spinBox.textFromValue: function(value, locale) {
-                    let val = Math.round((spinBox.realValue - 100) / 50)
+                stepSize: 50
+                valueLabel: {
+                    let val = Math.round((multiSwitch.value - 100) / 50)
                     return (val > 0 ? "+" : "") + val
                 }
             }

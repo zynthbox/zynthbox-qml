@@ -120,7 +120,7 @@ ZComponents.ScreenPage {
                     id: scaleModel
                     
                     ListElement { scale: "major"; text: "Major" }
-                    // ListElement { scale: "minor"; text: "Minor" }
+                    ListElement { scale: "minor"; text: "Minor" }
                     ListElement { scale: "chromatic"; text: "Chromatic" }
                 }
 
@@ -142,13 +142,11 @@ ZComponents.ScreenPage {
                         if (scaleModel.get(currentIndex).scale === 'major') {
                             optionTranspose.visible = false;
                             optionOctave.visible = false;
-                            optionGrid.visible = false;
                             optionKey.visible = true;
                             zynthian.playgrid.startingNote = 36;
                         } else {
                             optionTranspose.visible = true;
                             optionOctave.visible = true;
-                            optionGrid.visible = true;
                             optionKey.visible = false;
                             zynthian.playgrid.startingNote = 36;
                         }
@@ -264,7 +262,6 @@ ZComponents.ScreenPage {
             
             RowLayout {    
                 id: optionGrid
-                visible: false
 
                 ListModel {
                     id: gridModel

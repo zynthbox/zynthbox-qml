@@ -35,7 +35,7 @@ GridLayout {
     columns: 4
 
     // Cutoff
-    ZComponents.Controller {
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
@@ -43,7 +43,7 @@ GridLayout {
         controller: zynthian.control.controller_by_category("Obxd#12", 2)
     }
     // Resonance
-    ZComponents.Controller {
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
@@ -51,7 +51,7 @@ GridLayout {
         controller: zynthian.control.controller_by_category("Obxd#12", 1)
     }
     // Bandpassblend
-    ZComponents.Controller {
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
@@ -59,7 +59,7 @@ GridLayout {
         controller: zynthian.control.controller_by_category("Obxd#13", 2)
     }
     // Bandpass env amount
-    ZComponents.Controller {
+    ZComponents.DialController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true

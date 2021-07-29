@@ -77,7 +77,9 @@ ZComponents.ScreenPage {
                                         if (note.isPlaying) {
                                             return "#8bc34a";
                                         } else {
-                                            if (note.name === "C")
+                                            if (scaleModel.get(comboScale.currentIndex).scale !== "chromatic" &&
+                                                note.name === keyModel.get(comboKey.currentIndex).text
+                                            )
                                                 return Kirigami.Theme.focusColor
                                             else
                                                 return "white"
@@ -200,6 +202,7 @@ ZComponents.ScreenPage {
                     font.pointSize: rightPanel.textSize
                 }
                 QQC2.ComboBox {
+                    id: comboKey
                     Layout.fillWidth: true
                     Layout.preferredHeight: rightPanel.cellSize
                     model: keyModel

@@ -38,6 +38,7 @@ class Note(QObject):
     self.__note_name__ = name
     self.__scale_index__ = scale_index
     self.__octave__ = octave
+    self.__is_playing__ = False
     self.__midi_note__ = midi_note
     self.__midi_port__ = midi_port
     self.__midi_note_on_msg__ = mido.Message('note_on', note=self.__midi_note__)
@@ -48,6 +49,17 @@ class Note(QObject):
   
   def get_scale_index(self):
     return self.__scale_index__
+
+  def get_is_playing(self):
+    return self.__is_playing__
+
+  def set_is_playing(self, playing: bool):
+    self.__is_playing__ = playing
+    self.__is_playing_changed__.emit()
+
+  @Signal
+  def __is_playing_changed__(self):
+    pass
   
   @Slot(None)
   def on(self):
@@ -64,6 +76,8 @@ class Note(QObject):
   @Property(int, constant=True)
   def octave(self):
     return self.__octave__
+  
+  isPlaying = Property(bool, get_is_playing, set_is_playing, notify=__is_playing_changed__)
 
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
@@ -102,6 +116,13 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
   def set_grid(self, grid):
     self.__grid_notes__ = grid
+  
+  def highlight_playing_note(self, playingNote: Note, highlight: bool = True):
+    for row in self.__grid_notes__:
+      for note in row:
+        if note.get_midi_note() == playingNote.get_midi_note():
+          note.set_is_playing(highlight)
+
 
   @Property(dict, constant=True)
   def roles(self):
@@ -254,6 +275,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   @Signal
   def __scale_changed__(self):
     pass
+
+  @Slot(Note, bool)
+  def highlightPlayingNotes(self, note: Note, highlight: bool):
+    self.__model__.highlight_playing_note(note, highlight)
+
   
   rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
   columns = Property(int, __get_columns__, __set_columns__, notify=__columns_changed__)

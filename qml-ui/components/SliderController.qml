@@ -48,16 +48,16 @@ AbstractController {
             Layout.fillWidth: true
             Layout.fillHeight: true
             orientation: Qt.Vertical
-            stepSize: root.controller ? (root.controller.step_size === 0 ? 1 : root.controller.step_size) : 0
-            value: root.controller ? root.controller.value : 0
-            from: root.controller ? root.controller.value0 : 0
-            to: root.controller ? root.controller.max_value : 0
-            onMoved: root.controller.value = value
+            stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
+            value: root.controller.ctrl ? root.controller.ctrl.value : 0
+            from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
+            to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
+            onMoved: root.controller.ctrl.value = value
         }
         Kirigami.Heading {
 			id: valueLabel
             level: 2
-            text: root.controller ? root.controller.value_print : ""
+            text: root.controller.ctrl ? root.controller.ctrl.value_print : ""
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
         }

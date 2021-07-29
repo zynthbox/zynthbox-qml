@@ -35,7 +35,7 @@ AbstractController {
 
     control: MouseArea {
         anchors.fill: parent
-        onClicked: root.controller.value = root.controller.value == root.controller.value0 ? root.controller.max_value : root.controller.value0
+        onClicked: root.controller.ctrl.value = root.controller.ctrl.value == root.controller.ctrl.value0 ? root.controller.ctrl.max_value : root.controller.ctrl.value0
         /*Behavior on scale {
             NumberAnimation {
                 duration: Kirigami.Units.longDuration
@@ -48,8 +48,8 @@ AbstractController {
             anchors.centerIn: parent
             width: Math.min(Math.round(parent.width / 4 * 3), Kirigami.Units.gridUnit * 5)
             height: Kirigami.Units.gridUnit * 3
-            checked: root.controller && root.controller.value !== root.controller.value0
-            onToggled: root.controller.value = checked ? root.controller.max_value : root.controller.value0
+            checked: root.controller.ctrl && root.controller.ctrl.value !== root.controller.ctrl.value0
+            onToggled: root.controller.ctrl.value = checked ? root.controller.ctrl.max_value : root.controller.ctrl.value0
 
             // HACK for default style
             /* Binding {
@@ -64,7 +64,7 @@ AbstractController {
                     top: parent.bottom
                     //bottomMargin: Kirigami.Units.gridUnit * 2
                 }
-                text: root.controller ? root.controller.value_print : ""
+                text: root.controller.ctrl ? root.controller.ctrl.value_print : ""
             }
         }
     }

@@ -48,11 +48,11 @@ AbstractController {
             margins: Kirigami.Units.largeSpacing
         }
         width: height
-        stepSize: root.controller ? (root.controller.step_size === 0 ? 1 : root.controller.step_size) : 0
-        value: root.controller ? root.controller.value : 0
-        from: root.controller ? root.controller.value0 : 0
-        to: root.controller ? root.controller.max_value : 0
-        onMoved: root.controller.value = value
+        stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
+        value: root.controller.ctrl ? root.controller.ctrl.value : 0
+        from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
+        to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
+        onMoved: root.controller.ctrl.value = value
 
 
         // HACK for default style
@@ -69,7 +69,7 @@ AbstractController {
         Kirigami.Heading {
             id: valueLabel
             anchors.centerIn: parent
-            text: root.controller ? root.controller.value_print :  ""
+            text: root.controller.ctrl ? root.controller.ctrl.value_print :  ""
         }
 
         //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
@@ -89,7 +89,7 @@ AbstractController {
                 if (root.valueType === "int" || root.valueType === "bool") {
                     value = Math.round(value);
                 }
-                root.controller.value = value;
+                root.controller.ctrl.value = value;
             }
         }
     }

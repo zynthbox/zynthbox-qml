@@ -40,7 +40,10 @@ GridLayout {
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller: zynthian.control.controller_by_category("Obxd#12", 2)
+        controller {
+            category: "Obxd#12"
+            index: 2
+        }
     }
     // Resonance
     ZComponents.DialController {
@@ -48,7 +51,10 @@ GridLayout {
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller: zynthian.control.controller_by_category("Obxd#12", 1)
+        controller {
+            category: "Obxd#12"
+            index: 1
+        }
     }
     // Bandpassblend
     ZComponents.DialController {
@@ -56,7 +62,10 @@ GridLayout {
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller: zynthian.control.controller_by_category("Obxd#13", 2)
+        controller {
+            category: "Obxd#13"
+            index: 2
+        }
     }
     // Bandpass env amount
     ZComponents.DialController {
@@ -64,7 +73,10 @@ GridLayout {
         implicitHeight: 1
         Layout.fillWidth: true
         Layout.fillHeight: true
-        controller: zynthian.control.controller_by_category("Obxd#13", 3)
+        controller {
+            category: "Obxd#13"
+            index: 3
+        }
     }
     ZComponents.Card {
         implicitWidth: 1

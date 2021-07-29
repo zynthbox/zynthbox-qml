@@ -114,7 +114,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   __rows__: int = 5
   __columns__: int = 8
   __starting_note__: int = 36
-  __scale__ = 'major'
+  __scale__ = 'ionian'
 
   def __init__(self, parent = None):
     super(zynthian_gui_playgrid, self).__init__(parent)
@@ -144,9 +144,14 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     scale_mode_map = {
-      'chromatic': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      'major': [2, 2, 1, 2, 2, 2, 1],
-      'minor': [2, 1, 2, 2, 1, 2, 2]
+      'chromatic':  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      'ionian':     [2, 2, 1, 2, 2, 2, 1],
+      'dorian':     [2, 1, 2, 2, 2, 1, 2],
+      'phrygian':   [1, 2, 2, 2, 1, 2, 2],
+      'lydian':     [2, 2, 2, 1, 2, 2, 1],
+      'mixolydian': [2, 2, 1, 2, 2, 1, 2],
+      'aeolian':    [2, 1, 2, 2, 1, 2, 2],
+      'locrian':    [1, 2, 2, 1, 2, 2, 2]
     }
     grid_notes = []
 

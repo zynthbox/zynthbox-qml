@@ -119,14 +119,19 @@ ZComponents.ScreenPage {
                 ListModel {
                     id: scaleModel
                     
-                    ListElement { scale: "major"; text: "Major" }
-                    ListElement { scale: "minor"; text: "Minor" }
                     ListElement { scale: "chromatic"; text: "Chromatic" }
+                    ListElement { scale: "ionian"; text: "Ionian (Major)" }
+                    ListElement { scale: "dorian"; text: "Dorian" }
+                    ListElement { scale: "phrygian"; text: "Phrygian" }
+                    ListElement { scale: "lydian"; text: "Lydian" }
+                    ListElement { scale: "mixolydian"; text: "Mixolydian" }
+                    ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
+                    ListElement { scale: "locrian"; text: "Locrian" }
                 }
 
                 QQC2.Label {
                     Layout.preferredWidth: rightPanel.textElementWidth
-                    text: "Scale"
+                    text: "Modes"
                     font.pointSize: rightPanel.textSize
                 }
                 QQC2.ComboBox {
@@ -136,7 +141,7 @@ ZComponents.ScreenPage {
                     model: scaleModel
                     textRole: "text"
                     displayText: currentText
-                    currentIndex: 0
+                    currentIndex: 1
 
                     onActivated: {
                         if (scaleModel.get(currentIndex).scale === 'major') {

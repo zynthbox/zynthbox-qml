@@ -50,8 +50,7 @@ Kirigami.AbstractApplicationWindow {
     height: screen.height
 
     header: ZComponents.Breadcrumb {
-        //height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
-        visible: root.controlsVisible
+        //visible: root.controlsVisible
         layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
             spacing: 0

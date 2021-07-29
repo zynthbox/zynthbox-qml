@@ -49,7 +49,7 @@ Item { //TODO: componentize
                 checked: true
                 onCheckedChanged: {
                     if (checked) {
-                        internalStack.replace(mainPage)
+                        internalStack.replace(Qt.resolvedUrl("MainPage.qml"))
                     }
                 }
             }
@@ -105,66 +105,7 @@ Item { //TODO: componentize
             Layout.fillHeight: true
             clip: true
 
-            initialItem: mainPage
-        }
-    }
-
-    GridLayout {
-        id: mainPage
-        visible: false
-        rows: 2
-        columns: 2
-
-        // VoiceCount
-        ZComponents.SpinBoxController {
-            title: qsTr("Voices")
-            implicitWidth: 1
-            implicitHeight: 1
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.category: "Obxd#2"
-            controller.index: 0
-            spinBox.stepSize: Math.round(spinBox.to / 7)
-            spinBox.textFromValue: function(value, locale) {
-                return Math.round(spinBox.realValue / (200 / 7)) + 1
-            }
-        }
-        // Octave
-        ZComponents.SpinBoxController {
-            title: qsTr("Transpose")
-            implicitWidth: 1
-            implicitHeight: 1
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.category: "Obxd#2"
-            controller.index: 2
-            spinBox.stepSize: 5000
-            spinBox.textFromValue: function(value, locale) {
-                let val = Math.round((spinBox.realValue - 100) / 50)
-                return (val > 0 ? "+" : "") + val
-            }
-        }
-        // Tune
-        ZComponents.DialController {
-            title: qsTr("Tune")
-            implicitWidth: 1
-            implicitHeight: 1
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.category: "Obxd#2"
-            controller.index: 1
-            valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
-        }
-        // VOLUME
-        ZComponents.SliderController {
-            title: qsTr("Volume")
-            implicitWidth: 1
-            implicitHeight: 1
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            controller.category: "Obxd#1"
-            controller.index: 3
-            valueLabel: Math.round(value / 2)
+            initialItem: Qt.resolvedUrl("MainPage.qml")
         }
     }
 }

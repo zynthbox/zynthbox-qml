@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import "." as ZComponents
 
 Item {
     id: root
@@ -53,7 +53,7 @@ Item {
                     checkable: true
                     checked: internalStack.activeAction === modelData
                     onClicked: {
-                        internalStack.replace(Qt.resolvedUrl(modelData.page));
+                        internalStack.replace(modelData.page);
                         internalStack.activeAction = modelData;
                         if (modelData.children.length > 0) {
                             internalStack.activeSubAction = modelData.children[0]
@@ -90,7 +90,7 @@ Item {
                         checkable: true
                         checked: internalStack.activeSubAction === modelData
                         onClicked: {
-                            internalStack.replace(Qt.resolvedUrl(modelData.page));
+                            internalStack.replace(modelData.page);
                             internalStack.activeSubAction = modelData;
                         }
                     }

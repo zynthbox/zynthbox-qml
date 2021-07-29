@@ -33,14 +33,21 @@ from . import zynthian_qt_gui_base
 
 
 class Note(QObject):
-  def __init__(self, name: str, octave: int, midi_note: int, midi_port, parent:QObject = None):
+  def __init__(self, name: str, scale_index: int, octave: int, midi_note: int, midi_port, parent:QObject = None):
     super(Note, self).__init__(parent)
     self.__note_name__ = name
+    self.__scale_index__ = scale_index
     self.__octave__ = octave
     self.__midi_note__ = midi_note
     self.__midi_port__ = midi_port
     self.__midi_note_on_msg__ = mido.Message('note_on', note=self.__midi_note__)
     self.__midi_note_off_msg__ = mido.Message('note_off', note=self.__midi_note__)
+  
+  def get_midi_note(self):
+    return self.__midi_note__
+  
+  def get_scale_index(self):
+    return self.__scale_index__
   
   @Slot(None)
   def on(self):
@@ -131,8 +138,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
   def __populate_grid__(self) -> None:
     note_int_to_str_map = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    major_scale = [2, 2, 1, 2, 2, 2, 1]
-    minor_scale = [2, 1, 2, 2, 1, 2, 2]
+    scale_mode_map = {
+      'chromatic': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      'major': [2, 2, 1, 2, 2, 2, 1],
+      'minor': [2, 1, 2, 2, 1, 2, 2]
+    }
     scale_index = 0
     grid_notes = []
     col = self.__starting_note__
@@ -143,30 +153,28 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
       for i in range(0, self.__columns__):
         row_data.append(Note(
           name=note_int_to_str_map[col%12],
+          scale_index=scale_index,
           octave=col//12,
           midi_note=col,
           midi_port=self.__midi_port__,
           parent=self
         ))
 
-        if i != (self.__columns__ - 1):
-          if self.__scale__ == 'chromatic':
-            col += 1
-          elif self.__scale__ == 'major':
-            if scale_index >= len(major_scale):
-              scale_index = 0
+        if scale_index >= len(scale_mode_map[self.__scale__]):
+          scale_index = 0
 
-            col += major_scale[scale_index]
-            scale_index += 1
-      
+        col += scale_mode_map[self.__scale__][scale_index]
+        scale_index += 1
+    
       grid_notes.insert(0, row_data)
 
-      if self.__scale__ == 'major':
+      if self.__scale__ != 'chromatic':
+        col = row_data[0].get_midi_note()
+        scale_index = row_data[0].get_scale_index()
+
         for i in range(0, 3):
-          col += major_scale[scale_index%7]
-          scale_index = (scale_index+1)%7
-        
-        col -= 12
+          col += scale_mode_map[self.__scale__][scale_index%len(scale_mode_map[self.__scale__])]
+          scale_index = (scale_index+1)%len(scale_mode_map[self.__scale__])
     
     self.__model__.set_grid(grid_notes)
     self.__model_changed__.emit()

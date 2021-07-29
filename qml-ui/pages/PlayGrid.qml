@@ -73,7 +73,16 @@ ZComponents.ScreenPage {
                                         width: 1
                                         color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
                                     }
-                                    color: note.name === "C" ? Kirigami.Theme.focusColor : "white"
+                                    color: {
+                                        if (note.isPlaying) {
+                                            return "#8bc34a";
+                                        } else {
+                                            if (note.name === "C")
+                                                return Kirigami.Theme.focusColor
+                                            else
+                                                return "white"
+                                        }
+                                    }
 
                                     Text {
                                         anchors.centerIn: parent
@@ -89,10 +98,12 @@ ZComponents.ScreenPage {
                                 onPressed: {
                                     focus = true;
                                     note.on();
+                                    zynthian.playgrid.highlightPlayingNotes(note, true);
                                 }
                                 onReleased: {
                                     focus = false;
                                     note.off();
+                                    zynthian.playgrid.highlightPlayingNotes(note, false);
                                 }
                             }
                         }

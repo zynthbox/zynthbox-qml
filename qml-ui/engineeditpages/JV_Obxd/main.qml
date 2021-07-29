@@ -38,30 +38,30 @@ ZComponents.TabbedControlView {
     tabActions: [
         ZComponents.TabbedControlViewAction {
             text: qsTr("Main")
-            page: "MainView.qml"
+            page: Qt.resolvedUrl("MainView.qml")
             ZComponents.TabbedControlViewAction {
                 text: qsTr("Tune && Volume")
-                page: "MainView.qml"
+                page: Qt.resolvedUrl("MainView.qml")
             }
             ZComponents.TabbedControlViewAction {
                 text: qsTr("Voice Pan")
-                page: "VoicePanView.qml"
+                page: Qt.resolvedUrl("VoicePanView.qml")
             }
         },
         ZComponents.TabbedControlViewAction {
             text: qsTr("ADSR")
-            page: "ADSRView.qml"
+            page: Qt.resolvedUrl("ADSRView.qml")
         },
         ZComponents.TabbedControlViewAction {
             text: qsTr("Filter")
-            page: "FilterView.qml"
+            page: Qt.resolvedUrl("FilterView.qml")
             ZComponents.TabbedControlViewAction {
                 text: qsTr("General")
-                page: "FilterView.qml"
+                page: Qt.resolvedUrl("FilterView.qml")
             }
             ZComponents.TabbedControlViewAction {
                 text: qsTr("Filter ADSR")
-                page: "FilterADSRView.qml"
+                page: Qt.resolvedUrl("FilterADSRView.qml")
             }
         },
         ZComponents.TabbedControlViewAction {

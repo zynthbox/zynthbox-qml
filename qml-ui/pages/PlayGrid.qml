@@ -530,6 +530,7 @@ Zynthian.ScreenPage {
                                             parent.down = false;
                                             focus = false;
                                             note.off();
+                                            zynthian.playgrid.pitch = 0
                                             zynthian.playgrid.highlightPlayingNotes(note, false);
                                         }
                                     }

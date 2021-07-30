@@ -311,13 +311,17 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "arrow-up"
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
                         zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
@@ -331,13 +335,17 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "arrow-down"
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
                         if (zynthian.playgrid.startingNote - 12 > 0) {
@@ -353,19 +361,25 @@ Zynthian.ScreenPage {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
 
                         Text {
                             anchors.fill: parent
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            color: Kirigami.Theme.buttonTextColor
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            color: Kirigami.Theme.textColor
                             text: "Mod\nulate"
                         }
                     }
@@ -380,13 +394,17 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "arrow-up"
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
                     }
                     MultiPointTouchArea {
                         anchors.fill: parent
@@ -410,13 +428,17 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "arrow-down"
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
                     }
                     MultiPointTouchArea {
                         anchors.fill: parent
@@ -439,13 +461,17 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "configure"
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
                         radius: 2
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         border {
                             width: 1
-                            color: Kirigami.Theme.buttonTextColor
+                            color: Kirigami.Theme.textColor
                         }
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
                         settingsDialog.visible = true;

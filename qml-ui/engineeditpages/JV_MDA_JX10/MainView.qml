@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 
 GridLayout {
@@ -36,42 +36,42 @@ GridLayout {
     columns: 4
 
     // mod-wheel
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MIDI Controllers"
             index: 1
         }
     }
     // Glide
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MDA JX10#1"
             index: 3
         }
     }
     // gld rate
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MDA JX10#2"
             index: 0
         }
     }
     // gld blend
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MDA JX10#2"
             index: 1
         }
     }
     // vibrato
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MDA JX10#6"
             index: 0
         }
     }
     // octave
-    ZComponents.MultiSwitchController {
+    Zynthian.MultiSwitchController {
         controller {
             category: "MDA JX10#6"
             index: 2
@@ -83,7 +83,7 @@ GridLayout {
         }
     }
     // tuning
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "MDA JX10#6"
             index: 3
@@ -92,7 +92,7 @@ GridLayout {
     }
 
     // VOLUME
-    ZComponents.SliderController {
+    Zynthian.SliderController {
         title: qsTr("Volume")
         controller {
             category: "MIDI Controllers"

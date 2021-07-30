@@ -28,10 +28,10 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 
-ZComponents.ScrollableScreenPage {
+Zynthian.ScrollableScreenPage {
     id: root
     title: qsTr("Info")
     screenId: "info"

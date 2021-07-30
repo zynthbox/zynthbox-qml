@@ -29,8 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
-import "components" as ZComponents
-import "components/private" as ZComponentsPrivate
+import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 
 Kirigami.AbstractApplicationWindow {
@@ -49,12 +48,12 @@ Kirigami.AbstractApplicationWindow {
     width: screen.width
     height: screen.height
 
-    header: ZComponents.Breadcrumb {
+    header: Zynthian.Breadcrumb {
         //visible: root.controlsVisible
         layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
             spacing: 0
-            ZComponentsPrivate.BreadcrumbButton {
+            Zynthian.BreadcrumbButton {
                 id: homeButton
                 implicitWidth: height
                 icon.name: "go-home"
@@ -63,7 +62,7 @@ Kirigami.AbstractApplicationWindow {
                 onClicked: zynthian.current_screen_id = 'main'
                 highlighted: zynthian.current_screen_id === 'main'
             }
-            ZComponentsPrivate.BreadcrumbButton {
+            Zynthian.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
                         ? (zynthian.engine.midi_channel + 1) + "ˬ"
                         : zynthian.layer.selector_path_element + "ˬ"
@@ -83,7 +82,7 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
         }
-        rightHeaderControl: ZComponents.StatusInfo {}
+        rightHeaderControl: Zynthian.StatusInfo {}
     }
     pageStack: screensLayer
     ScreensLayer {
@@ -160,12 +159,12 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    ZComponents.ModalLoadingOverlay {
+    Zynthian.ModalLoadingOverlay {
         parent: root.contentItem.parent
         anchors.fill: parent
     }
 
-    footer: ZComponents.ActionBar {
+    footer: Zynthian.ActionBar {
         currentPage: root.currentPage
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)

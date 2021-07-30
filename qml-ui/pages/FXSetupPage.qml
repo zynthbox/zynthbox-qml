@@ -28,9 +28,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
-ZComponents.MultiSelectorPage {
+Zynthian.MultiSelectorPage {
 
     screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
     screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.effect_types.selector_list.count), qsTr("FX (%1)").arg(zynthian.layer_effect_chooser.selector_list.count)]

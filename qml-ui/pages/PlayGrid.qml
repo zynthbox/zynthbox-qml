@@ -383,8 +383,22 @@ Zynthian.ScreenPage {
                             text: "Mod\nulate"
                         }
                     }
-                    onClicked: {
-                        settingsDialog.visible = true;
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
+                        onModulationValueChanged: {
+                            //zynthian.playgrid.modulation = modulationValue;
+                        }
+                        touchPoints: [ TouchPoint { id: modulationPoint; } ]
+                        onPressed: {
+                            parent.down = true;
+                            focus = true;
+                        }
+                        onReleased: {
+                            parent.down = false;
+                            focus = false;
+                            //zynthian.playgrid.modulation = 0;
+                        }
                     }
                 }
 

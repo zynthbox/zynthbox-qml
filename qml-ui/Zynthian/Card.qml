@@ -34,8 +34,7 @@ import "private"
 QQC2.Control {
     id: root
 
-//     Kirigami.Theme.inherit: false
-//     Kirigami.Theme.colorSet: Kirigami.Theme.View
+    property bool highlighted: false
 
     leftPadding: background.leftPadding
     rightPadding: background.rightPadding
@@ -45,6 +44,6 @@ QQC2.Control {
     // This is done for performance reasons
     background: CardBackground {
         id: background
-        highlighted: root.activeFocus
+        highlighted: root.highlighted
     }
 }

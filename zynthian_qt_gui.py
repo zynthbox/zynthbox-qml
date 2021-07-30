@@ -45,7 +45,7 @@ import sched
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer, QEventLoop
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
 #from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide2.QtQml import QQmlApplicationEngine, QJSValue
 
 
 sys.path.insert(1, '/zynthian/zynthian-ui/')
@@ -320,6 +320,7 @@ class zynthian_gui(QObject):
 		self.info_timer.timeout.connect(self.hide_info)
 		# HACK: in order to start the timer from the proper thread
 		self.current_modal_screen_id_changed.connect(self.info_timer.start)
+		self.current_qml_page_prop = None
 
 		self.deferred_loading_timer = QTimer(self)
 		self.info_timer.setInterval(0)
@@ -873,6 +874,12 @@ class zynthian_gui(QObject):
 
 	def callable_ui_action(self, cuia, params=None):
 		logging.debug("CUIA '{}' => {}".format(cuia,params))
+
+		if self.current_qml_page != None:
+			js_value = self.current_qml_page_prop.property("cuiaCallback")
+			if js_value != None and js_value.isCallable():
+				if js_value.call([cuia]).toBool():
+					return
 
 		if cuia == "POWER_OFF":
 			self.screens['admin'].power_off_confirmed()
@@ -1857,6 +1864,7 @@ class zynthian_gui(QObject):
 		if action != None:
 			zyngui.callable_ui_action(action)
 
+
 	@Slot('void')
 	def go_back(self):
 		# switch 1 means going back TODO: instead of magic numbers their functions should be moved in slots?
@@ -2049,6 +2057,19 @@ class zynthian_gui(QObject):
 		return zynthian_gui_keybinding.getInstance(self)
 
 
+
+	def set_current_qml_page(self, page):
+		if self.current_qml_page_prop is page:
+			return
+		self.current_qml_page_prop = page
+		self.current_qml_page_changed.emit()
+
+	def get_current_qml_page(self):
+		return self.current_qml_page_prop
+
+
+
+
 	def get_info(self):
 		return self.screens['info']
 
@@ -2127,6 +2148,7 @@ class zynthian_gui(QObject):
 	current_modal_screen_id_changed = Signal()
 	is_loading_changed = Signal()
 	status_info_changed = Signal()
+	current_qml_page_changed = Signal()
 
 	current_screen_id = Property(str, get_current_screen_id, show_screen, notify = current_screen_id_changed)
 	current_modal_screen_id = Property(str, get_current_modal_screen_id, show_modal, notify = current_modal_screen_id_changed)
@@ -2136,6 +2158,8 @@ class zynthian_gui(QObject):
 	status_information = Property(QObject, get_status_information, constant = True)
 
 	keybinding = Property(QObject, get_keybinding, constant = True)
+
+	current_qml_page = Property(QObject, get_current_qml_page, set_current_qml_page, notify = current_qml_page_changed)
 
 	info = Property(QObject, get_info, constant = True)
 	confirm = Property(QObject, get_confirm, constant = True)

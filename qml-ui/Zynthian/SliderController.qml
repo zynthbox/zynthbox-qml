@@ -38,6 +38,7 @@ AbstractController {
     property alias stepSize: slider.stepSize
     property alias snapMode: slider.snapMode
     property alias slider: slider
+    highlighted: slider.activeFocus
 
     control: ColumnLayout {
 

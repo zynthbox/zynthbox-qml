@@ -38,6 +38,7 @@ AbstractController {
     property alias stepSize: dial.stepSize
     property alias snapMode: dial.snapMode
     property alias dial: dial
+    highlighted: dial.activeFocus
 
     control: QQC2.Dial {
         id: dial

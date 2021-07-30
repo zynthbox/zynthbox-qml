@@ -37,6 +37,7 @@ Kirigami.AbstractApplicationWindow {
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
+    onCurrentPageChanged: zynthian.current_qml_page = currentPage
 
     function showConfirmationDialog() {
         confirmDialog.open()
@@ -111,7 +112,6 @@ Kirigami.AbstractApplicationWindow {
     Instantiator {
         model: zynthian.keybinding.key_sequences_model
         delegate: Shortcut {
-            //enabled: zynthian.keybinding.enabled
             sequence: model.display
             context: Qt.ApplicationShortcut
             onActivated: zynthian.process_keybinding_shortcut(model.display)

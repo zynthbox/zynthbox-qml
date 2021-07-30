@@ -32,6 +32,7 @@ AbstractController {
     id: root
 
     property alias switchControl: switchControl
+    highlighted: switchControl.activeFocus
 
     control: MouseArea {
         anchors.fill: parent

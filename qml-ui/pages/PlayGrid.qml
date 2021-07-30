@@ -387,19 +387,18 @@ Zynthian.ScreenPage {
                             color: Kirigami.Theme.buttonTextColor
                         }
                         color: Kirigami.Theme.buttonBackgroundColor
-
-                        MultiPointTouchArea {
-                            anchors.fill: parent
-                            onPressed: {
-                                parent.down = true;
-                                focus = true;
-                                zynthian.playgrid.pitch = 8191;
-                            }
-                            onReleased: {
-                                parent.down = false;
-                                focus = false;
-                                zynthian.playgrid.pitch = 0;
-                            }
+                    }
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        onPressed: {
+                            parent.down = true;
+                            focus = true;
+                            zynthian.playgrid.pitch = 8191;
+                        }
+                        onReleased: {
+                            parent.down = false;
+                            focus = false;
+                            zynthian.playgrid.pitch = 0;
                         }
                     }
                 }
@@ -418,18 +417,18 @@ Zynthian.ScreenPage {
                             color: Kirigami.Theme.buttonTextColor
                         }
                         color: Kirigami.Theme.buttonBackgroundColor
-                        MultiPointTouchArea {
-                            anchors.fill: parent
-                            onPressed: {
-                                parent.down = true;
-                                focus = true;
-                                zynthian.playgrid.pitch = -8192;
-                            }
-                            onReleased: {
-                                parent.down = false;
-                                focus = false;
-                                zynthian.playgrid.pitch = 0;
-                            }
+                    }
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        onPressed: {
+                            parent.down = true;
+                            focus = true;
+                            zynthian.playgrid.pitch = -8192;
+                        }
+                        onReleased: {
+                            parent.down = false;
+                            focus = false;
+                            zynthian.playgrid.pitch = 0;
                         }
                     }
                 }

@@ -31,7 +31,6 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../../components" as ZComponents
 
 GridLayout {
-    rows: 2
     columns: 2
 
     ZComponents.DialController {
@@ -48,15 +47,11 @@ GridLayout {
             index: 3
         }
     }
-    ZComponents.Card {
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+    ZComponents.AbstractController { // Filler
+        visible: true
     }
-    ZComponents.Card {
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+    ZComponents.AbstractController {
+        visible: true
     }
 }
 

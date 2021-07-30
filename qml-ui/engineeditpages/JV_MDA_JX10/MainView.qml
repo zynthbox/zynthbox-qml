@@ -33,8 +33,6 @@ import "../../components" as ZComponents
 
 GridLayout {
     id: root
-    visible: false
-    rows: 2
     columns: 4
 
     // mod-wheel

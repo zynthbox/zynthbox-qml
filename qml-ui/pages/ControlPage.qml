@@ -35,6 +35,20 @@ Zynthian.ScreenPage {
     title: zynthian.control.selector_path_element
 
     screenId: "control"
+    property var cuiaCallback: function(cuia) {
+        if (!stack.currentItem || stack.currentItem.objectName === "defaultPage"
+            || !stack.currentItem.hasOwnProperty("cuiaCallback")
+            || !(stack.currentItem.cuiaCallback instanceof Function)) {
+            return false;
+        }
+
+        //return false if the function returns anything not boolean
+        if (stack.currentItem.cuiaCallback(cuia) === true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -72,7 +86,7 @@ Zynthian.ScreenPage {
     Connections {
         target: zynthian.control
         onCustom_control_pageChanged: {
-			print(zynthian.control.custom_control_page)
+            print(zynthian.control.custom_control_page)
             if (zynthian.control.custom_control_page.length > 0) {
                 stack.replace(zynthian.control.custom_control_page);
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {

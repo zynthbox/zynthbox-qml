@@ -40,7 +40,10 @@ Kirigami.Page {
 
     property string screenId
 
-    property bool customCUIAHandling: false
+    // This can be a function taking the cuia action name as paramenter. if returns
+    // true the python part won't manage that action.
+    // Useful for custom navigation in pages
+    property var cuiaCallback
 
     signal currentScreenIdRequested(string screenId)
     signal itemActivated(string screenId, int index)

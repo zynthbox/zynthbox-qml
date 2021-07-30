@@ -37,10 +37,12 @@ AbstractController {
     property alias to: multiSwitch.to
     property alias stepSize: multiSwitch.stepSize
     property alias multiSwitch: multiSwitch
+    highlighted: multiSwitch.activeFocus
 
     control: Item {
         id: multiSwitch
         anchors.fill: parent
+        activeFocusOnTab: true
 
         property real value: root.controller.ctrl ? root.controller.ctrl.value : 0
         property real from: root.controller.ctrl ? root.controller.ctrl.value0 : 0
@@ -61,7 +63,10 @@ AbstractController {
                 top: parent.top
                 bottom: parent.verticalCenter
             }
-            onClicked: root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value + multiSwitch.stepSize))
+            onClicked: {
+                root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value + multiSwitch.stepSize));
+                multiSwitch.forceActiveFocus();
+            }
             Kirigami.Icon {
                 anchors.centerIn: parent
                 source: "arrow-up"
@@ -78,7 +83,10 @@ AbstractController {
                 top: parent.verticalCenter
                 bottom: parent.bottom
             }
-            onClicked: root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value - multiSwitch.stepSize))
+            onClicked: {
+                root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value - multiSwitch.stepSize));
+                multiSwitch.forceActiveFocus();
+            }
             Kirigami.Icon {
                 anchors.centerIn: parent
                 source: "arrow-down"

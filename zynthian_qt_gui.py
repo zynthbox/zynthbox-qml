@@ -760,7 +760,7 @@ class zynthian_gui(QObject):
 						self.show_modal('bank')
 					else:
 						self.show_screen('bank')
-				elif self.active_screen == 'main' or (self.modal_screen == None and self.active_screen == None):
+				elif self.modal_screen == None and self.active_screen == None:
 					if modal:
 						self.show_modal('layer')
 					else:

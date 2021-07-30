@@ -28,51 +28,51 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
-ZComponents.TabbedControlView {
+Zynthian.TabbedControlView {
     id: root
 
     property QQC2.StackView stack
 
     tabActions: [
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("Main")
             page: Qt.resolvedUrl("MainView.qml")
-            ZComponents.TabbedControlViewAction {
+            Zynthian.TabbedControlViewAction {
                 text: qsTr("Tune && Volume")
                 page: Qt.resolvedUrl("MainView.qml")
             }
-            ZComponents.TabbedControlViewAction {
+            Zynthian.TabbedControlViewAction {
                 text: qsTr("Voice Pan")
                 page: Qt.resolvedUrl("VoicePanView.qml")
             }
         },
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("ADSR")
             page: Qt.resolvedUrl("ADSRView.qml")
         },
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("Filter")
             page: Qt.resolvedUrl("FilterView.qml")
-            ZComponents.TabbedControlViewAction {
+            Zynthian.TabbedControlViewAction {
                 text: qsTr("General")
                 page: Qt.resolvedUrl("FilterView.qml")
             }
-            ZComponents.TabbedControlViewAction {
+            Zynthian.TabbedControlViewAction {
                 text: qsTr("Filter ADSR")
                 page: Qt.resolvedUrl("FilterADSRView.qml")
             }
         },
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("OSC")
             page: Qt.resolvedUrl("OSCView.qml")
         },
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("LFO")
             page: Qt.resolvedUrl("LFOView.qml")
         },
-        ZComponents.TabbedControlViewAction {
+        Zynthian.TabbedControlViewAction {
             text: qsTr("Mix")
             page: Qt.resolvedUrl("MixView.qml")
         }

@@ -45,7 +45,7 @@ import sched
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QTimer, QEventLoop
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
 #from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine
+from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 
 
 sys.path.insert(1, '/zynthian/zynthian-ui/')
@@ -2302,6 +2302,7 @@ if __name__ == "__main__":
 	zyngui.show_screen('main')
 	zyngui.screens['preset'].disable_show_fav_presets()
 
+	engine.addImportPath(os.fspath(Path(__file__).resolve().parent / "qml-ui"))
 	engine.rootContext().setContextProperty("zynthian", zyngui)
 
 	engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))

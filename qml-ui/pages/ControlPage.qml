@@ -28,9 +28,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
-ZComponents.ScreenPage {
+Zynthian.ScreenPage {
     id: root
     title: zynthian.control.selector_path_element
 
@@ -87,7 +87,7 @@ ZComponents.ScreenPage {
     }
 
     bottomPadding: Kirigami.Units.gridUnit
-    contentItem: ZComponents.Stack {
+    contentItem: Zynthian.Stack {
         id: stack
     }
 
@@ -99,17 +99,17 @@ ZComponents.ScreenPage {
                 Layout.maximumWidth: Math.floor(root.width / 4)
                 Layout.minimumWidth: Layout.maximumWidth
                 Layout.fillHeight: true
-                ZComponents.ControllerLoader {
+                Zynthian.ControllerLoader {
                     Layout.preferredHeight: 1
                     // FIXME: this always assumes there are always exactly 4 controllers for the entire lifetime
                     controller.index: 0
                 }
-                ZComponents.ControllerLoader {
+                Zynthian.ControllerLoader {
                     Layout.preferredHeight: 1
                     controller.index: 1
                 }
             }
-            ZComponents.SelectorView {
+            Zynthian.SelectorView {
                 id: mainView
                 screenId: root.screenId
                 Layout.fillWidth: true
@@ -121,11 +121,11 @@ ZComponents.ScreenPage {
                 Layout.maximumWidth: Math.floor(root.width / 4)
                 Layout.minimumWidth: Layout.maximumWidth
                 Layout.fillHeight: true
-                ZComponents.ControllerLoader {
+                Zynthian.ControllerLoader {
                     Layout.preferredHeight: 1
                     controller.index: 2
                 }
-                ZComponents.ControllerLoader {
+                Zynthian.ControllerLoader {
                     Layout.preferredHeight: 1
                     controller.index: 3
                 }

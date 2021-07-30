@@ -31,15 +31,10 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../../components" as ZComponents
 
 GridLayout {
-    rows: 2
     columns: 4
 
     // KeyFollow
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#12"
             index: 0
@@ -47,10 +42,6 @@ GridLayout {
     }
     // Resonance
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#12"
             index: 1
@@ -58,10 +49,6 @@ GridLayout {
     }
     // Cutoff
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#12"
             index: 2
@@ -69,10 +56,6 @@ GridLayout {
     }
     // MultiMode
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#12"
             index: 3
@@ -81,10 +64,6 @@ GridLayout {
 
     // Warm
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#13"
             index: 0
@@ -92,10 +71,6 @@ GridLayout {
     }
     // FourPole
     ZComponents.SwitchController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#13"
             index: 1
@@ -103,10 +78,6 @@ GridLayout {
     }
     // Bandpassblend
     ZComponents.SwitchController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#13"
             index: 2
@@ -114,10 +85,6 @@ GridLayout {
     }
     // Filter env amount
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#13"
             index: 3

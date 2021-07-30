@@ -26,37 +26,27 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.5 as Kirigami
+import org.kde.kirigami 2.4 as Kirigami
+
+import "../../components" as ZComponents
 
 
-Kirigami.Page {
-    id: root
-
-    property Kirigami.Action backAction: Kirigami.Action {
-        text: qsTr("Back")
-        onTriggered: zynthian.go_back()
+ZComponents.ADSRControlView {
+    attackController {
+        category: "MDA JX10#3"
+        index: 3
     }
-    property string previousScreen
-
-    property string screenId
-
-    property bool customCUIAHandling: false
-
-    signal currentScreenIdRequested(string screenId)
-    signal itemActivated(string screenId, int index)
-    signal itemActivatedSecondary(string screenId, int index)
-
-    bottomPadding: Kirigami.Units.gridUnit
-
-    Component.onCompleted: {
-        //HACK to disable kirigami automatic toolbars in that old version
-        var i
-        for (i in root.children) {
-            let child = root.children[i];
-            // Duck type Loaders
-            if (child.hasOwnProperty("active") && child.hasOwnProperty("source")) {
-                child.active = false;
-            }
-        }
+    decayController {
+        category: "MDA JX10#4"
+        index: 0
+    }
+    sustainController {
+        category: "MDA JX10#4"
+        index: 1
+    }
+    releaseController {
+        category: "MDA JX10#4"
+        index: 2
     }
 }
+

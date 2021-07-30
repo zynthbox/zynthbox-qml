@@ -61,6 +61,14 @@ Item {
                     }
                 }
             }
+            Repeater {
+                model: Math.max(0, 6 - root.tabActions.length)
+                delegate: QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    enabled: false
+                }
+            }
         }
         ColumnLayout {
             Layout.fillWidth: true

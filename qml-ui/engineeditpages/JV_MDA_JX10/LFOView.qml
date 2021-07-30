@@ -26,37 +26,37 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.5 as Kirigami
+import org.kde.kirigami 2.4 as Kirigami
 
+import "../../components" as ZComponents
 
-Kirigami.Page {
-    id: root
+GridLayout {
+    rows: 2
+    columns: 2
 
-    property Kirigami.Action backAction: Kirigami.Action {
-        text: qsTr("Back")
-        onTriggered: zynthian.go_back()
-    }
-    property string previousScreen
-
-    property string screenId
-
-    property bool customCUIAHandling: false
-
-    signal currentScreenIdRequested(string screenId)
-    signal itemActivated(string screenId, int index)
-    signal itemActivatedSecondary(string screenId, int index)
-
-    bottomPadding: Kirigami.Units.gridUnit
-
-    Component.onCompleted: {
-        //HACK to disable kirigami automatic toolbars in that old version
-        var i
-        for (i in root.children) {
-            let child = root.children[i];
-            // Duck type Loaders
-            if (child.hasOwnProperty("active") && child.hasOwnProperty("source")) {
-                child.active = false;
-            }
+    ZComponents.DialController {
+        implicitHeight: 1
+        controller {
+            category: "MDA JX10#3"
+            index: 1
         }
     }
+    ZComponents.DialController {
+        implicitHeight: 1
+        controller {
+            category: "MDA JX10#5"
+            index: 3
+        }
+    }
+    ZComponents.Card {
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+    }
+    ZComponents.Card {
+        implicitHeight: 1
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+    }
 }
+

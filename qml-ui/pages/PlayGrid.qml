@@ -44,7 +44,7 @@ Zynthian.ScreenPage {
     Component.onDestruction: {
         applicationWindow().controlsVisible = true
     }
-    
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -53,14 +53,14 @@ Zynthian.ScreenPage {
             property var textSize: 10
             property var textElementWidth: 150
             property var cellSize: 30
-            
+
             id: controlsPanel
-          
+
             Layout.preferredWidth: 80
             Layout.maximumWidth: Layout.preferredWidth
             Layout.fillHeight: true
             Layout.margins: 8
-            
+
             QQC2.Dialog {
                 id: settingsDialog
                 visible: false
@@ -80,7 +80,7 @@ Zynthian.ScreenPage {
 
                         ListModel {
                             id: scaleModel
-                            
+
                             ListElement { scale: "chromatic"; text: "Chromatic" }
                             ListElement { scale: "ionian"; text: "Ionian (Major)" }
                             ListElement { scale: "dorian"; text: "Dorian" }
@@ -128,7 +128,7 @@ Zynthian.ScreenPage {
 
                         ListModel {
                             id: keyModel
-                            
+
                             ListElement { note: 36; text: "C" }
                             ListElement { note: 37; text: "C#" }
                             ListElement { note: 38; text: "D" }
@@ -175,7 +175,7 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             Layout.fillWidth: true
                             Layout.preferredHeight: controlsPanel.cellSize
-                            
+
                             text: "-"
                             onClicked: {         
                                 if (zynthian.playgrid.startingNote - 1 > 0) {
@@ -194,7 +194,7 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
-                    
+
                     RowLayout {
                         id: optionOctave
                         visible: true
@@ -216,7 +216,7 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                        QQC2.Button {                    
+                        QQC2.Button {
                             Layout.fillWidth: true
                             Layout.preferredHeight: controlsPanel.cellSize
                             text: "+"
@@ -224,19 +224,19 @@ Zynthian.ScreenPage {
                                 zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
                             }
                         }
-                    }            
-                    
-                    RowLayout {    
+                    }
+
+                    RowLayout {
                         id: optionGrid
 
                         ListModel {
                             id: gridModel
-                            
+
                             ListElement { row: 3; column: 3; text: "3x3" }
                             ListElement { row: 4; column: 4; text: "4x4" }
                             ListElement { row: 5; column: 8; text: "5x8" }
                             ListElement { row: 0; column: 0; text: "Custom" }
-                        }   
+                        }
 
                         QQC2.Label {
                             Layout.preferredWidth: controlsPanel.textElementWidth
@@ -267,7 +267,7 @@ Zynthian.ScreenPage {
                         }
                     }
 
-                    RowLayout {                
+                    RowLayout {
                         id: optionCustomGrid
                         visible: false
 
@@ -307,79 +307,86 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 Layout.margins: 8
 
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    
-                    QQC2.Label {
-                        text: "Octave"
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
-
-                        icon.name: "arrow-up"
-
-                        onClicked: {
-                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    icon.name: "arrow-up"
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
                         }
+                        color: Kirigami.Theme.buttonBackgroundColor
                     }
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
-
-                        icon.name: "arrow-down"
-
-                        onClicked: {
-                            if (zynthian.playgrid.startingNote - 12 > 0) {
-                                zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
-                            } else {
-                                zynthian.playgrid.startingNote = 0;
-                            }
+                    onClicked: {
+                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    }
+                }
+                QQC2.Label {
+                    text: "Octave"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    icon.name: "arrow-down"
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
+                        }
+                        color: Kirigami.Theme.buttonBackgroundColor
+                    }
+                    onClicked: {
+                        if (zynthian.playgrid.startingNote - 12 > 0) {
+                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                        } else {
+                            zynthian.playgrid.startingNote = 0;
                         }
                     }
                 }
-                
-                Kirigami.Separator {}
-                
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    
-                    QQC2.Label {
-                        text: "Modulation"
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
-                        
-                        text: "~"
-                        
-                        onClicked: {
-                            settingsDialog.visible = true;
+
+                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
+                        }
+                        color: Kirigami.Theme.buttonBackgroundColor
+
+                        Text {
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            color: Kirigami.Theme.buttonTextColor
+                            text: "Mod\nulate"
                         }
                     }
-                }
-                
-                Kirigami.Separator {}
-                
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    
-                    QQC2.Label {
-                        text: "Pitch"
-                        Layout.alignment: Qt.AlignHCenter
+                    onClicked: {
+                        settingsDialog.visible = true;
                     }
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
+                }
 
-                        icon.name: "arrow-up"
+                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    icon.name: "arrow-up"
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
+                        }
+                        color: Kirigami.Theme.buttonBackgroundColor
 
                         MultiPointTouchArea {
                             anchors.fill: parent
@@ -395,13 +402,22 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
-
-                        icon.name: "arrow-down"
-
+                }
+                QQC2.Label {
+                    text: "Pitch"
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    icon.name: "arrow-down"
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
+                        }
+                        color: Kirigami.Theme.buttonBackgroundColor
                         MultiPointTouchArea {
                             anchors.fill: parent
                             onPressed: {
@@ -417,26 +433,23 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-                
-                Kirigami.Separator {}
-                
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    
-                    QQC2.Label {
-                        text: "Settings"
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                    QQC2.Button {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
-                        Layout.alignment: Qt.AlignHCenter
 
-                        icon.name: "adjustlevels"
+                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-                        onClicked: {
-                            settingsDialog.visible = true;
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    icon.name: "configure"
+                    background: Rectangle {
+                        radius: 2
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.buttonTextColor
                         }
+                        color: Kirigami.Theme.buttonBackgroundColor
+                    }
+                    onClicked: {
+                        settingsDialog.visible = true;
                     }
                 }
             }

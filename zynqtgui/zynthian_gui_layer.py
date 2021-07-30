@@ -196,7 +196,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.activate_index(i)
 
 	@Slot(int)
-	def activate_midican_layer(self, midi_chan):
+	def activate_midichan_layer(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
 		else:

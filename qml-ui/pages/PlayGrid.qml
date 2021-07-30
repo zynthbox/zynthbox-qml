@@ -40,6 +40,10 @@ ZComponents.ScreenPage {
     Component.onCompleted: {
         applicationWindow().controlsVisible = false
     }
+
+    Component.onDestruction: {
+        applicationWindow().controlsVisible = true
+    }
     
     RowLayout {
         anchors.fill: parent
@@ -378,16 +382,21 @@ ZComponents.ScreenPage {
                                         }
                                     }
                                 }
-                                
-                                onPressed: {
-                                    focus = true;
-                                    note.on();
-                                    zynthian.playgrid.highlightPlayingNotes(note, true);
-                                }
-                                onReleased: {
-                                    focus = false;
-                                    note.off();
-                                    zynthian.playgrid.highlightPlayingNotes(note, false);
+
+                                MultiPointTouchArea {
+                                    anchors.fill: parent
+                                    onPressed: {
+                                        parent.down = true;
+                                        focus = true;
+                                        note.on();
+                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                    }
+                                    onReleased: {
+                                        parent.down = false;
+                                        focus = false;
+                                        note.off();
+                                        zynthian.playgrid.highlightPlayingNotes(note, false);
+                                    }
                                 }
                             }
                         }

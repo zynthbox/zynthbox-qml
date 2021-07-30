@@ -148,7 +148,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def get_custom_control_page(self):
 		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
 			return None
-		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_")
+		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
 		# TODO: also search for stuff installed in ~/.local
 		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/main.qml"
 		if Path(path).exists():

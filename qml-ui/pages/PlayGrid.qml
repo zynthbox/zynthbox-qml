@@ -302,27 +302,122 @@ ZComponents.ScreenPage {
                 }
             }
 
-            Rectangle {
+            ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 8
-                color: "#444"
 
-                MouseArea {
-                    id: modWheel
-                    anchors.fill: parent
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    
+                    QQC2.Label {
+                        text: "Octave"
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
+
+                        icon.name: "arrow-up"
+
+                        onClicked: {
+                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
+
+                        icon.name: "arrow-down"
+
+                        onClicked: {
+                            if (zynthian.playgrid.startingNote - 12 > 0) {
+                                zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                            } else {
+                                zynthian.playgrid.startingNote = 0;
+                            }
+                        }
+                    }
                 }
-            }
+                
+                Kirigami.Separator {}
+                
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    
+                    QQC2.Label {
+                        text: "Modulation"
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
+                        
+                        text: "~"
+                        
+                        onClicked: {
+                            settingsDialog.visible = true;
+                        }
+                    }
+                }
+                
+                Kirigami.Separator {}
+                
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    
+                    QQC2.Label {
+                        text: "Pitch"
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
+                        
+                        icon.name: "arrow-up"
+                        
+                        onClicked: {
+                            
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
+                        
+                        icon.name: "arrow-down"
+                        
+                        onClicked: {
+                            
+                        }
+                    }
+                }
+                
+                Kirigami.Separator {}
+                
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    
+                    QQC2.Label {
+                        text: "Settings"
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    QQC2.Button {
+                        Layout.preferredWidth: 32
+                        Layout.preferredHeight: 32
+                        Layout.alignment: Qt.AlignHCenter
 
-            QQC2.Button {
-                Layout.preferredWidth: 32
-                Layout.preferredHeight: 32
-                Layout.alignment: Qt.AlighHCenter
+                        icon.name: "adjustlevels"
 
-                icon.name: "adjustlevels"
-
-                onClicked: {
-                    settingsDialog.visible = true;
+                        onClicked: {
+                            settingsDialog.visible = true;
+                        }
+                    }
                 }
             }
         }

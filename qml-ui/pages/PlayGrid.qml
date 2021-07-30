@@ -40,6 +40,10 @@ ZComponents.ScreenPage {
     Component.onCompleted: {
         applicationWindow().controlsVisible = false
     }
+
+    Component.onDestruction: {
+        applicationWindow().controlsVisible = true
+    }
     
     RowLayout {
         anchors.fill: parent

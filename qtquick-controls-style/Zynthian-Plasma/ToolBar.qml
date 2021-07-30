@@ -17,19 +17,14 @@ T.ToolBar {
     implicitHeight: Math.max(background.implicitHeight,
                              contentItem.implicitHeight + topPadding + bottomPadding)
 
-    leftPadding: Kirigami.Units.smallSpacing
-    topPadding: Kirigami.Units.smallSpacing
-    rightPadding: Kirigami.Units.smallSpacing
-    bottomPadding: Kirigami.Units.smallSpacing
+    leftPadding: background.fixedMargins.left
+    topPadding: background.fixedMargins.top
+    rightPadding: background.fixedMargins.right
+    bottomPadding: background.fixedMargins.bottom
 
     contentItem: Item { }
 
     background: PlasmaCore.FrameSvgItem {
-        anchors {
-            fill: parent
-            topMargin: -margins.top
-            bottomMargin: -margins.bottom
-        }
         implicitHeight: Kirigami.Units.gridUnit * 3
         imagePath: "widgets/background"
         colorGroup: PlasmaCore.ColorScope.colorGroup

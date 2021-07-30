@@ -33,72 +33,107 @@ import Zynthian 1.0 as Zynthian
 GridLayout {
     columns: 4
 
+    // LFO Frequency
     Zynthian.DialController {
+        title: qsTr("LFO Speed")
         controller {
             category: "Obxd#5"
             index: 2
         }
     }
-    Zynthian.DialController {
+    // LFOSineWave
+    Zynthian.SwitchController {
+        title: qsTr("Sine")
         controller {
             category: "Obxd#5"
             index: 3
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
     }
-    Zynthian.DialController {
+    // LFOSquareWave
+    Zynthian.SwitchController {
+        title: qsTr("Square")
         controller {
             category: "Obxd#6"
             index: 0
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
     }
-    Zynthian.DialController {
+    // LFOSampleHoldWave
+    Zynthian.SwitchController {
+        title: qsTr("Sample & Hold")
         controller {
             category: "Obxd#6"
             index: 1
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
     }
+
+
+    // LFOAmount1
     Zynthian.DialController {
+        title: qsTr("Pitch")
         controller {
             category: "Obxd#6"
             index: 2
         }
     }
+    // LFOOsc1
+    Zynthian.SwitchController {
+        title: qsTr("OSC1 Pitch")
+        controller {
+            category: "Obxd#7"
+            index: 0
+        }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
+    }
+    // LFOOsc2
+    Zynthian.SwitchController {
+        title: qsTr("OSC2 Pitch")
+        controller {
+            category: "Obxd#7"
+            index: 1
+        }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
+    }
+    // LFOFilter
+    Zynthian.SwitchController {
+        title: qsTr("Filter")
+        controller {
+            category: "Obxd#7"
+            index: 2
+        }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
+    }
+
+
+    // LFOAmount2
     Zynthian.DialController {
+        title: qsTr("Pulse Width")
         controller {
             category: "Obxd#6"
             index: 3
         }
     }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#7"
-            index: 0
-        }
-    }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#7"
-            index: 1
-        }
-    }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#7"
-            index: 2
-        }
-    }
-    Zynthian.DialController {
+    // LFOPw1
+    Zynthian.SwitchController {
+        title: qsTr("OSC1 PWM")
         controller {
             category: "Obxd#7"
             index: 3
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
     }
-    Zynthian.DialController {
+    // LFOPw2
+    Zynthian.SwitchController {
+        title: qsTr("OSC2 PWM")
         controller {
             category: "Obxd#8"
             index: 0
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
     }
+
     Zynthian.AbstractController { // Filler
         visible: true
     }

@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 AbstractController {
     id: root
 
+    property alias valueLabel: valueLabel.text
     property alias switchControl: switchControl
     highlighted: switchControl.activeFocus
 
@@ -60,6 +61,7 @@ AbstractController {
             }*/
 
             Kirigami.Heading {
+                id: valueLabel
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     top: parent.bottom

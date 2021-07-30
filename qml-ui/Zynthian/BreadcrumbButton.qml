@@ -40,7 +40,7 @@ QQC2.ToolButton {
                 top: parent.top
                 bottom: parent.bottom
             }
-            source: "../img/breadcrumb-separator.svg"
+            source: "./img/breadcrumb-separator.svg"
         }
     }
     opacity: highlighted ? 1 : 0.5

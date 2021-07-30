@@ -28,29 +28,29 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 2
 
-    ZComponents.DialController {
+    Zynthian.DialController {
         implicitHeight: 1
         controller {
             category: "MDA JX10#3"
             index: 1
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         implicitHeight: 1
         controller {
             category: "MDA JX10#5"
             index: 3
         }
     }
-    ZComponents.AbstractController { // Filler
+    Zynthian.AbstractController { // Filler
         visible: true
     }
-    ZComponents.AbstractController {
+    Zynthian.AbstractController {
         visible: true
     }
 }

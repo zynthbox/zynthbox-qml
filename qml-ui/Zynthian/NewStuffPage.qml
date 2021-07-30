@@ -29,10 +29,9 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.newstuff 1.0 as NewStuff
 
-import "../components" as ZComponents
-import "../components/private/" as ZComponentsPrivate
+import Zynthian 1.0 as Zynthian
 
-ZComponents.SelectorPage {
+Zynthian.SelectorPage {
     id: component
 
     /**
@@ -92,7 +91,7 @@ ZComponents.SelectorPage {
     ]
     Component {
         id: newStuffDelegate
-        ZComponents.SelectorDelegate {
+        Zynthian.SelectorDelegate {
             screenId: component.screenId
             selector: ListView.view.parent.selector
             onCurrentScreenIdRequested: ListView.view.parent.currentScreenIdRequested(screenId)
@@ -154,7 +153,7 @@ ZComponents.SelectorPage {
             // We're using this as our de-facto single-item view, so just make these the full size of the ListView
             width: ListView.view.width
             height: ListView.view.height
-            ZComponents.Card {
+            Zynthian.Card {
                 anchors.fill: parent;
                 ColumnLayout {
                     opacity: busyInstallingStuff.running ? 0.3 : 1
@@ -232,7 +231,7 @@ ZComponents.SelectorPage {
                         QQC2.Label {
                             text: qsTr("Rated as")
                         }
-                        ZComponents.Rating {
+                        Zynthian.Rating {
                             Layout.fillWidth: true
                             rating: model.rating
                         }
@@ -274,7 +273,7 @@ ZComponents.SelectorPage {
         height: Kirigami.Units.gridUnit * 5
         opacity: newStuffEngine.isLoading ? 1 : 0;
         Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
-        ZComponentsPrivate.CardBackground {
+        Zynthian.Card {
             anchors {
                 top: parent.top
                 left: busyWithEngineStuffLabel.left

@@ -28,9 +28,6 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "." as ZComponents
-
-
 GridLayout {
     rows: 2
     columns: 4
@@ -40,7 +37,7 @@ GridLayout {
     property alias sustainController: sustainSlider.controller
     property alias releaseController: releaseSlider.controller
 
-    ZComponents.Card {
+    Card {
         Layout.columnSpan: 4
         implicitWidth: 1
         implicitHeight: 1
@@ -84,25 +81,25 @@ GridLayout {
         }
     }
 
-    ZComponents.SliderController {
+    SliderController {
         id: attackSlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
     }
-    ZComponents.SliderController {
+    SliderController {
         id: decaySlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
     }
-    ZComponents.SliderController {
+    SliderController {
         id: sustainSlider
         implicitWidth: 1
         implicitHeight: 1
         onValueChanged: canvas.requestPaint()
     }
-    ZComponents.SliderController {
+    SliderController {
         id: releaseSlider
         implicitWidth: 1
         implicitHeight: 1

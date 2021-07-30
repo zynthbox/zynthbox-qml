@@ -28,78 +28,78 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
 
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#5"
             index: 2
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#5"
             index: 3
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#6"
             index: 0
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#6"
             index: 1
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#6"
             index: 2
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#6"
             index: 3
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#7"
             index: 0
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#7"
             index: 1
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#7"
             index: 2
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#7"
             index: 3
         }
     }
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#8"
             index: 0
         }
     }
-    ZComponents.AbstractController { // Filler
+    Zynthian.AbstractController { // Filler
         visible: true
     }
 }

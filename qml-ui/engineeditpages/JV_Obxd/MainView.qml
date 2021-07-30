@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 
 GridLayout {
@@ -36,7 +36,7 @@ GridLayout {
     columns: 2
 
     // VoiceCount
-    ZComponents.MultiSwitchController {
+    Zynthian.MultiSwitchController {
         title: qsTr("Voices")
         controller.category: "Obxd#2"
         controller.index: 0
@@ -44,7 +44,7 @@ GridLayout {
         valueLabel: Math.round(multiSwitch.value / (200 / 7)) + 1
     }
     // Octave
-    ZComponents.MultiSwitchController {
+    Zynthian.MultiSwitchController {
         title: qsTr("Transpose")
         controller.category: "Obxd#2"
         controller.index: 2
@@ -55,14 +55,14 @@ GridLayout {
         }
     }
     // Tune
-    ZComponents.DialController {
+    Zynthian.DialController {
         title: qsTr("Tune")
         controller.category: "Obxd#2"
         controller.index: 1
         valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
     }
     // VOLUME
-    ZComponents.SliderController {
+    Zynthian.SliderController {
         title: qsTr("Volume")
         controller.category: "Obxd#1"
         controller.index: 3

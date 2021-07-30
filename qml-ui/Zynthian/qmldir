@@ -1,0 +1,26 @@
+module Zynthian
+
+AbstractController 1.0 AbstractController.qml
+ActionBar 1.0 ActionBar.qml
+ADSRControlView 1.0 ADSRControlView.qml
+Breadcrumb 1.0 Breadcrumb.qml
+BreadcrumbButton 1.0 BreadcrumbButton.qml
+Card 1.0 Card.qml
+ControllerLoader 1.0 ControllerLoader.qml
+DialController 1.0 DialController.qml
+ModalLoadingOverlay 1.0 ModalLoadingOverlay.qml
+MultiSelectorPage 1.0 MultiSelectorPage.qml
+MultiSwitchController 1.0 MultiSwitchController.qml
+NewStuffPage 1.0 NewStuffPage.qml
+Rating 1.0 Rating.qml
+ScreenPage 1.0 ScreenPage.qml
+ScrollableScreenPage 1.0 ScrollableScreenPage.qml
+SelectorDelegate 1.0 SelectorDelegate.qml
+SelectorPage 1.0 SelectorPage.qml
+SelectorView 1.0 SelectorView.qml
+SliderController 1.0 SliderController.qml
+Stack 1.0 Stack.qml
+StatusInfo 1.0 StatusInfo.qml
+SwitchController 1.0 SwitchController.qml
+TabbedControlViewAction 1.0 TabbedControlViewAction.qml
+TabbedControlView 1.0 TabbedControlView.qml

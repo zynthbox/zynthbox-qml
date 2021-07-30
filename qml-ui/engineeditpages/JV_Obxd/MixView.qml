@@ -39,7 +39,7 @@ GridLayout {
             category: "Obxd#11"
             index: 1
         }
-        valueLabel: Math.round(value * 100)
+        valueLabel: Math.round(value / 2)
     }
     // o2mix
     ZComponents.SliderController {
@@ -47,7 +47,7 @@ GridLayout {
             category: "Obxd#11"
             index: 2
         }
-        valueLabel: Math.round(value * 100)
+        valueLabel: Math.round(value / 2)
     }
     // noisemix
     ZComponents.SliderController {
@@ -55,7 +55,7 @@ GridLayout {
             category: "Obxd#11"
             index: 3
         }
-        valueLabel: Math.round(value * 100)
+        valueLabel: Math.round(value / 2)
     }
     ZComponents.AbstractController { // Filler
         visible: true

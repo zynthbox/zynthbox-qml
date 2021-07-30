@@ -60,7 +60,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
-		self.zyngui.screens['layer'].activate_midican_layer(i)
+		self.zyngui.screens['layer'].activate_midichan_layer(i)
 
 
 	def back_action(self):

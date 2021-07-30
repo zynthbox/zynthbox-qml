@@ -44,7 +44,7 @@ QQC2.ToolButton {
             imagePath: "widgets/breadcrumb"
             Component.onCompleted: {
                 if (!buttonSvg.isValid()) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("../img/breadcrumb.svg")
+                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
                 }
             }
         }
@@ -53,7 +53,7 @@ QQC2.ToolButton {
             onThemeChangedProxy: {
                 buttonSvg.imagePath = "widgets/breadcrumb"
                 if (!buttonSvg.isValid()) {
-                    buttonSvg.imagePath = Qt.resolvedUrl("../img/breadcrumb.svg")
+                    buttonSvg.imagePath = Qt.resolvedUrl("./img/breadcrumb.svg")
                 }
             }
         }

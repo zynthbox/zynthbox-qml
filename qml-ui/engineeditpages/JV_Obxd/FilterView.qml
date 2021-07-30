@@ -28,34 +28,34 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "../../components" as ZComponents
+import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
 
     // KeyFollow
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#12"
             index: 0
         }
     }
     // Resonance
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#12"
             index: 1
         }
     }
     // Cutoff
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#12"
             index: 2
         }
     }
     // MultiMode
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#12"
             index: 3
@@ -63,28 +63,28 @@ GridLayout {
     }
 
     // Warm
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#13"
             index: 0
         }
     }
     // FourPole
-    ZComponents.SwitchController {
+    Zynthian.SwitchController {
         controller {
             category: "Obxd#13"
             index: 1
         }
     }
     // Bandpassblend
-    ZComponents.SwitchController {
+    Zynthian.SwitchController {
         controller {
             category: "Obxd#13"
             index: 2
         }
     }
     // Filter env amount
-    ZComponents.DialController {
+    Zynthian.DialController {
         controller {
             category: "Obxd#13"
             index: 3

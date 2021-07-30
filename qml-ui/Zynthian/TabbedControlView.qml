@@ -28,13 +28,13 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "." as ZComponents
+import Zynthian 1.0 as Zynthian
 
 Item {
     id: root
 
     // FIXME: Use Kirigami.PAgePool when frameworks will be recent enough
-    property list<ZComponents.TabbedControlViewAction> tabActions
+    property list<Zynthian.TabbedControlViewAction> tabActions
 
     RowLayout {
         anchors.fill: parent
@@ -73,10 +73,10 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            ZComponents.Stack {
+            Zynthian.Stack {
                 id: internalStack
-                property ZComponents.TabbedControlViewAction activeAction: tabActions[0]
-                property ZComponents.TabbedControlViewAction activeSubAction: tabActions[0].children[0]
+                property Zynthian.TabbedControlViewAction activeAction: tabActions[0]
+                property Zynthian.TabbedControlViewAction activeSubAction: tabActions[0].children[0]
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true

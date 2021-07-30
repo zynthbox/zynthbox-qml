@@ -43,6 +43,8 @@ Card {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
+    Layout.preferredWidth: 1
+    Layout.preferredHeight: 1
     visible: controller.ctrl !== null
 
     property alias control: contentItem.contentItem

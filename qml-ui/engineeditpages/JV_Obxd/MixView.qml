@@ -31,60 +31,34 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../../components" as ZComponents
 
 GridLayout {
-    rows: 2
-    columns: 3
+    columns: 2
 
     // o1mix
     ZComponents.SliderController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#11"
             index: 1
         }
+        valueLabel: Math.round(value * 100)
     }
     // o2mix
     ZComponents.SliderController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#11"
             index: 2
         }
+        valueLabel: Math.round(value * 100)
     }
     // noisemix
     ZComponents.SliderController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#11"
             index: 3
         }
+        valueLabel: Math.round(value * 100)
     }
-    ZComponents.Card {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
+    ZComponents.AbstractController { // Filler
+        visible: true
     }
-    ZComponents.Card {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-    }
-    ZComponents.Card {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-    }
-
 }
 

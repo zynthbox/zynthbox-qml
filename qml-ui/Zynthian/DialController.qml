@@ -83,6 +83,7 @@ AbstractController {
             onPressed: {
                 startY = mouse.y;
                 startValue = dial.value
+                dial.forceActiveFocus()
             }
             onPositionChanged: {
                 let delta = mouse.y - startY;

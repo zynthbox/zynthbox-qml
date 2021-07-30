@@ -62,7 +62,8 @@ class Note(QObject):
     pass
   
   @Slot(None)
-  def on(self):
+  def on(self, velocity:int=64):
+    self.__midi_note_on_msg__.velocity = velocity
     self.__midi_port__.send(self.__midi_note_on_msg__)
 
   @Slot(None)
@@ -136,6 +137,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   __columns__: int = 8
   __starting_note__: int = 36
   __scale__ = 'ionian'
+  __pitch__ = 0
 
   def __init__(self, parent = None):
     super(zynthian_gui_playgrid, self).__init__(parent)
@@ -280,9 +282,23 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
   def highlightPlayingNotes(self, note: Note, highlight: bool):
     self.__model__.highlight_playing_note(note, highlight)
 
+  def get_pitch(self):
+    return self.__pitch__
+
+  @Signal
+  def __pitch_changed__(self):
+    pass
+
+  def set_pitch(self, pitch:int):
+    self.__pitch__ = pitch
+    midi_pitch_message = mido.Message('pitchwheel', channel=0, pitch=self.__pitch__)
+    self.__midi_port__.send(midi_pitch_message)
+    self.__pitch_changed__.emit()
+
   
   rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
   columns = Property(int, __get_columns__, __set_columns__, notify=__columns_changed__)
   startingNote = Property(int, __get_starting_note__, __set_starting_note__, notify=__starting_note_changed__)
   model = Property(QAbstractItemModel, __get_model__, notify=__model_changed__)
   scale = Property(str, __get_scale__, __set_scale__, notify=__scale_changed__)
+  pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)

@@ -378,22 +378,42 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: 32
                         Layout.preferredHeight: 32
                         Layout.alignment: Qt.AlignHCenter
-                        
+
                         icon.name: "arrow-up"
-                        
-                        onClicked: {
-                            
+
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.down = true;
+                                focus = true;
+                                zynthian.playgrid.pitch = 8191;
+                            }
+                            onReleased: {
+                                parent.down = false;
+                                focus = false;
+                                zynthian.playgrid.pitch = 0;
+                            }
                         }
                     }
                     QQC2.Button {
                         Layout.preferredWidth: 32
                         Layout.preferredHeight: 32
                         Layout.alignment: Qt.AlignHCenter
-                        
+
                         icon.name: "arrow-down"
-                        
-                        onClicked: {
-                            
+
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.down = true;
+                                focus = true;
+                                zynthian.playgrid.pitch = -8192;
+                            }
+                            onReleased: {
+                                parent.down = false;
+                                focus = false;
+                                zynthian.playgrid.pitch = 0;
+                            }
                         }
                     }
                 }
@@ -443,8 +463,16 @@ Zynthian.ScreenPage {
                         Repeater {
                             model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
                             delegate: QQC2.Button {
+                                id: playDelegate
                                 property var column: index
                                 property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
+
+                                // Pitch is -8192 to 8191 inclusive
+                                property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
+                                onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
+                                property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
+                                // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                property int velocityValue: pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
@@ -468,29 +496,42 @@ Zynthian.ScreenPage {
                                     }
 
                                     Text {
-                                        anchors.centerIn: parent
+                                        anchors.fill: parent
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
                                         text: {
                                             if (scaleModel.get(comboScale.currentIndex).scale == "major")
-                                                return note.name
+                                                return note.name// + "\nPitch/Mod\n" + zynthian.playgrid.pitch + "/" + playDelegate.modulationValue + "\nVel: " + playDelegate.velocityValue
                                             else
-                                                return note.name + note.octave
+                                                return note.name + note.octave// + "\nPitch/Mod\n" + zynthian.playgrid.pitch + "/" + playDelegate.modulationValue + "\nVel: " + playDelegate.velocityValue
                                         }
                                     }
                                 }
 
                                 MultiPointTouchArea {
                                     anchors.fill: parent
+                                    touchPoints: [
+                                        TouchPoint {
+                                            id: pitchModPoint;
+                                            property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
+                                            property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
+                                        }
+                                    ]
                                     onPressed: {
-                                        parent.down = true;
-                                        focus = true;
-                                        note.on();
-                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                        if (pitchModPoint.pressed) {
+                                            parent.down = true;
+                                            focus = true;
+                                            note.on(playDelegate.velocityValue);
+                                            zynthian.playgrid.highlightPlayingNotes(note, true);
+                                        }
                                     }
                                     onReleased: {
-                                        parent.down = false;
-                                        focus = false;
-                                        note.off();
-                                        zynthian.playgrid.highlightPlayingNotes(note, false);
+                                        if (!pitchModPoint.pressed) {
+                                            parent.down = false;
+                                            focus = false;
+                                            note.off();
+                                            zynthian.playgrid.highlightPlayingNotes(note, false);
+                                        }
                                     }
                                 }
                             }
@@ -501,4 +542,3 @@ Zynthian.ScreenPage {
         }
     }
 }
-            

@@ -33,17 +33,11 @@ import "../../components" as ZComponents
 
 GridLayout {
     id: root
-    visible: false
-    rows: 2
     columns: 2
 
     // VoiceCount
     ZComponents.MultiSwitchController {
         title: qsTr("Voices")
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller.category: "Obxd#2"
         controller.index: 0
         stepSize: Math.round(multiSwitch.to / 7)
@@ -52,10 +46,6 @@ GridLayout {
     // Octave
     ZComponents.MultiSwitchController {
         title: qsTr("Transpose")
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller.category: "Obxd#2"
         controller.index: 2
         stepSize: 50
@@ -67,10 +57,6 @@ GridLayout {
     // Tune
     ZComponents.DialController {
         title: qsTr("Tune")
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller.category: "Obxd#2"
         controller.index: 1
         valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
@@ -78,10 +64,6 @@ GridLayout {
     // VOLUME
     ZComponents.SliderController {
         title: qsTr("Volume")
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller.category: "Obxd#1"
         controller.index: 3
         valueLabel: Math.round(value / 2)

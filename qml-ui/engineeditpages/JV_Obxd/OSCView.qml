@@ -31,148 +31,76 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../../components" as ZComponents
 
 GridLayout {
-    rows: 3
     columns: 4
 
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#8"
             index: 1
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#8"
             index: 3
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#9"
             index: 0
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#9"
             index: 1
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#9"
             index: 2
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#9"
             index: 3
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#10"
             index: 0
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#10"
             index: 1
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#10"
             index: 2
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#10"
             index: 3
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#11"
             index: 0
         }
     }
-    /*ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#11"
-            index: 1
-        }
+    ZComponents.AbstractController { // Filler
+        visible: true
     }
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#11"
-            index: 2
-        }
-    }
-    ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        controller {
-            category: "Obxd#11"
-            index: 3
-        }
-    }*/
 }
 

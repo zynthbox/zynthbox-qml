@@ -31,7 +31,6 @@ import org.kde.kirigami 2.4 as Kirigami
 import "../../components" as ZComponents
 
 GridLayout {
-    rows: 2
     columns: 2
 
     ZComponents.DialController {

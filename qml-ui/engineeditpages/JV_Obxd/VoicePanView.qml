@@ -32,85 +32,51 @@ import "../../components" as ZComponents
 
 GridLayout {
     id: root
-    visible: false
-    rows: 2
     columns: 4
 
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#16"
             index: 3
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#17"
             index: 0
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#17"
             index: 1
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#17"
             index: 2
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#17"
             index: 3
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#18"
             index: 0
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#18"
             index: 1
         }
     }
     ZComponents.DialController {
-        implicitWidth: 1
-        implicitHeight: 1
-        Layout.fillWidth: true
-        Layout.fillHeight: true
         controller {
             category: "Obxd#18"
             index: 2

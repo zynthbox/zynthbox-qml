@@ -66,7 +66,7 @@ Zynthian.ScreenPage {
                 visible: false
                 title: "Settings"
                 modal: true
-                standardButtons: Dialog.Close
+                standardButtons: QQC2.Dialog.Close
                 width: 600
                 height: 400
                 x: root.width / 2 - width / 2

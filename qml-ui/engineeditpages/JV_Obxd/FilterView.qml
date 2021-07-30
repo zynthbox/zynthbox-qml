@@ -42,7 +42,7 @@ GridLayout {
         Layout.fillHeight: true
         controller {
             category: "Obxd#12"
-            index: 1
+            index: 0
         }
     }
     // Resonance
@@ -75,7 +75,7 @@ GridLayout {
         Layout.fillHeight: true
         controller {
             category: "Obxd#12"
-            index: 2
+            index: 3
         }
     }
 

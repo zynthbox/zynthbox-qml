@@ -43,7 +43,7 @@ Item {
             focusedScope.forceActiveFocus()
         }
 
-        switch (cuia) {
+        switch (cuia) { //TODO: figure out rows and columns
         // Eat select actions
         case "SWITCH_SELECT_SHORT":
         case "SWITCH_SELECT_BOLD":
@@ -52,23 +52,23 @@ Item {
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            if (primaryTabsScope.activeFocus) {
+            if (focusedScope === primaryTabsScope) {
                 return false;
             } else {
-                if (internalStack.activeFocus) {
+                if (focusedScope === internalStack) {
                     primaryTabsScope.forceActiveFocus();
                 }
-                return true;
             }
+            return true;
         case "SELECT_UP":
-            if (primaryTabsScope.activeFocus) {
+            if (focusedScope === primaryTabsScope) {
                 var button = nextFocusItemInScope(primaryTabsScope, false);
                 if (button) {
                     button.forceActiveFocus();
                     button.clicked();
                 }
-            } else if (internalStack.activeFocus) {
-                var controller = nextFocusItemInScope(internalStack, true);
+            } else if (focusedScope === internalStack) {
+                var controller = nextFocusItemInScope(internalStack, false);
                 if (controller) {
                     controller.forceActiveFocus();
                 }
@@ -76,13 +76,13 @@ Item {
             return true;
 
         case "SELECT_DOWN":
-            if (primaryTabsScope.activeFocus) {
+            if (focusedScope === primaryTabsScope) {
                 var button = nextFocusItemInScope(primaryTabsScope, true);
                 if (button) {
                     button.forceActiveFocus();
                     button.clicked();
                 }
-            } else if (internalStack.activeFocus) {
+            } else if (focusedScope === internalStack) {
                 var controller = nextFocusItemInScope(internalStack, true);
                 if (controller) {
                     controller.forceActiveFocus();
@@ -91,8 +91,13 @@ Item {
 
             return true;
         case "NEXT_SCREEN":
-            if (primaryTabsScope.activeFocus) {
+            if (focusedScope === primaryTabsScope) {
                 internalStack.forceActiveFocus()
+            } else if (focusedScope === internalStack) {
+                var controller = nextFocusItemInScope(internalStack, true);
+                if (controller) {
+                    controller.forceActiveFocus();
+                }
             }
             return true;
         default:
@@ -169,7 +174,9 @@ Item {
 
                 initialItem: Qt.resolvedUrl(tabActions[0].page)
                 onActiveFocusChanged: {
-                    currentItem.children[0].forceActiveFocus()
+                    if (activeFocus) {
+                        nextItemInFocusChain(true).forceActiveFocus()
+                    }
                 }
             }
             RowLayout {

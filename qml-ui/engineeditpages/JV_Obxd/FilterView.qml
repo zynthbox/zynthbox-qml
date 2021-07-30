@@ -91,7 +91,7 @@ GridLayout {
         }
     }
     // FourPole
-    ZComponents.DialController {
+    ZComponents.SwitchController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true
@@ -102,7 +102,7 @@ GridLayout {
         }
     }
     // Bandpassblend
-    ZComponents.DialController {
+    ZComponents.SwitchController {
         implicitWidth: 1
         implicitHeight: 1
         Layout.fillWidth: true

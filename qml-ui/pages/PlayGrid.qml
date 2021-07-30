@@ -513,9 +513,9 @@ Zynthian.ScreenPage {
                                         verticalAlignment: Text.AlignVCenter
                                         text: {
                                             if (scaleModel.get(comboScale.currentIndex).scale == "major")
-                                                return note.name// + "\nPitch/Mod\n" + zynthian.playgrid.pitch + "/" + playDelegate.modulationValue + "\nVel: " + playDelegate.velocityValue
+                                                return note.name
                                             else
-                                                return note.name + note.octave// + "\nPitch/Mod\n" + zynthian.playgrid.pitch + "/" + playDelegate.modulationValue + "\nVel: " + playDelegate.velocityValue
+                                                return note.name + note.octave
                                         }
                                     }
                                 }
@@ -529,11 +529,13 @@ Zynthian.ScreenPage {
                                             property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
                                         }
                                     ]
+                                    property var playingNote;
                                     onPressed: {
                                         if (pitchModPoint.pressed) {
                                             parent.down = true;
                                             focus = true;
-                                            note.on(playDelegate.velocityValue);
+                                            playingNote = note;
+                                            playingNote.on(playDelegate.velocityValue);
                                             zynthian.playgrid.highlightPlayingNotes(note, true);
                                         }
                                     }
@@ -541,7 +543,7 @@ Zynthian.ScreenPage {
                                         if (!pitchModPoint.pressed) {
                                             parent.down = false;
                                             focus = false;
-                                            note.off();
+                                            playingNote.off();
                                             zynthian.playgrid.pitch = 0
                                             zynthian.playgrid.highlightPlayingNotes(note, false);
                                         }

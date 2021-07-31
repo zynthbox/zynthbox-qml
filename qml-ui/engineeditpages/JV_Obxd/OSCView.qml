@@ -32,72 +32,122 @@ import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
-    
+
+    /* Row 1 */
+
+    // Osc1Pitch
     Zynthian.DialController {
-        controller {
-            category: "Obxd#8"
-            index: 1
-        }
-    }
-    Zynthian.DialController {
+        title: qsTr("OSC1 Tuning")
         controller {
             category: "Obxd#8"
             index: 3
         }
     }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#9"
-            index: 0
-        }
-    }
-    Zynthian.DialController {
+
+
+    // PitchQuant
+    Zynthian.SwitchController {
+        title: qsTr("Step Quantize")
         controller {
             category: "Obxd#9"
             index: 1
         }
     }
+
+    // Osc2HardSync
+    Zynthian.SwitchController {
+        title: qsTr("SYNC")
+        controller {
+            category: "Obxd#8"
+            index: 1
+        }
+    }
+
+    // Osc2Pitch
     Zynthian.DialController {
+        title: qsTr("OSC2 Tuning")
+        controller {
+            category: "Obxd#9"
+            index: 0
+        }
+    }
+
+
+    /* Row 2 */
+
+    // Osc1Saw
+    Zynthian.SwitchController {
+        title: qsTr("OSC1 Saw")
         controller {
             category: "Obxd#9"
             index: 2
         }
     }
+
+    // XMod
     Zynthian.DialController {
+        title: qsTr("Cross Modulation")
+        controller {
+            category: "Obxd#8"
+            index: 2
+        }
+    }
+
+    // Oscillator2detune
+    Zynthian.DialController {
+        title: qsTr("OSC 2 Detune")
+        controller {
+            category: "Obxd#5"
+            index: 1
+        }
+    }
+
+    // Osc2Saw
+    Zynthian.SwitchController {
+        title: qsTr("OSC2 Saw")
+        controller {
+            category: "Obxd#10"
+            index: 0
+        }
+    }
+
+
+    /* Row 3 */
+
+    // Osc1Pulse
+    Zynthian.SwitchController {
+        title: qsTr("OSC1 Pulse")
         controller {
             category: "Obxd#9"
             index: 3
         }
     }
+
+    // PulseWidth
     Zynthian.DialController {
-        controller {
-            category: "Obxd#10"
-            index: 0
-        }
-    }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#10"
-            index: 1
-        }
-    }
-    Zynthian.DialController {
+        title: qsTr("Pulse Width")
         controller {
             category: "Obxd#10"
             index: 2
         }
     }
+
+    // EnvelopeToPitch
     Zynthian.DialController {
+        title: qsTr("Pitch Envelope")
         controller {
             category: "Obxd#11"
             index: 0
         }
     }
-    Zynthian.AbstractController { // Filler
-        visible: true
-    }
-    Zynthian.AbstractController { // Filler
-        visible: true
+
+    // Osc2Pulse
+    Zynthian.SwitchController {
+        title: qsTr("OSC2 Pulse")
+        controller {
+            category: "Obxd#10"
+            index: 1
+        }
     }
 }
 

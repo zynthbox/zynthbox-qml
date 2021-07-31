@@ -32,7 +32,7 @@ import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
-
+    
     Zynthian.DialController {
         controller {
             category: "Obxd#8"
@@ -85,12 +85,6 @@ GridLayout {
         controller {
             category: "Obxd#10"
             index: 2
-        }
-    }
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#10"
-            index: 3
         }
     }
     Zynthian.DialController {
@@ -98,6 +92,9 @@ GridLayout {
             category: "Obxd#11"
             index: 0
         }
+    }
+    Zynthian.AbstractController { // Filler
+        visible: true
     }
     Zynthian.AbstractController { // Filler
         visible: true

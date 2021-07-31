@@ -57,8 +57,13 @@ GridLayout {
         }
         valueLabel: Math.round(value / 2)
     }
-    Zynthian.AbstractController { // Filler
-        visible: true
+    // brightness
+    Zynthian.SliderController {
+        controller {
+            category: "Obxd#10"
+            index: 3
+        }
+        valueLabel: Math.round(value / 2)
     }
 }
 

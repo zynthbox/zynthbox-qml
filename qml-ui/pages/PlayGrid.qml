@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
+    id: component
     screenId: "playgrid"
     leftPadding: 0
     rightPadding: 0
@@ -44,6 +45,53 @@ Zynthian.ScreenPage {
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true
+    }
+
+    ListModel {
+        id: scaleModel
+
+        ListElement { scale: "chromatic"; text: "Chromatic" }
+        ListElement { scale: "ionian"; text: "Ionian (Major)" }
+        ListElement { scale: "dorian"; text: "Dorian" }
+        ListElement { scale: "phrygian"; text: "Phrygian" }
+        ListElement { scale: "lydian"; text: "Lydian" }
+        ListElement { scale: "mixolydian"; text: "Mixolydian" }
+        ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
+        ListElement { scale: "locrian"; text: "Locrian" }
+    }
+    property string currentNoteName: keyModel.getName(zynthian.playgrid.startingNote)
+    ListModel {
+        id: keyModel
+        function getName(note) {
+            for(var i = 0; i < keyModel.rowCount(); ++i) {
+                var le = keyModel.get(i);
+                if (le.note = note) {
+                    return le.text;
+                }
+            }
+            return "C";
+        }
+
+        ListElement { note: 36; text: "C" }
+        ListElement { note: 37; text: "C#" }
+        ListElement { note: 38; text: "D" }
+        ListElement { note: 39; text: "D#" }
+        ListElement { note: 40; text: "E" }
+        ListElement { note: 41; text: "F" }
+        ListElement { note: 42; text: "F#" }
+        ListElement { note: 43; text: "G" }
+        ListElement { note: 44; text: "G#" }
+        ListElement { note: 45; text: "A" }
+        ListElement { note: 46; text: "A#" }
+        ListElement { note: 47; text: "B" }
+    }
+    ListModel {
+        id: gridModel
+
+        ListElement { row: 0; column: 0; text: "Custom" }
+        ListElement { row: 3; column: 3; text: "3x3" }
+        ListElement { row: 4; column: 4; text: "4x4" }
+        ListElement { row: 5; column: 8; text: "5x8" }
     }
 
     RowLayout {
@@ -63,170 +111,177 @@ Zynthian.ScreenPage {
                 visible: false
                 title: "Settings"
                 modal: true
-                standardButtons: QQC2.Dialog.Close
-                width: root.width - Kirigami.Units.largeSpacing * 4
-                height: root.height - Kirigami.Units.largeSpacing * 4
+                width: component.width - Kirigami.Units.largeSpacing * 4
+                height: component.height - Kirigami.Units.largeSpacing * 4
                 x: Kirigami.Units.largeSpacing
                 y: Kirigami.Units.largeSpacing
 
-                Kirigami.FormLayout {
+                footer: Zynthian.ActionBar {
+                    Layout.fillWidth: true
+                    currentPage: Item {
+                        property QtObject backAction: Kirigami.Action {
+                            text: "Back"
+                            onTriggered: {
+                                settingsDialog.visible = false;
+                            }
+                        }
+                        property list<QtObject> contextualActions: [
+                            Kirigami.Action {
+                                text: "Main Settings"
+                                enabled: settingsStack.currentItem ? settingsStack.currentItem.objectName !== "main" : false
+                                onTriggered: {
+                                    settingsStack.replace(mainSettings);
+                                }
+                            },
+                            Kirigami.Action {
+                                text: "Chords"
+                                enabled: settingsStack.currentItem ? settingsStack.currentItem.objectName !== "chords" : false
+                                onTriggered: {
+                                    settingsStack.replace(chordsSettings);
+                                }
+                            }
+                        ]
+                    }
+                }
+
+                QQC2.StackView {
+                    id: settingsStack
                     anchors.fill: parent
-
-                    ListModel {
-                        id: scaleModel
-
-                        ListElement { scale: "chromatic"; text: "Chromatic" }
-                        ListElement { scale: "ionian"; text: "Ionian (Major)" }
-                        ListElement { scale: "dorian"; text: "Dorian" }
-                        ListElement { scale: "phrygian"; text: "Phrygian" }
-                        ListElement { scale: "lydian"; text: "Lydian" }
-                        ListElement { scale: "mixolydian"; text: "Mixolydian" }
-                        ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
-                        ListElement { scale: "locrian"; text: "Locrian" }
-                    }
-
-                    QQC2.ComboBox {
-                        id: comboScale
-                        Kirigami.FormData.label: "Modes"
-                        Layout.fillWidth: true
-                        model: scaleModel
-                        textRole: "text"
-                        displayText: currentText
-                        currentIndex: 1
-
-                        onActivated: {
-                            zynthian.playgrid.startingNote = 36;
-                            zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                    initialItem: mainSettings
+                }
+                Component {
+                    id: chordsSettings
+                    Kirigami.FormLayout {
+                        objectName: "chords"
+                        QQC2.ComboBox {
+                            model: ["beep", "boop"]
                         }
                     }
-
-                    ListModel {
-                        id: keyModel
-
-                        ListElement { note: 36; text: "C" }
-                        ListElement { note: 37; text: "C#" }
-                        ListElement { note: 38; text: "D" }
-                        ListElement { note: 39; text: "D#" }
-                        ListElement { note: 40; text: "E" }
-                        ListElement { note: 41; text: "F" }
-                        ListElement { note: 42; text: "F#" }
-                        ListElement { note: 43; text: "G" }
-                        ListElement { note: 44; text: "G#" }
-                        ListElement { note: 45; text: "A" }
-                        ListElement { note: 46; text: "A#" }
-                        ListElement { note: 47; text: "B" }
-                    }
-                    QQC2.ComboBox {
-                        id: comboKey
+                }
+                Component {
+                    id: mainSettings
+                    Kirigami.FormLayout {
+                        objectName: "main"
                         Layout.fillWidth: true
-                        Kirigami.FormData.label: "Key"
-                        visible: zynthian.playgrid.scale == "chromatic"
-                        model: keyModel
-                        textRole: "text"
-                        displayText: currentText
-                        currentIndex: 0
+                        Layout.fillHeight: true
 
-                        onActivated: {
-                            zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
-                        }
-                    }
+                        QQC2.ComboBox {
+                            id: comboScale
+                            Kirigami.FormData.label: "Modes"
+                            Layout.fillWidth: true
+                            model: scaleModel
+                            textRole: "text"
+                            displayText: currentText
+                            currentIndex: 1
 
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Kirigami.FormData.label: "Transpose"
-                        visible: zynthian.playgrid.scale == "chromatic"
-                        text: "-"
-                        onClicked: {
-                            if (zynthian.playgrid.startingNote - 1 > 0) {
-                                zynthian.playgrid.startingNote--;
-                            } else {
-                                zynthian.playgrid.startingNote = 0;
+                            onActivated: {
+                                zynthian.playgrid.startingNote = 36;
+                                zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
                             }
                         }
-                    }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        visible: zynthian.playgrid.scale == "chromatic"
-                        text: "+"
-                        onClicked: {
-                            zynthian.playgrid.startingNote++;
-                        }
-                    }
+                        QQC2.ComboBox {
+                            id: comboKey
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Key"
+                            visible: zynthian.playgrid.scale == "chromatic"
+                            model: keyModel
+                            textRole: "text"
+                            displayText: currentText
+                            currentIndex: 0
 
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Kirigami.FormData.label: "Octave"
-                        visible: zynthian.playgrid.scale != "chromatic"
-                        text: "-"
-                        onClicked: {
-                            if (zynthian.playgrid.startingNote - 12 > 0) {
-                                zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
-                            } else {
-                                zynthian.playgrid.startingNote = 0;
+                            onActivated: {
+                                zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
                             }
                         }
-                    }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        visible: zynthian.playgrid.scale != "chromatic"
-                        text: "+"
-                        onClicked: {
-                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
-                        }
-                    }
 
-                    ListModel {
-                        id: gridModel
-
-                        ListElement { row: 0; column: 0; text: "Custom" }
-                        ListElement { row: 3; column: 3; text: "3x3" }
-                        ListElement { row: 4; column: 4; text: "4x4" }
-                        ListElement { row: 5; column: 8; text: "5x8" }
-                    }
-                    QQC2.ComboBox {
-                        id: optionGrid
-                        Layout.fillWidth: true
-                        Kirigami.FormData.label: "Grid"
-                        model: gridModel
-                        textRole: "text"
-                        displayText: currentText
-                        currentIndex: 3
-
-                        onActivated: {
-                            var data = gridModel.get(currentIndex)
-
-                            if (data.row === 0 && data.column === 0) {
-                                zynthian.playgrid.rows = customRows.currentText;
-                                zynthian.playgrid.columns = customColumns.currentText;
-                            } else {
-                                zynthian.playgrid.rows = data.row;
-                                zynthian.playgrid.columns = data.column;
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Transpose"
+                            visible: zynthian.playgrid.scale == "chromatic"
+                            text: "-"
+                            onClicked: {
+                                if (zynthian.playgrid.startingNote - 1 > 0) {
+                                    zynthian.playgrid.startingNote--;
+                                } else {
+                                    zynthian.playgrid.startingNote = 0;
+                                }
                             }
                         }
-                    }
-
-                    QQC2.ComboBox {
-                        id: customRows
-                        Layout.fillWidth: true
-                        visible: optionGrid.currentIndex === 0
-                        Kirigami.FormData.label: "Custom Grid Rows"
-                        model: [3,4,5,6,7,8,9]
-                        displayText: currentText
-                        currentIndex: 0
-                        onActivated: {
-                            zynthian.playgrid.rows = currentText;
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            visible: zynthian.playgrid.scale == "chromatic"
+                            text: "+"
+                            onClicked: {
+                                zynthian.playgrid.startingNote++;
+                            }
                         }
-                    }
-                    QQC2.ComboBox {
-                        id: customColumns
-                        Layout.fillWidth: true
-                        visible: optionGrid.currentIndex === 0
-                        Kirigami.FormData.label: "Custom Grid Columns"
-                        model: [3,4,5,6,7,8,9]
-                        displayText: currentText
-                        currentIndex: 0
-                        onActivated: {
-                            zynthian.playgrid.columns = currentText;
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Octave"
+                            visible: zynthian.playgrid.scale != "chromatic"
+                            text: "-"
+                            onClicked: {
+                                if (zynthian.playgrid.startingNote - 12 > 0) {
+                                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                                } else {
+                                    zynthian.playgrid.startingNote = 0;
+                                }
+                            }
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            visible: zynthian.playgrid.scale != "chromatic"
+                            text: "+"
+                            onClicked: {
+                                zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                            }
+                        }
+                        QQC2.ComboBox {
+                            id: optionGrid
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Grid"
+                            model: gridModel
+                            textRole: "text"
+                            displayText: currentText
+                            currentIndex: 3
+
+                            onActivated: {
+                                var data = gridModel.get(currentIndex)
+
+                                if (data.row === 0 && data.column === 0) {
+                                    zynthian.playgrid.rows = customRows.currentText;
+                                    zynthian.playgrid.columns = customColumns.currentText;
+                                } else {
+                                    zynthian.playgrid.rows = data.row;
+                                    zynthian.playgrid.columns = data.column;
+                                }
+                            }
+                        }
+
+                        QQC2.ComboBox {
+                            id: customRows
+                            Layout.fillWidth: true
+                            visible: optionGrid.currentIndex === 0
+                            Kirigami.FormData.label: "Custom Grid Rows"
+                            model: [3,4,5,6,7,8,9]
+                            displayText: currentText
+                            currentIndex: 0
+                            onActivated: {
+                                zynthian.playgrid.rows = currentText;
+                            }
+                        }
+                        QQC2.ComboBox {
+                            id: customColumns
+                            Layout.fillWidth: true
+                            visible: optionGrid.currentIndex === 0
+                            Kirigami.FormData.label: "Custom Grid Columns"
+                            model: [3,4,5,6,7,8,9]
+                            displayText: currentText
+                            currentIndex: 0
+                            onActivated: {
+                                zynthian.playgrid.columns = currentText;
+                            }
                         }
                     }
                 }
@@ -468,8 +523,8 @@ Zynthian.ScreenPage {
                                         if (note.isPlaying) {
                                             return "#8bc34a";
                                         } else {
-                                            if (scaleModel.get(comboScale.currentIndex).scale !== "chromatic" &&
-                                                note.name === keyModel.get(comboKey.currentIndex).text
+                                            if (zynthian.playgrid.scale !== "chromatic" &&
+                                                note.name === component.currentNoteName
                                             )
                                                 return Kirigami.Theme.focusColor
                                             else
@@ -482,7 +537,7 @@ Zynthian.ScreenPage {
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
                                         text: {
-                                            if (scaleModel.get(comboScale.currentIndex).scale == "major")
+                                            if (zynthian.playgrid.scale == "major")
                                                 return note.name
                                             else
                                                 return note.name + note.octave

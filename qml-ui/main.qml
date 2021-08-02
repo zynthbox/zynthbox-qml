@@ -39,6 +39,8 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
     onCurrentPageChanged: zynthian.current_qml_page = currentPage
 
+    property bool headerVisible: true
+
     function showConfirmationDialog() {
         confirmDialog.open()
     }
@@ -50,7 +52,7 @@ Kirigami.AbstractApplicationWindow {
     height: screen.height
 
     header: Zynthian.Breadcrumb {
-        //visible: root.controlsVisible
+        visible: root.headerVisible
         layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
             spacing: 0

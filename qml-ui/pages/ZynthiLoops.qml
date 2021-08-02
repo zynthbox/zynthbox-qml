@@ -38,10 +38,12 @@ Zynthian.ScreenPage {
     bottomPadding: 5
 
     Component.onCompleted: {
-        applicationWindow().controlsVisible = false
+        applicationWindow().controlsVisible = false;
+        applicationWindow().headerVisible = false;
     }
 
     Component.onDestruction: {
-        applicationWindow().controlsVisible = true
+        applicationWindow().controlsVisible = true;
+        applicationWindow().headerVisible = true;
     }
 }

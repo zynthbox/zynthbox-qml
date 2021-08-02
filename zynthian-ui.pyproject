@@ -54,6 +54,7 @@
       "zynqtgui/zynthiloops/__init__.py",
       "zynqtgui/zynthiloops/zynthian_gui_zynthiloops.py",
       "zynqtgui/zynthiloops/zynthiloops_tracks_model.py",
+      "zynqtgui/zynthiloops/zynthiloops_track.py",
 
       "qml-ui/CustomTheme.qml",
       "qml-ui/engineeditpages/JV_MDA_JX10/ADSRView.qml",

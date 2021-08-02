@@ -47,7 +47,12 @@ Zynthian.ScreenPage {
         applicationWindow().headerVisible = true;
     }
 
-    QQC2.Label {
-        text: "Hello"
+    ListView {
+        model: zynthian.zynthiloops.model
+        anchors.fill: parent
+
+        delegate: QQC2.Label {
+            text: name
+        }
     }
 }

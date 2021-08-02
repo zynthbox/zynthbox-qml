@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian PlayGrid: A page to play ntoes with buttons
+# A model to for storing tracks in ZynthiLoops page
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -23,22 +23,10 @@
 #
 # ******************************************************************************
 
-import logging
 
-from . import zynthian_qt_gui_base
+from PySide2.QtCore import QAbstractListModel
 
 
-class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
-    def __init__(self, parent=None):
-        super(zynthian_gui_zynthiloops, self).__init__(parent)
-
-        logging.info("ZynthiLoops Init")
-
-    def show(self):
-        pass
-
-    def zyncoder_read(self):
-        pass
-
-    def refresh_loading(self):
+class zynthiloops_tracks_model(QAbstractListModel):
+    def __init__(self):
         pass

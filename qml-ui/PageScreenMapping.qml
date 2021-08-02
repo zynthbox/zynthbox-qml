@@ -75,6 +75,6 @@ QtObject {
 		"theme_downloader": "ThemeDownloaderPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
         "playgrid": "PlayGrid.qml",
-        "zynthiloops": "ZynthiLoops.qml"
+        "zynthiloops": "ZynthiLoops/main.qml"
 	}
 }

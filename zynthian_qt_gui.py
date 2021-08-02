@@ -113,7 +113,9 @@ from zynqtgui.zynthian_gui_test_touchpoints import (
     zynthian_gui_test_touchpoints,
 )
 from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
-from zynqtgui.zynthian_gui_zynthiloops import zynthian_gui_zynthiloops
+from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
+    zynthian_gui_zynthiloops,
+)
 
 # if "autoeq" in zynthian_gui_config.experimental_features:
 # from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq

@@ -32,6 +32,22 @@ import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
+    
+    // Cutoff
+    Zynthian.DialController {
+        controller {
+            category: "Obxd#12"
+            index: 2
+        }
+    }
+
+    // Resonance
+    Zynthian.DialController {
+        controller {
+            category: "Obxd#12"
+            index: 1
+        }
+    }
 
     // KeyFollow
     Zynthian.DialController {
@@ -40,39 +56,12 @@ GridLayout {
             index: 0
         }
     }
-    // Resonance
+
+    // Filter env amount
     Zynthian.DialController {
         controller {
-            category: "Obxd#12"
-            index: 1
-        }
-    }
-    // Cutoff
-    Zynthian.DialController {
-        controller {
-            category: "Obxd#12"
-            index: 2
-        }
-    }
-    // MultiMode
-    Zynthian.DialController {
-        id:multimodeId
-        title: qsTr("MultiMode")
-        property int filtertypeVal: 0
-        property int lowpassVal: 0
-        controller {
-            category: "Obxd#12"
+            category: "Obxd#13"
             index: 3
-        }
-        Component.onCompleted: {
-            let newTitle;
-            if (lowpassId.ctrlval > 100){
-                newTitle = "24db-6db LowPass";
-            } else {
-                if (filtertypeId.ctrlval < 100) newTitle = "12db Low-Notch-HiPass";
-                else newTitle = "12db Low-Band-HiPass";
-            }
-            title = qsTr(newTitle);
         }
     }
 
@@ -87,6 +76,7 @@ GridLayout {
     // Bandpassblend
     Zynthian.SwitchController {
         id: filtertypeId
+        
         property int ctrlval: controller.ctrl.value
         onCtrlvalChanged: {
             let newTitle;
@@ -98,6 +88,7 @@ GridLayout {
             }
             multimodeId.title = qsTr(newTitle)
         }
+
         title: qsTr("Filtertype")
         controller {
             category: "Obxd#13"
@@ -128,11 +119,25 @@ GridLayout {
         valueLabel: controller.ctrl.value > 100 ? qsTr("24db") : qsTr("12db")
     }
     
-    // Filter env amount
+    // MultiMode
     Zynthian.DialController {
+        id:multimodeId
+        title: qsTr("MultiMode")
+        property int filtertypeVal: 0
+        property int lowpassVal: 0
         controller {
-            category: "Obxd#13"
+            category: "Obxd#12"
             index: 3
+        }
+        Component.onCompleted: {
+            let newTitle;
+            if (lowpassId.ctrlval > 100){
+                newTitle = "24db-6db LowPass";
+            } else {
+                if (filtertypeId.ctrlval < 100) newTitle = "12db Low-Notch-HiPass";
+                else newTitle = "12db Low-Band-HiPass";
+            }
+            title = qsTr(newTitle);
         }
     }
 }

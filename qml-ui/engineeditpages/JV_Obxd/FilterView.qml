@@ -32,12 +32,12 @@ import Zynthian 1.0 as Zynthian
 
 GridLayout {
     columns: 4
-    
+
     // Cutoff
     Zynthian.DialController {
         controller {
             category: "Obxd#12"
-            index: 2
+            index: 1
         }
     }
 
@@ -45,9 +45,10 @@ GridLayout {
     Zynthian.DialController {
         controller {
             category: "Obxd#12"
-            index: 1
+            index: 2
         }
     }
+
 
     // KeyFollow
     Zynthian.DialController {

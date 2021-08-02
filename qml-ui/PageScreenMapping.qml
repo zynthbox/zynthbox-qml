@@ -73,7 +73,8 @@ QtObject {
 		"option": "OptionPage.qml",
 		"theme_chooser": "ThemePage.qml",
 		"theme_downloader": "ThemeDownloaderPage.qml",
-		"test_touchpoints": "TestTouchpoints.qml",
-		"playgrid": "PlayGrid.qml"
+        "test_touchpoints": "TestTouchpoints.qml",
+        "playgrid": "PlayGrid.qml",
+        "zynthiloops": "ZynthiLoops.qml"
 	}
 }

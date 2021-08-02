@@ -69,7 +69,7 @@ GridLayout {
             if (lowpassId.ctrlval > 100){
                 newTitle = "24db-6db LowPass";
             } else {
-                if (filtertypeId.ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                if (filtertypeId.ctrlval < 100) newTitle = "12db Low-Notch-HiPass";
                 else newTitle = "12db Low-Band-HiPass";
             }
             title = qsTr(newTitle);
@@ -93,7 +93,7 @@ GridLayout {
             if (lowpassId.ctrlval > 100){
                 newTitle = "24db-6db LowPass";
             } else {
-                if (ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                if (ctrlval < 100) newTitle = "12db Low-Notch-HiPass";
                 else newTitle = "12db Low-Band-HiPass";
             }
             multimodeId.title = qsTr(newTitle)
@@ -103,7 +103,7 @@ GridLayout {
             category: "Obxd#13"
             index: 1
         }
-        valueLabel: controller.ctrl.value > 100 ? qsTr("Notch") : qsTr("Bandpass")
+        valueLabel: controller.ctrl.value < 100 ? qsTr("Notch") : qsTr("Bandpass")
     }
 
     // FourPole
@@ -116,7 +116,7 @@ GridLayout {
             if (ctrlval > 100){
                 newTitle = "24db-6db LowPass";
             } else {
-                if (filtertypeId.ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                if (filtertypeId.ctrlval < 100) newTitle = "12db Low-Notch-HiPass";
                 else newTitle = "12db Low-Band-HiPass";
             }
             multimodeId.title = qsTr(newTitle)

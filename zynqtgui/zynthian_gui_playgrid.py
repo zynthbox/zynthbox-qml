@@ -294,6 +294,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __set_scale__(self, scale: str):
         self.__scale__ = scale
+        self.__scale_changed__.emit()
         self.__populate_grid__()
 
     @Signal

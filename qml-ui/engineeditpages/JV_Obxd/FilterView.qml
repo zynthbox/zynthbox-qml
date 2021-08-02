@@ -69,20 +69,27 @@ GridLayout {
             index: 0
         }
     }
-    // FourPole
+
+    // Bandpassblend
     Zynthian.SwitchController {
+        title: qsTr("Filtertype")
         controller {
             category: "Obxd#13"
             index: 1
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("Notch") : qsTr("Bandpass")
     }
-    // Bandpassblend
+
+    // FourPole
     Zynthian.SwitchController {
+        title: qsTr("Lowpass")
         controller {
             category: "Obxd#13"
             index: 2
         }
+        valueLabel: controller.ctrl.value > 100 ? qsTr("24db") : qsTr("12db")
     }
+    
     // Filter env amount
     Zynthian.DialController {
         controller {

@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Play Grid Page 
+Play Grid Page
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 
@@ -38,12 +38,16 @@ Zynthian.ScreenPage {
     bottomPadding: 5
 
     Component.onCompleted: {
-        applicationWindow().controlsVisible = false;
+        applicationWindow().controlsVisible = true;
         applicationWindow().headerVisible = false;
     }
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
         applicationWindow().headerVisible = true;
+    }
+
+    QQC2.Label {
+        text: "Hello"
     }
 }

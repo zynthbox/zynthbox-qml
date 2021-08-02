@@ -1,6 +1,7 @@
 {
     "files": [
       "main.py",
+      "zynthian_qt_gui.py",
 
       "zynqtgui/__init__.py",
       "zynqtgui/zynthian_gui_admin.py",
@@ -49,6 +50,7 @@
       "zynqtgui/zynthian_gui_zs3_learn.py",
       "zynqtgui/zynthian_gui_zs3_options.py",
       "zynqtgui/zynthian_gui_zynpad.py",
+      "zynqtgui/zynthian_gui_zynthiloops.py",
       "zynqtgui/zynthian_qt_gui_base.py",
 
       "qml-ui/CustomTheme.qml",
@@ -88,6 +90,7 @@
       "qml-ui/pages/TestTouchpoints.qml",
       "qml-ui/pages/ThemeDownloaderPage.qml",
       "qml-ui/pages/ThemePage.qml",
+      "qml-ui/pages/ZynthiLoops.qml",
       "qml-ui/+Plasma/CustomTheme.qml",
       "qml-ui/ScreensLayer.qml",
       "qml-ui/Zynthian/AbstractController.qml",

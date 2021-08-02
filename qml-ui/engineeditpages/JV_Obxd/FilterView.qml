@@ -56,9 +56,23 @@ GridLayout {
     }
     // MultiMode
     Zynthian.DialController {
+        id:multimodeId
+        title: qsTr("MultiMode")
+        property int filtertypeVal: 0
+        property int lowpassVal: 0
         controller {
             category: "Obxd#12"
             index: 3
+        }
+        Component.onCompleted: {
+            let newTitle;
+            if (lowpassId.ctrlval > 100){
+                newTitle = "24db-6db LowPass";
+            } else {
+                if (filtertypeId.ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                else newTitle = "12db Low-Band-HiPass";
+            }
+            title = qsTr(newTitle);
         }
     }
 
@@ -72,6 +86,18 @@ GridLayout {
 
     // Bandpassblend
     Zynthian.SwitchController {
+        id: filtertypeId
+        property int ctrlval: controller.ctrl.value
+        onCtrlvalChanged: {
+            let newTitle;
+            if (lowpassId.ctrlval > 100){
+                newTitle = "24db-6db LowPass";
+            } else {
+                if (ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                else newTitle = "12db Low-Band-HiPass";
+            }
+            multimodeId.title = qsTr(newTitle)
+        }
         title: qsTr("Filtertype")
         controller {
             category: "Obxd#13"
@@ -82,7 +108,19 @@ GridLayout {
 
     // FourPole
     Zynthian.SwitchController {
+        id: lowpassId
         title: qsTr("Lowpass")
+        property int ctrlval: controller.ctrl.value
+        onCtrlvalChanged: {
+            let newTitle;
+            if (ctrlval > 100){
+                newTitle = "24db-6db LowPass";
+            } else {
+                if (filtertypeId.ctrlval > 100) newTitle = "12db Low-Notch-HiPass";
+                else newTitle = "12db Low-Band-HiPass";
+            }
+            multimodeId.title = qsTr(newTitle)
+        }
         controller {
             category: "Obxd#13"
             index: 2

@@ -113,6 +113,9 @@ from zynqtgui.zynthian_gui_test_touchpoints import (
     zynthian_gui_test_touchpoints,
 )
 from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
+from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
+    zynthian_gui_zynthiloops,
+)
 
 # if "autoeq" in zynthian_gui_config.experimental_features:
 # from zynqtgui.zynthian_gui_autoeq import zynthian_gui_autoeq
@@ -555,6 +558,7 @@ class zynthian_gui(QObject):
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
+        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
         # if "zynseq" in zynthian_gui_config.experimental_features:
@@ -2231,6 +2235,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def playgrid(self):
         return self.screens["playgrid"]
+
+    @Property(QObject, constant=True)
+    def zynthiloops(self):
+        return self.screens["zynthiloops"]
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

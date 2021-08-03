@@ -7,3 +7,4 @@ zynlibs/*/build
 *.qmlc
 *.pyproject.user
 *.pyproject.user*
+.idea

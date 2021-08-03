@@ -63,6 +63,9 @@ class Note(QObject):
         self.__midi_note_off_msg__ = mido.Message(
             "note_off", note=self.__midi_note__
         )
+        self.__midi_notes_on_msgs__ = []
+        self.__midi_notes_off_msgs__ = []
+        self.__subnotes__ = [];
 
     def get_midi_note(self):
         return self.__midi_note__
@@ -81,14 +84,46 @@ class Note(QObject):
     def __is_playing_changed__(self):
         pass
 
+    def get_subnotes(self):
+        return self.__subnotes__
+
+    def set_subnotes(self, subnotes):
+        self.__subnotes__ = subnotes
+        self.__subnotes_changed__.emit()
+        if (len(subnotes) > 0):
+            messages_on = []
+            messages_off = []
+            for i in range(0, len(subnotes)):
+                messages_on.append(mido.Message(
+                    "note_on", note=subnotes[i].__midi_note__
+                ))
+                messages_off.append(mido.Message(
+                    "note_off", note=subnotes[i].__midi_note__
+                ))
+            self.__midi_notes_on_msgs__ = messages_on
+            self.__midi_notes_off_msgs__ = messages_off
+
+    @Signal
+    def __subnotes_changed__(self):
+        pass
+
     @Slot(None)
     def on(self, velocity: int = 64):
-        self.__midi_note_on_msg__.velocity = velocity
-        self.__midi_port__.send(self.__midi_note_on_msg__)
+        if (len(self.__midi_notes_on_msgs__) > 0):
+            for i in range(0, len(self.__midi_notes_on_msgs__)):
+                self.__midi_notes_on_msgs__[i].velocity = velocity
+                self.__midi_port__.send(self.__midi_notes_on_msgs__[i])
+        else:
+            self.__midi_note_on_msg__.velocity = velocity
+            self.__midi_port__.send(self.__midi_note_on_msg__)
 
     @Slot(None)
     def off(self):
-        self.__midi_port__.send(self.__midi_note_off_msg__)
+        if (len(self.__midi_notes_off_msgs__) > 0):
+            for i in range(0, len(self.__midi_notes_off_msgs__)):
+                self.__midi_port__.send(self.__midi_notes_off_msgs__[i])
+        else:
+            self.__midi_port__.send(self.__midi_note_off_msg__)
 
     @Property(str, constant=True)
     def name(self):
@@ -100,6 +135,9 @@ class Note(QObject):
 
     isPlaying = Property(
         bool, get_is_playing, set_is_playing, notify=__is_playing_changed__
+    )
+    subnotes = Property(
+        'QVariantList', get_subnotes, set_subnotes, notify=__subnotes_changed__
     )
 
 
@@ -157,11 +195,31 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __starting_note__: int = 36
     __scale__ = "ionian"
     __pitch__ = 0
+    __chord_model__: QAbstractItemModel = None
+    __chord_rows__ = 5
+
+    __positional_velocity__ = False
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
 
+        self.__chord_scales__ = [
+            "ionian",
+            "chromatic",
+            "phrygian",
+            "aeolian",
+            "locrian"
+        ]
+        self.__chord_scales_starts__ = [
+            36,
+            36,
+            36,
+            36,
+            36
+        ]
+
         self.__model__ = zynthian_gui_grid_notes_model(self)
+        self.__chord_model__ = zynthian_gui_grid_notes_model(self)
 
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
         self.__populate_grid__()
@@ -208,6 +266,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             "aeolian": [2, 1, 2, 2, 1, 2, 2],
             "locrian": [1, 2, 2, 1, 2, 2, 2],
         }
+
+        ##########################################
+        # First we sort out our notes grid
+        ##########################################
         grid_notes = []
 
         # Scale index is the index of the current note in scale from scale_mode_map
@@ -262,8 +324,76 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__model__.set_grid(grid_notes)
         self.__model_changed__.emit()
 
+        ##########################################
+        # Next up, let us sort out out chord rows
+        ##########################################
+        chord_notes = []
+        # Reset our basic selector values
+        scale_index = 0
+
+        for row in range(0, self.__chord_rows__):
+            row_data = []
+            col = self.__chord_scales_starts__[row]
+
+            for i in range(0, 8):
+                # Create a Note object representing a music note for our current cell
+                # This one's a container, and it will contain a series of subnotes which make up the scale
+                note = Note(
+                    name=note_int_to_str_map[col % 12],
+                    scale_index=scale_index,
+                    octave=col // 12,
+                    midi_note=col,
+                    midi_port=self.__midi_port__,
+                    parent=self,
+                )
+                # Now create the subnotes, so we can have us a proper chord
+                subnotes = []
+                for subnote_index in range(0, 3):
+                    subnote_col = col + subnote_index
+                    subnote = Note(
+                        name=note_int_to_str_map[subnote_col % 12],
+                        scale_index=scale_index,
+                        octave=subnote_col // 12,
+                        midi_note=subnote_col,
+                        midi_port=self.__midi_port__,
+                        parent=self,
+                    )
+                    subnotes.append(subnote)
+                note.subnotes = subnotes
+                row_data.append(note)
+
+                # Cycle scale index value to 0 if it reaches the end of scale mode map
+                if scale_index >= len(scale_mode_map[self.__chord_scales__[row]]):
+                    scale_index = 0
+
+                # Calculate the next note value using the scale mode map and scale index
+                col += scale_mode_map[self.__chord_scales__[row]][scale_index]
+                scale_index += 1
+
+            # Prepend the generated row to grid as the grid direction should be bottom to top
+            chord_notes.insert(0, row_data)
+
+            # If scale mode is not chromatic, calculate the next row's starting note
+            if self.__chord_scales__[row] != "chromatic":
+                col = row_data[0].get_midi_note()
+                scale_index = row_data[0].get_scale_index()
+
+                for i in range(0, 3):
+                    col += scale_mode_map[self.__chord_scales__[row]][
+                        scale_index % len(scale_mode_map[self.__chord_scales__[row]])
+                    ]
+                    scale_index = (scale_index + 1) % len(
+                        scale_mode_map[self.__chord_scales__[row]]
+                    )
+
+        self.__chord_model__.set_grid(chord_notes)
+        self.__chord_model_changed__.emit()
+
     def __get_model__(self):
         return self.__model__
+
+    def __get_chord_model__(self):
+        return self.__chord_model__
 
     def __get_rows__(self):
         return self.__rows__
@@ -276,6 +406,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __get_scale__(self):
         return self.__scale__
+
+    def __get_chord_rows__(self):
+        return self.__chord_rows__
+
+    def __get_chord_scales__(self):
+        return self.__chord_scales__
 
     def __set_rows__(self, rows):
         self.__rows__ = rows
@@ -297,6 +433,15 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__scale_changed__.emit()
         self.__populate_grid__()
 
+    def __set_chord_rows__(self, chord_rows):
+        self.__chord_rows__ = chord_rows
+        self.__chord_rows_changed__.emit()
+
+    @Slot(int, int)
+    def setChordScale(self, chord_row: int, scale: int):
+        self.__chord_scales__[chord_row] = scale
+        self.__chord_scales_changed__.emit()
+
     @Signal
     def __rows_changed__(self):
         pass
@@ -311,6 +456,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Signal
     def __model_changed__(self):
+        pass
+
+    @Signal
+    def __chord_model_changed__(self):
+        pass
+
+    @Signal
+    def __chord_rows_changed__(self):
+        pass
+
+    @Signal
+    def __chord_scales_changed__(self):
         pass
 
     @Signal
@@ -336,6 +493,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__midi_port__.send(midi_pitch_message)
         self.__pitch_changed__.emit()
 
+    def get_positional_velocity(self):
+        return self.__positional_velocity__
+
+    def set_positional_velocity(self, positional_velocity: int):
+        self.__positional_velocity__ = positional_velocity
+        self.__positional_velocity_changed__.emit()
+
+    @Signal
+    def __positional_velocity_changed__(self):
+        pass
+
     rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
     columns = Property(
         int, __get_columns__, __set_columns__, notify=__columns_changed__
@@ -352,4 +520,14 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     scale = Property(
         str, __get_scale__, __set_scale__, notify=__scale_changed__
     )
+    chordModel = Property(
+        QAbstractItemModel, __get_chord_model__, notify=__chord_model_changed__
+    )
+    chordRows = Property(
+        int, __set_chord_rows__, __get_chord_rows__, notify=__chord_rows_changed__
+    )
+    chordScales = Property(
+        'QVariantList', __get_chord_scales__, notify=__chord_scales_changed__
+    )
     pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)
+    positionalVelocity = Property(bool, get_positional_velocity, set_positional_velocity, notify=__positional_velocity_changed__)

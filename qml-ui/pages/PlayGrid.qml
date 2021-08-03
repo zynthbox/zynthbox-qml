@@ -154,7 +154,24 @@ Zynthian.ScreenPage {
                     Kirigami.FormLayout {
                         objectName: "chords"
                         QQC2.ComboBox {
-                            model: ["beep", "boop"]
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Number Of Chord Rows"
+                            model: [3, 4, 5]
+                            onAccepted: {
+                                zynthian.playgrid.chordRows = model.get(currentIndex);
+                            }
+                        }
+                        Repeater {
+                            model: zynthian.playgrid.chorsRows
+                            QQC2.ComboBox {
+                                Layout.fillWidth: true
+                                Kirigami.FormData.label: "Scale for row " + (index + 1)
+                                model: scaleModel
+                                currentIndex: zynthian.playgrid.chordScales[index]
+                                onAccepted: {
+                                    zynthian.playgrid.setChordScale(index, currentIndex)
+                                }
+                            }
                         }
                     }
                 }
@@ -281,6 +298,15 @@ Zynthian.ScreenPage {
                             currentIndex: 0
                             onActivated: {
                                 zynthian.playgrid.columns = currentText;
+                            }
+                        }
+                        QQC2.Switch {
+                            id: positionalVelocitySwitch
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Use Tap Position As Velocity"
+                            checked: zynthian.playgrid.positionalVelocity
+                            onClicked: {
+                                zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
                             }
                         }
                     }
@@ -457,6 +483,7 @@ Zynthian.ScreenPage {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 QQC2.Button {
+                    id: settingsButton
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "configure"
@@ -472,106 +499,325 @@ Zynthian.ScreenPage {
                         }
                         color: Kirigami.Theme.backgroundColor
                     }
-                    onClicked: {
-                        settingsDialog.visible = true;
+                    function getYChoice() {
+                        var choice = 0;
+                        if (settingsSlidePoint.pressed) {
+                            choice = Math.floor(settingsSlidePoint.y / settingsButton.width);
+                        }
+                        return choice;
+                    }
+                    function getXChoice() {
+                        var choice = 0;
+                        if (settingsSlidePoint.pressed) {
+                            choice = Math.floor(settingsSlidePoint.x / settingsButton.height);
+                        }
+                        return choice;
+                    }
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
+                        property int xChoice
+                        property int yChoice
+                        property string currentText
+                        function getPositionalText() {
+                            var text = "Do nothing";
+                            var yChoice = settingsButton.getYChoice();
+                            var xChoice = settingsButton.getXChoice();
+                            // We only react to slides when outside the button
+                            if (xChoice === 0 && yChoice !== 0) {
+                                // Sliding upward from the button - switch between slide and not-slide input
+                                switch (yChoice) {
+                                    case -1:
+                                        text = "Use Swipe Input";
+                                        break;
+                                    case -2:
+                                        text = "Disable Swipe Input";
+                                        break;
+                                    default:
+                                        var text = "Do nothing";
+                                        break;
+                                }
+                            } else if (yChoice === 0 && xChoice !== 0) {
+                                // Sliding rightward from the button - switch between grid modes
+                                switch (xChoice) {
+                                    case 1:
+                                        text = "Switch to Note Grid";
+                                        break;
+                                    case 2:
+                                        text = "Switch to Chords Grid";
+                                        break;
+                                    case 3:
+                                        text = "Switch to Drum Pads";
+                                        break;
+                                    default:
+                                        var text = "Do nothing";
+                                        break;
+                                }
+                            } else if (yChoice === 0 && xChoice === 0) {
+                                text = "Show Settings";
+                            }
+                            return text;
+                        }
+                        onPressed: {
+                            if (settingsSlidePoint.pressed) {
+                                xChoice = settingsButton.getXChoice();
+                                yChoice = settingsButton.getYChoice();
+                                parent.down = true;
+                            }
+                        }
+                        onUpdated: {
+                            if (settingsSlidePoint.pressed) {
+                                xChoice = settingsButton.getXChoice();
+                                yChoice = settingsButton.getYChoice();
+                                var positionalText = getPositionalText();
+                                if (positionalText != currentText) {
+                                    applicationWindow().showPassiveNotification(positionalText);
+                                    currentText = positionalText;
+                                }
+                            }
+                        }
+                        onReleased: {
+                            if (!settingsSlidePoint.pressed) {
+                                parent.down = false;
+                                currentText = "";
+                                if (xChoice === 0 && yChoice !== 0) {
+                                    switch (yChoice) {
+                                        case -1:
+                                            // Enable the swipey manipulation on the grids
+                                            break;
+                                        case -2:
+                                            // Disable the swipy manipulation on the grids
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (yChoice === 0 && xChoice !== 0) {
+                                    switch (xChoice) {
+                                        case 1:
+                                            if (playGridStack.currentItem.objectName !== "notesGrid") {
+                                                playGridStack.replace(notesGrid);
+                                            }
+                                            break;
+                                        case 2:
+                                            if (playGridStack.currentItem.objectName !== "chordsGrid") {
+                                                playGridStack.replace(chordsGrid);
+                                            }
+                                            break;
+                                        case 3:
+                                            // No drum pads yet
+                                            applicationWindow().showPassiveNotification("Sorry, no drum pads yet... we'll get to those!");
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (xChoice === 0 && yChoice === 0) {
+                                    // Then it we just had a tap
+                                    settingsDialog.visible = true;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        Rectangle {
+        QQC2.StackView {
+            id: playGridStack
             Layout.fillWidth: true
             Layout.fillHeight: true
+            initialItem: notesGrid
+        }
+    }
+    Component {
+        id: notesGrid
+        ColumnLayout {
+            objectName: "notesGrid"
+            spacing: 0
+            anchors.margins: 5
 
-            color: "transparent"
+            Repeater {
+                model: zynthian.playgrid.model
+                delegate: RowLayout {
+                    property var row: index
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
-                anchors.margins: 5
+                    Layout.margins: 2.5
 
-                Repeater {
-                    model: zynthian.playgrid.model
-                    delegate: RowLayout {
-                        property var row: index
+                    Repeater {
+                        model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
+                        delegate: QQC2.Button {
+                            id: playDelegate
+                            property var column: index
+                            property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
 
-                        Layout.margins: 2.5
+                            // Pitch is -8192 to 8191 inclusive
+                            property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
+                            onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
+                            property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
+                            property int velocityValue: {
+                                if (zynthian.playgrid.positionalVelocity) {
+                                    return 127-pitchModPoint.startY * 127 / height;
+                                } else {
+                                    // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                    return pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
+                                }
+                            }
 
-                        Repeater {
-                            model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
-                            delegate: QQC2.Button {
-                                id: playDelegate
-                                property var column: index
-                                property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
-
-                                // Pitch is -8192 to 8191 inclusive
-                                property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
-                                onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
-                                property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
-                                // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                property int velocityValue: pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
-
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                background: Rectangle {
-                                    radius: 2
-                                    border {
-                                        width: 1
-                                        color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
-                                    }
-                                    color: {
-                                        if (note.isPlaying) {
-                                            return "#8bc34a";
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            background: Rectangle {
+                                radius: 2
+                                border {
+                                    width: 1
+                                    color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
+                                }
+                                color: {
+                                    if (note.isPlaying) {
+                                        return "#8bc34a";
+                                    } else {
+                                        if (zynthian.playgrid.scale !== "chromatic" &&
+                                            note.name === component.currentNoteName
+                                        ) {
+                                            return Kirigami.Theme.focusColor
                                         } else {
-                                            if (zynthian.playgrid.scale !== "chromatic" &&
-                                                note.name === component.currentNoteName
-                                            )
-                                                return Kirigami.Theme.focusColor
-                                            else
-                                                return "white"
-                                        }
-                                    }
-
-                                    Text {
-                                        anchors.fill: parent
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                        text: {
-                                            if (zynthian.playgrid.scale == "major")
-                                                return note.name
-                                            else
-                                                return note.name + note.octave
+                                            return "white"
                                         }
                                     }
                                 }
 
-                                MultiPointTouchArea {
+                                Text {
                                     anchors.fill: parent
-                                    touchPoints: [
-                                        TouchPoint {
-                                            id: pitchModPoint;
-                                            property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
-                                            property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
-                                        }
-                                    ]
-                                    property var playingNote;
-                                    onPressed: {
-                                        if (pitchModPoint.pressed) {
-                                            parent.down = true;
-                                            focus = true;
-                                            playingNote = note;
-                                            playingNote.on(playDelegate.velocityValue);
-                                            zynthian.playgrid.highlightPlayingNotes(note, true);
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: {
+                                        if (zynthian.playgrid.scale == "major") {
+                                            return note.name
+                                        } else {
+                                            return note.name + note.octave
                                         }
                                     }
-                                    onReleased: {
-                                        if (!pitchModPoint.pressed) {
-                                            parent.down = false;
-                                            focus = false;
-                                            playingNote.off();
-                                            zynthian.playgrid.pitch = 0
-                                            zynthian.playgrid.highlightPlayingNotes(note, false);
+                                }
+                            }
+
+                            MultiPointTouchArea {
+                                anchors.fill: parent
+                                touchPoints: [
+                                    TouchPoint {
+                                        id: pitchModPoint;
+                                        property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
+                                        property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
+                                    }
+                                ]
+                                property var playingNote;
+                                onPressed: {
+                                    if (pitchModPoint.pressed) {
+                                        parent.down = true;
+                                        focus = true;
+                                        playingNote = note;
+                                        playingNote.on(playDelegate.velocityValue);
+                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                    }
+                                }
+                                onReleased: {
+                                    if (!pitchModPoint.pressed) {
+                                        parent.down = false;
+                                        focus = false;
+                                        playingNote.off();
+                                        zynthian.playgrid.pitch = 0
+                                        zynthian.playgrid.highlightPlayingNotes(note, false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Component {
+        id: chordsGrid
+        ColumnLayout {
+            objectName: "chordsGrid"
+            spacing: 0
+            anchors.margins: 5
+            Repeater {
+                model: zynthian.playgrid.chordModel
+                delegate: RowLayout {
+                    property var row: index
+                    Layout.margins: 2.5
+                    Repeater {
+                        model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
+                        delegate: QQC2.Button {
+                            id: playDelegate
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            property int velocityValue: {
+                                if (zynthian.playgrid.positionalVelocity) {
+                                    return 127-chordSlidePoint.startY * 127 / height;
+                                } else {
+                                    // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                    return chordSlidePoint.pressure > 0.99999 ? 64 : Math.floor(chordSlidePoint.pressure * 127)
+                                }
+                            }
+                            background: Rectangle {
+                                radius: 2
+                                border {
+                                    width: 1
+                                    color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
+                                }
+                                color: {
+                                    if (note.isPlaying) {
+                                        return "#8bc34a";
+                                    } else {
+                                        if (zynthian.playgrid.scale !== "chromatic" &&
+                                            note.name === component.currentNoteName
+                                        ) {
+                                            return Kirigami.Theme.focusColor
+                                        } else {
+                                            return "white"
                                         }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.fill: parent
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: {
+                                        var text = "";
+                                        for (var i = 0; i < note.subnotes.length; ++i) {
+                                            text += " " + note.subnotes[i].name
+                                        }
+                                        return text;
+                                    }
+                                }
+                            }
+
+                            MultiPointTouchArea {
+                                anchors.fill: parent
+                                touchPoints: [
+                                    TouchPoint {
+                                        id: chordSlidePoint;
+                                        property double slideX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
+                                        property double slideY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
+                                    }
+                                ]
+                                property var playingNote;
+                                onPressed: {
+                                    if (chordSlidePoint.pressed) {
+                                        parent.down = true;
+                                        focus = true;
+                                        playingNote = note;
+                                        playingNote.on(playDelegate.velocityValue);
+                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                    }
+                                }
+                                onReleased: {
+                                    if (!chordSlidePoint.pressed) {
+                                        parent.down = false;
+                                        focus = false;
+                                        playingNote.off();
+                                        zynthian.playgrid.pitch = 0
+                                        zynthian.playgrid.highlightPlayingNotes(note, false);
                                     }
                                 }
                             }

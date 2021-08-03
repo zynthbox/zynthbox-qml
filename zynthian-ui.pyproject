@@ -1,6 +1,7 @@
 {
     "files": [
       "main.py",
+      "zynthian_qt_gui.py",
 
       "zynqtgui/__init__.py",
       "zynqtgui/zynthian_gui_admin.py",
@@ -50,6 +51,10 @@
       "zynqtgui/zynthian_gui_zs3_options.py",
       "zynqtgui/zynthian_gui_zynpad.py",
       "zynqtgui/zynthian_qt_gui_base.py",
+      "zynqtgui/zynthiloops/__init__.py",
+      "zynqtgui/zynthiloops/zynthian_gui_zynthiloops.py",
+      "zynqtgui/zynthiloops/zynthiloops_tracks_model.py",
+      "zynqtgui/zynthiloops/zynthiloops_track.py",
 
       "qml-ui/CustomTheme.qml",
       "qml-ui/engineeditpages/JV_MDA_JX10/ADSRView.qml",
@@ -88,6 +93,10 @@
       "qml-ui/pages/TestTouchpoints.qml",
       "qml-ui/pages/ThemeDownloaderPage.qml",
       "qml-ui/pages/ThemePage.qml",
+      "qml-ui/pages/ZynthiLoops/main.qml",
+      "qml-ui/pages/ZynthiLoops/Sidebar.qml",
+      "qml-ui/pages/ZynthiLoops/SidebarButton.qml",
+      "qml-ui/pages/ZynthiLoops/TableHeaderLabel.qml",
       "qml-ui/+Plasma/CustomTheme.qml",
       "qml-ui/ScreensLayer.qml",
       "qml-ui/Zynthian/AbstractController.qml",

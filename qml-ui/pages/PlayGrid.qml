@@ -283,6 +283,15 @@ Zynthian.ScreenPage {
                                 zynthian.playgrid.columns = currentText;
                             }
                         }
+                        QQC2.Switch {
+                            id: positionalVelocitySwitch
+                            Layout.fillWidth: true
+                            Kirigami.FormData.label: "Use Tap Position As Velocity"
+                            checked: zynthian.playgrid.positionalVelocity
+                            onClicked: {
+                                zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
+                            }
+                        }
                     }
                 }
             }
@@ -508,8 +517,14 @@ Zynthian.ScreenPage {
                                 property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
                                 onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
                                 property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
-                                // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                property int velocityValue: pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
+                                property int velocityValue: {
+                                    if (zynthian.playgrid.positionalVelocity) {
+                                        return 127-pitchModPoint.startY * 127 / height;
+                                    } else {
+                                        // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                        return pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
+                                    }
+                                }
 
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true

@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     screenId: "zynthiloops"
@@ -36,6 +36,13 @@ Zynthian.ScreenPage {
     rightPadding: 0
     topPadding: 5
     bottomPadding: 5
+
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Add Track")
+            onTriggered: zynthian.zynthiloops.addTrack()
+        }
+    ]
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
@@ -47,12 +54,95 @@ Zynthian.ScreenPage {
         applicationWindow().headerVisible = true;
     }
 
-    ListView {
-        model: zynthian.zynthiloops.model
+    RowLayout {
         anchors.fill: parent
+        spacing: 8
 
-        delegate: QQC2.Label {
-            text: name
+        ColumnLayout {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+
+            // HEADER ROW
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 50
+                Layout.maximumHeight: Layout.preferredHeight
+
+                Rectangle {
+                    Layout.preferredWidth: 80
+                    Layout.maximumWidth: Layout.preferredWidth
+                    Layout.fillHeight: true
+
+                    color: Kirigami.Theme.backgroundColor
+
+                    TableHeaderLabel {
+                        text: "Song 1"
+                    }
+                }
+
+                Repeater {
+                    model: zynthian.zynthiloops.partsCount
+
+                    delegate: Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        color: Kirigami.Theme.backgroundColor
+
+                        TableHeaderLabel {
+                            text: "Part " + modelData
+                        }
+                    }
+                }
+            }
+            // END HEADER ROW
+
+            // TRACK ROWS
+            Repeater {
+                model: zynthian.zynthiloops.model
+
+                delegate: RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 50
+                    Layout.maximumHeight: Layout.preferredHeight
+
+                    Rectangle {
+                        Layout.preferredWidth: 80
+                        Layout.maximumWidth: Layout.preferredWidth
+                        Layout.fillHeight: true
+
+                        color: Kirigami.Theme.backgroundColor
+
+                        TableHeaderLabel {
+                            text: "Track " + modelData
+                        }
+                    }
+
+                    Repeater {
+                        model: zynthian.zynthiloops.partsCount
+
+                        delegate: Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            color: "#444"
+                        }
+                    }
+                }
+            }
+            // END TRACK ROWS
+        }
+
+        Kirigami.Separator {
+            Layout.preferredWidth: 2
+            Layout.fillHeight: true
+        }
+
+        Sidebar {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 80
+            Layout.maximumWidth: Layout.preferredWidth
         }
     }
 }

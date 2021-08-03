@@ -22,7 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from .zynthiloops_track import ZynthiLoopsTrack
 from .zynthiloops_tracks_model import ZynthiLoopsTracksModel
@@ -31,15 +31,12 @@ from .. import zynthian_qt_gui_base
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     __track_counter__ = 0
+    __parts_count__ = 16
 
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
 
         self.__model__ = ZynthiLoopsTracksModel()
-
-        self.__model__.add_track(ZynthiLoopsTrack(0))
-        self.__model__.add_track(ZynthiLoopsTrack(1))
-        self.__model__.add_track(ZynthiLoopsTrack(2))
 
     def show(self):
         pass
@@ -57,4 +54,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __model_changed__(self):
         pass
 
-    model = Property(QObject, __get_model__, notify=__model_changed__)
+    @Property(QObject, notify=__model_changed__)
+    def model(self):
+        return self.__model__
+
+    @Property(int, constant=True)
+    def partsCount(self):
+        return self.__parts_count__
+
+    @Slot(None)
+    def addTrack(self):
+        self.__track_counter__ += 1
+        self.__model__.add_track(ZynthiLoopsTrack(self.__track_counter__))
+
+    # @partsCount.setter
+    # def __parts_setter__(self, parts_count):
+    #     self.__parts_count__ = parts_count

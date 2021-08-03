@@ -57,12 +57,8 @@ class Note(QObject):
         self.__is_playing__ = False
         self.__midi_note__ = midi_note
         self.__midi_port__ = midi_port
-        self.__midi_note_on_msg__ = mido.Message(
-            "note_on", note=self.__midi_note__
-        )
-        self.__midi_note_off_msg__ = mido.Message(
-            "note_off", note=self.__midi_note__
-        )
+        self.__midi_note_on_msg__ = mido.Message("note_on", note=self.__midi_note__)
+        self.__midi_note_off_msg__ = mido.Message("note_off", note=self.__midi_note__)
 
     def get_midi_note(self):
         return self.__midi_note__
@@ -138,9 +134,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def set_grid(self, grid):
         self.__grid_notes__ = grid
 
-    def highlight_playing_note(
-        self, playingNote: Note, highlight: bool = True
-    ):
+    def highlight_playing_note(self, playingNote: Note, highlight: bool = True):
         for row in self.__grid_notes__:
             for note in row:
                 if note.get_midi_note() == playingNote.get_midi_note():
@@ -329,9 +323,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def set_pitch(self, pitch: int):
         self.__pitch__ = pitch
-        midi_pitch_message = mido.Message(
-            "pitchwheel", channel=0, pitch=self.__pitch__
-        )
+        midi_pitch_message = mido.Message("pitchwheel", channel=0, pitch=self.__pitch__)
         self.__midi_port__.send(midi_pitch_message)
         self.__pitch_changed__.emit()
 
@@ -345,10 +337,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         __set_starting_note__,
         notify=__starting_note_changed__,
     )
-    model = Property(
-        QAbstractItemModel, __get_model__, notify=__model_changed__
-    )
-    scale = Property(
-        str, __get_scale__, __set_scale__, notify=__scale_changed__
-    )
+    model = Property(QAbstractItemModel, __get_model__, notify=__model_changed__)
+    scale = Property(str, __get_scale__, __set_scale__, notify=__scale_changed__)
     pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)

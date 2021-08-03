@@ -158,6 +158,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __scale__ = "ionian"
     __pitch__ = 0
 
+    __positional_velocity__ = False
+
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
 
@@ -336,6 +338,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__midi_port__.send(midi_pitch_message)
         self.__pitch_changed__.emit()
 
+    def get_positional_velocity(self):
+        return self.__positional_velocity__
+
+    def set_positional_velocity(self, positional_velocity: int):
+        self.__positional_velocity__ = positional_velocity
+        self.__positional_velocity_changed__.emit()
+
+    @Signal
+    def __positional_velocity_changed__(self):
+        pass
+
     rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
     columns = Property(
         int, __get_columns__, __set_columns__, notify=__columns_changed__
@@ -353,3 +366,4 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         str, __get_scale__, __set_scale__, notify=__scale_changed__
     )
     pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)
+    positionalVelocity = Property(bool, get_positional_velocity, set_positional_velocity, notify=__positional_velocity_changed__)

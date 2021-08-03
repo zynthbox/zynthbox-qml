@@ -38,4 +38,4 @@ class ZynthiLoopsTrack(QObject):
 
     @Property(str, constant=True)
     def name(self):
-        return f"Track #{self.__id__}"
+        return f"Track {self.__id__}"

@@ -41,7 +41,7 @@ class ZynthiLoopsTracksModel(QAbstractListModel):
         if not index.isValid():
             return None
 
-        if index.row() >= len(self.__tracks__):
+        if index.row() > len(self.__tracks__):
             return None
 
         if role == self.IdRole:

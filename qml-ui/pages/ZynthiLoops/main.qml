@@ -68,6 +68,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 50
                 Layout.maximumHeight: Layout.preferredHeight
+                spacing: 1
 
                 Rectangle {
                     Layout.preferredWidth: 80
@@ -99,34 +100,65 @@ Zynthian.ScreenPage {
             // END HEADER ROW
 
             // TRACK ROWS
-            Repeater {
-                model: zynthian.zynthiloops.model
+            Kirigami.ScrollablePage {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                delegate: RowLayout {
+                padding: 0
+                leftPadding: 0
+                rightPadding: 0
+                topPadding: 0
+                bottomPadding: 0
+
+                verticalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+
+                ColumnLayout {
+                    Layout.fillHeight: true
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 50
-                    Layout.maximumHeight: Layout.preferredHeight
-
-                    Rectangle {
-                        Layout.preferredWidth: 80
-                        Layout.maximumWidth: Layout.preferredWidth
-                        Layout.fillHeight: true
-
-                        color: Kirigami.Theme.backgroundColor
-
-                        TableHeaderLabel {
-                            text: "Track " + modelData
-                        }
-                    }
+                    spacing: 0
 
                     Repeater {
-                        model: zynthian.zynthiloops.partsCount
+                        model: zynthian.zynthiloops.model
 
-                        delegate: Rectangle {
+                        delegate: RowLayout {
+                            property var track: model
+
                             Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            Layout.preferredHeight: 50
+                            Layout.maximumHeight: Layout.preferredHeight
+                            Layout.bottomMargin: 1
+                            spacing: 1
 
-                            color: "#444"
+                            Rectangle {
+                                Layout.preferredWidth: 80
+                                Layout.maximumWidth: Layout.preferredWidth
+                                Layout.fillHeight: true
+
+                                color: Kirigami.Theme.backgroundColor
+
+                                TableHeaderLabel {
+                                    text: track.name
+                                }
+
+                                MultiPointTouchArea {
+                                    anchors.fill: parent
+
+                                    onPressed: {
+                                        console.log(track);
+                                    }
+                                }
+                            }
+
+                            Repeater {
+                                model: zynthian.zynthiloops.partsCount
+
+                                delegate: Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+
+                                    color: "#444"
+                                }
+                            }
                         }
                     }
                 }

@@ -174,7 +174,9 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         return QModelIndex()
 
     def set_grid(self, grid):
+        self.beginResetModel()
         self.__grid_notes__ = grid
+        self.endResetModel()
 
     def highlight_playing_note(
         self, playingNote: Note, highlight: bool = True
@@ -208,7 +210,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             "dorian",
             "phrygian",
             "aeolian",
-            "locrian"
+            "chromatic"
         ]
         self.__chord_scales_starts__ = [
             60,
@@ -338,7 +340,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             row_scale = scale_mode_map[self.__chord_scales__[row]]
             col = self.__chord_scales_starts__[row]
 
-            for i in range(0, 8):
+            for i in range(0, len(row_scale)):
                 # Create a Note object representing a music note for our current cell
                 # This one's a container, and it will contain a series of subnotes which make up the scale
                 note = Note(
@@ -431,11 +433,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __set_chord_rows__(self, chord_rows):
         self.__chord_rows__ = chord_rows
         self.__chord_rows_changed__.emit()
+        self.__populate_grid__()
 
-    @Slot(int, int)
-    def setChordScale(self, chord_row: int, scale: int):
+    @Slot(int, str)
+    def setChordScale(self, chord_row: int, scale: str):
         self.__chord_scales__[chord_row] = scale
         self.__chord_scales_changed__.emit()
+        self.__populate_grid__()
 
     @Signal
     def __rows_changed__(self):
@@ -519,7 +523,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         QAbstractItemModel, __get_chord_model__, notify=__chord_model_changed__
     )
     chordRows = Property(
-        int, __set_chord_rows__, __get_chord_rows__, notify=__chord_rows_changed__
+        int, __get_chord_rows__, __set_chord_rows__, notify=__chord_rows_changed__
     )
     chordScales = Property(
         'QVariantList', __get_chord_scales__, notify=__chord_scales_changed__

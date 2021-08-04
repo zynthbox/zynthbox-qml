@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Play Grid Page
+Zynthian Loopgrid Page
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 

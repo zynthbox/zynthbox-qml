@@ -47,7 +47,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data.append((self.layers, 0, "Layers"))
         #if "zynseq" in zynthian_gui_config.experimental_features:
             # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
-        self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
+        # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
         self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
         self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
         self.list_data.append((self.playgrid, 0, "Play Grid"))
@@ -63,7 +63,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
         self.list_data.append((None, 0, ""))
-        self.list_data.append((self.admin, 0, "Admin"))
+        self.list_data.append((self.admin, 0, "Settings"))
 
         super().fill_list()
 

@@ -46,12 +46,12 @@ Zynthian.ScreenPage {
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
-        applicationWindow().headerVisible = false;
+//        applicationWindow().headerVisible = false;
     }
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
-        applicationWindow().headerVisible = true;
+//        applicationWindow().headerVisible = true;
     }
 
     RowLayout {

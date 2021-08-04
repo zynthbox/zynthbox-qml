@@ -4,8 +4,17 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 ColumnLayout {
+    enum ControlType {
+        Song,
+        Clip,
+        Track,
+        Part,
+        None
+    }
+
     property alias heading: heading.text
     property alias bpm: bpmDial.value
+    property int controlType: Sidebar.ControlType.None
 
     spacing: 8
 
@@ -19,6 +28,7 @@ ColumnLayout {
 
     QQC2.Dial {
         id: bpmDial
+        visible: controlType === Sidebar.ControlType.Song
 
         Layout.preferredWidth: 80
         Layout.preferredHeight: 80
@@ -70,6 +80,7 @@ ColumnLayout {
     TableHeaderLabel {
         Layout.alignment: Qt.AlignHCenter
         text: "BPM"
+        visible: controlType === Sidebar.ControlType.Song
     }
 
     Kirigami.Separator {
@@ -80,9 +91,11 @@ ColumnLayout {
 
     SidebarButton {
         icon.name: "media-playback-start"
+        visible: controlType === Sidebar.ControlType.Track
     }
 
     SidebarButton {
         icon.name: "media-playback-stop"
+        visible: controlType === Sidebar.ControlType.Track
     }
 }

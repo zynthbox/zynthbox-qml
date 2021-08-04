@@ -83,15 +83,14 @@ Zynthian.ScreenPage {
                     Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true
 
+                    border.width: focus ? 1 : 0
+                    border.color: Kirigami.Theme.highlightColor
+
                     color: Kirigami.Theme.backgroundColor
 
-                    ColumnLayout {
-                        anchors.centerIn: parent
-
-                        TableHeaderLabel {
-                            text: "Song 1"
-                            text2: "BPM: " + sidebar.bpm
-                        }
+                    TableHeaderLabel {
+                        text: "Song 1"
+                        text2: "BPM: " + sidebar.bpm
                     }
 
                     MultiPointTouchArea {
@@ -99,6 +98,7 @@ Zynthian.ScreenPage {
                         onPressed: {
                             parent.focus = true;
                             sidebar.heading = "Song 1";
+                            sidebar.controlType = Sidebar.ControlType.Song
                         }
                     }
                 }
@@ -136,6 +136,7 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 parent.focus = true;
                                 sidebar.heading = "Part " + (modelData + 1);
+                                sidebar.controlType = Sidebar.ControlType.Part
                             }
                         }
                     }
@@ -184,6 +185,7 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 parent.focus = true;
                                 sidebar.heading = track.name;
+                                sidebar.controlType = Sidebar.ControlType.Track
                             }
                         }
                     }
@@ -240,6 +242,7 @@ Zynthian.ScreenPage {
                                         onPressed: {
                                             parent.focus = true;
                                             sidebar.heading = "Clip " + (rowIndex * zynthian.zynthiloops.partsCount + colIndex + 1);
+                                            sidebar.controlType = Sidebar.ControlType.Clip
                                         }
                                     }
                                 }

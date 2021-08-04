@@ -157,12 +157,17 @@ Zynthian.ScreenPage {
                             Layout.fillWidth: true
                             Kirigami.FormData.label: "Number Of Chord Rows"
                             model: [3, 4, 5]
+                            currentIndex: {
+                                for (var i = 0; i < count; ++i) {
+                                    zynthian.playgrid.chordRows === currentValue
+                                }
+                            }
                             onAccepted: {
                                 zynthian.playgrid.chordRows = model.get(currentIndex);
                             }
                         }
                         Repeater {
-                            model: zynthian.playgrid.chorsRows
+                            model: zynthian.playgrid.chordRows
                             QQC2.ComboBox {
                                 Layout.fillWidth: true
                                 Kirigami.FormData.label: "Scale for row " + (index + 1)
@@ -171,6 +176,10 @@ Zynthian.ScreenPage {
                                 onAccepted: {
                                     zynthian.playgrid.setChordScale(index, currentIndex)
                                 }
+                            }
+                            QQC2.ComboBox {
+                                Layout.fillWidth: true
+                                Kirigami.FormData.label: ""
                             }
                         }
                     }
@@ -744,19 +753,13 @@ Zynthian.ScreenPage {
                     property var row: index
                     Layout.margins: 2.5
                     Repeater {
-                        model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
+                        model: zynthian.playgrid.chordModel.columnCount(zynthian.playgrid.chordModel.index(index, 0))
                         delegate: QQC2.Button {
                             id: playDelegate
+                            property var column: index
+                            property var note: zynthian.playgrid.chordModel.data(zynthian.playgrid.chordModel.index(row, column), zynthian.playgrid.chordModel.roles['note'])
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            property int velocityValue: {
-                                if (zynthian.playgrid.positionalVelocity) {
-                                    return 127-chordSlidePoint.startY * 127 / height;
-                                } else {
-                                    // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                    return chordSlidePoint.pressure > 0.99999 ? 64 : Math.floor(chordSlidePoint.pressure * 127)
-                                }
-                            }
                             background: Rectangle {
                                 radius: 2
                                 border {
@@ -784,7 +787,7 @@ Zynthian.ScreenPage {
                                     text: {
                                         var text = "";
                                         for (var i = 0; i < note.subnotes.length; ++i) {
-                                            text += " " + note.subnotes[i].name
+                                            text += " " + note.subnotes[i].name + note.subnotes[i].octave
                                         }
                                         return text;
                                     }
@@ -803,10 +806,17 @@ Zynthian.ScreenPage {
                                 property var playingNote;
                                 onPressed: {
                                     if (chordSlidePoint.pressed) {
+                                        var velocityValue = 64;
+                                        if (zynthian.playgrid.positionalVelocity) {
+                                            velocityValue = 127 - Math.floor(chordSlidePoint.y * 127 / height);
+                                        } else {
+                                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                            velocityValue = chordSlidePoint.pressure > 0.99999 ? 64 : Math.floor(chordSlidePoint.pressure * 127);
+                                        }
                                         parent.down = true;
                                         focus = true;
                                         playingNote = note;
-                                        playingNote.on(playDelegate.velocityValue);
+                                        playingNote.on(velocityValue);
                                         zynthian.playgrid.highlightPlayingNotes(note, true);
                                     }
                                 }

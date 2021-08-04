@@ -92,10 +92,19 @@ ColumnLayout {
     SidebarButton {
         icon.name: "media-playback-start"
         visible: controlType === Sidebar.ControlType.Track
+
+        onClicked: {
+            console.log("Playing Sound Loop")
+            zynthian.zynthiloops.playWav()
+        }
     }
 
     SidebarButton {
         icon.name: "media-playback-stop"
         visible: controlType === Sidebar.ControlType.Track
+
+        onClicked: {
+            console.log("Stopping Sound Loop")
+        }
     }
 }

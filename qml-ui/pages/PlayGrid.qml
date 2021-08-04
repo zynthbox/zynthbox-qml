@@ -159,11 +159,13 @@ Zynthian.ScreenPage {
                             model: [3, 4, 5]
                             currentIndex: {
                                 for (var i = 0; i < count; ++i) {
-                                    zynthian.playgrid.chordRows === currentValue
+                                    if (zynthian.playgrid.chordRows === model[i]) {
+                                        return i;
+                                    }
                                 }
                             }
-                            onAccepted: {
-                                zynthian.playgrid.chordRows = model.get(currentIndex);
+                            onActivated: {
+                                zynthian.playgrid.chordRows = model[currentIndex];
                             }
                         }
                         Repeater {
@@ -171,15 +173,22 @@ Zynthian.ScreenPage {
                             QQC2.ComboBox {
                                 Layout.fillWidth: true
                                 Kirigami.FormData.label: "Scale for row " + (index + 1)
+                                property int repeaterIndex: index
                                 model: scaleModel
-                                currentIndex: zynthian.playgrid.chordScales[index]
-                                onAccepted: {
-                                    zynthian.playgrid.setChordScale(index, currentIndex)
+                                textRole: "text"
+                                displayText: currentText
+                                currentIndex: {
+                                    var theScale = zynthian.playgrid.chordScales[repeaterIndex];
+                                    for (var i = 0; i < count; ++i) {
+                                        if (scaleModel.get(i).scale === theScale) {
+                                            return i;
+                                        }
+                                    }
+                                    return 0;
                                 }
-                            }
-                            QQC2.ComboBox {
-                                Layout.fillWidth: true
-                                Kirigami.FormData.label: ""
+                                onActivated: {
+                                    zynthian.playgrid.setChordScale(repeaterIndex, scaleModel.get(currentIndex).scale);
+                                }
                             }
                         }
                     }
@@ -672,17 +681,21 @@ Zynthian.ScreenPage {
                                     color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
                                 }
                                 color: {
-                                    if (note.isPlaying) {
-                                        return "#8bc34a";
-                                    } else {
-                                        if (zynthian.playgrid.scale !== "chromatic" &&
-                                            note.name === component.currentNoteName
-                                        ) {
-                                            return Kirigami.Theme.focusColor
+                                    var color = "white";
+                                    if (note) {
+                                        if (note.isPlaying) {
+                                            color = "#8bc34a";
                                         } else {
-                                            return "white"
+                                            if (zynthian.playgrid.scale !== "chromatic" &&
+                                                note.name === component.currentNoteName
+                                            ) {
+                                                color = Kirigami.Theme.focusColor;
+                                            } else {
+                                                color = "white";
+                                            }
                                         }
                                     }
+                                    return color;
                                 }
 
                                 Text {
@@ -690,11 +703,15 @@ Zynthian.ScreenPage {
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                     text: {
-                                        if (zynthian.playgrid.scale == "major") {
-                                            return note.name
-                                        } else {
-                                            return note.name + note.octave
+                                        var text = "";
+                                        if (note) {
+                                            if (zynthian.playgrid.scale == "major") {
+                                                text = note.name
+                                            } else {
+                                                text = note.name + note.octave
+                                            }
                                         }
+                                        return text;
                                     }
                                 }
                             }
@@ -767,27 +784,34 @@ Zynthian.ScreenPage {
                                     color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
                                 }
                                 color: {
-                                    if (note.isPlaying) {
-                                        return "#8bc34a";
-                                    } else {
-                                        if (zynthian.playgrid.scale !== "chromatic" &&
-                                            note.name === component.currentNoteName
-                                        ) {
-                                            return Kirigami.Theme.focusColor
+                                    var color = "white";
+                                    if (note) {
+                                        if (note.isPlaying) {
+                                            color = "#8bc34a";
                                         } else {
-                                            return "white"
+                                            if (zynthian.playgrid.scale !== "chromatic" &&
+                                                note.name === component.currentNoteName
+                                            ) {
+                                                color = Kirigami.Theme.focusColor;
+                                            } else {
+                                                color = "white";
+                                            }
                                         }
                                     }
+                                    return color;
                                 }
 
                                 Text {
                                     anchors.fill: parent
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
+                                    wrapMode: Text.Wrap
                                     text: {
                                         var text = "";
-                                        for (var i = 0; i < note.subnotes.length; ++i) {
-                                            text += " " + note.subnotes[i].name + note.subnotes[i].octave
+                                        if (note) {
+                                            for (var i = 0; i < note.subnotes.length; ++i) {
+                                                text += " " + note.subnotes[i].name + note.subnotes[i].octave
+                                            }
                                         }
                                         return text;
                                     }

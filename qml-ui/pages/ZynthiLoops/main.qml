@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Play Grid Page
+Zynthian Loopgrid Page
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 
@@ -46,12 +46,21 @@ Zynthian.ScreenPage {
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
-        applicationWindow().headerVisible = false;
+//        applicationWindow().headerVisible = false;
     }
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
-        applicationWindow().headerVisible = true;
+//        applicationWindow().headerVisible = true;
+    }
+
+    QtObject {
+        id: privateProps
+
+        property int headerWidth: 160
+        property int headerHeight: 80
+        property int cellWidth: headerWidth
+        property int cellHeight: headerHeight
     }
 
     RowLayout {
@@ -66,104 +75,145 @@ Zynthian.ScreenPage {
             // HEADER ROW
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                Layout.maximumHeight: Layout.preferredHeight
+                Layout.preferredHeight: privateProps.headerHeight
+                Layout.maximumHeight: privateProps.headerHeight
                 spacing: 1
 
                 Rectangle {
-                    Layout.preferredWidth: 80
-                    Layout.maximumWidth: Layout.preferredWidth
+                    Layout.preferredWidth: privateProps.headerWidth
+                    Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true
 
                     color: Kirigami.Theme.backgroundColor
 
-                    TableHeaderLabel {
-                        text: "Song 1"
+                    ColumnLayout {
+                        anchors.centerIn: parent
+
+                        TableHeaderLabel {
+                            text: "Song 1"
+                            text2: "BPM: " + sidebar.bpm
+                        }
                     }
                 }
 
-                Repeater {
+                ListView {
+                    id: partsHeaderRow
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    clip: true
+                    spacing: 1
+                    contentX: loopGridFlickable.contentX
+                    orientation: Qt.Horizontal
+                    boundsBehavior: Flickable.StopAtBounds
+
                     model: zynthian.zynthiloops.partsCount
 
                     delegate: Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        width: privateProps.headerWidth
+                        height: ListView.view.height
 
                         color: Kirigami.Theme.backgroundColor
 
                         TableHeaderLabel {
-                            text: "Part " + modelData
+                            text: "Part " + (modelData + 1)                            
+                            text2: "Length: 1 Bar"
                         }
                     }
                 }
             }
             // END HEADER ROW
 
-            // TRACK ROWS
-            Kirigami.ScrollablePage {
-                Layout.fillWidth: true
+            RowLayout {
                 Layout.fillHeight: true
+                Layout.fillWidth: true
 
-                padding: 0
-                leftPadding: 0
-                rightPadding: 0
-                topPadding: 0
-                bottomPadding: 0
+                spacing: 1
 
-                verticalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+                ListView {
+                    id: tracksHeaderColumns
 
-                ColumnLayout {
+                    Layout.preferredWidth: privateProps.headerWidth
+                    Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true
+
+                    clip: true
+                    spacing: 1
+                    contentY: loopGridFlickable.contentY
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    model: zynthian.zynthiloops.model
+
+                    delegate: Rectangle {
+                        property var track: model
+
+                        width: ListView.view.width
+                        height: privateProps.headerHeight
+
+                        color: Kirigami.Theme.backgroundColor
+
+                        TableHeaderLabel {
+                            text: track.name
+                            text2: "Audio / Midi Info"
+                        }
+                    }
+                }
+
+                Flickable {
+                    id: loopGridFlickable
+
                     Layout.fillWidth: true
-                    spacing: 0
+                    Layout.fillHeight: true
+                    contentWidth: loopGrid.width
+                    contentHeight: loopGrid.height
 
-                    Repeater {
-                        model: zynthian.zynthiloops.model
+                    clip: true
+                    flickableDirection: Flickable.HorizontalAndVerticalFlick
+                    boundsBehavior: Flickable.StopAtBounds
 
-                        delegate: RowLayout {
-                            property var track: model
+                    contentX: partsHeaderRow.contentX
+                    contentY: tracksHeaderColumns.contentY
 
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 50
-                            Layout.maximumHeight: Layout.preferredHeight
-                            Layout.bottomMargin: 1
-                            spacing: 1
+                    GridLayout {
+                        id: loopGrid
+                        columns: zynthian.zynthiloops.partsCount
+                        rowSpacing: 1
+                        columnSpacing: 1
 
-                            Rectangle {
-                                Layout.preferredWidth: 80
-                                Layout.maximumWidth: Layout.preferredWidth
-                                Layout.fillHeight: true
+                        Repeater {
+                            model: zynthian.zynthiloops.model
 
-                                color: Kirigami.Theme.backgroundColor
-
-                                TableHeaderLabel {
-                                    text: track.name
-                                }
-
-                                MultiPointTouchArea {
-                                    anchors.fill: parent
-
-                                    onPressed: {
-                                        console.log(track);
-                                    }
-                                }
-                            }
-
-                            Repeater {
+                            delegate: Repeater {
+                                property int rowIndex: index
                                 model: zynthian.zynthiloops.partsCount
 
                                 delegate: Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
+                                    property int colIndex: index
+
+                                    Layout.preferredWidth: privateProps.cellWidth
+                                    Layout.maximumWidth: privateProps.cellWidth
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    Layout.maximumHeight: privateProps.cellHeight
 
                                     color: "#444"
+
+                                    QQC2.Label {
+                                        anchors.centerIn: parent
+                                        text: rowIndex + "," + colIndex
+                                    }
+
+                                    MultiPointTouchArea {
+                                        anchors.fill: parent
+                                        onPressed: {
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-            // END TRACK ROWS
         }
 
         Kirigami.Separator {
@@ -172,8 +222,10 @@ Zynthian.ScreenPage {
         }
 
         Sidebar {
+            id: sidebar
+
             Layout.fillHeight: true
-            Layout.preferredWidth: 80
+            Layout.preferredWidth: 160
             Layout.maximumWidth: Layout.preferredWidth
         }
     }

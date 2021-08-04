@@ -4,10 +4,12 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 ColumnLayout {
+    property alias bpm: bpmDial.value
+
     spacing: 8
 
     QQC2.Dial {
-        id: dial
+        id: bpmDial
 
         Layout.preferredWidth: 80
         Layout.preferredHeight: 80
@@ -20,19 +22,19 @@ ColumnLayout {
 
         // HACK for default style
         Binding {
-            target: dial.background
+            target: bpmDial.background
             property: "color"
             value: Kirigami.Theme.highlightColor
         }
         Binding {
-            target: dial.handle
+            target: bpmDial.handle
             property: "color"
             value: Kirigami.Theme.highlightColor
         }
         TableHeaderLabel {
             id: valueLabel
             anchors.centerIn: parent
-            text: dial.value
+            text: bpmDial.value
         }
 
         //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
@@ -44,14 +46,14 @@ ColumnLayout {
             property real startValue
             onPressed: {
                 startY = mouse.y;
-                startValue = dial.value
-                dial.forceActiveFocus()
+                startValue = bpmDial.value
+                bpmDial.forceActiveFocus()
             }
             onPositionChanged: {
                 let delta = mouse.y - startY;
-                let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
+                let value = Math.max(bpmDial.from, Math.min(bpmDial.to, startValue - (bpmDial.to / bpmDial.stepSize) * (delta*bpmDial.stepSize/(Kirigami.Units.gridUnit*10))));
 
-                dial.value = Math.round(value);
+                bpmDial.value = Math.round(value);
             }
         }
     }

@@ -86,8 +86,13 @@ Zynthian.ScreenPage {
 
                     color: Kirigami.Theme.backgroundColor
 
-                    TableHeaderLabel {
-                        text: "Song 1"
+                    ColumnLayout {
+                        anchors.centerIn: parent
+
+                        TableHeaderLabel {
+                            text: "Song 1"
+                            text2: "BPM: " + sidebar.bpm
+                        }
                     }
                 }
 
@@ -112,7 +117,8 @@ Zynthian.ScreenPage {
                         color: Kirigami.Theme.backgroundColor
 
                         TableHeaderLabel {
-                            text: "Part " + (modelData + 1)
+                            text: "Part " + (modelData + 1)                            
+                            text2: "Length: 1 Bar"
                         }
                     }
                 }
@@ -149,6 +155,7 @@ Zynthian.ScreenPage {
 
                         TableHeaderLabel {
                             text: track.name
+                            text2: "Audio / Midi Info"
                         }
                     }
                 }
@@ -215,6 +222,8 @@ Zynthian.ScreenPage {
         }
 
         Sidebar {
+            id: sidebar
+
             Layout.fillHeight: true
             Layout.preferredWidth: 160
             Layout.maximumWidth: Layout.preferredWidth

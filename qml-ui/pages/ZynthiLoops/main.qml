@@ -216,7 +216,7 @@ Zynthian.ScreenPage {
 
         Sidebar {
             Layout.fillHeight: true
-            Layout.preferredWidth: 80
+            Layout.preferredWidth: 160
             Layout.maximumWidth: Layout.preferredWidth
         }
     }

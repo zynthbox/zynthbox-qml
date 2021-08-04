@@ -653,14 +653,6 @@ Zynthian.ScreenPage {
                             property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
                             onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
                             property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
-                            property int velocityValue: {
-                                if (zynthian.playgrid.positionalVelocity) {
-                                    return 127-pitchModPoint.startY * 127 / height;
-                                } else {
-                                    // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                    return pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127)
-                                }
-                            }
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -710,10 +702,17 @@ Zynthian.ScreenPage {
                                 property var playingNote;
                                 onPressed: {
                                     if (pitchModPoint.pressed) {
+                                        var velocityValue = 64;
+                                        if (zynthian.playgrid.positionalVelocity) {
+                                            velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
+                                        } else {
+                                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                            velocityValue = pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127);
+                                        }
                                         parent.down = true;
                                         focus = true;
                                         playingNote = note;
-                                        playingNote.on(playDelegate.velocityValue);
+                                        playingNote.on(velocityValue);
                                         zynthian.playgrid.highlightPlayingNotes(note, true);
                                     }
                                 }

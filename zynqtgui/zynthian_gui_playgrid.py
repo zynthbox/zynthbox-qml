@@ -107,14 +107,14 @@ class Note(QObject):
     def __subnotes_changed__(self):
         pass
 
-    @Slot(None)
-    def on(self, velocity: int = 64):
+    @Slot(int)
+    def on(self, _velocity: int = 64):
         if (len(self.__midi_notes_on_msgs__) > 0):
             for i in range(0, len(self.__midi_notes_on_msgs__)):
-                self.__midi_notes_on_msgs__[i].velocity = velocity
+                self.__midi_notes_on_msgs__[i].velocity = _velocity
                 self.__midi_port__.send(self.__midi_notes_on_msgs__[i])
         else:
-            self.__midi_note_on_msg__.velocity = velocity
+            self.__midi_note_on_msg__.velocity = _velocity
             self.__midi_port__.send(self.__midi_note_on_msg__)
 
     @Slot(None)

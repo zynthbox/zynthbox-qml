@@ -101,6 +101,10 @@ Zynthian.ScreenPage {
                             sidebar.controlType = Sidebar.ControlType.Song
                         }
                     }
+
+                    onFocusChanged: {
+                        console.log("Song focus :", focus)
+                    }
                 }
 
                 ListView {
@@ -138,6 +142,10 @@ Zynthian.ScreenPage {
                                 sidebar.heading = "Part " + (modelData + 1);
                                 sidebar.controlType = Sidebar.ControlType.Part
                             }
+                        }
+
+                        onFocusChanged: {
+                            console.log("Part focus :", focus)
                         }
                     }
                 }
@@ -187,6 +195,10 @@ Zynthian.ScreenPage {
                                 sidebar.heading = track.name;
                                 sidebar.controlType = Sidebar.ControlType.Track
                             }
+                        }
+
+                        onFocusChanged: {
+                            console.log("Track focus :", focus)
                         }
                     }
                 }
@@ -244,6 +256,10 @@ Zynthian.ScreenPage {
                                             sidebar.heading = "Clip " + (rowIndex * zynthian.zynthiloops.partsCount + colIndex + 1);
                                             sidebar.controlType = Sidebar.ControlType.Clip
                                         }
+                                    }
+
+                                    onFocusChanged: {
+                                        console.log("Clip focus :", focus)
                                     }
                                 }
                             }

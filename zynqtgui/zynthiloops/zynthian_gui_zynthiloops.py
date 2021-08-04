@@ -47,9 +47,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def __get_model__(self):
-        return self.__model__
-
     @Signal
     def __model_changed__(self):
         pass

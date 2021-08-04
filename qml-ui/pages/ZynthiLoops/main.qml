@@ -93,6 +93,14 @@ Zynthian.ScreenPage {
                             text2: "BPM: " + sidebar.bpm
                         }
                     }
+
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        onPressed: {
+                            parent.focus = true;
+                            sidebar.heading = "Song 1";
+                        }
+                    }
                 }
 
                 ListView {

@@ -4,16 +4,25 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 ColumnLayout {
+    property alias heading: heading.text
     property alias bpm: bpmDial.value
 
     spacing: 8
+
+    QQC2.Label {
+        id: heading
+
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+        color: Kirigami.Theme.textColor
+        font.pointSize: 12
+    }
 
     QQC2.Dial {
         id: bpmDial
 
         Layout.preferredWidth: 80
         Layout.preferredHeight: 80
-        Layout.alignment: Qt.AlignHCenter
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         stepSize: 1
         value: 120

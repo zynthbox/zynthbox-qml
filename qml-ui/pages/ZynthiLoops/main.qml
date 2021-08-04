@@ -70,7 +70,6 @@ Zynthian.ScreenPage {
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignTop
 
             // HEADER ROW
             RowLayout {
@@ -116,9 +115,20 @@ Zynthian.ScreenPage {
 
                         color: Kirigami.Theme.backgroundColor
 
+                        border.width: focus ? 1 : 0
+                        border.color: Kirigami.Theme.highlightColor
+
                         TableHeaderLabel {
-                            text: "Part " + (modelData + 1)                            
+                            text: "Part " + (modelData + 1)
                             text2: "Length: 1 Bar"
+                        }
+
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.focus = true;
+                                sidebar.heading = "Part " + (modelData + 1);
+                            }
                         }
                     }
                 }
@@ -153,9 +163,20 @@ Zynthian.ScreenPage {
 
                         color: Kirigami.Theme.backgroundColor
 
+                        border.width: focus ? 1 : 0
+                        border.color: Kirigami.Theme.highlightColor
+
                         TableHeaderLabel {
                             text: track.name
                             text2: "Audio / Midi Info"
+                        }
+
+                        MultiPointTouchArea {
+                            anchors.fill: parent
+                            onPressed: {
+                                parent.focus = true;
+                                sidebar.heading = track.name;
+                            }
                         }
                     }
                 }
@@ -198,6 +219,9 @@ Zynthian.ScreenPage {
 
                                     color: "#444"
 
+                                    border.width: focus ? 1 : 0
+                                    border.color: Kirigami.Theme.highlightColor
+
                                     QQC2.Label {
                                         anchors.centerIn: parent
                                         text: rowIndex + "," + colIndex
@@ -206,6 +230,8 @@ Zynthian.ScreenPage {
                                     MultiPointTouchArea {
                                         anchors.fill: parent
                                         onPressed: {
+                                            parent.focus = true;
+                                            sidebar.heading = "Clip " + (rowIndex * zynthian.zynthiloops.partsCount + colIndex + 1);
                                         }
                                     }
                                 }

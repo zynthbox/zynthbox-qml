@@ -205,17 +205,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
         self.__chord_scales__ = [
             "ionian",
-            "chromatic",
+            "dorian",
             "phrygian",
             "aeolian",
             "locrian"
         ]
         self.__chord_scales_starts__ = [
-            36,
-            36,
-            36,
-            36,
-            36
+            60,
+            60,
+            60,
+            60,
+            60
         ]
 
         self.__model__ = zynthian_gui_grid_notes_model(self)
@@ -329,10 +329,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         ##########################################
         chord_notes = []
         # Reset our basic selector values
-        scale_index = 0
 
+        # Let's grab ourselves some diatonic progressions...
+        diatonic_progressions = [0, 2, 4]
         for row in range(0, self.__chord_rows__):
+            scale_index = 0
             row_data = []
+            row_scale = scale_mode_map[self.__chord_scales__[row]]
             col = self.__chord_scales_starts__[row]
 
             for i in range(0, 8):
@@ -348,8 +351,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 )
                 # Now create the subnotes, so we can have us a proper chord
                 subnotes = []
-                for subnote_index in range(0, 3):
-                    subnote_col = col + subnote_index
+                for subnote_index in range(0, len(diatonic_progressions)):
+                    subnote_col = col
+                    for j in range(0, diatonic_progressions[subnote_index]):
+                        subnote_scale_index = scale_index + j
+                        if (subnote_scale_index >= len(row_scale)):
+                            subnote_scale_index -= len(row_scale)
+                        subnote_col += row_scale[subnote_scale_index]
                     subnote = Note(
                         name=note_int_to_str_map[subnote_col % 12],
                         scale_index=scale_index,
@@ -363,28 +371,15 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 row_data.append(note)
 
                 # Cycle scale index value to 0 if it reaches the end of scale mode map
-                if scale_index >= len(scale_mode_map[self.__chord_scales__[row]]):
+                if scale_index >= len(row_scale):
                     scale_index = 0
 
                 # Calculate the next note value using the scale mode map and scale index
-                col += scale_mode_map[self.__chord_scales__[row]][scale_index]
+                col += row_scale[scale_index]
                 scale_index += 1
 
             # Prepend the generated row to grid as the grid direction should be bottom to top
             chord_notes.insert(0, row_data)
-
-            # If scale mode is not chromatic, calculate the next row's starting note
-            if self.__chord_scales__[row] != "chromatic":
-                col = row_data[0].get_midi_note()
-                scale_index = row_data[0].get_scale_index()
-
-                for i in range(0, 3):
-                    col += scale_mode_map[self.__chord_scales__[row]][
-                        scale_index % len(scale_mode_map[self.__chord_scales__[row]])
-                    ]
-                    scale_index = (scale_index + 1) % len(
-                        scale_mode_map[self.__chord_scales__[row]]
-                    )
 
         self.__chord_model__.set_grid(chord_notes)
         self.__chord_model_changed__.emit()

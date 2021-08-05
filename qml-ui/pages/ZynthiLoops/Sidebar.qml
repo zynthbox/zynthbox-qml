@@ -15,6 +15,7 @@ Item {
     property alias heading: heading.text
     property alias bpm: bpmDial.value
     property int controlType: Sidebar.ControlType.None
+    property bool isPlaying: false
 
     ColumnLayout {
         anchors.fill: parent
@@ -43,7 +44,7 @@ Item {
             ColumnLayout {
                 anchors.centerIn: parent
 
-                QQC2.Dial {
+                SidebarDial {
                     id: bpmDial
                     visible: controlType === Sidebar.ControlType.Song
 
@@ -55,43 +56,6 @@ Item {
                     value: 120
                     from: 0
                     to: 200
-
-                    // HACK for default style
-                    Binding {
-                        target: bpmDial.background
-                        property: "color"
-                        value: Kirigami.Theme.highlightColor
-                    }
-                    Binding {
-                        target: bpmDial.handle
-                        property: "color"
-                        value: Kirigami.Theme.highlightColor
-                    }
-                    TableHeaderLabel {
-                        id: valueLabel
-                        anchors.centerIn: parent
-                        text: bpmDial.value
-                    }
-
-                    //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
-                    MouseArea {
-                        id: dialMouse
-                        anchors.fill: parent
-                        preventStealing: true
-                        property real startY
-                        property real startValue
-                        onPressed: {
-                            startY = mouse.y;
-                            startValue = bpmDial.value
-                            bpmDial.forceActiveFocus()
-                        }
-                        onPositionChanged: {
-                            let delta = mouse.y - startY;
-                            let value = Math.max(bpmDial.from, Math.min(bpmDial.to, startValue - (bpmDial.to / bpmDial.stepSize) * (delta*bpmDial.stepSize/(Kirigami.Units.gridUnit*10))));
-
-                            bpmDial.value = Math.round(value);
-                        }
-                    }
                 }
 
                 TableHeaderLabel {
@@ -100,29 +64,98 @@ Item {
                     visible: controlType === Sidebar.ControlType.Song
                 }
 
-                Kirigami.Separator {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 0
-                    Layout.margins: 8
+                SidebarDial {
+                    visible: controlType === Sidebar.ControlType.Part ||
+                             controlType === Sidebar.ControlType.Clip
+
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    Layout.alignment: Qt.AlignHCenter
+
+                    stepSize: 1
+                    value: 1
+                    from: 1
+                    to: 16
                 }
 
-                SidebarButton {
-                    icon.name: "media-playback-start"
-                    visible: controlType === Sidebar.ControlType.Track
-
-                    onClicked: {
-                        console.log("Playing Sound Loop")
-                        zynthian.zynthiloops.playWav()
-                    }
+                TableHeaderLabel {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Length"
+                    visible: controlType === Sidebar.ControlType.Part ||
+                             controlType === Sidebar.ControlType.Clip
                 }
+            }
+        }
 
-                SidebarButton {
-                    icon.name: "media-playback-stop"
-                    visible: controlType === Sidebar.ControlType.Track
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 50
+            Layout.maximumHeight: Layout.preferredHeight
 
-                    onClicked: {
-                        console.log("Stopping Sound Loop")
-                    }
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "media-playback-start"
+                visible: !isPlaying &&
+                         (controlType === Sidebar.ControlType.Track ||
+                         controlType === Sidebar.ControlType.Clip ||
+                         controlType === Sidebar.ControlType.Part)
+
+                onClicked: {
+                    zynthian.zynthiloops.playWav()
+                    console.log("Playing Sound Loop")
+                    isPlaying = true;
+                }
+            }
+
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "media-playback-stop"
+                visible: isPlaying &&
+                         (controlType === Sidebar.ControlType.Track ||
+                         controlType === Sidebar.ControlType.Clip ||
+                         controlType === Sidebar.ControlType.Part)
+
+                onClicked: {
+                    console.log("Stopping Sound Loop")
+                    isPlaying = false;
+                }
+            }
+
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "media-record"
+                visible: controlType === Sidebar.ControlType.Clip
+
+                onClicked: {
+                }
+            }
+
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "delete"
+                visible: controlType === Sidebar.ControlType.Track
+
+                onClicked: {
+                }
+            }
+
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "edit-clear-all"
+                visible: controlType !== Sidebar.ControlType.Clip ||
+                         controlType !== Sidebar.ControlType.Part
+
+                onClicked: {
                 }
             }
         }

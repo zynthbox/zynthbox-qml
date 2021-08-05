@@ -26,7 +26,7 @@ Item {
         }
         TableHeaderLabel {
             id: valueLabel
-            anchors.centerIn: parent
+            anchors.centerIn: dial
             text: dial.value
         }
 

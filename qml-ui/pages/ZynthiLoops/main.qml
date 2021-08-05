@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
+import ZynthiLoops 1.0 as ZynthiLoops
 
 Zynthian.ScreenPage {
     screenId: "zynthiloops"
@@ -61,6 +62,8 @@ Zynthian.ScreenPage {
         property int headerHeight: 80
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
+
+        property var partsArr: []
     }
 
     RowLayout {
@@ -132,10 +135,18 @@ Zynthian.ScreenPage {
                         border.width: focus ? 1 : 0
                         border.color: Kirigami.Theme.highlightColor
 
+                        ZynthiLoops.Part {
+                            id: part
+
+                            Component.onCompleted: {
+                                privateProps.partsArr[modelData] = part;
+                            }
+                        }
+
                         TableHeaderLabel {
                             anchors.centerIn: parent
-                            text: "Part " + (modelData + 1)
-                            text2: "Length: 1 Bar"
+                            text: "Part " + (part.id + 1)
+                            text2: "Length: " + part.length + " Bar"
                         }
 
                         MultiPointTouchArea {
@@ -144,6 +155,7 @@ Zynthian.ScreenPage {
                                 parent.focus = true;
                                 sidebar.heading = "Part " + (modelData + 1);
                                 sidebar.controlType = Sidebar.ControlType.Part;
+                                sidebar.controlObj = part;
                             }
                         }
 

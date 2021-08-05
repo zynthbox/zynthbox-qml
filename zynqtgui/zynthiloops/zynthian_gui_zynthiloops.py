@@ -28,7 +28,10 @@ import soundfile as sf
 import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtQml import qmlRegisterType
 
+from .clip import zynthiloops_clip
+from .part import zynthiloops_part
 from .zynthiloops_track import ZynthiLoopsTrack
 from .zynthiloops_tracks_model import ZynthiLoopsTracksModel
 from .. import zynthian_qt_gui_base
@@ -48,6 +51,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__client__ = jack.Client(self.__client_name__)
         self.__blocksize__ = self.__client__.blocksize
         self.__samplerate__ = self.__client__.samplerate
+
+        self.__register_qml_modules__()
 
     def show(self):
         pass
@@ -88,6 +93,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.stop_callback()  # Playback is finished
         for channel, port in zip(data.T, self.__client__.outports):
             port.get_array()[:] = channel
+
+    def __register_qml_modules__(self):
+        qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
+        qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
 
     @Signal
     def __model_changed__(self):

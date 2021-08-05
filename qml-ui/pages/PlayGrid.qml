@@ -540,7 +540,7 @@ Zynthian.ScreenPage {
                                     verticalAlignment: Text.AlignVCenter
                                     text: {
                                         var text = "";
-                                        if (note) {
+                                        if (note && note.name != "") {
                                             if (zynthian.playgrid.scale == "major") {
                                                 text = note.name
                                             } else {

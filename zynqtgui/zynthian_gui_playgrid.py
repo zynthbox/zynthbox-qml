@@ -199,6 +199,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __pitch__ = 0
     __chord_model__: QAbstractItemModel = None
     __chord_rows__ = 5
+    __play_grid_index__ = 0
 
     __positional_velocity__ = False
 
@@ -410,6 +411,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __get_chord_scales__(self):
         return self.__chord_scales__
 
+    def __get_play_grid_index__(self):
+        return self.__play_grid_index__
+
     def __set_rows__(self, rows):
         self.__rows__ = rows
         self.__rows_changed__.emit()
@@ -434,6 +438,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__chord_rows__ = chord_rows
         self.__chord_rows_changed__.emit()
         self.__populate_grid__()
+
+    def __set_play_grid_index__(self, play_grid_index):
+        self.__play_grid_index__ = play_grid_index
+        self.__play_grid_index_changed__.emit()
 
     @Slot(int, str)
     def setChordScale(self, chord_row: int, scale: str):
@@ -467,6 +475,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Signal
     def __chord_scales_changed__(self):
+        pass
+
+    @Signal
+    def __play_grid_index_changed__(self):
         pass
 
     @Signal
@@ -530,3 +542,4 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     )
     pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)
     positionalVelocity = Property(bool, get_positional_velocity, set_positional_velocity, notify=__positional_velocity_changed__)
+    playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)

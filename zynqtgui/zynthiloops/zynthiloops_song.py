@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# Zynthiloops Song: An object to store song information
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -22,32 +22,36 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 
-from PySide2.QtCore import Property, QObject, Slot
+class zynthiloops_song(QObject):
+    __bpm__ = 120
+    __index__ = 0
 
+    @Signal
+    def bpm_changed(self):
+        pass
 
-class ZynthiLoopsTrack(QObject):
-    # Possible Values : "audio", "video"
-    __type__ = "audio"
-    __clips__ = []
+    @Signal
+    def index_changed(self):
+        pass
 
-    def __init__(self, id: int, parent: QObject = None):
-        super(ZynthiLoopsTrack, self).__init__(parent)
-        self.__id__ = id
+    @Property(int, notify=bpm_changed)
+    def bpm(self):
+        return self.__bpm__
 
-    @Property(int, constant=True)
-    def id(self):
-        return self.__id__
+    @bpm.setter
+    def set_bpm(self, bpm: int):
+        self.__bpm__ = bpm
+        self.bpm_changed.emit()
 
-    @Property(str, constant=True)
-    def name(self):
-        return f"Track {self.__id__}"
+    @Property(int, notify=index_changed)
+    def index(self):
+        return self.__index__
 
-    @Property(str, constant=True)
-    def type(self):
-        return self.__type__
+    @index.setter
+    def set_index(self, index):
+        self.__index__ = index
+        self.index_changed.emit()
 
-    @Slot(QObject, int)
-    def addClip(self, clip: QObject, index: int):
-        self.__clips__.insert(index, clip)

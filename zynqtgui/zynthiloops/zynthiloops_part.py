@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# Zynthiloops Part: An object to store clips of a part
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -22,31 +22,47 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 
-from PySide2.QtCore import Property, QObject, Slot
-
-
-class ZynthiLoopsTrack(QObject):
-    # Possible Values : "audio", "video"
-    __type__ = "audio"
+class zynthiloops_part(QObject):
+    __length__ = 1
     __clips__ = []
+    __part_index__ = 0
 
-    def __init__(self, id: int, parent: QObject = None):
-        super(ZynthiLoopsTrack, self).__init__(parent)
-        self.__id__ = id
+    # def __init__(self, part_index: int):
+    #     self.__part_index__ = part_index
 
-    @Property(int, constant=True)
-    def id(self):
-        return self.__id__
+
+    @Signal
+    def length_changed(self):
+        pass
+
+    @Signal
+    def part_index_changed(self):
+        pass
+
+    @Property(int, notify=length_changed)
+    def length(self):
+        return self.__length__
+
+    @length.setter
+    def set_length(self, length: int):
+        self.__length__ = length
+        self.length_changed.emit()
+
+    @Property(int, notify=part_index_changed)
+    def partIndex(self):
+        return self.__part_index__
+
+    @partIndex.setter
+    def set_part_index(self, part_index):
+        self.__part_index__ = part_index
+        self.part_index_changed.emit()
 
     @Property(str, constant=True)
     def name(self):
-        return f"Track {self.__id__}"
-
-    @Property(str, constant=True)
-    def type(self):
-        return self.__type__
+        return f"Part {self.__part_index__+1}"
 
     @Slot(QObject, int)
     def addClip(self, clip: QObject, index: int):

@@ -57,12 +57,8 @@ class Note(QObject):
         self.__is_playing__ = False
         self.__midi_note__ = midi_note
         self.__midi_port__ = midi_port
-        self.__midi_note_on_msg__ = mido.Message(
-            "note_on", note=self.__midi_note__
-        )
-        self.__midi_note_off_msg__ = mido.Message(
-            "note_off", note=self.__midi_note__
-        )
+        self.__midi_note_on_msg__ = None
+        self.__midi_note_off_msg__ = None
         self.__midi_notes_on_msgs__ = []
         self.__midi_notes_off_msgs__ = []
         self.__subnotes__ = [];
@@ -113,7 +109,11 @@ class Note(QObject):
             for i in range(0, len(self.__midi_notes_on_msgs__)):
                 self.__midi_notes_on_msgs__[i].velocity = _velocity
                 self.__midi_port__.send(self.__midi_notes_on_msgs__[i])
-        else:
+        elif 0 <= self.__midi_note__ <= 127:
+            if self.__midi_note_on_msg__ is None:
+                self.__midi_note_on_msg__ = mido.Message(
+                    "note_on", note=self.__midi_note__
+                )
             self.__midi_note_on_msg__.velocity = _velocity
             self.__midi_port__.send(self.__midi_note_on_msg__)
 
@@ -122,7 +122,11 @@ class Note(QObject):
         if (len(self.__midi_notes_off_msgs__) > 0):
             for i in range(0, len(self.__midi_notes_off_msgs__)):
                 self.__midi_port__.send(self.__midi_notes_off_msgs__[i])
-        else:
+        elif 0 <= self.__midi_note__ <= 127:
+            if self.__midi_note_off_msg__ is None:
+                self.__midi_note_off_msg__ = mido.Message(
+                    "note_off", note=self.__midi_note__
+                )
             self.__midi_port__.send(self.__midi_note_off_msg__)
 
     @Property(str, constant=True)
@@ -200,8 +204,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __chord_model__: QAbstractItemModel = None
     __chord_rows__ = 5
     __play_grid_index__ = 0
-
     __positional_velocity__ = False
+
+    __note_state_map__ = {}
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
@@ -342,17 +347,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             col = self.__chord_scales_starts__[row]
 
             for i in range(0, len(row_scale)):
-                # Create a Note object representing a music note for our current cell
-                # This one's a container, and it will contain a series of subnotes which make up the scale
-                note = Note(
-                    name=note_int_to_str_map[col % 12],
-                    scale_index=scale_index,
-                    octave=col // 12,
-                    midi_note=col,
-                    midi_port=self.__midi_port__,
-                    parent=self,
-                )
-                # Now create the subnotes, so we can have us a proper chord
+                # We will use a fake midi note to signify a chord (as only leaf nodes actually
+                # get played, this is just used for identifying the chord (for example for highlighting
+                # purposes))
+                fake_midi_note = 0
+                # First create the subnotes, so we can have us a proper chord
                 subnotes = []
                 for subnote_index in range(0, len(diatonic_progressions)):
                     subnote_col = col
@@ -370,6 +369,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                         parent=self,
                     )
                     subnotes.append(subnote)
+                    # Offset each note by a full midi note value spread, so we can kind of identify things
+                    fake_midi_note += (127 * subnote_index) + subnote_col
+                # Now create a Note object representing a music note for our current cell
+                # This one's our container, and it will contain a series of subnotes which make up the scale
+                note = Note(
+                    name=note_int_to_str_map[col % 12],
+                    scale_index=scale_index,
+                    octave=col // 12,
+                    midi_note=fake_midi_note,
+                    midi_port=self.__midi_port__,
+                    parent=self,
+                )
                 note.subnotes = subnotes
                 row_data.append(note)
 
@@ -488,6 +499,45 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(Note, bool)
     def highlightPlayingNotes(self, note: Note, highlight: bool):
         self.__model__.highlight_playing_note(note, highlight)
+
+    @Slot(Note, int)
+    def setNoteOn(self, note: Note, velocity: int = 64):
+        self.setNoteState(note = note, velocity = velocity, setOn = True)
+
+    @Slot(Note)
+    def setNoteOff(self, note: Note):
+        self.setNoteState(note = note, setOn = False)
+
+    def setNoteState(self, note: Note, velocity: int = 64, setOn: bool = True):
+        subnotes = note.get_subnotes()
+        subnoteCount = len(note.get_subnotes())
+        if subnoteCount > 0:
+            for i in range(0, subnoteCount):
+                self.setNoteState(subnotes[i], velocity, setOn)
+            self.__model__.highlight_playing_note(note, setOn)
+            self.__chord_model__.highlight_playing_note(note, setOn)
+        else:
+            noteKey = str(note.get_midi_note())
+            if noteKey in self.__note_state_map__:
+                if setOn:
+                    self.__note_state_map__[noteKey] += 1
+                else:
+                    self.__note_state_map__[noteKey] -= 1
+                    if self.__note_state_map__[noteKey] == 0:
+                        note.off()
+                        self.__note_state_map__.pop(noteKey)
+                        self.__model__.highlight_playing_note(note, False)
+                        self.__chord_model__.highlight_playing_note(note, False)
+            else:
+                if setOn:
+                    note.on(velocity)
+                    self.__note_state_map__[noteKey] = 1
+                    self.__model__.highlight_playing_note(note, True)
+                    self.__chord_model__.highlight_playing_note(note, True)
+                else:
+                    note.off()
+                    self.__model__.highlight_playing_note(note, False)
+                    self.__chord_model__.highlight_playing_note(note, False)
 
     def get_pitch(self):
         return self.__pitch__

@@ -574,17 +574,15 @@ Zynthian.ScreenPage {
                                         parent.down = true;
                                         focus = true;
                                         playingNote = note;
-                                        playingNote.on(velocityValue);
-                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue);
                                     }
                                 }
                                 onReleased: {
                                     if (!pitchModPoint.pressed) {
                                         parent.down = false;
                                         focus = false;
-                                        playingNote.off();
+                                        zynthian.playgrid.setNoteOff(playingNote);
                                         zynthian.playgrid.pitch = 0
-                                        zynthian.playgrid.highlightPlayingNotes(note, false);
                                     }
                                 }
                             }
@@ -811,17 +809,15 @@ Zynthian.ScreenPage {
                                         parent.down = true;
                                         focus = true;
                                         playingNote = note;
-                                        playingNote.on(velocityValue);
-                                        zynthian.playgrid.highlightPlayingNotes(note, true);
+                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue)
                                     }
                                 }
                                 onReleased: {
                                     if (!chordSlidePoint.pressed) {
                                         parent.down = false;
                                         focus = false;
-                                        playingNote.off();
+                                        zynthian.playgrid.setNoteOff(playingNote)
                                         zynthian.playgrid.pitch = 0
-                                        zynthian.playgrid.highlightPlayingNotes(note, false);
                                     }
                                 }
                             }

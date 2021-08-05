@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-ColumnLayout {
+Item {
     enum ControlType {
         Song,
         Clip,
@@ -16,95 +16,115 @@ ColumnLayout {
     property alias bpm: bpmDial.value
     property int controlType: Sidebar.ControlType.None
 
-    spacing: 8
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 8
 
-    QQC2.Label {
-        id: heading
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 80
 
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-        color: Kirigami.Theme.textColor
-        font.pointSize: 12
-    }
+            color: Kirigami.Theme.backgroundColor
 
-    QQC2.Dial {
-        id: bpmDial
-        visible: controlType === Sidebar.ControlType.Song
+            border.width: focus ? 1 : 0
+            border.color: Kirigami.Theme.highlightColor
 
-        Layout.preferredWidth: 80
-        Layout.preferredHeight: 80
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-        stepSize: 1
-        value: 120
-        from: 0
-        to: 200
-
-        // HACK for default style
-        Binding {
-            target: bpmDial.background
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
-        Binding {
-            target: bpmDial.handle
-            property: "color"
-            value: Kirigami.Theme.highlightColor
-        }
-        TableHeaderLabel {
-            id: valueLabel
-            anchors.centerIn: parent
-            text: bpmDial.value
-        }
-
-        //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
-        MouseArea {
-            id: dialMouse
-            anchors.fill: parent
-            preventStealing: true
-            property real startY
-            property real startValue
-            onPressed: {
-                startY = mouse.y;
-                startValue = bpmDial.value
-                bpmDial.forceActiveFocus()
-            }
-            onPositionChanged: {
-                let delta = mouse.y - startY;
-                let value = Math.max(bpmDial.from, Math.min(bpmDial.to, startValue - (bpmDial.to / bpmDial.stepSize) * (delta*bpmDial.stepSize/(Kirigami.Units.gridUnit*10))));
-
-                bpmDial.value = Math.round(value);
+            Kirigami.Heading {
+                id: heading
+                anchors.centerIn: parent
+                font.bold: true
             }
         }
-    }
 
-    TableHeaderLabel {
-        Layout.alignment: Qt.AlignHCenter
-        text: "BPM"
-        visible: controlType === Sidebar.ControlType.Song
-    }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-    Kirigami.Separator {
-        Layout.fillWidth: true
-        Layout.preferredHeight: 0
-        Layout.margins: 8
-    }
+            ColumnLayout {
+                anchors.centerIn: parent
 
-    SidebarButton {
-        icon.name: "media-playback-start"
-        visible: controlType === Sidebar.ControlType.Track
+                QQC2.Dial {
+                    id: bpmDial
+                    visible: controlType === Sidebar.ControlType.Song
 
-        onClicked: {
-            console.log("Playing Sound Loop")
-            zynthian.zynthiloops.playWav()
-        }
-    }
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    Layout.alignment: Qt.AlignHCenter
 
-    SidebarButton {
-        icon.name: "media-playback-stop"
-        visible: controlType === Sidebar.ControlType.Track
+                    stepSize: 1
+                    value: 120
+                    from: 0
+                    to: 200
 
-        onClicked: {
-            console.log("Stopping Sound Loop")
+                    // HACK for default style
+                    Binding {
+                        target: bpmDial.background
+                        property: "color"
+                        value: Kirigami.Theme.highlightColor
+                    }
+                    Binding {
+                        target: bpmDial.handle
+                        property: "color"
+                        value: Kirigami.Theme.highlightColor
+                    }
+                    TableHeaderLabel {
+                        id: valueLabel
+                        anchors.centerIn: parent
+                        text: bpmDial.value
+                    }
+
+                    //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical
+                    MouseArea {
+                        id: dialMouse
+                        anchors.fill: parent
+                        preventStealing: true
+                        property real startY
+                        property real startValue
+                        onPressed: {
+                            startY = mouse.y;
+                            startValue = bpmDial.value
+                            bpmDial.forceActiveFocus()
+                        }
+                        onPositionChanged: {
+                            let delta = mouse.y - startY;
+                            let value = Math.max(bpmDial.from, Math.min(bpmDial.to, startValue - (bpmDial.to / bpmDial.stepSize) * (delta*bpmDial.stepSize/(Kirigami.Units.gridUnit*10))));
+
+                            bpmDial.value = Math.round(value);
+                        }
+                    }
+                }
+
+                TableHeaderLabel {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "BPM"
+                    visible: controlType === Sidebar.ControlType.Song
+                }
+
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 0
+                    Layout.margins: 8
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-start"
+                    visible: controlType === Sidebar.ControlType.Track
+
+                    onClicked: {
+                        console.log("Playing Sound Loop")
+                        zynthian.zynthiloops.playWav()
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-stop"
+                    visible: controlType === Sidebar.ControlType.Track
+
+                    onClicked: {
+                        console.log("Stopping Sound Loop")
+                    }
+                }
+            }
         }
     }
 }

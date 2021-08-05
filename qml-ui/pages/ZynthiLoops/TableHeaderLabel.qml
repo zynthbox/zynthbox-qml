@@ -7,8 +7,6 @@ ColumnLayout {
     property alias text: label1.text
     property alias text2: label2.text
 
-    anchors.centerIn: parent
-
     QQC2.Label {
         id: label1
         Layout.alignment: Qt.AlignHCenter

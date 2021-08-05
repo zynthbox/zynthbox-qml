@@ -9,6 +9,7 @@ ColumnLayout {
 
     QQC2.Label {
         id: label1
+        visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         color: Kirigami.Theme.textColor
         font.pointSize: 12
@@ -16,6 +17,7 @@ ColumnLayout {
 
     QQC2.Label {
         id: label2
+        visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         color: Kirigami.Theme.textColor
         font.pointSize: 10

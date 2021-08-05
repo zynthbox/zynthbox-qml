@@ -96,6 +96,7 @@
       "qml-ui/pages/ZynthiLoops/main.qml",
       "qml-ui/pages/ZynthiLoops/Sidebar.qml",
       "qml-ui/pages/ZynthiLoops/SidebarButton.qml",
+      "qml-ui/pages/ZynthiLoops/SidebarDial.qml",
       "qml-ui/pages/ZynthiLoops/TableHeaderLabel.qml",
       "qml-ui/+Plasma/CustomTheme.qml",
       "qml-ui/ScreensLayer.qml",

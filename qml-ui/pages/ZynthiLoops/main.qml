@@ -32,10 +32,10 @@ import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     screenId: "zynthiloops"
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 5
-    bottomPadding: 5
+    leftPadding: 8
+    rightPadding: 8
+    topPadding: 8
+    bottomPadding: 8
 
     contextualActions: [
         Kirigami.Action {
@@ -100,7 +100,7 @@ Zynthian.ScreenPage {
                         onPressed: {
                             parent.focus = true;
                             sidebar.heading = "Song 1";
-                            sidebar.controlType = Sidebar.ControlType.Song
+                            sidebar.controlType = Sidebar.ControlType.Song;
                         }
                     }
 
@@ -143,7 +143,7 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 parent.focus = true;
                                 sidebar.heading = "Part " + (modelData + 1);
-                                sidebar.controlType = Sidebar.ControlType.Part
+                                sidebar.controlType = Sidebar.ControlType.Part;
                             }
                         }
 
@@ -197,7 +197,7 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 parent.focus = true;
                                 sidebar.heading = track.name;
-                                sidebar.controlType = Sidebar.ControlType.Track
+                                sidebar.controlType = Sidebar.ControlType.Track;
                             }
                         }
 
@@ -248,9 +248,10 @@ Zynthian.ScreenPage {
                                     border.width: focus ? 1 : 0
                                     border.color: Kirigami.Theme.highlightColor
 
-                                    QQC2.Label {
+                                    TableHeaderLabel {
                                         anchors.centerIn: parent
-                                        text: rowIndex + "," + colIndex
+                                        text: "Clip " + colIndex
+                                        text2: "Length: 1 Bar"
                                     }
 
                                     MultiPointTouchArea {
@@ -258,7 +259,7 @@ Zynthian.ScreenPage {
                                         onPressed: {
                                             parent.focus = true;
                                             sidebar.heading = "Clip " + (rowIndex * zynthian.zynthiloops.partsCount + colIndex + 1);
-                                            sidebar.controlType = Sidebar.ControlType.Clip
+                                            sidebar.controlType = Sidebar.ControlType.Clip;
                                         }
                                     }
 

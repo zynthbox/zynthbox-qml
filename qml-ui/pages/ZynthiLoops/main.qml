@@ -26,16 +26,18 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
+import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
+import ZynthiLoops 1.0 as ZynthiLoops
 
 Zynthian.ScreenPage {
     screenId: "zynthiloops"
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 5
-    bottomPadding: 5
+    leftPadding: 8
+    rightPadding: 8
+    topPadding: 8
+    bottomPadding: 8
 
     contextualActions: [
         Kirigami.Action {
@@ -61,6 +63,34 @@ Zynthian.ScreenPage {
         property int headerHeight: 80
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
+    }
+
+    // AWFUL TEMPORARY WORKAROUND
+    // FIX IMMEDIATELY
+    ObjectModel {
+        id: partsModel
+
+        ZynthiLoops.Part { partIndex: 0 }
+        ZynthiLoops.Part { partIndex: 1 }
+        ZynthiLoops.Part { partIndex: 2 }
+        ZynthiLoops.Part { partIndex: 3 }
+        ZynthiLoops.Part { partIndex: 4 }
+        ZynthiLoops.Part { partIndex: 5 }
+        ZynthiLoops.Part { partIndex: 6 }
+        ZynthiLoops.Part { partIndex: 7 }
+        ZynthiLoops.Part { partIndex: 8 }
+        ZynthiLoops.Part { partIndex: 9 }
+        ZynthiLoops.Part { partIndex: 10 }
+        ZynthiLoops.Part { partIndex: 11 }
+        ZynthiLoops.Part { partIndex: 12 }
+        ZynthiLoops.Part { partIndex: 13 }
+        ZynthiLoops.Part { partIndex: 14 }
+        ZynthiLoops.Part { partIndex: 15 }
+    }
+
+    ZynthiLoops.Song {
+        id: song
+        index: 0
     }
 
     RowLayout {
@@ -89,16 +119,19 @@ Zynthian.ScreenPage {
                     color: Kirigami.Theme.backgroundColor
 
                     TableHeaderLabel {
-                        text: "Song 1"
-                        text2: "BPM: " + sidebar.bpm
+                        anchors.centerIn: parent
+
+                        text: "Song " + (song.index+1)
+                        text2: "BPM: " + song.bpm
                     }
 
                     MultiPointTouchArea {
                         anchors.fill: parent
                         onPressed: {
                             parent.focus = true;
-                            sidebar.heading = "Song 1";
-                            sidebar.controlType = Sidebar.ControlType.Song
+                            sidebar.heading = "Song " + (song.index+1);
+                            sidebar.controlType = Sidebar.ControlType.Song;
+                            sidebar.controlObj = song;
                         }
                     }
 
@@ -119,9 +152,11 @@ Zynthian.ScreenPage {
                     orientation: Qt.Horizontal
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: zynthian.zynthiloops.partsCount
+                    model: partsModel.count
 
                     delegate: Rectangle {
+                        property var part: partsModel.get(index)
+
                         width: privateProps.headerWidth
                         height: ListView.view.height
 
@@ -131,16 +166,18 @@ Zynthian.ScreenPage {
                         border.color: Kirigami.Theme.highlightColor
 
                         TableHeaderLabel {
-                            text: "Part " + (modelData + 1)
-                            text2: "Length: 1 Bar"
+                            anchors.centerIn: parent
+                            text: "Part " + (part.partIndex+1) // part.name
+                            text2: "Length: " + part.length + " Bar"
                         }
 
                         MultiPointTouchArea {
                             anchors.fill: parent
                             onPressed: {
                                 parent.focus = true;
-                                sidebar.heading = "Part " + (modelData + 1);
-                                sidebar.controlType = Sidebar.ControlType.Part
+                                sidebar.heading = "Part " + (part.partIndex+1) // part.name;
+                                sidebar.controlType = Sidebar.ControlType.Part;
+                                sidebar.controlObj = part;
                             }
                         }
 
@@ -184,8 +221,9 @@ Zynthian.ScreenPage {
                         border.color: Kirigami.Theme.highlightColor
 
                         TableHeaderLabel {
+                            anchors.centerIn: parent
                             text: track.name
-                            text2: "Audio / Midi Info"
+                            text2: track.type === "audio" ? "Audio" : "Midi"
                         }
 
                         MultiPointTouchArea {
@@ -193,7 +231,8 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 parent.focus = true;
                                 sidebar.heading = track.name;
-                                sidebar.controlType = Sidebar.ControlType.Track
+                                sidebar.controlType = Sidebar.ControlType.Track;
+                                sidebar.controlObj = track;
                             }
                         }
 
@@ -220,7 +259,7 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: zynthian.zynthiloops.partsCount
+                        columns: partsModel.count
                         rowSpacing: 1
                         columnSpacing: 1
 
@@ -228,10 +267,13 @@ Zynthian.ScreenPage {
                             model: zynthian.zynthiloops.model
 
                             delegate: Repeater {
+                                property var track: zynthian.zynthiloops.model.data(zynthian.zynthiloops.model.index(index, 0))
                                 property int rowIndex: index
-                                model: zynthian.zynthiloops.partsCount
+
+                                model: partsModel.count
 
                                 delegate: Rectangle {
+                                    property var part: partsModel.get(index)
                                     property int colIndex: index
 
                                     Layout.preferredWidth: privateProps.cellWidth
@@ -244,22 +286,35 @@ Zynthian.ScreenPage {
                                     border.width: focus ? 1 : 0
                                     border.color: Kirigami.Theme.highlightColor
 
-                                    QQC2.Label {
+                                    ZynthiLoops.Clip {
+                                        id: clip
+                                        row: rowIndex
+                                        col: colIndex
+
+                                        Component.onCompleted: {
+                                            track.addClip(clip, colIndex);
+                                            part.addClip(clip, rowIndex);
+                                        }
+                                    }
+
+                                    TableHeaderLabel {
                                         anchors.centerIn: parent
-                                        text: rowIndex + "," + colIndex
+                                        text: "Clip " + (clip.col+1) // clip.name
+                                        text2: "Length: " + clip.length + " Bar"
                                     }
 
                                     MultiPointTouchArea {
                                         anchors.fill: parent
                                         onPressed: {
                                             parent.focus = true;
-                                            sidebar.heading = "Clip " + (rowIndex * zynthian.zynthiloops.partsCount + colIndex + 1);
-                                            sidebar.controlType = Sidebar.ControlType.Clip
+                                            sidebar.heading = "Clip " + (clip.col+1) // clip.name;
+                                            sidebar.controlType = Sidebar.ControlType.Clip;
+                                            sidebar.controlObj = clip;
                                         }
                                     }
 
                                     onFocusChanged: {
-                                        console.log("Clip focus :", focus)
+                                        console.log("Clip :", clip.row, clip.col)
                                     }
                                 }
                             }
@@ -277,9 +332,9 @@ Zynthian.ScreenPage {
         Sidebar {
             id: sidebar
 
-            Layout.fillHeight: true
             Layout.preferredWidth: 160
             Layout.maximumWidth: Layout.preferredWidth
+            Layout.fillHeight: true
         }
     }
 }

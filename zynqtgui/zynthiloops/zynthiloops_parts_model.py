@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# A model to for storing parts of a song in ZynthiLoops
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -25,33 +25,38 @@
 import logging
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt
-from .zynthiloops_track import ZynthiLoopsTrack
+from .zynthiloops_part import zynthiloops_part
 
 
-class ZynthiLoopsTracksModel(QAbstractListModel):
+class zynthiloops_parts_model(QAbstractListModel):
     IdRole = Qt.UserRole + 1
     NameRole = IdRole + 1
 
-    __tracks__: [ZynthiLoopsTrack] = []
+    __parts__: [zynthiloops_part] = []
 
     def __init__(self, parent: QObject = None):
-        super(ZynthiLoopsTracksModel, self).__init__(parent)
+        super(zynthiloops_parts_model, self).__init__(parent)
+
+        # for i in range(0, 2):
+        #     self.add_part(zynthiloops_part(i))
+
+        logging.info(self.__parts__)
 
     def data(self, index, role=None):
-        logging.info(index.row(), self.__tracks__[index.row()])
+        # if not index.isValid():
+        #     return None
 
-        if not index.isValid():
-            return None
+        logging.info(index.row(), self.__parts__[index.row()])
 
-        if index.row() > len(self.__tracks__):
-            return None
+        # if index.row() > len(self.__parts__):
+        #     return None
 
         if role == self.IdRole:
-            return self.__tracks__[index.row()].id
+            return self.__parts__[index.row()].id
         elif role == self.NameRole:
-            return self.__tracks__[index.row()].name
+            return self.__parts__[index.row()].name
         else:
-            return self.__tracks__[index.row()]
+            return self.__parts__[index.row()]
 
     def roleNames(self):
         role_names = {
@@ -62,11 +67,11 @@ class ZynthiLoopsTracksModel(QAbstractListModel):
         return role_names
 
     def rowCount(self, index):
-        return len(self.__tracks__)
+        return len(self.__parts__)
 
-    def add_track(self, track: ZynthiLoopsTrack):
-        length = len(self.__tracks__)
+    def add_part(self, part: zynthiloops_part):
+        length = len(self.__parts__)
 
         self.beginInsertRows(QModelIndex(), length, length)
-        self.__tracks__.append(track)
+        self.__parts__.append(part)
         self.endInsertRows()

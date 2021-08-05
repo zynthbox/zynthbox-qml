@@ -28,7 +28,12 @@ import soundfile as sf
 import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtQml import qmlRegisterType
 
+from .zynthiloops_clip import zynthiloops_clip
+from .zynthiloops_part import zynthiloops_part
+from .zynthiloops_parts_model import zynthiloops_parts_model
+from .zynthiloops_song import zynthiloops_song
 from .zynthiloops_track import ZynthiLoopsTrack
 from .zynthiloops_tracks_model import ZynthiLoopsTracksModel
 from .. import zynthian_qt_gui_base
@@ -36,18 +41,20 @@ from .. import zynthian_qt_gui_base
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     __track_counter__ = 0
-    __parts_count__ = 16
     __buffer_size__ = 20
     __client_name__ = "ZynthiLoops"
 
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
 
-        self.__model__ = ZynthiLoopsTracksModel()
+        self.__model__ = ZynthiLoopsTracksModel(self)
+        self.__parts__ = zynthiloops_parts_model(self)
         self.__q__ = queue.Queue(maxsize=self.__buffer_size__)
         self.__client__ = jack.Client(self.__client_name__)
         self.__blocksize__ = self.__client__.blocksize
         self.__samplerate__ = self.__client__.samplerate
+
+        self.__register_qml_modules__()
 
     def show(self):
         pass
@@ -89,17 +96,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         for channel, port in zip(data.T, self.__client__.outports):
             port.get_array()[:] = channel
 
+    def __register_qml_modules__(self):
+        qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")
+        qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
+        qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
+
     @Signal
     def __model_changed__(self):
+        pass
+
+    @Signal
+    def __parts_changed__(self):
         pass
 
     @Property(QObject, notify=__model_changed__)
     def model(self):
         return self.__model__
 
-    @Property(int, constant=True)
-    def partsCount(self):
-        return self.__parts_count__
+    @Property(QObject, notify=__parts_changed__)
+    def parts(self):
+        return self.__parts__
 
     @Slot(None)
     def addTrack(self):

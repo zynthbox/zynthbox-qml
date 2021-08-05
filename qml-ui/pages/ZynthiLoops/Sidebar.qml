@@ -14,8 +14,22 @@ Item {
 
     property alias heading: heading.text
     property alias bpm: bpmDial.value
+    property alias length: lengthDial.value
     property int controlType: Sidebar.ControlType.None
+    property QtObject controlObj: null
     property bool isPlaying: false
+
+    Binding {
+        target: bpmDial
+        property: "value"
+        value: controlObj && controlObj.bpm ? controlObj.bpm : 120
+    }
+
+    Binding {
+        target: lengthDial
+        property: "value"
+        value: controlObj && controlObj.length ? controlObj.length : 1
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -46,43 +60,52 @@ Item {
 
                 SidebarDial {
                     id: bpmDial
-                    visible: controlType === Sidebar.ControlType.Song
+                    visible: controlObj && controlObj.bpm ? true : false
 
                     Layout.preferredWidth: 80
                     Layout.preferredHeight: 80
                     Layout.alignment: Qt.AlignHCenter
 
                     stepSize: 1
-                    value: 120
                     from: 0
                     to: 200
+
+                    onValueChanged: {
+                        if (controlObj && controlObj.bpm) {
+                            controlObj.bpm = value
+                        }
+                    }
                 }
 
                 TableHeaderLabel {
                     Layout.alignment: Qt.AlignHCenter
                     text: "BPM"
-                    visible: controlType === Sidebar.ControlType.Song
+                    visible: bpmDial.visible
                 }
 
                 SidebarDial {
-                    visible: controlType === Sidebar.ControlType.Part ||
-                             controlType === Sidebar.ControlType.Clip
+                    id: lengthDial
+                    visible: controlObj && controlObj.length ? true : false
 
                     Layout.preferredWidth: 80
                     Layout.preferredHeight: 80
                     Layout.alignment: Qt.AlignHCenter
 
                     stepSize: 1
-                    value: 1
                     from: 1
                     to: 16
+
+                    onValueChanged: {
+                        if (controlObj && controlObj.length) {
+                            controlObj.length = value
+                        }
+                    }
                 }
 
                 TableHeaderLabel {
                     Layout.alignment: Qt.AlignHCenter
                     text: "Length"
-                    visible: controlType === Sidebar.ControlType.Part ||
-                             controlType === Sidebar.ControlType.Clip
+                    visible: lengthDial.visible
                 }
             }
         }

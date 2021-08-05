@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthiloops Part: An object to store clips of a part
+# Zynthiloops Clip: An object to store clip information for a track
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -22,15 +22,24 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 
-class zynthiloops_part(QObject):
+class zynthiloops_clip(QObject):
     __length__ = 1
-    __id__ = None
+    __row_index__ = 0
+    __col_index__ = 0
 
     @Signal
     def length_changed(self):
+        pass
+
+    @Signal
+    def row_index_changed(self):
+        pass
+
+    @Signal
+    def col_index_changed(self):
         pass
 
     @Property(int, notify=length_changed)
@@ -42,6 +51,24 @@ class zynthiloops_part(QObject):
         self.__length__ = length
         self.length_changed.emit()
 
-    @Property(int, constant=True)
-    def id(self):
-        return self.__id__
+    @Property(int, notify=row_index_changed)
+    def row(self):
+        return self.__row_index__
+
+    @row.setter
+    def set_row_index(self, index):
+        self.__row_index__ = index
+        self.row_index_changed.emit()
+
+    @Property(int, notify=col_index_changed)
+    def col(self):
+        return self.__col_index__
+
+    @col.setter
+    def set_col_index(self, index):
+        self.__col_index__ = index
+        self.col_index_changed.emit()
+
+    @Property(str, constant=True)
+    def name(self):
+        return f"Clip {self.__row_index__ + 1}"

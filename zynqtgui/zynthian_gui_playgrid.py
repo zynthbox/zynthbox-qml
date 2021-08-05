@@ -41,6 +41,17 @@ from . import zynthian_qt_gui_base
 
 
 class Note(QObject):
+    __note_name__: str = ""
+    __scale_index__: int = 0
+    __octave__: int = 0
+    __is_playing__: bool = False
+    __midi_note__: int = 0
+    __midi_port__: int = 0
+    __midi_note_on_msg__ = None
+    __midi_note_off_msg__ = None
+    __midi_notes_on_msgs__ = []
+    __midi_notes_off_msgs__ = []
+    __subnotes__ = []
     def __init__(
         self,
         name: str,
@@ -54,14 +65,8 @@ class Note(QObject):
         self.__note_name__ = name
         self.__scale_index__ = scale_index
         self.__octave__ = octave
-        self.__is_playing__ = False
         self.__midi_note__ = midi_note
         self.__midi_port__ = midi_port
-        self.__midi_note_on_msg__ = None
-        self.__midi_note_off_msg__ = None
-        self.__midi_notes_on_msgs__ = []
-        self.__midi_notes_off_msgs__ = []
-        self.__subnotes__ = [];
 
     def get_midi_note(self):
         return self.__midi_note__
@@ -296,7 +301,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 # Create a Note Object representing a Music Note for current cell
                 row_data.append(
                     Note(
-                        name=note_int_to_str_map[col % 12],
+                        name=(note_int_to_str_map[col % 12] if 0 <= col <= 127 else ""),
                         scale_index=scale_index,
                         octave=col // 12,
                         midi_note=col,

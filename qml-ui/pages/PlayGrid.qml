@@ -93,6 +93,18 @@ Zynthian.ScreenPage {
         ListElement { row: 4; column: 4; text: "4x4" }
         ListElement { row: 5; column: 8; text: "5x8" }
     }
+    property var playGridsModel: [
+        { displayName: "Notes Grid", gridComponent: notesGrid, settingsComponent: notesGridSettings },
+        { displayName: "Chords Grid", gridComponent: chordsGrid, settingsComponent: chordsGridSettings },
+        { displayName: "Drumpads", gridComponent: chordsGrid, settingsComponent: chordsGridSettings }
+    ]
+    Connections {
+        target: zynthian.playgrid
+        onPlayGridIndexChanged: {
+            playGridStack.replace(component.playGridsModel[zynthian.playgrid.playGridIndex].gridComponent);
+            settingsStack.replace(component.playGridsModel[zynthian.playgrid.playGridIndex].settingsComponent);
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -125,208 +137,54 @@ Zynthian.ScreenPage {
                                 settingsDialog.visible = false;
                             }
                         }
-                        property list<QtObject> contextualActions: [
-                            Kirigami.Action {
-                                text: "Main Settings"
-                                enabled: settingsStack.currentItem ? settingsStack.currentItem.objectName !== "main" : false
-                                onTriggered: {
-                                    settingsStack.replace(mainSettings);
-                                }
-                            },
-                            Kirigami.Action {
-                                text: "Chords"
-                                enabled: settingsStack.currentItem ? settingsStack.currentItem.objectName !== "chords" : false
-                                onTriggered: {
-                                    settingsStack.replace(chordsSettings);
-                                }
-                            }
-                        ]
+                        property list<QtObject> contextualActions
                     }
                 }
 
-                QQC2.StackView {
-                    id: settingsStack
-                    anchors.fill: parent
-                    initialItem: mainSettings
-                }
-                Component {
-                    id: chordsSettings
-                    Kirigami.FormLayout {
-                        objectName: "chords"
-                        QQC2.ComboBox {
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Number Of Chord Rows"
-                            model: [3, 4, 5]
-                            currentIndex: {
-                                for (var i = 0; i < count; ++i) {
-                                    if (zynthian.playgrid.chordRows === model[i]) {
-                                        return i;
+                contentItem: RowLayout {
+                    ListView {
+                        Layout.preferredWidth: settingsDialog.width / 4
+                        Layout.maximumWidth: Layout.preferredWidth
+                        Layout.fillHeight: true
+                        Layout.margins: 8
+                        model: playGridsModel
+                        currentIndex: zynthian.playgrid.playGridIndex
+                        delegate: QQC2.ItemDelegate {
+                            id: settingsSelectorDelegate
+                            width: ListView.view.width
+                            topPadding: Kirigami.Units.largeSpacing
+                            leftPadding: Kirigami.Units.largeSpacing
+                            bottomPadding: Kirigami.Units.largeSpacing
+                            rightPadding: Kirigami.Units.largeSpacing
+                            highlighted: ListView.isCurrentItem
+                            background: Rectangle {
+                                color: !settingsSelectorDelegate.ListView.isCurrentItem && !settingsSelectorDelegate.pressed
+                                    ? "transparent"
+                                    : ((settingsSelectorDelegate.ListView.view.activeFocus && !settingsSelectorDelegate.pressed || !settingsSelectorDelegate.ListView.view.activeFocus && settingsSelectorDelegate.pressed)
+                                            ? Kirigami.Theme.highlightColor
+                                            : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Kirigami.Units.shortDuration
+                                        easing.type: Easing.InOutQuad
                                     }
                                 }
                             }
-                            onActivated: {
-                                zynthian.playgrid.chordRows = model[currentIndex];
+                            contentItem: QQC2.Label {
+                                text: modelData.displayName
+                                elide: Text.ElideRight
                             }
-                        }
-                        Repeater {
-                            model: zynthian.playgrid.chordRows
-                            QQC2.ComboBox {
-                                Layout.fillWidth: true
-                                Kirigami.FormData.label: "Scale for row " + (index + 1)
-                                property int repeaterIndex: index
-                                model: scaleModel
-                                textRole: "text"
-                                displayText: currentText
-                                currentIndex: {
-                                    var theScale = zynthian.playgrid.chordScales[repeaterIndex];
-                                    for (var i = 0; i < count; ++i) {
-                                        if (scaleModel.get(i).scale === theScale) {
-                                            return i;
-                                        }
-                                    }
-                                    return 0;
-                                }
-                                onActivated: {
-                                    zynthian.playgrid.setChordScale(repeaterIndex, scaleModel.get(currentIndex).scale);
-                                }
+                            onClicked: {
+                                zynthian.playgrid.playGridIndex = model.index;
                             }
                         }
                     }
-                }
-                Component {
-                    id: mainSettings
-                    Kirigami.FormLayout {
-                        objectName: "main"
+                    QQC2.StackView {
+                        id: settingsStack
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-
-                        QQC2.ComboBox {
-                            id: comboScale
-                            Kirigami.FormData.label: "Modes"
-                            Layout.fillWidth: true
-                            model: scaleModel
-                            textRole: "text"
-                            displayText: currentText
-                            currentIndex: 1
-
-                            onActivated: {
-                                zynthian.playgrid.startingNote = 36;
-                                zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
-                            }
-                        }
-                        QQC2.ComboBox {
-                            id: comboKey
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Key"
-                            visible: zynthian.playgrid.scale == "chromatic"
-                            model: keyModel
-                            textRole: "text"
-                            displayText: currentText
-                            currentIndex: 0
-
-                            onActivated: {
-                                zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
-                            }
-                        }
-
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Transpose"
-                            visible: zynthian.playgrid.scale == "chromatic"
-                            text: "-"
-                            onClicked: {
-                                if (zynthian.playgrid.startingNote - 1 > 0) {
-                                    zynthian.playgrid.startingNote--;
-                                } else {
-                                    zynthian.playgrid.startingNote = 0;
-                                }
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            visible: zynthian.playgrid.scale == "chromatic"
-                            text: "+"
-                            onClicked: {
-                                zynthian.playgrid.startingNote++;
-                            }
-                        }
-
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Octave"
-                            visible: zynthian.playgrid.scale != "chromatic"
-                            text: "-"
-                            onClicked: {
-                                if (zynthian.playgrid.startingNote - 12 > 0) {
-                                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
-                                } else {
-                                    zynthian.playgrid.startingNote = 0;
-                                }
-                            }
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            visible: zynthian.playgrid.scale != "chromatic"
-                            text: "+"
-                            onClicked: {
-                                zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
-                            }
-                        }
-                        QQC2.ComboBox {
-                            id: optionGrid
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Grid"
-                            model: gridModel
-                            textRole: "text"
-                            displayText: currentText
-                            currentIndex: 3
-
-                            onActivated: {
-                                var data = gridModel.get(currentIndex)
-
-                                if (data.row === 0 && data.column === 0) {
-                                    zynthian.playgrid.rows = customRows.currentText;
-                                    zynthian.playgrid.columns = customColumns.currentText;
-                                } else {
-                                    zynthian.playgrid.rows = data.row;
-                                    zynthian.playgrid.columns = data.column;
-                                }
-                            }
-                        }
-
-                        QQC2.ComboBox {
-                            id: customRows
-                            Layout.fillWidth: true
-                            visible: optionGrid.currentIndex === 0
-                            Kirigami.FormData.label: "Custom Grid Rows"
-                            model: [3,4,5,6,7,8,9]
-                            displayText: currentText
-                            currentIndex: 0
-                            onActivated: {
-                                zynthian.playgrid.rows = currentText;
-                            }
-                        }
-                        QQC2.ComboBox {
-                            id: customColumns
-                            Layout.fillWidth: true
-                            visible: optionGrid.currentIndex === 0
-                            Kirigami.FormData.label: "Custom Grid Columns"
-                            model: [3,4,5,6,7,8,9]
-                            displayText: currentText
-                            currentIndex: 0
-                            onActivated: {
-                                zynthian.playgrid.columns = currentText;
-                            }
-                        }
-                        QQC2.Switch {
-                            id: positionalVelocitySwitch
-                            Layout.fillWidth: true
-                            Kirigami.FormData.label: "Use Tap Position As Velocity"
-                            checked: zynthian.playgrid.positionalVelocity
-                            onClicked: {
-                                zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
-                            }
-                        }
+                        clip: true
+                        initialItem: component.playGridsModel[zynthian.playgrid.playGridIndex].settingsComponent
                     }
                 }
             }
@@ -335,6 +193,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 8
+                z: 999
 
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -557,19 +416,10 @@ Zynthian.ScreenPage {
                                 }
                             } else if (yChoice === 0 && xChoice !== 0) {
                                 // Sliding rightward from the button - switch between grid modes
-                                switch (xChoice) {
-                                    case 1:
-                                        text = "Switch to Note Grid";
-                                        break;
-                                    case 2:
-                                        text = "Switch to Chords Grid";
-                                        break;
-                                    case 3:
-                                        text = "Switch to Drum Pads";
-                                        break;
-                                    default:
-                                        var text = "Do nothing";
-                                        break;
+                                if (xChoice <= playGridsModel.length  && zynthian.playgrid.playGridIndex !== xChoice - 1) {
+                                    text = "Switch to " + component.playGridsModel[xChoice - 1].displayName;
+                                } else {
+                                    text = "Do nothing";
                                 }
                             } else if (yChoice === 0 && xChoice === 0) {
                                 text = "Show Settings";
@@ -598,7 +448,10 @@ Zynthian.ScreenPage {
                             if (!settingsSlidePoint.pressed) {
                                 parent.down = false;
                                 currentText = "";
-                                if (xChoice === 0 && yChoice !== 0) {
+                                if (xChoice === 0 && yChoice === 0) {
+                                    // Then it we just had a tap
+                                    settingsDialog.visible = true;
+                                } else if (xChoice === 0 && yChoice !== 0) {
                                     switch (yChoice) {
                                         case -1:
                                             // Enable the swipey manipulation on the grids
@@ -610,27 +463,9 @@ Zynthian.ScreenPage {
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    switch (xChoice) {
-                                        case 1:
-                                            if (playGridStack.currentItem.objectName !== "notesGrid") {
-                                                playGridStack.replace(notesGrid);
-                                            }
-                                            break;
-                                        case 2:
-                                            if (playGridStack.currentItem.objectName !== "chordsGrid") {
-                                                playGridStack.replace(chordsGrid);
-                                            }
-                                            break;
-                                        case 3:
-                                            // No drum pads yet
-                                            applicationWindow().showPassiveNotification("Sorry, no drum pads yet... we'll get to those!");
-                                            break;
-                                        default:
-                                            break;
+                                    if (xChoice <= playGridsModel.length && zynthian.playgrid.playGridIndex !== xChoice - 1) {
+                                        zynthian.playgrid.playGridIndex = xChoice - 1
                                     }
-                                } else if (xChoice === 0 && yChoice === 0) {
-                                    // Then it we just had a tap
-                                    settingsDialog.visible = true;
                                 }
                             }
                         }
@@ -643,7 +478,8 @@ Zynthian.ScreenPage {
             id: playGridStack
             Layout.fillWidth: true
             Layout.fillHeight: true
-            initialItem: notesGrid
+            clip: true
+            initialItem: component.playGridsModel[zynthian.playgrid.playGridIndex].gridComponent
         }
     }
     Component {
@@ -759,6 +595,141 @@ Zynthian.ScreenPage {
         }
     }
     Component {
+        id: notesGridSettings
+        Kirigami.FormLayout {
+            objectName: "notesGridSettings"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            QQC2.ComboBox {
+                id: comboScale
+                Kirigami.FormData.label: "Modes"
+                Layout.fillWidth: true
+                model: scaleModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 1
+
+                onActivated: {
+                    zynthian.playgrid.startingNote = 36;
+                    zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                }
+            }
+            QQC2.ComboBox {
+                id: comboKey
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Key"
+                visible: zynthian.playgrid.scale == "chromatic"
+                model: keyModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 0
+
+                onActivated: {
+                    zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Transpose"
+                visible: zynthian.playgrid.scale == "chromatic"
+                text: "-"
+                onClicked: {
+                    if (zynthian.playgrid.startingNote - 1 > 0) {
+                        zynthian.playgrid.startingNote--;
+                    } else {
+                        zynthian.playgrid.startingNote = 0;
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                visible: zynthian.playgrid.scale == "chromatic"
+                text: "+"
+                onClicked: {
+                    zynthian.playgrid.startingNote++;
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Octave"
+                visible: zynthian.playgrid.scale != "chromatic"
+                text: "-"
+                onClicked: {
+                    if (zynthian.playgrid.startingNote - 12 > 0) {
+                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                    } else {
+                        zynthian.playgrid.startingNote = 0;
+                    }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                visible: zynthian.playgrid.scale != "chromatic"
+                text: "+"
+                onClicked: {
+                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                }
+            }
+            QQC2.ComboBox {
+                id: optionGrid
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Grid"
+                model: gridModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 3
+
+                onActivated: {
+                    var data = gridModel.get(currentIndex)
+
+                    if (data.row === 0 && data.column === 0) {
+                        zynthian.playgrid.rows = customRows.currentText;
+                        zynthian.playgrid.columns = customColumns.currentText;
+                    } else {
+                        zynthian.playgrid.rows = data.row;
+                        zynthian.playgrid.columns = data.column;
+                    }
+                }
+            }
+
+            QQC2.ComboBox {
+                id: customRows
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Rows"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    zynthian.playgrid.rows = currentText;
+                }
+            }
+            QQC2.ComboBox {
+                id: customColumns
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Columns"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    zynthian.playgrid.columns = currentText;
+                }
+            }
+            QQC2.Switch {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Use Tap Position As Velocity"
+                checked: zynthian.playgrid.positionalVelocity
+                onClicked: {
+                    zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
+                }
+            }
+        }
+    }
+    Component {
         id: chordsGrid
         ColumnLayout {
             objectName: "chordsGrid"
@@ -856,6 +827,58 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+    Component {
+        id: chordsGridSettings
+        Kirigami.FormLayout {
+            objectName: "chordsGridSettings"
+            QQC2.ComboBox {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Number Of Chord Rows"
+                model: [3, 4, 5]
+                currentIndex: {
+                    for (var i = 0; i < count; ++i) {
+                        if (zynthian.playgrid.chordRows === model[i]) {
+                            return i;
+                        }
+                    }
+                }
+                onActivated: {
+                    zynthian.playgrid.chordRows = model[currentIndex];
+                }
+            }
+            Repeater {
+                model: zynthian.playgrid.chordRows
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Kirigami.FormData.label: "Scale for row " + (index + 1)
+                    property int repeaterIndex: index
+                    model: scaleModel
+                    textRole: "text"
+                    displayText: currentText
+                    currentIndex: {
+                        var theScale = zynthian.playgrid.chordScales[repeaterIndex];
+                        for (var i = 0; i < count; ++i) {
+                            if (scaleModel.get(i).scale === theScale) {
+                                return i;
+                            }
+                        }
+                        return 0;
+                    }
+                    onActivated: {
+                        zynthian.playgrid.setChordScale(repeaterIndex, scaleModel.get(currentIndex).scale);
+                    }
+                }
+            }
+            QQC2.Switch {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Use Tap Position As Velocity"
+                checked: zynthian.playgrid.positionalVelocity
+                onClicked: {
+                    zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
                 }
             }
         }

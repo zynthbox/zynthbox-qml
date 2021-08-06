@@ -35,6 +35,7 @@
       "zynqtgui/zynthian_gui_midi_out.py",
       "zynqtgui/zynthian_gui_midi_profile.py",
       "zynqtgui/zynthian_gui_midi_recorder.py",
+      "zynqtgui/zynthian_gui_network.py",
       "zynqtgui/zynthian_gui_newstuff.py",
       "zynqtgui/zynthian_gui_option.py",
       "zynqtgui/zynthian_gui_osc_browser.py",

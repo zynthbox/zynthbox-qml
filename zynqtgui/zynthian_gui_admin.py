@@ -192,12 +192,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         #     self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
 
         self.list_data.append((None, 0, "-----------------------------"))
-
         self.list_data.append((self.hardware, 0, "Hardware"))
-
-        self.list_data.append((self.test_audio, 0, "Test Audio"))
-        self.list_data.append((self.test_midi, 0, "Test MIDI"))
-        self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append(
             (self.zyngui.calibrate_touchscreen, 0, "Calibrate Touchscreen")

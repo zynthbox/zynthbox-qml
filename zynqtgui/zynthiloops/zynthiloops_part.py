@@ -30,9 +30,9 @@ class zynthiloops_part(QObject):
     __clips__ = []
     __part_index__ = 0
 
-    # def __init__(self, part_index: int):
-    #     self.__part_index__ = part_index
-
+    def __init__(self, part_index: int, parent=None):
+        super(zynthiloops_part, self).__init__(parent)
+        self.__part_index__ = part_index
 
     @Signal
     def length_changed(self):

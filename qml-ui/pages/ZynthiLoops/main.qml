@@ -65,29 +65,6 @@ Zynthian.ScreenPage {
         property int cellHeight: headerHeight
     }
 
-    // AWFUL TEMPORARY WORKAROUND
-    // FIX IMMEDIATELY
-    ObjectModel {
-        id: partsModel
-
-        ZynthiLoops.Part { partIndex: 0 }
-        ZynthiLoops.Part { partIndex: 1 }
-        ZynthiLoops.Part { partIndex: 2 }
-        ZynthiLoops.Part { partIndex: 3 }
-        ZynthiLoops.Part { partIndex: 4 }
-        ZynthiLoops.Part { partIndex: 5 }
-        ZynthiLoops.Part { partIndex: 6 }
-        ZynthiLoops.Part { partIndex: 7 }
-        ZynthiLoops.Part { partIndex: 8 }
-        ZynthiLoops.Part { partIndex: 9 }
-        ZynthiLoops.Part { partIndex: 10 }
-        ZynthiLoops.Part { partIndex: 11 }
-        ZynthiLoops.Part { partIndex: 12 }
-        ZynthiLoops.Part { partIndex: 13 }
-        ZynthiLoops.Part { partIndex: 14 }
-        ZynthiLoops.Part { partIndex: 15 }
-    }
-
     ZynthiLoops.Song {
         id: song
         index: 0
@@ -152,10 +129,10 @@ Zynthian.ScreenPage {
                     orientation: Qt.Horizontal
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: partsModel.count
+                    model: zynthian.zynthiloops.partsModel
 
                     delegate: Rectangle {
-                        property var part: partsModel.get(index)
+                        property var part: zynthian.zynthiloops.partsModel.data(zynthian.zynthiloops.partsModel.index(index, 0))
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
@@ -259,7 +236,7 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: partsModel.count
+                        columns: zynthian.zynthiloops.partsModel.rowCount(zynthian.zynthiloops.partsModel.index(0,0))
                         rowSpacing: 1
                         columnSpacing: 1
 
@@ -270,10 +247,10 @@ Zynthian.ScreenPage {
                                 property var track: zynthian.zynthiloops.model.data(zynthian.zynthiloops.model.index(index, 0))
                                 property int rowIndex: index
 
-                                model: partsModel.count
+                                model: zynthian.zynthiloops.partsModel
 
                                 delegate: Rectangle {
-                                    property var part: partsModel.get(index)
+                                    property var part: zynthian.zynthiloops.partsModel.data(zynthian.zynthiloops.partsModel.index(index, 0))
                                     property int colIndex: index
 
                                     Layout.preferredWidth: privateProps.cellWidth

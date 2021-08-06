@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing parts of a song in ZynthiLoops
+# A model to store parts of a song in ZynthiLoops
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -22,37 +22,31 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-import logging
+from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 
-from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt
-from .zynthiloops_part import zynthiloops_part
+from zynqtgui.zynthiloops.zynthiloops_part import zynthiloops_part
 
 
 class zynthiloops_parts_model(QAbstractListModel):
-    IdRole = Qt.UserRole + 1
-    NameRole = IdRole + 1
-
+    PartIndexRole = Qt.UserRole + 1
+    NameRole = PartIndexRole + 1
     __parts__: [zynthiloops_part] = []
 
-    def __init__(self, parent: QObject = None):
-        super(zynthiloops_parts_model, self).__init__(parent)
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-        # for i in range(0, 2):
-        #     self.add_part(zynthiloops_part(i))
-
-        logging.info(self.__parts__)
+        for i in range(0, 4):
+            self.add_part(zynthiloops_part(i, self))
 
     def data(self, index, role=None):
-        # if not index.isValid():
-        #     return None
+        if not index.isValid():
+            return None
 
-        logging.info(index.row(), self.__parts__[index.row()])
+        if index.row() > len(self.__parts__):
+            return None
 
-        # if index.row() > len(self.__parts__):
-        #     return None
-
-        if role == self.IdRole:
-            return self.__parts__[index.row()].id
+        if role == self.PartIndexRole:
+            return self.__parts__[index.row()].partIndex
         elif role == self.NameRole:
             return self.__parts__[index.row()].name
         else:
@@ -60,7 +54,7 @@ class zynthiloops_parts_model(QAbstractListModel):
 
     def roleNames(self):
         role_names = {
-            self.IdRole: b"id",
+            self.PartIndexRole: b"partIndex",
             self.NameRole: b"name",
         }
 

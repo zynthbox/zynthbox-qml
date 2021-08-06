@@ -170,6 +170,9 @@ class zynthian_gui_admin(zynthian_gui_selector):
         # self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
 
         self.list_data.append((None, 0, "-----------------------------"))
+
+        self.list_data.append((self.network, 0, "Network"))
+
         self.list_data.append((self.network_info, 0, "Network Info"))
 
         if zynconf.is_wifi_active():
@@ -708,6 +711,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
     # ------------------------------------------------------------------------------
     # NETWORK FEATURES
     # ------------------------------------------------------------------------------
+
+    def network(self):
+        logging.info("Network")
+        self.zyngui.show_modal("network")
 
     def network_info(self):
         self.zyngui.show_info("NETWORK INFO\n")

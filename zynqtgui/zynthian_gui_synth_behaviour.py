@@ -174,8 +174,8 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
             self.last_action()
 
     def set_select_path(self):
-        self.select_path = "Synth_Behaviour"
-        self.select_path_element = "Synth_Behaviour"
+        self.select_path = "Synth Behaviour"
+        self.select_path_element = "Synth Behaviour"
         super().set_select_path()
 
     def execute_commands(self):

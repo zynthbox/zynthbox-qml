@@ -55,8 +55,6 @@ class zynthian_gui_network(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
 
-        self.list_data.append((self.network, 0, "Network"))
-
         self.list_data.append((self.network_info, 0, "Network Info"))
 
         if zynconf.is_wifi_active():

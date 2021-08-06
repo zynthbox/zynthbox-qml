@@ -29,10 +29,40 @@ class zynthiloops_part(QObject):
     __length__ = 1
     __clips__ = []
     __part_index__ = 0
+    __is_playing__ = False
 
     def __init__(self, part_index: int, parent=None):
         super(zynthiloops_part, self).__init__(parent)
         self.__part_index__ = part_index
+
+    @Property(bool, constant=True)
+    def playable(self):
+        return True
+
+    @Property(bool, constant=True)
+    def recordable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def clearable(self):
+        return True
+
+    @Property(bool, constant=True)
+    def deletable(self):
+        return True
+
+    @Signal
+    def __is_playing_changed__(self):
+        pass
+
+    @Property(bool, notify=__is_playing_changed__)
+    def isPlaying(self):
+        return self.__is_playing__
+
+    @isPlaying.setter
+    def __set_is_playing__(self, is_playing: bool):
+        self.__is_playing__ = is_playing
+        self.__is_playing_changed__.emit()
 
     @Signal
     def length_changed(self):

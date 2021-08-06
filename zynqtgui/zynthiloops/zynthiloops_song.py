@@ -40,6 +40,22 @@ class zynthiloops_song(QObject):
         self.__tracks_model__ = zynthiloops_tracks_model(parent)
         self.__parts_model__ = zynthiloops_parts_model(parent)
 
+    @Property(bool, constant=True)
+    def playable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def recordable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def clearable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def deletable(self):
+        return False
+
     @Signal
     def bpm_changed(self):
         pass

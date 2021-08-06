@@ -76,6 +76,7 @@ QtObject {
         "test_touchpoints": "TestTouchpoints.qml",
 		"synth_behaviour":"SynthBehaviourPage.qml",
 		"network":"NetworkPage.qml",
+		"hardware":"HardwarePage.qml",
         "playgrid": "PlayGrid.qml",
         "zynthiloops": "ZynthiLoops/main.qml"
 	}

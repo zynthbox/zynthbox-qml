@@ -31,11 +31,13 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 Zynthian.SelectorPage {
-    screenId: "synth_behaviour"
+    screenId: "hardware"
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Themes")
             onTriggered: zynthian.show_modal("theme_chooser")
         }
     ]
+
+
 }

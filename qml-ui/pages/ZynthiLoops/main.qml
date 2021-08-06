@@ -276,7 +276,7 @@ Zynthian.ScreenPage {
                                     TableHeaderLabel {
                                         anchors.centerIn: parent
                                         // text: "Clip " + (clip.col+1) // clip.name
-                                        text2: clip.length + " Bar"
+                                        // text2: clip.length + " Bar"
                                     }
 
                                     MultiPointTouchArea {

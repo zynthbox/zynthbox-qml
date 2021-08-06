@@ -245,6 +245,7 @@ Zynthian.ScreenPage {
                                 property var track: song.tracksModel.data(song.tracksModel.index(index, 0))
                                 property int rowIndex: index
 
+                                // TODO : Populate clips model per track in tracks model
                                 model: song.partsModel
 
                                 delegate: Rectangle {

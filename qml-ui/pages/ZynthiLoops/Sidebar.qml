@@ -67,7 +67,7 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
 
                     stepSize: 1
-                    from: 0
+                    from: 50
                     to: 200
 
                     onValueChanged: {

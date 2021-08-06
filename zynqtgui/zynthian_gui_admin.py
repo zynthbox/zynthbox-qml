@@ -167,7 +167,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         #         (self.start_aubionotes, 0, "[  ] AubioNotes (Audio2MIDI)")
         #     )
 
-        self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
+        # self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
 
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((self.network_info, 0, "Network Info"))

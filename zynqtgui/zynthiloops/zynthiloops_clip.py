@@ -52,6 +52,10 @@ class zynthiloops_clip(QObject):
         self.__client__.set_shutdown_callback(self.shutdown)
         self.__client__.set_process_callback(self.process)
 
+        with sf.SoundFile("/zynthian/zynthian-my-data/capture/test.wav") as f:
+            for ch in range(f.channels):
+                self.__client__.outports.register('out_{0}'.format(ch + 1))
+
     def print_error(self, *args):
         logging.error(*args)
 
@@ -78,8 +82,11 @@ class zynthiloops_clip(QObject):
             data = self.__q__.get_nowait()
         except queue.Empty:
             self.stop_callback('Buffer is empty: increase buffersize?')
+
         if data is None:
-            self.stop_callback()  # Playback is finished
+            # self.stop_callback()  # Playback is finished
+            self.__q__.queue.clear()
+
         for channel, port in zip(data.T, self.__client__.outports):
             port.get_array()[:] = channel
 
@@ -165,8 +172,6 @@ class zynthiloops_clip(QObject):
 
         try:
             with sf.SoundFile("/zynthian/zynthian-my-data/capture/test.wav") as f:
-                for ch in range(f.channels):
-                    self.__client__.outports.register('out_{0}'.format(ch + 1))
                 block_generator = f.blocks(blocksize=self.__blocksize__, dtype='float32',
                                            always_2d=True, fill_value=0)
                 for _, data in zip(range(self.__buffer_size__), block_generator):

@@ -130,7 +130,7 @@ from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 
 from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
-
+from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 
 from pathlib import Path
 

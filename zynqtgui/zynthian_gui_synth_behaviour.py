@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian GUI Admin Class
+# Zynthian GUI Synth Behaviour Class
 #
 # Copyright (C) 2015-2016 Fernando Moyano <jofemodo@zynthian.org>
 #
@@ -38,15 +38,15 @@ from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
 # -------------------------------------------------------------------------------
-# Zynthian Admin GUI Class
+# Zynthian Synth Behaviour GUI Class
 # -------------------------------------------------------------------------------
-class zynthian_gui_admin(zynthian_gui_selector):
+class zynthian_gui_synth_behaviour(zynthian_gui_selector):
 
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
     sys_dir = os.environ.get("ZYNTHIAN_SYS_DIR", "/zynthian/zynthian-sys")
 
     def __init__(self, parent=None):
-        super(zynthian_gui_admin, self).__init__("Engine", parent)
+        super(zynthian_gui_synth_behaviour, self).__init__("Engine", parent)
         self.commands = None
         self.thread = None
         self.child_pid = None
@@ -216,8 +216,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.last_action()
 
     def set_select_path(self):
-        self.select_path = "Admin"
-        self.select_path_element = "Admin"
+        self.select_path = "Synth_Behaviour"
+        self.select_path_element = "Synth_Behaviour"
         super().set_select_path()
 
     def execute_commands(self):

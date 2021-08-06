@@ -27,13 +27,13 @@
 from PySide2.QtCore import Property, QObject, Slot
 
 
-class ZynthiLoopsTrack(QObject):
+class zynthiloops_track(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
     __clips__ = []
 
     def __init__(self, id: int, parent: QObject = None):
-        super(ZynthiLoopsTrack, self).__init__(parent)
+        super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
 
     @Property(int, constant=True)

@@ -42,18 +42,16 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Add Track")
-            onTriggered: zynthian.zynthiloops.addTrack()
+            onTriggered: song.addTrack()
         }
     ]
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
-//        applicationWindow().headerVisible = false;
     }
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
-//        applicationWindow().headerVisible = true;
     }
 
     QtObject {
@@ -129,10 +127,10 @@ Zynthian.ScreenPage {
                     orientation: Qt.Horizontal
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: zynthian.zynthiloops.partsModel
+                    model: song.partsModel
 
                     delegate: Rectangle {
-                        property var part: zynthian.zynthiloops.partsModel.data(zynthian.zynthiloops.partsModel.index(index, 0))
+                        property var part: song.partsModel.data(song.partsModel.index(index, 0))
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
@@ -184,7 +182,7 @@ Zynthian.ScreenPage {
                     contentY: loopGridFlickable.contentY
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: zynthian.zynthiloops.model
+                    model: song.tracksModel
 
                     delegate: Rectangle {
                         property var track: model
@@ -236,21 +234,21 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: zynthian.zynthiloops.partsModel.rowCount(zynthian.zynthiloops.partsModel.index(0,0))
+                        columns: song.partsModel.rowCount(song.partsModel.index(0,0))
                         rowSpacing: 1
                         columnSpacing: 1
 
                         Repeater {
-                            model: zynthian.zynthiloops.model
+                            model: song.tracksModel
 
                             delegate: Repeater {
-                                property var track: zynthian.zynthiloops.model.data(zynthian.zynthiloops.model.index(index, 0))
+                                property var track: song.tracksModel.data(song.tracksModel.index(index, 0))
                                 property int rowIndex: index
 
-                                model: zynthian.zynthiloops.partsModel
+                                model: song.partsModel
 
                                 delegate: Rectangle {
-                                    property var part: zynthian.zynthiloops.partsModel.data(zynthian.zynthiloops.partsModel.index(index, 0))
+                                    property var part: song.partsModel.data(song.partsModel.index(index, 0))
                                     property int colIndex: index
 
                                     Layout.preferredWidth: privateProps.cellWidth

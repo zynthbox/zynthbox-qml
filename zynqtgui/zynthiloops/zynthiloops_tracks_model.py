@@ -25,17 +25,17 @@
 import logging
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt
-from .zynthiloops_track import ZynthiLoopsTrack
+from .zynthiloops_track import zynthiloops_track
 
 
-class ZynthiLoopsTracksModel(QAbstractListModel):
+class zynthiloops_tracks_model(QAbstractListModel):
     IdRole = Qt.UserRole + 1
     NameRole = IdRole + 1
 
-    __tracks__: [ZynthiLoopsTrack] = []
+    __tracks__: [zynthiloops_track] = []
 
     def __init__(self, parent: QObject = None):
-        super(ZynthiLoopsTracksModel, self).__init__(parent)
+        super(zynthiloops_tracks_model, self).__init__(parent)
 
     def data(self, index, role=None):
         logging.info(index.row(), self.__tracks__[index.row()])
@@ -64,7 +64,7 @@ class ZynthiLoopsTracksModel(QAbstractListModel):
     def rowCount(self, index):
         return len(self.__tracks__)
 
-    def add_track(self, track: ZynthiLoopsTrack):
+    def add_track(self, track: zynthiloops_track):
         length = len(self.__tracks__)
 
         self.beginInsertRows(QModelIndex(), length, length)

@@ -23,11 +23,22 @@
 #
 # ******************************************************************************
 from PySide2.QtCore import Property, QObject, Signal, Slot
+from .zynthiloops_track import zynthiloops_track
+from .zynthiloops_part import zynthiloops_part
+from .zynthiloops_parts_model import zynthiloops_parts_model
+from .zynthiloops_tracks_model import zynthiloops_tracks_model
 
 
 class zynthiloops_song(QObject):
+    __track_counter__ = 0
     __bpm__ = 120
     __index__ = 0
+
+    def __init__(self, parent=None):
+        super(zynthiloops_song, self).__init__(parent)
+
+        self.__tracks_model__ = zynthiloops_tracks_model(parent)
+        self.__parts_model__ = zynthiloops_parts_model(parent)
 
     @Signal
     def bpm_changed(self):
@@ -36,6 +47,27 @@ class zynthiloops_song(QObject):
     @Signal
     def index_changed(self):
         pass
+
+    @Signal
+    def __tracks_model_changed__(self):
+        pass
+
+    @Signal
+    def __parts_model_changed__(self):
+        pass
+
+    @Property(QObject, notify=__tracks_model_changed__)
+    def tracksModel(self):
+        return self.__tracks_model__
+
+    @Property(QObject, notify=__parts_model_changed__)
+    def partsModel(self):
+        return self.__parts_model__
+
+    @Slot(None)
+    def addTrack(self):
+        self.__track_counter__ += 1
+        self.__tracks_model__.add_track(zynthiloops_track(self.__track_counter__, self.__tracks_model__))
 
     @Property(int, notify=bpm_changed)
     def bpm(self):

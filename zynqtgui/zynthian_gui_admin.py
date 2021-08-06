@@ -60,9 +60,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
 
-        self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
-
-
         # if self.zyngui.allow_headphones():
         #     if zynthian_gui_config.rbpi_headphones:
         #         self.list_data.append(
@@ -169,10 +166,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
         # self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
 
-        self.list_data.append((None, 0, "-----------------------------"))
-
-        self.list_data.append((self.network, 0, "Network"))
-
         # self.list_data.append((self.network_info, 0, "Network Info"))
 
         # if zynconf.is_wifi_active():
@@ -192,11 +185,14 @@ class zynthian_gui_admin(zynthian_gui_selector):
         #     self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
 
         # self.list_data.append((None, 0, "-----------------------------"))
-        self.list_data.append((self.hardware, 0, "Hardware"))
         # self.list_data.append((self.test_audio, 0, "Test Audio"))
         # self.list_data.append((self.test_midi, 0, "Test MIDI"))
         # self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
         # self.list_data.append((None, 0, "-----------------------------"))
+
+        self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
+        self.list_data.append((self.network, 0, "Network"))
+        self.list_data.append((self.hardware, 0, "Hardware"))
         self.list_data.append((None, 0, "-----------------------------"))
         if self.is_update_available():
             self.list_data.append((self.update_software, 0, "Update Software"))

@@ -63,111 +63,111 @@ class zynthian_gui_admin(zynthian_gui_selector):
         self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
 
 
-        if self.zyngui.allow_headphones():
-            if zynthian_gui_config.rbpi_headphones:
-                self.list_data.append(
-                    (self.stop_rbpi_headphones, 0, "[x] RBPi Headphones")
-                )
-            else:
-                self.list_data.append(
-                    (self.start_rbpi_headphones, 0, "[  ] RBPi Headphones")
-                )
+        # if self.zyngui.allow_headphones():
+        #     if zynthian_gui_config.rbpi_headphones:
+        #         self.list_data.append(
+        #             (self.stop_rbpi_headphones, 0, "[x] RBPi Headphones")
+        #         )
+        #     else:
+        #         self.list_data.append(
+        #             (self.start_rbpi_headphones, 0, "[  ] RBPi Headphones")
+        #         )
 
-        if zynthian_gui_config.midi_single_active_channel:
-            self.list_data.append(
-                (self.toggle_single_channel, 0, "->  Stage Mode")
-            )
-        else:
-            self.list_data.append(
-                (self.toggle_single_channel, 0, "=>  Multi-timbral Mode")
-            )
+        # if zynthian_gui_config.midi_single_active_channel:
+        #     self.list_data.append(
+        #         (self.toggle_single_channel, 0, "->  Stage Mode")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.toggle_single_channel, 0, "=>  Multi-timbral Mode")
+        #     )
 
-        if zynthian_gui_config.midi_prog_change_zs3:
-            self.list_data.append(
-                (self.toggle_prog_change_zs3, 0, "[x] Program Change ZS3")
-            )
-        else:
-            self.list_data.append(
-                (self.toggle_prog_change_zs3, 0, "[  ] Program Change ZS3")
-            )
+        # if zynthian_gui_config.midi_prog_change_zs3:
+        #     self.list_data.append(
+        #         (self.toggle_prog_change_zs3, 0, "[x] Program Change ZS3")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.toggle_prog_change_zs3, 0, "[  ] Program Change ZS3")
+        #     )
 
-        if zynthian_gui_config.preset_preload_noteon:
-            self.list_data.append(
-                (self.toggle_preset_preload_noteon, 0, "[x] Preset Preload")
-            )
-        else:
-            self.list_data.append(
-                (self.toggle_preset_preload_noteon, 0, "[  ] Preset Preload")
-            )
+        # if zynthian_gui_config.preset_preload_noteon:
+        #     self.list_data.append(
+        #         (self.toggle_preset_preload_noteon, 0, "[x] Preset Preload")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.toggle_preset_preload_noteon, 0, "[  ] Preset Preload")
+        #     )
 
-        if zynthian_gui_config.snapshot_mixer_settings:
-            self.list_data.append(
-                (
-                    self.toggle_snapshot_mixer_settings,
-                    0,
-                    "[x] Audio Levels on Snapshots",
-                )
-            )
-        else:
-            self.list_data.append(
-                (
-                    self.toggle_snapshot_mixer_settings,
-                    0,
-                    "[  ] Audio Levels on Snapshots",
-                )
-            )
+        # if zynthian_gui_config.snapshot_mixer_settings:
+        #     self.list_data.append(
+        #         (
+        #             self.toggle_snapshot_mixer_settings,
+        #             0,
+        #             "[x] Audio Levels on Snapshots",
+        #         )
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (
+        #             self.toggle_snapshot_mixer_settings,
+        #             0,
+        #             "[  ] Audio Levels on Snapshots",
+        #         )
+        #     )
 
-        if zynthian_gui_config.midi_filter_output:
-            self.list_data.append(
-                (self.toggle_midi_filter_output, 0, "[x] MIDI Filter Ouput")
-            )
-        else:
-            self.list_data.append(
-                (self.toggle_midi_filter_output, 0, "[  ] MIDI Filter Output")
-            )
+        # if zynthian_gui_config.midi_filter_output:
+        #     self.list_data.append(
+        #         (self.toggle_midi_filter_output, 0, "[x] MIDI Filter Ouput")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.toggle_midi_filter_output, 0, "[  ] MIDI Filter Output")
+        #     )
 
-        if zynthian_gui_config.midi_sys_enabled:
-            self.list_data.append(
-                (self.toggle_midi_sys, 0, "[x] MIDI System Messages")
-            )
-        else:
-            self.list_data.append(
-                (self.toggle_midi_sys, 0, "[  ] MIDI System Messages")
-            )
+        # if zynthian_gui_config.midi_sys_enabled:
+        #     self.list_data.append(
+        #         (self.toggle_midi_sys, 0, "[x] MIDI System Messages")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.toggle_midi_sys, 0, "[  ] MIDI System Messages")
+        #     )
 
-        if zynconf.is_service_active("jackrtpmidid"):
-            self.list_data.append((self.stop_rtpmidi, 0, "[x] RTP-MIDI"))
-        else:
-            self.list_data.append((self.start_rtpmidi, 0, "[  ] RTP-MIDI"))
+        # if zynconf.is_service_active("jackrtpmidid"):
+        #     self.list_data.append((self.stop_rtpmidi, 0, "[x] RTP-MIDI"))
+        # else:
+        #     self.list_data.append((self.start_rtpmidi, 0, "[  ] RTP-MIDI"))
 
-        if zynconf.is_service_active("qmidinet"):
-            self.list_data.append(
-                (self.stop_qmidinet, 0, "[x] QmidiNet (IP Multicast)")
-            )
-        else:
-            self.list_data.append(
-                (self.start_qmidinet, 0, "[  ] QmidiNet (IP Multicast)")
-            )
+        # if zynconf.is_service_active("qmidinet"):
+        #     self.list_data.append(
+        #         (self.stop_qmidinet, 0, "[x] QmidiNet (IP Multicast)")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.start_qmidinet, 0, "[  ] QmidiNet (IP Multicast)")
+        #     )
 
-        if zynconf.is_service_active("touchosc2midi"):
-            self.list_data.append(
-                (self.stop_touchosc2midi, 0, "[x] TouchOSC MIDI Bridge")
-            )
-        else:
-            self.list_data.append(
-                (self.start_touchosc2midi, 0, "[  ] TouchOSC MIDI Bridge")
-            )
+        # if zynconf.is_service_active("touchosc2midi"):
+        #     self.list_data.append(
+        #         (self.stop_touchosc2midi, 0, "[x] TouchOSC MIDI Bridge")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.start_touchosc2midi, 0, "[  ] TouchOSC MIDI Bridge")
+        #     )
 
-        if zynconf.is_service_active("aubionotes"):
-            self.list_data.append(
-                (self.stop_aubionotes, 0, "[x] AubioNotes (Audio2MIDI)")
-            )
-        else:
-            self.list_data.append(
-                (self.start_aubionotes, 0, "[  ] AubioNotes (Audio2MIDI)")
-            )
+        # if zynconf.is_service_active("aubionotes"):
+        #     self.list_data.append(
+        #         (self.stop_aubionotes, 0, "[x] AubioNotes (Audio2MIDI)")
+        #     )
+        # else:
+        #     self.list_data.append(
+        #         (self.start_aubionotes, 0, "[  ] AubioNotes (Audio2MIDI)")
+        #     )
 
-        self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
+        # self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
 
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((self.network_info, 0, "Network Info"))

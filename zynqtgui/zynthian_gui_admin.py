@@ -173,23 +173,23 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
         self.list_data.append((self.network, 0, "Network"))
 
-        self.list_data.append((self.network_info, 0, "Network Info"))
+        # self.list_data.append((self.network_info, 0, "Network Info"))
 
-        if zynconf.is_wifi_active():
-            if zynconf.is_service_active("hostapd"):
-                self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi Hotspot"))
-            else:
-                self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi"))
-        else:
-            self.list_data.append((self.start_wifi, 0, "[  ] Wi-Fi"))
-            self.list_data.append(
-                (self.start_wifi_hotspot, 0, "[  ] Wi-Fi Hotspot")
-            )
+        # if zynconf.is_wifi_active():
+        #     if zynconf.is_service_active("hostapd"):
+        #         self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi Hotspot"))
+        #     else:
+        #         self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi"))
+        # else:
+        #     self.list_data.append((self.start_wifi, 0, "[  ] Wi-Fi"))
+        #     self.list_data.append(
+        #         (self.start_wifi_hotspot, 0, "[  ] Wi-Fi Hotspot")
+        #     )
 
-        if zynconf.is_service_active("vncserver@:1"):
-            self.list_data.append((self.stop_vncserver, 0, "[x] VNC Server"))
-        else:
-            self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
+        # if zynconf.is_service_active("vncserver@:1"):
+        #     self.list_data.append((self.stop_vncserver, 0, "[x] VNC Server"))
+        # else:
+        #     self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
 
         self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((self.test_audio, 0, "Test Audio"))

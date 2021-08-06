@@ -659,4 +659,229 @@ class zynthian_gui_synth_behaviour(zynthian_gui_selector):
         logging.info("MIDI Profile")
         self.zyngui.show_modal("midi_profile")
 
+    # ------------------------------------------------------------------------------
+    # NETWORK FEATURES
+    # ------------------------------------------------------------------------------
+
+    def network_info(self):
+        self.zyngui.show_info("NETWORK INFO\n")
+
+        res = zynconf.network_info()
+        for k, v in res.items():
+            self.zyngui.add_info(" {} => {}\n".format(k, v[0]), v[1])
+
+        self.zyngui.hide_info_timer(5000)
+        self.zyngui.stop_loading()
+
+    def start_wifi(self):
+        if not zynconf.start_wifi():
+            self.zyngui.show_info("STARTING WIFI ERROR\n")
+            self.zyngui.add_info("Can't start WIFI network!", "WARNING")
+            self.zyngui.hide_info_timer(2000)
+
+        self.fill_list()
+
+    def start_wifi_hotspot(self):
+        if not zynconf.start_wifi_hotspot():
+            self.zyngui.show_info("STARTING WIFI HOTSPOT ERROR\n")
+            self.zyngui.add_info("Can't start WIFI Hotspot!", "WARNING")
+            self.zyngui.hide_info_timer(2000)
+
+        self.fill_list()
+
+    def stop_wifi(self):
+        if not zynconf.stop_wifi():
+            self.zyngui.show_info("STOPPING WIFI ERROR\n")
+            self.zyngui.add_info("Can't stop WIFI network!", "WARNING")
+            self.zyngui.hide_info_timer(2000)
+
+        self.fill_list()
+
+    def start_vncserver(self, save_config=True):
+        logging.info("STARTING VNC SERVICES")
+
+        # Save state and stop engines
+        if len(self.zyngui.screens["layer"].layers) > 0:
+            self.zyngui.screens["snapshot"].save_last_state_snapshot()
+            self.zyngui.screens["layer"].reset()
+            restore_state = True
+        else:
+            restore_state = False
+
+        try:
+            check_output(
+                "systemctl start vncserver@:1; systemctl start novnc",
+                shell=True,
+            )
+            zynthian_gui_config.vncserver_enabled = 1
+            # Update Config
+            if save_config:
+                zynconf.save_config(
+                    {
+                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
+                            zynthian_gui_config.vncserver_enabled
+                        )
+                    }
+                )
+        except Exception as e:
+            logging.error(e)
+
+        # Restore state
+        if restore_state:
+            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+
+        self.fill_list()
+
+    def stop_vncserver(self, save_config=True):
+        logging.info("STOPPING VNC SERVICES")
+
+        # Save state and stop engines
+        if len(self.zyngui.screens["layer"].layers) > 0:
+            self.zyngui.screens["snapshot"].save_last_state_snapshot()
+            self.zyngui.screens["layer"].reset()
+            restore_state = True
+        else:
+            restore_state = False
+
+        try:
+            check_output(
+                "systemctl stop novnc; systemctl stop vncserver@:1", shell=True
+            )
+            zynthian_gui_config.vncserver_enabled = 0
+            # Update Config
+            if save_config:
+                zynconf.save_config(
+                    {
+                        "ZYNTHIAN_VNCSERVER_ENABLED": str(
+                            zynthian_gui_config.vncserver_enabled
+                        )
+                    }
+                )
+        except Exception as e:
+            logging.error(e)
+
+        # Restore state
+        if restore_state:
+            self.zyngui.screens["snapshot"].load_last_state_snapshot(True)
+
+        self.fill_list()
+
+    # Start/Stop VNC Server depending on configuration
+    def default_vncserver(self):
+        if zynthian_gui_config.vncserver_enabled:
+            self.start_vncserver(False)
+        else:
+            self.stop_vncserver(False)
+
+    # ------------------------------------------------------------------------------
+    # SYSTEM FEATURES
+    # ------------------------------------------------------------------------------
+
+    def test_audio(self):
+        logging.info("TESTING AUDIO")
+        self.zyngui.show_info("TEST AUDIO")
+        # self.killable_start_command(["mpg123 {}/audio/test.mp3".format(self.data_dir)])
+        self.killable_start_command(
+            [
+                "mplayer -nogui -noconsolecontrols -nolirc -nojoystick -really-quiet -ao jack {}/audio/test.mp3".format(
+                    self.data_dir
+                )
+            ]
+        )
+        sleep(0.5)
+        self.zyngui.zynautoconnect_audio()
+
+    def test_midi(self):
+        logging.info("TESTING MIDI")
+        self.zyngui.show_info("TEST MIDI")
+        self.killable_start_command(
+            ["aplaymidi -p 14 {}/mid/test.mid".format(self.data_dir)]
+        )
+
+    def test_touchpoints(self):
+        logging.info("Testing Touchpoints")
+        self.zyngui.show_modal("test_touchpoints")
+
+    # TODO enable again update of everything
+    def update_software(self):
+        logging.info("UPDATE SOFTWARE")
+        self.zyngui.show_info("UPDATE SOFTWARE")
+        # self.start_command([self.sys_dir + "/scripts/update_zynthian.sh"])
+        self.start_command(
+            [
+                "git -C /zynthian/zynthian-ui reset --hard HEAD;git -C /zynthian/zynthian-ui pull --rebase;"
+            ]
+        )
+
+    # TODO enable again update of everything
+    def is_update_available(self):
+        # repos = ["/zynthian/zyncoder", "/zynthian/zynthian-ui", "/zynthian/zynthian-sys", "/zynthian/zynthian-webconf", "/zynthian/zynthian-data"]
+        repos = ["/zynthian/zynthian-ui"]
+        update_available = False
+        for path in repos:
+            update_available |= (
+                check_output(
+                    "git -C %s status --porcelain -bs | grep behind | wc -l"
+                    % path,
+                    shell=True,
+                ).decode()[:1]
+                == "1"
+            )
+        return update_available
+
+    # TODO enable again update of everything
+    def check_for_updates(self):
+        self.zyngui.show_info("CHECK FOR UPDATES")
+        # self.start_command(["git -C /zynthian/zyncoder remote update; git -C /zynthian/zynthian-ui remote update; git -C /zynthian/zynthian-sys remote update; git -C /zynthian/zynthian-webconf remote update; git -C /zynthian/zynthian-data remote update"])
+        self.start_command(["git -C /zynthian/zynthian-ui remote update;"])
+
+    def update_system(self):
+        logging.info("UPDATE SYSTEM")
+        self.zyngui.show_info("UPDATE SYSTEM")
+        self.start_command([self.sys_dir + "/scripts/update_system.sh"])
+
+    def restart_gui(self):
+        logging.info("RESTART ZYNTHIAN-UI")
+        self.last_state_action()
+        self.zyngui.exit(102)
+
+    def exit_to_console(self):
+        logging.info("EXIT TO CONSOLE")
+        self.last_state_action()
+        self.zyngui.exit(101)
+
+    def reboot(self):
+        self.zyngui.show_confirm(
+            "Do you really want to reboot?", self.reboot_confirmed
+        )
+
+    def reboot_confirmed(self, params=None):
+        logging.info("REBOOT")
+        self.last_state_action()
+        self.zyngui.exit(100)
+
+    def power_off(self):
+        self.zyngui.show_confirm(
+            "Do you really want to power off?", self.power_off_confirmed
+        )
+
+    def power_off_confirmed(self, params=None):
+        logging.info("POWER OFF")
+        self.last_state_action()
+        self.zyngui.exit(0)
+
+    def last_state_action(self):
+        if (
+            zynthian_gui_config.restore_last_state
+            and len(self.zyngui.screens["layer"].layers) > 0
+        ):
+            self.zyngui.screens["snapshot"].save_last_state_snapshot()
+        else:
+            self.zyngui.screens["snapshot"].delete_last_state_snapshot()
+
+    # def back_action(self):
+    # 	self.zyngui.show_screen("main")
+    # 	return ''
+
+
 # ------------------------------------------------------------------------------

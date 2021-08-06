@@ -17,7 +17,6 @@ Item {
     property alias length: lengthDial.value
     property int controlType: Sidebar.ControlType.None
     property QtObject controlObj: null
-    property bool isPlaying: false
 
     Binding {
         target: bpmDial
@@ -119,32 +118,18 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                icon.name: "media-playback-start"
-                visible: !isPlaying &&
-                         (controlType === Sidebar.ControlType.Track ||
-                         controlType === Sidebar.ControlType.Clip ||
-                         controlType === Sidebar.ControlType.Part)
+                icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                visible: (controlObj != null) && controlObj.playable
 
                 onClicked: {
-                    zynthian.zynthiloops.playWav()
-                    console.log("Playing Sound Loop")
-                    isPlaying = true;
-                }
-            }
-
-            SidebarButton {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                icon.name: "media-playback-stop"
-                visible: isPlaying &&
-                         (controlType === Sidebar.ControlType.Track ||
-                         controlType === Sidebar.ControlType.Clip ||
-                         controlType === Sidebar.ControlType.Part)
-
-                onClicked: {
-                    console.log("Stopping Sound Loop")
-                    isPlaying = false;
+                    if (controlObj.isPlaying) {
+                        console.log("Stopping Sound Loop")
+                        controlObj.isPlaying = false;
+                    } else {
+                        console.log("Playing Sound Loop")
+                        controlObj.isPlaying = true;
+                        controlObj.playWav()
+                    }
                 }
             }
 
@@ -153,7 +138,7 @@ Item {
                 Layout.fillHeight: true
 
                 icon.name: "media-record"
-                visible: controlType === Sidebar.ControlType.Clip
+                visible: (controlObj != null) && controlObj.recordable
 
                 onClicked: {
                 }
@@ -164,7 +149,7 @@ Item {
                 Layout.fillHeight: true
 
                 icon.name: "delete"
-                visible: controlType === Sidebar.ControlType.Track
+                visible: (controlObj != null) && controlObj.deletable
 
                 onClicked: {
                 }
@@ -175,8 +160,7 @@ Item {
                 Layout.fillHeight: true
 
                 icon.name: "edit-clear-all"
-                visible: controlType !== Sidebar.ControlType.Clip ||
-                         controlType !== Sidebar.ControlType.Part
+                visible: (controlObj != null) && controlObj.clearable
 
                 onClicked: {
                 }

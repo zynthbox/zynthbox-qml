@@ -36,6 +36,22 @@ class zynthiloops_track(QObject):
         super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
 
+    @Property(bool, constant=True)
+    def playable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def recordable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def clearable(self):
+        return True
+
+    @Property(bool, constant=True)
+    def deletable(self):
+        return True
+
     @Property(int, constant=True)
     def id(self):
         return self.__id__

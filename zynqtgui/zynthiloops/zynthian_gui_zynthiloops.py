@@ -48,7 +48,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
 
         self.__model__ = ZynthiLoopsTracksModel(self)
-        self.__parts__ = zynthiloops_parts_model(self)
+        self.__parts_model__ = zynthiloops_parts_model(self)
         self.__q__ = queue.Queue(maxsize=self.__buffer_size__)
         self.__client__ = jack.Client(self.__client_name__)
         self.__blocksize__ = self.__client__.blocksize
@@ -99,23 +99,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __register_qml_modules__(self):
         qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")
         qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
-        qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
+        # qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
 
     @Signal
     def __model_changed__(self):
         pass
 
     @Signal
-    def __parts_changed__(self):
+    def __parts_model_changed__(self):
         pass
 
     @Property(QObject, notify=__model_changed__)
     def model(self):
         return self.__model__
 
-    @Property(QObject, notify=__parts_changed__)
-    def parts(self):
-        return self.__parts__
+    @Property(QObject, notify=__parts_model_changed__)
+    def partsModel(self):
+        return self.__parts_model__
 
     @Slot(None)
     def addTrack(self):
@@ -157,6 +157,3 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(type(e).__name__ + ': ' + str(e))
 
-    # @partsCount.setter
-    # def __parts_setter__(self, parts_count):
-    #     self.__parts_count__ = parts_count

@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian GUI Admin Class
+# Zynthian GUI Synth Behaviour Class
 #
 # Copyright (C) 2015-2016 Fernando Moyano <jofemodo@zynthian.org>
 #
@@ -38,15 +38,15 @@ from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
 # -------------------------------------------------------------------------------
-# Zynthian Admin GUI Class
+# Zynthian Synth Behaviour GUI Class
 # -------------------------------------------------------------------------------
-class zynthian_gui_admin(zynthian_gui_selector):
+class zynthian_gui_synth_behaviour(zynthian_gui_selector):
 
     data_dir = os.environ.get("ZYNTHIAN_DATA_DIR", "/zynthian/zynthian-data")
     sys_dir = os.environ.get("ZYNTHIAN_SYS_DIR", "/zynthian/zynthian-sys")
 
     def __init__(self, parent=None):
-        super(zynthian_gui_admin, self).__init__("Engine", parent)
+        super(zynthian_gui_synth_behaviour, self).__init__("Engine", parent)
         self.commands = None
         self.thread = None
         self.child_pid = None
@@ -60,151 +60,112 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def fill_list(self):
         self.list_data = []
 
-        # if self.zyngui.allow_headphones():
-        #     if zynthian_gui_config.rbpi_headphones:
-        #         self.list_data.append(
-        #             (self.stop_rbpi_headphones, 0, "[x] RBPi Headphones")
-        #         )
-        #     else:
-        #         self.list_data.append(
-        #             (self.start_rbpi_headphones, 0, "[  ] RBPi Headphones")
-        #         )
+        if self.zyngui.allow_headphones():
+            if zynthian_gui_config.rbpi_headphones:
+                self.list_data.append(
+                    (self.stop_rbpi_headphones, 0, "[x] RBPi Headphones")
+                )
+            else:
+                self.list_data.append(
+                    (self.start_rbpi_headphones, 0, "[  ] RBPi Headphones")
+                )
 
-        # if zynthian_gui_config.midi_single_active_channel:
-        #     self.list_data.append(
-        #         (self.toggle_single_channel, 0, "->  Stage Mode")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.toggle_single_channel, 0, "=>  Multi-timbral Mode")
-        #     )
-
-        # if zynthian_gui_config.midi_prog_change_zs3:
-        #     self.list_data.append(
-        #         (self.toggle_prog_change_zs3, 0, "[x] Program Change ZS3")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.toggle_prog_change_zs3, 0, "[  ] Program Change ZS3")
-        #     )
-
-        # if zynthian_gui_config.preset_preload_noteon:
-        #     self.list_data.append(
-        #         (self.toggle_preset_preload_noteon, 0, "[x] Preset Preload")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.toggle_preset_preload_noteon, 0, "[  ] Preset Preload")
-        #     )
-
-        # if zynthian_gui_config.snapshot_mixer_settings:
-        #     self.list_data.append(
-        #         (
-        #             self.toggle_snapshot_mixer_settings,
-        #             0,
-        #             "[x] Audio Levels on Snapshots",
-        #         )
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (
-        #             self.toggle_snapshot_mixer_settings,
-        #             0,
-        #             "[  ] Audio Levels on Snapshots",
-        #         )
-        #     )
-
-        # if zynthian_gui_config.midi_filter_output:
-        #     self.list_data.append(
-        #         (self.toggle_midi_filter_output, 0, "[x] MIDI Filter Ouput")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.toggle_midi_filter_output, 0, "[  ] MIDI Filter Output")
-        #     )
-
-        # if zynthian_gui_config.midi_sys_enabled:
-        #     self.list_data.append(
-        #         (self.toggle_midi_sys, 0, "[x] MIDI System Messages")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.toggle_midi_sys, 0, "[  ] MIDI System Messages")
-        #     )
-
-        # if zynconf.is_service_active("jackrtpmidid"):
-        #     self.list_data.append((self.stop_rtpmidi, 0, "[x] RTP-MIDI"))
-        # else:
-        #     self.list_data.append((self.start_rtpmidi, 0, "[  ] RTP-MIDI"))
-
-        # if zynconf.is_service_active("qmidinet"):
-        #     self.list_data.append(
-        #         (self.stop_qmidinet, 0, "[x] QmidiNet (IP Multicast)")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.start_qmidinet, 0, "[  ] QmidiNet (IP Multicast)")
-        #     )
-
-        # if zynconf.is_service_active("touchosc2midi"):
-        #     self.list_data.append(
-        #         (self.stop_touchosc2midi, 0, "[x] TouchOSC MIDI Bridge")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.start_touchosc2midi, 0, "[  ] TouchOSC MIDI Bridge")
-        #     )
-
-        # if zynconf.is_service_active("aubionotes"):
-        #     self.list_data.append(
-        #         (self.stop_aubionotes, 0, "[x] AubioNotes (Audio2MIDI)")
-        #     )
-        # else:
-        #     self.list_data.append(
-        #         (self.start_aubionotes, 0, "[  ] AubioNotes (Audio2MIDI)")
-        #     )
-
-        # self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
-
-        # self.list_data.append((self.network_info, 0, "Network Info"))
-
-        # if zynconf.is_wifi_active():
-        #     if zynconf.is_service_active("hostapd"):
-        #         self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi Hotspot"))
-        #     else:
-        #         self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi"))
-        # else:
-        #     self.list_data.append((self.start_wifi, 0, "[  ] Wi-Fi"))
-        #     self.list_data.append(
-        #         (self.start_wifi_hotspot, 0, "[  ] Wi-Fi Hotspot")
-        #     )
-
-        # if zynconf.is_service_active("vncserver@:1"):
-        #     self.list_data.append((self.stop_vncserver, 0, "[x] VNC Server"))
-        # else:
-        #     self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
-
-        # self.list_data.append((None, 0, "-----------------------------"))
-        # self.list_data.append((self.test_audio, 0, "Test Audio"))
-        # self.list_data.append((self.test_midi, 0, "Test MIDI"))
-        # self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
-        # self.list_data.append((None, 0, "-----------------------------"))
-
-        self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
-        self.list_data.append((self.network, 0, "Network"))
-        self.list_data.append((self.hardware, 0, "Hardware"))
-        self.list_data.append((None, 0, "-----------------------------"))
-        if self.is_update_available():
-            self.list_data.append((self.update_software, 0, "Update Software"))
+        if zynthian_gui_config.midi_single_active_channel:
+            self.list_data.append(
+                (self.toggle_single_channel, 0, "->  Stage Mode")
+            )
         else:
             self.list_data.append(
-                (self.check_for_updates, 0, "Check for software updates")
+                (self.toggle_single_channel, 0, "=>  Multi-timbral Mode")
             )
-        # self.list_data.append((self.update_system,0,"Update Operating System"))
-        self.list_data.append((self.restart_gui, 0, "Restart UI"))
-        # self.list_data.append((self.exit_to_console,0,"Exit to Console"))
-        self.list_data.append((self.reboot, 0, "Reboot"))
-        self.list_data.append((self.power_off, 0, "Power Off"))
+
+        if zynthian_gui_config.midi_prog_change_zs3:
+            self.list_data.append(
+                (self.toggle_prog_change_zs3, 0, "[x] Program Change ZS3")
+            )
+        else:
+            self.list_data.append(
+                (self.toggle_prog_change_zs3, 0, "[  ] Program Change ZS3")
+            )
+
+        if zynthian_gui_config.preset_preload_noteon:
+            self.list_data.append(
+                (self.toggle_preset_preload_noteon, 0, "[x] Preset Preload")
+            )
+        else:
+            self.list_data.append(
+                (self.toggle_preset_preload_noteon, 0, "[  ] Preset Preload")
+            )
+
+        if zynthian_gui_config.snapshot_mixer_settings:
+            self.list_data.append(
+                (
+                    self.toggle_snapshot_mixer_settings,
+                    0,
+                    "[x] Audio Levels on Snapshots",
+                )
+            )
+        else:
+            self.list_data.append(
+                (
+                    self.toggle_snapshot_mixer_settings,
+                    0,
+                    "[  ] Audio Levels on Snapshots",
+                )
+            )
+
+        if zynthian_gui_config.midi_filter_output:
+            self.list_data.append(
+                (self.toggle_midi_filter_output, 0, "[x] MIDI Filter Ouput")
+            )
+        else:
+            self.list_data.append(
+                (self.toggle_midi_filter_output, 0, "[  ] MIDI Filter Output")
+            )
+
+        if zynthian_gui_config.midi_sys_enabled:
+            self.list_data.append(
+                (self.toggle_midi_sys, 0, "[x] MIDI System Messages")
+            )
+        else:
+            self.list_data.append(
+                (self.toggle_midi_sys, 0, "[  ] MIDI System Messages")
+            )
+
+        if zynconf.is_service_active("jackrtpmidid"):
+            self.list_data.append((self.stop_rtpmidi, 0, "[x] RTP-MIDI"))
+        else:
+            self.list_data.append((self.start_rtpmidi, 0, "[  ] RTP-MIDI"))
+
+        if zynconf.is_service_active("qmidinet"):
+            self.list_data.append(
+                (self.stop_qmidinet, 0, "[x] QmidiNet (IP Multicast)")
+            )
+        else:
+            self.list_data.append(
+                (self.start_qmidinet, 0, "[  ] QmidiNet (IP Multicast)")
+            )
+
+        if zynconf.is_service_active("touchosc2midi"):
+            self.list_data.append(
+                (self.stop_touchosc2midi, 0, "[x] TouchOSC MIDI Bridge")
+            )
+        else:
+            self.list_data.append(
+                (self.start_touchosc2midi, 0, "[  ] TouchOSC MIDI Bridge")
+            )
+
+        if zynconf.is_service_active("aubionotes"):
+            self.list_data.append(
+                (self.stop_aubionotes, 0, "[x] AubioNotes (Audio2MIDI)")
+            )
+        else:
+            self.list_data.append(
+                (self.start_aubionotes, 0, "[  ] AubioNotes (Audio2MIDI)")
+            )
+
+        self.list_data.append((self.midi_profile, 0, "MIDI Profile"))
+
         super().fill_list()
 
     def select_action(self, i, t="S"):
@@ -213,8 +174,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.last_action()
 
     def set_select_path(self):
-        self.select_path = "Admin"
-        self.select_path_element = "Admin"
+        self.select_path = "Synth Behaviour"
+        self.select_path_element = "Synth Behaviour"
         super().set_select_path()
 
     def execute_commands(self):
@@ -320,10 +281,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     # ------------------------------------------------------------------------------
     # CONFIG OPTIONS
     # ------------------------------------------------------------------------------
-
-    def synth_behaviour(self):
-        logging.info("Synth Behaviour")
-        self.zyngui.show_modal("synth_behaviour")
 
     def start_rbpi_headphones(self, save_config=True):
         logging.info("STARTING RBPI HEADPHONES")
@@ -706,44 +663,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
     # NETWORK FEATURES
     # ------------------------------------------------------------------------------
 
-    def network(self):
-        logging.info("Network")
-        self.zyngui.show_modal("network")
-
-    def network_info(self):
-        self.zyngui.show_info("NETWORK INFO\n")
-
-        res = zynconf.network_info()
-        for k, v in res.items():
-            self.zyngui.add_info(" {} => {}\n".format(k, v[0]), v[1])
-
-        self.zyngui.hide_info_timer(5000)
-        self.zyngui.stop_loading()
-
-    def start_wifi(self):
-        if not zynconf.start_wifi():
-            self.zyngui.show_info("STARTING WIFI ERROR\n")
-            self.zyngui.add_info("Can't start WIFI network!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
-
-        self.fill_list()
-
-    def start_wifi_hotspot(self):
-        if not zynconf.start_wifi_hotspot():
-            self.zyngui.show_info("STARTING WIFI HOTSPOT ERROR\n")
-            self.zyngui.add_info("Can't start WIFI Hotspot!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
-
-        self.fill_list()
-
-    def stop_wifi(self):
-        if not zynconf.stop_wifi():
-            self.zyngui.show_info("STOPPING WIFI ERROR\n")
-            self.zyngui.add_info("Can't stop WIFI network!", "WARNING")
-            self.zyngui.hide_info_timer(2000)
-
-        self.fill_list()
-
     def start_vncserver(self, save_config=True):
         logging.info("STARTING VNC SERVICES")
 
@@ -819,120 +738,5 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.start_vncserver(False)
         else:
             self.stop_vncserver(False)
-
-    # ------------------------------------------------------------------------------
-    # SYSTEM FEATURES
-    # ------------------------------------------------------------------------------
-
-    def hardware(self):
-        logging.info("Hardware")
-        self.zyngui.show_modal("hardware")
-
-    def test_audio(self):
-        logging.info("TESTING AUDIO")
-        self.zyngui.show_info("TEST AUDIO")
-        # self.killable_start_command(["mpg123 {}/audio/test.mp3".format(self.data_dir)])
-        self.killable_start_command(
-            [
-                "mplayer -nogui -noconsolecontrols -nolirc -nojoystick -really-quiet -ao jack {}/audio/test.mp3".format(
-                    self.data_dir
-                )
-            ]
-        )
-        sleep(0.5)
-        self.zyngui.zynautoconnect_audio()
-
-    def test_midi(self):
-        logging.info("TESTING MIDI")
-        self.zyngui.show_info("TEST MIDI")
-        self.killable_start_command(
-            ["aplaymidi -p 14 {}/mid/test.mid".format(self.data_dir)]
-        )
-
-    def test_touchpoints(self):
-        logging.info("Testing Touchpoints")
-        self.zyngui.show_modal("test_touchpoints")
-
-    # TODO enable again update of everything
-    def update_software(self):
-        logging.info("UPDATE SOFTWARE")
-        self.zyngui.show_info("UPDATE SOFTWARE")
-        # self.start_command([self.sys_dir + "/scripts/update_zynthian.sh"])
-        self.start_command(
-            [
-                "git -C /zynthian/zynthian-ui reset --hard HEAD;git -C /zynthian/zynthian-ui pull --rebase;"
-            ]
-        )
-
-    # TODO enable again update of everything
-    def is_update_available(self):
-        # repos = ["/zynthian/zyncoder", "/zynthian/zynthian-ui", "/zynthian/zynthian-sys", "/zynthian/zynthian-webconf", "/zynthian/zynthian-data"]
-        repos = ["/zynthian/zynthian-ui"]
-        update_available = False
-        for path in repos:
-            update_available |= (
-                check_output(
-                    "git -C %s status --porcelain -bs | grep behind | wc -l"
-                    % path,
-                    shell=True,
-                ).decode()[:1]
-                == "1"
-            )
-        return update_available
-
-    # TODO enable again update of everything
-    def check_for_updates(self):
-        self.zyngui.show_info("CHECK FOR UPDATES")
-        # self.start_command(["git -C /zynthian/zyncoder remote update; git -C /zynthian/zynthian-ui remote update; git -C /zynthian/zynthian-sys remote update; git -C /zynthian/zynthian-webconf remote update; git -C /zynthian/zynthian-data remote update"])
-        self.start_command(["git -C /zynthian/zynthian-ui remote update;"])
-
-    def update_system(self):
-        logging.info("UPDATE SYSTEM")
-        self.zyngui.show_info("UPDATE SYSTEM")
-        self.start_command([self.sys_dir + "/scripts/update_system.sh"])
-
-    def restart_gui(self):
-        logging.info("RESTART ZYNTHIAN-UI")
-        self.last_state_action()
-        self.zyngui.exit(102)
-
-    def exit_to_console(self):
-        logging.info("EXIT TO CONSOLE")
-        self.last_state_action()
-        self.zyngui.exit(101)
-
-    def reboot(self):
-        self.zyngui.show_confirm(
-            "Do you really want to reboot?", self.reboot_confirmed
-        )
-
-    def reboot_confirmed(self, params=None):
-        logging.info("REBOOT")
-        self.last_state_action()
-        self.zyngui.exit(100)
-
-    def power_off(self):
-        self.zyngui.show_confirm(
-            "Do you really want to power off?", self.power_off_confirmed
-        )
-
-    def power_off_confirmed(self, params=None):
-        logging.info("POWER OFF")
-        self.last_state_action()
-        self.zyngui.exit(0)
-
-    def last_state_action(self):
-        if (
-            zynthian_gui_config.restore_last_state
-            and len(self.zyngui.screens["layer"].layers) > 0
-        ):
-            self.zyngui.screens["snapshot"].save_last_state_snapshot()
-        else:
-            self.zyngui.screens["snapshot"].delete_last_state_snapshot()
-
-    # def back_action(self):
-    # 	self.zyngui.show_screen("main")
-    # 	return ''
-
 
 # ------------------------------------------------------------------------------

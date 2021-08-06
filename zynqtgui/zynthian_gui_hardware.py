@@ -62,6 +62,9 @@ class zynthian_gui_hardware(zynthian_gui_selector):
         self.list_data.append((self.test_audio, 0, "Test Audio"))
         self.list_data.append((self.test_midi, 0, "Test MIDI"))
         self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
+        self.list_data.append(
+            (self.zyngui.calibrate_touchscreen, 0, "Calibrate Touchscreen")
+        )
         super().fill_list()
 
     def select_action(self, i, t="S"):

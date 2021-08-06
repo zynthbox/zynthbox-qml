@@ -191,12 +191,13 @@ class zynthian_gui_admin(zynthian_gui_selector):
         # else:
         #     self.list_data.append((self.start_vncserver, 0, "[  ] VNC Server"))
 
-        self.list_data.append((None, 0, "-----------------------------"))
+        # self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((self.hardware, 0, "Hardware"))
+        # self.list_data.append((self.test_audio, 0, "Test Audio"))
+        # self.list_data.append((self.test_midi, 0, "Test MIDI"))
+        # self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
+        # self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((None, 0, "-----------------------------"))
-        self.list_data.append(
-            (self.zyngui.calibrate_touchscreen, 0, "Calibrate Touchscreen")
-        )
         if self.is_update_available():
             self.list_data.append((self.update_software, 0, "Update Software"))
         else:
@@ -204,7 +205,6 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 (self.check_for_updates, 0, "Check for software updates")
             )
         # self.list_data.append((self.update_system,0,"Update Operating System"))
-        self.list_data.append((None, 0, "-----------------------------"))
         self.list_data.append((self.restart_gui, 0, "Restart UI"))
         # self.list_data.append((self.exit_to_console,0,"Exit to Console"))
         self.list_data.append((self.reboot, 0, "Reboot"))

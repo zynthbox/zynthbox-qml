@@ -44,6 +44,7 @@
       "zynqtgui/zynthian_gui_selector.py",
       "zynqtgui/zynthian_gui_snapshot.py",
       "zynqtgui/zynthian_gui_stepsequencer.py",
+      "zynqtgui/zynthian_gui_synth_behaviour.py",
       "zynqtgui/zynthian_gui_test_touchpoints.py",
       "zynqtgui/zynthian_gui_theme_chooser.py",
       "zynqtgui/zynthian_gui_touchscreen_calibration.py",

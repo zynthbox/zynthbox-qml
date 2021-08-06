@@ -128,6 +128,8 @@ from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
 from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 
+from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
+
 
 from pathlib import Path
 
@@ -551,6 +553,8 @@ class zynthian_gui(QObject):
         # self.screens['zs3_options'] = zynthian_gui_zs3_options(self)
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["admin"] = zynthian_gui_admin(self)
+        self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
+
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
         # Create UI Apps Screens
         # self.screens['alsa_mixer'] = self.screens['control']
@@ -2239,6 +2243,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def zynthiloops(self):
         return self.screens["zynthiloops"]
+
+    @Property(QObject, constant=True)
+    def synth_behaviour(self):
+        return self.screens["synth_behaviour"]
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

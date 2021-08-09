@@ -33,6 +33,41 @@ import Zynthian 1.0 as Zynthian
 Zynthian.SelectorPage {
     screenId: "main"
     backAction.visible: false
+
+    RowLayout {
+        id:rowLayoutId
+        width:800
+        spacing:Kirigami.Units.smallSpacing
+
+        Rectangle {
+            id:layersRect
+            width:parent.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:layersSvg
+                anchors.centerIn: parent
+                width: 100; height: 100
+                source:  Qt.resolvedUrl("../../img/layers.svg")
+            }
+        }
+
+        Rectangle {
+            id:playGridRect
+            width:parent.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:playGridSvg
+                anchors.centerIn: parent
+                width: 100; height:100
+                source:  Qt.resolvedUrl("../../img/playgrid.svg")
+            }
+        }
+    }
+
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Synth Setup")

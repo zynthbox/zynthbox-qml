@@ -36,76 +36,64 @@ Zynthian.SelectorPage {
 
     Rectangle {
         id:mainviewRectId
-        width: screen.width - (Kirigami.Units.gridUnit * 2)
-        height: screen.height - (Kirigami.Units.largeSpacing * 18)
+        width: screen.width - (Kirigami.Units.gridUnit * 2) - 4
+        height: screen.height - (Kirigami.Units.gridUnit * 8) - 4
         anchors.centerIn:parent
         color:"transparent"
-
-        Component.onCompleted:{
-            console.log(screen.width);
-            console.log(mainviewRectId.width);
-        }
 
         Rectangle {
             id:layersRect
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
-            Image {
-                id:layersSvg
-                anchors.centerIn: parent
-                width:90;height:90
-                source:  Qt.resolvedUrl("../../img/layers.svg")
-            }
-
-            Kirigami.Heading {
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.bottom
-                    bottomMargin: Kirigami.Units.gridUnit * 2
-                }
-                text: "Layers"
-                font.pointSize: 12
-            }
-
-            MouseArea {
+            QQC2.Button {
                 anchors.fill: parent
-                onClicked: {
-                    zynthian.current_screen_id = "layer"
+                onClicked: zynthian.current_screen_id = "layer"
+            
+                Image {
+                    id:layersSvg
+                    anchors.centerIn: parent
+                    width:90;height:90
+                    source:  Qt.resolvedUrl("../../img/layers.svg")
+                }
+
+                Kirigami.Heading {
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        bottom: parent.bottom
+                    }
+                    text: "Layers"
+                    font.pointSize: 12
                 }
             }
-
         }
 
         Rectangle {
             id:playgridRect
             x:layersRect.width
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
-            Image {
-                id:playgridSvg
-                anchors.centerIn: parent
-                width:90;height:90
-                source:  Qt.resolvedUrl("../../img/playgrid.svg")
-            }
-
-            Kirigami.Heading {
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.bottom
-                    bottomMargin: Kirigami.Units.gridUnit * 2
-                }
-                text: "Playgrid"
-                font.pointSize: 12
-            }
-
-            MouseArea {
+            QQC2.Button {
                 anchors.fill: parent
-                onClicked: {
-                    zynthian.current_modal_screen_id = "playgrid"
+                onClicked:  zynthian.current_modal_screen_id = "playgrid"
+            
+                Image {
+                    id:playgridSvg
+                    anchors.centerIn: parent
+                    width:90;height:90
+                    source:  Qt.resolvedUrl("../../img/playgrid.svg")
+                }
+
+                Kirigami.Heading {
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        bottom: parent.bottom
+                    }
+                    text: "Playgrid"
+                    font.pointSize: 12
                 }
             }
         }
@@ -114,30 +102,35 @@ Zynthian.SelectorPage {
             id:zynthiloopsRect
             x:playgridRect.x + playgridRect.width
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
-            Image {
-                id:zynthiloopsSvg
-                anchors.centerIn: parent
-                width:90;height:90
-                source:  Qt.resolvedUrl("../../img/zynthiloops.svg")
-            }
+            
+            QQC2.Button {
+                anchors.fill: parent
+                onClicked: zynthian.current_modal_screen_id = "zynthiloops"
 
-            Kirigami.Heading {
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.bottom
-                    bottomMargin: Kirigami.Units.gridUnit * 2
+                Image {
+                    id:zynthiloopsSvg
+                    anchors.centerIn: parent
+                    width:90;height:90
+                    source:  Qt.resolvedUrl("../../img/zynthiloops.svg")
                 }
-                text: "ZynthiLoops"
-                font.pointSize: 12
+
+                Kirigami.Heading {
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        bottom: parent.bottom
+                    }
+                    text: "ZynthiLoops"
+                    font.pointSize: 12
+                }
+
             }
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    zynthian.current_modal_screen_id = "zynthiloops"
                 }
             }
         }
@@ -146,7 +139,7 @@ Zynthian.SelectorPage {
             id:audiorecorderRect
             x:zynthiloopsRect.x + zynthiloopsRect.width
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
             Image {
@@ -178,7 +171,7 @@ Zynthian.SelectorPage {
             id:midirecorderRect
             x:audiorecorderRect.x + audiorecorderRect.width
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
             Image {
@@ -210,7 +203,7 @@ Zynthian.SelectorPage {
             id:snapshotsRect
             x:midirecorderRect.x + midirecorderRect.width
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
             Image {
@@ -242,7 +235,7 @@ Zynthian.SelectorPage {
             id:settingsRect
             y:mainviewRectId.height / 2
             width:mainviewRectId.width / 6
-            height:width
+            height:mainviewRectId.height / 2
             color:"transparent"
 
             Image {

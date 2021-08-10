@@ -14,8 +14,8 @@ import "private" as Private
 T.SpinBox {
     id: control
 
-    implicitWidth: Math.max(PlasmaCore.Units.gridUnit * 6, contentItem.implicitWidth + 2 * padding + up.indicator.implicitWidth + down.indicator.implicitWidth)
-    implicitHeight: PlasmaCore.Units.gridUnit * 1.6
+    implicitWidth: Math.max(units.gridUnit * 6, contentItem.implicitWidth + 2 * padding + up.indicator.implicitWidth + down.indicator.implicitWidth)
+    implicitHeight: units.gridUnit * 1.6
 
     padding: 6
     leftPadding: padding + height
@@ -35,9 +35,9 @@ T.SpinBox {
         opacity: control.enabled ? 1 : 0.6
 
         font: control.font
-        color: PlasmaCore.Theme.viewTextColor
-        selectionColor: PlasmaCore.Theme.highlightColor
-        selectedTextColor: PlasmaCore.Theme.highlightedTextColor
+        color: theme.viewTextColor
+        selectionColor: theme.highlightColor
+        selectedTextColor: theme.highlightedTextColor
         horizontalAlignment: Qt.AlignHCenter
         verticalAlignment: Qt.AlignVCenter
 

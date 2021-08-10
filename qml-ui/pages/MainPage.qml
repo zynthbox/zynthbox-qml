@@ -1,4 +1,4 @@
-/* -*- coding: utf-8 -*-
+ /* -*- coding: utf-8 -*-
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
@@ -34,36 +34,240 @@ Zynthian.SelectorPage {
     screenId: "main"
     backAction.visible: false
 
-    RowLayout {
-        id:rowLayoutId
-        width:800
-        spacing:Kirigami.Units.smallSpacing
+    Rectangle {
+        id:mainviewRectId
+        width: screen.width - (Kirigami.Units.gridUnit * 2)
+        height: screen.height - (Kirigami.Units.largeSpacing * 18)
+        anchors.centerIn:parent
+        color:"transparent"
+
+        Component.onCompleted:{
+            console.log(screen.width);
+            console.log(mainviewRectId.width);
+        }
 
         Rectangle {
             id:layersRect
-            width:parent.width / 6
+            width:mainviewRectId.width / 6
             height:width
             color:"transparent"
 
             Image {
                 id:layersSvg
                 anchors.centerIn: parent
-                width: 100; height: 100
+                width:90;height:90
                 source:  Qt.resolvedUrl("../../img/layers.svg")
             }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Layers"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_screen_id = "layer"
+                }
+            }
+
         }
 
         Rectangle {
-            id:playGridRect
-            width:parent.width / 6
+            id:playgridRect
+            x:layersRect.width
+            width:mainviewRectId.width / 6
             height:width
             color:"transparent"
 
             Image {
-                id:playGridSvg
+                id:playgridSvg
                 anchors.centerIn: parent
-                width: 100; height:100
+                width:90;height:90
                 source:  Qt.resolvedUrl("../../img/playgrid.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Playgrid"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "playgrid"
+                }
+            }
+        }
+
+        Rectangle {
+            id:zynthiloopsRect
+            x:playgridRect.x + playgridRect.width
+            width:mainviewRectId.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:zynthiloopsSvg
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/zynthiloops.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "ZynthiLoops"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "zynthiloops"
+                }
+            }
+        }
+
+        Rectangle {
+            id:audiorecorderRect
+            x:zynthiloopsRect.x + zynthiloopsRect.width
+            width:mainviewRectId.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:audiorecorderSvg
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/rec-audio.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Audio Recorder"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "audio_recorder"
+                }
+            }
+        }
+
+        Rectangle {
+            id:midirecorderRect
+            x:audiorecorderRect.x + audiorecorderRect.width
+            width:mainviewRectId.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:midirecorderSvg
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/rec.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "MIDI Recorder"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "midi_recorder"
+                }
+            }
+        }
+
+        Rectangle {
+            id:snapshotsRect
+            x:midirecorderRect.x + midirecorderRect.width
+            width:mainviewRectId.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:snapshotsSvg
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/snapshots.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Snapshots"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "snapshot"
+                }
+            }
+        }
+
+        Rectangle {
+            id:settingsRect
+            y:mainviewRectId.height / 2
+            width:mainviewRectId.width / 6
+            height:width
+            color:"transparent"
+
+            Image {
+                id:settingsSvg
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/settings.svg")
+            }
+
+            
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Settings"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "admin"
+                }
             }
         }
     }

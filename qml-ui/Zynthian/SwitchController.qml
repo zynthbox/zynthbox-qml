@@ -38,6 +38,12 @@ AbstractController {
     control: MouseArea {
         anchors.fill: parent
         onClicked: root.controller.ctrl.value = root.controller.ctrl.value == root.controller.ctrl.value0 ? root.controller.ctrl.max_value : root.controller.ctrl.value0
+
+        onActiveFocusChanged: {
+            if (activeFocus) {
+                switchControl.forceActiveFocus();
+            }
+        }
         /*Behavior on scale {
             NumberAnimation {
                 duration: Kirigami.Units.longDuration

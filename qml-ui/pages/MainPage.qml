@@ -131,6 +131,7 @@ Zynthian.SelectorPage {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                   zynthian.current_modal_screen_id = "zynthiloops"
                 }
             }
         }

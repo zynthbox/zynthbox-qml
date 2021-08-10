@@ -89,7 +89,7 @@ Zynthian.ScreenPage {
 										//Layout.fillWidth: true
 										text: model.name
 									}
-									QQC2.ToolButton {
+									QQC2.Button {
 										icon.name: "document-edit"
 										onClicked: titleStack.currentIndex = 1;
 									}

@@ -49,6 +49,12 @@ Card {
 
     property alias control: contentItem.contentItem
 
+    onActiveFocusChanged: {
+        if (activeFocus) {
+            control.forceActiveFocus();
+        }
+    }
+
 
     contentItem: ColumnLayout {
         Kirigami.Heading {

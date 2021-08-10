@@ -77,7 +77,8 @@ QtObject {
 		"synth_behaviour":"SynthBehaviourPage.qml",
 		"network":"NetworkPage.qml",
 		"hardware":"HardwarePage.qml",
-        "playgrid": "PlayGrid.qml",
-        "zynthiloops": "ZynthiLoops/main.qml"
+		"playgrid": "PlayGrid.qml",
+		"track": "TrackPage.qml",
+		"zynthiloops": "ZynthiLoops/main.qml"
 	}
 }

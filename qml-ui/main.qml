@@ -47,6 +47,9 @@ Kirigami.AbstractApplicationWindow {
     function hideConfirmationDialog() {
         confirmDialog.close()
     }
+    Component.onCompleted: {
+		root.showFullScreen()
+	}
 
     width: screen.width
     height: screen.height
@@ -171,5 +174,11 @@ Kirigami.AbstractApplicationWindow {
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
+     VirtualKeyboardLoader {
+		id: virtualKeyboard
+		parent: root.contentItem
+		z: 1000
+		anchors.bottom: parent.bottom
+	}
 }
 

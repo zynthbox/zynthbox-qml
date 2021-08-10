@@ -64,7 +64,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Heading {
                 level: 2
-                text: qsTr("Length: %1 bars")
+                text: qsTr("Length: %1 bars").arg()
             }
             Item {
                 Layout.fillWidth: true
@@ -82,18 +82,36 @@ Zynthian.ScreenPage {
 						spacing: Kirigami.Units.largeSpacing
 						RowLayout {
 							spacing: Kirigami.Units.largeSpacing
-							Kirigami.Heading {
-								Layout.fillWidth: true
-								text: qsTr("Track 01")
+							StackLayout {
+								id: titleStack
+								RowLayout {
+									Kirigami.Heading {
+										//Layout.fillWidth: true
+										text: model.name
+									}
+									QQC2.ToolButton {
+										icon.name: "document-edit"
+										onClicked: titleStack.currentIndex = 1;
+									}
+								}
+								QQC2.TextField {
+									onAccepted: titleStack.currentIndex = 0;
+									onActiveFocusChanged: {
+										if(activeFocus) {
+											Qt.inputMethod.update(Qt.ImQueryInput)
+										}
+									}
+								}
 							}
 							QQC2.Button {
+								id: midiButton
 								text: qsTr("MIDI")
 								checkable: true
-								checked: true
 								autoExclusive: true
 							}
 							QQC2.Button {
 								text: qsTr("AUDIO")
+								checked: true
 								checkable: true
 								autoExclusive: true
 							}
@@ -101,6 +119,7 @@ Zynthian.ScreenPage {
 						RowLayout {
 							Layout.fillWidth: true
 							ColumnLayout {
+								enabled: false
 								Kirigami.Heading {
 									id: topSoundHeading
 									text: qsTr("Top Sound")
@@ -113,6 +132,7 @@ Zynthian.ScreenPage {
 								}
 							}
 							ColumnLayout {
+								enabled: midiButton.checked
 								Kirigami.Heading {
 									text: qsTr("Synth")
 									level: 2
@@ -121,9 +141,15 @@ Zynthian.ScreenPage {
 								QQC2.SpinBox {
 									Layout.fillWidth: true
 									font: topSoundHeading.font
+									from: 0
+									to: zynthian.layer.selector_list.count
+									textFromValue: function(value) {
+										return zynthian.layer.selector_list.data(zynthian.layer.selector_list.index(value, 0)).substring(0, 5)
+									}
 								}
 							}
 							ColumnLayout {
+								enabled: midiButton.checked
 								Kirigami.Heading {
 									text: qsTr("Bank")
 									level: 2
@@ -132,9 +158,15 @@ Zynthian.ScreenPage {
 								QQC2.SpinBox {
 									Layout.fillWidth: true
 									font: topSoundHeading.font
+									from: 0
+									to: zynthian.bank.selector_list.count
+									textFromValue: function(value) {
+										return zynthian.bank.selector_list.data(zynthian.bank.selector_list.index(value, 0)).substring(0, 5)
+									}
 								}
 							}
 							ColumnLayout {
+								enabled: midiButton.checked
 								Kirigami.Heading {
 									text: qsTr("Preset")
 									level: 2
@@ -143,6 +175,11 @@ Zynthian.ScreenPage {
 								QQC2.SpinBox {
 									Layout.fillWidth: true
 									font: topSoundHeading.font
+									from: 0
+									to: zynthian.preset.selector_list.count
+									textFromValue: function(value) {
+										return zynthian.preset.selector_list.data(zynthian.preset.selector_list.index(value, 0)).substring(0, 5)
+									}
 								}
 							}
 						}
@@ -159,11 +196,12 @@ Zynthian.ScreenPage {
 							Layout.preferredWidth: Kirigami.Units.iconSizes.large
 							Layout.preferredHeight: Layout.preferredWidth
 						}
-						Kirigami.Heading {
+						QQC2.ComboBox {
 							Layout.alignment: Qt.AlignCenter
-							text: qsTr("Playgrid")
-							level: 2
-							font.capitalization: Font.AllUppercase
+							model: ListModel {
+								ListElement { text: "None" }
+								ListElement { text: "Playgrid" }
+							}
 						}
 					}
 				}

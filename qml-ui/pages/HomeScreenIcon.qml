@@ -39,6 +39,7 @@ Rectangle {
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 bottom: parent.bottom
+                bottomMargin: Kirigami.Units.smallSpacing
             }
             text: "Layers"
             font.pointSize: 12

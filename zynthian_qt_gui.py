@@ -130,6 +130,7 @@ from zynqtgui.zynthian_gui_theme_chooser import zynthian_gui_theme_chooser
 from zynqtgui.zynthian_gui_newstuff import zynthian_gui_newstuff
 
 from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
+from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 
@@ -559,6 +560,8 @@ class zynthian_gui(QObject):
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["admin"] = zynthian_gui_admin(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
+        self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
+
         self.screens["network"] = zynthian_gui_network(self)
         self.screens["hardware"] = zynthian_gui_hardware(self)
 
@@ -2254,6 +2257,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def synth_behaviour(self):
         return self.screens["synth_behaviour"]
+
+    @Property(QObject, constant=True)
+    def snapshots_menu(self):
+        return self.screens["snapshots_menu"]
 
     @Property(QObject, constant=True)
     def network(self):

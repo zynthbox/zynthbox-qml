@@ -105,7 +105,7 @@ Zynthian.SelectorPage {
             rectX:  0
             rectY: mainviewRectId.height / 2
             imgSrc: Qt.resolvedUrl("../../img/snapshots.svg")
-            onClicked:  zynthian.current_modal_screen_id = "snapshot"
+            onClicked:  zynthian.current_modal_screen_id = "snapshots_menu"
             text: "Snapshots"
         }
 

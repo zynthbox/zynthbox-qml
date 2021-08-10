@@ -133,7 +133,6 @@ class selector_list_model(QAbstractListModel):
 		else:
 			return None
 
-
 	count_changed = Signal()
 
 	count = Property(int, get_count, notify = count_changed)

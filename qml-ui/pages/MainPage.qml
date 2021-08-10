@@ -48,25 +48,17 @@ Zynthian.SelectorPage {
         HomeScreenIcon {
             rectWidth: mainviewRectId.width / 6
             rectHeight:  mainviewRectId.height / 2
-            rectX:0
-            imgSrc: Qt.resolvedUrl("../../img/layers.svg")
-            onClicked: zynthian.current_screen_id = "layer"
-            text: "Layers"
+            rectX:0            
+            imgSrc: Qt.resolvedUrl("../../img/track.svg")
+            onClicked:  zynthian.current_modal_screen_id = "track"
+            text: "Tracks"
         }
 
         HomeScreenIcon {
             rectWidth: mainviewRectId.width / 6
             rectHeight: mainviewRectId.height / 2
             rectX:  mainviewRectId.width / 6
-            imgSrc: Qt.resolvedUrl("../../img/playgrid.svg")
-            onClicked:  zynthian.current_modal_screen_id = "playgrid"
-            text: "Playgrid"
-        }
-
-        HomeScreenIcon {
-            rectWidth: mainviewRectId.width / 6
-            rectHeight: mainviewRectId.height / 2
-            rectX:  (mainviewRectId.width / 6) * 2
+            
             imgSrc: Qt.resolvedUrl("../../img/zynthiloops.svg")
             onClicked:  zynthian.current_modal_screen_id = "zynthiloops"
             text: "Zynthiloops"
@@ -75,19 +67,31 @@ Zynthian.SelectorPage {
         HomeScreenIcon {
             rectWidth: mainviewRectId.width / 6
             rectHeight: mainviewRectId.height / 2
+            rectX:  (mainviewRectId.width / 6) * 2
+            
+            imgSrc: Qt.resolvedUrl("../../img/playgrid.svg")
+            onClicked:  zynthian.current_modal_screen_id = "playgrid"
+            text: "Playgrid"
+        }
+
+        HomeScreenIcon {
+            rectWidth: mainviewRectId.width / 6
+            rectHeight: mainviewRectId.height / 2
             rectX:  (mainviewRectId.width / 6) * 3
-            imgSrc: Qt.resolvedUrl("../../img/rec-audio.svg")
-            onClicked:  zynthian.current_modal_screen_id = "audio_recorder"
-            text: "Audio Recorder"
+            
+            imgSrc: Qt.resolvedUrl("../../img/layers.svg")
+            onClicked: zynthian.current_screen_id = "layer"
+            text: "Layers"
         }
 
         HomeScreenIcon {
             rectWidth: mainviewRectId.width / 6
             rectHeight: mainviewRectId.height / 2
             rectX:  (mainviewRectId.width / 6) * 4
-            imgSrc: Qt.resolvedUrl("../../img/track.svg")
-            onClicked:  zynthian.current_modal_screen_id = "track"
-            text: "Tracks"
+            
+            imgSrc: Qt.resolvedUrl("../../img/rec-audio.svg")
+            onClicked:  zynthian.current_modal_screen_id = "audio_recorder"
+            text: "Audio Recorder"
         }
 
         HomeScreenIcon {
@@ -105,7 +109,7 @@ Zynthian.SelectorPage {
             rectX:  0
             rectY: mainviewRectId.height / 2
             imgSrc: Qt.resolvedUrl("../../img/snapshots.svg")
-            onClicked:  zynthian.current_modal_screen_id = "snapshot"
+            onClicked:  zynthian.current_modal_screen_id = "snapshots_menu"
             text: "Snapshots"
         }
 

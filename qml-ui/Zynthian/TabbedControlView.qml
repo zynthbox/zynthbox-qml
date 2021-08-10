@@ -139,6 +139,20 @@ Item {
                 }
             }
             return true;
+        case "INCREASE":
+            if (focusedScope === internalStack) {
+                if (Window.activeFocusItem && Window.activeFocusItem.increase) {
+                    Window.activeFocusItem.increase();
+                }
+            }
+            return true;
+        case "DECREASE":
+            if (focusedScope === internalStack) {
+                if (Window.activeFocusItem && Window.activeFocusItem.decrease) {
+                    Window.activeFocusItem.decrease();
+                }
+            }
+            return true;
         default:
             return false;
         }

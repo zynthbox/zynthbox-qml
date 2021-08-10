@@ -44,28 +44,28 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data = []
 
         # Main Apps
-        self.list_data.append((self.layers, 0, "Layers"))
-        #if "zynseq" in zynthian_gui_config.experimental_features:
-            # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
-        # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
-        self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
-        self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
-        self.list_data.append((self.playgrid, 0, "Play Grid"))
-        self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
-        if "autoeq" in zynthian_gui_config.experimental_features:
-            self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
+        # self.list_data.append((self.layers, 0, "Layers"))
+        # #if "zynseq" in zynthian_gui_config.experimental_features:
+        #     # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
+        # # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
+        # self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
+        # self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
+        # self.list_data.append((self.playgrid, 0, "Play Grid"))
+        # self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
+        # if "autoeq" in zynthian_gui_config.experimental_features:
+        #     self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
 
-        # Snapshot Management
-        self.list_data.append((None, 0, ""))
-        self.list_data.append((self.load_snapshot, 0, "Load Snapshot"))
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
-            self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
+        # # Snapshot Management
+        # self.list_data.append((None, 0, ""))
+        # self.list_data.append((self.load_snapshot, 0, "Load Snapshot"))
+        # if len(self.zyngui.screens["layer"].layers) > 0:
+        #     self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
+        #     self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
-        self.list_data.append((None, 0, ""))
-        self.list_data.append((self.admin, 0, "Settings"))
+        # self.list_data.append((None, 0, ""))
+        # self.list_data.append((self.admin, 0, "Settings"))
 
-        super().fill_list()
+        # super().fill_list()
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0]:

@@ -1,39 +1,21 @@
 <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
 <circle cx="45" cy="45" r="45" fill="#465774"/>
-<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="90" height="90">
-<circle cx="45" cy="45" r="45" fill="#465774"/>
-</mask>
-<g mask="url(#mask0)">
-<rect width="88" height="30" transform="matrix(1 0 0 -1 1 30)" fill="url(#paint0_linear)"/>
-<rect x="1" y="60" width="88" height="30" fill="url(#paint1_linear)"/>
+<path d="M0 45C0 69.8528 20.1472 90 45 90C69.8528 90 90 69.8528 90 45H0Z" fill="url(#paint0_linear)"/>
+<path d="M0 45C0 20.1472 20.1472 0 45 0C69.8528 0 90 20.1472 90 45H0Z" fill="url(#paint1_linear)"/>
 <rect x="19" y="65" width="52" height="8" rx="4" fill="#0BA7FF"/>
 <rect x="15" y="53" width="60" height="8" rx="4" fill="#4BBEFF"/>
 <rect x="15" y="41" width="60" height="8" rx="4" fill="#D4A4FF"/>
 <rect x="15" y="29" width="60" height="8" rx="4" fill="#A984FF"/>
 <rect x="19" y="17" width="52" height="8" rx="4" fill="#7F64FF"/>
-</g>
-<mask id="mask1" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="90" height="90">
-<circle cx="45" cy="45" r="45" fill="#C4C4C4"/>
-</mask>
-<g mask="url(#mask1)">
-<g filter="url(#filter0_f)">
-<circle cx="45" cy="45" r="42" stroke="#8296B9" stroke-opacity="0.25" stroke-width="6"/>
-</g>
 <circle cx="45" cy="45" r="44" stroke="#8296B9" stroke-width="2"/>
-</g>
 <defs>
-<filter id="filter0_f" x="-14" y="-14" width="118" height="118" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-<feGaussianBlur stdDeviation="7" result="effect1_foregroundBlur"/>
-</filter>
-<linearGradient id="paint0_linear" x1="44" y1="0" x2="44" y2="30" gradientUnits="userSpaceOnUse">
-<stop stop-color="#343E51" stop-opacity="0"/>
-<stop offset="1" stop-color="#D4A4FF" stop-opacity="0.3"/>
-</linearGradient>
-<linearGradient id="paint1_linear" x1="45" y1="60" x2="45" y2="90" gradientUnits="userSpaceOnUse">
+<linearGradient id="paint0_linear" x1="45" y1="45" x2="45" y2="90" gradientUnits="userSpaceOnUse">
 <stop stop-color="#343E51" stop-opacity="0"/>
 <stop offset="1" stop-color="#00A3FF" stop-opacity="0.3"/>
+</linearGradient>
+<linearGradient id="paint1_linear" x1="45" y1="45" x2="45" y2="0" gradientUnits="userSpaceOnUse">
+<stop stop-color="#343E51" stop-opacity="0"/>
+<stop offset="1" stop-color="#D4A4FF" stop-opacity="0.3"/>
 </linearGradient>
 </defs>
 </svg>

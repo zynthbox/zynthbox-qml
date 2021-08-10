@@ -118,7 +118,10 @@ class zynthian_gui_keybinding(QObject):
 			"LAYER_THREE": { "modifier": 0, "keysym": "3" },
 			"LAYER_FOUR": { "modifier": 0, "keysym": "4" },
 			"LAYER_FIVE": { "modifier": 0, "keysym": "5" },
-			"LAYER_SIX": { "modifier": 0, "keysym": "6" }
+			"LAYER_SIX": { "modifier": 0, "keysym": "6" },
+
+			"INCREASE" : { "modifier": 0, "keysym": "+" },
+			"DECREASE" : { "modifier": 0, "keysym": "-" }
 		}
 	}
 

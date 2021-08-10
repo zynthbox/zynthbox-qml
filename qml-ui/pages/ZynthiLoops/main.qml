@@ -185,7 +185,7 @@ Zynthian.ScreenPage {
                     model: song.tracksModel
 
                     delegate: Rectangle {
-                        property var track: model
+                        property var track: song.tracksModel.data(song.tracksModel.index(index,0))
 
                         width: ListView.view.width
                         height: privateProps.headerHeight

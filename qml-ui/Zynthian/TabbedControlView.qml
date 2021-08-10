@@ -38,7 +38,7 @@ Item {
     property list<Zynthian.TabbedControlViewAction> tabActions
 
     property var cuiaCallback: function(cuia) {
-        let focusedScope = internalStack.activeFocus ? internalStack : primaryTabsScope
+        let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
         if (!focusedScope.activeFocus) {
             focusedScope.forceActiveFocus()
         }
@@ -54,11 +54,24 @@ Item {
         case "SWITCH_BACK_LONG":
             if (focusedScope === primaryTabsScope) {
                 return false;
-            } else {
-                if (focusedScope === internalStack) {
+            } else if (focusedScope === internalStack) {
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo && (layoutInfo.position % layoutInfo.layout.columns !== 0)) {
+                    var controller = nextFocusItemInScope(internalStack, false);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
+                } else {
                     primaryTabsScope.forceActiveFocus();
                 }
+            } else if (focusedScope === secondaryTabsScope) {
+                var button = nextFocusItemInScope(secondaryTabsScope, false);
+                if (button) {
+                    button.forceActiveFocus();
+                    button.clicked();
+                }
             }
+
             return true;
         case "SELECT_UP":
             if (focusedScope === primaryTabsScope) {
@@ -68,10 +81,20 @@ Item {
                     button.clicked();
                 }
             } else if (focusedScope === internalStack) {
-                var controller = nextFocusItemInScope(internalStack, false);
-                if (controller) {
-                    controller.forceActiveFocus();
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo) {
+                    var newIndex = Number(layoutInfo.position) - layoutInfo.layout.columns;
+                    if (newIndex >= 0) {
+                        layoutInfo.layout.children[newIndex].forceActiveFocus();
+                    }
+                } else {
+                    var controller = nextFocusItemInScope(internalStack, false);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
                 }
+            } else if (focusedScope === secondaryTabsScope) {
+                internalStack.forceActiveFocus();
             }
             return true;
 
@@ -83,9 +106,19 @@ Item {
                     button.clicked();
                 }
             } else if (focusedScope === internalStack) {
-                var controller = nextFocusItemInScope(internalStack, true);
-                if (controller) {
-                    controller.forceActiveFocus();
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo) {
+                    var newIndex = Number(layoutInfo.position) + layoutInfo.layout.columns;
+                    if (newIndex < layoutInfo.layout.children.length) {
+                        layoutInfo.layout.children[newIndex].forceActiveFocus();
+                    } else {
+                        secondaryTabsScope.forceActiveFocus();
+                    }
+                } else {
+                    var controller = nextFocusItemInScope(internalStack, true);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
                 }
             }
 
@@ -97,6 +130,26 @@ Item {
                 var controller = nextFocusItemInScope(internalStack, true);
                 if (controller) {
                     controller.forceActiveFocus();
+                }
+            } else if (focusedScope === secondaryTabsScope) {
+                var button = nextFocusItemInScope(secondaryTabsScope, true);
+                if (button) {
+                    button.forceActiveFocus();
+                    button.clicked();
+                }
+            }
+            return true;
+        case "INCREASE":
+            if (focusedScope === internalStack) {
+                if (Window.activeFocusItem && Window.activeFocusItem.increase) {
+                    Window.activeFocusItem.increase();
+                }
+            }
+            return true;
+        case "DECREASE":
+            if (focusedScope === internalStack) {
+                if (Window.activeFocusItem && Window.activeFocusItem.decrease) {
+                    Window.activeFocusItem.decrease();
                 }
             }
             return true;
@@ -119,7 +172,36 @@ Item {
         return null;
     }
 
-    Component.onCompleted: primaryTabsScope.children[1].forceActiveFocus()
+    function gridLayoutInfoFor(item) {
+        var result = null;
+        var candidate = item;
+        while (candidate && candidate != internalStack && candidate != root) {
+            candidate = candidate.parent;
+            if (candidate && candidate.parent && candidate.parent.parent
+                && candidate.parent.parent == internalStack
+                && candidate.parent instanceof GridLayout) {
+                let layout = candidate.parent;
+                let index = -1;
+                var i;
+                for (i in layout.children) {
+                    let child = layout.children[i];
+                    if (child === candidate) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index >= 0) {
+                    return {"layout": layout, "position": index};
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    Component.onCompleted: internalStack.forceActiveFocus()
 
     RowLayout {
         anchors.fill: parent
@@ -179,23 +261,29 @@ Item {
                     }
                 }
             }
-            RowLayout {
+            FocusScope {
+                id: secondaryTabsScope
+                implicitHeight: secondaryTabLayout.implicitHeight
                 Layout.fillWidth: true
                 visible: internalStack.activeAction && internalStack.activeAction.children.length > 0
-                Repeater {
-                    model: internalStack.activeAction.children
-                    delegate: QQC2.Button {
-                        implicitWidth: 1
-                        Layout.fillWidth: true
-                        text: modelData.text
-                        autoExclusive: true
-                        enabled: modelData.enabled
-                        visible: modelData.visible
-                        checkable: true
-                        checked: internalStack.activeSubAction === modelData
-                        onClicked: {
-                            internalStack.replace(modelData.page);
-                            internalStack.activeSubAction = modelData;
+                RowLayout {
+                    id: secondaryTabLayout
+                    anchors.fill: parent
+                    Repeater {
+                        model: internalStack.activeAction.children
+                        delegate: QQC2.Button {
+                            implicitWidth: 1
+                            Layout.fillWidth: true
+                            text: modelData.text
+                            autoExclusive: true
+                            enabled: modelData.enabled
+                            visible: modelData.visible
+                            checkable: true
+                            checked: internalStack.activeSubAction === modelData
+                            onClicked: {
+                                internalStack.replace(modelData.page);
+                                internalStack.activeSubAction = modelData;
+                            }
                         }
                     }
                 }

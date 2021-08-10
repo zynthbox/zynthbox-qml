@@ -112,6 +112,10 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("Play Grid")
         self.zyngui.show_modal("playgrid")
 
+    def playgrid(self):
+        logging.info("Track")
+        self.zyngui.show_modal("track")
+
     def zynthiloops(self):
         logging.info("ZynthiLoops")
         self.zyngui.show_modal("zynthiloops")

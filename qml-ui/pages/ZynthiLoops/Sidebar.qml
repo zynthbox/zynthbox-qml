@@ -124,11 +124,12 @@ Item {
                 onClicked: {
                     if (controlObj.isPlaying) {
                         console.log("Stopping Sound Loop")
-                        controlObj.isPlaying = false;
+                        controlObj.isPlaying = false;                        
+                        controlObj.stopWav();
                     } else {
                         console.log("Playing Sound Loop")
                         controlObj.isPlaying = true;
-                        controlObj.playWav()
+                        controlObj.playWav();
                     }
                 }
             }

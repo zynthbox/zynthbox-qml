@@ -41,6 +41,11 @@ AbstractController {
     highlighted: slider.activeFocus
 
     control: ColumnLayout {
+        onActiveFocusChanged: {
+            if (activeFocus) {
+                slider.forceActiveFocus();
+            }
+        }
 
         QQC2.Slider {
             id: slider
@@ -56,7 +61,7 @@ AbstractController {
             onMoved: root.controller.ctrl.value = value
         }
         Kirigami.Heading {
-			id: valueLabel
+            id: valueLabel
             level: 2
             text: root.controller.ctrl ? root.controller.ctrl.value_print : ""
             Layout.fillWidth: true

@@ -97,6 +97,7 @@ from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
 from zynqtgui.zynthian_gui_control import zynthian_gui_control
+from zynqtgui.zynthian_gui_track import zynthian_gui_track
 
 # from zynqtgui.zynthian_gui_control_xy import zynthian_gui_control_xy
 # from zynqtgui.zynthian_gui_midi_profile import zynthian_gui_midi_profile
@@ -318,6 +319,8 @@ class zynthian_gui(QObject):
         "104": "LAYER_FOUR",
         "105": "LAYER_FIVE",
         "106": "LAYER_SIX",
+        "107": "INCREASE",
+        "108": "DECREASE",
     }
 
     def __init__(self, parent=None):
@@ -548,6 +551,7 @@ class zynthian_gui(QObject):
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
         self.screens["control"] = zynthian_gui_control(self)
+        self.screens["track"] = zynthian_gui_track(self)
         # self.screens['control_xy'] = zynthian_gui_control_xy(self)
         # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
         # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)

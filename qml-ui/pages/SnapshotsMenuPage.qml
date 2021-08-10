@@ -32,10 +32,4 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.SelectorPage {
     screenId: "snapshots_menu"
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Themes")
-            onTriggered: zynthian.show_modal("theme_chooser")
-        }
-    ]
 }

@@ -38,7 +38,7 @@ Item {
     property list<Zynthian.TabbedControlViewAction> tabActions
 
     property var cuiaCallback: function(cuia) {
-        let focusedScope = internalStack.activeFocus ? internalStack : primaryTabsScope
+        let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
         if (!focusedScope.activeFocus) {
             focusedScope.forceActiveFocus()
         }
@@ -64,6 +64,12 @@ Item {
                 } else {
                     primaryTabsScope.forceActiveFocus();
                 }
+            } else if (focusedScope === secondaryTabsScope) {
+                var button = nextFocusItemInScope(secondaryTabsScope, false);
+                if (button) {
+                    button.forceActiveFocus();
+                    button.clicked();
+                }
             }
 
             return true;
@@ -87,6 +93,8 @@ Item {
                         controller.forceActiveFocus();
                     }
                 }
+            } else if (focusedScope === secondaryTabsScope) {
+                internalStack.forceActiveFocus();
             }
             return true;
 
@@ -103,6 +111,8 @@ Item {
                     var newIndex = Number(layoutInfo.position) + layoutInfo.layout.columns;
                     if (newIndex < layoutInfo.layout.children.length) {
                         layoutInfo.layout.children[newIndex].forceActiveFocus();
+                    } else {
+                        secondaryTabsScope.forceActiveFocus();
                     }
                 } else {
                     var controller = nextFocusItemInScope(internalStack, true);
@@ -120,6 +130,12 @@ Item {
                 var controller = nextFocusItemInScope(internalStack, true);
                 if (controller) {
                     controller.forceActiveFocus();
+                }
+            } else if (focusedScope === secondaryTabsScope) {
+                var button = nextFocusItemInScope(secondaryTabsScope, true);
+                if (button) {
+                    button.forceActiveFocus();
+                    button.clicked();
                 }
             }
             return true;
@@ -171,7 +187,7 @@ Item {
         return null;
     }
 
-    Component.onCompleted: primaryTabsScope.children[1].forceActiveFocus()
+    Component.onCompleted: internalStack.forceActiveFocus()
 
     RowLayout {
         anchors.fill: parent
@@ -231,23 +247,29 @@ Item {
                     }
                 }
             }
-            RowLayout {
+            FocusScope {
+                id: secondaryTabsScope
+                implicitHeight: secondaryTabLayout.implicitHeight
                 Layout.fillWidth: true
                 visible: internalStack.activeAction && internalStack.activeAction.children.length > 0
-                Repeater {
-                    model: internalStack.activeAction.children
-                    delegate: QQC2.Button {
-                        implicitWidth: 1
-                        Layout.fillWidth: true
-                        text: modelData.text
-                        autoExclusive: true
-                        enabled: modelData.enabled
-                        visible: modelData.visible
-                        checkable: true
-                        checked: internalStack.activeSubAction === modelData
-                        onClicked: {
-                            internalStack.replace(modelData.page);
-                            internalStack.activeSubAction = modelData;
+                RowLayout {
+                    id: secondaryTabLayout
+                    anchors.fill: parent
+                    Repeater {
+                        model: internalStack.activeAction.children
+                        delegate: QQC2.Button {
+                            implicitWidth: 1
+                            Layout.fillWidth: true
+                            text: modelData.text
+                            autoExclusive: true
+                            enabled: modelData.enabled
+                            visible: modelData.visible
+                            checkable: true
+                            checked: internalStack.activeSubAction === modelData
+                            onClicked: {
+                                internalStack.replace(modelData.page);
+                                internalStack.activeSubAction = modelData;
+                            }
                         }
                     }
                 }

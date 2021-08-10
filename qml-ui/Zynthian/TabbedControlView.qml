@@ -54,11 +54,18 @@ Item {
         case "SWITCH_BACK_LONG":
             if (focusedScope === primaryTabsScope) {
                 return false;
-            } else {
-                if (focusedScope === internalStack) {
+            } else if (focusedScope === internalStack) {
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo && (layoutInfo.position % layoutInfo.layout.columns !== 0)) {
+                    var controller = nextFocusItemInScope(internalStack, false);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
+                } else {
                     primaryTabsScope.forceActiveFocus();
                 }
             }
+
             return true;
         case "SELECT_UP":
             if (focusedScope === primaryTabsScope) {
@@ -68,9 +75,17 @@ Item {
                     button.clicked();
                 }
             } else if (focusedScope === internalStack) {
-                var controller = nextFocusItemInScope(internalStack, false);
-                if (controller) {
-                    controller.forceActiveFocus();
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo) {
+                    var newIndex = Number(layoutInfo.position) - layoutInfo.layout.columns;
+                    if (newIndex >= 0) {
+                        layoutInfo.layout.children[newIndex].forceActiveFocus();
+                    }
+                } else {
+                    var controller = nextFocusItemInScope(internalStack, false);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
                 }
             }
             return true;
@@ -83,9 +98,17 @@ Item {
                     button.clicked();
                 }
             } else if (focusedScope === internalStack) {
-                var controller = nextFocusItemInScope(internalStack, true);
-                if (controller) {
-                    controller.forceActiveFocus();
+                var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
+                if (layoutInfo) {
+                    var newIndex = Number(layoutInfo.position) + layoutInfo.layout.columns;
+                    if (newIndex < layoutInfo.layout.children.length) {
+                        layoutInfo.layout.children[newIndex].forceActiveFocus();
+                    }
+                } else {
+                    var controller = nextFocusItemInScope(internalStack, true);
+                    if (controller) {
+                        controller.forceActiveFocus();
+                    }
                 }
             }
 
@@ -113,6 +136,35 @@ Item {
             while (candidate = candidate.parent) {
                 if (candidate === scope) {
                     return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    function gridLayoutInfoFor(item) {
+        var result = null;
+        var candidate = item;
+        while (candidate && candidate != internalStack && candidate != root) {
+            candidate = candidate.parent;
+            if (candidate && candidate.parent && candidate.parent.parent
+                && candidate.parent.parent == internalStack
+                && candidate.parent instanceof GridLayout) {
+                let layout = candidate.parent;
+                let index = -1;
+                var i;
+                for (i in layout.children) {
+                    let child = layout.children[i];
+                    if (child === candidate) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index >= 0) {
+                    return {"layout": layout, "position": index};
+                } else {
+                    return null;
                 }
             }
         }

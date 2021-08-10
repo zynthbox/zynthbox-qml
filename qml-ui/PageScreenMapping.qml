@@ -75,6 +75,7 @@ QtObject {
 		"theme_downloader": "ThemeDownloaderPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
 		"synth_behaviour":"SynthBehaviourPage.qml",
+		"snapshots_menu":"SnapshotsMenuPage.qml",
 		"network":"NetworkPage.qml",
 		"hardware":"HardwarePage.qml",
 		"playgrid": "PlayGrid.qml",

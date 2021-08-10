@@ -136,10 +136,41 @@ Zynthian.SelectorPage {
         }
 
         Rectangle {
-            id:audiorecorderRect
+            id:trackRect
             x:zynthiloopsRect.x + zynthiloopsRect.width
             width:mainviewRectId.width / 6
             height:mainviewRectId.height / 2
+            color:"transparent"
+
+            Image {
+                anchors.centerIn: parent
+                width:90;height:90
+                source:  Qt.resolvedUrl("../../img/track.svg")
+            }
+
+            Kirigami.Heading {
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.bottom
+                    bottomMargin: Kirigami.Units.gridUnit * 2
+                }
+                text: "Tracks"
+                font.pointSize: 12
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    zynthian.current_modal_screen_id = "track"
+                }
+            }
+        }
+
+        Rectangle {
+            id:audiorecorderRect
+            x:trackRect.x + trackRect.width
+            width:mainviewRectId.width / 6
+            height:width
             color:"transparent"
 
             Image {
@@ -201,7 +232,7 @@ Zynthian.SelectorPage {
 
         Rectangle {
             id:snapshotsRect
-            x:midirecorderRect.x + midirecorderRect.width
+            y:mainviewRectId.height / 2
             width:mainviewRectId.width / 6
             height:mainviewRectId.height / 2
             color:"transparent"
@@ -233,6 +264,7 @@ Zynthian.SelectorPage {
 
         Rectangle {
             id:settingsRect
+            x: snapshotsRect.x + snapshotsRect.width
             y:mainviewRectId.height / 2
             width:mainviewRectId.width / 6
             height:mainviewRectId.height / 2

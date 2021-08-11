@@ -201,10 +201,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 (self.check_for_updates, 0, "Check for software updates")
             )
         # self.list_data.append((self.update_system,0,"Update Operating System"))
-        self.list_data.append((self.restart_gui, 0, "Restart UI"))
+        # self.list_data.append((self.restart_gui, 0, "Restart UI"))
         # self.list_data.append((self.exit_to_console,0,"Exit to Console"))
-        self.list_data.append((self.reboot, 0, "Reboot"))
-        self.list_data.append((self.power_off, 0, "Power Off"))
+        # self.list_data.append((self.reboot, 0, "Reboot"))
+        # self.list_data.append((self.power_off, 0, "Power Off"))
         super().fill_list()
 
     def select_action(self, i, t="S"):
@@ -213,8 +213,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.last_action()
 
     def set_select_path(self):
-        self.select_path = "Admin"
-        self.select_path_element = "Admin"
+        self.select_path = "Settings"
+        self.select_path_element = "Settings"
         super().set_select_path()
 
     def execute_commands(self):

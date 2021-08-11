@@ -88,17 +88,28 @@ Zynthian.ScreenPage {
                         StackLayout {
                             id: titleStack
                             RowLayout {
-                                Kirigami.Heading {
-                                    //Layout.fillWidth: true
-                                    text: root.track.name
+                                QQC2.SpinBox {
+                                    from: 0
+                                    implicitWidth: trackTitle.implicitWidth + Kirigami.Units.gridUnit * 7
+                                    implicitHeight: trackTitle.implicitHeight + Kirigami.Units.gridUnit
+                                    to: root.song.tracksModel.count
+                                    value: root.track.trackId
+                                    onValueModified: zynthian.track.trackId = value
+                                    contentItem: Kirigami.Heading {
+                                        id: trackTitle
+                                        //Layout.fillWidth: true
+                                        wrapMode: Text.NoWrap
+                                        text: root.track.name
+                                    }
                                 }
                                 QQC2.Button {
                                     icon.name: "document-edit"
                                     onClicked: {
                                         titleStack.currentIndex = 1;
+                                        trackNameEdit.text = root.track.name;
                                         trackNameEdit.forceActiveFocus();
                                     }
-                                    Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                                    Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
                                     Layout.preferredHeight: Layout.preferredWidth
                                 }
                             }

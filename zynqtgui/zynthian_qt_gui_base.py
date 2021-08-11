@@ -36,6 +36,15 @@ class ZynGui(QObject):
         self.select_path = ""
         self.shown = True
 
+    def show(self):
+        pass
+
+    def zyncoder_read(self):
+        pass
+
+    def refresh_loading(self):
+        pass
+
     def set_select_path(self):
         pass
 

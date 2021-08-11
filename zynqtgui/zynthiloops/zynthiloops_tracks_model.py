@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt
+from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Slot
 from .zynthiloops_track import zynthiloops_track
 
 
@@ -43,7 +43,7 @@ class zynthiloops_tracks_model(QAbstractListModel):
         if not index.isValid():
             return None
 
-        if index.row() > len(self.__tracks__):
+        if index.row() >= len(self.__tracks__):
             return None
 
         if role == self.IdRole:
@@ -70,3 +70,9 @@ class zynthiloops_tracks_model(QAbstractListModel):
         self.beginInsertRows(QModelIndex(), length, length)
         self.__tracks__.append(track)
         self.endInsertRows()
+
+    @Slot('void', result=QObject)
+    def getTrack(self, row):
+        if row < 0 or row >= len(self.__tracks__):
+            return None
+        return self.__tracks__[row]

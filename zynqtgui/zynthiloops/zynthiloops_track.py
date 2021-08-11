@@ -24,7 +24,7 @@
 # ******************************************************************************
 
 
-from PySide2.QtCore import Property, QObject, Slot
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 
 class zynthiloops_track(QObject):
@@ -35,6 +35,7 @@ class zynthiloops_track(QObject):
     def __init__(self, id: int, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
+        self.__name__ = f"Track {self.__id__}"
 
     @Property(bool, constant=True)
     def playable(self):
@@ -56,9 +57,18 @@ class zynthiloops_track(QObject):
     def id(self):
         return self.__id__
 
-    @Property(str, constant=True)
+    @Signal
+    def __name_changed__(self):
+        pass
+
+    @Property(str, notify=__name_changed__)
     def name(self):
-        return f"Track {self.__id__}"
+        return self.__name__
+
+    @name.setter
+    def set_name(self, name):
+        self.__name__ = name
+        self.__name_changed__.emit()
 
     @Property(str, constant=True)
     def type(self):

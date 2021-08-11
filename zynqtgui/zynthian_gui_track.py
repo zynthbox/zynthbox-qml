@@ -44,19 +44,28 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     def show(self):
         pass
 
-
     @Signal
     def __track_id_changed__(self):
         pass
 
     @Property(str, notify=__track_id_changed__)
     def trackId(self):
-        return self.__name__
+        return self.__track_id__
 
     @trackId.setter
-    def setTrackId(self, name):
-        self.__track_id__ = name
+    def setTrackId(self, tId):
+        self.__track_id__ = tId
         self.__track_id_changed__.emit()
+        self.__track_changed__.emit()
+
+
+    @Signal
+    def __track_changed__(self):
+        pass
+
+    @Property(str, notify=__track_changed__)
+    def track(self):
+        return self.zyngui.screens['zynthiloops'].song().tracksModel().getTrack(self.__track_id__)
 
 
     def set_select_path(self):

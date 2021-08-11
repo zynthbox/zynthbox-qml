@@ -39,7 +39,7 @@ Zynthian.ScreenPage {
     readonly property QtObject part: zynthian.track.part
 
     screenId: "track"
-    title: zynthian.track.selector_path_element
+    title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
@@ -103,7 +103,7 @@ Zynthian.ScreenPage {
                                 QQC2.SpinBox {
                                     from: 0
                                     implicitWidth: trackTitle.implicitWidth + Kirigami.Units.gridUnit * 7
-                                    implicitHeight: trackTitle.implicitHeight + Kirigami.Units.gridUnit
+                                    implicitHeight: trackTitle.implicitHeight + topPadding + bottomPadding
                                     to: root.song.tracksModel.count - 1
                                     value: root.track.trackId
                                     onValueModified: zynthian.track.trackId = value

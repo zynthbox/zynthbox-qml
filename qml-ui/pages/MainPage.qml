@@ -126,8 +126,16 @@ Zynthian.SelectorPage {
 
     contextualActions: [
         Kirigami.Action {
+            text: qsTr("Restart UI")
+            onTriggered: zynthian.restart_gui()
+        }
+        Kirigami.Action {
+            text: qsTr("Reboot")
+            onTriggered: zynthian.reboot()
+        }
+        Kirigami.Action {
             text: qsTr("Synth Setup")
-            onTriggered: zynthian.current_screen_id = "layer"
+            onTriggered: zynthian.power_off()
         }
     ]
 }

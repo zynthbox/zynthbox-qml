@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Slot
+from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 from .zynthiloops_track import zynthiloops_track
 
 
@@ -70,9 +70,22 @@ class zynthiloops_tracks_model(QAbstractListModel):
         self.beginInsertRows(QModelIndex(), length, length)
         self.__tracks__.append(track)
         self.endInsertRows()
+        self.countChanged.emit()
 
-    @Slot('void', result=QObject)
-    def getTrack(self, row):
+    @Slot(int, result=QObject)
+    def getTrack(self, row : int):
+        logging.error(type(row))
         if row < 0 or row >= len(self.__tracks__):
             return None
         return self.__tracks__[row]
+
+
+    @Signal
+    def countChanged(self):
+        pass
+
+    @Property(int, notify=countChanged)
+    def count(self):
+        return len(self.__tracks__)
+
+

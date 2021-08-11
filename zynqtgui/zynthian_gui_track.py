@@ -29,25 +29,38 @@ import logging
 # Zynthian specific modules
 from . import zynthian_qt_gui_base
 
+from PySide2.QtCore import Qt, Signal, Property
+
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
 class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
-	def __init__(self, parent=None):
-		super(zynthian_gui_track, self).__init__(parent)
-		self.title = "Tracks"
+    def __init__(self, parent=None):
+        super(zynthian_gui_track, self).__init__(parent)
+        self.title = "Tracks"
+        self.__track_id__ = 0
 
-	def show(self):
-		pass
+    def show(self):
+        pass
 
-	def zyncoder_read(self):
-		pass
 
-	def refresh_loading(self):
-		pass
+    @Signal
+    def __track_id_changed__(self):
+        pass
 
-	def set_select_path(self):
-		self.select_path = self.title
+    @Property(str, notify=__track_id_changed__)
+    def trackId(self):
+        return self.__name__
+
+    @trackId.setter
+    def setTrackId(self, name):
+        self.__track_id__ = name
+        self.__track_id_changed__.emit()
+
+
+    def set_select_path(self):
+        self.select_path = self.title
+
 
 #------------------------------------------------------------------------------

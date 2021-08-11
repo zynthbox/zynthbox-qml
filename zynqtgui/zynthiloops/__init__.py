@@ -8,4 +8,3 @@ from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
 )
 from . import libzl
 
-libzl.init()

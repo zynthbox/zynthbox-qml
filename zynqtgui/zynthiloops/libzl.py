@@ -28,15 +28,12 @@ from os.path import dirname, realpath
 
 libzl = None
 
-
-def init():
-    global libzl
-    try:
-        libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
-        libzl.init()
-    except Exception as e:
-        libzl = None
-        print(f"Can't initialise zynseq library: {str(e)}")
+try:
+    libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
+    libzl.init()
+except Exception as e:
+    libzl = None
+    print(f"Can't initialise libzl library: {str(e)}")
 
 
 def playWav():
@@ -47,3 +44,20 @@ def playWav():
 def stopWav():
     if libzl:
         libzl.stopWav()
+
+
+def createClip():
+    if libzl:
+        return libzl.libzl.ZynthiLoopsComponent_new()
+
+
+class libzlClip(object):
+    def __init__(self):
+        libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
+        self.obj = libzl.ZynthiLoopsComponent_new()
+
+    def play(self):
+        libzl.ZynthiLoopsComponent_play(self.obj)
+
+    def stop(self):
+        return libzl.ZynthiLoopsComponent_stop(self.obj)

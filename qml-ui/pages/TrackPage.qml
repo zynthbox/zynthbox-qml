@@ -36,6 +36,7 @@ Zynthian.ScreenPage {
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject track: zynthian.track.track
+    readonly property QtObject part: zynthian.track.part
 
     screenId: "track"
     title: zynthian.track.selector_path_element
@@ -60,14 +61,25 @@ Zynthian.ScreenPage {
                     return qsTr("%1 BPM").arg(value);
                 }
             }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("PART 01")
-                font.capitalization: Font.AllUppercase
+            QQC2.SpinBox {
+                font: topSoundHeading.font
+                from: 0
+                to: root.song.partsModel.count - 1
+                value: root.track.partId
+                onValueModified: zynthian.track.partId = value
+                textFromValue: function(value) {
+                    return root.part.name
+                }
             }
-            Kirigami.Heading {
-                level: 2
-                text: qsTr("Length: %1 bars").arg()
+            QQC2.SpinBox {
+                //font: topSoundHeading.font
+                from: 1
+                to: 999
+                value: root.part.length
+                onValueModified: root.part.length = value
+                textFromValue: function(value) {
+                    return qsTr("Length: %1 bars").arg(root.part.length)
+                }
             }
             Item {
                 Layout.fillWidth: true
@@ -92,7 +104,7 @@ Zynthian.ScreenPage {
                                     from: 0
                                     implicitWidth: trackTitle.implicitWidth + Kirigami.Units.gridUnit * 7
                                     implicitHeight: trackTitle.implicitHeight + Kirigami.Units.gridUnit
-                                    to: root.song.tracksModel.count
+                                    to: root.song.tracksModel.count - 1
                                     value: root.track.trackId
                                     onValueModified: zynthian.track.trackId = value
                                     contentItem: Kirigami.Heading {

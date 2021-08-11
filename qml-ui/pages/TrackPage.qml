@@ -34,14 +34,11 @@ import ZynthiLoops 1.0 as ZynthiLoops
 Zynthian.ScreenPage {
     id: root
 
-    readonly property QtObject track: song.tracksModel.getTrack(zynthian.track.trackId)
+    readonly property QtObject song: zynthian.zynthiloops.song
+    readonly property QtObject track: zynthian.track.track
 
     screenId: "track"
-
-    ZynthiLoops.Song {
-        id: song
-        index: 0
-    }
+    title: zynthian.track.selector_path_element
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
@@ -50,15 +47,15 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Kirigami.Heading {
                 level: 2
-                text: qsTr("Song %1").arg(song.index + 1)
+                text: qsTr("Song %1").arg(root.song.index + 1)
                 font.capitalization: Font.AllUppercase
             }
             QQC2.SpinBox {
                 font: topSoundHeading.font
                 from: 0
                 to: 999
-                value: song.bpm
-                onValueModified: song.bpm = value
+                value: root.song.bpm
+                onValueModified: root.song.bpm = value
                 textFromValue: function(value) {
                     return qsTr("%1 BPM").arg(value);
                 }
@@ -101,7 +98,7 @@ Zynthian.ScreenPage {
                                         titleStack.currentIndex = 1;
                                         trackNameEdit.forceActiveFocus();
                                     }
-                                    Layout.preferredWidth: Kirigami.Units.iconSizes.large
+                                    Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                                     Layout.preferredHeight: Layout.preferredWidth
                                 }
                             }

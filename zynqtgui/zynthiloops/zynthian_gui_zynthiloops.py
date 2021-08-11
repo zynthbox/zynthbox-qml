@@ -24,6 +24,7 @@
 # ******************************************************************************
 
 from PySide2.QtQml import qmlRegisterType
+from PySide2.QtCore import Property, QObject, Signal
 
 from .zynthiloops_clip import zynthiloops_clip
 from .zynthiloops_song import zynthiloops_song
@@ -33,17 +34,18 @@ from .. import zynthian_qt_gui_base
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
-
+        self.__song__ = zynthiloops_song(self)
         self.__register_qml_modules__()
+
 
     def show(self):
         pass
 
-    def zyncoder_read(self):
-        pass
 
-    def refresh_loading(self):
-        pass
+    @Property(QObject, constant=True)
+    def song(self):
+        return self.__song__
+
 
     def __register_qml_modules__(self):
         qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")

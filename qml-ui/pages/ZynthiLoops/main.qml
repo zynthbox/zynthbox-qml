@@ -33,6 +33,10 @@ import '../../Zynthian' 1.0 as Zynthian
 import ZynthiLoops 1.0 as ZynthiLoops
 
 Zynthian.ScreenPage {
+    id: root
+
+    readonly property QtObject song: zynthian.zynthiloops.song
+
     screenId: "zynthiloops"
     leftPadding: 8
     rightPadding: 8
@@ -42,7 +46,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Add Track")
-            onTriggered: song.addTrack()
+            onTriggered: root.song.addTrack()
         }
     ]
 
@@ -61,11 +65,6 @@ Zynthian.ScreenPage {
         property int headerHeight: 80
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
-    }
-
-    ZynthiLoops.Song {
-        id: song
-        index: 0
     }
 
     RowLayout {
@@ -96,17 +95,17 @@ Zynthian.ScreenPage {
                     TableHeaderLabel {
                         anchors.centerIn: parent
 
-                        text: "Song " + (song.index+1)
-                        text2: "BPM: " + song.bpm
+                        text: "Song " + (root.song.index+1)
+                        text2: "BPM: " + root.song.bpm
                     }
 
                     MultiPointTouchArea {
                         anchors.fill: parent
                         onPressed: {
                             parent.focus = true;
-                            sidebar.heading = "Song " + (song.index+1);
+                            sidebar.heading = "Song " + (root.song.index+1);
                             sidebar.controlType = Sidebar.ControlType.Song;
-                            sidebar.controlObj = song;
+                            sidebar.controlObj = root.song;
                         }
                     }
 
@@ -127,10 +126,10 @@ Zynthian.ScreenPage {
                     orientation: Qt.Horizontal
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: song.partsModel
+                    model: root.song.partsModel
 
                     delegate: Rectangle {
-                        property var part: song.partsModel.data(song.partsModel.index(index, 0))
+                        property var part: root.song.partsModel.data(root.song.partsModel.index(index, 0))
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
@@ -182,10 +181,10 @@ Zynthian.ScreenPage {
                     contentY: loopGridFlickable.contentY
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: song.tracksModel
+                    model: root.song.tracksModel
 
                     delegate: Rectangle {
-                        property var track: song.tracksModel.data(song.tracksModel.index(index,0))
+                        property var track: root.song.tracksModel.data(root.song.tracksModel.index(index,0))
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
@@ -234,22 +233,22 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: song.partsModel.rowCount(song.partsModel.index(0,0))
+                        columns: root.song.partsModel.rowCount(root.song.partsModel.index(0,0))
                         rowSpacing: 1
                         columnSpacing: 1
 
                         Repeater {
-                            model: song.tracksModel
+                            model: root.song.tracksModel
 
                             delegate: Repeater {
-                                property var track: song.tracksModel.data(song.tracksModel.index(index, 0))
+                                property var track: root.song.tracksModel.data(root.song.tracksModel.index(index, 0))
                                 property int rowIndex: index
 
                                 // TODO : Populate clips model per track in tracks model
-                                model: song.partsModel
+                                model: root.song.partsModel
 
                                 delegate: Rectangle {
-                                    property var part: song.partsModel.data(song.partsModel.index(index, 0))
+                                    property var part: root.song.partsModel.data(root.song.partsModel.index(index, 0))
                                     property int colIndex: index
 
                                     Layout.preferredWidth: privateProps.cellWidth

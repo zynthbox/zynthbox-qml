@@ -74,7 +74,6 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
     @Slot(int, result=QObject)
     def getTrack(self, row : int):
-        logging.error(type(row))
         if row < 0 or row >= len(self.__tracks__):
             return None
         return self.__tracks__[row]

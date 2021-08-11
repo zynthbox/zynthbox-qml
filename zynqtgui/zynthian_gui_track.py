@@ -39,7 +39,8 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_track, self).__init__(parent)
         self.title = "Tracks"
-        self.__track_id__ : int = 0
+        self.__track_id__ = 0
+        self.__part_id__ = 0
 
     def show(self):
         pass
@@ -58,6 +59,19 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
         self.__track_id_changed__.emit()
         self.__track_changed__.emit()
 
+    @Signal
+    def __part_id_changed__(self):
+        pass
+
+    @Property(int, notify=__part_id_changed__)
+    def partId(self):
+        return self.__part_id__
+
+    @partId.setter
+    def setPartId(self, pId):
+        self.__part_id__ = pId
+        self.__part_id_changed__.emit()
+        self.__part_changed__.emit()
 
     @Signal
     def __track_changed__(self):
@@ -68,8 +82,18 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
         return self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.__track_id__)
 
 
+    @Signal
+    def __part_changed__(self):
+        pass
+
+    @Property(QObject, notify=__part_changed__)
+    def part(self):
+        return self.zyngui.screens['zynthiloops'].song.partsModel.getPart(self.__part_id__)
+
+
     def set_select_path(self):
         self.select_path = self.title
+        self.select_path_element = self.title
 
 
 #------------------------------------------------------------------------------

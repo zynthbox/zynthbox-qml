@@ -207,6 +207,16 @@ Zynthian.ScreenPage {
                                 sidebar.heading = track.name;
                                 sidebar.controlType = Sidebar.ControlType.Track;
                                 sidebar.controlObj = track;
+                                longPressTimer.restart();
+                            }
+                            onReleased: longPressTimer.running = false
+                            Timer {
+                                id: longPressTimer
+                                interval: 500
+                                onTriggered: {
+                                    zynthian.track.trackId = model.id
+                                    zynthian.current_modal_screen_id = "track"
+                                }
                             }
                         }
 

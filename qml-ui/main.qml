@@ -48,8 +48,8 @@ Kirigami.AbstractApplicationWindow {
         confirmDialog.close()
     }
     Component.onCompleted: {
-		root.showFullScreen()
-	}
+        root.showFullScreen()
+    }
 
     width: screen.width
     height: screen.height
@@ -174,11 +174,17 @@ Kirigami.AbstractApplicationWindow {
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
     }
-     VirtualKeyboardLoader {
-		id: virtualKeyboard
-		parent: root.contentItem
-		z: 1000
-		anchors.bottom: parent.bottom
-	}
+
+    Loader {
+        parent: root.contentItem.parent
+        anchors {
+            left: parent.left
+            bottom: parent.bottom
+            right: parent.right
+            //bottomMargin: -root.footer.height
+        }
+        height: Math.min(parent.height / 2, Math.max(parent.height/3, Kirigami.Units.gridUnit * 15))
+        source: "./VirtualKeyboard.qml"
+    }
 }
 

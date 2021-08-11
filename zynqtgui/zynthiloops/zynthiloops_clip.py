@@ -26,6 +26,8 @@
 from . import libzl
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
+from .libzl import libzlClip
+
 
 class zynthiloops_clip(QObject):
     __length__ = 1
@@ -35,6 +37,7 @@ class zynthiloops_clip(QObject):
 
     def __init__(self, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
+        self.libzlClip = libzlClip()
 
     @Signal
     def length_changed(self):
@@ -110,8 +113,10 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def playWav(self, loop=True):
-        libzl.playWav()
+        # libzl.playWav()
+        self.libzlClip.play()
 
     @Slot(None)
     def stopWav(self, loop=True):
-        libzl.stopWav()
+        # libzl.stopWav()
+        self.libzlClip.stop()

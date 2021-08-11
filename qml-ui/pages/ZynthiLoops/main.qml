@@ -289,6 +289,16 @@ Zynthian.ScreenPage {
                                         }
                                     }
 
+                                    Kirigami.Icon {
+                                        width: 24
+                                        height: 24
+                                        anchors.centerIn: parent
+                                        color: "white"
+
+                                        source: "media-playback-start"
+                                        visible: clip.isPlaying
+                                    }
+
                                     onFocusChanged: {
                                         console.log("Clip :", clip.row, clip.col)
                                     }

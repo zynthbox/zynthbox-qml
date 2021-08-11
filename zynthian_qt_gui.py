@@ -2227,6 +2227,9 @@ class zynthian_gui(QObject):
     def get_control(self):
         return self.screens["control"]
 
+    def get_track(self):
+        return self.screens["track"]
+
     def get_audio_recorder(self):
         return self.screens["audio_recorder"]
 
@@ -2324,6 +2327,7 @@ class zynthian_gui(QObject):
     bank = Property(QObject, get_bank, constant=True)
     preset = Property(QObject, get_preset, constant=True)
     control = Property(QObject, get_control, constant=True)
+    track = Property(QObject, get_track, constant=True)
     audio_recorder = Property(QObject, get_audio_recorder, constant=True)
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)

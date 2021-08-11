@@ -29,7 +29,7 @@ import logging
 # Zynthian specific modules
 from . import zynthian_qt_gui_base
 
-from PySide2.QtCore import Qt, Signal, Property
+from PySide2.QtCore import Qt, QObject, Signal, Property
 
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
@@ -39,7 +39,7 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_track, self).__init__(parent)
         self.title = "Tracks"
-        self.__track_id__ = 0
+        self.__track_id__ : int = 0
 
     def show(self):
         pass
@@ -48,7 +48,7 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     def __track_id_changed__(self):
         pass
 
-    @Property(str, notify=__track_id_changed__)
+    @Property(int, notify=__track_id_changed__)
     def trackId(self):
         return self.__track_id__
 
@@ -63,9 +63,9 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     def __track_changed__(self):
         pass
 
-    @Property(str, notify=__track_changed__)
+    @Property(QObject, notify=__track_changed__)
     def track(self):
-        return self.zyngui.screens['zynthiloops'].song().tracksModel().getTrack(self.__track_id__)
+        return self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.__track_id__)
 
 
     def set_select_path(self):

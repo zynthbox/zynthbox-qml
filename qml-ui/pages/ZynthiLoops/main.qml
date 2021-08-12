@@ -187,7 +187,7 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: root.song.partsModel.rowCount(root.song.partsModel.index(0,0))
+                        columns: root.song.partsModel.count
                         rowSpacing: 1
                         columnSpacing: 1
 
@@ -196,7 +196,6 @@ Zynthian.ScreenPage {
 
                             delegate: Repeater {
                                 property int rowIndex: index
-                                //readonly property QtObject track = model.track
 
                                 model: track.clipsModel
 
@@ -207,17 +206,6 @@ Zynthian.ScreenPage {
                                     Layout.maximumWidth: privateProps.cellWidth
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
-
-                                    /*ZynthiLoops.Clip {
-                                        id: clip
-                                        row: rowIndex
-                                        col: colIndex
-
-                                        Component.onCompleted: {
-                                            track.addClip(clip, colIndex);
-                                            model.part.addClip(clip, rowIndex);
-                                        }
-                                    }*/
 
                                     onPressed: {
                                         sidebar.controlType = Sidebar.ControlType.Clip;

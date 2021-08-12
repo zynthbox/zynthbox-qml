@@ -37,8 +37,8 @@ class zynthiloops_song(QObject):
     def __init__(self, parent=None):
         super(zynthiloops_song, self).__init__(parent)
 
-        self.__tracks_model__ = zynthiloops_tracks_model(parent)
-        self.__parts_model__ = zynthiloops_parts_model(parent)
+        self.__tracks_model__ = zynthiloops_tracks_model(self)
+        self.__parts_model__ = zynthiloops_parts_model(self)
 
     @Property(bool, constant=True)
     def playable(self):

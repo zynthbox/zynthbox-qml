@@ -35,7 +35,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         self.__song__ = zynthiloops_song(self)
-        self.__register_qml_modules__()
+        #self.__register_qml_modules__()
 
 
     def show(self):
@@ -47,8 +47,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return self.__song__
 
 
-    def __register_qml_modules__(self):
-        qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")
-        qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
+    #def __register_qml_modules__(self):
+        #qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")
+        #qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
         # qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
 

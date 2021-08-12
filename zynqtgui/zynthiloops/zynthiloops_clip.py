@@ -41,6 +41,7 @@ class zynthiloops_clip(QObject):
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__is_playing__ = False
+        self.__start_position__ = 0.0
         self.__path__ = None
         self.libzlClip = None
 
@@ -61,6 +62,14 @@ class zynthiloops_clip(QObject):
         pass
 
     @Signal
+    def start_position_changed(self):
+        pass
+
+    @Signal
+    def duration_changed(self):
+        pass
+
+    @Signal
     def __is_playing_changed__(self):
         pass
 
@@ -78,6 +87,10 @@ class zynthiloops_clip(QObject):
 
     @Property(bool, constant=True)
     def deletable(self):
+        return False
+
+    @Property(bool, constant=True)
+    def nameEditable(self):
         return False
 
     @Property(bool, notify=__is_playing_changed__)
@@ -116,6 +129,24 @@ class zynthiloops_clip(QObject):
         return f"Clip {self.__col_index__ + 1}"
 
 
+    @Property(int, notify=start_position_changed)
+    def startPosition(self):
+        return self.__start_position__
+
+    @col.setter
+    def set_start_position(self, position: float):
+        self.__start_position__ = position
+        self.start_position_changed.emit()
+        if self.libzlClip is None:
+            return
+        self.libzlClip.set_start_position(position)
+
+    @Property(float, notify=duration_changed)
+    def duration(self):
+        if self.libzlClip is None:
+            return 0.0
+        return self.libzlClip.get_duration()
+
     @Property(str, notify=path_changed)
     def path(self):
         return self.__path__
@@ -125,7 +156,9 @@ class zynthiloops_clip(QObject):
         self.__path__ = path
         self.stop()
         self.libzlClip = libzlClip(path.encode('utf-8'))
+        #self.libzlClip.setStartPosition(self.__start_position__)
         self.path_changed.emit()
+        self.duration_changed.emit()
 
     @Slot(None)
     def clear(self, loop=True):

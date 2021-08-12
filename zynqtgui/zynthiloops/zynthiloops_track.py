@@ -58,6 +58,10 @@ class zynthiloops_track(QObject):
     def deletable(self):
         return True
 
+    @Property(bool, constant=True)
+    def nameEditable(self):
+        return True
+
     @Property(int, constant=True)
     def id(self):
         return self.__id__

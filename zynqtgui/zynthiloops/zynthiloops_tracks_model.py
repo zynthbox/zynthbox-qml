@@ -30,7 +30,8 @@ from .zynthiloops_track import zynthiloops_track
 
 class zynthiloops_tracks_model(QAbstractListModel):
     IdRole = Qt.UserRole + 1
-    NameRole = IdRole + 1
+    NameRole = Qt.UserRole + 2
+    TrackRole = Qt.UserRole + 3
 
     __tracks__: [zynthiloops_track] = []
 
@@ -48,15 +49,19 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
         if role == self.IdRole:
             return self.__tracks__[index.row()].id
-        elif role == self.NameRole:
+        elif role == self.NameRole or role == Qt.DisplayRole:
             return self.__tracks__[index.row()].name
-        else:
+        elif role == self.TrackRole:
             return self.__tracks__[index.row()]
+        else:
+            return None
 
     def roleNames(self):
         role_names = {
+            Qt.DisplayRole: b'display',
             self.IdRole: b"id",
             self.NameRole: b"name",
+            self.TrackRole: b"track"
         }
 
         return role_names

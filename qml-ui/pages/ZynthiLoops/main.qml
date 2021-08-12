@@ -74,6 +74,7 @@ Zynthian.ScreenPage {
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            spacing: 1
 
             // HEADER ROW
             RowLayout {
@@ -91,7 +92,7 @@ Zynthian.ScreenPage {
                     subText: "BPM: " + root.song.bpm
 
                     onPressed: {
-                        sidebar.heading = "Song " + (root.song.index+1);
+                        //sidebar.heading = "Song " + (root.song.index+1);
                         sidebar.controlType = Sidebar.ControlType.Song;
                         sidebar.controlObj = root.song;
                     }
@@ -113,18 +114,16 @@ Zynthian.ScreenPage {
                     model: root.song.partsModel
 
                     delegate: TableHeader {
-                        text: "Part " + (part.partIndex+1) // part.name
-                        subText: part.length + " Bar"
-
-                        property var part: root.song.partsModel.data(root.song.partsModel.index(index, 0))
+                        text: part.name
+                        subText: model.part.length + " Bar"
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
 
                         onPressed: {
-                            sidebar.heading = "Part " + (part.partIndex+1) // part.name;
+                            //sidebar.heading = part.name;
                             sidebar.controlType = Sidebar.ControlType.Part;
-                            sidebar.controlObj = part;
+                            sidebar.controlObj = model.part;
                         }
                     }
                 }
@@ -152,22 +151,20 @@ Zynthian.ScreenPage {
                     model: root.song.tracksModel
 
                     delegate: TableHeader {
-                        text: track.name
-                        subText: track.type === "audio" ? "Audio" : "Midi"
-
-                        property var track: root.song.tracksModel.data(root.song.tracksModel.index(index,0))
+                        text: model.track.name
+                        subText: model.track.type === "audio" ? "Audio" : "Midi"
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            sidebar.heading = track.name;
+                            //sidebar.heading = model.track.name;
                             sidebar.controlType = Sidebar.ControlType.Track;
-                            sidebar.controlObj = track;
+                            sidebar.controlObj = model.track;
                         }
 
                         onPressAndHold: {
-                            zynthian.track.trackId = model.id
+                            zynthian.track.trackId = model.track.id
                             zynthian.current_modal_screen_id = "track"
                         }
                     }
@@ -239,7 +236,7 @@ Zynthian.ScreenPage {
                                         anchors.fill: parent
                                         onPressed: {
                                             parent.forceActiveFocus();
-                                            sidebar.heading = "Clip " + (clip.col+1) // clip.name;
+                                            //sidebar.heading = clip.name;
                                             sidebar.controlType = Sidebar.ControlType.Clip;
                                             sidebar.controlObj = clip;
                                         }

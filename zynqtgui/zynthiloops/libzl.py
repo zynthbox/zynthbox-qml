@@ -43,6 +43,7 @@ class libzlClip(object):
         libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
         libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
         libzl.ZynthiLoopsComponent_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        libzl.ZynthiLoopsComponent_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
         self.obj = libzl.ZynthiLoopsComponent_new(filepath)
 
@@ -60,3 +61,6 @@ class libzlClip(object):
 
     def set_start_position(self, startPositionInSeconds: float):
         libzl.ZynthiLoopsComponent_setStartPosition(self.obj, startPositionInSeconds)
+
+    def set_length(self, lengthInSeconds: float):
+        libzl.ZynthiLoopsComponent_setLength(self.obj, lengthInSeconds)

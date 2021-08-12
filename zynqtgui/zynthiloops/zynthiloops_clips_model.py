@@ -36,6 +36,7 @@ class zynthiloops_clips_model(QAbstractListModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.__clips__ = []
 
     def data(self, index, role=None):
         if not index.isValid():

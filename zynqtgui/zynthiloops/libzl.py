@@ -38,7 +38,8 @@ except Exception as e:
 class libzlClip(object):
     def __init__(self):
         libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
-        libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_int
+        libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
+        libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
         self.obj = libzl.ZynthiLoopsComponent_new()
 
     def play(self):
@@ -49,3 +50,6 @@ class libzlClip(object):
 
     def get_duration(self):
         return libzl.ZynthiLoopsComponent_getDuration(self.obj)
+
+    def get_filename(self):
+        return libzl.ZynthiLoopsComponent_getFileName(self.obj)

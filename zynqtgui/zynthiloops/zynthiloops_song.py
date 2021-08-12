@@ -58,7 +58,7 @@ class zynthiloops_song(QObject):
 
     @Property(str, constant=True)
     def name(self):
-        return f"Song {self.__part_index__+1}"
+        return f"Song {self.__index__+1}"
 
     @Signal
     def bpm_changed(self):

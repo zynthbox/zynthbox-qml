@@ -62,8 +62,10 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        property int headerWidth: 160
-        property int headerHeight: 80
+        //Try to fit exactly until a minimum allowed size
+        property int headerWidth: Math.max(tableLayout.width / (root.song.partsModel.count + 1),
+                                           Kirigami.Units.gridUnit * 8)
+        property int headerHeight: Kirigami.Units.gridUnit * 4
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
     }
@@ -73,6 +75,7 @@ Zynthian.ScreenPage {
         spacing: 8
 
         ColumnLayout {
+            id: tableLayout
             Layout.fillHeight: true
             Layout.fillWidth: true
             spacing: 1

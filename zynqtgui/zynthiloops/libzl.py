@@ -36,14 +36,15 @@ except Exception as e:
 
 
 class libzlClip(object):
-    def __init__(self):
+    def __init__(self, filepath: bytes):
         libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
+        libzl.ZynthiLoopsComponent_new.argtypes = [ctypes.c_char_p]
+
         libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
         libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
         libzl.ZynthiLoopsComponent_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-        self.obj = libzl.ZynthiLoopsComponent_new()
-        self.set_start_position(1.5)
+        self.obj = libzl.ZynthiLoopsComponent_new(filepath)
 
     def play(self):
         libzl.ZynthiLoopsComponent_play(self.obj)

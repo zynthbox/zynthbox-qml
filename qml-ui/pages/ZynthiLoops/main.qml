@@ -37,6 +37,7 @@ Zynthian.ScreenPage {
 
     readonly property QtObject song: zynthian.zynthiloops.song
 
+    title: qsTr("Zynthiloops")
     screenId: "zynthiloops"
     leftPadding: 8
     rightPadding: 8
@@ -92,7 +93,6 @@ Zynthian.ScreenPage {
                     subText: "BPM: " + root.song.bpm
 
                     onPressed: {
-                        //sidebar.heading = "Song " + (root.song.index+1);
                         sidebar.controlType = Sidebar.ControlType.Song;
                         sidebar.controlObj = root.song;
                     }
@@ -121,7 +121,6 @@ Zynthian.ScreenPage {
                         height: ListView.view.height
 
                         onPressed: {
-                            //sidebar.heading = part.name;
                             sidebar.controlType = Sidebar.ControlType.Part;
                             sidebar.controlObj = model.part;
                         }
@@ -158,7 +157,6 @@ Zynthian.ScreenPage {
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            //sidebar.heading = model.track.name;
                             sidebar.controlType = Sidebar.ControlType.Track;
                             sidebar.controlObj = model.track;
                         }
@@ -201,19 +199,13 @@ Zynthian.ScreenPage {
                                 // TODO : Populate clips model per track in tracks model
                                 model: root.song.partsModel
 
-                                delegate: Rectangle {
-                                    property var part: root.song.partsModel.data(root.song.partsModel.index(index, 0))
-                                    property int colIndex: index
+                                delegate: ClipCell {
+                                    isPlaying: clip.isPlaying
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
-
-                                    color: "#444"
-
-                                    border.width: focus ? 1 : 0
-                                    border.color: Kirigami.Theme.highlightColor
 
                                     ZynthiLoops.Clip {
                                         id: clip
@@ -222,38 +214,13 @@ Zynthian.ScreenPage {
 
                                         Component.onCompleted: {
                                             track.addClip(clip, colIndex);
-                                            part.addClip(clip, rowIndex);
+                                            model.part.addClip(clip, rowIndex);
                                         }
                                     }
 
-                                    TableHeaderLabel {
-                                        anchors.centerIn: parent
-                                        // text: "Clip " + (clip.col+1) // clip.name
-                                        // text2: clip.length + " Bar"
-                                    }
-
-                                    MultiPointTouchArea {
-                                        anchors.fill: parent
-                                        onPressed: {
-                                            parent.forceActiveFocus();
-                                            //sidebar.heading = clip.name;
-                                            sidebar.controlType = Sidebar.ControlType.Clip;
-                                            sidebar.controlObj = clip;
-                                        }
-                                    }
-
-                                    Kirigami.Icon {
-                                        width: 24
-                                        height: 24
-                                        anchors.centerIn: parent
-                                        color: "white"
-
-                                        source: "media-playback-start"
-                                        visible: clip.isPlaying
-                                    }
-
-                                    onFocusChanged: {
-                                        console.log("Clip :", clip.row, clip.col)
+                                    onPressed: {
+                                        sidebar.controlType = Sidebar.ControlType.Clip;
+                                        sidebar.controlObj = clip;
                                     }
                                 }
                             }

@@ -82,36 +82,20 @@ Zynthian.ScreenPage {
                 Layout.maximumHeight: privateProps.headerHeight
                 spacing: 1
 
-                Rectangle {
+                TableHeader {
                     Layout.preferredWidth: privateProps.headerWidth
                     Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true
 
-                    border.width: focus ? 1 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    text: "Song " + (root.song.index+1)
+                    subText: "BPM: " + root.song.bpm
 
-                    color: Kirigami.Theme.backgroundColor
-
-                    TableHeaderLabel {
-                        anchors.centerIn: parent
-
-                        text: "Song " + (root.song.index+1)
-                        text2: "BPM: " + root.song.bpm
+                    onPressed: {
+                        sidebar.heading = "Song " + (root.song.index+1);
+                        sidebar.controlType = Sidebar.ControlType.Song;
+                        sidebar.controlObj = root.song;
                     }
 
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        onPressed: {
-                            parent.focus = true;
-                            sidebar.heading = "Song " + (root.song.index+1);
-                            sidebar.controlType = Sidebar.ControlType.Song;
-                            sidebar.controlObj = root.song;
-                        }
-                    }
-
-                    onFocusChanged: {
-                        console.log("Song focus :", focus)
-                    }
                 }
 
                 ListView {
@@ -128,35 +112,19 @@ Zynthian.ScreenPage {
 
                     model: root.song.partsModel
 
-                    delegate: Rectangle {
+                    delegate: TableHeader {
+                        text: "Part " + (part.partIndex+1) // part.name
+                        subText: part.length + " Bar"
+
                         property var part: root.song.partsModel.data(root.song.partsModel.index(index, 0))
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
 
-                        color: Kirigami.Theme.backgroundColor
-
-                        border.width: focus ? 1 : 0
-                        border.color: Kirigami.Theme.highlightColor
-
-                        TableHeaderLabel {
-                            anchors.centerIn: parent
-                            text: "Part " + (part.partIndex+1) // part.name
-                            text2: part.length + " Bar"
-                        }
-
-                        MultiPointTouchArea {
-                            anchors.fill: parent
-                            onPressed: {
-                                parent.focus = true;
-                                sidebar.heading = "Part " + (part.partIndex+1) // part.name;
-                                sidebar.controlType = Sidebar.ControlType.Part;
-                                sidebar.controlObj = part;
-                            }
-                        }
-
-                        onFocusChanged: {
-                            console.log("Part focus :", focus)
+                        onPressed: {
+                            sidebar.heading = "Part " + (part.partIndex+1) // part.name;
+                            sidebar.controlType = Sidebar.ControlType.Part;
+                            sidebar.controlObj = part;
                         }
                     }
                 }
@@ -183,45 +151,24 @@ Zynthian.ScreenPage {
 
                     model: root.song.tracksModel
 
-                    delegate: Rectangle {
+                    delegate: TableHeader {
+                        text: track.name
+                        subText: track.type === "audio" ? "Audio" : "Midi"
+
                         property var track: root.song.tracksModel.data(root.song.tracksModel.index(index,0))
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
 
-                        color: Kirigami.Theme.backgroundColor
-
-                        border.width: focus ? 1 : 0
-                        border.color: Kirigami.Theme.highlightColor
-
-                        TableHeaderLabel {
-                            anchors.centerIn: parent
-                            text: track.name
-                            text2: track.type === "audio" ? "Audio" : "Midi"
+                        onPressed: {
+                            sidebar.heading = track.name;
+                            sidebar.controlType = Sidebar.ControlType.Track;
+                            sidebar.controlObj = track;
                         }
 
-                        MultiPointTouchArea {
-                            anchors.fill: parent
-                            onPressed: {
-                                parent.focus = true;
-                                sidebar.heading = track.name;
-                                sidebar.controlType = Sidebar.ControlType.Track;
-                                sidebar.controlObj = track;
-                                longPressTimer.restart();
-                            }
-                            onReleased: longPressTimer.running = false
-                            Timer {
-                                id: longPressTimer
-                                interval: 500
-                                onTriggered: {
-                                    zynthian.track.trackId = model.id
-                                    zynthian.current_modal_screen_id = "track"
-                                }
-                            }
-                        }
-
-                        onFocusChanged: {
-                            console.log("Track focus :", focus)
+                        onPressAndHold: {
+                            zynthian.track.trackId = model.id
+                            zynthian.current_modal_screen_id = "track"
                         }
                     }
                 }
@@ -291,7 +238,7 @@ Zynthian.ScreenPage {
                                     MultiPointTouchArea {
                                         anchors.fill: parent
                                         onPressed: {
-                                            parent.focus = true;
+                                            parent.forceActiveFocus();
                                             sidebar.heading = "Clip " + (clip.col+1) // clip.name;
                                             sidebar.controlType = Sidebar.ControlType.Clip;
                                             sidebar.controlObj = clip;

@@ -26,16 +26,21 @@
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
+from .zynthiloops_clips_model import zynthiloops_clips_model
+from .zynthiloops_clip import zynthiloops_clip
 
 class zynthiloops_track(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
-    __clips__ = []
 
     def __init__(self, id: int, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
         self.__name__ = f"Track {self.__id__}"
+        self.__clips_model__ = zynthiloops_clips_model(self)
+        # TODO: do from unserialization
+        for i in range(0, 4):
+            self.__clips_model__.add_clip(zynthiloops_clip(self.__id__, i, self))
 
     @Property(bool, constant=True)
     def playable(self):
@@ -74,6 +79,6 @@ class zynthiloops_track(QObject):
     def type(self):
         return self.__type__
 
-    @Slot(QObject, int)
-    def addClip(self, clip: QObject, index: int):
-        self.__clips__.insert(index, clip)
+    @Property(QObject, constant=True )
+    def clipsModel(self):
+        return self.__clips_model__

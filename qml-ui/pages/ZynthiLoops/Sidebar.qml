@@ -3,6 +3,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import Qt.labs.folderlistmodel 2.11
+
 Item {
     id: root
     enum ControlType {
@@ -126,12 +128,10 @@ Item {
                 onClicked: {
                     if (controlObj.isPlaying) {
                         console.log("Stopping Sound Loop")
-                        controlObj.isPlaying = false;
-                        controlObj.stopWav();
+                        controlObj.stop();
                     } else {
                         console.log("Playing Sound Loop")
-                        controlObj.isPlaying = true;
-                        controlObj.playWav();
+                        controlObj.play();
                     }
                 }
             }
@@ -144,6 +144,18 @@ Item {
                 visible: (controlObj != null) && controlObj.recordable
 
                 onClicked: {
+                }
+            }
+
+            SidebarButton {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                icon.name: "document-open"
+                visible: root.controlType === Sidebar.ControlType.Clip
+
+                onClicked: {
+                    pickerDialog.open()
                 }
             }
 
@@ -165,7 +177,33 @@ Item {
                 icon.name: "edit-clear-all"
                 visible: (controlObj != null) && controlObj.clearable
 
-                onClicked: {
+                onClicked: controlObj.clear()
+            }
+        }
+    }
+    QQC2.Dialog {
+        id: pickerDialog
+        parent: root.parent
+        header: Kirigami.Heading {
+            text: qsTr("Pick an audio file")
+        }
+        x: parent.width/2 - width/2
+        y: parent.height/2 - height/2
+        width: Math.round(parent.width * 0.8)
+        height: Math.round(parent.height * 0.8)
+        contentItem: QQC2.ScrollView {
+            contentItem: ListView {
+                model: FolderListModel {
+                    id: folderModel
+                    nameFilters: ["*.wav"]
+                    folder: "/zynthian/zynthian-my-data/capture/"
+                }
+                delegate: Kirigami.BasicListItem {
+                    label: model.fileName
+                    onClicked: {
+                        controlObj.path = model.filePath
+                        pickerDialog.accept()
+                    }
                 }
             }
         }

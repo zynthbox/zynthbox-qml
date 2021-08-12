@@ -39,9 +39,10 @@ QQC2.AbstractButton {
 
     onPressed: forceActiveFocus()
 
-    contentItem: ColumnLayout {
+    contentItem: Item {
         TableHeaderLabel {
-            visible: false
+            anchors.centerIn: parent
+            text: model.clip.path.length > 0 ? "W" : ""
             // text: "Clip " + (clip.col+1) // clip.name
             // text2: clip.length + " Bar"
         }
@@ -50,7 +51,7 @@ QQC2.AbstractButton {
             width: 24
             height: 24
             color: "white"
-            Layout.alignment: Qt.AlignCenter
+            anchors.centerIn: parent
 
             source: "media-playback-start"
             visible: root.isPlaying

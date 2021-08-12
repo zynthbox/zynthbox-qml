@@ -35,8 +35,10 @@ class zynthiloops_clip(QObject):
     __col_index__ = 0
     __is_playing__ = False
 
-    def __init__(self, parent=None):
+    def __init__(self, row_index: int, col_index: int, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
+        self.__row_index__ = row_index
+        self.__col_index__ = col_index
         self.libzlClip = libzlClip()
 
     @Signal

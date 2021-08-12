@@ -29,8 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
-import '../../Zynthian' 1.0 as Zynthian
-import ZynthiLoops 1.0 as ZynthiLoops
+import Zynthian 1.0 as Zynthian
 
 QQC2.AbstractButton {
     id: root
@@ -60,7 +59,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
+        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
 
         border.width: root.activeFocus ? 1 : 0
         border.color: Kirigami.Theme.highlightColor

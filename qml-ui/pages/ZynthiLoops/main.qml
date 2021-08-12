@@ -30,7 +30,6 @@ import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
 import '../../Zynthian' 1.0 as Zynthian
-import ZynthiLoops 1.0 as ZynthiLoops
 
 Zynthian.ScreenPage {
     id: root
@@ -196,21 +195,20 @@ Zynthian.ScreenPage {
                             model: root.song.tracksModel
 
                             delegate: Repeater {
-                                property var track: root.song.tracksModel.data(root.song.tracksModel.index(index, 0))
                                 property int rowIndex: index
+                                //readonly property QtObject track = model.track
 
-                                // TODO : Populate clips model per track in tracks model
-                                model: root.song.partsModel
+                                model: track.clipsModel
 
                                 delegate: ClipCell {
-                                    isPlaying: clip.isPlaying
+                                    isPlaying: model.clip.isPlaying
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
 
-                                    ZynthiLoops.Clip {
+                                    /*ZynthiLoops.Clip {
                                         id: clip
                                         row: rowIndex
                                         col: colIndex
@@ -219,11 +217,11 @@ Zynthian.ScreenPage {
                                             track.addClip(clip, colIndex);
                                             model.part.addClip(clip, rowIndex);
                                         }
-                                    }
+                                    }*/
 
                                     onPressed: {
                                         sidebar.controlType = Sidebar.ControlType.Clip;
-                                        sidebar.controlObj = clip;
+                                        sidebar.controlObj = model.clip;
                                     }
                                 }
                             }

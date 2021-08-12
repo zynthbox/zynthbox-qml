@@ -152,7 +152,7 @@ class zynthiloops_song(QObject):
 
     @Slot(None)
     def play(self):
-        elf.__current_bar__ = 0
+        self.__current_bar__ = 0
         self.__is_playing__ = True
         self.metronome_update()
         self.__metronome_timer__.start()
@@ -160,7 +160,7 @@ class zynthiloops_song(QObject):
 
     @Slot(None)
     def stop(self):
-        elf.__current_bar__ = 0
+        self.__current_bar__ = 0
         self.__is_playing__ = False
         self.__metronome_timer__.stop()
         for i in range(0, self.__tracks_model__.count):

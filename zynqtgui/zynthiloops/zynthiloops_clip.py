@@ -37,9 +37,12 @@ class zynthiloops_clip(QObject):
 
     def __init__(self, row_index: int, col_index: int, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
+        self.__length__ = 1
         self.__row_index__ = row_index
         self.__col_index__ = col_index
-        self.libzlClip = libzlClip()
+        self.__is_playing__ = False
+        self.__path__ = None
+        self.libzlClip = None
 
     @Signal
     def length_changed(self):
@@ -51,6 +54,10 @@ class zynthiloops_clip(QObject):
 
     @Signal
     def col_index_changed(self):
+        pass
+
+    @Signal
+    def path_changed(self):
         pass
 
     @Signal
@@ -76,11 +83,6 @@ class zynthiloops_clip(QObject):
     @Property(bool, notify=__is_playing_changed__)
     def isPlaying(self):
         return self.__is_playing__
-
-    @isPlaying.setter
-    def __set_is_playing__(self, is_playing: bool):
-        self.__is_playing__ = is_playing
-        self.__is_playing_changed__.emit()
 
     @Property(int, notify=length_changed)
     def length(self):
@@ -113,12 +115,37 @@ class zynthiloops_clip(QObject):
     def name(self):
         return f"Clip {self.__col_index__ + 1}"
 
+
+    @Property(str, notify=path_changed)
+    def path(self):
+        return self.__path__
+
+    @path.setter
+    def set_path(self, path):
+        self.__path__ = path
+        self.stop()
+        self.libzlClip = libzlClip(path.encode('utf-8'))
+        self.path_changed.emit()
+
     @Slot(None)
-    def playWav(self, loop=True):
-        # libzl.playWav()
+    def clear(self, loop=True):
+        self.stop()
+        self.libzlClip = None
+        self.__path__ = None
+        self.path_changed.emit()
+
+    @Slot(None)
+    def play(self, loop=True):
+        if self.libzlClip is None:
+            return
+        self.__is_playing__ = True
+        self.__is_playing_changed__.emit()
         self.libzlClip.play()
 
     @Slot(None)
-    def stopWav(self, loop=True):
-        # libzl.stopWav()
+    def stop(self, loop=True):
+        if self.libzlClip is None:
+            return
+        self.__is_playing__ = False
+        self.__is_playing_changed__.emit()
         self.libzlClip.stop()

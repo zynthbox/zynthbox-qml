@@ -53,10 +53,10 @@ QQC2.ToolBar {
                 if (page.hasOwnProperty("screenIds")) {
                     for (var j = 0; j < page.screenIds.length; ++j) {
                         let id = page.screenIds[j];
-                        breadcrumbModel.append({"screenId": id});
+                        breadcrumbModel.append({"screenId": id, "page": page});
                     }
                 } else {
-                    breadcrumbModel.append({"screenId": page.screenId});
+                    breadcrumbModel.append({"screenId": page.screenId, "page": page});
                 }
             }
         }
@@ -90,7 +90,9 @@ QQC2.ToolBar {
                     BreadcrumbButton {
                         id: toolButton
                         Layout.fillWidth: true
-                        text: (zynthian[model.screenId].selector_path_element || zynthian[model.screenId].selector_path).replace("Jalv/", "") //HACK for name shortening
+                        text: zynthian[model.screenId].selector_path_element
+                               || zynthian[model.screenId].selector_path.replace("Jalv/", "")
+                               || model.page.title //HACK for name shortening
                         // HACK to hide home button as there is already one
                         visible: (index > 1 || root.layerManager.depth > 1) && text.length > 0
                         highlighted: model.screenId === zynthian.current_screen_id;

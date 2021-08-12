@@ -43,6 +43,7 @@ QQC2.AbstractButton {
     contentItem: ColumnLayout {
         TableHeaderLabel {
             anchors.centerIn: parent
+            visible: false
             // text: "Clip " + (clip.col+1) // clip.name
             // text2: clip.length + " Bar"
         }

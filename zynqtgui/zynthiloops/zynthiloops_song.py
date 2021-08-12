@@ -56,6 +56,10 @@ class zynthiloops_song(QObject):
     def deletable(self):
         return False
 
+    @Property(str, constant=True)
+    def name(self):
+        return f"Song {self.__part_index__+1}"
+
     @Signal
     def bpm_changed(self):
         pass

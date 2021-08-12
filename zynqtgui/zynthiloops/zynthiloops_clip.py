@@ -109,7 +109,7 @@ class zynthiloops_clip(QObject):
 
     @Property(str, constant=True)
     def name(self):
-        return f"Clip {self.__row_index__ + 1}"
+        return f"Clip {self.__col_index__ + 1}"
 
     @Slot(None)
     def playWav(self, loop=True):

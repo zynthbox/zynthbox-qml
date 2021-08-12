@@ -4,6 +4,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 Item {
+    id: root
     enum ControlType {
         Song,
         Clip,
@@ -45,6 +46,7 @@ Item {
 
             Kirigami.Heading {
                 id: heading
+                text: root.controlObj ? root.controlObj.name : ""
                 anchors.centerIn: parent
                 font.bold: true
             }
@@ -124,7 +126,7 @@ Item {
                 onClicked: {
                     if (controlObj.isPlaying) {
                         console.log("Stopping Sound Loop")
-                        controlObj.isPlaying = false;                        
+                        controlObj.isPlaying = false;
                         controlObj.stopWav();
                     } else {
                         console.log("Playing Sound Loop")

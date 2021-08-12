@@ -31,6 +31,7 @@ from zynqtgui.zynthiloops.zynthiloops_part import zynthiloops_part
 class zynthiloops_parts_model(QAbstractListModel):
     PartIndexRole = Qt.UserRole + 1
     NameRole = PartIndexRole + 1
+    PartRole = PartIndexRole + 2
     __parts__: [zynthiloops_part] = []
 
     def __init__(self, parent=None):
@@ -48,15 +49,19 @@ class zynthiloops_parts_model(QAbstractListModel):
 
         if role == self.PartIndexRole:
             return self.__parts__[index.row()].partIndex
-        elif role == self.NameRole:
+        elif role == self.NameRole or role == Qt.DisplayRole :
             return self.__parts__[index.row()].name
-        else:
+        elif role == self.PartRole:
             return self.__parts__[index.row()]
+        else:
+            return None
 
     def roleNames(self):
         role_names = {
+            Qt.DisplayRole: b'display',
             self.PartIndexRole: b"partIndex",
             self.NameRole: b"name",
+            self.PartRole: b"part"
         }
 
         return role_names

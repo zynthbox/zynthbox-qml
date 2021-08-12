@@ -67,6 +67,10 @@ class zynthiloops_song(QObject):
     def deletable(self):
         return False
 
+    @Property(bool, constant=True)
+    def nameEditable(self):
+        return False
+
     @Property(str, constant=True)
     def name(self):
         return f"Song {self.__index__+1}"

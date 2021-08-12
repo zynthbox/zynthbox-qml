@@ -45,12 +45,35 @@ Item {
 
             border.width: focus ? 1 : 0
             border.color: Kirigami.Theme.highlightColor
-
-            Kirigami.Heading {
-                id: heading
-                text: root.controlObj ? root.controlObj.name : ""
+            StackLayout {
+                id: titleStack
                 anchors.centerIn: parent
-                font.bold: true
+                RowLayout {
+                    Kirigami.Heading {
+                        id: heading
+                        text: root.controlObj ? root.controlObj.name : ""
+                        //Layout.fillWidth: true
+                        wrapMode: Text.NoWrap
+                    }
+                    QQC2.Button {
+                        icon.name: "document-edit"
+                        visible: controlObj && controlObj.nameEditable
+                        onClicked: {
+                            titleStack.currentIndex = 1;
+                            objNameEdit.text = heading.text;
+                            objNameEdit.forceActiveFocus();
+                        }
+                        Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
+                        Layout.preferredHeight: Layout.preferredWidth
+                    }
+                }
+                QQC2.TextField {
+                    id: objNameEdit
+                    onAccepted: {
+                        controlObj.name = text
+                        titleStack.currentIndex = 0;
+                    }
+                }
             }
         }
 
@@ -60,6 +83,23 @@ Item {
 
             ColumnLayout {
                 anchors.centerIn: parent
+                width: Math.min(parent.width, implicitWidth)
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    text: {
+                        if (!controlObj || !controlObj.path) {
+                            return "";
+                        }
+                        var arr = controlObj.path.split('/')
+                        return arr[arr.length - 1]
+                    }
+                    wrapMode: Text.Wrap
+                }
+                QQC2.Label {
+                    text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration : 0.0)
+                    Layout.fillWidth: true
+                    wrapMode: Text.Wrap
+                }
 
                 SidebarDial {
                     id: bpmDial
@@ -84,6 +124,32 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     text: "BPM"
                     visible: bpmDial.visible
+                }
+
+                 SidebarDial {
+                    id: startDial
+                    visible: controlObj && controlObj.startPosition ? true : false
+
+                    Layout.preferredWidth: 80
+                    Layout.preferredHeight: 80
+                    Layout.alignment: Qt.AlignHCenter
+
+                    stepSize: controlObj.duration / 100
+                    from: 0
+                    to: controlObj.audioLength
+                    value: controlObj ? controlObj.startPosition : 0.0
+
+                    onValueChanged: {
+                        if (controlObj && controlObj.startPosition) {
+                            controlObj.startPosition = value
+                        }
+                    }
+                }
+
+                TableHeaderLabel {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Start Position"
+                    visible: startDial.visible
                 }
 
                 SidebarDial {

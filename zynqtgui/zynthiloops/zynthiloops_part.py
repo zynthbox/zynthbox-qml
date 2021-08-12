@@ -34,6 +34,7 @@ class zynthiloops_part(QObject):
     def __init__(self, part_index: int, parent=None):
         super(zynthiloops_part, self).__init__(parent)
         self.__part_index__ = part_index
+        self.__name__ = f"Part {self.__part_index__+1}"
 
     @Property(bool, constant=True)
     def playable(self):
@@ -49,6 +50,10 @@ class zynthiloops_part(QObject):
 
     @Property(bool, constant=True)
     def deletable(self):
+        return True
+
+    @Property(bool, constant=True)
+    def nameEditable(self):
         return True
 
     @Signal
@@ -72,6 +77,10 @@ class zynthiloops_part(QObject):
     def part_index_changed(self):
         pass
 
+    @Signal
+    def name_changed(self):
+        pass
+
     @Property(int, notify=length_changed)
     def length(self):
         return self.__length__
@@ -90,9 +99,14 @@ class zynthiloops_part(QObject):
         self.__part_index__ = part_index
         self.part_index_changed.emit()
 
-    @Property(str, constant=True)
+    @Property(str, notify=name_changed)
     def name(self):
-        return f"Part {self.__part_index__+1}"
+        return self.__name__
+
+    @name.setter
+    def set_name(self, name):
+        self.__name__ = name
+        self.name_changed.emit()
 
     @Slot(QObject, int)
     def addClip(self, clip: QObject, index: int):

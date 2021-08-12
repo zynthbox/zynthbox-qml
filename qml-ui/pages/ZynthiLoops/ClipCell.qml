@@ -29,34 +29,44 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
-
+import '../../Zynthian' 1.0 as Zynthian
+import ZynthiLoops 1.0 as ZynthiLoops
 
 QQC2.AbstractButton {
     id: root
+    readonly property int colIndex: index
+    property bool isPlaying
 
-    Layout.preferredWidth: privateProps.headerWidth
-    Layout.maximumWidth: privateProps.headerWidth
-    Layout.fillHeight: true
 
-    property alias subText: contents.text2
+    onPressed: forceActiveFocus()
 
-    contentItem: TableHeaderLabel {
-        id: contents
-        text: root.text
-        text2: root.subText
+    contentItem: ColumnLayout {
+        TableHeaderLabel {
+            anchors.centerIn: parent
+            // text: "Clip " + (clip.col+1) // clip.name
+            // text2: clip.length + " Bar"
+        }
+
+        Kirigami.Icon {
+            width: 24
+            height: 24
+            anchors.centerIn: parent
+            color: "white"
+
+            source: "media-playback-start"
+            visible: root.isPlaying
+        }
     }
 
-    onPressed: root.forceActiveFocus();
+    background: Rectangle {
+        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+
+        border.width: root.activeFocus ? 1 : 0
+        border.color: Kirigami.Theme.highlightColor
+    }
 
     onActiveFocusChanged: {
         console.log("Item with active Focus :", activeFocus)
     }
 
-    background: Rectangle { //TODO: plasma theming
-        border.width: root.activeFocus ? 1 : 0
-        border.color: Kirigami.Theme.highlightColor
-
-        color: Kirigami.Theme.backgroundColor
-    }
 }

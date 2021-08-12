@@ -50,8 +50,8 @@ QQC2.AbstractButton {
         Kirigami.Icon {
             width: 24
             height: 24
-            anchors.centerIn: parent
             color: "white"
+            Layout.alignment: Qt.AlignCenter
 
             source: "media-playback-start"
             visible: root.isPlaying
@@ -59,7 +59,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
 
         border.width: root.activeFocus ? 1 : 0
         border.color: Kirigami.Theme.highlightColor

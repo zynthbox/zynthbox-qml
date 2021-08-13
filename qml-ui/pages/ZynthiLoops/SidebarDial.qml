@@ -3,15 +3,42 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-Item {
-    property alias stepSize: dial.stepSize
-    property alias value: dial.value
-    property alias from: dial.from
-    property alias to: dial.to
+//TODO: Use Zynthian.DialController?
+ColumnLayout {
+    id: root
+    property alias dial: dial
+    property alias text: label.text
+    property alias valueString: valueLabel.text
+
+    property QtObject controlObj
+    property string controlProperty
+    onControlObjChanged: dial.value = controlObj[controlProperty]
+
+    visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
+
+    Layout.fillWidth: true
+    Layout.preferredHeight: 100
+    Layout.maximumHeight: 100
+
+    Binding {
+        target: dial
+        property: "value"
+        value: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 1
+    }
 
     QQC2.Dial {
         id: dial
-        anchors.fill: parent
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+
+        value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
+
+        onValueChanged: {
+            if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
+                return;
+            }
+            root.controlObj[root.controlProperty] = value
+        }
 
         // HACK for default style
         Binding {
@@ -24,7 +51,7 @@ Item {
             property: "color"
             value: Kirigami.Theme.highlightColor
         }
-        TableHeaderLabel {
+        QQC2.Label {
             id: valueLabel
             anchors.centerIn: dial
             text: dial.value
@@ -49,5 +76,10 @@ Item {
                 dial.value = Math.round(value);
             }
         }
+    }
+    QQC2.Label {
+        id: label
+        Layout.fillWidth: parent
+        horizontalAlignment: Text.AlignHCenter
     }
 }

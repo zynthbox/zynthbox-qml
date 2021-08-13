@@ -116,7 +116,7 @@ Item {
                 text: qsTr("Start Position (msecs)")
                 controlObj: root.controlObj
                 controlProperty: "startPosition"
-                valueString: dial.value * 1000
+                valueString: Math.round(dial.value * 1000)
 
                 dial {
                     stepSize: 0.001
@@ -127,7 +127,7 @@ Item {
 
             SidebarDial {
                 id: lengthDial
-                text: qsTr("Length (bars)")
+                text: qsTr("Length (beats)")
                 controlObj: root.controlObj
                 controlProperty: "length"
 

@@ -113,21 +113,21 @@ Item {
 
             SidebarDial {
                 id: startDial
-                text: qsTr("Start Position")
+                text: qsTr("Start Position (msecs)")
                 controlObj: root.controlObj
                 controlProperty: "startPosition"
-                valueString: dial.value.toFixed(2)
+                valueString: dial.value * 1000
 
                 dial {
-                    stepSize: controlObj.duration / 100
+                    stepSize: 0.001
                     from: 0
-                    to: controlObj.duration
+                    to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
                 }
             }
 
             SidebarDial {
                 id: lengthDial
-                text: qsTr("Length")
+                text: qsTr("Length (bars)")
                 controlObj: root.controlObj
                 controlProperty: "length"
 

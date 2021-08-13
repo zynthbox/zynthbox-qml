@@ -28,53 +28,67 @@ from os.path import dirname, realpath
 
 libzl = None
 
-try:
-    libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
-except Exception as e:
-    libzl = None
-    print(f"Can't initialise libzl library: {str(e)}")
+
+def init():
+    global libzl
+
+    try:
+        libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
+    except Exception as e:
+        libzl = None
+        print(f"Can't initialise libzl library: {str(e)}")
 
 
 def registerTimerCallback(callback):
-    libzl.registerTimerCallback(callback)
+    if libzl:
+        libzl.registerTimerCallback(callback)
 
 
 def startTimer(interval: int):
-    libzl.startTimer(interval)
+    if libzl:
+        libzl.startTimer(interval)
 
 
 def stopTimer():
-    libzl.stopTimer()
+    if libzl:
+        libzl.stopTimer()
 
 
 class libzlClip(object):
     def __init__(self, filepath: bytes):
-        libzl.startTimer.argtypes = [ctypes.c_int]
+        if libzl:
+            libzl.startTimer.argtypes = [ctypes.c_int]
 
-        libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
-        libzl.ZynthiLoopsComponent_new.argtypes = [ctypes.c_char_p]
+            libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
+            libzl.ZynthiLoopsComponent_new.argtypes = [ctypes.c_char_p]
 
-        libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
-        libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
-        libzl.ZynthiLoopsComponent_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
-        libzl.ZynthiLoopsComponent_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
+            libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
+            libzl.ZynthiLoopsComponent_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ZynthiLoopsComponent_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-        self.obj = libzl.ZynthiLoopsComponent_new(filepath)
+            self.obj = libzl.ZynthiLoopsComponent_new(filepath)
 
     def play(self):
-        libzl.ZynthiLoopsComponent_play(self.obj)
+        if libzl:
+            libzl.ZynthiLoopsComponent_play(self.obj)
 
     def stop(self):
-        return libzl.ZynthiLoopsComponent_stop(self.obj)
+        if libzl:
+            libzl.ZynthiLoopsComponent_stop(self.obj)
 
     def get_duration(self):
-        return libzl.ZynthiLoopsComponent_getDuration(self.obj)
+        if libzl:
+            return libzl.ZynthiLoopsComponent_getDuration(self.obj)
 
     def get_filename(self):
-        return libzl.ZynthiLoopsComponent_getFileName(self.obj)
+        if libzl:
+            return libzl.ZynthiLoopsComponent_getFileName(self.obj)
 
     def set_start_position(self, startPositionInSeconds: float):
-        libzl.ZynthiLoopsComponent_setStartPosition(self.obj, startPositionInSeconds)
+        if libzl:
+            libzl.ZynthiLoopsComponent_setStartPosition(self.obj, startPositionInSeconds)
 
     def set_length(self, lengthInSeconds: float):
-        libzl.ZynthiLoopsComponent_setLength(self.obj, lengthInSeconds)
+        if libzl:
+            libzl.ZynthiLoopsComponent_setLength(self.obj, lengthInSeconds)

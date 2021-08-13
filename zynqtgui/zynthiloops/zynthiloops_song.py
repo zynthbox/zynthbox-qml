@@ -63,7 +63,7 @@ class zynthiloops_song(QObject):
 
     @Property(bool, constant=True)
     def playable(self):
-        return True
+        return False
 
     @Property(bool, constant=True)
     def recordable(self):

@@ -42,7 +42,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         self.__song__ = zynthiloops_song(self)
         libzl.registerTimerCallback(timer_callback)
-        libzl.startTimer()
+        libzl.startTimer(2000)
 
     def show(self):
         pass

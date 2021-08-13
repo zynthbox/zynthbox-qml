@@ -39,8 +39,8 @@ def registerTimerCallback(callback):
     libzl.registerTimerCallback(callback)
 
 
-def startTimer():
-    libzl.startTimer()
+def startTimer(interval: int):
+    libzl.startTimer(interval)
 
 
 def stopTimer():

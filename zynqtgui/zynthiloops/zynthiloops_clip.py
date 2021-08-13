@@ -181,8 +181,6 @@ class zynthiloops_clip(QObject):
     def play(self, loop=True):
         if self.libzlClip is None:
             return
-        logging.error(self.zyngui)
-        logging.error(self.zyngui.screens['zynthiloops'])
         self.zyngui.screens['zynthiloops'].start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()

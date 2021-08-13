@@ -25,7 +25,7 @@
 import ctypes as ctypes
 import math
 
-from PySide2.QtCore import Qt, Property, QObject, Signal, Slot, QTimer
+from PySide2.QtCore import Qt, Property, QObject, Signal, Slot
 
 from . import libzl
 from .zynthiloops_track import zynthiloops_track
@@ -57,12 +57,6 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_beat__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
-
-        # self.__metronome_timer__ = QTimer(self)
-        # self.__metronome_timer__.setTimerType(Qt.PreciseTimer)
-        # self.__metronome_timer__.setInterval(60.0 / self.__bpm__ * 1000)
-        # self.__metronome_timer__.setSingleShot(False)
-        # self.__metronome_timer__.timeout.connect(self.metronome_update)
 
         libzl.registerTimerCallback(cb)
         #libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
@@ -139,7 +133,7 @@ class zynthiloops_song(QObject):
     @bpm.setter
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
-        self.__metronome_timer__.setInterval(60.0 / self.__bpm__  * 1000)
+        libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
         self.bpm_changed.emit()
 
     @Property(int, notify=current_beat_changed)
@@ -187,7 +181,6 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__is_playing__ = True
-       # self.__metronome_timer__.start()
         libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
         self.__is_playing_changed__.emit()
 

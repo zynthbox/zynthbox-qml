@@ -161,6 +161,9 @@ class zynthiloops_clip(QObject):
         self.__path__ = path
         self.stop()
         self.libzlClip = libzlClip(path.encode('utf-8'))
+        self.startPosition = self.__start_position__
+        self.length = self.__length__
+
         # self.libzlClip.setStartPosition(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()

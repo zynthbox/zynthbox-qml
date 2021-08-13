@@ -25,7 +25,7 @@
 import logging
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt, Property, Signal, Slot, QObject
 
-from zynqtgui.zynthiloops.zynthiloops_clip import zynthiloops_clip
+from .zynthiloops_clip import zynthiloops_clip
 
 
 class zynthiloops_clips_model(QAbstractListModel):

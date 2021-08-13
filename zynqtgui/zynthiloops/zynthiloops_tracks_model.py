@@ -27,16 +27,15 @@ import logging
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 from .zynthiloops_track import zynthiloops_track
 
-
 class zynthiloops_tracks_model(QAbstractListModel):
     IdRole = Qt.UserRole + 1
     NameRole = Qt.UserRole + 2
     TrackRole = Qt.UserRole + 3
 
-    __tracks__: [zynthiloops_track] = []
-
-    def __init__(self, parent: QObject = None):
+    def __init__(self, parent: QObject):
         super(zynthiloops_tracks_model, self).__init__(parent)
+        self.__song__ = parent
+        self.__tracks__: [zynthiloops_track] = []
 
     def data(self, index, role=None):
         logging.info(index.row(), self.__tracks__[index.row()])

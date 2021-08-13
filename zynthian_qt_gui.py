@@ -56,7 +56,7 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QJSValue
-
+from zynqtgui.zynthiloops import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
 sys.path.insert(1, "./zynqtgui")
@@ -2435,6 +2435,7 @@ def delete_window():
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    libzl.init()
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 

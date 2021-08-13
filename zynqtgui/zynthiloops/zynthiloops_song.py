@@ -53,7 +53,6 @@ class zynthiloops_song(QObject):
         self.__is_playing__ = False
 
         self.__current_bar__ = 0
-        self.__current_beat__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
 
 
@@ -129,13 +128,7 @@ class zynthiloops_song(QObject):
     @bpm.setter
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
-        libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
         self.bpm_changed.emit()
-
-    @Property(int, notify=current_beat_changed)
-    def currentBeat(self):
-        return self.__current_beat__
-
 
     @Property(int, notify=index_changed)
     def index(self):
@@ -166,19 +159,18 @@ class zynthiloops_song(QObject):
                 clip = track.clipsModel.getClip(self.__current_part__.partIndex)
                 clip.play()
 
-        self.__current_beat__ = (self.__current_beat__ + 1) % 4
-        if self.__current_beat__ is 0:
+        if self.zyngui.screens['zynthiloops'].currentBeat is 0:
             self.__current_bar__ = self.__current_bar__ + 1
         self.current_beat_changed.emit()
-        logging.error("current beat: {} bar: {}".format(self.__current_beat__, self.__current_bar__))
+        logging.error("current bar: {}".format(self.__current_bar__))
 
     @Slot(None)
     def play(self):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__is_playing__ = True
-        libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
         self.__is_playing_changed__.emit()
+        self.zyngui.screens['zynthiloops'].start_metronome_request()
 
         for i in range(0, self.__tracks_model__.count):
             track = self.__tracks_model__.getTrack(i)
@@ -189,8 +181,7 @@ class zynthiloops_song(QObject):
     def stop(self):
         self.__current_bar__ = 0
         self.__is_playing__ = False
-        #self.__metronome_timer__.stop()
-        libzl.stopTimer()
+        self.zyngui.screens['zynthiloops'].stop_metronome_request()
         for i in range(0, self.__tracks_model__.count):
             track = self.__tracks_model__.getTrack(i)
             clip = track.clipsModel.getClip(self.__current_part__.partIndex)

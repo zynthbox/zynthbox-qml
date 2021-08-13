@@ -48,6 +48,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = 0
         self.__metronome_running_refcount = 0
         self.__song__ = zynthiloops_song(self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         libzl.registerTimerCallback(cb)
 
     def show(self):
@@ -66,6 +67,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
+    def update_timer_bpm(self):
+        if self.__metronome_running_refcount > 0:
+            libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
     def start_metronome_request(self):
         self.__metronome_running_refcount += 1

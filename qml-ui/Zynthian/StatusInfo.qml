@@ -257,8 +257,8 @@ Item {
             }
             QQC2.Label {
                 id: metronomeLabel
-                visible: zynthian.zynthiloops.song.isPlaying
-                text: zynthian.zynthiloops.song.currentBeat + 1
+                visible: zynthian.zynthiloops.isMetronomeRunning
+                text: zynthian.zynthiloops.currentBeat + 1
             }
         }
     }

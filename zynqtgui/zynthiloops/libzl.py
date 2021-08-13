@@ -49,6 +49,8 @@ def stopTimer():
 
 class libzlClip(object):
     def __init__(self, filepath: bytes):
+        libzl.startTimer.argtypes = [ctypes.c_int]
+
         libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
         libzl.ZynthiLoopsComponent_new.argtypes = [ctypes.c_char_p]
 

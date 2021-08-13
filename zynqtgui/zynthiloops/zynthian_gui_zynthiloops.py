@@ -76,7 +76,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
 
     def stop_metronome_request(self):
-        self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)
+        self.__metronome_running_refcount = math.max(self.__metronome_running_refcount - 1, 0)
         if self.__metronome_running_refcount == 0:
             libzl.stopTimer()
             self.metronome_running_changed.emit()

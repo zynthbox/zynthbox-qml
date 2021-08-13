@@ -37,12 +37,15 @@ import logging
 
 @ctypes.CFUNCTYPE(None)
 def cb():
-    logging.error("Timer triggered")
+    zynthiloops_song.__instance__.metronome_update()
 
 
 class zynthiloops_song(QObject):
+    __instance__ = None
+
     def __init__(self, parent=None):
         super(zynthiloops_song, self).__init__(parent)
+        zynthiloops_song.__instance__ = self
 
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
@@ -62,7 +65,7 @@ class zynthiloops_song(QObject):
         # self.__metronome_timer__.timeout.connect(self.metronome_update)
 
         libzl.registerTimerCallback(cb)
-        libzl.startTimer(math.floor(60.0 / (self.__bpm__ * 1000)))
+        #libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
 
     @Property(bool, constant=True)
     def playable(self):
@@ -184,7 +187,8 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__is_playing__ = True
-        self.__metronome_timer__.start()
+       # self.__metronome_timer__.start()
+        libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
         self.__is_playing_changed__.emit()
 
         for i in range(0, self.__tracks_model__.count):
@@ -196,7 +200,8 @@ class zynthiloops_song(QObject):
     def stop(self):
         self.__current_bar__ = 0
         self.__is_playing__ = False
-        self.__metronome_timer__.stop()
+        #self.__metronome_timer__.stop()
+        libzl.stopTimer()
         for i in range(0, self.__tracks_model__.count):
             track = self.__tracks_model__.getTrack(i)
             clip = track.clipsModel.getClip(self.__current_part__.partIndex)

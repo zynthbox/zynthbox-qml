@@ -255,6 +255,11 @@ Item {
                 }
                 visible: zynthian.status_information.midi_recorder.length > 0
             }
+            QQC2.Label {
+                id: metronomeLabel
+                visible: zynthian.zynthiloops.song.isPlaying
+                text: zynthian.zynthiloops.song.currentBeat + 1
+            }
         }
     }
 }

@@ -108,8 +108,8 @@ class zynthiloops_clip(QObject):
         self.__length__ = length
         self.length_changed.emit()
 
-        if self.libzlClip != None:
-            self.libzlClip.set_length(min(self.duration - self.__start_position__, 60.0 / self.__song__.bpm ));
+        if self.libzlClip is not None:
+            self.libzlClip.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
 
     @Property(int, notify=row_index_changed)
     def row(self):
@@ -132,7 +132,6 @@ class zynthiloops_clip(QObject):
     @Property(str, constant=True)
     def name(self):
         return f"Clip {self.__col_index__ + 1}"
-
 
     @Property(float, notify=start_position_changed)
     def startPosition(self):
@@ -161,7 +160,7 @@ class zynthiloops_clip(QObject):
         self.__path__ = path
         self.stop()
         self.libzlClip = libzlClip(path.encode('utf-8'))
-        #self.libzlClip.setStartPosition(self.__start_position__)
+        # self.libzlClip.setStartPosition(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
 

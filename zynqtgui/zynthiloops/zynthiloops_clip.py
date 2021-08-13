@@ -129,11 +129,11 @@ class zynthiloops_clip(QObject):
         return f"Clip {self.__col_index__ + 1}"
 
 
-    @Property(int, notify=start_position_changed)
+    @Property(float, notify=start_position_changed)
     def startPosition(self):
         return self.__start_position__
 
-    @col.setter
+    @startPosition.setter
     def set_start_position(self, position: float):
         self.__start_position__ = position
         self.start_position_changed.emit()

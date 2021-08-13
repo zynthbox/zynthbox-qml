@@ -22,7 +22,12 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import ctypes as ctypes
+import math
+
 from PySide2.QtCore import Qt, Property, QObject, Signal, Slot, QTimer
+
+from . import libzl
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
 from .zynthiloops_parts_model import zynthiloops_parts_model
@@ -30,8 +35,12 @@ from .zynthiloops_tracks_model import zynthiloops_tracks_model
 
 import logging
 
-class zynthiloops_song(QObject):
+@ctypes.CFUNCTYPE(None)
+def cb():
+    logging.error("Timer triggered")
 
+
+class zynthiloops_song(QObject):
     def __init__(self, parent=None):
         super(zynthiloops_song, self).__init__(parent)
 
@@ -46,11 +55,14 @@ class zynthiloops_song(QObject):
         self.__current_beat__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
 
-        self.__metronome_timer__ = QTimer(self)
-        self.__metronome_timer__.setTimerType(Qt.PreciseTimer)
-        self.__metronome_timer__.setInterval(60.0 / self.__bpm__ * 1000)
-        self.__metronome_timer__.setSingleShot(False)
-        self.__metronome_timer__.timeout.connect(self.metronome_update)
+        # self.__metronome_timer__ = QTimer(self)
+        # self.__metronome_timer__.setTimerType(Qt.PreciseTimer)
+        # self.__metronome_timer__.setInterval(60.0 / self.__bpm__ * 1000)
+        # self.__metronome_timer__.setSingleShot(False)
+        # self.__metronome_timer__.timeout.connect(self.metronome_update)
+
+        libzl.registerTimerCallback(cb)
+        libzl.startTimer(math.floor(60.0 / (self.__bpm__ * 1000)))
 
     @Property(bool, constant=True)
     def playable(self):

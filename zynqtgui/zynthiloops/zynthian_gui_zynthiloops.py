@@ -27,22 +27,14 @@ import ctypes as ctypes
 
 from PySide2.QtCore import Property, QObject
 
-from . import libzl
 from .zynthiloops_song import zynthiloops_song
 from .. import zynthian_qt_gui_base
-
-
-@ctypes.CFUNCTYPE(None)
-def timer_callback():
-    logging.error(f"Timer triggered")
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         self.__song__ = zynthiloops_song(self)
-        libzl.registerTimerCallback(timer_callback)
-        libzl.startTimer(2000)
 
     def show(self):
         pass

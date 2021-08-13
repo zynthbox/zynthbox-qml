@@ -28,14 +28,13 @@ from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
 from .libzl import libzlClip
 
-
 class zynthiloops_clip(QObject):
     __length__ = 1
     __row_index__ = 0
     __col_index__ = 0
     __is_playing__ = False
 
-    def __init__(self, row_index: int, col_index: int, parent=None):
+    def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
         self.__length__ = 1
         self.__row_index__ = row_index
@@ -43,6 +42,7 @@ class zynthiloops_clip(QObject):
         self.__is_playing__ = False
         self.__start_position__ = 0.0
         self.__path__ = None
+        self.__song__ = song
         self.libzlClip = None
 
     @Signal
@@ -105,6 +105,9 @@ class zynthiloops_clip(QObject):
     def set_length(self, length: int):
         self.__length__ = length
         self.length_changed.emit()
+
+        if self.libzlClip != None:
+            self.libzlClip.set_length(60.0 / self.__song__.bpm * 1000);
 
     @Property(int, notify=row_index_changed)
     def row(self):

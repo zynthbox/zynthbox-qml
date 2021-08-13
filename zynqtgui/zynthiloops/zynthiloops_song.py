@@ -27,6 +27,8 @@ import math
 
 from PySide2.QtCore import Qt, Property, QObject, Signal, Slot
 
+from .. import zynthian_gui_config
+
 from . import libzl
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
@@ -35,17 +37,13 @@ from .zynthiloops_tracks_model import zynthiloops_tracks_model
 
 import logging
 
-@ctypes.CFUNCTYPE(None)
-def cb():
-    zynthiloops_song.__instance__.metronome_update()
-
 
 class zynthiloops_song(QObject):
     __instance__ = None
 
     def __init__(self, parent=None):
         super(zynthiloops_song, self).__init__(parent)
-        zynthiloops_song.__instance__ = self
+        self.zyngui = zynthian_gui_config.zyngui
 
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
@@ -58,8 +56,6 @@ class zynthiloops_song(QObject):
         self.__current_beat__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
 
-        libzl.registerTimerCallback(cb)
-        #libzl.startTimer(math.floor((60.0 / self.__bpm__) * 1000))
 
     @Property(bool, constant=True)
     def playable(self):

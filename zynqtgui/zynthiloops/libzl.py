@@ -35,6 +35,18 @@ except Exception as e:
     print(f"Can't initialise libzl library: {str(e)}")
 
 
+def registerTimerCallback(callback):
+    libzl.registerTimerCallback(callback)
+
+
+def startTimer():
+    libzl.startTimer()
+
+
+def stopTimer():
+    libzl.stopTimer()
+
+
 class libzlClip(object):
     def __init__(self, filepath: bytes):
         libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p

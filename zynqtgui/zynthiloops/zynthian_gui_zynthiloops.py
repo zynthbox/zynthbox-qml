@@ -22,33 +22,32 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import logging
+import ctypes as ctypes
 
-from PySide2.QtQml import qmlRegisterType
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject
 
-from .zynthiloops_clip import zynthiloops_clip
+from . import libzl
 from .zynthiloops_song import zynthiloops_song
 from .. import zynthian_qt_gui_base
+
+
+@ctypes.CFUNCTYPE(None)
+def timer_callback():
+    logging.error(f"Timer triggered")
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         self.__song__ = zynthiloops_song(self)
-        #self.__register_qml_modules__()
-
+        libzl.registerTimerCallback(timer_callback)
+        libzl.startTimer()
 
     def show(self):
         pass
 
-
     @Property(QObject, constant=True)
     def song(self):
         return self.__song__
-
-
-    #def __register_qml_modules__(self):
-        #qmlRegisterType(zynthiloops_song, 'ZynthiLoops', 1, 0, "Song")
-        #qmlRegisterType(zynthiloops_clip, 'ZynthiLoops', 1, 0, "Clip")
-        # qmlRegisterType(zynthiloops_part, 'ZynthiLoops', 1, 0, "Part")
 

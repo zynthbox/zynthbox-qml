@@ -115,7 +115,7 @@ class zynthiloops_song(QObject):
     @Slot(None)
     def addTrack(self):
         self.__track_counter__ += 1
-        self.__tracks_model__.add_track(zynthiloops_track(self.__track_counter__, self.__tracks_model__))
+        self.__tracks_model__.add_track(zynthiloops_track(self.__track_counter__, self, self.__tracks_model__))
 
     @Property(int, notify=bpm_changed)
     def bpm(self):

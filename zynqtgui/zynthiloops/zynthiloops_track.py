@@ -33,14 +33,15 @@ class zynthiloops_track(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
 
-    def __init__(self, id: int, parent: QObject = None):
+    def __init__(self, id: int, song: QObject, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
         self.__name__ = f"Track {self.__id__}"
         self.__clips_model__ = zynthiloops_clips_model(self)
+        self.__song__ = song
         # TODO: do from unserialization
         for i in range(0, 4):
-            self.__clips_model__.add_clip(zynthiloops_clip(self.__id__, i, self))
+            self.__clips_model__.add_clip(zynthiloops_clip(self.__id__, i, song, self))
 
     @Property(bool, constant=True)
     def playable(self):

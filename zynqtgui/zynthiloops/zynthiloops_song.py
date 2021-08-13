@@ -43,11 +43,12 @@ class zynthiloops_song(QObject):
         self.__is_playing__ = False
 
         self.__current_bar__ = 0
+        self.__current_beat__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
 
         self.__metronome_timer__ = QTimer(self)
         self.__metronome_timer__.setTimerType(Qt.PreciseTimer)
-        self.__metronome_timer__.setInterval(self.__bpm__ / 60.0 * 1000)
+        self.__metronome_timer__.setInterval(60.0 / self.__bpm__ * 1000)
         self.__metronome_timer__.setSingleShot(False)
         self.__metronome_timer__.timeout.connect(self.metronome_update)
 
@@ -88,6 +89,10 @@ class zynthiloops_song(QObject):
         pass
 
     @Signal
+    def current_beat_changed(self):
+        pass
+
+    @Signal
     def __tracks_model_changed__(self):
         pass
 
@@ -119,8 +124,13 @@ class zynthiloops_song(QObject):
     @bpm.setter
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
-        self.__metronome_timer__.setInterval(self.__bpm__ / 60.0 * 1000)
+        self.__metronome_timer__.setInterval(60.0 / self.__bpm__  * 1000)
         self.bpm_changed.emit()
+
+    @Property(int, notify=current_beat_changed)
+    def currentBeat(self):
+        return self.__current_beat__
+
 
     @Property(int, notify=index_changed)
     def index(self):
@@ -151,16 +161,24 @@ class zynthiloops_song(QObject):
                 clip = track.clipsModel.getClip(self.__current_part__.partIndex)
                 clip.play()
 
-        self.__current_bar__ = self.__current_bar__ + 1
-        logging.error("current bar {}".format(self.__current_bar__))
+        self.__current_beat__ = (self.__current_beat__ + 1) % 4
+        if self.__current_beat__ is 0:
+            self.__current_bar__ = self.__current_bar__ + 1
+        self.current_beat_changed.emit()
+        logging.error("current beat: {} bar: {}".format(self.__current_beat__, self.__current_bar__))
 
     @Slot(None)
     def play(self):
         self.__current_bar__ = 0
+        self.__current_part__ = self.__parts_model__.getPart(0)
         self.__is_playing__ = True
-        self.metronome_update()
         self.__metronome_timer__.start()
         self.__is_playing_changed__.emit()
+
+        for i in range(0, self.__tracks_model__.count):
+            track = self.__tracks_model__.getTrack(i)
+            clip = track.clipsModel.getClip(self.__current_part__.partIndex)
+            clip.play()
 
     @Slot(None)
     def stop(self):

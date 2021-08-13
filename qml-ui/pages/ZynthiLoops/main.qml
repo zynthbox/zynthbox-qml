@@ -117,7 +117,7 @@ Zynthian.ScreenPage {
 
                     delegate: TableHeader {
                         text: part.name
-                        subText: model.part.length + " Bar"
+                        subText: qsTr("%L1 Bar").arg(model.part.length)
 
                         width: privateProps.headerWidth
                         height: ListView.view.height

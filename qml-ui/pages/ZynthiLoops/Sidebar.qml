@@ -15,12 +15,9 @@ Item {
         None
     }
 
-    property alias heading: heading.text
-    property alias bpm: bpmDial.value
-    property alias length: lengthDial.value
     property int controlType: Sidebar.ControlType.None
     property QtObject controlObj: null
-
+/*
     Binding {
         target: bpmDial
         property: "value"
@@ -31,7 +28,7 @@ Item {
         target: lengthDial
         property: "value"
         value: controlObj && controlObj.length ? controlObj.length : 1
-    }
+    }*/
 
     ColumnLayout {
         anchors.fill: parent
@@ -77,107 +74,74 @@ Item {
             }
         }
 
-        Item {
+        QQC2.Label {
             Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            ColumnLayout {
-                anchors.centerIn: parent
-                width: Math.min(parent.width, implicitWidth)
-                QQC2.Label {
-                    Layout.fillWidth: true
-                    text: {
-                        if (!controlObj || !controlObj.path) {
-                            return "";
-                        }
-                        var arr = controlObj.path.split('/')
-                        return arr[arr.length - 1]
-                    }
-                    wrapMode: Text.Wrap
+            visible: root.controlType === Sidebar.ControlType.Clip
+            text: {
+                if (!controlObj || !controlObj.path) {
+                    return "";
                 }
-                QQC2.Label {
-                    text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration : 0.0)
-                    Layout.fillWidth: true
-                    wrapMode: Text.Wrap
-                }
+                var arr = controlObj.path.split('/')
+                return arr[arr.length - 1]
+            }
+            wrapMode: Text.Wrap
+        }
+        QQC2.Label {
+            visible: root.controlType === Sidebar.ControlType.Clip
+            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+        }
 
-                SidebarDial {
-                    id: bpmDial
-                    visible: controlObj && controlObj.bpm ? true : false
 
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: 80
-                    Layout.alignment: Qt.AlignHCenter
+        ColumnLayout {
+            Layout.alignment: Qt.AplignCenter
+            width: Math.min(parent.width, implicitWidth)
 
+            SidebarDial {
+                id: bpmDial
+                text: qsTr("BPM")
+                controlObj: root.controlObj
+                controlProperty: "bpm"
+
+                dial {
                     stepSize: 1
                     from: 50
                     to: 200
-
-                    onValueChanged: {
-                        if (controlObj && controlObj.bpm) {
-                            controlObj.bpm = value
-                        }
-                    }
                 }
+            }
 
-                TableHeaderLabel {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "BPM"
-                    visible: bpmDial.visible
-                }
+            SidebarDial {
+                id: startDial
+                text: qsTr("Start Position")
+                controlObj: root.controlObj
+                controlProperty: "startPosition"
+                valueString: dial.value.toFixed(2)
 
-                 SidebarDial {
-                    id: startDial
-                    visible: controlObj && controlObj.startPosition ? true : false
-
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: 80
-                    Layout.alignment: Qt.AlignHCenter
-
+                dial {
                     stepSize: controlObj.duration / 100
                     from: 0
-                    to: controlObj.audioLength
-                    value: controlObj ? controlObj.startPosition : 0.0
-
-                    onValueChanged: {
-                        if (controlObj && controlObj.startPosition) {
-                            controlObj.startPosition = value
-                        }
-                    }
+                    to: controlObj.duration
                 }
+            }
 
-                TableHeaderLabel {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "Start Position"
-                    visible: startDial.visible
-                }
+            SidebarDial {
+                id: lengthDial
+                text: qsTr("Length")
+                controlObj: root.controlObj
+                controlProperty: "length"
 
-                SidebarDial {
-                    id: lengthDial
-                    visible: controlObj && controlObj.length ? true : false
-
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: 80
-                    Layout.alignment: Qt.AlignHCenter
-
+                dial {
                     stepSize: 1
                     from: 1
                     to: 16
-
-                    onValueChanged: {
-                        if (controlObj && controlObj.length) {
-                            controlObj.length = value
-                        }
-                    }
-                }
-
-                TableHeaderLabel {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "Length"
-                    visible: lengthDial.visible
                 }
             }
         }
+        Item {
+            Layout.fillHeight: true
+        }
+
 
         RowLayout {
             Layout.fillWidth: true

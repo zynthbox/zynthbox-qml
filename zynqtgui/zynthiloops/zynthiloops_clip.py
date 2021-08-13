@@ -108,8 +108,13 @@ class zynthiloops_clip(QObject):
         self.__length__ = length
         self.length_changed.emit()
 
+<<<<<<< HEAD
         if self.libzlClip is not None:
             self.libzlClip.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+=======
+        if self.libzlClip != None:
+            self.libzlClip.set_length(min(self.duration - self.__start_position__, length (60.0 / self.__song__.bpm )));
+>>>>>>> 43f5d9c... iallow 1 msec increment
 
     @Property(int, notify=row_index_changed)
     def row(self):

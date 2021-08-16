@@ -85,6 +85,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.stopTimer()
             self.metronome_running_changed.emit()
 
+            self.__current_beat__ = 0
+            self.current_beat_changed.emit()
+
 
     def metronome_update(self):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4

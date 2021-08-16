@@ -24,6 +24,8 @@
 # ******************************************************************************
 
 import logging
+import re
+from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
 from . import zynthian_gui_selector
@@ -132,6 +134,39 @@ class zynthian_gui_main(zynthian_gui_selector):
     def step_sequencer(self):
         logging.info("Step Sequencer")
         self.zyngui.show_modal("stepseq")
+
+    @Slot('void')
+    def start_norns(self):
+        self.zyngui.start_loading()
+        cmd = "/usr/bin/norns-qml-shield";
+        logging.info("Executing Command: %s" % cmd)
+        self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
+        self.zyngui.add_info("{}\n".format(cmd))
+        try:
+            self.proc = Popen(
+                cmd,
+                shell=True,
+                stdout=PIPE,
+                stderr=STDOUT,
+                universal_newlines=True,
+            )
+            self.zyngui.add_info("RESULT:\n", "EMPHASIS")
+            for line in self.proc.stdout:
+                if re.search("ERROR", line, re.IGNORECASE):
+                    tag = "ERROR"
+                elif re.search("Already", line, re.IGNORECASE):
+                    tag = "SUCCESS"
+                else:
+                    tag = None
+                logging.info(line.rstrip())
+                self.zyngui.add_info(line, tag)
+            self.zyngui.add_info("\n")
+        except Exception as e:
+            logging.error(e)
+            self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
+        self.zyngui.add_info("\n\n")
+        self.zyngui.hide_info_timer(3000)
+        self.zyngui.stop_loading()
 
     def admin(self):
         logging.info("Admin")

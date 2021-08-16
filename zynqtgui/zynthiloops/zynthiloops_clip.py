@@ -27,7 +27,7 @@ from .. import zynthian_gui_config
 from . import libzl
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
-from .libzl import libzlClip
+from .libzl import ClipAudioSource
 
 import logging
 
@@ -47,7 +47,7 @@ class zynthiloops_clip(QObject):
         self.__start_position__ = 0.0
         self.__path__ = None
         self.__song__ = song
-        self.libzlClip = None
+        self.audioSource = None
 
     @Signal
     def length_changed(self):
@@ -110,8 +110,8 @@ class zynthiloops_clip(QObject):
         self.__length__ = length
         self.length_changed.emit()
 
-        if self.libzlClip is not None:
-            self.libzlClip.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+        if self.audioSource is not None:
+            self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
 
 
     @Property(int, notify=row_index_changed)
@@ -144,15 +144,15 @@ class zynthiloops_clip(QObject):
     def set_start_position(self, position: float):
         self.__start_position__ = position
         self.start_position_changed.emit()
-        if self.libzlClip is None:
+        if self.audioSource is None:
             return
-        self.libzlClip.set_start_position(position)
+        self.audioSource.set_start_position(position)
 
     @Property(float, notify=duration_changed)
     def duration(self):
-        if self.libzlClip is None:
+        if self.audioSource is None:
             return 0.0
-        return self.libzlClip.get_duration()
+        return self.audioSource.get_duration()
 
     @Property(str, notify=path_changed)
     def path(self):
@@ -162,35 +162,35 @@ class zynthiloops_clip(QObject):
     def set_path(self, path):
         self.__path__ = path
         self.stop()
-        self.libzlClip = libzlClip(path.encode('utf-8'))
+        self.audioSource = ClipAudioSource(path.encode('utf-8'))
         self.startPosition = self.__start_position__
         self.length = self.__length__
 
-        # self.libzlClip.setStartPosition(self.__start_position__)
+        # self.audioSource.setStartPosition(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
 
     @Slot(None)
     def clear(self, loop=True):
         self.stop()
-        self.libzlClip = None
+        self.audioSource = None
         self.__path__ = None
         self.path_changed.emit()
 
     @Slot(None)
     def play(self, loop=True):
-        if self.libzlClip is None:
+        if self.audioSource is None:
             return
         self.zyngui.screens['zynthiloops'].start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
-        self.libzlClip.play()
+        self.audioSource.play()
 
     @Slot(None)
     def stop(self, loop=True):
-        if self.libzlClip is None:
+        if self.audioSource is None:
             return
         self.zyngui.screens['zynthiloops'].stop_metronome_request()
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
-        self.libzlClip.stop()
+        self.audioSource.stop()

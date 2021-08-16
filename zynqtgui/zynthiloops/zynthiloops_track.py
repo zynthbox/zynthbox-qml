@@ -38,7 +38,7 @@ class zynthiloops_track(QObject):
         super(zynthiloops_track, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
-        self.__name__ = f"Track {self.__id__}"
+        self.__name__ = f"T{self.__id__}"
         self.__clips_model__ = zynthiloops_clips_model(self)
         self.__song__ = song
         # TODO: do from unserialization

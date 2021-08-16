@@ -54,6 +54,7 @@ class zynthiloops_song(QObject):
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
+        self.addTrack()
 
 
     @Property(bool, constant=True)

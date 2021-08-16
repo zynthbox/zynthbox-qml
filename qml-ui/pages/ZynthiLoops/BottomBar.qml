@@ -46,11 +46,15 @@ Zynthian.Card {
     property int controlType: Sidebar.ControlType.None
     property QtObject controlObj: null
 
+    transform: Translate {
+        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 4 : 0
+    }
 
     contentItem: ColumnLayout {
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.maximumHeight: Kirigami.Units.gridUnit * 2
 
             StackLayout {
                 id: titleStack

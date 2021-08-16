@@ -94,8 +94,8 @@ Zynthian.ScreenPage {
                     subText: "BPM: " + root.song.bpm
 
                     onPressed: {
-                        sidebar.controlType = Sidebar.ControlType.Song;
-                        sidebar.controlObj = root.song;
+                        bottomBar.controlType = Sidebar.ControlType.Song;
+                        bottomBar.controlObj = root.song;
                     }
 
                 }
@@ -122,8 +122,8 @@ Zynthian.ScreenPage {
                         height: ListView.view.height
 
                         onPressed: {
-                            sidebar.controlType = Sidebar.ControlType.Track;
-                            sidebar.controlObj = model.track;
+                            bottomBar.controlType = Sidebar.ControlType.Track;
+                            bottomBar.controlObj = model.track;
                         }
 
                         onPressAndHold: {
@@ -163,8 +163,8 @@ Zynthian.ScreenPage {
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            sidebar.controlType = Sidebar.ControlType.Part;
-                            sidebar.controlObj = model.part;
+                            bottomBar.controlType = Sidebar.ControlType.Part;
+                            bottomBar.controlObj = model.part;
                         }
                     }
                 }
@@ -208,8 +208,8 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        sidebar.controlType = Sidebar.ControlType.Clip;
-                                        sidebar.controlObj = model.clip;
+                                        bottomBar.controlType = Sidebar.ControlType.Clip;
+                                        bottomBar.controlObj = model.clip;
                                     }
                                 }
                             }
@@ -220,7 +220,7 @@ Zynthian.ScreenPage {
         }
 
         BottomBar {
-            id: sidebar
+            id: bottomBar
 
             Layout.preferredHeight: Kirigami.Units.gridUnit * 11
             Layout.fillWidth: true

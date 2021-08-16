@@ -147,36 +147,40 @@ Zynthian.Card {
                 }
             }
 
+            SidebarDial {
+                id: pitchDial
+                text: qsTr("Pitch")
+                controlObj: root.controlObj
+                controlProperty: "pitch"
+
+                dial {
+                    stepSize: 1
+                    from: -12
+                    to: 12
+                }
+            }
+
+            SidebarDial {
+                id: timeDial
+                text: qsTr("Time")
+                controlObj: root.controlObj
+                controlProperty: "time"
+
+                dial {
+                    stepSize: 1
+                    from: 0
+                    to: 200
+                }
+            }
+
             Item {
                 Layout.fillWidth: true
             }
 
-            RowLayout {
+            GridLayout {
+                columns: 2
                 Layout.alignment: Qt.AlignBottom
-                Layout.maximumHeight: Kirigami.Units.iconSizes.large
-
-                SidebarButton {
-                    icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                    visible: (controlObj != null) && controlObj.playable
-
-                    onClicked: {
-                        if (controlObj.isPlaying) {
-                            console.log("Stopping Sound Loop")
-                            controlObj.stop();
-                        } else {
-                            console.log("Playing Sound Loop")
-                            controlObj.play();
-                        }
-                    }
-                }
-
-                SidebarButton {
-                    icon.name: "media-record"
-                    visible: (controlObj != null) && controlObj.recordable
-
-                    onClicked: {
-                    }
-                }
+                //Layout.maximumHeight: Kirigami.Units.iconSizes.large
 
                 SidebarButton {
                     icon.name: "document-open"
@@ -200,6 +204,29 @@ Zynthian.Card {
                     visible: (controlObj != null) && controlObj.clearable
 
                     onClicked: controlObj.clear()
+                }
+
+                SidebarButton {
+                    icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    visible: (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        if (controlObj.isPlaying) {
+                            console.log("Stopping Sound Loop")
+                            controlObj.stop();
+                        } else {
+                            console.log("Playing Sound Loop")
+                            controlObj.play();
+                        }
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-record"
+                    visible: (controlObj != null) && controlObj.recordable
+
+                    onClicked: {
+                    }
                 }
             }
         }

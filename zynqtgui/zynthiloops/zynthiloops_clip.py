@@ -47,6 +47,8 @@ class zynthiloops_clip(QObject):
         self.__start_position__ = 0.0
         self.__path__ = None
         self.__song__ = song
+        self.__pitch__ = 0
+        self.__time__ = 0
         self.audioSource = None
 
     @Signal
@@ -71,6 +73,14 @@ class zynthiloops_clip(QObject):
 
     @Signal
     def duration_changed(self):
+        pass
+
+    @Signal
+    def pitch_changed(self):
+        pass
+
+    @Signal
+    def time_changed(self):
         pass
 
     @Signal
@@ -153,6 +163,28 @@ class zynthiloops_clip(QObject):
         if self.audioSource is None:
             return 0.0
         return self.audioSource.get_duration()
+
+
+
+    @Property(int, notify=pitch_changed)
+    def pitch(self):
+        return self.__pitch__
+
+    @pitch.setter
+    def set_pitch(self, pitch: int):
+        self.__pitch__ = pitch
+        self.pitch_changed.emit()
+
+    @Property(int, notify=time_changed)
+    def time(self):
+        return self.__time__
+
+    @time.setter
+    def set_time(self, time: int):
+        self.__time__ = time
+        self.time_changed.emit()
+
+
 
     @Property(str, notify=path_changed)
     def path(self):

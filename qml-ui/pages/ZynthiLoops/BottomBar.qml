@@ -1,3 +1,29 @@
+/* -*- coding: utf-8 -*-
+******************************************************************************
+ZYNTHIAN PROJECT: Zynthian Qt GUI
+
+Zynthian Loopgrid Page
+
+Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
+Copyright (C) 2021 Marco MArtin <mart@kde.org>
+
+******************************************************************************
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of
+the License, or any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+For a full copy of the GNU General Public License see the LICENSE.txt file.
+
+******************************************************************************
+*/
+
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
@@ -5,7 +31,9 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
-Item {
+import Zynthian 1.0 as Zynthian
+
+Zynthian.Card {
     id: root
     enum ControlType {
         Song,
@@ -17,34 +45,15 @@ Item {
 
     property int controlType: Sidebar.ControlType.None
     property QtObject controlObj: null
-/*
-    Binding {
-        target: bpmDial
-        property: "value"
-        value: controlObj && controlObj.bpm ? controlObj.bpm : 120
-    }
 
-    Binding {
-        target: lengthDial
-        property: "value"
-        value: controlObj && controlObj.length ? controlObj.length : 1
-    }*/
 
-    ColumnLayout {
-        anchors.fill: parent
-        spacing: 8
+    contentItem: ColumnLayout {
 
-        Rectangle {
+        RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 80
 
-            color: Kirigami.Theme.backgroundColor
-
-            border.width: focus ? 1 : 0
-            border.color: Kirigami.Theme.highlightColor
             StackLayout {
                 id: titleStack
-                anchors.centerIn: parent
                 RowLayout {
                     Kirigami.Heading {
                         id: heading
@@ -72,30 +81,30 @@ Item {
                     }
                 }
             }
-        }
 
-        QQC2.Label {
-            Layout.fillWidth: true
-            visible: root.controlType === Sidebar.ControlType.Clip
-            text: {
-                if (!controlObj || !controlObj.path) {
-                    return "";
-                }
-                var arr = controlObj.path.split('/')
-                return arr[arr.length - 1]
+            Item {
+                Layout.fillWidth: true
             }
-            wrapMode: Text.Wrap
+
+            QQC2.Label {
+                visible: root.controlType === Sidebar.ControlType.Clip
+                text: {
+                    if (!controlObj || !controlObj.path) {
+                        return "";
+                    }
+                    var arr = controlObj.path.split('/')
+                    return arr[arr.length - 1]
+                }
+            }
+            QQC2.Label {
+                visible: root.controlType === Sidebar.ControlType.Clip
+                text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+            }
         }
-        QQC2.Label {
-            visible: root.controlType === Sidebar.ControlType.Clip
-            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+
+
+        RowLayout {
             Layout.fillWidth: true
-            wrapMode: Text.Wrap
-        }
-
-
-        ColumnLayout {
-            Layout.alignment: Qt.AplignCenter
             width: Math.min(parent.width, implicitWidth)
 
             SidebarDial {
@@ -137,77 +146,61 @@ Item {
                     to: 16
                 }
             }
-        }
-        Item {
-            Layout.fillHeight: true
-        }
 
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 50
-            Layout.maximumHeight: Layout.preferredHeight
-
-            SidebarButton {
+            Item {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+            }
 
-                icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                visible: (controlObj != null) && controlObj.playable
+            RowLayout {
+                Layout.alignment: Qt.AlignBottom
+                Layout.maximumHeight: Kirigami.Units.iconSizes.large
 
-                onClicked: {
-                    if (controlObj.isPlaying) {
-                        console.log("Stopping Sound Loop")
-                        controlObj.stop();
-                    } else {
-                        console.log("Playing Sound Loop")
-                        controlObj.play();
+                SidebarButton {
+                    icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    visible: (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        if (controlObj.isPlaying) {
+                            console.log("Stopping Sound Loop")
+                            controlObj.stop();
+                        } else {
+                            console.log("Playing Sound Loop")
+                            controlObj.play();
+                        }
                     }
                 }
-            }
 
-            SidebarButton {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                SidebarButton {
+                    icon.name: "media-record"
+                    visible: (controlObj != null) && controlObj.recordable
 
-                icon.name: "media-record"
-                visible: (controlObj != null) && controlObj.recordable
-
-                onClicked: {
+                    onClicked: {
+                    }
                 }
-            }
 
-            SidebarButton {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                SidebarButton {
+                    icon.name: "document-open"
+                    visible: root.controlType === Sidebar.ControlType.Clip
 
-                icon.name: "document-open"
-                visible: root.controlType === Sidebar.ControlType.Clip
-
-                onClicked: {
-                    pickerDialog.open()
+                    onClicked: {
+                        pickerDialog.open()
+                    }
                 }
-            }
 
-            SidebarButton {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                SidebarButton {
+                    icon.name: "delete"
+                    visible: (controlObj != null) && controlObj.deletable
 
-                icon.name: "delete"
-                visible: (controlObj != null) && controlObj.deletable
-
-                onClicked: {
+                    onClicked: {
+                    }
                 }
-            }
 
-            SidebarButton {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                SidebarButton {
+                    icon.name: "edit-clear-all"
+                    visible: (controlObj != null) && controlObj.clearable
 
-                icon.name: "edit-clear-all"
-                visible: (controlObj != null) && controlObj.clearable
-
-                onClicked: controlObj.clear()
+                    onClicked: controlObj.clear()
+                }
             }
         }
     }

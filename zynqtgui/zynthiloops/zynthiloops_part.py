@@ -36,7 +36,7 @@ class zynthiloops_part(QObject):
         super(zynthiloops_part, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__part_index__ = part_index
-        self.__name__ = f"Part {self.__part_index__+1}"
+        self.__name__ = chr(self.__part_index__+65) # A B C ...
 
     @Property(bool, constant=True)
     def playable(self):

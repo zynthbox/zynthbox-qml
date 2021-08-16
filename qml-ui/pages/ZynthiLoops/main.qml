@@ -62,16 +62,15 @@ Zynthian.ScreenPage {
         id: privateProps
 
         //Try to fit exactly until a minimum allowed size
-        property int headerWidth: Math.max(tableLayout.width / (root.song.partsModel.count + 1),
-                                           Kirigami.Units.gridUnit * 8)
-        property int headerHeight: Kirigami.Units.gridUnit * 4
+        property int headerWidth: Math.round(
+                                    Math.max(Kirigami.Units.gridUnit * 6,
+                                            tableLayout.width / 9))
+        property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
     }
 
-    RowLayout {
-        anchors.fill: parent
-        spacing: 8
+    contentItem : ColumnLayout {
 
         ColumnLayout {
             id: tableLayout
@@ -113,18 +112,23 @@ Zynthian.ScreenPage {
                     orientation: Qt.Horizontal
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.song.partsModel
+                    model: root.song.tracksModel
 
                     delegate: TableHeader {
-                        text: part.name
-                        subText: qsTr("%L1 Bar").arg(model.part.length)
+                        text: model.track.name
+                        subText: model.track.type === "audio" ? "Audio" : "Midi"
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
 
                         onPressed: {
-                            sidebar.controlType = Sidebar.ControlType.Part;
-                            sidebar.controlObj = model.part;
+                            sidebar.controlType = Sidebar.ControlType.Track;
+                            sidebar.controlObj = model.track;
+                        }
+
+                        onPressAndHold: {
+                            zynthian.track.trackId = model.track.id
+                            zynthian.current_modal_screen_id = "track"
                         }
                     }
                 }
@@ -149,23 +153,18 @@ Zynthian.ScreenPage {
                     contentY: loopGridFlickable.contentY
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.song.tracksModel
+                    model: root.song.partsModel
 
                     delegate: TableHeader {
-                        text: model.track.name
-                        subText: model.track.type === "audio" ? "Audio" : "Midi"
+                        text: part.name
+                        subText: qsTr("%L1 Bar").arg(model.part.length)
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            sidebar.controlType = Sidebar.ControlType.Track;
-                            sidebar.controlObj = model.track;
-                        }
-
-                        onPressAndHold: {
-                            zynthian.track.trackId = model.track.id
-                            zynthian.current_modal_screen_id = "track"
+                            sidebar.controlType = Sidebar.ControlType.Part;
+                            sidebar.controlObj = model.part;
                         }
                     }
                 }
@@ -187,7 +186,8 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: loopGrid
-                        columns: root.song.partsModel.count
+                        rows: root.song.partsModel.count
+                        flow: GridLayout.TopToBottom
                         rowSpacing: 1
                         columnSpacing: 1
 
@@ -219,17 +219,12 @@ Zynthian.ScreenPage {
             }
         }
 
-        Kirigami.Separator {
-            Layout.preferredWidth: 2
-            Layout.fillHeight: true
-        }
-
-        Sidebar {
+        BottomBar {
             id: sidebar
 
-            Layout.preferredWidth: 160
-            Layout.maximumWidth: Layout.preferredWidth
-            Layout.fillHeight: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 11
+            Layout.fillWidth: true
+            Layout.fillHeight: false
         }
     }
 }

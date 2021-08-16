@@ -42,7 +42,7 @@ class zynthiloops_track(QObject):
         self.__clips_model__ = zynthiloops_clips_model(self)
         self.__song__ = song
         # TODO: do from unserialization
-        for i in range(0, 4):
+        for i in range(0, 2):
             self.__clips_model__.add_clip(zynthiloops_clip(self.__id__, i, song, self))
 
     @Property(bool, constant=True)

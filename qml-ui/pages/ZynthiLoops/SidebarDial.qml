@@ -16,9 +16,10 @@ ColumnLayout {
 
     visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
 
-    Layout.fillWidth: true
-    Layout.preferredHeight: 100
-    Layout.maximumHeight: 100
+    Layout.fillHeight: true
+    Layout.fillWidth: false
+    //Layout.preferredHeight: 100
+    //Layout.maximumHeight: 100
 
     Binding {
         target: dial

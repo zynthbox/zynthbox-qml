@@ -251,7 +251,7 @@ Zynthian.Card {
                 delegate: Kirigami.BasicListItem {
                     label: model.fileName
                     onClicked: {
-                        controlObj.path = model.filePath
+                        root.controlObj.path = model.filePath
                         pickerDialog.accept()
                     }
                 }

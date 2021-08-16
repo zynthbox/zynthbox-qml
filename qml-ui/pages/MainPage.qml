@@ -118,6 +118,16 @@ Zynthian.SelectorPage {
             rectHeight: mainviewRectId.height / 2
             rectX:  mainviewRectId.width / 6
             rectY: mainviewRectId.height / 2
+            imgSrc: Qt.resolvedUrl("../../img/norns-qml-shield.svg")
+            onClicked: zynthian.main.start_norns()
+            text: "Norns"
+        }
+
+        HomeScreenIcon {
+            rectWidth: mainviewRectId.width / 6
+            rectHeight: mainviewRectId.height / 2
+            rectX:  (mainviewRectId.width / 6) * 2
+            rectY: mainviewRectId.height / 2
             imgSrc: Qt.resolvedUrl("../../img/settings.svg")
             onClicked:  zynthian.current_modal_screen_id = "admin"
             text: "Settings"

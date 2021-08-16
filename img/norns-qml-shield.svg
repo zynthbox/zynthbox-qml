@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="128"
+   viewBox="0 0 33.866667 33.866667"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (3bc2e81, 2020-09-07)"
+   sodipodi:docname="norns-qml-shield.svg"
+   inkscape:export-filename="/home/leinir/Downloads/fates-210706/norns-qml-shield-128.png"
+   inkscape:export-xdpi="96.000008"
+   inkscape:export-ydpi="96.000008">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="104.02448"
+     inkscape:cy="74.454119"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     fit-margin-top="5"
+     lock-margins="true"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5"
+     inkscape:window-width="3840"
+     inkscape:window-height="2277"
+     inkscape:window-x="0"
+     inkscape:window-y="36"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(2.0914974,-138.64067)">
+    <g
+       id="g849"
+       transform="matrix(0.21359066,0,0,0.21359066,-1.6225519,156.59831)">
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect878"
+         width="6.7829261"
+         height="56.857105"
+         x="22.654781"
+         y="-41.871426"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect880"
+         width="6.7829261"
+         height="56.857105"
+         x="35.796219"
+         y="-46.136654"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect882"
+         width="6.7829261"
+         height="56.857105"
+         x="48.936237"
+         y="-50.401424"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect884"
+         width="6.7829261"
+         height="56.857105"
+         x="61.973026"
+         y="-54.632687"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect886"
+         width="6.7829261"
+         height="56.857105"
+         x="75.076073"
+         y="-58.885456"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect888"
+         width="6.7829261"
+         height="56.857105"
+         x="88.187767"
+         y="-63.141026"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect890"
+         width="6.7829261"
+         height="56.857105"
+         x="101.16215"
+         y="-67.352036"
+         ry="0"
+         transform="rotate(17.98153)" />
+      <rect
+         style="fill:#a7a9ac;fill-opacity:1;stroke-width:0.264999;stroke-linecap:round;stroke-linejoin:bevel"
+         id="rect892"
+         width="6.7829261"
+         height="56.857105"
+         x="114.27293"
+         y="-71.607315"
+         ry="0"
+         transform="rotate(17.98153)" />
+    </g>
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#a7a9ac;stroke-width:1.35363;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path894"
+       r="15.308176"
+       cy="155.5847"
+       cx="14.842182" />
+  </g>
+</svg>

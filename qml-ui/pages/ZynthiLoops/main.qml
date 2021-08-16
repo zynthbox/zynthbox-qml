@@ -208,7 +208,7 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        bottomBar.controlType = Sidebar.ControlType.Clip;
+                                        bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
                                     }
                                 }

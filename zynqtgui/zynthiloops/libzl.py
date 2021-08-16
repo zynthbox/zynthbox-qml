@@ -54,41 +54,41 @@ def stopTimer():
         libzl.stopTimer()
 
 
-class libzlClip(object):
+class ClipAudioSource(object):
     def __init__(self, filepath: bytes):
         if libzl:
             libzl.startTimer.argtypes = [ctypes.c_int]
 
-            libzl.ZynthiLoopsComponent_new.restype = ctypes.c_void_p
-            libzl.ZynthiLoopsComponent_new.argtypes = [ctypes.c_char_p]
+            libzl.ClipAudioSource_new.restype = ctypes.c_void_p
+            libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
 
-            libzl.ZynthiLoopsComponent_getDuration.restype = ctypes.c_float
-            libzl.ZynthiLoopsComponent_getFileName.restype = ctypes.c_char_p
-            libzl.ZynthiLoopsComponent_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
-            libzl.ZynthiLoopsComponent_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
+            libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
+            libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-            self.obj = libzl.ZynthiLoopsComponent_new(filepath)
+            self.obj = libzl.ClipAudioSource_new(filepath)
 
     def play(self):
         if libzl:
-            libzl.ZynthiLoopsComponent_play(self.obj)
+            libzl.ClipAudioSource_play(self.obj)
 
     def stop(self):
         if libzl:
-            libzl.ZynthiLoopsComponent_stop(self.obj)
+            libzl.ClipAudioSource_stop(self.obj)
 
     def get_duration(self):
         if libzl:
-            return libzl.ZynthiLoopsComponent_getDuration(self.obj)
+            return libzl.ClipAudioSource_getDuration(self.obj)
 
     def get_filename(self):
         if libzl:
-            return libzl.ZynthiLoopsComponent_getFileName(self.obj)
+            return libzl.ClipAudioSource_getFileName(self.obj)
 
-    def set_start_position(self, startPositionInSeconds: float):
+    def set_start_position(self, start_position_in_seconds: float):
         if libzl:
-            libzl.ZynthiLoopsComponent_setStartPosition(self.obj, startPositionInSeconds)
+            libzl.ClipAudioSource_setStartPosition(self.obj, start_position_in_seconds)
 
-    def set_length(self, lengthInSeconds: float):
+    def set_length(self, length_in_seconds: float):
         if libzl:
-            libzl.ZynthiLoopsComponent_setLength(self.obj, lengthInSeconds)
+            libzl.ClipAudioSource_setLength(self.obj, length_in_seconds)

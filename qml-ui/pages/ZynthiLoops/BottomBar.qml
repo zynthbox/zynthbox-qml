@@ -97,7 +97,7 @@ Zynthian.Card {
                 }
             }
             QQC2.Label {
-                visible: root.controlType === Sidebar.ControlType.Clip
+                visible: root.controlType === Sidebar.ControlType.Clip && controlObj.path.length > 0
                 text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
             }
         }

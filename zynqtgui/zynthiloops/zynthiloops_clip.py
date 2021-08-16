@@ -134,7 +134,7 @@ class zynthiloops_clip(QObject):
 
     @Property(str, constant=True)
     def name(self):
-        return f"Clip {self.__col_index__ + 1}"
+        return f"T{self.__row_index__}{chr(self.__col_index__+65)}"
 
     @Property(float, notify=start_position_changed)
     def startPosition(self):

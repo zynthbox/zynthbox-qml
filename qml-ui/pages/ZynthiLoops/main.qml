@@ -63,7 +63,7 @@ Zynthian.ScreenPage {
 
         //Try to fit exactly until a minimum allowed size
         property int headerWidth: Math.round(
-                                    Math.max(Kirigami.Units.gridUnit * 6,
+                                    Math.max(Kirigami.Units.gridUnit * 5,
                                             tableLayout.width / 9))
         property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
         property int cellWidth: headerWidth

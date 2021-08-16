@@ -37,7 +37,7 @@ class zynthiloops_parts_model(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        for i in range(0, 4):
+        for i in range(0, 2):
             self.add_part(zynthiloops_part(i, self))
 
     def data(self, index, role=None):

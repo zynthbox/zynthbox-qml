@@ -18,7 +18,7 @@ ColumnLayout {
 
     Layout.fillHeight: true
     Layout.fillWidth: false
-    //Layout.preferredHeight: 100
+    Layout.preferredWidth: Kirigami.Units.gridUnit * 9
     //Layout.maximumHeight: 100
 
     Binding {

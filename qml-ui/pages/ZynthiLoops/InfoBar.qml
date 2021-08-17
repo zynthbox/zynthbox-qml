@@ -2,9 +2,10 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Main Class and Program for Zynthian GUI
+Zynthian Loopgrid Page
 
-Copyright (C) 2021 Marco Martin <mart@kde.org>
+Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
+Copyright (C) 2021 Marco MArtin <mart@kde.org>
 
 ******************************************************************************
 
@@ -28,18 +29,19 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-import "private"
+import Qt.labs.folderlistmodel 2.11
 
-// FIXME: replace with Kirigami.PagePoolAction when frameworks will be recent enough
-Kirigami.Action {
-    id: root
+import Zynthian 1.0 as Zynthian
 
-    enabled: page.length > 0
-    checkable: true
-    /**
-     * Url or filename of the page this action will load
-     */
-    property string page
-    property var initialProperties
+// GridLayout so TabbedControlView knows how to navigate it
+GridLayout {
+    id: waveBar
+    rows: 1
+    Layout.fillWidth: true
 
+    QQC2.Label {
+        Layout.alignment: Qt.alignCenter
+        text: "Info"
+    }
 }
+

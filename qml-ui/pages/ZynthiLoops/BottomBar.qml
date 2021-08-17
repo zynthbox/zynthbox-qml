@@ -43,7 +43,7 @@ Zynthian.Card {
         None
     }
 
-    property int controlType: Sidebar.ControlType.None
+    property int controlType: BottomBar.ControlType.None
     property QtObject controlObj: null
 
     transform: Translate {
@@ -106,135 +106,35 @@ Zynthian.Card {
             }
         }
 
-
-        RowLayout {
+        Zynthian.TabbedControlView {
             Layout.fillWidth: true
-            width: Math.min(parent.width, implicitWidth)
-
-            SidebarDial {
-                id: bpmDial
-                text: qsTr("BPM")
-                controlObj: root.controlObj
-                controlProperty: "bpm"
-
-                dial {
-                    stepSize: 1
-                    from: 50
-                    to: 200
+            Layout.fillHeight: true
+            minimumTabsCount: 4
+            tabActions: [
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Main")
+                    page: Qt.resolvedUrl("MainBar.qml")
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Wave")
+                    page: Qt.resolvedUrl("WaveBar.qml")
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("FX")
+                    page: Qt.resolvedUrl("FXBar.qml")
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Info")
+                    page: Qt.resolvedUrl("InfoBar.qml")
+                    initialProperties: {"bottomBar": root}
                 }
-            }
-
-            SidebarDial {
-                id: startDial
-                text: qsTr("Start Position (msecs)")
-                controlObj: root.controlObj
-                controlProperty: "startPosition"
-                valueString: Math.round(dial.value * 1000)
-
-                dial {
-                    stepSize: 0.001
-                    from: 0
-                    to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
-                }
-            }
-
-            SidebarDial {
-                id: lengthDial
-                text: qsTr("Length (beats)")
-                controlObj: root.controlObj
-                controlProperty: "length"
-
-                dial {
-                    stepSize: 1
-                    from: 1
-                    to: 16
-                }
-            }
-
-            SidebarDial {
-                id: pitchDial
-                text: qsTr("Pitch")
-                controlObj: root.controlObj
-                controlProperty: "pitch"
-
-                dial {
-                    stepSize: 1
-                    from: -12
-                    to: 12
-                }
-            }
-
-            SidebarDial {
-                id: timeDial
-                text: qsTr("Time")
-                controlObj: root.controlObj
-                controlProperty: "time"
-
-                dial {
-                    stepSize: 1
-                    from: 0
-                    to: 200
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            GridLayout {
-                columns: 2
-                Layout.alignment: Qt.AlignBottom
-                //Layout.maximumHeight: Kirigami.Units.iconSizes.large
-
-                SidebarButton {
-                    icon.name: "document-open"
-                    visible: root.controlType === Sidebar.ControlType.Clip
-
-                    onClicked: {
-                        pickerDialog.open()
-                    }
-                }
-
-                SidebarButton {
-                    icon.name: "delete"
-                    visible: (controlObj != null) && controlObj.deletable
-
-                    onClicked: {
-                    }
-                }
-
-                SidebarButton {
-                    icon.name: "edit-clear-all"
-                    visible: (controlObj != null) && controlObj.clearable
-
-                    onClicked: controlObj.clear()
-                }
-
-                SidebarButton {
-                    icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                    visible: (controlObj != null) && controlObj.playable
-
-                    onClicked: {
-                        if (controlObj.isPlaying) {
-                            console.log("Stopping Sound Loop")
-                            controlObj.stop();
-                        } else {
-                            console.log("Playing Sound Loop")
-                            controlObj.play();
-                        }
-                    }
-                }
-
-                SidebarButton {
-                    icon.name: "media-record"
-                    visible: (controlObj != null) && controlObj.recordable
-
-                    onClicked: {
-                    }
-                }
-            }
+            ]
         }
     }
+
     QQC2.Dialog {
         id: pickerDialog
         parent: root.parent

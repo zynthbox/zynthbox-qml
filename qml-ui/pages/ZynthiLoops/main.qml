@@ -94,7 +94,7 @@ Zynthian.ScreenPage {
                     subText: "BPM: " + root.song.bpm
 
                     onPressed: {
-                        bottomBar.controlType = Sidebar.ControlType.Song;
+                        bottomBar.controlType = BottomBar.ControlType.Song;
                         bottomBar.controlObj = root.song;
                     }
 
@@ -122,7 +122,7 @@ Zynthian.ScreenPage {
                         height: ListView.view.height
 
                         onPressed: {
-                            bottomBar.controlType = Sidebar.ControlType.Track;
+                            bottomBar.controlType = BottomBar.ControlType.Track;
                             bottomBar.controlObj = model.track;
                         }
 
@@ -163,7 +163,7 @@ Zynthian.ScreenPage {
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            bottomBar.controlType = Sidebar.ControlType.Part;
+                            bottomBar.controlType = BottomBar.ControlType.Part;
                             bottomBar.controlObj = model.part;
                         }
                     }

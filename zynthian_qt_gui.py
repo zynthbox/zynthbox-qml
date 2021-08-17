@@ -345,9 +345,11 @@ class zynthian_gui(QObject):
         self.current_modal_screen_id_changed.connect(self.info_timer.start)
         self.current_qml_page_prop = None
 
+        #FIXME HACK: this spams is_loading_changed on the proper thread until the ui gets it, can it be done properly?
         self.deferred_loading_timer = QTimer(self)
-        self.info_timer.setInterval(0)
-        self.info_timer.timeout.connect(self.is_loading_changed)
+        self.deferred_loading_timer.setInterval(0)
+        self.deferred_loading_timer.setSingleShot(False)
+        self.deferred_loading_timer.timeout.connect(self.is_loading_changed)
 
         self.curlayer = None
         self._curlayer = None
@@ -380,6 +382,7 @@ class zynthian_gui(QObject):
 
         # Create Lock object to avoid concurrence problems
         self.lock = Lock()
+        self.osc_server = None
 
         # Load keyboard binding map
         zynthian_gui_keybinding.getInstance(self).load()
@@ -1792,17 +1795,22 @@ class zynthian_gui(QObject):
         # FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
         self.deferred_loading_timer.start()
         QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
+        self.is_loading_changed.emit()
         # logging.debug("START LOADING %d" % self.loading)
 
     def stop_loading(self):
         self.loading = self.loading - 1
         if self.loading < 0:
             self.loading = 0
-        self.is_loading_changed.emit()
+
+        if self.loading == 0:
+            self.deferred_loading_timer.stop()
+            self.is_loading_changed.emit()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
         self.is_loading_changed.emit()
+        self.deferred_loading_timer.stop()
         self.loading = 0
 
     def get_is_loading(self):

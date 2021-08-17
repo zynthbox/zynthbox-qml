@@ -56,7 +56,7 @@ GridLayout {
 
     SidebarDial {
         id: startDial
-        text: qsTr("Start Position (msecs)")
+        text: qsTr("Start (msecs)")
         controlObj: root.bottomBar.controlObj
         controlProperty: "startPosition"
         valueString: Math.round(dial.value * 1000)

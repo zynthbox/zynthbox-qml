@@ -47,7 +47,7 @@ Zynthian.Card {
     property QtObject controlObj: null
 
     transform: Translate {
-        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 4 : 0
+        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 2 : 0
     }
 
     contentItem: ColumnLayout {
@@ -110,6 +110,7 @@ Zynthian.Card {
             Layout.fillWidth: true
             Layout.fillHeight: true
             minimumTabsCount: 4
+            orientation: Qt.Vertical
             tabActions: [
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Main")
@@ -119,16 +120,19 @@ Zynthian.Card {
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Wave")
                     page: Qt.resolvedUrl("WaveBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("FX")
                     page: Qt.resolvedUrl("FXBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Info")
                     page: Qt.resolvedUrl("InfoBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip
                     initialProperties: {"bottomBar": root}
                 }
             ]

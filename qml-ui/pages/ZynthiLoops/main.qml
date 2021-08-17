@@ -52,6 +52,8 @@ Zynthian.ScreenPage {
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
+        bottomBar.controlType = BottomBar.ControlType.Song;
+        bottomBar.controlObj = root.song;
     }
 
     Component.onDestruction: {
@@ -222,7 +224,7 @@ Zynthian.ScreenPage {
         BottomBar {
             id: bottomBar
 
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 11
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 15
             Layout.fillWidth: true
             Layout.fillHeight: false
         }

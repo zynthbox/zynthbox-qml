@@ -37,6 +37,7 @@ Item {
     // FIXME: Use Kirigami.PAgePool when frameworks will be recent enough
     property list<Zynthian.TabbedControlViewAction> tabActions
     property int minimumTabsCount: 6
+    property int orientation: Qt.Horizontal
 
     property var cuiaCallback: function(cuia) {
         let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
@@ -204,14 +205,22 @@ Item {
 
     Component.onCompleted: internalStack.forceActiveFocus()
 
-    RowLayout {
+    GridLayout {
+        columns: root.orientation === Qt.Horizontal ? 2 : 1
         anchors.fill: parent
         FocusScope {
             id: primaryTabsScope
-            Layout.minimumWidth: Layout.maximumWidth
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
-            Layout.fillHeight: true
-            ColumnLayout {
+            opacity: tabsLayout.visibleChildren.length > 3 ? 1 : 0
+            Layout.minimumWidth: root.orientation === Qt.Horizontal ? Layout.maximumWidth : -1
+            Layout.maximumWidth: root.orientation === Qt.Horizontal ? Kirigami.Units.gridUnit * 6 : -1
+            Layout.minimumHeight: root.orientation === Qt.Horizontal ? -1 : Layout.maximumHeight
+            Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 1.6
+            Layout.fillHeight: root.orientation === Qt.Horizontal
+            Layout.fillWidth: root.orientation !== Qt.Horizontal
+            GridLayout {
+                id: tabsLayout
+                columns: root.orientation === Qt.Horizontal ? 1 : undefined
+                rows: root.orientation === Qt.Horizontal ? undefined : 1
                 anchors.fill: parent
 
                 Repeater {
@@ -219,6 +228,8 @@ Item {
                     delegate: QQC2.Button {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        implicitWidth: 1
+                        implicitHeight: 1
                         text: modelData.text
                         autoExclusive: true
                         enabled: modelData.enabled
@@ -239,6 +250,8 @@ Item {
                     delegate: QQC2.Button {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        implicitWidth: 1
+                        implicitHeight: 1
                         enabled: false
                     }
                 }

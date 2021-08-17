@@ -36,6 +36,7 @@ Item {
 
     // FIXME: Use Kirigami.PAgePool when frameworks will be recent enough
     property list<Zynthian.TabbedControlViewAction> tabActions
+    property int minimumTabsCount: 6
 
     property var cuiaCallback: function(cuia) {
         let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
@@ -225,7 +226,7 @@ Item {
                         checkable: true
                         checked: internalStack.activeAction === modelData
                         onClicked: {
-                            internalStack.replace(modelData.page);
+                            internalStack.replace(modelData.page, modelData.initialProperties);
                             internalStack.activeAction = modelData;
                             if (modelData.children.length > 0) {
                                 internalStack.activeSubAction = modelData.children[0]
@@ -234,7 +235,7 @@ Item {
                     }
                 }
                 Repeater {
-                    model: Math.max(0, 6 - root.tabActions.length)
+                    model: Math.max(0, root.minimumTabsCount - root.tabActions.length)
                     delegate: QQC2.Button {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -254,11 +255,13 @@ Item {
                 Layout.fillHeight: true
                 clip: true
 
-                initialItem: Qt.resolvedUrl(tabActions[0].page)
                 onActiveFocusChanged: {
                     if (activeFocus) {
                         nextItemInFocusChain(true).forceActiveFocus()
                     }
+                }
+                Component.onCompleted: {
+                    internalStack.push(Qt.resolvedUrl(tabActions[0].page), tabActions[0].initialProperties);
                 }
             }
             FocusScope {
@@ -281,7 +284,7 @@ Item {
                             checkable: true
                             checked: internalStack.activeSubAction === modelData
                             onClicked: {
-                                internalStack.replace(modelData.page);
+                                internalStack.replace(modelData.page, modelData.initialProperties);
                                 internalStack.activeSubAction = modelData;
                             }
                         }

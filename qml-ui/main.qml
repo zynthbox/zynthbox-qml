@@ -186,5 +186,19 @@ Kirigami.AbstractApplicationWindow {
         height: Math.min(parent.height / 2, Math.max(parent.height/3, Kirigami.Units.gridUnit * 15))
         source: "./VirtualKeyboard.qml"
     }
+
+    Connections {
+        target: zynthian
+        onMiniPlayGridToggle: miniPlayGridDrawer.visible = !miniPlayGridDrawer.visible
+    }
+    QQC2.Drawer {
+        id: miniPlayGridDrawer
+        width: root.width
+        height: Kirigami.Units.gridUnit * 10
+        edge: Qt.BottomEdge
+        modal: false
+
+        contentItem: MiniPlayGrid {}
+    }
 }
 

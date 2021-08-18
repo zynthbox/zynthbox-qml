@@ -322,6 +322,7 @@ class zynthian_gui(QObject):
         "106": "LAYER_SIX",
         "107": "INCREASE",
         "108": "DECREASE",
+        "109": "KEYBOARD",
     }
 
     def __init__(self, parent=None):
@@ -574,7 +575,12 @@ class zynthian_gui(QObject):
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
+
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
+        self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
+        self.screens["miniplaygrid"].__set_rows__(2)
+        self.screens["miniplaygrid"].__set_columns__(8)
+
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -1165,6 +1171,10 @@ class zynthian_gui(QObject):
             self.screens["layer"].activate_midichan_layer(4)
         elif cuia == "LAYER_SIX":
             self.screens["layer"].activate_midichan_layer(5)
+
+        elif cuia == "KEYBOARD":
+            logging.error("KEYBOARD")
+            self.miniPlayGridToggle.emit()
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2262,6 +2272,10 @@ class zynthian_gui(QObject):
         return self.screens["playgrid"]
 
     @Property(QObject, constant=True)
+    def miniplaygrid(self):
+        return self.screens["miniplaygrid"]
+
+    @Property(QObject, constant=True)
     def zynthiloops(self):
         return self.screens["zynthiloops"]
 
@@ -2287,6 +2301,7 @@ class zynthian_gui(QObject):
     is_loading_changed = Signal()
     status_info_changed = Signal()
     current_qml_page_changed = Signal()
+    miniPlayGridToggle = Signal()
 
     current_screen_id = Property(
         str,

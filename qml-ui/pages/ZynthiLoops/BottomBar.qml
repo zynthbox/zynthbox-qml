@@ -61,7 +61,21 @@ Zynthian.Card {
                 RowLayout {
                     Kirigami.Heading {
                         id: heading
-                        text: root.controlObj ? root.controlObj.name : ""
+                        text: {
+                            let text = root.controlObj ? root.controlObj.name : "";
+                            switch (root.controlType) {
+                            case BottomBar.ControlType.Song:
+                                return qsTr("SONG: %1").arg(text);
+                            case BottomBar.ControlType.Clip:
+                                return qsTr("CLIP: %1").arg(text);
+                            case BottomBar.ControlType.Track:
+                                return qsTr("TRACK: %1").arg(text);
+                            case BottomBar.ControlType.Part:
+                                return qsTr("PART: %1").arg(text);
+                            default:
+                                return text;
+                            }
+                        }
                         //Layout.fillWidth: true
                         wrapMode: Text.NoWrap
                     }
@@ -70,7 +84,7 @@ Zynthian.Card {
                         visible: controlObj && controlObj.nameEditable
                         onClicked: {
                             titleStack.currentIndex = 1;
-                            objNameEdit.text = heading.text;
+                            objNameEdit.text = root.controlObj ? root.controlObj.name : "";
                             objNameEdit.forceActiveFocus();
                         }
                         Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)

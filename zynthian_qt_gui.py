@@ -588,6 +588,7 @@ class zynthian_gui(QObject):
         # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["norns_shield"] = zynthian_gui_selector(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -2263,6 +2264,9 @@ class zynthian_gui(QObject):
     def get_theme_downloader(self):
         return self.screens["theme_downloader"]
 
+    def get_norns_shield(self):
+        return self.screens["norns_shield"]
+
     @Property(QObject, constant=True)
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
@@ -2355,6 +2359,7 @@ class zynthian_gui(QObject):
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)
+    norns_shield = Property(QObject, get_norns_shield, constant=True)
 
 
 # ------------------------------------------------------------------------------

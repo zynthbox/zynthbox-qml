@@ -51,6 +51,7 @@ class zynthiloops_song(QObject):
         self.__bpm__ = 120
         self.__index__ = 0
         self.__is_playing__ = False
+        self.__name__ = f"Song {self.__index__+1}"
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -75,11 +76,20 @@ class zynthiloops_song(QObject):
 
     @Property(bool, constant=True)
     def nameEditable(self):
-        return False
+        return True
 
-    @Property(str, constant=True)
+    @Signal
+    def __name_changed__(self):
+        pass
+
+    @Property(str, notify=__name_changed__)
     def name(self):
-        return f"Song {self.__index__+1}"
+        return self.__name__
+
+    @name.setter
+    def set_name(self, name):
+        self.__name__ = name
+        self.__name_changed__.emit()
 
     @Signal
     def bpm_changed(self):

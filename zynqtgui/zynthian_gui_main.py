@@ -54,17 +54,18 @@ class zynthian_gui_main(zynthian_gui_selector):
             # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
         # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
         self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
+        self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
         self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
         self.list_data.append((self.playgrid, 0, "Play Grid"))
         self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
         if "autoeq" in zynthian_gui_config.experimental_features:
             self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
 
-        # # Snapshot Management
-        self.list_data.append((None, 0, ""))
-        self.list_data.append((self.load_snapshot, 0, "Load Snapshot"))
-        if len(self.zyngui.screens["layer"].layers) > 0:
-            self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
+        # Snapshot Management
+        # self.list_data.append((None, 0, ""))
+        self.list_data.append((self.snapshots_menu, 0, "Snapshots"))
+        # if len(self.zyngui.screens["layer"].layers) > 0:
+            # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
         # self.list_data.append((None, 0, ""))
@@ -91,6 +92,10 @@ class zynthian_gui_main(zynthian_gui_selector):
     def save_snapshot(self):
         logging.info("Save Snapshot")
         self.zyngui.save_snapshot()
+
+    def snapshots_menu(self):
+        logging.info("Snapshots")
+        self.zyngui.show_screen("snapshots_menu")
 
     def clean_all(self):
         self.zyngui.show_confirm(

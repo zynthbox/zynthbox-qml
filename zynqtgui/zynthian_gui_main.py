@@ -49,26 +49,26 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         # Main Apps
         self.list_data.append((self.track, 0, "Track"))
-        self.list_metadata.append({"icon":"../../img/track.svg","type":"modal","screenId":"track"})
+        self.list_metadata.append({"icon":"../../img/track.svg"})
 
         self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
-        self.list_metadata.append({"icon":"../../img/zynthiloops.svg","type":"modal","screenId":"zynthiloops"})
+        self.list_metadata.append({"icon":"../../img/zynthiloops.svg"})
         
         self.list_data.append((self.playgrid, 0, "Play Grid"))
-        self.list_metadata.append({"icon":"../../img/playgrid.svg","type":"modal","screenId":"playgrid"})
+        self.list_metadata.append({"icon":"../../img/playgrid.svg"})
         
         self.list_data.append((self.layers, 0, "Layers"))
-        self.list_metadata.append({"icon":"../../img/layers.svg","type":"screen","screenId":"layer"})
+        self.list_metadata.append({"icon":"../../img/layers.svg"})
         
         #if "zynseq" in zynthian_gui_config.experimental_features:
             # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
         # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
 
         self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
-        self.list_metadata.append({"icon":"../../img/rec-audio.svg","type":"modal","screenId":"audio_recorder"})
+        self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
 
         self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
-        self.list_metadata.append({"icon":"../../img/rec.svg","type":"modal","screenId":"midi_recorder"})
+        self.list_metadata.append({"icon":"../../img/rec.svg"})
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
@@ -77,18 +77,18 @@ class zynthian_gui_main(zynthian_gui_selector):
         # self.list_data.append((None, 0, ""))
 
         self.list_data.append((self.snapshots_menu, 0, "Snapshots"))
-        self.list_metadata.append({"icon":"../../img/snapshots.svg","type":"modal","screenId":"snapshots_menu"})
+        self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
         # if len(self.zyngui.screens["layer"].layers) > 0:
             # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
         self.list_data.append((self.start_norns, 0, "Norns"))
-        self.list_metadata.append({"icon":"../../img/norns-qml-shield.svg","type":"norns","screenId":"norns"})
+        self.list_metadata.append({"icon":"../../img/norns-qml-shield.svg"})
 
         # self.list_data.append((None, 0, ""))
         self.list_data.append((self.admin, 0, "Settings"))
-        self.list_metadata.append({"icon":"../../img/settings.svg","type":"modal","screenId":"admin"})
+        self.list_metadata.append({"icon":"../../img/settings.svg"})
 
         super().fill_list()
 

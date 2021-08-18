@@ -54,16 +54,7 @@ Zynthian.ScreenPage {
                 rectWidth: mainviewGridId.iconWidth
                 rectHeight:  mainviewGridId.iconHeight
                 imgSrc: model.icon
-                onClicked: {
-                    for (var i in model){
-                        print(i+": "+model[i])
-                        // if (i === "model"){
-                            // for (var i in m){
-                            //     print(i+": "+m[i])
-                            // }
-                        // }
-                    }
-                }
+                onClicked: zynthian.main.activate_index(model.index)
                 text: model.display
             }
         }
@@ -90,34 +81,10 @@ Zynthian.ScreenPage {
 
     //     HomeScreenIcon {
     //         rectWidth: parent.iconWidth
-    //         rectHeight:  parent.iconHeight
-    //         imgSrc: Qt.resolvedUrl("../../img/track.svg")
-    //         onClicked:  zynthian.current_modal_screen_id = "track"
-    //         text: "Tracks"
-    //     }
-
-    //     HomeScreenIcon {
-    //         rectWidth: parent.iconWidth
-    //         rectHeight:  parent.iconHeight          
-    //         imgSrc: Qt.resolvedUrl("../../img/zynthiloops.svg")
-    //         onClicked:  zynthian.current_modal_screen_id = "zynthiloops"
-    //         text: "Zynthiloops"
-    //     }
-
-    //     HomeScreenIcon {
-    //         rectWidth: parent.iconWidth
     //         rectHeight:  parent.iconHeight         
     //         imgSrc: Qt.resolvedUrl("../../img/playgrid.svg")
     //         onClicked:  zynthian.current_modal_screen_id = "playgrid"
     //         text: "Playgrid"
-    //     }
-
-    //     HomeScreenIcon {
-    //         rectWidth: parent.iconWidth
-    //         rectHeight:  parent.iconHeight          
-    //         imgSrc: Qt.resolvedUrl("../../img/layers.svg")
-    //         onClicked: zynthian.current_screen_id = "layer"
-    //         text: "Layers"
     //     }
 
     //     HomeScreenIcon {

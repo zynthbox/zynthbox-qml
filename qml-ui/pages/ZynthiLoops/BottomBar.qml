@@ -51,7 +51,6 @@ Zynthian.Card {
     }
 
     contentItem: ColumnLayout {
-
         RowLayout {
             Layout.fillWidth: true
             Layout.maximumHeight: Kirigami.Units.gridUnit * 2
@@ -104,49 +103,131 @@ Zynthian.Card {
                 Layout.fillWidth: true
             }
 
-            QQC2.Label {
-                visible: root.controlType === Sidebar.ControlType.Clip
-                text: {
-                    if (!controlObj || !controlObj.path) {
-                        return "";
-                    }
-                    var arr = controlObj.path.split('/')
-                    return arr[arr.length - 1]
+            SidebarButton {
+                icon.name: "document-open"
+                visible: root.controlType === BottomBar.ControlType.Clip
+
+                onClicked: {
+                    pickerDialog.open()
                 }
             }
-            QQC2.Label {
-                visible: root.controlType === Sidebar.ControlType.Clip && controlObj.path.length > 0
-                text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+
+            SidebarButton {
+                icon.name: "delete"
+                visible: (controlObj != null) && controlObj.deletable
+
+                onClicked: {
+                }
+            }
+
+            SidebarButton {
+                icon.name: "edit-clear-all"
+                visible: (controlObj != null) && controlObj.clearable
+
+                onClicked: controlObj.clear()
+            }
+
+            SidebarButton {
+                icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                visible: (controlObj != null) && controlObj.playable
+
+                onClicked: {
+                    if (controlObj.isPlaying) {
+                        console.log("Stopping Sound Loop")
+                        controlObj.stop();
+                    } else {
+                        console.log("Playing Sound Loop")
+                        controlObj.play();
+                    }
+                }
+            }
+
+            SidebarButton {
+                icon.name: "media-record-symbolic"
+                visible: (controlObj != null) && controlObj.recordable
+
+                onClicked: {
+                }
             }
         }
 
         Zynthian.TabbedControlView {
+            id: tabbedView
             Layout.fillWidth: true
             Layout.fillHeight: true
             minimumTabsCount: 4
             orientation: Qt.Vertical
+
+            initialAction: {
+                switch (root.controlType) {
+                case BottomBar.ControlType.Song:
+                    return songAction;
+                case BottomBar.ControlType.Clip:
+                    return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : emptyPageAction;
+                case BottomBar.ControlType.Track:
+                    return trackAction;
+                case BottomBar.ControlType.Part:
+                    return partAction;
+                default:
+                    return waveAction;
+                }
+            }
+
+            onInitialActionChanged: initialAction.trigger()
+
             tabActions: [
+                Zynthian.TabbedControlViewAction { // Never visible
+                    id: emptyPageAction
+                    text: "Empty"
+                    page: Qt.resolvedUrl("EmptyBar.qml")
+                    visible: false
+                    initialProperties: {"bottomBar": root, "message": qsTr("No Audio Loaded")}
+                },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Wave")
-                    page: Qt.resolvedUrl("WaveBar.qml")
+                    id: songAction
+                    text: qsTr("Song")
+                    page: Qt.resolvedUrl("SongBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Song
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
+                    id: partAction
+                    text: qsTr("Part")
+                    page: Qt.resolvedUrl("PartBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Part
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: waveAction
+                    text: qsTr("Wave")
+                    page: Qt.resolvedUrl("WaveBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: editorAction
                     text: qsTr("Editor")
                     page: Qt.resolvedUrl("EditorBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Info")
+                    page: Qt.resolvedUrl("InfoBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: trackAction
+                    text: qsTr("Track")
+                    page: Qt.resolvedUrl("TrackBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("FX")
                     page: Qt.resolvedUrl("FXBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Info")
-                    page: Qt.resolvedUrl("InfoBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip
                     initialProperties: {"bottomBar": root}
                 }
             ]

@@ -35,14 +35,23 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: root
     rows: 1
     Layout.fillWidth: true
+
     property QtObject bottomBar: null
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "FX"
+    SidebarDial {
+        id: lengthDial
+        text: qsTr("Length (beats)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "length"
+
+        dial {
+            stepSize: 1
+            from: 1
+            to: 16
+        }
     }
 }
 

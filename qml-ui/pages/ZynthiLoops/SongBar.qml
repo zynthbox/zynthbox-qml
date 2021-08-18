@@ -35,14 +35,23 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: root
     rows: 1
     Layout.fillWidth: true
+
     property QtObject bottomBar: null
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "FX"
+    SidebarDial {
+        id: bpmDial
+        text: qsTr("BPM")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "bpm"
+
+        dial {
+            stepSize: 1
+            from: 50
+            to: 200
+        }
     }
 }
 

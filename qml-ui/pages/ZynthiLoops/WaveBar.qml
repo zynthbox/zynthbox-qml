@@ -42,19 +42,6 @@ GridLayout {
     property QtObject bottomBar: null
 
     SidebarDial {
-        id: bpmDial
-        text: qsTr("BPM")
-        controlObj: root.bottomBar.controlObj
-        controlProperty: "bpm"
-
-        dial {
-            stepSize: 1
-            from: 50
-            to: 200
-        }
-    }
-
-    SidebarDial {
         id: startDial
         text: qsTr("Start (msecs)")
         controlObj: root.bottomBar.controlObj
@@ -111,55 +98,22 @@ GridLayout {
         Layout.fillWidth: true
     }
 
-    GridLayout {
-        columns: 2
-        Layout.alignment: Qt.AlignBottom
-        //Layout.maximumHeight: Kirigami.Units.iconSizes.large
-
-        SidebarButton {
-            icon.name: "document-open"
+    ColumnLayout {
+        Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+        }
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
-
-            onClicked: {
-                pickerDialog.open()
-            }
-        }
-
-        SidebarButton {
-            icon.name: "delete"
-            visible: (controlObj != null) && controlObj.deletable
-
-            onClicked: {
-            }
-        }
-
-        SidebarButton {
-            icon.name: "edit-clear-all"
-            visible: (controlObj != null) && controlObj.clearable
-
-            onClicked: controlObj.clear()
-        }
-
-        SidebarButton {
-            icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-            visible: (controlObj != null) && controlObj.playable
-
-            onClicked: {
-                if (controlObj.isPlaying) {
-                    console.log("Stopping Sound Loop")
-                    controlObj.stop();
-                } else {
-                    console.log("Playing Sound Loop")
-                    controlObj.play();
+            text: {
+                if (!controlObj || !controlObj.path) {
+                    return qsTr("No File Loaded");
                 }
-            }
-        }
-
-        SidebarButton {
-            icon.name: "media-record"
-            visible: (controlObj != null) && controlObj.recordable
-
-            onClicked: {
+                var arr = controlObj.path.split('/');
+                return qsTr("File: %1").arg(arr[arr.length - 1]);
             }
         }
     }

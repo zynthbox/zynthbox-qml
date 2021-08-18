@@ -38,10 +38,11 @@ GridLayout {
     id: waveBar
     rows: 1
     Layout.fillWidth: true
+    property QtObject bottomBar: null
 
     QQC2.Label {
         Layout.alignment: Qt.alignCenter
-        text: "Wave"
+        text: "Editor"
     }
 }
 

@@ -35,13 +35,133 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: root
     rows: 1
     Layout.fillWidth: true
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "Wave"
+    property QtObject bottomBar: null
+
+    SidebarDial {
+        id: bpmDial
+        text: qsTr("BPM")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "bpm"
+
+        dial {
+            stepSize: 1
+            from: 50
+            to: 200
+        }
+    }
+
+    SidebarDial {
+        id: startDial
+        text: qsTr("Start (msecs)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "startPosition"
+        valueString: Math.round(dial.value * 1000)
+
+        dial {
+            stepSize: 0.001
+            from: 0
+            to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
+        }
+    }
+
+    SidebarDial {
+        id: lengthDial
+        text: qsTr("Length (beats)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "length"
+
+        dial {
+            stepSize: 1
+            from: 1
+            to: 16
+        }
+    }
+
+    SidebarDial {
+        id: pitchDial
+        text: qsTr("Pitch")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "pitch"
+
+        dial {
+            stepSize: 1
+            from: -12
+            to: 12
+        }
+    }
+
+    SidebarDial {
+        id: timeDial
+        text: qsTr("Time")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "time"
+
+        dial {
+            stepSize: 1
+            from: 0
+            to: 200
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+    }
+
+    GridLayout {
+        columns: 2
+        Layout.alignment: Qt.AlignBottom
+        //Layout.maximumHeight: Kirigami.Units.iconSizes.large
+
+        SidebarButton {
+            icon.name: "document-open"
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
+
+            onClicked: {
+                pickerDialog.open()
+            }
+        }
+
+        SidebarButton {
+            icon.name: "delete"
+            visible: (controlObj != null) && controlObj.deletable
+
+            onClicked: {
+            }
+        }
+
+        SidebarButton {
+            icon.name: "edit-clear-all"
+            visible: (controlObj != null) && controlObj.clearable
+
+            onClicked: controlObj.clear()
+        }
+
+        SidebarButton {
+            icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+            visible: (controlObj != null) && controlObj.playable
+
+            onClicked: {
+                if (controlObj.isPlaying) {
+                    console.log("Stopping Sound Loop")
+                    controlObj.stop();
+                } else {
+                    console.log("Playing Sound Loop")
+                    controlObj.play();
+                }
+            }
+        }
+
+        SidebarButton {
+            icon.name: "media-record"
+            visible: (controlObj != null) && controlObj.recordable
+
+            onClicked: {
+            }
+        }
     }
 }
 

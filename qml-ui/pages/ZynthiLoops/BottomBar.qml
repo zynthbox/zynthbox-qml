@@ -127,13 +127,13 @@ Zynthian.Card {
             orientation: Qt.Vertical
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Main")
-                    page: Qt.resolvedUrl("MainBar.qml")
+                    text: qsTr("Wave")
+                    page: Qt.resolvedUrl("WaveBar.qml")
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Wave")
-                    page: Qt.resolvedUrl("WaveBar.qml")
+                    text: qsTr("Editor")
+                    page: Qt.resolvedUrl("EditorBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip
                     initialProperties: {"bottomBar": root}
                 },

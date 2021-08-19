@@ -34,6 +34,7 @@ def init():
 
     try:
         libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
+        libzl.startLoop.argtypes = [ctypes.c_char_p]
     except Exception as e:
         libzl = None
         print(f"Can't initialise libzl library: {str(e)}")
@@ -54,6 +55,21 @@ def stopTimer():
         libzl.stopTimer()
 
 
+def startLoop(filepath: bytes):
+    if libzl:
+        libzl.startLoop(filepath)
+
+
+def init_juce():
+    if libzl:
+        libzl.initJuce()
+
+
+def shutdown_juce():
+    if libzl:
+        libzl.shutdownJuce()
+
+
 class ClipAudioSource(object):
     def __init__(self, filepath: bytes):
         if libzl:
@@ -66,12 +82,16 @@ class ClipAudioSource(object):
             libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
             libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
             libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
+            libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
             self.obj = libzl.ClipAudioSource_new(filepath)
+            self.filepath = filepath
 
     def play(self):
         if libzl:
-            libzl.ClipAudioSource_play(self.obj)
+            # libzl.ClipAudioSource_play(self.obj)
+            startLoop(self.filepath)
 
     def stop(self):
         if libzl:
@@ -92,3 +112,11 @@ class ClipAudioSource(object):
     def set_length(self, length_in_seconds: float):
         if libzl:
             libzl.ClipAudioSource_setLength(self.obj, length_in_seconds)
+
+    def set_pitch(self, pitch_change: float):
+        if libzl:
+            libzl.ClipAudioSource_setPitch(self.obj, pitch_change)
+
+    def set_speed_ratio(self, speed_ratio: float):
+        if libzl:
+            libzl.ClipAudioSource_setSpeedRatio(self.obj, speed_ratio)

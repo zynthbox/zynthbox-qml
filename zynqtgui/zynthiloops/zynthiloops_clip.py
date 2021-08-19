@@ -180,11 +180,14 @@ class zynthiloops_clip(QObject):
         return self.__time__
 
     @time.setter
-    def set_time(self, time: int):
+    def set_time(self, time: float):
         self.__time__ = time
         self.time_changed.emit()
 
+        if self.audioSource is None:
+            return
 
+        self.audioSource.set_speed_ratio(time)
 
     @Property(str, notify=path_changed)
     def path(self):
@@ -217,6 +220,7 @@ class zynthiloops_clip(QObject):
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
         self.audioSource.play()
+        # libzl.startLoop()
 
     @Slot(None)
     def stop(self, loop=True):

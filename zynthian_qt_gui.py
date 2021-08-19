@@ -2464,6 +2464,7 @@ def delete_window():
 
 if __name__ == "__main__":
     libzl.init()
+    libzl.init_juce()
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
@@ -2514,7 +2515,10 @@ if __name__ == "__main__":
     zynthian_gui_config.top = app.topLevelWindows()[0]
     zynthian_gui_config.app = app
 
-    sys.exit(app.exec_())
+    ret_code = app.exec_()
+    libzl.shutdown_juce()
+
+    sys.exit(ret_code)
 
 
 # ------------------------------------------------------------------------------

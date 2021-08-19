@@ -54,6 +54,13 @@ QQC2.Control {
         width: component.width
         height: component.height
         color: component.palette.base
+        Image {
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            clip: true
+            source: Qt.resolvedUrl("../../img/brushed-steel.png")
+            asynchronous: true
+        }
     }
     contentItem: Norns.Shield {
         anchors.fill: parent

@@ -32,17 +32,19 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     screenId: "norns_shield"
-    Loader {
-        id: shieldLoader
-        anchors.fill: parent
-        source: "NornsPageProxy.qml"
-    }
-    QQC2.Label {
-        anchors.fill: parent
-        visible: shieldLoader.status == Loader.Error
-        text: "Error occurred during loading of the Norns component."
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
+    contentItem: Item {
+        Loader {
+            id: shieldLoader
+            anchors.fill: parent
+            source: "NornsPageProxy.qml"
+        }
+        QQC2.Label {
+            anchors.fill: parent
+            visible: shieldLoader.status == Loader.Error
+            text: "Error occurred during loading of the Norns component."
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+        }
     }
 }

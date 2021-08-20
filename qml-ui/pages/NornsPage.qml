@@ -32,6 +32,19 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     screenId: "norns_shield"
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Control Norns")
+            Kirigami.Action {
+                text: qsTr("Start Norns")
+                enabled: shieldLoader.item && !shieldLoader.item.fatesRunning
+            }
+            Kirigami.Action {
+                text: qsTr("Stop Norns")
+                enabled: shieldLoader.item && shieldLoader.item.fatesRunning
+            }
+        }
+    ]
     contentItem: Item {
         Loader {
             id: shieldLoader

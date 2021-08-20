@@ -29,6 +29,13 @@ import org.zynthbox.norns.qmlshield 1.0 as Norns
 
 QQC2.Control {
     id: component
+    property alias fatesRunning: shield.fatesRunning
+    function startNorns() {
+        shield.startNorns();
+    }
+    function endNorns() {
+        shield.endNorns();
+    }
     palette {
         alternateBase: "#091010"
         base: "silver"
@@ -63,6 +70,7 @@ QQC2.Control {
         }
     }
     contentItem: Norns.Shield {
+        id: shield
         anchors.fill: parent
         palette: component.palette
     }

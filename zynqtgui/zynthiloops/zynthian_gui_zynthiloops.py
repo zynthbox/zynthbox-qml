@@ -29,6 +29,7 @@ import math
 from PySide2.QtCore import Property, QObject, Signal
 
 from . import libzl
+from .zynthiloops_clip import zynthiloops_clip
 from .zynthiloops_song import zynthiloops_song
 from .. import zynthian_qt_gui_base
 
@@ -36,7 +37,6 @@ from .. import zynthian_qt_gui_base
 @ctypes.CFUNCTYPE(None)
 def cb():
     zynthian_gui_zynthiloops.__instance__.metronome_update()
-
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
@@ -49,11 +49,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__metronome_running_refcount = 0
         self.__song__ = zynthiloops_song(self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
+        self.__clips_queue__: list[zynthiloops_clip] = []
         libzl.registerTimerCallback(cb)
 
     def show(self):
         pass
-
 
     @Signal
     def current_beat_changed(self):
@@ -71,16 +71,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
-    def start_metronome_request(self):
+    def start_metronome_request(self, clip: zynthiloops_clip):
         self.__metronome_running_refcount += 1
+
+        self.__clips_queue__.append(clip)
 
         if self.__metronome_running_refcount == 1:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
             self.metronome_running_changed.emit()
 
-
-    def stop_metronome_request(self):
+    def stop_metronome_request(self, clip: zynthiloops_clip):
         self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)
+
+        try:
+            self.__clips_queue__.remove(clip)
+        except Exception as e:
+            logging.error(f"Error removing clip from playing queue : {str(e)}")
+
         if self.__metronome_running_refcount == 0:
             libzl.stopTimer()
             self.metronome_running_changed.emit()
@@ -91,10 +98,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def metronome_update(self):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
+
+        if self.__current_beat__ == 1:
+            for q_clip in self.__clips_queue__:
+                q_clip.playAudio(False)
+
+        if self.__current_beat__ == 4:
+            for q_clip in self.__clips_queue__:
+                q_clip.stopAudio()
+
         self.current_beat_changed.emit()
         if self.__song__.isPlaying:
             self.__song__.metronome_update()
-
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

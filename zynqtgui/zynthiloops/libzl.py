@@ -34,6 +34,25 @@ def init():
 
     try:
         libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
+
+        libzl.startTimer.argtypes = [ctypes.c_int]
+
+        libzl.ClipAudioSource_new.restype = ctypes.c_void_p
+        libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
+
+        libzl.ClipAudioSource_getDuration.argtypes = ctypes.c_void_p
+        libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
+
+        libzl.ClipAudioSource_getFileName.argtypes = ctypes.c_void_p
+        libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
+
+        libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+        libzl.ClipAudioSource_play.argTypes = [ctypes.c_void_p]
+
         libzl.initJuce()
     except Exception as e:
         libzl = None
@@ -58,20 +77,6 @@ def stopTimer():
 class ClipAudioSource(object):
     def __init__(self, filepath: bytes):
         if libzl:
-            libzl.startTimer.argtypes = [ctypes.c_int]
-
-            libzl.ClipAudioSource_new.restype = ctypes.c_void_p
-            libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
-
-            libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
-            libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
-            libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
-            libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
-            libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
-            libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-            libzl.ClipAudioSource_play.argTypes = [ctypes.c_void_p]
-
             self.obj = libzl.ClipAudioSource_new(filepath)
 
     def play(self):

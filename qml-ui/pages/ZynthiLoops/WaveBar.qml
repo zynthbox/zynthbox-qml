@@ -88,9 +88,9 @@ GridLayout {
         controlProperty: "time"
 
         dial {
-            stepSize: 1
-            from: 0
-            to: 200
+            stepSize: 0.1
+            from: 0.5
+            to: 2
         }
     }
 

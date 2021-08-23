@@ -37,13 +37,13 @@ def init():
 
         libzl.startTimer.argtypes = [ctypes.c_int]
 
-        libzl.ClipAudioSource_new.restype = ctypes.c_void_p
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
+        libzl.ClipAudioSource_new.restype = ctypes.c_void_p
 
-        libzl.ClipAudioSource_getDuration.argtypes = ctypes.c_void_p
+        libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
 
-        libzl.ClipAudioSource_getFileName.argtypes = ctypes.c_void_p
+        libzl.ClipAudioSource_getFileName.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
 
         libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
@@ -79,9 +79,9 @@ class ClipAudioSource(object):
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
 
-    def play(self):
+    def play(self, should_loop=True):
         if libzl:
-            libzl.ClipAudioSource_play(self.obj)
+            libzl.ClipAudioSource_play(self.obj, should_loop)
 
     def stop(self):
         if libzl:

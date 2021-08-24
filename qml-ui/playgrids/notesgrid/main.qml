@@ -31,10 +31,11 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-Item {
-    id: root
-    property QtObject notesGrid: notesGrid
-    property QtObject notesGridSettings: notesGridSettings
+Zynthian.BasePlayGrid {
+    id: component
+    grid: notesGrid
+    settings: notesGridSettings
+    name:'Notes Grid'
 
     Component {
         id: notesGrid

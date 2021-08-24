@@ -31,10 +31,11 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-Item {
-    id: root
-    property QtObject chordsGrid: chordsGrid
-    property QtObject chordsGridSettings: chordsGridSettings
+Zynthian.BasePlayGrid {
+    id: component
+    grid: chordsGrid
+    settings: chordsGridSettings
+    name:'Chords Grid'
 
     Component {
         id: chordsGrid

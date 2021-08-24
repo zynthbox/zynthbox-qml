@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
+import JuceGraphics 1.0
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
@@ -40,9 +41,48 @@ GridLayout {
     Layout.fillWidth: true
     property QtObject bottomBar: null
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "Editor"
+    WaveFormItem {
+        id: wav
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        color: Kirigami.Theme.textColor
+        source: waveBar.bottomBar.controlObj.path
+        PinchArea {
+            anchors.fill: parent
+            property real scale: 1
+            onPinchUpdated: {
+                let actualScale = Math.min(1.2, Math.max(1, scale + pinch.scale - 1));
+                print(actualScale)
+                let ratio = pinch.center.x / width;
+                let newLength = wav.length / actualScale;
+                let remaining = wav.length - newLength;
+                wav.start = remaining/(1-ratio);
+                wav.end = newLength - remaining/(ratio);
+            }
+            onPinchFinished: {
+                scale = pinch.scale
+                print ("scale"+scale)
+            }
+            MouseArea {
+                anchors.fill: parent
+                property int lastX
+                onPressed: {
+                    lastX = mouse.x
+                }
+                onPositionChanged: {
+                    let pixelToSecs = (wav.end - wav.start) / width
+                    let delta = pixelToSecs * (mouse.x - lastX)
+                    if (wav.start - delta < 0) {
+                        delta = wav.start;
+                    } else if (wav.end - delta > wav.length) {
+                        delta = wav.length - wav.end;
+                    }
+                    wav.start -= delta;
+                    wav.end -= delta;
+                    lastX = mouse.x;
+                }
+            }
+        }
     }
 }
 

@@ -36,7 +36,7 @@ from PySide2.QtCore import (
     Property,
     Signal,
 )
-from PySide2.QtQml import qmlRegisterType
+from PySide2.QtQml import QQmlEngine,qmlRegisterType
 from . import zynthian_qt_gui_base
 
 
@@ -155,6 +155,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
     def __init__(self, parent: QObject = None) -> None:
         super(zynthian_gui_grid_notes_model, self).__init__(parent)
+        self.__grid_notes__ = []
 
     def roleNames(self) -> typing.Dict:
         roles = {self.NoteRole: b"note"}
@@ -199,6 +200,12 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def roles(self):
         return {b"note": zynthian_gui_grid_notes_model.NoteRole}
 
+    @Slot('QVariantList')
+    def addRow(self, notes):
+        self.beginResetModel()
+        self.__grid_notes__.append(notes)
+        self.endResetModel()
+
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __rows__: int = 5
@@ -215,6 +222,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
+        qmlRegisterType(Note, "Zynthian.PlayGrid", 1, 0, "Note")
+        qmlRegisterType(zynthian_gui_grid_notes_model, "Zynthian.PlayGrid", 1, 0, "Model")
 
         self.__chord_scales__ = [
             "ionian",
@@ -569,6 +578,29 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Signal
     def __positional_velocity_changed__(self):
         pass
+
+    @Slot(result=QObject)
+    def createNotesModel(self):
+        model = zynthian_gui_grid_notes_model(self)
+        QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
+        return model
+
+    @Slot(str, int, int, int, result=QObject)
+    def createNote(self,
+                   _name: str,
+                   _scale_index: int,
+                   _octave: int,
+                   _midi_note: int):
+        note = Note(
+            name=_name,
+            scale_index=_scale_index,
+            octave=_octave,
+            midi_note=_midi_note,
+            midi_port=self.__midi_port__,
+            parent=self
+        )
+        QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
+        return note
 
     rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
     columns = Property(

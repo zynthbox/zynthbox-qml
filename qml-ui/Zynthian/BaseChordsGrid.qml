@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Play Grid Page 
+Base Chords Grid Component
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 Copyright (C) 2021 Dan Leinir Turthra Jensen <admin@leinir.dk>

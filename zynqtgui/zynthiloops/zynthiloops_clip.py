@@ -221,6 +221,7 @@ class zynthiloops_clip(QObject):
         self.zyngui.screens['zynthiloops'].start_metronome_request(self)
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
+        self.audioSource.addClipToTimer()
 
 
     @Slot(None)
@@ -230,6 +231,7 @@ class zynthiloops_clip(QObject):
         self.zyngui.screens['zynthiloops'].stop_metronome_request(self)
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
+        self.audioSource.removeClipFromTimer()
 
     def playAudio(self, loop=True):
         self.audioSource.play(loop)

@@ -35,10 +35,15 @@ def init():
     try:
         libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
 
+        ### Type Definition
         libzl.startTimer.argtypes = [ctypes.c_int]
 
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
+
+        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+
+        libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
 
         libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
@@ -47,12 +52,15 @@ def init():
         libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
 
         libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
         libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
         libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
         libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        ### END Type Definition
 
-        libzl.ClipAudioSource_play.argTypes = [ctypes.c_void_p]
-
+        # Start juce event loop
         libzl.initJuce()
     except Exception as e:
         libzl = None

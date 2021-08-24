@@ -83,9 +83,10 @@ GridLayout {
 
     SidebarDial {
         id: timeDial
-        text: qsTr("Time")
+        text: qsTr("Speed Ratio")
         controlObj: root.bottomBar.controlObj
         controlProperty: "time"
+        valueString: dial.value.toFixed(2)
 
         dial {
             stepSize: 0.1

@@ -37,6 +37,12 @@ class zynthiloops_tracks_model(QAbstractListModel):
         self.__song__ = parent
         self.__tracks__: [zynthiloops_track] = []
 
+    def serialize(self):
+        data = []
+        for t in self.__tracks__:
+            data.append(t.serialize())
+        return data
+
     def data(self, index, role=None):
         logging.info(index.row(), self.__tracks__[index.row()])
 

@@ -32,10 +32,6 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    # __length__ = 1
-    # __row_index__ = 0
-    # __col_index__ = 0
-    # __is_playing__ = False
 
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
@@ -50,6 +46,15 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.audioSource: ClipAudioSource = None
+
+    def serialize(self):
+        return {"name": self.name,
+                "path": self.__path__,
+                "start": self.__start_position__,
+                "length": self.__length__,
+                "pitch": self.__pitch__,
+                "time": self.__time__}
+
 
     @Signal
     def length_changed(self):

@@ -51,6 +51,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         libzl.registerTimerCallback(cb)
+        libzl.registerGraphicTypes()
 
     def show(self):
         pass

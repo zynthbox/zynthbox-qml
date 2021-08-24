@@ -72,22 +72,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
-    def start_metronome_request(self, clip: zynthiloops_clip):
+    def start_metronome_request(self):
         self.__metronome_running_refcount += 1
-
-        # self.__clips_queue__.append(clip)
 
         if self.__metronome_running_refcount == 1:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
             self.metronome_running_changed.emit()
 
-    def stop_metronome_request(self, clip: zynthiloops_clip):
+    def stop_metronome_request(self):
         self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)
-
-        # try:
-        #     self.__clips_queue__.remove(clip)
-        # except Exception as e:
-        #     logging.error(f"Error removing clip from playing queue : {str(e)}")
 
         if self.__metronome_running_refcount == 0:
             libzl.stopTimer()
@@ -96,20 +89,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__current_beat__ = 0
             self.current_beat_changed.emit()
 
-
     def metronome_update(self):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
         self.current_beat_changed.emit()
-
-        logging.error(f"Python Current Beat : {self.__current_beat__}")
-
-        # if self.__current_beat__ == 3:
-        #     for q_clip in self.__clips_queue__:
-        #         q_clip.playAudio(False)
-
-        # if self.__current_beat__ == 4:
-        #     for q_clip in self.__clips_queue__:
-        #         q_clip.stopAudio()
 
         if self.__song__.isPlaying:
             self.__song__.metronome_update()

@@ -75,9 +75,11 @@ def registerTimerCallback(callback):
     if libzl:
         libzl.SyncTimer_registerTimerCallback(callback)
 
+
 def registerGraphicTypes():
     if libzl:
         libzl.registerGraphicTypes()
+
 
 def startTimer(interval: int):
     if libzl:

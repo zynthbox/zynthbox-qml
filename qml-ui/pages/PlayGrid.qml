@@ -98,16 +98,9 @@ Zynthian.ScreenPage {
 
     ListModel {
         id: playGrids
-
-        ListElement { 
-            url: '../playgrids/notesgrid/main.qml'
-            name: 'Notes Grid'
-        }
-
-        ListElement { 
-            url: '../playgrids/chordsgrid/main.qml'
-            name: 'Chords Grid'
-        }
+        ListElement { url: '../playgrids/notesgrid/main.qml'; name: 'Notes Grid'}
+        ListElement { url: '../playgrids/chordsgrid/main.qml'; name: 'Chords Grid'}
+        ListElement { url: '../playgrids/drumsgrid/main.qml'; name: 'Drums Grid'}
     }
 
     property var playGridsModel: [

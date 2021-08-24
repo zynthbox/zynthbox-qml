@@ -35,14 +35,19 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: root
     rows: 1
     Layout.fillWidth: true
+
     property QtObject bottomBar: null
+    property string message
 
     QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "FX"
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: root.message
     }
 }
 

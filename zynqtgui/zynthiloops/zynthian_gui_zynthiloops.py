@@ -29,6 +29,7 @@ import math
 from PySide2.QtCore import Property, QObject, Signal
 
 from . import libzl
+from .zynthiloops_clip import zynthiloops_clip
 from .zynthiloops_song import zynthiloops_song
 from .. import zynthian_qt_gui_base
 
@@ -36,7 +37,6 @@ from .. import zynthian_qt_gui_base
 @ctypes.CFUNCTYPE(None)
 def cb():
     zynthian_gui_zynthiloops.__instance__.metronome_update()
-
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
@@ -49,11 +49,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__metronome_running_refcount = 0
         self.__song__ = zynthiloops_song(self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
+        self.__clips_queue__: list[zynthiloops_clip] = []
         libzl.registerTimerCallback(cb)
+        libzl.registerGraphicTypes()
 
     def show(self):
         pass
-
 
     @Signal
     def current_beat_changed(self):
@@ -78,9 +79,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
             self.metronome_running_changed.emit()
 
-
     def stop_metronome_request(self):
         self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)
+
         if self.__metronome_running_refcount == 0:
             libzl.stopTimer()
             self.metronome_running_changed.emit()
@@ -88,13 +89,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__current_beat__ = 0
             self.current_beat_changed.emit()
 
-
     def metronome_update(self):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
         self.current_beat_changed.emit()
+
         if self.__song__.isPlaying:
             self.__song__.metronome_update()
-
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

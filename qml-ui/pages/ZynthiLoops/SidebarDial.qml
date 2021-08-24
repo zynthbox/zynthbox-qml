@@ -14,7 +14,7 @@ ColumnLayout {
     property string controlProperty
     onControlObjChanged: dial.value = controlObj[controlProperty]
 
-    visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
+    //visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
 
     Layout.fillHeight: true
     Layout.fillWidth: false

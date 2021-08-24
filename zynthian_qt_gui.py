@@ -322,6 +322,7 @@ class zynthian_gui(QObject):
         "106": "LAYER_SIX",
         "107": "INCREASE",
         "108": "DECREASE",
+        "109": "KEYBOARD",
     }
 
     def __init__(self, parent=None):
@@ -345,9 +346,11 @@ class zynthian_gui(QObject):
         self.current_modal_screen_id_changed.connect(self.info_timer.start)
         self.current_qml_page_prop = None
 
+        #FIXME HACK: this spams is_loading_changed on the proper thread until the ui gets it, can it be done properly?
         self.deferred_loading_timer = QTimer(self)
-        self.info_timer.setInterval(0)
-        self.info_timer.timeout.connect(self.is_loading_changed)
+        self.deferred_loading_timer.setInterval(0)
+        self.deferred_loading_timer.setSingleShot(False)
+        self.deferred_loading_timer.timeout.connect(self.is_loading_changed)
 
         self.curlayer = None
         self._curlayer = None
@@ -380,6 +383,7 @@ class zynthian_gui(QObject):
 
         # Create Lock object to avoid concurrence problems
         self.lock = Lock()
+        self.osc_server = None
 
         # Load keyboard binding map
         zynthian_gui_keybinding.getInstance(self).load()
@@ -571,7 +575,12 @@ class zynthian_gui(QObject):
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
+
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
+        self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
+        self.screens["miniplaygrid"].__set_rows__(2)
+        self.screens["miniplaygrid"].__set_columns__(8)
+
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -579,6 +588,7 @@ class zynthian_gui(QObject):
         # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["norns_shield"] = zynthian_gui_selector(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -1162,6 +1172,10 @@ class zynthian_gui(QObject):
             self.screens["layer"].activate_midichan_layer(4)
         elif cuia == "LAYER_SIX":
             self.screens["layer"].activate_midichan_layer(5)
+
+        elif cuia == "KEYBOARD":
+            logging.error("KEYBOARD")
+            self.miniPlayGridToggle.emit()
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -1792,17 +1806,22 @@ class zynthian_gui(QObject):
         # FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
         self.deferred_loading_timer.start()
         QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
+        self.is_loading_changed.emit()
         # logging.debug("START LOADING %d" % self.loading)
 
     def stop_loading(self):
         self.loading = self.loading - 1
         if self.loading < 0:
             self.loading = 0
-        self.is_loading_changed.emit()
+
+        if self.loading == 0:
+            self.deferred_loading_timer.stop()
+            self.is_loading_changed.emit()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
         self.is_loading_changed.emit()
+        self.deferred_loading_timer.stop()
         self.loading = 0
 
     def get_is_loading(self):
@@ -2245,6 +2264,9 @@ class zynthian_gui(QObject):
     def get_theme_downloader(self):
         return self.screens["theme_downloader"]
 
+    def get_norns_shield(self):
+        return self.screens["norns_shield"]
+
     @Property(QObject, constant=True)
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
@@ -2252,6 +2274,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def playgrid(self):
         return self.screens["playgrid"]
+
+    @Property(QObject, constant=True)
+    def miniplaygrid(self):
+        return self.screens["miniplaygrid"]
 
     @Property(QObject, constant=True)
     def zynthiloops(self):
@@ -2279,6 +2305,7 @@ class zynthian_gui(QObject):
     is_loading_changed = Signal()
     status_info_changed = Signal()
     current_qml_page_changed = Signal()
+    miniPlayGridToggle = Signal()
 
     current_screen_id = Property(
         str,
@@ -2332,6 +2359,7 @@ class zynthian_gui(QObject):
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)
+    norns_shield = Property(QObject, get_norns_shield, constant=True)
 
 
 # ------------------------------------------------------------------------------

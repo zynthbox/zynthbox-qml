@@ -35,13 +35,88 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: root
     rows: 1
     Layout.fillWidth: true
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "Wave"
+    property QtObject bottomBar: null
+
+    SidebarDial {
+        id: startDial
+        text: qsTr("Start (msecs)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "startPosition"
+        valueString: Math.round(dial.value * 1000)
+
+        dial {
+            stepSize: 0.001
+            from: 0
+            to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
+        }
+    }
+
+    SidebarDial {
+        id: lengthDial
+        text: qsTr("Length (beats)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "length"
+
+        dial {
+            stepSize: 1
+            from: 1
+            to: 16
+        }
+    }
+
+    SidebarDial {
+        id: pitchDial
+        text: qsTr("Pitch")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "pitch"
+
+        dial {
+            stepSize: 1
+            from: -12
+            to: 12
+        }
+    }
+
+    SidebarDial {
+        id: timeDial
+        text: qsTr("Speed Ratio")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "time"
+        valueString: dial.value.toFixed(2)
+
+        dial {
+            stepSize: 0.1
+            from: 0.5
+            to: 2
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+    }
+
+    ColumnLayout {
+        Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+        }
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
+            text: {
+                if (!controlObj || !controlObj.path) {
+                    return qsTr("No File Loaded");
+                }
+                var arr = controlObj.path.split('/');
+                return qsTr("File: %1").arg(arr[arr.length - 1]);
+            }
+        }
     }
 }
 

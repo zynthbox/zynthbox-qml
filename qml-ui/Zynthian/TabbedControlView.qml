@@ -38,6 +38,8 @@ Item {
     property list<Zynthian.TabbedControlViewAction> tabActions
     property int minimumTabsCount: 6
     property int orientation: Qt.Horizontal
+    property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
+    readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
 
     property var cuiaCallback: function(cuia) {
         let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
@@ -70,7 +72,7 @@ Item {
                 var button = nextFocusItemInScope(secondaryTabsScope, false);
                 if (button) {
                     button.forceActiveFocus();
-                    button.clicked();
+                    button.tabAction.trigger();
                 }
             }
 
@@ -80,7 +82,7 @@ Item {
                 var button = nextFocusItemInScope(primaryTabsScope, false);
                 if (button) {
                     button.forceActiveFocus();
-                    button.clicked();
+                    button.tabAction.trigger();
                 }
             } else if (focusedScope === internalStack) {
                 var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
@@ -105,7 +107,7 @@ Item {
                 var button = nextFocusItemInScope(primaryTabsScope, true);
                 if (button) {
                     button.forceActiveFocus();
-                    button.clicked();
+                    button.tabAction.trigger();
                 }
             } else if (focusedScope === internalStack) {
                 var layoutInfo = gridLayoutInfoFor(Window.activeFocusItem);
@@ -137,7 +139,7 @@ Item {
                 var button = nextFocusItemInScope(secondaryTabsScope, true);
                 if (button) {
                     button.forceActiveFocus();
-                    button.clicked();
+                    button.tabAction.trigger();
                 }
             }
             return true;
@@ -226,6 +228,7 @@ Item {
                 Repeater {
                     model: root.tabActions
                     delegate: QQC2.Button {
+                        readonly property Zynthian.TabbedControlViewAction tabAction: modelData
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         implicitWidth: 1
@@ -236,11 +239,22 @@ Item {
                         visible: modelData.visible
                         checkable: true
                         checked: internalStack.activeAction === modelData
-                        onClicked: {
-                            internalStack.replace(modelData.page, modelData.initialProperties);
-                            internalStack.activeAction = modelData;
-                            if (modelData.children.length > 0) {
-                                internalStack.activeSubAction = modelData.children[0]
+                        onCheckedChanged: {
+                            if (checked) {
+                                modelData.trigger();
+                            }
+                        }
+                        Connections {
+                            target: modelData
+                            onTriggered: {
+                                if (internalStack.activeAction === modelData) {
+                                    return;
+                                }
+                                internalStack.replace(modelData.page, modelData.initialProperties);
+                                internalStack.activeAction = modelData;
+                                if (modelData.children.length > 0) {
+                                    internalStack.activeSubAction = modelData.children[0]
+                                }
                             }
                         }
                     }
@@ -262,8 +276,8 @@ Item {
             Layout.fillHeight: true
             Zynthian.Stack {
                 id: internalStack
-                property Zynthian.TabbedControlViewAction activeAction: tabActions[0]
-                property Zynthian.TabbedControlViewAction activeSubAction: tabActions[0].children[0]
+                property Zynthian.TabbedControlViewAction activeAction: root.initialAction
+                property Zynthian.TabbedControlViewAction activeSubAction: root.initialAction.children[0]
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
@@ -274,7 +288,7 @@ Item {
                     }
                 }
                 Component.onCompleted: {
-                    internalStack.push(Qt.resolvedUrl(tabActions[0].page), tabActions[0].initialProperties);
+                    internalStack.push(Qt.resolvedUrl(root.initialAction.page), root.initialAction.initialProperties);
                 }
             }
             FocusScope {
@@ -288,6 +302,7 @@ Item {
                     Repeater {
                         model: internalStack.activeAction.children
                         delegate: QQC2.Button {
+                            readonly property Zynthian.TabbedControlViewAction tabAction: modelData
                             implicitWidth: 1
                             Layout.fillWidth: true
                             text: modelData.text

@@ -32,10 +32,10 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    __length__ = 1
-    __row_index__ = 0
-    __col_index__ = 0
-    __is_playing__ = False
+    # __length__ = 1
+    # __row_index__ = 0
+    # __col_index__ = 0
+    # __is_playing__ = False
 
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
@@ -48,8 +48,8 @@ class zynthiloops_clip(QObject):
         self.__path__ = None
         self.__song__ = song
         self.__pitch__ = 0
-        self.__time__ = 0
-        self.audioSource = None
+        self.__time__ = 1
+        self.audioSource: ClipAudioSource = None
 
     @Signal
     def length_changed(self):
@@ -123,7 +123,6 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
 
-
     @Property(int, notify=row_index_changed)
     def row(self):
         return self.__row_index__
@@ -164,27 +163,29 @@ class zynthiloops_clip(QObject):
             return 0.0
         return self.audioSource.get_duration()
 
-
-
     @Property(int, notify=pitch_changed)
     def pitch(self):
         return self.__pitch__
 
     @pitch.setter
-    def set_pitch(self, pitch: int):
+    def set_pitch(self, pitch: float):
         self.__pitch__ = pitch
         self.pitch_changed.emit()
+        if self.audioSource is None:
+            return
+        self.audioSource.set_pitch(pitch)
 
-    @Property(int, notify=time_changed)
+    @Property(float, notify=time_changed)
     def time(self):
         return self.__time__
 
     @time.setter
-    def set_time(self, time: int):
+    def set_time(self, time: float):
         self.__time__ = time
         self.time_changed.emit()
-
-
+        if self.audioSource is None:
+            return
+        self.audioSource.set_speed_ratio(time)
 
     @Property(str, notify=path_changed)
     def path(self):
@@ -198,7 +199,7 @@ class zynthiloops_clip(QObject):
         self.startPosition = self.__start_position__
         self.length = self.__length__
 
-        # self.audioSource.setStartPosition(self.__start_position__)
+        self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
 
@@ -210,13 +211,13 @@ class zynthiloops_clip(QObject):
         self.path_changed.emit()
 
     @Slot(None)
-    def play(self, loop=True):
+    def play(self):
         if self.audioSource is None:
             return
         self.zyngui.screens['zynthiloops'].start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
-        self.audioSource.play()
+        self.audioSource.addClipToTimer()
 
     @Slot(None)
     def stop(self, loop=True):

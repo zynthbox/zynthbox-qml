@@ -92,7 +92,7 @@ Zynthian.ScreenPage {
                     Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true
 
-                    text: "Song " + (root.song.index+1)
+                    text: root.song.name
                     subText: "BPM: " + root.song.bpm
 
                     onPressed: {

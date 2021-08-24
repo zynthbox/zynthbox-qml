@@ -40,12 +40,10 @@ def init():
 
         libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
 
-        libzl.SyncTimer_removeClip.argtypes = [ctypes.c_void_p]
-
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
 
-        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p]
 
         libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
 
@@ -96,9 +94,9 @@ class ClipAudioSource(object):
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
 
-    def play(self, should_loop=True):
+    def play(self):
         if libzl:
-            libzl.ClipAudioSource_play(self.obj, should_loop)
+            libzl.ClipAudioSource_play(self.obj)
 
     def stop(self):
         if libzl:
@@ -131,7 +129,3 @@ class ClipAudioSource(object):
     def addClipToTimer(self):
         if libzl:
             libzl.SyncTimer_addClip(self.obj)
-
-    def removeClipFromTimer(self):
-        if libzl:
-            libzl.SyncTimer_removeClip(self.obj)

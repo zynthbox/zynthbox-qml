@@ -27,15 +27,14 @@ from PySide2.QtCore import Property, QObject, Signal, Slot
 from .. import zynthian_gui_config
 
 class zynthiloops_part(QObject):
-    __length__ = 1
-    __clips__ = []
-    __part_index__ = 0
-    __is_playing__ = False
-
     def __init__(self, part_index: int, parent=None):
         super(zynthiloops_part, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__part_index__ = part_index
+        self.__clips__ = []
+        self.__is_playing__ = False
+        self.__part_index__ = 0
+        self.__length__ = 1
         self.__name__ = chr(self.__part_index__+65) # A B C ...
 
     @Property(bool, constant=True)
@@ -110,6 +109,21 @@ class zynthiloops_part(QObject):
         self.__name__ = name
         self.name_changed.emit()
 
-    @Slot(QObject, int)
-    def addClip(self, clip: QObject, index: int):
-        self.__clips__.insert(index, clip)
+    def add_clip(self, clip):
+        self.__clips__.append(clip)
+
+    @Slot(None)
+    def play(self):
+        self.__is_playing__ = True
+        self.__is_playing_changed__.emit()
+
+        for clip in self.__clips__:
+            clip.play()
+
+    @Slot(None)
+    def stop(self):
+        self.__is_playing__ = False
+        self.__is_playing_changed__.emit()
+
+        for clip in self.__clips__:
+            clip.stop()

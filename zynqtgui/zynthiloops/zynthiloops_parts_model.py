@@ -77,13 +77,11 @@ class zynthiloops_parts_model(QAbstractListModel):
         self.endInsertRows()
         self.countChanged.emit()
 
-
     @Slot(int, result=QObject)
     def getPart(self, row : int):
         if row < 0 or row >= len(self.__parts__):
             return None
         return self.__parts__[row]
-
 
     @Signal
     def countChanged(self):

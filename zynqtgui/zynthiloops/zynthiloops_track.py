@@ -43,7 +43,9 @@ class zynthiloops_track(QObject):
         self.__song__ = song
         # TODO: do from unserialization
         for i in range(0, 2):
-            self.__clips_model__.add_clip(zynthiloops_clip(self.__id__, i, song, self))
+            clip = zynthiloops_clip(self.__id__, i, song, self)
+            self.__clips_model__.add_clip(clip)
+            self.__song__.add_clip_to_part(clip, i)
 
     @Property(bool, constant=True)
     def playable(self):

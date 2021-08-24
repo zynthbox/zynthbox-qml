@@ -60,6 +60,7 @@ Zynthian.ScreenPage {
     }
 
     property string currentNoteName: keyModel.getName(zynthian.playgrid.startingNote)
+    
     ListModel {
         id: keyModel
         function getName(note) {
@@ -85,6 +86,7 @@ Zynthian.ScreenPage {
         ListElement { note: 46; text: "A#" }
         ListElement { note: 47; text: "B" }
     }
+
     ListModel {
         id: gridModel
 
@@ -93,16 +95,35 @@ Zynthian.ScreenPage {
         ListElement { row: 4; column: 4; text: "4x4" }
         ListElement { row: 5; column: 8; text: "5x8" }
     }
+
+    ListModel {
+        id: playGrids
+
+        ListElement { 
+            url: '../playgrids/notesgrid/main.qml'
+            name: 'Notes Grid'
+        }
+
+        ListElement { 
+            url: '../playgrids/chordsgrid/main.qml'
+            name: 'Chords Grid'
+        }
+    }
+
     property var playGridsModel: [
-        { displayName: "Notes Grid", gridComponent: basePlayGrid.notesGrid, settingsComponent: basePlayGrid.notesGridSettings },
-        { displayName: "Chords Grid", gridComponent: basePlayGrid.chordsGrid, settingsComponent: basePlayGrid.chordsGridSettings },
-        { displayName: "Drumpads", gridComponent: basePlayGrid.chordsGrid, settingsComponent: basePlayGrid.chordsGridSettings }
+        { displayName: "Notes Grid", gridComponent: playGridsRepeater.notesGrid, settingsComponent: playGridsRepeater.notesGridSettings },
+        { displayName: "Chords Grid", gridComponent: playGridsRepeater.chordsGrid, settingsComponent: playGridsRepeater.chordsGridSettings },
+        { displayName: "Drumpads", gridComponent: playGridsRepeater.chordsGrid, settingsComponent: playGridsRepeater.chordsGridSettings }
     ]
+
     Connections {
         target: zynthian.playgrid
         onPlayGridIndexChanged: {
-            playGridStack.replace(component.playGridsModel[zynthian.playgrid.playGridIndex].gridComponent);
-            settingsStack.replace(component.playGridsModel[zynthian.playgrid.playGridIndex].settingsComponent);
+            if (playGridsRepeater.count > 0){
+                var playgrid = playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item
+                playGridStack.replace(playgrid.grid);
+                settingsStack.replace(playgrid.settings);
+            }
         }
     }
 
@@ -147,10 +168,12 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: Layout.preferredWidth
                         Layout.fillHeight: true
                         Layout.margins: 8
-                        model: playGridsModel
+                        model: playGridsRepeater.count
                         currentIndex: zynthian.playgrid.playGridIndex
                         delegate: QQC2.ItemDelegate {
                             id: settingsSelectorDelegate
+                            property Item gridComponent: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(model.index).item
+                            
                             width: ListView.view.width
                             topPadding: Kirigami.Units.largeSpacing
                             leftPadding: Kirigami.Units.largeSpacing
@@ -171,7 +194,7 @@ Zynthian.ScreenPage {
                                 }
                             }
                             contentItem: QQC2.Label {
-                                text: modelData.displayName
+                                text: settingsSelectorDelegate.gridComponent.name
                                 elide: Text.ElideRight
                             }
                             onClicked: {
@@ -184,7 +207,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         clip: true
-                        initialItem: component.playGridsModel[zynthian.playgrid.playGridIndex].settingsComponent
+                        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item.settings
                     }
                 }
             }
@@ -416,8 +439,8 @@ Zynthian.ScreenPage {
                                 }
                             } else if (yChoice === 0 && xChoice !== 0) {
                                 // Sliding rightward from the button - switch between grid modes
-                                if (xChoice <= playGridsModel.length  && zynthian.playgrid.playGridIndex !== xChoice - 1) {
-                                    text = "Switch to " + component.playGridsModel[xChoice - 1].displayName;
+                                if (xChoice <= playGridsRepeater.count  && zynthian.playgrid.playGridIndex !== xChoice - 1) {
+                                    text = "Switch to " + playGridsRepeater.itemAt(xChoice - 1).item.name;
                                 } else {
                                     text = "Do nothing";
                                 }
@@ -479,10 +502,22 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            initialItem: component.playGridsModel[zynthian.playgrid.playGridIndex].gridComponent
+            initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item.grid
         }
     }
-    Zynthian.BasePlayGrid {
-        id:basePlayGrid
+
+    Repeater {
+        id:playGridsRepeater
+        model: playGrids
+        Loader {
+            id:playGridLoader
+            source: model.url
+            Binding {
+                target: playGridLoader.item
+                property: 'currentNoteName'
+                value: component.currentNoteName
+            }
+        }
     }
+
 }

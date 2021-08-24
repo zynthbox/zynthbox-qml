@@ -33,25 +33,9 @@ import Zynthian 1.0 as Zynthian
 
 Item {
     id: root
-    property QtObject notesGrid: baseNotesGrid.notesGrid
-    property QtObject notesGridSettings: baseNotesGrid.notesGridSettings
-    property QtObject chordsGrid: baseChordsGrid.chordsGrid
-    property QtObject chordsGridSettings: baseChordsGridSettings.chordsGridSettings
-
-    Zynthian.BaseNotesGrid {
-        id:baseNotesGrid
-    }
-
-    Zynthian.BaseNotesGrid {
-        id:baseNotesGridSettings
-    }
-
-    Zynthian.BaseChordsGrid {
-        id:baseChordsGrid
-    }
-
-    Zynthian.BaseChordsGrid {
-        id:baseChordsGridSettings
-    }
-
+    property Component grid
+    property Component settings
+    property QtObject model
+    property string name
+    property string currentNoteName
 }

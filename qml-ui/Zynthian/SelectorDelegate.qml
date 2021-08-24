@@ -55,18 +55,18 @@ QQC2.ItemDelegate {
         delegate: delegate
     }
     contentItem: RowLayout {
-		QQC2.Label {
-			text: (model.show_numbers ? (index + 1) + " - " : "") + delegate.text
-			Layout.fillWidth: true
-			elide: Text.ElideRight
-		}
-		Kirigami.Icon {
-			source: model.icon
-			Layout.fillHeight: true
-			Layout.preferredWidth: height
-			visible: valid
-		}
-	}
+        QQC2.Label {
+            text: (model.show_numbers ? (index + 1) + " - " : "") + delegate.text
+            Layout.fillWidth: true
+            elide: Text.ElideRight
+        }
+        Kirigami.Icon {
+            source: model.icon
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            visible: valid
+        }
+    }
 
     onClicked: {
         let oldCurrent_screen_id = zynthian.current_screen_id;

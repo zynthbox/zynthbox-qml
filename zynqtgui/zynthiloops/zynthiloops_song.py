@@ -57,6 +57,10 @@ class zynthiloops_song(QObject):
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.addTrack()
 
+    def serialize(self):
+        return {"name": self.__name__,
+                "bpm": self.__bpm__,
+                "tracks": self.__tracks_model__.serialize()}
 
     @Property(bool, constant=True)
     def playable(self):
@@ -131,6 +135,7 @@ class zynthiloops_song(QObject):
     def addTrack(self):
         self.__track_counter__ += 1
         self.__tracks_model__.add_track(zynthiloops_track(self.__track_counter__, self, self.__tracks_model__))
+        logging.error(self.serialize())
 
     @Property(int, notify=bpm_changed)
     def bpm(self):

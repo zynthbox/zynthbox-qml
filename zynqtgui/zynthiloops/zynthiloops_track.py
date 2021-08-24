@@ -47,6 +47,10 @@ class zynthiloops_track(QObject):
             self.__clips_model__.add_clip(clip)
             self.__song__.add_clip_to_part(clip, i)
 
+    def serialize(self):
+        return {"name": self.name,
+            "clips": self.__clips_model__.serialize()}
+
     @Property(bool, constant=True)
     def playable(self):
         return False

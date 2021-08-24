@@ -163,8 +163,6 @@ class zynthiloops_clip(QObject):
             return 0.0
         return self.audioSource.get_duration()
 
-
-
     @Property(int, notify=pitch_changed)
     def pitch(self):
         return self.__pitch__
@@ -188,8 +186,6 @@ class zynthiloops_clip(QObject):
         if self.audioSource is None:
             return
         self.audioSource.set_speed_ratio(time)
-
-
 
     @Property(str, notify=path_changed)
     def path(self):
@@ -218,17 +214,16 @@ class zynthiloops_clip(QObject):
     def play(self):
         if self.audioSource is None:
             return
-        self.zyngui.screens['zynthiloops'].start_metronome_request(self)
+        self.zyngui.screens['zynthiloops'].start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
         self.audioSource.addClipToTimer()
-
 
     @Slot(None)
     def stop(self, loop=True):
         if self.audioSource is None:
             return
-        self.zyngui.screens['zynthiloops'].stop_metronome_request(self)
+        self.zyngui.screens['zynthiloops'].stop_metronome_request()
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
         self.audioSource.removeClipFromTimer()

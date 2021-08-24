@@ -38,6 +38,12 @@ class zynthiloops_clips_model(QAbstractListModel):
         super().__init__(parent)
         self.__clips__ = []
 
+    def serialize(self):
+        data = []
+        for c in self.__clips__:
+            data.append(c.serialize())
+        return data
+
     def data(self, index, role=None):
         if not index.isValid():
             return None

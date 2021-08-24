@@ -226,10 +226,4 @@ class zynthiloops_clip(QObject):
         self.zyngui.screens['zynthiloops'].stop_metronome_request()
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
-        self.audioSource.removeClipFromTimer()
-
-    def playAudio(self, loop=True):
-        self.audioSource.play(loop)
-
-    def stopAudio(self):
         self.audioSource.stop()

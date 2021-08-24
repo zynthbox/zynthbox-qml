@@ -32,10 +32,10 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    __length__ = 1
-    __row_index__ = 0
-    __col_index__ = 0
-    __is_playing__ = False
+    # __length__ = 1
+    # __row_index__ = 0
+    # __col_index__ = 0
+    # __is_playing__ = False
 
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
@@ -48,7 +48,7 @@ class zynthiloops_clip(QObject):
         self.__path__ = None
         self.__song__ = song
         self.__pitch__ = 0
-        self.__time__ = 0
+        self.__time__ = 1
         self.audioSource: ClipAudioSource = None
 
     @Signal
@@ -177,7 +177,7 @@ class zynthiloops_clip(QObject):
             return
         self.audioSource.set_pitch(pitch)
 
-    @Property(int, notify=time_changed)
+    @Property(float, notify=time_changed)
     def time(self):
         return self.__time__
 
@@ -185,9 +185,9 @@ class zynthiloops_clip(QObject):
     def set_time(self, time: float):
         self.__time__ = time
         self.time_changed.emit()
-        # if self.audioSource is None:
-        #     return
-        # self.audioSource.set_speed_ratio(time)
+        if self.audioSource is None:
+            return
+        self.audioSource.set_speed_ratio(time)
 
 
 

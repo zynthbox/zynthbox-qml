@@ -36,7 +36,11 @@ def init():
         libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
 
         ### Type Definition
-        libzl.startTimer.argtypes = [ctypes.c_int]
+        libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
+
+        libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
+
+        libzl.SyncTimer_removeClip.argtypes = [ctypes.c_void_p]
 
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
@@ -69,7 +73,7 @@ def init():
 
 def registerTimerCallback(callback):
     if libzl:
-        libzl.registerTimerCallback(callback)
+        libzl.SyncTimer_registerTimerCallback(callback)
 
 def registerGraphicTypes():
     if libzl:
@@ -77,12 +81,12 @@ def registerGraphicTypes():
 
 def startTimer(interval: int):
     if libzl:
-        libzl.startTimer(interval)
+        libzl.SyncTimer_startTimer(interval)
 
 
 def stopTimer():
     if libzl:
-        libzl.stopTimer()
+        libzl.SyncTimer_stopTimer()
 
 
 class ClipAudioSource(object):
@@ -121,3 +125,11 @@ class ClipAudioSource(object):
     def set_speed_ratio(self, speed_ratio: float):
         if libzl:
             libzl.ClipAudioSource_setSpeedRatio(self.obj, speed_ratio)
+
+    def addClipToTimer(self):
+        if libzl:
+            libzl.SyncTimer_addClip(self.obj)
+
+    def removeClipFromTimer(self):
+        if libzl:
+            libzl.SyncTimer_removeClip(self.obj)

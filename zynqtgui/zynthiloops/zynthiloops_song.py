@@ -184,7 +184,7 @@ class zynthiloops_song(QObject):
         for i in range(0, 2): #TODO: keep numer of parts consistent
             clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
             track.clipsModel.add_clip(clip)
-            self.add_clip_to_part(clip, i)
+            #self.add_clip_to_part(clip, i)
         self.save()
 
     @Property(int, notify=bpm_changed)

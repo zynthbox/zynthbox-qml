@@ -36,7 +36,7 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    model: zynthian.playgrid.model
+    model: zynthian.playgrid.chordsModel
 
     Component {
         id: notesGrid

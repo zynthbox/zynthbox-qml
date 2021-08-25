@@ -145,6 +145,9 @@ class Note(QObject):
     midiNote = Property(
         int, get_midi_note, constant=True
     )
+    scaleIndex = Property(
+        int, get_scale_index, constant=True
+    )
     isPlaying = Property(
         bool, get_is_playing, set_is_playing, notify=__is_playing_changed__
     )

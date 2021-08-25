@@ -47,7 +47,7 @@ Zynthian.Card {
     property QtObject controlObj: null
 
     transform: Translate {
-        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 6 : 0
+        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 2 : 0
     }
 
     contentItem: ColumnLayout {

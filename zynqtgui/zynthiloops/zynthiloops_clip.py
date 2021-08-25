@@ -45,9 +45,24 @@ class zynthiloops_clip(QObject):
         self.__song__ = song
         self.__pitch__ = 0
         self.__time__ = 1
-        self.__bpm__ = 200
+        self.__bpm__ = 0
         self.__should_sync__ = False
         self.audioSource: ClipAudioSource = None
+
+        self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
+
+    def song_bpm_changed(self):
+        self.update_synced_values()
+
+    def update_synced_values(self):
+        if self.__should_sync__:
+            logging.error(f"Song BPM : {self.__song__.bpm}")
+            new_ratio = self.__song__.bpm / self.__bpm__
+            logging.error(f"Song New Ratio : {new_ratio}")
+            self.set_time(new_ratio)
+
+            # Set length to recalculate loop time
+            self.set_length(self.__length__)
 
     def serialize(self):
         return {"name": self.name,
@@ -56,7 +71,6 @@ class zynthiloops_clip(QObject):
                 "length": self.__length__,
                 "pitch": self.__pitch__,
                 "time": self.__time__}
-
 
     @Signal
     def length_changed(self):
@@ -207,10 +221,16 @@ class zynthiloops_clip(QObject):
     def shouldSync(self):
         return self.__should_sync__
 
-    @bpm.setter
+    @shouldSync.setter
     def set_shouldSync(self, shouldSync: bool):
         self.__should_sync__ = shouldSync
         self.should_sync_changed.emit()
+        self.update_synced_values()
+
+        if not shouldSync:
+            self.set_time(1.0)
+            # Set length to recalculate loop time
+            self.set_length(self.__length__)
 
     @time.setter
     def set_time(self, time: float):

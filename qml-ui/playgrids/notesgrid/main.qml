@@ -36,48 +36,83 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    model: zynthian.playgrid.model
+    // model: zynthian.playgrid.model
 
-    // Component.onCompleted: {
-    //     note_int_to_str_map = [
-    //         "C",
-    //         "C#",
-    //         "D",
-    //         "D#",
-    //         "E",
-    //         "F",
-    //         "F#",
-    //         "G",
-    //         "G#",
-    //         "A",
-    //         "A#",
-    //         "B",
-    //     ]
+    function populateGrid(){
+        
+        var note_int_to_str_map = [
+            "C",
+            "C#",
+            "D",
+            "D#",
+            "E",
+            "F",
+            "F#",
+            "G",
+            "G#",
+            "A",
+            "A#",
+            "B",
+        ]
 
-    //     component.model = zynthian.playgrid.createNotesModel();
-    //     var notes = [];
-    //     for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
-    //         var note = zynthian.playgrid.createNote(
-    //             ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
-    //             0,
-    //             Math.floor(col / 12),
-    //             col
-    //         );
-    //         notes.push(note);
-    //     }
-    //     component.model.addRow(notes);
+        var scale_mode_map = {
+            "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            "ionian": [2, 2, 1, 2, 2, 2, 1],
+            "dorian": [2, 1, 2, 2, 2, 1, 2],
+            "phrygian": [1, 2, 2, 2, 1, 2, 2],
+            "lydian": [2, 2, 2, 1, 2, 2, 1],
+            "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+            "aeolian": [2, 1, 2, 2, 1, 2, 2],
+            "locrian": [1, 2, 2, 1, 2, 2, 2],
+        }
 
-    //     scale_mode_map = {
-    //         "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    //         "ionian": [2, 2, 1, 2, 2, 2, 1],
-    //         "dorian": [2, 1, 2, 2, 2, 1, 2],
-    //         "phrygian": [1, 2, 2, 2, 1, 2, 2],
-    //         "lydian": [2, 2, 2, 1, 2, 2, 1],
-    //         "mixolydian": [2, 2, 1, 2, 2, 1, 2],
-    //         "aeolian": [2, 1, 2, 2, 1, 2, 2],
-    //         "locrian": [1, 2, 2, 1, 2, 2, 2],
-    //     }
-    // }
+        var col = zynthian.playgrid.startingNote;
+        var scaleArray = scale_mode_map[zynthian.playgrid.scale];
+        var scale_index = 0;
+
+        component.model = zynthian.playgrid.createNotesModel();
+
+        for (var row = 0; row < zynthian.playgrid.rows; ++row){
+
+            var notes = [];
+            
+            for (var i = 0; i < zynthian.playgrid.columns; ++i) {
+
+                var note = zynthian.playgrid.createNote(
+                    ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
+                    scale_index,
+                    Math.floor(col / 12),
+                    col
+                );
+                if (scale_index >= scaleArray.length){
+                    scale_index = 0;
+                }
+                col += scaleArray[scale_index];
+                scale_index += 1;
+                notes.push(note);
+
+            }
+
+            if (zynthian.playgrid.scale !== "chromatic"){ 
+
+                for (var x = 0; x < 3; ++x){
+
+                    col += scaleArray[ scale_index % scaleArray.length ];
+                    console.log(col, "++++ col ++++");
+                    scale_index = (scale_index + 1) %  scaleArray.length;
+                    console.log(scale_index," ++++ scale_index ++++");
+
+                }
+
+            }
+
+            component.model.addRow(notes);
+        }
+    }
+
+    Component.onCompleted: {
+        populateGrid();
+    }
 
     Component {
         id: notesGrid
@@ -322,6 +357,13 @@ Zynthian.BasePlayGrid {
                     zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
                 }
             }
+        }
+    }
+
+    Connections {
+        target: zynthian.playgrid
+        onScaleChanged: {
+            component.populateGrid();
         }
     }
 }

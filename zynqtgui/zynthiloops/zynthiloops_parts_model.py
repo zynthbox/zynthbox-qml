@@ -32,13 +32,24 @@ class zynthiloops_parts_model(QAbstractListModel):
     PartIndexRole = Qt.UserRole + 1
     NameRole = PartIndexRole + 1
     PartRole = PartIndexRole + 2
-    __parts__: [zynthiloops_part] = []
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.__parts__: [zynthiloops_part] = []
 
-        for i in range(0, 2):
-            self.add_part(zynthiloops_part(i, self))
+    def serialize(self):
+        data = []
+        for p in self.__parts__:
+            data.append(p.serialize())
+        return data
+
+    def deserialize(self, arr):
+        if not isinstance(arr, list):
+            raise Exception("Invalid json format for parts")
+        for i, p in enumerate(arr):
+            part = zynthiloops_part(i, self)
+            part.deserialize(p)
+            self.add_part(part)
 
     def data(self, index, role=None):
         if not index.isValid():

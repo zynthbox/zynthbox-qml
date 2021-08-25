@@ -43,6 +43,14 @@ class zynthiloops_tracks_model(QAbstractListModel):
             data.append(t.serialize())
         return data
 
+    def deserialize(self, arr):
+        if not isinstance(arr, list):
+            raise Exception("Invalid json format for tracks")
+        for i, t in enumerate(arr):
+            track = zynthiloops_track(i, self.__song__, self)
+            track.deserialize(t)
+            self.add_track(track)
+
     def data(self, index, role=None):
         logging.info(index.row(), self.__tracks__[index.row()])
 

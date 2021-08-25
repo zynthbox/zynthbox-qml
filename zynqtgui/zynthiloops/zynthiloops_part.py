@@ -24,12 +24,9 @@
 # ******************************************************************************
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
-from .. import zynthian_gui_config
-
 class zynthiloops_part(QObject):
     def __init__(self, part_index: int, parent=None):
         super(zynthiloops_part, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
         self.__part_index__ = part_index
         self.__clips__ = []
         self.__is_playing__ = False

@@ -38,6 +38,47 @@ Zynthian.BasePlayGrid {
     name:'Notes Grid'
     model: zynthian.playgrid.model
 
+    // Component.onCompleted: {
+    //     note_int_to_str_map = [
+    //         "C",
+    //         "C#",
+    //         "D",
+    //         "D#",
+    //         "E",
+    //         "F",
+    //         "F#",
+    //         "G",
+    //         "G#",
+    //         "A",
+    //         "A#",
+    //         "B",
+    //     ]
+
+    //     component.model = zynthian.playgrid.createNotesModel();
+    //     var notes = [];
+    //     for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
+    //         var note = zynthian.playgrid.createNote(
+    //             ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
+    //             0,
+    //             Math.floor(col / 12),
+    //             col
+    //         );
+    //         notes.push(note);
+    //     }
+    //     component.model.addRow(notes);
+
+    //     scale_mode_map = {
+    //         "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    //         "ionian": [2, 2, 1, 2, 2, 2, 1],
+    //         "dorian": [2, 1, 2, 2, 2, 1, 2],
+    //         "phrygian": [1, 2, 2, 2, 1, 2, 2],
+    //         "lydian": [2, 2, 2, 1, 2, 2, 1],
+    //         "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+    //         "aeolian": [2, 1, 2, 2, 1, 2, 2],
+    //         "locrian": [1, 2, 2, 1, 2, 2, 2],
+    //     }
+    // }
+
     Component {
         id: notesGrid
         ColumnLayout {

@@ -207,6 +207,40 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         self.endResetModel()
 
 
+# A dictionary wrapper which notifies about changes to the values, and only
+# when the value actually has changed
+# TODO Persist settings (load on init, save on set)
+class zynthian_gui_playgrid_settings(QObject):
+    __settings__ = {}
+    __most_recently_changed__: str
+    __name__: str
+    def __init__(self, name:str, parent=None):
+        super(zynthian_gui_playgrid_settings, self).__init__(parent)
+        self.__name__ = name
+
+    @Property(str, constant=True)
+    def name(self):
+        return self.__name__
+
+    @Slot(str,'QVariant')
+    def setProperty(self, property:str, value:'QVariant'):
+        if not property in self.__settings__ or not self.__settings__[property] == value:
+            self.__settings__[property] = value
+            self.__most_recently_changed__ = property
+            self.propertyChanged.emit()
+
+    @Slot(str,result='QVariant')
+    def property(self, property:str):
+        return self.__settings__[property]
+
+    @Slot(result=str)
+    def mostRecentlyChanged(self):
+        return self.__most_recently_changed__
+
+    @Signal
+    def propertyChanged(self):
+        pass
+
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __rows__: int = 5
     __columns__: int = 8
@@ -218,6 +252,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __play_grid_index__ = 0
     __positional_velocity__ = False
     __models__ = []
+    __settings_stores__ = {}
 
     __note_state_map__ = {}
 
@@ -581,8 +616,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(result=QObject)
     def createNotesModel(self):
         model = zynthian_gui_grid_notes_model(self)
-        QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
         self.__models__.append(model)
+        QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
         return model
 
     @Slot(str, int, int, int, result=QObject)
@@ -601,6 +636,14 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         )
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
         return note
+
+    @Slot(str, result=QObject)
+    def getSettingsStore(self, name:str):
+        if not name in self.__settings_stores__:
+            settingsStore = zynthian_gui_playgrid_settings(name, self)
+            self.__settings_stores__[name] = settingsStore
+            QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
+        return self.__settings_stores__[name]
 
     rows = Property(int, __get_rows__, __set_rows__, notify=__rows_changed__)
     columns = Property(

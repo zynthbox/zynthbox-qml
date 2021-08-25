@@ -39,8 +39,19 @@ Zynthian.ScreenPage {
     topPadding: 5
     bottomPadding: 5
 
+    property QtObject someSettings
     Component.onCompleted: {
         applicationWindow().controlsVisible = false
+        component.someSettings = zynthian.playgrid.getSettingsStore("zynthian playgrid main settings");
+        console.log("A settings component called " + component.someSettings.name)
+        component.someSettings.setProperty("a value", ["item 1", "item 2", "item 3"])
+        console.log("Explicitly fetching the value, which is: " + component.someSettings.property("a value"));
+    }
+    Connections {
+        target: component.someSettings
+        onPropertyChanged: {
+            console.log("The property " + component.someSettings.mostRecentlyChanged() + " changed to " + component.someSettings.property(component.someSettings.mostRecentlyChanged()))
+        }
     }
 
     Component.onDestruction: {

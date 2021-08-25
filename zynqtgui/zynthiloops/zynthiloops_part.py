@@ -109,21 +109,21 @@ class zynthiloops_part(QObject):
         self.__name__ = name
         self.name_changed.emit()
 
-    def add_clip(self, clip):
-        self.__clips__.append(clip)
-
-    @Slot(None)
-    def play(self):
-        self.__is_playing__ = True
-        self.__is_playing_changed__.emit()
-
-        for clip in self.__clips__:
-            clip.play()
-
-    @Slot(None)
-    def stop(self):
-        self.__is_playing__ = False
-        self.__is_playing_changed__.emit()
-
-        for clip in self.__clips__:
-            clip.stop()
+    # def add_clip(self, clip):
+    #     self.__clips__.append(clip)
+    #
+    # @Slot(None)
+    # def play(self):
+    #     self.__is_playing__ = True
+    #     self.__is_playing_changed__.emit()
+    #
+    #     for clip in self.__clips__:
+    #         clip.play()
+    #
+    # @Slot(None)
+    # def stop(self):
+    #     self.__is_playing__ = False
+    #     self.__is_playing_changed__.emit()
+    #
+    #     for clip in self.__clips__:
+    #         clip.stop()

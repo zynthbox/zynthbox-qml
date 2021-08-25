@@ -204,5 +204,5 @@ class zynthiloops_song(QObject):
             clip.stop()
         self.__is_playing_changed__.emit()
 
-    def add_clip_to_part(self, clip, part_index):
-        self.__parts_model__.getPart(part_index).add_clip(clip)
+    # def add_clip_to_part(self, clip, part_index):
+    #     self.__parts_model__.getPart(part_index).add_clip(clip)

@@ -119,6 +119,10 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            checked: root.bottomBar.controlObj.shouldSync
+            onToggled: {
+                root.bottomBar.controlObj.shouldSync = checked
+            }
         }
 
         QQC2.Label {

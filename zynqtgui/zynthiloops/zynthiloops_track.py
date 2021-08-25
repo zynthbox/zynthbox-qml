@@ -26,7 +26,6 @@
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
-from .. import zynthian_gui_config
 from .zynthiloops_clips_model import zynthiloops_clips_model
 from .zynthiloops_clip import zynthiloops_clip
 
@@ -36,7 +35,6 @@ class zynthiloops_track(QObject):
 
     def __init__(self, id: int, song: QObject, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
         self.__name__ = f"T{self.__id__ + 1}"
         self.__song__ = song

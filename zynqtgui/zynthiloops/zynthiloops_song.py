@@ -27,8 +27,6 @@ import math
 
 from PySide2.QtCore import Qt, Property, QObject, Signal, Slot
 
-from .. import zynthian_gui_config
-
 from . import libzl
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
@@ -46,7 +44,8 @@ class zynthiloops_song(QObject):
 
     def __init__(self, parent=None):
         super(zynthiloops_song, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
+
+        self.__metronome_manager__ = parent
 
         self.__sketch_folder__ = "/zynthian/zynthian-my-data/sketches/"
         self.__sketch_filename__ = "sketch1.json"
@@ -64,7 +63,7 @@ class zynthiloops_song(QObject):
             # Add default parts
             for i in range(0, 2):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
-            
+
             track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
             self.__tracks_model__.add_track(track)
             for i in range(0, 2):
@@ -107,6 +106,9 @@ class zynthiloops_song(QObject):
         except Exception as e:
             logging.error(e)
             return False
+
+    def get_metronome_manager(self):
+        return self.__metronome_manager__
 
     @Property(bool, constant=True)
     def playable(self):
@@ -204,55 +206,6 @@ class zynthiloops_song(QObject):
     def set_index(self, index):
         self.__index__ = index
         self.index_changed.emit()
-
-    def metronome_update(self):
-        logging.error("metronome tick")
-        if self.__current_part__.length == self.__current_bar__:
-            for i in range(0, self.__tracks_model__.count):
-                track = self.__tracks_model__.getTrack(i)
-                clip = track.clipsModel.getClip(self.__current_part__.partIndex)
-                clip.stop()
-
-            if self.__current_part__.partIndex == self.__parts_model__.count - 1:
-                self.__current_part__ = self.__parts_model__.getPart(0)
-            else:
-                self.__current_part__ = self.__parts_model__.getPart(self.__current_part__.partIndex + 1)
-
-            self.__current_bar__ = 0
-
-            for i in range(0, self.__tracks_model__.count):
-                track = self.__tracks_model__.getTrack(i)
-                clip = track.clipsModel.getClip(self.__current_part__.partIndex)
-                clip.play()
-
-        if self.zyngui.screens['zynthiloops'].currentBeat is 0:
-            self.__current_bar__ = self.__current_bar__ + 1
-        self.current_beat_changed.emit()
-        logging.error("current bar: {}".format(self.__current_bar__))
-
-    @Slot(None)
-    def play(self):
-        self.__current_bar__ = 0
-        self.__current_part__ = self.__parts_model__.getPart(0)
-        self.__is_playing__ = True
-        self.__is_playing_changed__.emit()
-        self.zyngui.screens['zynthiloops'].start_metronome_request()
-
-        for i in range(0, self.__tracks_model__.count):
-            track = self.__tracks_model__.getTrack(i)
-            clip = track.clipsModel.getClip(self.__current_part__.partIndex)
-            clip.play()
-
-    @Slot(None)
-    def stop(self):
-        self.__current_bar__ = 0
-        self.__is_playing__ = False
-        self.zyngui.screens['zynthiloops'].stop_metronome_request()
-        for i in range(0, self.__tracks_model__.count):
-            track = self.__tracks_model__.getTrack(i)
-            clip = track.clipsModel.getClip(self.__current_part__.partIndex)
-            clip.stop()
-        self.__is_playing_changed__.emit()
 
     # def add_clip_to_part(self, clip, part_index):
     #     self.__parts_model__.getPart(part_index).add_clip(clip)

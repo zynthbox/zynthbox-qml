@@ -79,10 +79,13 @@ class zynthiloops_song(QObject):
                 "parts": self.__parts_model__.serialize()}
 
     def save(self):
-        Path(self.__sketch_folder__).mkdir(parents=True, exist_ok=True)
-        f = open(self.__sketch_folder__ + self.__sketch_filename__, "w")
-        f.write(json.dumps(self.serialize()))
-        f.close()
+        try:
+            Path(self.__sketch_folder__).mkdir(parents=True, exist_ok=True)
+            f = open(self.__sketch_folder__ + self.__sketch_filename__, "w")
+            f.write(json.dumps(self.serialize()))
+            f.close()
+        except Exception as e:
+            logging.error(e)
 
     def restore(self):
         try:

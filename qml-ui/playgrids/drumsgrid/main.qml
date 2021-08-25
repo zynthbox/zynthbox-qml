@@ -38,34 +38,34 @@ Zynthian.BasePlayGrid {
     name:'Drums Grid'
     model: zynthian.playgrid.model
 
-    // Component.onCompleted: {
-    //     var note_int_to_str_map = [
-    //         "C",
-    //         "C#",
-    //         "D",
-    //         "D#",
-    //         "E",
-    //         "F",
-    //         "F#",
-    //         "G",
-    //         "G#",
-    //         "A",
-    //         "A#",
-    //         "B",
-    //     ]
-    //     component.model = zynthian.playgrid.createNotesModel();
-    //     var notes = [];
-    //     for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
-    //         var note = zynthian.playgrid.createNote(
-    //             ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
-    //             0,
-    //             Math.floor(col / 12),
-    //             col
-    //         );
-    //         notes.push(note);
-    //     }
-    //     component.model.addRow(notes);
-    // }
+    Component.onCompleted: {
+        var note_int_to_str_map = [
+            "C",
+            "C#",
+            "D",
+            "D#",
+            "E",
+            "F",
+            "F#",
+            "G",
+            "G#",
+            "A",
+            "A#",
+            "B",
+        ]
+        component.model = zynthian.playgrid.createNotesModel();
+        var notes = [];
+        for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
+            var note = zynthian.playgrid.createNote(
+                ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
+                0,
+                Math.floor(col / 12),
+                col
+            );
+            notes.push(note);
+        }
+        component.model.addRow(notes);
+    }
     
     Component {
         id: drumsGrid

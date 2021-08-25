@@ -217,6 +217,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __chord_rows__ = 5
     __play_grid_index__ = 0
     __positional_velocity__ = False
+    __models__ = []
 
     __note_state_map__ = {}
 
@@ -242,6 +243,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
         self.__model__ = zynthian_gui_grid_notes_model(self)
         self.__chord_model__ = zynthian_gui_grid_notes_model(self)
+        self.__models__.append(self.__model__)
+        self.__models__.append(self.__chord_model__)
 
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
         self.__populate_grid__()
@@ -510,10 +513,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __scale_changed__(self):
         pass
 
-    @Slot(Note, bool)
-    def highlightPlayingNotes(self, note: Note, highlight: bool):
-        self.__model__.highlight_playing_note(note, highlight)
-
     @Slot(Note, int)
     def setNoteOn(self, note: Note, velocity: int = 64):
         self.setNoteState(note = note, velocity = velocity, setOn = True)
@@ -528,8 +527,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         if subnoteCount > 0:
             for i in range(0, subnoteCount):
                 self.setNoteState(subnotes[i], velocity, setOn)
-            self.__model__.highlight_playing_note(note, setOn)
-            self.__chord_model__.highlight_playing_note(note, setOn)
+            for model in self.__models__:
+                model.highlight_playing_note(note, setOn)
         else:
             noteKey = str(note.get_midi_note())
             if noteKey in self.__note_state_map__:
@@ -540,18 +539,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                     if self.__note_state_map__[noteKey] == 0:
                         note.off()
                         self.__note_state_map__.pop(noteKey)
-                        self.__model__.highlight_playing_note(note, False)
-                        self.__chord_model__.highlight_playing_note(note, False)
+                        for model in self.__models__:
+                            model.highlight_playing_note(note, False)
             else:
                 if setOn:
                     note.on(velocity)
                     self.__note_state_map__[noteKey] = 1
-                    self.__model__.highlight_playing_note(note, True)
-                    self.__chord_model__.highlight_playing_note(note, True)
+                    for model in self.__models__:
+                        model.highlight_playing_note(note, True)
                 else:
                     note.off()
-                    self.__model__.highlight_playing_note(note, False)
-                    self.__chord_model__.highlight_playing_note(note, False)
+                    for model in self.__models__:
+                        model.highlight_playing_note(note, False)
 
     def get_pitch(self):
         return self.__pitch__
@@ -583,6 +582,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def createNotesModel(self):
         model = zynthian_gui_grid_notes_model(self)
         QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
+        self.__models__.append(model)
         return model
 
     @Slot(str, int, int, int, result=QObject)

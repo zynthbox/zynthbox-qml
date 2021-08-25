@@ -60,17 +60,17 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
 
-        if not self.restore():
-            # Add default parts
-            for i in range(0, 2):
-                self.__parts_model__.add_part(zynthiloops_part(i, self))
-            
-            track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
-            self.__tracks_model__.add_track(track)
-            for i in range(0, 2):
-                clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
-                track.clipsModel.add_clip(clip)
-                #self.add_clip_to_part(clip, i)
+        #if not self.restore():
+        # Add default parts
+        for i in range(0, 2):
+            self.__parts_model__.add_part(zynthiloops_part(i, self, self))
+        
+        track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
+        self.__tracks_model__.add_track(track)
+        for i in range(0, 2):
+            clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
+            track.clipsModel.add_clip(clip)
+            #self.add_clip_to_part(clip, i)
 
     def serialize(self):
         return {"name": self.__name__,
@@ -107,7 +107,6 @@ class zynthiloops_song(QObject):
         # except Exception as e:
         #     logging.error(e)
         #     return False
-
         return False
 
     @Property(bool, constant=True)

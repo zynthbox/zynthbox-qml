@@ -128,25 +128,25 @@ class zynthiloops_clip(QObject):
     def __is_playing_changed__(self):
         pass
 
-    @Property(bool, constant=True)
     def playable(self):
         return True
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return True
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return True
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return False
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return False
+    nameEditable = Property(bool, constant=True)
 
     @Property(bool, notify=__is_playing_changed__)
     def isPlaying(self):
@@ -182,9 +182,9 @@ class zynthiloops_clip(QObject):
         self.__col_index__ = index
         self.col_index_changed.emit()
 
-    @Property(str, constant=True)
     def name(self):
         return f"T{self.__row_index__}{chr(self.__col_index__+65)}"
+    name = Property(str, name, constant=True)
 
     @Property(float, notify=start_position_changed)
     def startPosition(self):
@@ -229,9 +229,9 @@ class zynthiloops_clip(QObject):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
 
-    @Property(bool, notify=should_sync_changed)
     def shouldSync(self):
         return self.__should_sync__
+    shouldSync = Property(bool, shouldSync, notify=should_sync_changed)
 
     @shouldSync.setter
     def set_shouldSync(self, shouldSync: bool):
@@ -252,11 +252,10 @@ class zynthiloops_clip(QObject):
             return
         self.audioSource.set_speed_ratio(time)
 
-    @Property(str, notify=path_changed)
+
     def path(self):
         return self.__path__
 
-    @path.setter
     def set_path(self, path):
         self.__path__ = path
         self.stop()
@@ -277,6 +276,7 @@ class zynthiloops_clip(QObject):
         self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
+    path = Property(str, path, set_path, notify=path_changed)
 
     @Slot(None)
     def clear(self, loop=True):

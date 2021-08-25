@@ -70,7 +70,7 @@ class zynthiloops_song(QObject):
             for i in range(0, 2):
                 clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
                 track.clipsModel.add_clip(clip)
-                self.add_clip_to_part(clip, i)
+                #self.add_clip_to_part(clip, i)
 
     def serialize(self):
         return {"name": self.__name__,

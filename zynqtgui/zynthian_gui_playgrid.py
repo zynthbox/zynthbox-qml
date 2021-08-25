@@ -247,7 +247,7 @@ class zynthian_gui_playgrid_settings(QObject):
 
     @Slot(str,result='QVariant')
     def property(self, property:str):
-        return self.__settings__[property]
+        return self.__settings__.get(property)
 
     @Slot(result=str)
     def mostRecentlyChanged(self):

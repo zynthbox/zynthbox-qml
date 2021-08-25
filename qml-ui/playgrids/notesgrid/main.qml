@@ -36,7 +36,7 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    // model: zynthian.playgrid.model
+    model: zynthian.playgrid.model
 
     function populateGrid(){
         
@@ -94,7 +94,8 @@ Zynthian.BasePlayGrid {
             }
 
             if (zynthian.playgrid.scale !== "chromatic"){ 
-
+                col = zynthian.playgrid.startingNote + (zynthian.playgrid.columns * row);
+                scale_index = 0;
                 for (var x = 0; x < 3; ++x){
 
                     col += scaleArray[ scale_index % scaleArray.length ];

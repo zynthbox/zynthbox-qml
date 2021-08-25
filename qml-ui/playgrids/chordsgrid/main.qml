@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Base Chords Grid Component
+Base Notes Grid Component 
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 Copyright (C) 2021 Dan Leinir Turthra Jensen <admin@leinir.dk>
@@ -33,27 +33,37 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.BasePlayGrid {
     id: component
-    grid: chordsGrid
-    settings: chordsGridSettings
-    name:'Chords Grid'
+    grid: notesGrid
+    settings: notesGridSettings
+    name:'Notes Grid'
+    model: zynthian.playgrid.model
 
     Component {
-        id: chordsGrid
+        id: notesGrid
         ColumnLayout {
-            objectName: "chordsGrid"
+            objectName: "notesGrid"
             spacing: 0
             anchors.margins: 5
+
             Repeater {
-                model: zynthian.playgrid.chordModel
+                model: component.model
                 delegate: RowLayout {
                     property var row: index
+
                     Layout.margins: 2.5
+
                     Repeater {
-                        model: zynthian.playgrid.chordModel.columnCount(zynthian.playgrid.chordModel.index(index, 0))
+                        model: component.model.columnCount(component.model.index(index, 0))
                         delegate: QQC2.Button {
                             id: playDelegate
                             property var column: index
-                            property var note: zynthian.playgrid.chordModel.data(zynthian.playgrid.chordModel.index(row, column), zynthian.playgrid.chordModel.roles['note'])
+                            property var note: component.model.data(component.model.index(row, column), component.model.roles['note'])
+
+                            // Pitch is -8192 to 8191 inclusive
+                            property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
+                            onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
+                            property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
+
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             background: Rectangle {
@@ -84,12 +94,13 @@ Zynthian.BasePlayGrid {
                                     anchors.fill: parent
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
-                                    wrapMode: Text.Wrap
                                     text: {
                                         var text = "";
-                                        if (note) {
-                                            for (var i = 0; i < note.subnotes.length; ++i) {
-                                                text += " " + note.subnotes[i].name + note.subnotes[i].octave
+                                        if (note && note.name != "") {
+                                            if (zynthian.playgrid.scale == "major") {
+                                                text = note.name
+                                            } else {
+                                                text = note.name + note.octave
                                             }
                                         }
                                         return text;
@@ -101,32 +112,35 @@ Zynthian.BasePlayGrid {
                                 anchors.fill: parent
                                 touchPoints: [
                                     TouchPoint {
-                                        id: chordSlidePoint;
-                                        property double slideX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
-                                        property double slideY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
+                                        id: pitchModPoint;
+                                        property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
+                                        property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
                                     }
                                 ]
                                 property var playingNote;
                                 onPressed: {
-                                    if (chordSlidePoint.pressed) {
+                                    console.log('on pressed');
+                                    if (pitchModPoint.pressed) {
                                         var velocityValue = 64;
                                         if (zynthian.playgrid.positionalVelocity) {
-                                            velocityValue = 127 - Math.floor(chordSlidePoint.y * 127 / height);
+                                            velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
                                         } else {
                                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                            velocityValue = chordSlidePoint.pressure > 0.99999 ? 64 : Math.floor(chordSlidePoint.pressure * 127);
+                                            velocityValue = pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127);
                                         }
+                                        console.log(velocityValue);
+                                        console.log(playingNote)
                                         parent.down = true;
                                         focus = true;
                                         playingNote = note;
-                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue)
+                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue);
                                     }
                                 }
                                 onReleased: {
-                                    if (!chordSlidePoint.pressed) {
+                                    if (!pitchModPoint.pressed) {
                                         parent.down = false;
                                         focus = false;
-                                        zynthian.playgrid.setNoteOff(playingNote)
+                                        zynthian.playgrid.setNoteOff(playingNote);
                                         zynthian.playgrid.pitch = 0
                                     }
                                 }
@@ -138,45 +152,128 @@ Zynthian.BasePlayGrid {
         }
     }
     Component {
-        id: chordsGridSettings
+        id: notesGridSettings
         Kirigami.FormLayout {
-            objectName: "chordsGridSettings"
+            objectName: "notesGridSettings"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
             QQC2.ComboBox {
+                id: comboScale
+                Kirigami.FormData.label: "Modes"
                 Layout.fillWidth: true
-                Kirigami.FormData.label: "Number Of Chord Rows"
-                model: [3, 4, 5]
-                currentIndex: {
-                    for (var i = 0; i < count; ++i) {
-                        if (zynthian.playgrid.chordRows === model[i]) {
-                            return i;
-                        }
-                    }
-                }
+                model: scaleModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 1
+
                 onActivated: {
-                    zynthian.playgrid.chordRows = model[currentIndex];
+                    zynthian.playgrid.startingNote = 36;
+                    zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
                 }
             }
-            Repeater {
-                model: zynthian.playgrid.chordRows
-                QQC2.ComboBox {
-                    Layout.fillWidth: true
-                    Kirigami.FormData.label: "Scale for row " + (index + 1)
-                    property int repeaterIndex: index
-                    model: scaleModel
-                    textRole: "text"
-                    displayText: currentText
-                    currentIndex: {
-                        var theScale = zynthian.playgrid.chordScales[repeaterIndex];
-                        for (var i = 0; i < count; ++i) {
-                            if (scaleModel.get(i).scale === theScale) {
-                                return i;
-                            }
-                        }
-                        return 0;
+            QQC2.ComboBox {
+                id: comboKey
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Key"
+                visible: zynthian.playgrid.scale == "chromatic"
+                model: keyModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 0
+
+                onActivated: {
+                    zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Transpose"
+                visible: zynthian.playgrid.scale == "chromatic"
+                text: "-"
+                onClicked: {
+                    if (zynthian.playgrid.startingNote - 1 > 0) {
+                        zynthian.playgrid.startingNote--;
+                    } else {
+                        zynthian.playgrid.startingNote = 0;
                     }
-                    onActivated: {
-                        zynthian.playgrid.setChordScale(repeaterIndex, scaleModel.get(currentIndex).scale);
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                visible: zynthian.playgrid.scale == "chromatic"
+                text: "+"
+                onClicked: {
+                    zynthian.playgrid.startingNote++;
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Octave"
+                visible: zynthian.playgrid.scale != "chromatic"
+                text: "-"
+                onClicked: {
+                    if (zynthian.playgrid.startingNote - 12 > 0) {
+                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                    } else {
+                        zynthian.playgrid.startingNote = 0;
                     }
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                visible: zynthian.playgrid.scale != "chromatic"
+                text: "+"
+                onClicked: {
+                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                }
+            }
+            QQC2.ComboBox {
+                id: optionGrid
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Grid"
+                model: gridModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 3
+
+                onActivated: {
+                    var data = gridModel.get(currentIndex)
+
+                    if (data.row === 0 && data.column === 0) {
+                        zynthian.playgrid.rows = customRows.currentText;
+                        zynthian.playgrid.columns = customColumns.currentText;
+                    } else {
+                        zynthian.playgrid.rows = data.row;
+                        zynthian.playgrid.columns = data.column;
+                    }
+                }
+            }
+
+            QQC2.ComboBox {
+                id: customRows
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Rows"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    zynthian.playgrid.rows = currentText;
+                }
+            }
+            QQC2.ComboBox {
+                id: customColumns
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Columns"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    zynthian.playgrid.columns = currentText;
                 }
             }
             QQC2.Switch {

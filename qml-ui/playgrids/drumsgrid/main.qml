@@ -36,7 +36,36 @@ Zynthian.BasePlayGrid {
     grid: drumsGrid
     settings: drumsGridSettings
     name:'Drums Grid'
+    model: zynthian.playgrid.model
 
+    Component.onCompleted: {
+        var note_int_to_str_map = [
+            "C",
+            "C#",
+            "D",
+            "D#",
+            "E",
+            "F",
+            "F#",
+            "G",
+            "G#",
+            "A",
+            "A#",
+            "B",
+        ]
+        component.model = zynthian.playgrid.createNotesModel();
+        var notes = [];
+        for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
+            var note = zynthian.playgrid.createNote(
+                ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
+                0,
+                Math.floor(col / 12),
+                col
+            );
+            notes.push(note);
+        }
+        component.model.addRow(notes);
+    }
     Component {
         id: drumsGrid
         ColumnLayout {
@@ -45,18 +74,18 @@ Zynthian.BasePlayGrid {
             anchors.margins: 5
 
             Repeater {
-                model: zynthian.playgrid.model
+                model: component.model
                 delegate: RowLayout {
                     property var row: index
 
                     Layout.margins: 2.5
 
                     Repeater {
-                        model: zynthian.playgrid.model.columnCount(zynthian.playgrid.model.index(index, 0))
+                        model: component.model.columnCount(component.model.index(index, 0))
                         delegate: QQC2.Button {
                             id: playDelegate
                             property var column: index
-                            property var note: zynthian.playgrid.model.data(zynthian.playgrid.model.index(row, column), zynthian.playgrid.model.roles['note'])
+                            property var note: component.model.data(component.model.index(row, column), component.model.roles['note'])
 
                             // Pitch is -8192 to 8191 inclusive
                             property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))

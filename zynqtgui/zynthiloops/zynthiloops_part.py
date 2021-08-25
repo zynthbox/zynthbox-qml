@@ -37,6 +37,16 @@ class zynthiloops_part(QObject):
         self.__length__ = 1
         self.__name__ = chr(self.__part_index__+65) # A B C ...
 
+    def serialize(self):
+        return {"name": self.__name__,
+                "length": self.__length__}
+
+    def deserialize(self, obj):
+        if "name" in obj:
+            self.__name__ = obj["name"]
+        if "length" in obj:
+            self.__length__ = obj["length"]
+
     @Property(bool, constant=True)
     def playable(self):
         return True

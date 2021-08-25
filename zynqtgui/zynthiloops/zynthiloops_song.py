@@ -32,10 +32,13 @@ from .. import zynthian_gui_config
 from . import libzl
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
+from .zynthiloops_clip import zynthiloops_clip
 from .zynthiloops_parts_model import zynthiloops_parts_model
 from .zynthiloops_tracks_model import zynthiloops_tracks_model
 
 import logging
+import json
+from pathlib import Path
 
 
 class zynthiloops_song(QObject):
@@ -47,7 +50,6 @@ class zynthiloops_song(QObject):
 
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
-        self.__track_counter__ = 0
         self.__bpm__ = 120
         self.__index__ = 0
         self.__is_playing__ = False
@@ -55,12 +57,51 @@ class zynthiloops_song(QObject):
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
-        self.addTrack()
+
+        if not self.restore():
+            # Add default parts
+            for i in range(0, 2):
+                self.__parts_model__.add_part(zynthiloops_part(i, self))
+            
+            track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
+            self.__tracks_model__.add_track(track)
+            for i in range(0, 2):
+                clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
+                track.clipsModel.add_clip(clip)
+                self.add_clip_to_part(clip, i)
 
     def serialize(self):
         return {"name": self.__name__,
                 "bpm": self.__bpm__,
-                "tracks": self.__tracks_model__.serialize()}
+                "tracks": self.__tracks_model__.serialize(),
+                "parts": self.__parts_model__.serialize()}
+
+    def save(self):
+        Path("/zynthian/zynthian-my-data/songs/").mkdir(parents=True, exist_ok=True)
+        f = open("/zynthian/zynthian-my-data/songs/song1.json", "w")
+        f.write(json.dumps(self.serialize()))
+        f.close()
+
+    def restore(self):
+        try:
+            f = open("/zynthian/zynthian-my-data/songs/song1.json", "r")
+            obj = json.loads(f.read())
+            logging.error("BBBBB")
+            logging.error(obj["tracks"])
+            logging.error(obj["parts"])
+
+            if "name" in obj:
+                self.__name__ = obj["name"]
+            if "bpm" in obj:
+                self.__bpm__ = obj["bpm"]
+            if "parts" in obj:
+                self.__parts_model__.deserialize(obj["parts"])
+            if "tracks" in obj:
+                self.__tracks_model__.deserialize(obj["tracks"])
+            return True
+        except Exception as e:
+            logging.error(e)
+            return False
 
     @Property(bool, constant=True)
     def playable(self):
@@ -133,9 +174,13 @@ class zynthiloops_song(QObject):
 
     @Slot(None)
     def addTrack(self):
-        self.__track_counter__ += 1
-        self.__tracks_model__.add_track(zynthiloops_track(self.__track_counter__, self, self.__tracks_model__))
-        logging.error(self.serialize())
+        track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
+        self.__tracks_model__.add_track(track)
+        for i in range(0, 2): #TODO: keep numer of parts consistent
+            clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
+            track.clipsModel.add_clip(clip)
+            self.add_clip_to_part(clip, i)
+        self.save()
 
     @Property(int, notify=bpm_changed)
     def bpm(self):

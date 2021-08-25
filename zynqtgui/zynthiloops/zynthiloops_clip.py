@@ -55,6 +55,19 @@ class zynthiloops_clip(QObject):
                 "pitch": self.__pitch__,
                 "time": self.__time__}
 
+    def deserialize(self, obj):
+        #if "name" in obj:
+            #self.name = obj["name"]
+        if "path" in obj:
+            self.__path__ = obj["path"]
+        if "start" in obj:
+            self.__start_position__ = obj["start"]
+        if "length" in obj:
+            self.__length__ = obj["length"]
+        if "pitch" in obj:
+            self.__pitch__ = obj["pitch"]
+        if "time" in obj:
+            self.__time__ = obj["time"]
 
     @Signal
     def length_changed(self):

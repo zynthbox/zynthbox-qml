@@ -121,11 +121,11 @@ Zynthian.BasePlayGrid {
 
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
         
-        component.settingsStore.setDefaultProperty("startingNote", zynthian.playgrid.startingNote);
-        component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
-        component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
-        component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
-        component.settingsStore.setDefaultProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
+        component.settingsStore.setDefault("startingNote", zynthian.playgrid.startingNote);
+        component.settingsStore.setDefault("scale", zynthian.playgrid.scale);
+        component.settingsStore.setDefault("rows", zynthian.playgrid.rows);
+        component.settingsStore.setDefault("columns", zynthian.playgrid.columns);
+        component.settingsStore.setDefault("positionalVelocity", zynthian.playgrid.positionalVelocity);
         
         component.populateGrid();
     }

@@ -26,7 +26,7 @@ import logging
 import ctypes as ctypes
 import math
 
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, QTimer, Signal
 
 from . import libzl
 from .zynthiloops_clip import zynthiloops_clip
@@ -76,8 +76,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__metronome_running_refcount += 1
 
         if self.__metronome_running_refcount == 1:
-            libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
-            self.metronome_running_changed.emit()
+            # Start metronome after a slight delay to allow clips to load before starting timer
+            QTimer.singleShot(500, self.__start_timer__)
+
+    def __start_timer__(self):
+        libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+        self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
         self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)

@@ -142,6 +142,9 @@ class Note(QObject):
     def octave(self):
         return self.__octave__
 
+    midiNote = Property(
+        int, get_midi_note, constant=True
+    )
     isPlaying = Property(
         bool, get_is_playing, set_is_playing, notify=__is_playing_changed__
     )

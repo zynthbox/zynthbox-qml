@@ -48,25 +48,25 @@ class zynthiloops_part(QObject):
         if "length" in obj:
             self.__length__ = obj["length"]
 
-    @Property(bool, constant=True)
     def playable(self):
         return True
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return False
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return True
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return True
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return True
+    nameEditable = Property(bool, nameEditable, constant=True)
 
     @Signal
     def __is_playing_changed__(self):

@@ -112,25 +112,25 @@ class zynthiloops_song(QObject):
     def get_metronome_manager(self):
         return self.__metronome_manager__
 
-    @Property(bool, constant=True)
     def playable(self):
         return False
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return False
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return False
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return False
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return True
+    nameEditable = Property(bool, nameEditable, constant=True)
 
     @Signal
     def __name_changed__(self):

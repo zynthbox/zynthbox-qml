@@ -200,7 +200,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def roles(self):
         return {b"note": zynthian_gui_grid_notes_model.NoteRole}
 
-    @Slot(void)
+    @Slot(None)
     def clear(self):
         temporary_notes = self.__grid_notes__
         self.beginResetModel()

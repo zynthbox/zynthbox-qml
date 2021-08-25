@@ -203,7 +203,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     @Slot('QVariantList')
     def addRow(self, notes):
         self.beginResetModel()
-        self.__grid_notes__.append(notes)
+        self.__grid_notes__.insert(0, notes)
         self.endResetModel()
 
 

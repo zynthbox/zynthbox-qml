@@ -38,18 +38,19 @@ class zynthiloops_track(QObject):
         super(zynthiloops_track, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
-        self.__name__ = f"T{self.__id__}"
-        self.__clips_model__ = zynthiloops_clips_model(self)
+        self.__name__ = f"T{self.__id__ + 1}"
         self.__song__ = song
-        # TODO: do from unserialization
-        for i in range(0, 2):
-            clip = zynthiloops_clip(self.__id__, i, song, self)
-            self.__clips_model__.add_clip(clip)
-            self.__song__.add_clip_to_part(clip, i)
+        self.__clips_model__ = zynthiloops_clips_model(song, self)
 
     def serialize(self):
         return {"name": self.name,
             "clips": self.__clips_model__.serialize()}
+
+    def deserialize(self, obj):
+        if "name" in obj:
+            self.__name__ = obj["name"]
+        if "clips" in obj:
+            self.__clips_model__.deserialize(obj["clips"])
 
     @Property(bool, constant=True)
     def playable(self):

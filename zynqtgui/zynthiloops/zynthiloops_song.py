@@ -80,13 +80,13 @@ class zynthiloops_song(QObject):
 
     def save(self):
         Path(self.__sketch_folder__).mkdir(parents=True, exist_ok=True)
-        f = open(self.__sketch__folder__ + self.__sketch_filename__, "w")
+        f = open(self.__sketch_folder__ + self.__sketch_filename__, "w")
         f.write(json.dumps(self.serialize()))
         f.close()
 
     def restore(self):
         try:
-            f = open(self.__sketch__folder__ + self.__sketch_filename__, "r")
+            f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
             obj = json.loads(f.read())
             logging.error("BBBBB")
             logging.error(obj["tracks"])

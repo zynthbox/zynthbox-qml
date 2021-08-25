@@ -41,6 +41,12 @@ def init():
 
         libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
 
+        # libzl.SyncTimer_addToPart.argtypes = [ctypes.c_int, ctypes.c_void_p]
+        #
+        # libzl.SyncTimer_playPart.argtypes = [ctypes.c_int]
+        #
+        # libzl.SyncTimer_stopPart.argtypes = [ctypes.c_int]
+
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
 
@@ -88,6 +94,21 @@ def startTimer(interval: int):
 def stopTimer():
     if libzl:
         libzl.SyncTimer_stopTimer()
+
+
+# def add_clip_to_part(partIndex, clip):
+#     if libzl:
+#         libzl.SyncTimer_addToPart(partIndex, clip)
+#
+#
+# def play_part(partIndex):
+#     if libzl:
+#         libzl.SyncTimer_playPart(partIndex)
+#
+#
+# def stop_part(partIndex):
+#     if libzl:
+#         libzl.SyncTimer_stopPart(partIndex)
 
 
 class ClipAudioSource(object):

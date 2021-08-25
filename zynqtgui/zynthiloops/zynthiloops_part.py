@@ -36,7 +36,6 @@ class zynthiloops_part(QObject):
         self.__part_index__ = part_index
         self.__clips__ = []
         self.__is_playing__ = False
-        self.__part_index__ = 0
         self.__length__ = 1
         self.__song__ = song
         self.__name__ = chr(self.__part_index__+65) # A B C ...

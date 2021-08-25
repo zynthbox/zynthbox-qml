@@ -24,6 +24,7 @@
 #********************************************************************
 
 import ctypes
+import logging
 from os.path import dirname, realpath
 
 libzl = None
@@ -39,8 +40,6 @@ def init():
         libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
 
         libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
-
-        libzl.SyncTimer_removeClip.argtypes = [ctypes.c_void_p]
 
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
@@ -91,16 +90,6 @@ def stopTimer():
         libzl.SyncTimer_stopTimer()
 
 
-def removeClip(clip):
-    if libzl:
-        libzl.SyncTimer_removeClip(clip.audioSource.obj)
-
-
-def removeAllClips():
-    if libzl:
-        libzl.SyncTimer_removeAllClips()
-
-
 class ClipAudioSource(object):
     def __init__(self, filepath: bytes):
         if libzl:
@@ -112,8 +101,7 @@ class ClipAudioSource(object):
 
     def stop(self):
         if libzl:
-            # libzl.ClipAudioSource_stop(self.obj)
-            self.removeClip()
+            libzl.ClipAudioSource_stop(self.obj)
 
     def get_duration(self):
         if libzl:
@@ -142,7 +130,3 @@ class ClipAudioSource(object):
     def addClipToTimer(self):
         if libzl:
             libzl.SyncTimer_addClip(self.obj)
-
-    def removeClip(self):
-        if libzl:
-            libzl.SyncTimer_removeClip(self.obj)

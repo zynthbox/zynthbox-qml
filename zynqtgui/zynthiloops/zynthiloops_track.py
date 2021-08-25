@@ -45,7 +45,7 @@ class zynthiloops_track(QObject):
         for i in range(0, 2):
             clip = zynthiloops_clip(self.__id__, i, song, self)
             self.__clips_model__.add_clip(clip)
-            self.__song__.add_clip_to_part(clip, i)
+            # self.__song__.add_clip_to_part(clip, i)
 
     def serialize(self):
         return {"name": self.name,

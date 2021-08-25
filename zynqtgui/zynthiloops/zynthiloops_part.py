@@ -126,6 +126,10 @@ class zynthiloops_part(QObject):
     def play(self):
         logging.error(f"Playing Part {self.partIndex}")
 
+        for i in range(0, self.__song__.partsModel.count):
+            part = self.__song__.partsModel.getPart(i)
+            part.stop()
+
         for i in range(0, self.__song__.tracksModel.count):
             track = self.__song__.tracksModel.getTrack(i)
             clipsModel = track.clipsModel
@@ -135,8 +139,9 @@ class zynthiloops_part(QObject):
                 logging.error(f"Track {i} Clip {clip_index}")
                 clip: zynthiloops_clip = clipsModel.getClip(clip_index)
 
-                # if clip.col == self.partIndex:
-                logging.error(f"Clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                if clip.col == self.partIndex:
+                    logging.error(f"Clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                    clip.play()
 
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
@@ -151,6 +156,7 @@ class zynthiloops_part(QObject):
 
                 if clip.col == self.partIndex:
                     logging.error(f"Stopping clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                    clip.stop()
 
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()

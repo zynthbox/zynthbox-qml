@@ -88,25 +88,27 @@ class zynthiloops_song(QObject):
             logging.error(e)
 
     def restore(self):
-        try:
-            f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
-            obj = json.loads(f.read())
-            logging.error("BBBBB")
-            logging.error(obj["tracks"])
-            logging.error(obj["parts"])
+        # try:
+        #     f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
+        #     obj = json.loads(f.read())
+        #     logging.error("BBBBB")
+        #     logging.error(obj["tracks"])
+        #     logging.error(obj["parts"])
+        #
+        #     if "name" in obj:
+        #         self.__name__ = obj["name"]
+        #     if "bpm" in obj:
+        #         self.__bpm__ = obj["bpm"]
+        #     if "parts" in obj:
+        #         self.__parts_model__.deserialize(obj["parts"])
+        #     if "tracks" in obj:
+        #         self.__tracks_model__.deserialize(obj["tracks"])
+        #     return True
+        # except Exception as e:
+        #     logging.error(e)
+        #     return False
 
-            if "name" in obj:
-                self.__name__ = obj["name"]
-            if "bpm" in obj:
-                self.__bpm__ = obj["bpm"]
-            if "parts" in obj:
-                self.__parts_model__.deserialize(obj["parts"])
-            if "tracks" in obj:
-                self.__tracks_model__.deserialize(obj["tracks"])
-            return True
-        except Exception as e:
-            logging.error(e)
-            return False
+        return False
 
     @Property(bool, constant=True)
     def playable(self):

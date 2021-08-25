@@ -224,10 +224,12 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
 
 # A dictionary wrapper which notifies about changes to the values, and only
-# when the value actually has changed
+# when the value actually has changed. It supports setting a series of default
+# values for the properties.
 # TODO Persist settings (load on init, save on set)
 class zynthian_gui_playgrid_settings(QObject):
     __settings__ = {}
+    __defaults__ = {}
     __most_recently_changed__: str
     __name__: str
     def __init__(self, name:str, parent=None):
@@ -238,6 +240,12 @@ class zynthian_gui_playgrid_settings(QObject):
     def name(self):
         return self.__name__
 
+    @Slot(str,result='QVariant')
+    def property(self, property:str):
+        if property in self.__settings__:
+            return self.__settings__.get(property)
+        return self.__defaults__.get(property)
+
     @Slot(str,'QVariant')
     def setProperty(self, property:str, value:'QVariant'):
         if not property in self.__settings__ or not self.__settings__[property] == value:
@@ -245,9 +253,24 @@ class zynthian_gui_playgrid_settings(QObject):
             self.__most_recently_changed__ = property
             self.propertyChanged.emit()
 
+    @Slot(str)
+    def clearProperty(self, property:str):
+        if property in self.__settings__:
+            self.__settings__.remove(property)
+            self.propertyChanged.emit()
+
     @Slot(str,result='QVariant')
-    def property(self, property:str):
-        return self.__settings__.get(property)
+    def default(self, property:str):
+        return self.__defaults__.get(property)
+
+    @Slot(str,'QVariant')
+    def setDefault(self, property:str, value:'QVariant'):
+        if not property in self.__defaults__ or not self.__defaults__[property] == value:
+            self.__defaults__[property] = value
+            self.__most_recently_changed__ = property
+            self.defaultChanged.emit()
+            if not property in self.__settings__:
+                self.propertyChanged()
 
     @Slot(result=str)
     def mostRecentlyChanged(self):
@@ -257,19 +280,23 @@ class zynthian_gui_playgrid_settings(QObject):
     def propertyChanged(self):
         pass
 
+    @Signal
+    def defaultChanged(self):
+        pass
+
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __rows__: int = 5
     __columns__: int = 8
     __starting_note__: int = 36
     __scale__ = "ionian"
-    __pitch__ = 0
     __chord_model__: QAbstractItemModel = None
     __chord_rows__ = 5
     __play_grid_index__ = 0
     __positional_velocity__ = False
+
+    __pitch__ = 0
     __models__ = []
     __settings_stores__ = {}
-
     __note_state_map__ = {}
 
     def __init__(self, parent=None):

@@ -39,6 +39,7 @@ Zynthian.BasePlayGrid {
     // model: zynthian.playgrid.chordModel
 
     property QtObject settingsStore
+    property int chordRows
 
     function populateGrid(){
 
@@ -90,7 +91,7 @@ Zynthian.BasePlayGrid {
             60
         ]
 
-        var chord_rows = component.settings.property("chordRows");
+        var chord_rows = component.settingsStore.property("chordRows");
         var chord_notes = [];
         var diatonic_progressions = [0, 2, 4];
 
@@ -157,6 +158,7 @@ Zynthian.BasePlayGrid {
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
         component.settingsStore.setDefault("chordRows", 5);
+        component.chordRows = component.settingsStore.property("chordRows");
         // component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
         // component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
         // component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
@@ -274,7 +276,7 @@ Zynthian.BasePlayGrid {
                 model: [3, 4, 5]
                 currentIndex: {
                     for (var i = 0; i < count; ++i) {
-                        if (component.settingsStore.property("chordRows") === model[i]) {
+                        if (component.chordRows === model[i]) {
                             return i;
                         }
                     }
@@ -282,6 +284,16 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     component.settingsStore.setProperty("chordRows",model[currentIndex])
                 }
+                // currentIndex: {
+                //     for (var i = 0; i < count; ++i) {
+                //         if (zynthian.playgrid.chordRows === model[i]) {
+                //             return i;
+                //         }
+                //     }
+                // }
+                // onActivated: {
+                //     zynthian.playgrid.chordRows = model[currentIndex];
+                // }
             }
             Repeater {
                 model: zynthian.playgrid.chordRows
@@ -320,6 +332,9 @@ Zynthian.BasePlayGrid {
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
+            if (component.settingsStore.mostRecentlyChanged() === "chordRows"){
+                component.chordRows = component.settingsStore.property("chordRows");
+            }
             populateGridTimer.start()
         }
     }

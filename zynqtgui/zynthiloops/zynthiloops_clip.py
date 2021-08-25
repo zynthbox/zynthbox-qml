@@ -249,8 +249,18 @@ class zynthiloops_clip(QObject):
         self.__path__ = path
         self.stop()
         self.audioSource = ClipAudioSource(path.encode('utf-8'))
+
+        self.__length__ = 1
+        self.__is_playing__ = False
+        self.__start_position__ = 0.0
+        self.__pitch__ = 0
+        self.__time__ = 1
+        self.__bpm__ = 0
+
         self.startPosition = self.__start_position__
         self.length = self.__length__
+        self.pitch - self.__pitch__
+        self.time = self.__time__
 
         self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()

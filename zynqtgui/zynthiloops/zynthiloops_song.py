@@ -48,6 +48,8 @@ class zynthiloops_song(QObject):
         super(zynthiloops_song, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
 
+        self.__sketch_folder__ = "/zynthian/zynthian-my-data/sketches/"
+        self.__sketch_filename__ = "sketch1.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120
@@ -77,14 +79,14 @@ class zynthiloops_song(QObject):
                 "parts": self.__parts_model__.serialize()}
 
     def save(self):
-        Path("/zynthian/zynthian-my-data/songs/").mkdir(parents=True, exist_ok=True)
-        f = open("/zynthian/zynthian-my-data/songs/song1.json", "w")
+        Path(self.__sketch_folder__).mkdir(parents=True, exist_ok=True)
+        f = open(self.__sketch__folder__ + self.__sketch_filename__, "w")
         f.write(json.dumps(self.serialize()))
         f.close()
 
     def restore(self):
         try:
-            f = open("/zynthian/zynthian-my-data/songs/song1.json", "r")
+            f = open(self.__sketch__folder__ + self.__sketch_filename__, "r")
             obj = json.loads(f.read())
             logging.error("BBBBB")
             logging.error(obj["tracks"])

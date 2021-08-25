@@ -66,6 +66,7 @@ Zynthian.BasePlayGrid {
         }
         component.model.addRow(notes);
     }
+    
     Component {
         id: drumsGrid
         ColumnLayout {

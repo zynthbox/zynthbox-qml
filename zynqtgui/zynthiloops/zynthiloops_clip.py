@@ -45,6 +45,7 @@ class zynthiloops_clip(QObject):
         self.__song__ = song
         self.__pitch__ = 0
         self.__time__ = 1
+        self.__bpm__ = 200
         self.audioSource: ClipAudioSource = None
 
     def serialize(self):
@@ -86,6 +87,10 @@ class zynthiloops_clip(QObject):
 
     @Signal
     def time_changed(self):
+        pass
+
+    @Signal
+    def bpm_changed(self):
         pass
 
     @Signal
@@ -183,6 +188,15 @@ class zynthiloops_clip(QObject):
     @Property(float, notify=time_changed)
     def time(self):
         return self.__time__
+
+    @Property(int, notify=bpm_changed)
+    def bpm(self):
+        return self.__bpm__
+
+    @bpm.setter
+    def set_bpm(self, bpm: int):
+        self.__bpm__ = bpm
+        self.bpm_changed.emit()
 
     @time.setter
     def set_time(self, time: float):

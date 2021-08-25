@@ -95,6 +95,38 @@ GridLayout {
         }
     }
 
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        QQC2.TextField {
+            id: objBpmEdit
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.alignment: Qt.AlignCenter
+            horizontalAlignment: TextInput.AlignHCenter
+            text: root.bottomBar.controlObj.bpm
+            validator: IntValidator {bottom: 1; top: 250}
+            inputMethodHints: Qt.ImhDigitsOnly
+            onAccepted: {
+                root.bottomBar.controlObj.bpm = parseInt(text);
+            }
+        }
+
+        QQC2.Switch {
+            id: syncSwitch
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        }
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: qsTr("Sync")
+        }
+    }
+
     Item {
         Layout.fillWidth: true
     }

@@ -41,6 +41,12 @@ Zynthian.BasePlayGrid {
 
     function populateGrid(){
         
+        if (component.model){
+            component.model.clear();
+        } else {
+            component.model = zynthian.playgrid.createNotesModel();
+        }
+
         var note_int_to_str_map = [
             "C",
             "C#",
@@ -77,13 +83,6 @@ Zynthian.BasePlayGrid {
         var scaleArray = scale_mode_map[scale];
         var scale_index = 0;
 
-        if (component.model){
-            component.model.clear();
-        } else {
-            component.model = zynthian.playgrid.createNotesModel();
-        }
-
-
         for (var row = 0; row < rows; ++row){
 
             var notes = [];
@@ -119,15 +118,16 @@ Zynthian.BasePlayGrid {
     }
 
     Component.onCompleted: {
+
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
-        // var propname = component.settingsStore.mostRecentlyChanged()
-        // var propval = component.settingsStore.property(propname)
-        component.settingsStore.setProperty("startingNote", zynthian.playgrid.startingNote);
-        component.settingsStore.setProperty("scale", zynthian.playgrid.scale);
-        component.settingsStore.setProperty("rows", zynthian.playgrid.rows);
-        component.settingsStore.setProperty("columns", zynthian.playgrid.columns);
-        component.settingsStore.setProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
-        populateGrid();
+        
+        component.settingsStore.setDefaultProperty("startingNote", zynthian.playgrid.startingNote);
+        component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
+        component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
+        component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
+        component.settingsStore.setDefaultProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
+        
+        component.populateGrid();
     }
 
     Component {

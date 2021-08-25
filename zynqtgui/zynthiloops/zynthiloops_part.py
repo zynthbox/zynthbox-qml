@@ -22,19 +22,22 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import logging
+
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
+from .zynthiloops_clip import zynthiloops_clip
 from .. import zynthian_gui_config
 
 class zynthiloops_part(QObject):
-    def __init__(self, part_index: int, parent=None):
+    def __init__(self, part_index: int, song,  parent=None):
         super(zynthiloops_part, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__part_index__ = part_index
         self.__clips__ = []
         self.__is_playing__ = False
-        self.__part_index__ = 0
         self.__length__ = 1
+        self.__song__ = song
         self.__name__ = chr(self.__part_index__+65) # A B C ...
 
     def serialize(self):
@@ -119,21 +122,41 @@ class zynthiloops_part(QObject):
         self.__name__ = name
         self.name_changed.emit()
 
-    # def add_clip(self, clip):
-    #     self.__clips__.append(clip)
-    #
-    # @Slot(None)
-    # def play(self):
-    #     self.__is_playing__ = True
-    #     self.__is_playing_changed__.emit()
-    #
-    #     for clip in self.__clips__:
-    #         clip.play()
-    #
-    # @Slot(None)
-    # def stop(self):
-    #     self.__is_playing__ = False
-    #     self.__is_playing_changed__.emit()
-    #
-    #     for clip in self.__clips__:
-    #         clip.stop()
+    @Slot(None)
+    def play(self):
+        logging.error(f"Playing Part {self.partIndex}")
+
+        for i in range(0, self.__song__.partsModel.count):
+            part = self.__song__.partsModel.getPart(i)
+            part.stop()
+
+        for i in range(0, self.__song__.tracksModel.count):
+            track = self.__song__.tracksModel.getTrack(i)
+            clipsModel = track.clipsModel
+            logging.error(f"Track {track} ClipsModel {clipsModel}")
+
+            for clip_index in range(0, clipsModel.count):
+                logging.error(f"Track {i} Clip {clip_index}")
+                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+
+                if clip.col == self.partIndex:
+                    logging.error(f"Clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                    clip.play()
+
+        self.__is_playing__ = True
+        self.__is_playing_changed__.emit()
+
+    @Slot(None)
+    def stop(self):
+        for i in range(0, self.__song__.tracksModel.count):
+            clipsModel = self.__song__.tracksModel.getTrack(i).clipsModel
+
+            for clip_index in range(0, clipsModel.count):
+                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+
+                if clip.col == self.partIndex:
+                    logging.error(f"Stopping clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                    clip.stop()
+
+        self.__is_playing__ = False
+        self.__is_playing_changed__.emit()

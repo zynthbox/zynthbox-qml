@@ -87,6 +87,7 @@ GridLayout {
         controlObj: root.bottomBar.controlObj
         controlProperty: "time"
         valueString: dial.value.toFixed(2)
+        enabled: !root.bottomBar.controlObj.shouldSync
 
         dial {
             stepSize: 0.1
@@ -109,6 +110,7 @@ GridLayout {
             text: root.bottomBar.controlObj.bpm
             validator: IntValidator {bottom: 1; top: 250}
             inputMethodHints: Qt.ImhDigitsOnly
+            enabled: !root.bottomBar.controlObj.shouldSync
             onAccepted: {
                 root.bottomBar.controlObj.bpm = parseInt(text);
             }

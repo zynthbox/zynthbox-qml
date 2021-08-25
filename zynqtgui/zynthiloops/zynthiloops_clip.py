@@ -23,7 +23,6 @@
 #
 # ******************************************************************************
 
-from .. import zynthian_gui_config
 from . import libzl
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
@@ -35,7 +34,6 @@ class zynthiloops_clip(QObject):
 
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
-        self.zyngui = zynthian_gui_config.zyngui
         self.__length__ = 1
         self.__row_index__ = row_index
         self.__col_index__ = col_index
@@ -291,7 +289,7 @@ class zynthiloops_clip(QObject):
     def play(self):
         if self.audioSource is None:
             return
-        self.zyngui.screens['zynthiloops'].start_metronome_request()
+        self.__song__.get_metronome_manager().start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
         self.audioSource.addClipToTimer()
@@ -302,7 +300,7 @@ class zynthiloops_clip(QObject):
 
         if self.audioSource is None:
             return
-        self.zyngui.screens['zynthiloops'].stop_metronome_request()
+        self.__song__.get_metronome_manager().stop_metronome_request()
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
         self.audioSource.stop()

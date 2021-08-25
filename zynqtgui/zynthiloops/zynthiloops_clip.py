@@ -226,6 +226,8 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def stop(self, loop=True):
+        logging.error(f"Stopping Clip {self.audioSource}")
+
         if self.audioSource is None:
             return
         self.zyngui.screens['zynthiloops'].stop_metronome_request()

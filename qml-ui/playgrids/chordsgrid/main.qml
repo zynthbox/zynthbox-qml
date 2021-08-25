@@ -156,7 +156,7 @@ Zynthian.BasePlayGrid {
 
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
-        component.settingsStore.setDefaultProperty("chordRows", 5);
+        component.settingsStore.setDefault("chordRows", 5);
         // component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
         // component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
         // component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);

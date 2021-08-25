@@ -270,7 +270,7 @@ class zynthian_gui_playgrid_settings(QObject):
             self.__most_recently_changed__ = property
             self.defaultChanged.emit()
             if not property in self.__settings__:
-                self.propertyChanged()
+                self.propertyChanged.emit()
 
     @Slot(result=str)
     def mostRecentlyChanged(self):

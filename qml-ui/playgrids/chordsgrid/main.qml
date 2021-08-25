@@ -36,7 +36,133 @@ Zynthian.BasePlayGrid {
     grid: chordsGrid
     settings: chordsGridSettings
     name:'Chords Grid'
-    model: zynthian.playgrid.chordModel
+    // model: zynthian.playgrid.chordModel
+
+    property QtObject settingsStore
+
+    function populateGrid(){
+
+        if (component.model){
+            component.model.clear();
+        } else {
+            component.model = zynthian.playgrid.createNotesModel();
+        }
+
+        var note_int_to_str_map = [
+            "C",
+            "C#",
+            "D",
+            "D#",
+            "E",
+            "F",
+            "F#",
+            "G",
+            "G#",
+            "A",
+            "A#",
+            "B",
+        ]
+
+        var scale_mode_map = {
+            "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            "ionian": [2, 2, 1, 2, 2, 2, 1],
+            "dorian": [2, 1, 2, 2, 2, 1, 2],
+            "phrygian": [1, 2, 2, 2, 1, 2, 2],
+            "lydian": [2, 2, 2, 1, 2, 2, 1],
+            "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+            "aeolian": [2, 1, 2, 2, 1, 2, 2],
+            "locrian": [1, 2, 2, 1, 2, 2, 2],
+        }
+
+        var chord_scales  = [
+            "ionian",
+            "dorian",
+            "phrygian",
+            "aeolian",
+            "chromatic"
+        ]
+
+        var chord_scales_starts = [
+            60,
+            60,
+            60,
+            60,
+            60
+        ]
+
+        var chord_rows = component.settings.property("chordRows");
+        var chord_notes = [];
+        var diatonic_progressions = [0, 2, 4];
+
+        for (var row = 0; row < chord_rows; ++row){
+
+            var scale_index = 0;
+            var row_data = [];
+            var row_scale = scale_mode_map[chord_scales[row]]
+            var col = chord_scales_starts[row];
+
+            for (var i = 0; i < row_scale.length; ++i){
+
+                var fake_midi_note = 0;
+                var subnotes = [];
+                for (var subnote_index = 0; subnote_index < diatonic_progressions.length; ++subnote_index){
+
+                    var subnote_col = col;
+
+                    for (var j = 0; j < diatonic_progressions[subnote_index]; ++j){
+
+                        var subnote_scale_index = scale_index + j;
+                        if (subnote_scale_index >= row_scale.length){
+                            subnote_scale_index -= row_scale.length;
+                        }
+                        subnote_col += row_scale[subnote_scale_index]
+                    }
+
+                    var subnote = zynthian.playgrid.createNote(
+                        note_int_to_str_map[subnote_col % 12],
+                        scale_index,
+                        Math.floor(subnote_col / 12),
+                        subnote_col
+                    );
+                    subnotes.push(subnote);
+                    fake_midi_note += (127 * subnote_index) + subnote_col
+
+                }
+                // Now create a Note object representing a music note for our current cell
+                // This one's our container, and it will contain a series of subnotes which make up the scale
+                var note = zynthian.playgrid.createNote(
+                    note_int_to_str_map[col % 12],
+                    scale_index,
+                    Math.floor(col / 12),
+                    fake_midi_note
+                );
+
+                note.subnotes = subnotes
+                row_data.push(note)
+
+                // Cycle scale index value to 0 if it reaches the end of scale mode map
+                if (scale_index >=  row_scale.length) {
+                    scale_index = 0
+                }
+
+                // Calculate the next note value using the scale mode map and scale index
+                col += row_scale[scale_index]
+                scale_index += 1
+            }
+            
+            component.model.addRow(row_data);
+        }
+    }
+
+    Component.onCompleted: {
+        component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
+        component.settingsStore.setDefaultProperty("chordRows", 5);
+        // component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
+        // component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
+        // component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
+        // component.settingsStore.setDefaultProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
+        component.populateGrid();
+    }
 
     Component {
         id: chordsGrid
@@ -148,13 +274,13 @@ Zynthian.BasePlayGrid {
                 model: [3, 4, 5]
                 currentIndex: {
                     for (var i = 0; i < count; ++i) {
-                        if (zynthian.playgrid.chordRows === model[i]) {
+                        if (component.settingsStore.property("chordRows") === model[i]) {
                             return i;
                         }
                     }
                 }
                 onActivated: {
-                    zynthian.playgrid.chordRows = model[currentIndex];
+                    component.settingsStore.setProperty("chordRows",model[currentIndex])
                 }
             }
             Repeater {
@@ -188,6 +314,21 @@ Zynthian.BasePlayGrid {
                     zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
                 }
             }
+        }
+    }
+
+    Connections {
+        target: component.settingsStore
+        onPropertyChanged: {
+            populateGridTimer.start()
+        }
+    }
+    Timer {
+        id: populateGridTimer
+        interval: 1
+        repeat: false
+        onTriggered: {
+            component.populateGrid();
         }
     }
 }

@@ -36,7 +36,8 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    model: zynthian.playgrid.model
+
+    property QtObject settingsStore
 
     function populateGrid(){
         
@@ -66,17 +67,28 @@ Zynthian.BasePlayGrid {
             "locrian": [1, 2, 2, 1, 2, 2, 2],
         }
 
-        var col = zynthian.playgrid.startingNote;
-        var scaleArray = scale_mode_map[zynthian.playgrid.scale];
+        var startingNote = component.settingsStore.property("startingNote")
+        var scale = component.settingsStore.property("scale")
+        var rows = component.settingsStore.property("rows")
+        var columns = component.settingsStore.property("columns")
+        var positionalVelocity = component.settingsStore.property("positionalVelocity")
+
+        var col = startingNote;
+        var scaleArray = scale_mode_map[scale];
         var scale_index = 0;
 
-        component.model = zynthian.playgrid.createNotesModel();
+        if (component.model){
+            component.model.clear();
+        } else {
+            component.model = zynthian.playgrid.createNotesModel();
+        }
 
-        for (var row = 0; row < zynthian.playgrid.rows; ++row){
+
+        for (var row = 0; row < rows; ++row){
 
             var notes = [];
             
-            for (var i = 0; i < zynthian.playgrid.columns; ++i) {
+            for (var i = 0; i < columns; ++i) {
 
                 var note = zynthian.playgrid.createNote(
                     ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
@@ -93,18 +105,13 @@ Zynthian.BasePlayGrid {
 
             }
 
-            if (zynthian.playgrid.scale !== "chromatic"){ 
-                col = zynthian.playgrid.startingNote + (zynthian.playgrid.columns * row);
-                scale_index = 0;
+            if (scale !== "chromatic"){ 
+                col = notes[0].midiNote;
+                scale_index = notes[0].scaleIndex;
                 for (var x = 0; x < 3; ++x){
-
                     col += scaleArray[ scale_index % scaleArray.length ];
-                    console.log(col, "++++ col ++++");
                     scale_index = (scale_index + 1) %  scaleArray.length;
-                    console.log(scale_index," ++++ scale_index ++++");
-
                 }
-
             }
 
             component.model.addRow(notes);
@@ -112,6 +119,14 @@ Zynthian.BasePlayGrid {
     }
 
     Component.onCompleted: {
+        component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
+        // var propname = component.settingsStore.mostRecentlyChanged()
+        // var propval = component.settingsStore.property(propname)
+        component.settingsStore.setProperty("startingNote", zynthian.playgrid.startingNote);
+        component.settingsStore.setProperty("scale", zynthian.playgrid.scale);
+        component.settingsStore.setProperty("rows", zynthian.playgrid.rows);
+        component.settingsStore.setProperty("columns", zynthian.playgrid.columns);
+        component.settingsStore.setProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
         populateGrid();
     }
 
@@ -225,6 +240,7 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+
     Component {
         id: notesGridSettings
         Kirigami.FormLayout {
@@ -242,66 +258,74 @@ Zynthian.BasePlayGrid {
                 currentIndex: 1
 
                 onActivated: {
-                    zynthian.playgrid.startingNote = 36;
-                    zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
+                    component.settingsStore.setProperty("startingNote", 36);
+                    component.settingsStore.setProperty("scale", scaleModel.get(currentIndex).scale);
+                    // zynthian.playgrid.startingNote = 36;
+                    // zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
                 }
             }
             QQC2.ComboBox {
                 id: comboKey
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Key"
-                visible: zynthian.playgrid.scale == "chromatic"
+                visible: component.settingsStore.property("scale") == "chromatic"
                 model: keyModel
                 textRole: "text"
                 displayText: currentText
                 currentIndex: 0
 
                 onActivated: {
-                    zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
+                    component.settingsStore.setProperty("startingNote", keyModel.get(currentIndex).note);
                 }
             }
 
             QQC2.Button {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Transpose"
-                visible: zynthian.playgrid.scale == "chromatic"
+                visible: component.settingsStore.property("scale") === "chromatic"
                 text: "-"
                 onClicked: {
-                    if (zynthian.playgrid.startingNote - 1 > 0) {
-                        zynthian.playgrid.startingNote--;
+                    var startingNote = component.settingsStore.property("startingNote")
+                    if (startingNote - 1 > 0) {
+                        component.settingsStore.setProperty("startingNote", startingNote - 1);
                     } else {
-                        zynthian.playgrid.startingNote = 0;
+                        startingNote = 0;
+                        component.settingsStore.setProperty("startingNote", 0);
                     }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
-                visible: zynthian.playgrid.scale == "chromatic"
+                visible: component.settingsStore.property("scale") === "chromatic"
                 text: "+"
                 onClicked: {
-                    zynthian.playgrid.startingNote++;
+                    var startingNote = component.settingsStore.property("startingNote")
+                    component.settingsStore.setProperty("startingNote", startingNote + 1);
                 }
             }
 
             QQC2.Button {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Octave"
-                visible: zynthian.playgrid.scale != "chromatic"
+                visible: component.settingsStore.property("scale") !== "chromatic"
                 text: "-"
                 onClicked: {
-                    if (zynthian.playgrid.startingNote - 12 > 0) {
-                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                    var startingNote = component.settingsStore.property("startingNote")
+                    if (startingNote - 12 > 0) {
+                        component.settingsStore.setProperty("startingNote", startingNote - 12);
                     } else {
-                        zynthian.playgrid.startingNote = 0;
+                        component.settingsStore.setProperty("startingNote",0);
                     }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
-                visible: zynthian.playgrid.scale != "chromatic"
+                visible: component.settingsStore.property("scale") != "chromatic"
                 text: "+"
                 onClicked: {
-                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    // zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                    var startingNote = component.settingsStore.property("startingNote")
+                    component.settingsStore.setProperty("startingNote", startingNote + 12);
                 }
             }
             QQC2.ComboBox {
@@ -315,13 +339,14 @@ Zynthian.BasePlayGrid {
 
                 onActivated: {
                     var data = gridModel.get(currentIndex)
-
                     if (data.row === 0 && data.column === 0) {
-                        zynthian.playgrid.rows = customRows.currentText;
-                        zynthian.playgrid.columns = customColumns.currentText;
+                        component.settingsStore.setProperty("rows", customRows.currentText);
+                        component.settingsStore.setProperty("columns", customColumns.currentText);
                     } else {
                         zynthian.playgrid.rows = data.row;
                         zynthian.playgrid.columns = data.column;
+                        component.settingsStore.setProperty("rows", data.row);
+                        component.settingsStore.setProperty("columns", data.column);
                     }
                 }
             }
@@ -336,6 +361,7 @@ Zynthian.BasePlayGrid {
                 currentIndex: 0
                 onActivated: {
                     zynthian.playgrid.rows = currentText;
+                    component.settingsStore.setProperty("rows", currentText);
                 }
             }
             QQC2.ComboBox {
@@ -347,7 +373,7 @@ Zynthian.BasePlayGrid {
                 displayText: currentText
                 currentIndex: 0
                 onActivated: {
-                    zynthian.playgrid.columns = currentText;
+                    component.settingsStore.setProperty("columns", currentText);
                 }
             }
             QQC2.Switch {
@@ -355,15 +381,25 @@ Zynthian.BasePlayGrid {
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: zynthian.playgrid.positionalVelocity
                 onClicked: {
-                    zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
+                    var positionalVelocity = component.settingsStore.property("positionalVelocity")
+                    component.settingsStore.setProperty("positionalVelocity", !positionalVelocity);
                 }
             }
         }
     }
 
     Connections {
-        target: zynthian.playgrid
-        onScaleChanged: {
+        target: component.settingsStore
+        onPropertyChanged: {
+            populateGridTimer.start()
+        }
+    }
+
+    Timer {
+        id: populateGridTimer
+        interval: 1
+        repeat: false
+        onTriggered: {
             component.populateGrid();
         }
     }

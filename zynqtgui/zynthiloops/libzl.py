@@ -100,6 +100,8 @@ class ClipAudioSource(object):
             libzl.ClipAudioSource_play(self.obj)
 
     def stop(self):
+        logging.error(f"Stopping Audio Source : {self.obj}, {libzl}")
+
         if libzl:
             libzl.ClipAudioSource_stop(self.obj)
 

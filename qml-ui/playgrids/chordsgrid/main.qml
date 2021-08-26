@@ -38,7 +38,6 @@ Zynthian.BasePlayGrid {
     name:'Chords Grid'
     octave: 5
     useOctaves: true
-    // model: zynthian.playgrid.chordModel
 
     property QtObject settingsStore
     property int chordRows
@@ -180,9 +179,7 @@ Zynthian.BasePlayGrid {
                                         if (note.isPlaying) {
                                             color = "#8bc34a";
                                         } else {
-                                            if (zynthian.playgrid.scale !== "chromatic" &&
-                                                note.name === component.currentNoteName
-                                            ) {
+                                            if (note.name === component.currentNoteName) {
                                                 color = Kirigami.Theme.focusColor;
                                             } else {
                                                 color = "white";
@@ -222,7 +219,7 @@ Zynthian.BasePlayGrid {
                                 onPressed: {
                                     if (chordSlidePoint.pressed) {
                                         var velocityValue = 64;
-                                        if (zynthian.playgrid.positionalVelocity) {
+                                        if (component.settingsStore.property("positionalVelocity")) {
                                             velocityValue = 127 - Math.floor(chordSlidePoint.y * 127 / height);
                                         } else {
                                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
@@ -270,7 +267,7 @@ Zynthian.BasePlayGrid {
                 }
             }
             Repeater {
-                model: zynthian.playgrid.chordRows
+                model:  component.settingsStore.property("chordRows")
                 QQC2.ComboBox {
                     Layout.fillWidth: true
                     Kirigami.FormData.label: "Scale for row " + (index + 1)

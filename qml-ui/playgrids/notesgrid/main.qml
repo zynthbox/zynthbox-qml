@@ -107,10 +107,10 @@ Zynthian.BasePlayGrid {
 
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
         
-        component.settingsStore.setDefault("startingNote", zynthian.playgrid.startingNote);
-        component.settingsStore.setDefault("scale", zynthian.playgrid.scale);
-        component.settingsStore.setDefault("rows", zynthian.playgrid.rows);
-        component.settingsStore.setDefault("columns", zynthian.playgrid.columns);
+        component.settingsStore.setDefault("startingNote", component.octave * 12);
+        component.settingsStore.setDefault("scale", "ionian");
+        component.settingsStore.setDefault("rows", 5);
+        component.settingsStore.setDefault("columns", 8);
         component.settingsStore.setDefault("positionalVelocity", true);
         
         component.populateGrid();
@@ -160,7 +160,7 @@ Zynthian.BasePlayGrid {
                                         if (note.isPlaying) {
                                             color = "#8bc34a";
                                         } else {
-                                            if (zynthian.playgrid.scale !== "chromatic" &&
+                                            if (component.settingsStore.property("scale") !== "chromatic" &&
                                                 note.name === component.currentNoteName
                                             ) {
                                                 color = Kirigami.Theme.focusColor;
@@ -179,7 +179,7 @@ Zynthian.BasePlayGrid {
                                     text: {
                                         var text = "";
                                         if (note && note.name != "") {
-                                            if (zynthian.playgrid.scale == "major") {
+                                            if (component.settingsStore.property("scale") == "major") {
                                                 text = note.name
                                             } else {
                                                 text = note.name + note.octave
@@ -203,7 +203,7 @@ Zynthian.BasePlayGrid {
                                 onPressed: {
                                     if (pitchModPoint.pressed) {
                                         var velocityValue = 64;
-                                        if (zynthian.playgrid.positionalVelocity) {
+                                        if (component.settingsStore.property("positionalVelocity")) {
                                             velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
                                         } else {
                                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
@@ -250,8 +250,6 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     component.settingsStore.setProperty("startingNote", 36);
                     component.settingsStore.setProperty("scale", scaleModel.get(currentIndex).scale);
-                    // zynthian.playgrid.startingNote = 36;
-                    // zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
                 }
             }
             QQC2.ComboBox {
@@ -336,8 +334,6 @@ Zynthian.BasePlayGrid {
                         component.settingsStore.setProperty("rows", customRows.currentText);
                         component.settingsStore.setProperty("columns", customColumns.currentText);
                     } else {
-                        zynthian.playgrid.rows = data.row;
-                        zynthian.playgrid.columns = data.column;
                         component.settingsStore.setProperty("rows", data.row);
                         component.settingsStore.setProperty("columns", data.column);
                     }
@@ -353,7 +349,6 @@ Zynthian.BasePlayGrid {
                 displayText: currentText
                 currentIndex: 0
                 onActivated: {
-                    zynthian.playgrid.rows = currentText;
                     component.settingsStore.setProperty("rows", currentText);
                 }
             }

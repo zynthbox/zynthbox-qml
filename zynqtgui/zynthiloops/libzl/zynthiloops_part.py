@@ -26,6 +26,7 @@ import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
+from . import libzl
 from .zynthiloops_clip import zynthiloops_clip
 
 class zynthiloops_part(QObject):
@@ -147,6 +148,8 @@ class zynthiloops_part(QObject):
 
     @Slot(None)
     def stop(self):
+        clips_to_stop = []
+
         for i in range(0, self.__song__.tracksModel.count):
             clipsModel = self.__song__.tracksModel.getTrack(i).clipsModel
 
@@ -155,7 +158,13 @@ class zynthiloops_part(QObject):
 
                 if clip.col == self.partIndex:
                     logging.error(f"Stopping clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
-                    clip.stop()
+                    clip.stop(True)
+                    if clip.audioSource is not None:
+                        clips_to_stop.append(clip)
+
+        logging.error(f"Clips to Stop for Part {self.__part_index__} : f{clips_to_stop}")
+
+        libzl.stopClips(clips_to_stop)
 
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()

@@ -257,7 +257,7 @@ Item {
             }
             QQC2.Label {
                 id: metronomeLabel
-                visible: zynthian.zynthiloops.isMetronomeRunning
+                visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
                 text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
             }
         }

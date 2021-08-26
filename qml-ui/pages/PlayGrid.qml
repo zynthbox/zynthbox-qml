@@ -168,7 +168,8 @@ Zynthian.ScreenPage {
                                 text: "Get New Playgrids"
                                 onTriggered: {
                                     settingsDialog.visible = false;
-                                    zynthian.show_modal("playgrid_downloader")
+                                    zynthian.show_modal("playgrid_downloader");
+                                    applicationWindow().controlsVisible = true;
                                 }
                             }
                         ]

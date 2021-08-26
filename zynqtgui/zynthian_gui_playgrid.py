@@ -181,9 +181,9 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         return len(self.__grid_notes__)
 
     def columnCount(self, index):
-        if index.row() >= len(self.__grid_notes__):
-            return 0
-        return len(self.__grid_notes__[index.row()])
+        if 0 <= index.row() < len(self.__grid_notes__):
+            return len(self.__grid_notes__[index.row()])
+        return 0
 
     def index(self, row: int, column: int, parent: QModelIndex = None):
         return self.createIndex(row, column)

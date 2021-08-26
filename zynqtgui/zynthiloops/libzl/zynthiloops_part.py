@@ -48,38 +48,38 @@ class zynthiloops_part(QObject):
         if "length" in obj:
             self.__length__ = obj["length"]
 
-    @Property(bool, constant=True)
     def playable(self):
         return True
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return False
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return True
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return True
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return True
+    nameEditable = Property(bool, nameEditable, constant=True)
 
     @Signal
     def __is_playing_changed__(self):
         pass
 
-    @Property(bool, notify=__is_playing_changed__)
     def isPlaying(self):
         return self.__is_playing__
 
-    @isPlaying.setter
     def __set_is_playing__(self, is_playing: bool):
         self.__is_playing__ = is_playing
         self.__is_playing_changed__.emit()
+
+    isPlaying = Property(bool, isPlaying, __set_is_playing__, notify=__is_playing_changed__)
 
     @Signal
     def length_changed(self):
@@ -93,32 +93,33 @@ class zynthiloops_part(QObject):
     def name_changed(self):
         pass
 
-    @Property(int, notify=length_changed)
     def length(self):
         return self.__length__
 
-    @length.setter
     def set_length(self, length: int):
         self.__length__ = length
         self.length_changed.emit()
+    length = Property(int, length, set_length, notify=length_changed)
 
-    @Property(int, notify=part_index_changed)
+
     def partIndex(self):
         return self.__part_index__
 
-    @partIndex.setter
     def set_part_index(self, part_index):
         self.__part_index__ = part_index
         self.part_index_changed.emit()
 
-    @Property(str, notify=name_changed)
+    partIndex = Property(int, partIndex, set_part_index, notify=part_index_changed)
+
+
+
     def name(self):
         return self.__name__
 
-    @name.setter
     def set_name(self, name):
         self.__name__ = name
         self.name_changed.emit()
+    name = Property(str, name, set_name, notify=name_changed)
 
     @Slot(None)
     def play(self):

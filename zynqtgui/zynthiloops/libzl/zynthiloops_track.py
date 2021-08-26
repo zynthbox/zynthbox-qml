@@ -50,47 +50,48 @@ class zynthiloops_track(QObject):
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
 
-    @Property(bool, constant=True)
+
     def playable(self):
         return False
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return False
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return True
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return True
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return True
+    nameEditable = Property(bool, nameEditable, constant=True)
 
-    @Property(int, constant=True)
     def id(self):
         return self.__id__
+    id = Property(int, id, constant=True)
 
     @Signal
     def __name_changed__(self):
         pass
 
-    @Property(str, notify=__name_changed__)
     def name(self):
         return self.__name__
 
-    @name.setter
     def set_name(self, name):
         self.__name__ = name
         self.__name_changed__.emit()
 
-    @Property(str, constant=True)
+    name = Property(str, name, set_name, notify=__name_changed__)
+
     def type(self):
         return self.__type__
+    type = Property(str, type, constant=True)
 
-    @Property(QObject, constant=True )
     def clipsModel(self):
         return self.__clips_model__
+    clipsModel = Property(QObject, clipsModel, constant=True )

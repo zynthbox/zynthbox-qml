@@ -69,15 +69,36 @@ class metronome_manager(QObject):
         self.current_beat_changed.emit()
 
 
+class song_manager(QObject):
+    def __init__(self, parent: QObject = None):
+        super(song_manager, self).__init__(parent)
+        self.__metronome__ = metronome_manager()
+        self.__song__ = zynthiloops_song.zynthiloops_song("/home/diau/", self.__metronome__)
+
+    @Signal
+    def song_changed(self):
+        pass
+
+    def song(self):
+        return self.__song__
+    song = Property(QObject, song, notify=song_changed)
+
+    @Slot(None)
+    def clearSong(self):
+        self.__song__.destroy()
+        self.__song__ = zynthiloops_song.zynthiloops_song("/home/diau/", self.__metronome__)
+        self.song_changed.emit()
+
+
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     libzl.init()
     libzl.registerGraphicTypes()
-    metronome = metronome_manager()
-    song = zynthiloops_song(metronome)
 
-    engine.rootContext().setContextProperty("song", song)
+    song_man = song_manager()
+
+    engine.rootContext().setContextProperty("songManager", song_man)
     engine.load(os.fspath(dirname(realpath(__file__)) + "/sketchtest.qml"))
 
     if not engine.rootObjects():

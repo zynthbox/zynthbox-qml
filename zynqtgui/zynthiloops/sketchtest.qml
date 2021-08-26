@@ -14,10 +14,10 @@ Controls.ApplicationWindow {
     ColumnLayout {
         RowLayout {
             Controls.Label {
-                text: song.name
+                text: songManager.song.name
             }
             Repeater {
-                model: song.tracksModel
+                model: songManager.song.tracksModel
                 delegate: Controls.Label {
                     text: track.name
                 }
@@ -26,23 +26,30 @@ Controls.ApplicationWindow {
         RowLayout {
             ColumnLayout {
                 Repeater {
-                    model: song.partsModel
-                    delegate: Controls.Label {
+                    model: songManager.song.partsModel
+                    delegate: Controls.Button {
                         text: part.name
+                        onClicked: {
+                                if (model.part.isPlaying) {
+                                    model.part.stop()
+                                } else {
+                                    model.part.play()
+                                }
+                            }
                     }
                 }
             }
             GridLayout {
                 id: lay
-                rows: song.partsModel.count
+                rows: songManager.song.partsModel.count
                 flow: GridLayout.TopToBottom
                 Repeater {
-                    model: song.tracksModel
+                    model: songManager.song.tracksModel
                     delegate: Repeater {
                         model: track.clipsModel
                         delegate: Controls.Button {
                             text: model.clip.name
-                            //Component.onCompleted: model.clip.path = "/home/diau/test.wav"
+                            Component.onCompleted: model.clip.path = "/home/diau/test.wav"
                             onClicked: {
                                 print(model.clip.path)
                                 
@@ -50,7 +57,7 @@ Controls.ApplicationWindow {
                                 if (model.clip.isPlaying) {
                                     model.clip.stop()
                                 } else {
-                                    model.clip.path = "/home/diau/test.wav"
+                                    //model.clip.path = "/home/diau/test.wav"
                                     model.clip.play()
                                 }
                             }
@@ -58,6 +65,14 @@ Controls.ApplicationWindow {
                     }
                 }
             }
+        }
+        Controls.Button {
+            text: "Add Track"
+            onClicked: songManager.song.addTrack()
+        }
+        Controls.Button {
+            text: "Reset Song"
+            onClicked: songManager.clearSong()
         }
     }
 }

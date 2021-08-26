@@ -27,7 +27,7 @@ import ctypes as ctypes
 import math
 import sys
 
-from PySide2.QtCore import Property, QObject, QTimer, Signal
+from PySide2.QtCore import Property, QObject, QTimer, Signal, Slot
 
 sys.path.insert(1, "./libzl")
 from .libzl import libzl
@@ -51,7 +51,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = 0
         self.__current_bar__ = 0
         self.__metronome_running_refcount = 0
-        self.__song__ = zynthiloops_song.zynthiloops_song(self)
+        self.__sketch_basepath__ = "/zynthian/zynthian-my-data/sketches/"
+        self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         libzl.registerTimerCallback(cb)
@@ -72,9 +73,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def metronome_running_changed(self):
         pass
 
-    @Property(QObject, constant=True)
+    @Signal
+    def song_changed(self):
+        pass
+
+    @Property(QObject, notify=song_changed)
     def song(self):
         return self.__song__
+
+    @Slot(None)
+    def clearCurrentSketch(self):
+        self.__song__.destroy()
+        self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
+        self.song_changed.emit()
+
 
     def update_timer_bpm(self):
         if self.__metronome_running_refcount > 0:

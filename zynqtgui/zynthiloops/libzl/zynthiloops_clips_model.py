@@ -53,7 +53,7 @@ class zynthiloops_clips_model(QAbstractListModel):
             clip = zynthiloops_clip(self.__track__.id, i, self.__song__, self)
             clip.deserialize(c)
             self.add_clip(clip)
-            self.__song__.add_clip_to_part(clip, i)
+            #self.__song__.add_clip_to_part(clip, i)
 
     def data(self, index, role=None):
         if not index.isValid():

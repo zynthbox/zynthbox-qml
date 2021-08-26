@@ -49,6 +49,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         zynthian_gui_zynthiloops.__instance__ = self
         self.__current_beat__ = 0
+        self.__current_bar__ = 0
         self.__metronome_running_refcount = 0
         self.__song__ = zynthiloops_song.zynthiloops_song(self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -61,6 +62,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Signal
     def current_beat_changed(self):
+        pass
+
+    @Signal
+    def current_bar_changed(self):
         pass
 
     @Signal
@@ -97,11 +102,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.metronome_running_changed.emit()
 
             self.__current_beat__ = 0
+            self.__current_bar__ = 0
             self.current_beat_changed.emit()
+            self.current_bar_changed.emit()
 
     def metronome_update(self):
         self.current_beat_changed.emit()
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
+
+        if self.__current_beat__ == 0:
+            self.__current_bar__ += 1
+            self.current_bar_changed
 
         #if self.__song__.isPlaying:
             #self.__song__.metronome_update()
@@ -109,6 +120,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):
         return self.__current_beat__
+
+    @Property(int, notify=current_bar_changed)
+    def currentBar(self):
+        return self.__current_bar__
 
     @Property(bool, notify=metronome_running_changed)
     def isMetronomeRunning(self):

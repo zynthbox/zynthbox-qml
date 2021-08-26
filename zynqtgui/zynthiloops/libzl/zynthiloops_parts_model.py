@@ -35,6 +35,7 @@ class zynthiloops_parts_model(QAbstractListModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.__song__ = parent
         self.__parts__: [zynthiloops_part] = []
 
     def serialize(self):
@@ -47,7 +48,7 @@ class zynthiloops_parts_model(QAbstractListModel):
         if not isinstance(arr, list):
             raise Exception("Invalid json format for parts")
         for i, p in enumerate(arr):
-            part = zynthiloops_part(i, self)
+            part = zynthiloops_part(i, self.__song__, self)
             part.deserialize(p)
             self.add_part(part)
 

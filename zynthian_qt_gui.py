@@ -577,6 +577,7 @@ class zynthian_gui(QObject):
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
 
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
+        self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
         self.screens["miniplaygrid"].__set_rows__(2)
         self.screens["miniplaygrid"].__set_columns__(8)
@@ -2258,6 +2259,9 @@ class zynthian_gui(QObject):
     def get_play_grid(self):
         return self.screens["play_grid"]
 
+    def get_playgrid_downloader(self):
+        return self.screens["playgrid_downloader"]
+
     def get_theme_chooser(self):
         return self.screens["theme_chooser"]
 
@@ -2357,6 +2361,7 @@ class zynthian_gui(QObject):
     track = Property(QObject, get_track, constant=True)
     audio_recorder = Property(QObject, get_audio_recorder, constant=True)
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
+    playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)
     norns_shield = Property(QObject, get_norns_shield, constant=True)

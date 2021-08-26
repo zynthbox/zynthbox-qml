@@ -36,7 +36,10 @@ Zynthian.NewStuffPage {
 
     /// HACK WARNING This thing means you should NOT use this anywhere that expects the controls to be
     /// visible when the playgrid downloader page is removed from the stack.
-    Component.onDestruction: {
-        applicationWindow().controlsVisible = false
+    Connections {
+        target: component.backAction
+        onTriggered: {
+            applicationWindow().controlsVisible = false
+        }
     }
 }

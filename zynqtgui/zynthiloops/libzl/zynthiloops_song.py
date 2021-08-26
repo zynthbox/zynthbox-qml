@@ -25,7 +25,7 @@
 import ctypes as ctypes
 import math
 
-from PySide2.QtCore import Qt, Property, QObject, Signal, Slot
+from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
 from . import libzl
 from .zynthiloops_track import zynthiloops_track
@@ -56,6 +56,10 @@ class zynthiloops_song(QObject):
         self.__index__ = 0
         self.__is_playing__ = False
         self.__name__ = f"Sketch {self.__index__+1}"
+        self.__save_timer__ = QTimer(self)
+        self.__save_timer__.setInterval(1000)
+        self.__save_timer__.setSingleShot(True)
+        self.__save_timer__.timeout.connect(self.save)
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -88,6 +92,11 @@ class zynthiloops_song(QObject):
             print(self.__sketch_folder__ + self.__sketch_filename__)
         except Exception as e:
             logging.error(e)
+
+
+    def schedule_save(self):
+        self.__save_timer__.start()
+
 
     def restore(self):
         try:
@@ -148,6 +157,7 @@ class zynthiloops_song(QObject):
     def set_name(self, name):
         self.__name__ = name
         self.__name_changed__.emit()
+        self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
 
@@ -198,7 +208,7 @@ class zynthiloops_song(QObject):
             clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
             track.clipsModel.add_clip(clip)
             #self.add_clip_to_part(clip, i)
-        self.save()
+        self.schedule_save()
 
     def bpm(self):
         return self.__bpm__
@@ -206,6 +216,7 @@ class zynthiloops_song(QObject):
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
+        self.schedule_save()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
 

@@ -216,11 +216,18 @@ Zynthian.ScreenPage {
                                     onPressed: {
                                         bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
+                                        if (dblTimer.running) {
+                                            if (model.clip.isPlaying) {
+                                                model.clip.stop();
+                                            } else {
+                                                model.clip.play();
+                                            }
+                                        }
+                                        dblTimer.restart()
                                     }
-                                    onDoubleClicked: {
-                                        bottomBar.controlType = BottomBar.ControlType.Clip;
-                                        bottomBar.controlObj = model.clip;
-                                        model.clip.play();
+                                    Timer { //FIXME: why onDoubleClicked doesn't work
+                                        id: dblTimer
+                                        interval: 200
                                     }
                                 }
                             }

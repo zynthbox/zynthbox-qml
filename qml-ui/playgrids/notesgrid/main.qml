@@ -36,6 +36,8 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
+    octave: 3
+    useOctaves: true
 
     property QtObject settingsStore
 
@@ -128,6 +130,11 @@ Zynthian.BasePlayGrid {
         component.settingsStore.setDefault("positionalVelocity", zynthian.playgrid.positionalVelocity);
         
         component.populateGrid();
+    }
+
+    onOctaveChanged: {
+        console.log(component.octave);
+        component.settingsStore.setDefault("startingNote", component.octave * 12);
     }
 
     Component {

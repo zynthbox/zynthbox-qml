@@ -40,6 +40,7 @@ Zynthian.ScreenPage {
     bottomPadding: 5
 
     property QtObject someSettings
+
     Component.onCompleted: {
         applicationWindow().controlsVisible = false
         component.someSettings = zynthian.playgrid.getSettingsStore("zynthian playgrid main settings");
@@ -236,6 +237,7 @@ Zynthian.ScreenPage {
                     icon.name: "arrow-up"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    enabled: playGridStack.currentItem.useOctaves
                     background: Rectangle {
                         radius: 2
                         Kirigami.Theme.inherit: false
@@ -247,19 +249,27 @@ Zynthian.ScreenPage {
                         color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
-                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
+                        console.log(playGridStack.currentItem.octave)
+                        if (playGridStack.currentItem.octave + 1 < 11){
+                            playGridStack.currentItem.octave =  playGridStack.currentItem.octave + 1;
+                        } else {
+                            playGridStack.currentItem.octave =  10;
+                        }
                     }
                 }
+
                 QQC2.Label {
                     text: "Octave"
                     Layout.alignment: Qt.AlignHCenter
                 }
+
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     icon.name: "arrow-down"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    enabled: playGridStack.currentItem.useOctaves
                     background: Rectangle {
                         radius: 2
                         Kirigami.Theme.inherit: false
@@ -271,10 +281,11 @@ Zynthian.ScreenPage {
                         color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
-                        if (zynthian.playgrid.startingNote - 12 > 0) {
-                            zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
+                        console.log(playGridStack.currentItem)
+                        if (playGridStack.currentItem.octave - 1 > 0) {
+                            playGridStack.currentItem.octave =  playGridStack.currentItem.octave - 1;
                         } else {
-                            zynthian.playgrid.startingNote = 0;
+                            playGridStack.currentItem.octave = 0;
                         }
                     }
                 }

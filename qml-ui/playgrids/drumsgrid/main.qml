@@ -75,7 +75,7 @@ Zynthian.BasePlayGrid {
 
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian drumsgrid settings")
-        component.settingsStore.setDefault("startingNote", zynthian.playgrid.startingNote);
+        component.settingsStore.setDefault("startingNote", 36);
         component.settingsStore.setDefault("positionalVelocity", true);
         component.populateGrid();
     }
@@ -120,9 +120,7 @@ Zynthian.BasePlayGrid {
                                         if (note.isPlaying) {
                                             color = "#8bc34a";
                                         } else {
-                                            if (zynthian.playgrid.scale !== "chromatic" &&
-                                                note.name === component.currentNoteName
-                                            ) {
+                                            if (note.name === component.currentNoteName) {
                                                 color = Kirigami.Theme.focusColor;
                                             } else {
                                                 color = "white";
@@ -139,11 +137,7 @@ Zynthian.BasePlayGrid {
                                     text: {
                                         var text = "";
                                         if (note && note.name != "") {
-                                            if (zynthian.playgrid.scale == "major") {
-                                                text = note.name
-                                            } else {
-                                                text = note.name + note.octave
-                                            }
+                                            text = note.name + note.octave
                                         }
                                         return text;
                                     }
@@ -163,7 +157,7 @@ Zynthian.BasePlayGrid {
                                 onPressed: {
                                     if (pitchModPoint.pressed) {
                                         var velocityValue = 64;
-                                        if (zynthian.playgrid.positionalVelocity) {
+                                        if (component.settingsStore.property("positionalVelocity")) {
                                             velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
                                         } else {
                                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...

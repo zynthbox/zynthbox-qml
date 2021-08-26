@@ -36,6 +36,8 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
+    octave: 3
+    useOctaves: true
 
     property QtObject settingsStore
 
@@ -109,7 +111,7 @@ Zynthian.BasePlayGrid {
         component.settingsStore.setDefault("scale", zynthian.playgrid.scale);
         component.settingsStore.setDefault("rows", zynthian.playgrid.rows);
         component.settingsStore.setDefault("columns", zynthian.playgrid.columns);
-        component.settingsStore.setDefault("positionalVelocity", zynthian.playgrid.positionalVelocity);
+        component.settingsStore.setDefault("positionalVelocity", true);
         
         component.populateGrid();
     }
@@ -311,9 +313,12 @@ Zynthian.BasePlayGrid {
                 visible: component.settingsStore.property("scale") != "chromatic"
                 text: "+"
                 onClicked: {
-                    // zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
                     var startingNote = component.settingsStore.property("startingNote")
-                    component.settingsStore.setProperty("startingNote", startingNote + 12);
+                    if (startingNote + 12 < 127){
+                        component.settingsStore.setProperty("startingNote", startingNote + 12);
+                    } else {
+                        component.settingsStore.setProperty("startingNote", 120);
+                    }
                 }
             }
             QQC2.ComboBox {
@@ -367,7 +372,7 @@ Zynthian.BasePlayGrid {
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: zynthian.playgrid.positionalVelocity
+                checked: component.settingsStore.property("positionalVelocity")
                 onClicked: {
                     var positionalVelocity = component.settingsStore.property("positionalVelocity")
                     component.settingsStore.setProperty("positionalVelocity", !positionalVelocity);
@@ -379,6 +384,9 @@ Zynthian.BasePlayGrid {
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
+            if (component.settingsStore.mostRecentlyChanged() === "startingNote"){
+                console.log(component.settingsStore.property("startingNote"))
+            }
             populateGridTimer.start()
         }
     }

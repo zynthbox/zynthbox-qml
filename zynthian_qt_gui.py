@@ -579,8 +579,8 @@ class zynthian_gui(QObject):
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
-        self.screens["miniplaygrid"].__set_rows__(2)
-        self.screens["miniplaygrid"].__set_columns__(8)
+        #self.screens["miniplaygrid"].__set_rows__(2)
+        #self.screens["miniplaygrid"].__set_columns__(8)
 
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:

@@ -56,7 +56,7 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QJSValue
-from zynqtgui.zynthiloops import libzl
+from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
 sys.path.insert(1, "./zynqtgui")

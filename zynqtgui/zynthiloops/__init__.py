@@ -6,5 +6,4 @@ __all__ = [
 from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
     zynthian_gui_zynthiloops,
 )
-from .libzl import libzl
 

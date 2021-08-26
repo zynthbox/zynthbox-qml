@@ -238,7 +238,7 @@ Zynthian.ScreenPage {
                     icon.name: "arrow-up"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    enabled: playGridStack.currentItem.useOctaves
+                    enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
                     background: Rectangle {
                         radius: 2
                         Kirigami.Theme.inherit: false
@@ -269,7 +269,7 @@ Zynthian.ScreenPage {
                     icon.name: "arrow-down"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    enabled: playGridStack.currentItem.useOctaves
+                    enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
                     background: Rectangle {
                         radius: 2
                         Kirigami.Theme.inherit: false
@@ -282,7 +282,7 @@ Zynthian.ScreenPage {
                     }
                     onClicked: {
                         if (playGridsRepeater.currentItem.octave - 1 > 0) {
-                            playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave - 1;
+                            playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
                         } else {
                             playGridsRepeater.currentItem.octave = 0;
                         }

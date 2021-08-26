@@ -198,35 +198,42 @@ Zynthian.BasePlayGrid {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Octave"
-                visible: zynthian.playgrid.scale != "chromatic"
-                text: "-"
-                onClicked: {
-                    if (zynthian.playgrid.startingNote - 12 > 0) {
-                        zynthian.playgrid.startingNote = zynthian.playgrid.startingNote - 12;
-                    } else {
-                        zynthian.playgrid.startingNote = 0;
-                    }
-                }
-            }
+            // QQC2.Button {
+            //     Layout.fillWidth: true
+            //     Kirigami.FormData.label: "Octave"
+            //     visible: zynthian.playgrid.scale != "chromatic"
+            //     text: "-"
+            //     onClicked: {
+            //         var startingNote = component.settingsStore.property("startingNote")
+            //         if (startingNote - 12 > 0) {
+            //             component.settingsStore.setProperty("startingNote", startingNote - 12);
+            //         } else {
+            //             component.settingsStore.setProperty("startingNote",0);
+            //         }
+            //     }
+            // }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                visible: zynthian.playgrid.scale != "chromatic"
-                text: "+"
-                onClicked: {
-                    zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
-                }
-            }
+            // QQC2.Button {
+            //     Layout.fillWidth: true
+            //     visible: zynthian.playgrid.scale != "chromatic"
+            //     text: "+"
+            //     onClicked: {
+            //         var startingNote = component.settingsStore.property("startingNote")
+            //         if (startingNote + 12 < 127){
+            //             component.settingsStore.setProperty("startingNote", startingNote + 12);
+            //         } else {
+            //             component.settingsStore.setProperty("startingNote", 120);
+            //         }
+            //     }
+            // }
 
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: zynthian.playgrid.positionalVelocity
+                checked: component.settingsStore.property("positionalVelocity")
                 onClicked: {
-                    zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
+                    var positionalVelocity = component.settingsStore.property("positionalVelocity")
+                    component.settingsStore.setProperty("positionalVelocity", !positionalVelocity);
                 }
             }
         }

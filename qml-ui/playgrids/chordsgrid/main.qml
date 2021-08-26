@@ -37,6 +37,7 @@ Zynthian.BasePlayGrid {
     settings: chordsGridSettings
     name:'Chords Grid'
     octave: 5
+    useOctaves: true
     // model: zynthian.playgrid.chordModel
 
     property QtObject settingsStore
@@ -144,12 +145,7 @@ Zynthian.BasePlayGrid {
         component.chordRows = component.settingsStore.property("chordRows");
         component.chordScales = component.settingsStore.property("chordScales");
         component.positionalVelocity = component.settingsStore.property("positionalVelocity")
-
-        // component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
-        // component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
-        // component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
-        // component.settingsStore.setDefaultProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
-
+        
         component.populateGrid();
     }
 

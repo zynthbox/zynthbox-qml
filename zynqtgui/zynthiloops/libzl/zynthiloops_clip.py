@@ -161,6 +161,7 @@ class zynthiloops_clip(QObject):
     def set_length(self, length: int):
         self.__length__ = length
         self.length_changed.emit()
+        self.__song__.schedule_save()
 
         if self.audioSource is not None:
             self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
@@ -197,6 +198,7 @@ class zynthiloops_clip(QObject):
     def set_start_position(self, position: float):
         self.__start_position__ = position
         self.start_position_changed.emit()
+        self.__song__.schedule_save()
         if self.audioSource is None:
             return
         self.audioSource.set_start_position(position)
@@ -218,6 +220,7 @@ class zynthiloops_clip(QObject):
     def set_pitch(self, pitch: float):
         self.__pitch__ = pitch
         self.pitch_changed.emit()
+        self.__song__.schedule_save()
         if self.audioSource is None:
             return
         self.audioSource.set_pitch(pitch)
@@ -231,6 +234,7 @@ class zynthiloops_clip(QObject):
     def set_time(self, time: float):
         self.__time__ = time
         self.time_changed.emit()
+        self.__song__.schedule_save()
         if self.audioSource is None:
             return
         self.audioSource.set_speed_ratio(time)
@@ -243,6 +247,7 @@ class zynthiloops_clip(QObject):
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
+        self.__song__.schedule_save()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
 
@@ -254,6 +259,7 @@ class zynthiloops_clip(QObject):
         self.__should_sync__ = shouldSync
         self.should_sync_changed.emit()
         self.update_synced_values()
+        self.__song__.schedule_save()
 
         if not shouldSync:
             self.set_time(1.0)
@@ -287,6 +293,7 @@ class zynthiloops_clip(QObject):
         self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
+        self.__song__.schedule_save()
     path = Property(str, path, set_path, notify=path_changed)
 
     @Slot(None)

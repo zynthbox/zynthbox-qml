@@ -47,6 +47,10 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Add Track")
             onTriggered: root.song.addTrack()
+        },
+        Kirigami.Action {
+            text: qsTr("Clear Sketch")
+            onTriggered: zynthian.zynthiloops.clearCurrentSketch()
         }
     ]
 

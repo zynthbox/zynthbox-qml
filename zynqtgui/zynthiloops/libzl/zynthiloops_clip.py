@@ -74,7 +74,10 @@ class zynthiloops_clip(QObject):
         #if "name" in obj:
             #self.name = obj["name"]
         if "path" in obj:
-            self.__path__ = obj["path"]
+            if obj["path"] is None:
+                self.__path__ = None
+            else:
+                self.path = obj["path"]
         if "start" in obj:
             self.__start_position__ = obj["start"]
         if "length" in obj:
@@ -297,13 +300,15 @@ class zynthiloops_clip(QObject):
     def play(self):
         if self.audioSource is None:
             return
+
+        self.stop()
         self.__song__.get_metronome_manager().start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
         self.audioSource.addClipToTimer()
 
     @Slot(None)
-    def stop(self, loop=True):
+    def stop(self, only_visual=False):
         logging.error(f"Stopping Clip {self.audioSource}")
 
         if self.audioSource is None:
@@ -311,4 +316,6 @@ class zynthiloops_clip(QObject):
         self.__song__.get_metronome_manager().stop_metronome_request()
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
-        self.audioSource.stop()
+
+        if not only_visual:
+            self.audioSource.stop()

@@ -27,8 +27,8 @@ import ctypes
 import logging
 from os.path import dirname, realpath
 
-libzl = None
 
+libzl = None
 
 def init():
     global libzl
@@ -37,6 +37,8 @@ def init():
         libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
 
         ### Type Definition
+        libzl.stopClips.argTypes = [ctypes.c_int, ]
+
         libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
 
         libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
@@ -94,6 +96,17 @@ def startTimer(interval: int):
 def stopTimer():
     if libzl:
         libzl.SyncTimer_stopTimer()
+
+
+def stopClips(clips: list):
+    if len(clips) > 0:
+        logging.error(f"{clips[0]}, {clips[0].audioSource}")
+
+        arr = (ctypes.c_void_p * len(clips))()
+        arr[:] = [c.audioSource.obj for c in clips]
+
+        if libzl:
+            libzl.stopClips(len(clips), arr)
 
 
 # def add_clip_to_part(partIndex, clip):

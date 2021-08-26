@@ -36,25 +36,26 @@ from .zynthiloops_tracks_model import zynthiloops_tracks_model
 
 import logging
 import json
+import os
 from pathlib import Path
 
 
 class zynthiloops_song(QObject):
     __instance__ = None
 
-    def __init__(self, parent=None):
+    def __init__(self, sketch_folder: str, parent=None):
         super(zynthiloops_song, self).__init__(parent)
 
         self.__metronome_manager__ = parent
 
-        self.__sketch_folder__ = "/zynthian/zynthian-my-data/sketches/"
+        self.__sketch_folder__ = sketch_folder
         self.__sketch_filename__ = "sketch1.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120
         self.__index__ = 0
         self.__is_playing__ = False
-        self.__name__ = f"Song {self.__index__+1}"
+        self.__name__ = f"Sketch {self.__index__+1}"
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -84,30 +85,34 @@ class zynthiloops_song(QObject):
             f = open(self.__sketch_folder__ + self.__sketch_filename__, "w")
             f.write(json.dumps(self.serialize()))
             f.close()
+            print(self.__sketch_folder__ + self.__sketch_filename__)
         except Exception as e:
             logging.error(e)
 
     def restore(self):
-        # try:
-        #     f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
-        #     obj = json.loads(f.read())
-        #     logging.error("BBBBB")
-        #     logging.error(obj["tracks"])
-        #     logging.error(obj["parts"])
-        #
-        #     if "name" in obj:
-        #         self.__name__ = obj["name"]
-        #     if "bpm" in obj:
-        #         self.__bpm__ = obj["bpm"]
-        #     if "parts" in obj:
-        #         self.__parts_model__.deserialize(obj["parts"])
-        #     if "tracks" in obj:
-        #         self.__tracks_model__.deserialize(obj["tracks"])
-        #     return True
-        # except Exception as e:
-        #     logging.error(e)
-        #     return False
-        return False
+        try:
+            f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
+            obj = json.loads(f.read())
+            logging.error("BBBBB")
+            logging.error(obj["tracks"])
+            logging.error(obj["parts"])
+
+            if "name" in obj:
+                self.__name__ = obj["name"]
+            if "bpm" in obj:
+                self.__bpm__ = obj["bpm"]
+            if "parts" in obj:
+                self.__parts_model__.deserialize(obj["parts"])
+            if "tracks" in obj:
+                self.__tracks_model__.deserialize(obj["tracks"])
+            return True
+        except Exception as e:
+            logging.error(e)
+            return False
+
+    def destroy(self):
+        os.remove(self.__sketch_folder__ + self.__sketch_filename__)
+        self.deleteLater()
 
     def get_metronome_manager(self):
         return self.__metronome_manager__

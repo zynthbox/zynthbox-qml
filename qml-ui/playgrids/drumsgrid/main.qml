@@ -36,9 +36,12 @@ Zynthian.BasePlayGrid {
     grid: drumsGrid
     settings: drumsGridSettings
     name:'Drums Grid'
-    model: zynthian.playgrid.model
+    // model: zynthian.playgrid.model
 
-    Component.onCompleted: {
+    property QtObject settingsStore
+
+    function populateGrid(){
+
         var note_int_to_str_map = [
             "C",
             "C#",
@@ -53,18 +56,34 @@ Zynthian.BasePlayGrid {
             "A#",
             "B",
         ]
+        
         component.model = zynthian.playgrid.createNotesModel();
-        var notes = [];
-        for(var col = zynthian.playgrid.startingNote; col < zynthian.playgrid.startingNote + 9; ++col) {
-            var note = zynthian.playgrid.createNote(
-                ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
-                0,
-                Math.floor(col / 12),
-                col
-            );
-            notes.push(note);
+        var startingNote = component.settingsStore.property("startingNote")
+        
+        for (var row = 0; row < 3; ++row){
+
+            var rowStartingNote = startingNote + (row * 3);
+            var rowEndingNote = rowStartingNote + 3;
+            var notes = [];
+
+            for(var col = rowStartingNote; col < rowEndingNote; ++col) {
+                var note = zynthian.playgrid.createNote(
+                    ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
+                    0,
+                    Math.floor(col / 12),
+                    col
+                );
+                notes.push(note);
+            }
+            component.model.addRow(notes);
         }
-        component.model.addRow(notes);
+
+    }
+
+    Component.onCompleted: {
+        component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian drumsgrid settings")
+        component.settingsStore.setDefault("startingNote", zynthian.playgrid.startingNote);
+        component.populateGrid();
     }
     
     Component {
@@ -310,6 +329,22 @@ Zynthian.BasePlayGrid {
                     zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
                 }
             }
+        }
+    }
+
+    Connections {
+        target: component.settingsStore
+        onPropertyChanged: {
+            populateGridTimer.start()
+        }
+    }
+
+    Timer {
+        id: populateGridTimer
+        interval: 1
+        repeat: false
+        onTriggered: {
+            component.populateGrid();
         }
     }
 }

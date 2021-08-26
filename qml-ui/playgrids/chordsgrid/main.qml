@@ -40,6 +40,8 @@ Zynthian.BasePlayGrid {
 
     property QtObject settingsStore
     property int chordRows
+    property var chordScales
+    property bool positionalVelocity
 
     function populateGrid(){
 
@@ -75,13 +77,6 @@ Zynthian.BasePlayGrid {
             "locrian": [1, 2, 2, 1, 2, 2, 2],
         }
 
-        var chord_scales  = [
-            "ionian",
-            "dorian",
-            "phrygian",
-            "aeolian",
-            "chromatic"
-        ]
 
         var chord_scales_starts = [
             60,
@@ -92,6 +87,7 @@ Zynthian.BasePlayGrid {
         ]
 
         var chord_rows = component.settingsStore.property("chordRows");
+        var chord_scales = component.settingsStore.property("chordScales")
         var chord_notes = [];
         var diatonic_progressions = [0, 2, 4];
 
@@ -156,13 +152,22 @@ Zynthian.BasePlayGrid {
     }
 
     Component.onCompleted: {
+
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
+        
         component.settingsStore.setDefault("chordRows", 5);
+        component.settingsStore.setDefault("chordScales",["ionian","dorian","phrygian","aeolian","chromatic"])
+        component.settingsStore.setDefault("positionalVelocity",true)
+
         component.chordRows = component.settingsStore.property("chordRows");
+        component.chordScales = component.settingsStore.property("chordScales");
+        component.positionalVelocity = component.settingsStore.property("positionalVelocity")
+
         // component.settingsStore.setDefaultProperty("scale", zynthian.playgrid.scale);
         // component.settingsStore.setDefaultProperty("rows", zynthian.playgrid.rows);
         // component.settingsStore.setDefaultProperty("columns", zynthian.playgrid.columns);
         // component.settingsStore.setDefaultProperty("positionalVelocity", zynthian.playgrid.positionalVelocity);
+
         component.populateGrid();
     }
 
@@ -266,6 +271,7 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+
     Component {
         id: chordsGridSettings
         Kirigami.FormLayout {
@@ -284,16 +290,6 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     component.settingsStore.setProperty("chordRows",model[currentIndex])
                 }
-                // currentIndex: {
-                //     for (var i = 0; i < count; ++i) {
-                //         if (zynthian.playgrid.chordRows === model[i]) {
-                //             return i;
-                //         }
-                //     }
-                // }
-                // onActivated: {
-                //     zynthian.playgrid.chordRows = model[currentIndex];
-                // }
             }
             Repeater {
                 model: zynthian.playgrid.chordRows
@@ -305,7 +301,7 @@ Zynthian.BasePlayGrid {
                     textRole: "text"
                     displayText: currentText
                     currentIndex: {
-                        var theScale = zynthian.playgrid.chordScales[repeaterIndex];
+                        var theScale = component.chordScales[repeaterIndex];
                         for (var i = 0; i < count; ++i) {
                             if (scaleModel.get(i).scale === theScale) {
                                 return i;
@@ -314,16 +310,18 @@ Zynthian.BasePlayGrid {
                         return 0;
                     }
                     onActivated: {
-                        zynthian.playgrid.setChordScale(repeaterIndex, scaleModel.get(currentIndex).scale);
+                        var chordScales = component.chordScales;
+                        chordScales[repeaterIndex] =  scaleModel.get(currentIndex).scale;
+                        component.settingsStore.setProperty("chordScales", chordScales)
                     }
                 }
             }
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: zynthian.playgrid.positionalVelocity
+                checked: component.positionalVelocity
                 onClicked: {
-                    zynthian.playgrid.positionalVelocity = !zynthian.playgrid.positionalVelocity
+                    component.settingsStore.setProperty("positionalVelocity", !component.positionalVelocity)
                 }
             }
         }
@@ -332,12 +330,22 @@ Zynthian.BasePlayGrid {
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
-            if (component.settingsStore.mostRecentlyChanged() === "chordRows"){
+            
+            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged()
+            
+            if (mostRecentlyChanged === "chordRows"){
                 component.chordRows = component.settingsStore.property("chordRows");
+            } else if (mostRecentlyChanged === "chordScales"){
+                component.chordScales = component.settingsStore.property("chordScales");
+            } else if (mostRecentlyChanged === "positionalVelocity"){
+                component.positionalVelocity = component.settingsStore.property("positionalVelocity");
             }
+
             populateGridTimer.start()
+        
         }
     }
+
     Timer {
         id: populateGridTimer
         interval: 1
@@ -346,4 +354,5 @@ Zynthian.BasePlayGrid {
             component.populateGrid();
         }
     }
+
 }

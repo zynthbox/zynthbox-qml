@@ -319,6 +319,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __play_grid_index_changed__(self):
         pass
 
+    def __get_pitch__(self):
+        return self.__pitch__
+
+    def __set_pitch__(self, pitch):
+        self.__pitch__ = pitch
+        self.__pitch_changed__.emit()
+
+    @Signal
+    def __pitch_changed__(self):
+        pass
+
     @Slot(Note, int)
     def setNoteOn(self, note: Note, velocity: int = 64):
         self.setNoteState(note = note, velocity = velocity, setOn = True)
@@ -399,5 +410,5 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
         return self.__settings_stores__[name]
 
-    pitch = Property(int, get_pitch, set_pitch, notify=__pitch_changed__)
+    pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
     playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)

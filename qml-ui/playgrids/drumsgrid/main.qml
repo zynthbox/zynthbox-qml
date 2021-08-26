@@ -43,12 +43,11 @@ Zynthian.BasePlayGrid {
 
     function populateGrid(){
 
-        if (component.model) component.model.clear();
-        else component.model = zynthian.playgrid.createNotesModel();
+        if (component.model){ 
+            component.model.clear();
+        } else component.model = zynthian.playgrid.createNotesModel();
 
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-        
-        component.model = zynthian.playgrid.createNotesModel();
         var startingNote = component.settingsStore.property("startingNote")
         
         for (var row = 0; row < 4; ++row){
@@ -58,12 +57,14 @@ Zynthian.BasePlayGrid {
             var notes = [];
 
             for(var col = rowStartingNote; col < rowEndingNote; ++col) {
+
                 var note = zynthian.playgrid.createNote(
                     ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
                     0,
                     Math.floor(col / 12),
                     col
                 );
+                
                 notes.push(note);
             }
             

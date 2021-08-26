@@ -38,4 +38,6 @@ Item {
     property QtObject model
     property string name
     property string currentNoteName
+    property bool useOctaves: true
+    property int octave: 3
 }

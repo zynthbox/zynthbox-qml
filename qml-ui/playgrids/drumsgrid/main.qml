@@ -36,6 +36,7 @@ Zynthian.BasePlayGrid {
     grid: drumsGrid
     settings: drumsGridSettings
     name:'Drums Grid'
+    useOctaves: false
     // model: zynthian.playgrid.model
 
     property QtObject settingsStore
@@ -60,10 +61,10 @@ Zynthian.BasePlayGrid {
         component.model = zynthian.playgrid.createNotesModel();
         var startingNote = component.settingsStore.property("startingNote")
         
-        for (var row = 0; row < 3; ++row){
+        for (var row = 0; row < 4; ++row){
 
-            var rowStartingNote = startingNote + (row * 3);
-            var rowEndingNote = rowStartingNote + 3;
+            var rowStartingNote = startingNote + (row * 4);
+            var rowEndingNote = rowStartingNote + 4;
             var notes = [];
 
             for(var col = rowStartingNote; col < rowEndingNote; ++col) {
@@ -83,6 +84,7 @@ Zynthian.BasePlayGrid {
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian drumsgrid settings")
         component.settingsStore.setDefault("startingNote", zynthian.playgrid.startingNote);
+        component.settingsStore.setDefault("positionalVelocity", true);
         component.populateGrid();
     }
     
@@ -196,63 +198,13 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+
     Component {
         id: drumsGridSettings
         Kirigami.FormLayout {
             objectName: "drumsGridSettings"
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            QQC2.ComboBox {
-                id: comboScale
-                Kirigami.FormData.label: "Modes"
-                Layout.fillWidth: true
-                model: scaleModel
-                textRole: "text"
-                displayText: currentText
-                currentIndex: 1
-
-                onActivated: {
-                    zynthian.playgrid.startingNote = 36;
-                    zynthian.playgrid.scale = scaleModel.get(currentIndex).scale
-                }
-            }
-            QQC2.ComboBox {
-                id: comboKey
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Key"
-                visible: zynthian.playgrid.scale == "chromatic"
-                model: keyModel
-                textRole: "text"
-                displayText: currentText
-                currentIndex: 0
-
-                onActivated: {
-                    zynthian.playgrid.startingNote = keyModel.get(currentIndex).note;
-                }
-            }
-
-            QQC2.Button {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Transpose"
-                visible: zynthian.playgrid.scale == "chromatic"
-                text: "-"
-                onClicked: {
-                    if (zynthian.playgrid.startingNote - 1 > 0) {
-                        zynthian.playgrid.startingNote--;
-                    } else {
-                        zynthian.playgrid.startingNote = 0;
-                    }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                visible: zynthian.playgrid.scale == "chromatic"
-                text: "+"
-                onClicked: {
-                    zynthian.playgrid.startingNote++;
-                }
-            }
 
             QQC2.Button {
                 Layout.fillWidth: true
@@ -267,6 +219,7 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
+
             QQC2.Button {
                 Layout.fillWidth: true
                 visible: zynthian.playgrid.scale != "chromatic"
@@ -275,52 +228,7 @@ Zynthian.BasePlayGrid {
                     zynthian.playgrid.startingNote = zynthian.playgrid.startingNote + 12;
                 }
             }
-            QQC2.ComboBox {
-                id: optionGrid
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Grid"
-                model: gridModel
-                textRole: "text"
-                displayText: currentText
-                currentIndex: 3
 
-                onActivated: {
-                    var data = gridModel.get(currentIndex)
-
-                    if (data.row === 0 && data.column === 0) {
-                        zynthian.playgrid.rows = customRows.currentText;
-                        zynthian.playgrid.columns = customColumns.currentText;
-                    } else {
-                        zynthian.playgrid.rows = data.row;
-                        zynthian.playgrid.columns = data.column;
-                    }
-                }
-            }
-
-            QQC2.ComboBox {
-                id: customRows
-                Layout.fillWidth: true
-                visible: optionGrid.currentIndex === 0
-                Kirigami.FormData.label: "Custom Grid Rows"
-                model: [3,4,5,6,7,8,9]
-                displayText: currentText
-                currentIndex: 0
-                onActivated: {
-                    zynthian.playgrid.rows = currentText;
-                }
-            }
-            QQC2.ComboBox {
-                id: customColumns
-                Layout.fillWidth: true
-                visible: optionGrid.currentIndex === 0
-                Kirigami.FormData.label: "Custom Grid Columns"
-                model: [3,4,5,6,7,8,9]
-                displayText: currentText
-                currentIndex: 0
-                onActivated: {
-                    zynthian.playgrid.columns = currentText;
-                }
-            }
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"

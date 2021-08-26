@@ -128,69 +128,69 @@ class zynthiloops_clip(QObject):
     def __is_playing_changed__(self):
         pass
 
-    @Property(bool, constant=True)
     def playable(self):
         return True
+    playable = Property(bool, playable, constant=True)
 
-    @Property(bool, constant=True)
     def recordable(self):
         return True
+    recordable = Property(bool, recordable, constant=True)
 
-    @Property(bool, constant=True)
     def clearable(self):
         return True
+    clearable = Property(bool, clearable, constant=True)
 
-    @Property(bool, constant=True)
     def deletable(self):
         return False
+    deletable = Property(bool, deletable, constant=True)
 
-    @Property(bool, constant=True)
     def nameEditable(self):
         return False
+    nameEditable = Property(bool, constant=True)
 
-    @Property(bool, notify=__is_playing_changed__)
     def isPlaying(self):
         return self.__is_playing__
+    isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
 
-    @Property(int, notify=length_changed)
     def length(self):
         return self.__length__
 
-    @length.setter
     def set_length(self, length: int):
         self.__length__ = length
         self.length_changed.emit()
 
         if self.audioSource is not None:
             self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+    length = Property(int, length, set_length, notify=length_changed)
 
-    @Property(int, notify=row_index_changed)
+
     def row(self):
         return self.__row_index__
 
-    @row.setter
     def set_row_index(self, index):
         self.__row_index__ = index
         self.row_index_changed.emit()
+    
+    row = Property(int, row, set_row_index, notify=row_index_changed)
 
-    @Property(int, notify=col_index_changed)
+
     def col(self):
         return self.__col_index__
 
-    @col.setter
     def set_col_index(self, index):
         self.__col_index__ = index
         self.col_index_changed.emit()
 
-    @Property(str, constant=True)
+    col = Property(int, col, set_col_index, notify=col_index_changed)
+
+
     def name(self):
         return f"T{self.__row_index__}{chr(self.__col_index__+65)}"
+    name = Property(str, name, constant=True)
 
-    @Property(float, notify=start_position_changed)
     def startPosition(self):
         return self.__start_position__
 
-    @startPosition.setter
     def set_start_position(self, position: float):
         self.__start_position__ = position
         self.start_position_changed.emit()
@@ -198,17 +198,20 @@ class zynthiloops_clip(QObject):
             return
         self.audioSource.set_start_position(position)
 
-    @Property(float, notify=duration_changed)
+    startPosition = Property(float, startPosition, set_start_position, notify=start_position_changed)
+
     def duration(self):
         if self.audioSource is None:
             return 0.0
         return self.audioSource.get_duration()
 
-    @Property(int, notify=pitch_changed)
+    duration = Property(float, duration, notify=duration_changed)
+
+
+
     def pitch(self):
         return self.__pitch__
 
-    @pitch.setter
     def set_pitch(self, pitch: float):
         self.__pitch__ = pitch
         self.pitch_changed.emit()
@@ -216,24 +219,34 @@ class zynthiloops_clip(QObject):
             return
         self.audioSource.set_pitch(pitch)
 
-    @Property(float, notify=time_changed)
+    pitch = Property(int, pitch, set_pitch, notify=pitch_changed)
+
+
     def time(self):
         return self.__time__
 
-    @Property(int, notify=bpm_changed)
+    def set_time(self, time: float):
+        self.__time__ = time
+        self.time_changed.emit()
+        if self.audioSource is None:
+            return
+        self.audioSource.set_speed_ratio(time)
+    time = Property(float, time, set_time, notify=time_changed)
+
+
     def bpm(self):
         return self.__bpm__
 
-    @bpm.setter
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
 
-    @Property(bool, notify=should_sync_changed)
+    bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
+
+
     def shouldSync(self):
         return self.__should_sync__
 
-    @shouldSync.setter
     def set_shouldSync(self, shouldSync: bool):
         self.__should_sync__ = shouldSync
         self.should_sync_changed.emit()
@@ -244,23 +257,17 @@ class zynthiloops_clip(QObject):
             # Set length to recalculate loop time
             self.set_length(self.__length__)
 
-    @time.setter
-    def set_time(self, time: float):
-        self.__time__ = time
-        self.time_changed.emit()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_speed_ratio(time)
+    shouldSync = Property(bool, shouldSync, set_shouldSync, notify=should_sync_changed)
 
-    @Property(str, notify=path_changed)
+
     def path(self):
         return self.__path__
 
-    @path.setter
     def set_path(self, path):
         self.__path__ = path
         self.stop()
         self.audioSource = ClipAudioSource(path.encode('utf-8'))
+        print(path)
 
         self.__length__ = 1
         self.__is_playing__ = False
@@ -277,6 +284,7 @@ class zynthiloops_clip(QObject):
         self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
+    path = Property(str, path, set_path, notify=path_changed)
 
     @Slot(None)
     def clear(self, loop=True):

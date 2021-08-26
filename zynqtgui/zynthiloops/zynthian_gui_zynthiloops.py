@@ -25,12 +25,15 @@
 import logging
 import ctypes as ctypes
 import math
+import sys
 
 from PySide2.QtCore import Property, QObject, QTimer, Signal
 
-from . import libzl
-from .zynthiloops_clip import zynthiloops_clip
-from .zynthiloops_song import zynthiloops_song
+sys.path.insert(1, "./libzl")
+from .libzl import libzl
+from .libzl import zynthiloops_song
+from .libzl import zynthiloops_clip
+
 from .. import zynthian_qt_gui_base
 
 
@@ -47,7 +50,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         zynthian_gui_zynthiloops.__instance__ = self
         self.__current_beat__ = 0
         self.__metronome_running_refcount = 0
-        self.__song__ = zynthiloops_song(self)
+        self.__song__ = zynthiloops_song.zynthiloops_song(self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         libzl.registerTimerCallback(cb)
@@ -100,8 +103,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
         self.current_beat_changed.emit()
 
-        if self.__song__.isPlaying:
-            self.__song__.metronome_update()
+        #if self.__song__.isPlaying:
+            #self.__song__.metronome_update()
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

@@ -50,7 +50,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Clear Sketch")
-            onTriggered: root.clearCurrentSketch()
+            onTriggered: zynthian.zynthiloops.clearCurrentSketch()
         }
     ]
 

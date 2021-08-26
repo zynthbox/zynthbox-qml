@@ -136,14 +136,16 @@ class zynthiloops_song(QObject):
     def __name_changed__(self):
         pass
 
-    @Property(str, notify=__name_changed__)
+
     def name(self):
         return self.__name__
 
-    @name.setter
     def set_name(self, name):
         self.__name__ = name
         self.__name_changed__.emit()
+
+    name = Property(str, name, set_name, notify=__name_changed__)
+
 
     @Signal
     def bpm_changed(self):
@@ -169,17 +171,19 @@ class zynthiloops_song(QObject):
     def __parts_model_changed__(self):
         pass
 
-    @Property(QObject, notify=__tracks_model_changed__)
     def tracksModel(self):
         return self.__tracks_model__
+    tracksModel = Property(QObject, tracksModel, notify=__tracks_model_changed__)
 
-    @Property(QObject, notify=__parts_model_changed__)
+
     def partsModel(self):
         return self.__parts_model__
+    partsModel = Property(QObject, partsModel, notify=__parts_model_changed__)
 
-    @Property(bool, notify=__is_playing_changed__)
+
     def isPlaying(self):
         return self.__is_playing__
+    isPlaying = Property(bool, notify=__is_playing_changed__)
 
     @Slot(None)
     def addTrack(self):
@@ -191,23 +195,24 @@ class zynthiloops_song(QObject):
             #self.add_clip_to_part(clip, i)
         self.save()
 
-    @Property(int, notify=bpm_changed)
     def bpm(self):
         return self.__bpm__
 
-    @bpm.setter
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
 
-    @Property(int, notify=index_changed)
+    bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
+
+
     def index(self):
         return self.__index__
 
-    @index.setter
     def set_index(self, index):
         self.__index__ = index
         self.index_changed.emit()
+
+    index = Property(int, index, set_index, notify=index_changed)
 
     # def add_clip_to_part(self, clip, part_index):
     #     self.__parts_model__.getPart(part_index).add_clip(clip)

@@ -104,6 +104,7 @@ class zynthiloops_clips_model(QAbstractListModel):
     def countChanged(self):
         pass
 
-    @Property(int, notify=countChanged)
+
     def count(self):
         return len(self.__clips__)
+    count = Property(int, count, notify=countChanged)

@@ -79,14 +79,14 @@ class zynthiloops_track(QObject):
     def __name_changed__(self):
         pass
 
-    @Property(str, notify=__name_changed__)
     def name(self):
         return self.__name__
 
-    @name.setter
     def set_name(self, name):
         self.__name__ = name
         self.__name_changed__.emit()
+
+    name = Property(str, name, set_name, notify=__name_changed__)
 
     def type(self):
         return self.__type__

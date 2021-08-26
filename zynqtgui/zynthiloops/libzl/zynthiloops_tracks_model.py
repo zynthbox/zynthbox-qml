@@ -101,8 +101,9 @@ class zynthiloops_tracks_model(QAbstractListModel):
     def countChanged(self):
         pass
 
-    @Property(int, notify=countChanged)
+
     def count(self):
         return len(self.__tracks__)
+    count = Property(int, count, notify=countChanged)
 
 

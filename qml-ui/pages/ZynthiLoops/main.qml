@@ -217,6 +217,11 @@ Zynthian.ScreenPage {
                                         bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
                                     }
+                                    onDoubleClicked: {
+                                        bottomBar.controlType = BottomBar.ControlType.Clip;
+                                        bottomBar.controlObj = model.clip;
+                                        model.clip.play();
+                                    }
                                 }
                             }
                         }

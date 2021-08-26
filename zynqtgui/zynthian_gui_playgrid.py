@@ -158,14 +158,13 @@ class Note(QObject):
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
     NoteRole = Qt.DisplayRole
+    __grid_notes__ = []
 
     def __init__(self, parent: QObject = None) -> None:
         super(zynthian_gui_grid_notes_model, self).__init__(parent)
-        self.__grid_notes__ = []
 
     def roleNames(self) -> typing.Dict:
         roles = {self.NoteRole: b"note"}
-
         return roles
 
     def data(self, index: QModelIndex, role: int) -> Note:
@@ -298,6 +297,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     __pitch__ = 0
     __models__ = []
+    __notes__ = []
     __settings_stores__ = {}
     __note_state_map__ = {}
 
@@ -658,12 +658,19 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __positional_velocity_changed__(self):
         pass
 
+    def model_deleted(self, model:zynthian_gui_grid_notes_model):
+        self.__models__.remove(model)
+
     @Slot(result=QObject)
     def createNotesModel(self):
         model = zynthian_gui_grid_notes_model(self)
         self.__models__.append(model)
+        model.destroyed.connect(self.model_deleted)
         QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
         return model
+
+    def note_deleted(self, note:Note):
+        self.__notes__.remove(note)
 
     @Slot(str, int, int, int, result=QObject)
     def createNote(self,
@@ -679,6 +686,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             midi_port=self.__midi_port__,
             parent=self
         )
+        self.__notes__.append(note)
+        note.destroyed.connect(self.note_deleted)
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
         return note
 

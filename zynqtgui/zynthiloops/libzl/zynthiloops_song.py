@@ -102,9 +102,6 @@ class zynthiloops_song(QObject):
         try:
             f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
             obj = json.loads(f.read())
-            logging.error("BBBBB")
-            logging.error(obj["tracks"])
-            logging.error(obj["parts"])
 
             if "name" in obj:
                 self.__name__ = obj["name"]

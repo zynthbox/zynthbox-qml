@@ -80,6 +80,7 @@ QtObject {
 		"network":"NetworkPage.qml",
 		"hardware":"HardwarePage.qml",
 		"playgrid": "PlayGrid.qml",
+		"playgrid_downloader": "PlayGridDownloaderPage.qml",
 		"track": "TrackPage.qml",
 		"zynthiloops": "ZynthiLoops/main.qml"
 	}

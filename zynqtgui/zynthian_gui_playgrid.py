@@ -382,7 +382,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return model
 
     def note_deleted(self, note:Note):
-        if note in self.__notes:
+        if note in self.__notes__:
             self.__notes__.remove(note)
 
     @Slot(str, int, int, int, result=QObject)

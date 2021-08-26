@@ -370,7 +370,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                         model.highlight_playing_note(note, False)
 
     def model_deleted(self, model:zynthian_gui_grid_notes_model):
-        self.__models__.remove(model)
+        if model in self.__models__:
+            self.__models__.remove(model)
 
     @Slot(result=QObject)
     def createNotesModel(self):
@@ -381,7 +382,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return model
 
     def note_deleted(self, note:Note):
-        self.__notes__.remove(note)
+        if note in self.__notes:
+            self.__notes__.remove(note)
 
     @Slot(str, int, int, int, result=QObject)
     def createNote(self,

@@ -250,11 +250,10 @@ Zynthian.ScreenPage {
                         color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
-                        console.log(playGridStack.currentItem.octave)
-                        if (playGridStack.currentItem.octave + 1 < 11){
-                            playGridStack.currentItem.octave =  playGridStack.currentItem.octave + 1;
+                        if (playGridsRepeater.currentItem.octave + 1 < 11){
+                            playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
                         } else {
-                            playGridStack.currentItem.octave =  10;
+                            playGridsRepeater.currentItem.octave =  10;
                         }
                     }
                 }
@@ -282,11 +281,10 @@ Zynthian.ScreenPage {
                         color: Kirigami.Theme.backgroundColor
                     }
                     onClicked: {
-                        console.log(playGridStack.currentItem)
-                        if (playGridStack.currentItem.octave - 1 > 0) {
-                            playGridStack.currentItem.octave =  playGridStack.currentItem.octave - 1;
+                        if (playGridsRepeater.currentItem.octave - 1 > 0) {
+                            playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave - 1;
                         } else {
-                            playGridStack.currentItem.octave = 0;
+                            playGridsRepeater.currentItem.octave = 0;
                         }
                     }
                 }
@@ -533,6 +531,7 @@ Zynthian.ScreenPage {
     Repeater {
         id:playGridsRepeater
         model: playGrids
+        property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item
         Loader {
             id:playGridLoader
             source: model.url

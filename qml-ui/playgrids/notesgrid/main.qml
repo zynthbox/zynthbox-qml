@@ -36,33 +36,15 @@ Zynthian.BasePlayGrid {
     grid: notesGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    octave: 3
-    useOctaves: true
 
     property QtObject settingsStore
 
     function populateGrid(){
         
-        if (component.model){
-            component.model.clear();
-        } else {
-            component.model = zynthian.playgrid.createNotesModel();
-        }
+        if (component.model) component.model.clear();
+        else component.model = zynthian.playgrid.createNotesModel();
 
-        var note_int_to_str_map = [
-            "C",
-            "C#",
-            "D",
-            "D#",
-            "E",
-            "F",
-            "F#",
-            "G",
-            "G#",
-            "A",
-            "A#",
-            "B",
-        ]
+        var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
             "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -133,8 +115,7 @@ Zynthian.BasePlayGrid {
     }
 
     onOctaveChanged: {
-        console.log(component.octave);
-        component.settingsStore.setDefault("startingNote", component.octave * 12);
+        component.settingsStore.setProperty("startingNote", component.octave * 12);
     }
 
     Component {

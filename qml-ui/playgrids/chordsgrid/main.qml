@@ -36,6 +36,7 @@ Zynthian.BasePlayGrid {
     grid: chordsGrid
     settings: chordsGridSettings
     name:'Chords Grid'
+    octave: 5
     // model: zynthian.playgrid.chordModel
 
     property QtObject settingsStore
@@ -45,26 +46,10 @@ Zynthian.BasePlayGrid {
 
     function populateGrid(){
 
-        if (component.model){
-            component.model.clear();
-        } else {
-            component.model = zynthian.playgrid.createNotesModel();
-        }
+        if (component.model) component.model.clear();
+        else component.model = zynthian.playgrid.createNotesModel();
 
-        var note_int_to_str_map = [
-            "C",
-            "C#",
-            "D",
-            "D#",
-            "E",
-            "F",
-            "F#",
-            "G",
-            "G#",
-            "A",
-            "A#",
-            "B",
-        ]
+        var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
             "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -77,15 +62,7 @@ Zynthian.BasePlayGrid {
             "locrian": [1, 2, 2, 1, 2, 2, 2],
         }
 
-
-        var chord_scales_starts = [
-            60,
-            60,
-            60,
-            60,
-            60
-        ]
-
+        var chord_scales_start = component.octave * 12;
         var chord_rows = component.settingsStore.property("chordRows");
         var chord_scales = component.settingsStore.property("chordScales")
         var chord_notes = [];
@@ -96,7 +73,7 @@ Zynthian.BasePlayGrid {
             var scale_index = 0;
             var row_data = [];
             var row_scale = scale_mode_map[chord_scales[row]]
-            var col = chord_scales_starts[row];
+            var col = chord_scales_start;
 
             for (var i = 0; i < row_scale.length; ++i){
 
@@ -151,11 +128,16 @@ Zynthian.BasePlayGrid {
         }
     }
 
+    onOctaveChanged: {
+        component.settingsStore.setProperty("startingNote", component.octave * 12);
+    }
+
     Component.onCompleted: {
 
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
         
         component.settingsStore.setDefault("chordRows", 5);
+        component.settingsStore.setDefault("startingNote", component.octave * 12);
         component.settingsStore.setDefault("chordScales",["ionian","dorian","phrygian","aeolian","chromatic"])
         component.settingsStore.setDefault("positionalVelocity",true)
 

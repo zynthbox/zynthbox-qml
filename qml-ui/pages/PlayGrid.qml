@@ -165,7 +165,10 @@ Zynthian.ScreenPage {
                         property list<QtObject> contextualActions: [
                             Kirigami.Action {
                                 text: "Get New Playgrids"
-                                onTriggered: zynthian.show_modal("playgrid_downloader")
+                                onTriggered: {
+                                    settingsDialog.visible = false;
+                                    zynthian.show_modal("playgrid_downloader")
+                                }
                             }
                         ]
                     }

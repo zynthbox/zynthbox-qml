@@ -48,8 +48,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         zynthian_gui_zynthiloops.__instance__ = self
-        self.__current_beat__ = 0
-        self.__current_bar__ = 0
+        self.__current_beat__ = -1
+        self.__current_bar__ = -1
         self.__metronome_running_refcount = 0
         self.__sketch_basepath__ = "/zynthian/zynthian-my-data/sketches/"
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
@@ -113,8 +113,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.stopTimer()
             self.metronome_running_changed.emit()
 
-            self.__current_beat__ = 0
-            self.__current_bar__ = 0
+            self.__current_beat__ = -1
+            self.__current_bar__ = -1
             self.current_beat_changed.emit()
             self.current_bar_changed.emit()
 

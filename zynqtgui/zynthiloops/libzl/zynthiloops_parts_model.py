@@ -98,6 +98,6 @@ class zynthiloops_parts_model(QAbstractListModel):
     def countChanged(self):
         pass
 
-    @Property(int, notify=countChanged)
     def count(self):
         return len(self.__parts__)
+    count = Property(int, count, notify=countChanged)

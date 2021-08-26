@@ -64,7 +64,7 @@ Zynthian.Card {
                             let text = root.controlObj ? root.controlObj.name : "";
                             switch (root.controlType) {
                             case BottomBar.ControlType.Song:
-                                return qsTr("SONG: %1").arg(text);
+                                return qsTr("SKETCH: %1").arg(text);
                             case BottomBar.ControlType.Clip:
                                 return qsTr("CLIP: %1").arg(text);
                             case BottomBar.ControlType.Track:

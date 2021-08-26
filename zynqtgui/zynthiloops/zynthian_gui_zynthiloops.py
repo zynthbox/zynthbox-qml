@@ -100,8 +100,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
         self.current_beat_changed.emit()
 
-        if self.__song__.isPlaying:
-            self.__song__.metronome_update()
+        #if self.__song__.isPlaying:
+            #self.__song__.metronome_update()
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

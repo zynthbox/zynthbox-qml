@@ -74,7 +74,10 @@ class zynthiloops_clip(QObject):
         #if "name" in obj:
             #self.name = obj["name"]
         if "path" in obj:
-            self.path = obj["path"]
+            if obj["path"] is None:
+                self.__path__ = None
+            else:
+                self.path = obj["path"]
         if "start" in obj:
             self.__start_position__ = obj["start"]
         if "length" in obj:

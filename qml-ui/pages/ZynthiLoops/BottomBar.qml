@@ -129,7 +129,8 @@ Zynthian.Card {
 
             SidebarButton {
                 icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                visible: (controlObj != null) && controlObj.playable
+                visible: root.controlType !== BottomBar.ControlType.Part &&
+                         (controlObj != null) && controlObj.playable
 
                 onClicked: {
                     if (controlObj.isPlaying) {
@@ -139,6 +140,28 @@ Zynthian.Card {
                         console.log("Playing Sound Loop")
                         controlObj.play();
                     }
+                }
+            }
+
+            SidebarButton {
+                icon.name: "media-playback-start"
+                visible: root.controlType === BottomBar.ControlType.Part &&
+                         (controlObj != null) && controlObj.playable
+
+                onClicked: {
+                    console.log("Starting Part")
+                    controlObj.play();
+                }
+            }
+
+            SidebarButton {
+                icon.name: "media-playback-stop"
+                visible: root.controlType === BottomBar.ControlType.Part &&
+                         (controlObj != null) && controlObj.playable
+
+                onClicked: {
+                    console.log("Stopping Part")
+                    controlObj.stop();
                 }
             }
 

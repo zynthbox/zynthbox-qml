@@ -348,47 +348,51 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def play(self):
-        track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        clipsModel = track.clipsModel
+        if not self.__is_playing__:
+            logging.error(f"Playing Clip {self}")
 
-        for clip_index in range(0, clipsModel.count):
-            clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-            logging.error(f"Track({track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+            track = self.__song__.tracksModel.getTrack(self.__row_index__)
+            clipsModel = track.clipsModel
 
-            if clip.__is_playing__:
-                clip.stop()
+            for clip_index in range(0, clipsModel.count):
+                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+                logging.error(f"Track({track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
 
-        if self.audioSource is None:
-            return
+                if clip.__is_playing__:
+                    clip.stop()
 
-        self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
+            if self.audioSource is None:
+                return
 
-        self.__song__.get_metronome_manager().start_metronome_request()
-        self.__is_playing__ = True
-        self.__is_playing_changed__.emit()
-        self.audioSource.queueClipToStart()
+            self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
+
+            self.__song__.get_metronome_manager().start_metronome_request()
+            self.__is_playing__ = True
+            self.__is_playing_changed__.emit()
+            self.audioSource.queueClipToStart()
 
     @Slot(None)
     def stop(self):
-        logging.error(f"Stopping Clip {self.audioSource}")
+        if self.__is_playing__:
+            logging.error(f"Stopping Clip {self}")
 
-        try:
-            self.__song__.get_metronome_manager().current_beat_changed.disconnect(self.update_current_beat)
-        except:
-            logging.error(f"Error disconnecting from current_beat_changed signal. Not yet connected maybe?")
+            try:
+                self.__song__.get_metronome_manager().current_beat_changed.disconnect(self.update_current_beat)
+            except:
+                logging.error(f"Error disconnecting from current_beat_changed signal. Not yet connected maybe?")
 
-        self.reset_beat_count()
+            self.reset_beat_count()
 
-        if self.audioSource is None:
-            return
-        self.__song__.get_metronome_manager().stop_metronome_request()
-        self.__is_playing__ = False
-        self.__is_playing_changed__.emit()
+            if self.audioSource is None:
+                return
+            self.__song__.get_metronome_manager().stop_metronome_request()
+            self.__is_playing__ = False
+            self.__is_playing_changed__.emit()
 
-        # self.audioSource.stop()
-        self.audioSource.queueClipToStop()
+            # self.audioSource.stop()
+            self.audioSource.queueClipToStop()
 
-        self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+            self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
     def reset_beat_count(self):
         logging.error(f"Resetting beat count")

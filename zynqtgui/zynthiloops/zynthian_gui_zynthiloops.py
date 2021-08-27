@@ -95,6 +95,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def start_metronome_request(self):
         self.metronome_running_refcount += 1
 
+        logging.error(f"Start Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
+
         if self.metronome_running_refcount == 1:
             if self.metronome_schedule_stop:
                 # Metronome is already running and scheduled to stop.
@@ -106,6 +108,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def stop_metronome_request(self):
         self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
+
+        logging.error(f"Stop Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
 
         if self.metronome_running_refcount == 0:
             self.metronome_schedule_stop = True

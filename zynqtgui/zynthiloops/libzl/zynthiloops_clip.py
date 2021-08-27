@@ -373,6 +373,8 @@ class zynthiloops_clip(QObject):
         if not only_visual:
             self.audioSource.stop()
 
+        self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+
     def reset_beat_count(self):
         self.__current_beat__ = -1
         self.__playing_started__ = False

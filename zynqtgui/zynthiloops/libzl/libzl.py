@@ -41,7 +41,9 @@ def init():
 
         libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
 
-        libzl.SyncTimer_addClip.argtypes = [ctypes.c_void_p]
+        libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
+
+        libzl.SyncTimer_queueClipToStop.argtypes = [ctypes.c_void_p]
 
         # libzl.SyncTimer_addToPart.argtypes = [ctypes.c_int, ctypes.c_void_p]
         #
@@ -165,9 +167,13 @@ class ClipAudioSource(object):
         if libzl:
             libzl.ClipAudioSource_setSpeedRatio(self.obj, speed_ratio)
 
-    def addClipToTimer(self):
+    def queueClipToStart(self):
         if libzl:
-            libzl.SyncTimer_addClip(self.obj)
+            libzl.SyncTimer_queueClipToStart(self.obj)
+
+    def queueClipToStop(self):
+        if libzl:
+            libzl.SyncTimer_queueClipToStop(self.obj)
 
     def destroy(self):
         if libzl:

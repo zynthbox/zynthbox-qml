@@ -96,8 +96,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.metronome_running_refcount += 1
 
         if self.metronome_running_refcount == 1:
-            libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
-            self.metronome_running_changed.emit()
+            if self.metronome_schedule_stop:
+                # Metronome is already running and scheduled to stop.
+                # Do not start timer again and remove stop schedule
+                self.metronome_schedule_stop = False
+            else:
+                libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+                self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
         self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)

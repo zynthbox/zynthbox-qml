@@ -172,6 +172,19 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Part;
                             bottomBar.controlObj = model.part;
                         }
+
+                        Kirigami.Icon {
+                            width: 14
+                            height: 14
+                            color: "white"
+                            anchors {
+                                right: parent.right
+                                top: parent.top
+                            }
+
+                            source: "media-playback-start"
+                            visible: model.part.isPlaying
+                        }
                     }
                 }
 

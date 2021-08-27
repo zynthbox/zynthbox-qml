@@ -40,12 +40,31 @@ QQC2.AbstractButton {
     onPressed: forceActiveFocus()
 
     contentItem: Item {
+//        TableHeaderLabel {
+//            anchors.centerIn: parent
+//            text: model.clip.path.length > 0 ? "W" : ""
+//            // text: "Clip " + (clip.col+1) // clip.name
+//            // text2: clip.length + " Bar"
+//        }
         TableHeaderLabel {
-            anchors.centerIn: parent
-            text: model.clip.path.length > 0 ? "W" : ""
-            // text: "Clip " + (clip.col+1) // clip.name
-            // text2: clip.length + " Bar"
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            text: {
+                if (model.clip.path.length > 0) {
+                    if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
+                        return (model.clip.currentBeat+1) + "/" + model.clip.length
+                    } else {
+                        return "Length : " + model.clip.length
+                    }
+                } else {
+                    return ""
+                }
+            }
         }
+
 
         Kirigami.Icon {
             width: 24

@@ -50,6 +50,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         zynthian_gui_zynthiloops.__instance__ = self
         self.__current_beat__ = -1
         self.__current_bar__ = -1
+        self.metronome_schedule_stop = False
         self.metronome_running_refcount = 0
         self.__sketch_basepath__ = "/zynthian/zynthian-my-data/sketches/"
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
@@ -87,7 +88,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
         self.song_changed.emit()
 
-
     def update_timer_bpm(self):
         if self.metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
@@ -99,36 +99,29 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
             self.metronome_running_changed.emit()
 
-            # libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
-            # self.metronome_running_changed.emit()
-
-            # Start metronome after a slight delay to allow clips to load before starting timer
-            # QTimer.singleShot(500, self.__start_timer__)
-
-    # def __start_timer__(self):
-    #     logging.error("###### __start_timer__ called : startingTimer")
-    #     libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
-    #     self.metronome_running_changed.emit()
-
     def stop_metronome_request(self):
         self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
 
         if self.metronome_running_refcount == 0:
-            libzl.stopTimer()
-            self.metronome_running_changed.emit()
-
-            self.__current_beat__ = -1
-            self.__current_bar__ = -1
-            self.current_beat_changed.emit()
-            self.current_bar_changed.emit()
+            self.metronome_schedule_stop = True
 
     def metronome_update(self):
         self.current_beat_changed.emit()
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
 
         if self.__current_beat__ == 0:
-            self.__current_bar__ += 1
-            self.current_bar_changed
+            if self.metronome_schedule_stop:
+                libzl.stopTimer()
+                self.metronome_running_changed.emit()
+
+                self.__current_beat__ = -1
+                self.__current_bar__ = -1
+                self.current_beat_changed.emit()
+                self.current_bar_changed.emit()
+                self.metronome_schedule_stop = False
+            else:
+                self.__current_bar__ += 1
+                self.current_bar_changed
 
         #if self.__song__.isPlaying:
             #self.__song__.metronome_update()
@@ -143,6 +136,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Property(bool, notify=metronome_running_changed)
     def isMetronomeRunning(self):
-        return self.metronome_running_refcount > 0
+        if self.metronome_running_refcount > 0:
+            return True
+        elif self.metronome_running_refcount == 0 and self.metronome_schedule_stop:
+            return True
+        else:
+            return False
 
 

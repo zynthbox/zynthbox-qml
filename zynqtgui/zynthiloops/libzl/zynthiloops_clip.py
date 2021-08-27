@@ -366,7 +366,7 @@ class zynthiloops_clip(QObject):
         self.__song__.get_metronome_manager().start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
-        self.audioSource.addClipToTimer()
+        self.audioSource.queueClipToStart()
 
     @Slot(None)
     def stop(self, only_visual=False):
@@ -386,7 +386,8 @@ class zynthiloops_clip(QObject):
         self.__is_playing_changed__.emit()
 
         if not only_visual:
-            self.audioSource.stop()
+            # self.audioSource.stop()
+            self.audioSource.queueClipToStop()
 
         self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 

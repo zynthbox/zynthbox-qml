@@ -348,9 +348,6 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def play(self):
-        if self.audioSource is None:
-            return
-
         track = self.__song__.tracksModel.getTrack(self.__row_index__)
         clipsModel = track.clipsModel
 
@@ -361,6 +358,9 @@ class zynthiloops_clip(QObject):
             if clip.__is_playing__:
                 clip.stop()
 
+        if self.audioSource is None:
+            return
+
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
 
         self.__song__.get_metronome_manager().start_metronome_request()
@@ -369,7 +369,7 @@ class zynthiloops_clip(QObject):
         self.audioSource.queueClipToStart()
 
     @Slot(None)
-    def stop(self, only_visual=False):
+    def stop(self):
         logging.error(f"Stopping Clip {self.audioSource}")
 
         try:
@@ -385,9 +385,8 @@ class zynthiloops_clip(QObject):
         self.__is_playing__ = False
         self.__is_playing_changed__.emit()
 
-        if not only_visual:
-            # self.audioSource.stop()
-            self.audioSource.queueClipToStop()
+        # self.audioSource.stop()
+        self.audioSource.queueClipToStop()
 
         self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 

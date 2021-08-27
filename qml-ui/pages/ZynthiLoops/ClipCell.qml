@@ -57,7 +57,7 @@ QQC2.AbstractButton {
                     if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
                         return (model.clip.currentBeat+1) + "/" + model.clip.length
                     } else {
-                        return "Length : " + model.clip.length
+                        return model.clip.length
                     }
                 } else {
                     return ""

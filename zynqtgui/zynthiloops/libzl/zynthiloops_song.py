@@ -76,6 +76,7 @@ class zynthiloops_song(QObject):
                 track.clipsModel.add_clip(clip)
                 #self.add_clip_to_part(clip, i)
 
+        self.bpm_changed.emit()
 
     def serialize(self):
         return {"name": self.__name__,
@@ -211,9 +212,10 @@ class zynthiloops_song(QObject):
         return self.__bpm__
 
     def set_bpm(self, bpm: int):
-        self.__bpm__ = bpm
-        self.bpm_changed.emit()
-        self.schedule_save()
+        if self.__bpm__ != math.floor(bpm):
+            self.__bpm__ = math.floor(bpm)
+            self.bpm_changed.emit()
+            self.schedule_save()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
 

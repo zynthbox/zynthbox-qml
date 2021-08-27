@@ -50,7 +50,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         zynthian_gui_zynthiloops.__instance__ = self
         self.__current_beat__ = -1
         self.__current_bar__ = -1
-        self.__metronome_running_refcount = 0
+        self.metronome_running_refcount = 0
         self.__sketch_basepath__ = "/zynthian/zynthian-my-data/sketches/"
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -89,27 +89,31 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
 
     def update_timer_bpm(self):
-        if self.__metronome_running_refcount > 0:
+        if self.metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
     def start_metronome_request(self):
-        self.__metronome_running_refcount += 1
+        self.metronome_running_refcount += 1
 
-        if self.__metronome_running_refcount == 1:
+        if self.metronome_running_refcount == 1:
+            libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+            self.metronome_running_changed.emit()
+
             # libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
             # self.metronome_running_changed.emit()
 
             # Start metronome after a slight delay to allow clips to load before starting timer
-            QTimer.singleShot(500, self.__start_timer__)
+            # QTimer.singleShot(500, self.__start_timer__)
 
-    def __start_timer__(self):
-        libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
-        self.metronome_running_changed.emit()
+    # def __start_timer__(self):
+    #     logging.error("###### __start_timer__ called : startingTimer")
+    #     libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+    #     self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
-        self.__metronome_running_refcount = max(self.__metronome_running_refcount - 1, 0)
+        self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
 
-        if self.__metronome_running_refcount == 0:
+        if self.metronome_running_refcount == 0:
             libzl.stopTimer()
             self.metronome_running_changed.emit()
 
@@ -139,6 +143,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Property(bool, notify=metronome_running_changed)
     def isMetronomeRunning(self):
-        return self.__metronome_running_refcount > 0
+        return self.metronome_running_refcount > 0
 
 

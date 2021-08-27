@@ -31,7 +31,6 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
         self.__length__ = 1
@@ -59,6 +58,9 @@ class zynthiloops_clip(QObject):
             logging.error(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio)
 
+            # Set length to recalculate loop time
+            self.set_length(self.__length__)
+        else:
             # Set length to recalculate loop time
             self.set_length(self.__length__)
 
@@ -308,7 +310,7 @@ class zynthiloops_clip(QObject):
         if self.audioSource is None:
             return
 
-        self.stop()
+        # self.stop()
         self.__song__.get_metronome_manager().start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()

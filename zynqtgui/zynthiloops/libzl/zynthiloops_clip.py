@@ -22,6 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import math
 
 from . import libzl
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
@@ -31,7 +32,6 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
         self.__length__ = 1
@@ -44,10 +44,30 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.__current_beat__ = -1
         self.__should_sync__ = False
+        self.__playing_started__ = False
         self.audioSource: ClipAudioSource = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
+
+    def update_current_beat(self):
+        if not self.__playing_started__:
+            if self.__song__.get_metronome_manager().currentBeat == 0:
+                self.__current_beat__ = 0
+                self.__playing_started__ = True
+        else:
+            self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
+        self.current_beat_changed.emit()
+
+    @Signal
+    def current_beat_changed(self):
+        pass
+
+    def get_current_beat(self):
+        return self.__current_beat__
+
+    currentBeat = Property(int, get_current_beat, notify=current_beat_changed)
 
     def song_bpm_changed(self):
         self.update_synced_values()
@@ -59,6 +79,9 @@ class zynthiloops_clip(QObject):
             logging.error(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio)
 
+            # Set length to recalculate loop time
+            self.set_length(self.__length__)
+        else:
             # Set length to recalculate loop time
             self.set_length(self.__length__)
 
@@ -158,13 +181,15 @@ class zynthiloops_clip(QObject):
     def length(self):
         return self.__length__
 
-    def set_length(self, length: int):
-        self.__length__ = length
-        self.length_changed.emit()
-        self.__song__.schedule_save()
+    def set_length(self, length: int, force_set=False):
+        if self.__length__ != math.floor(length) or force_set is True:
+            self.__length__ = math.floor(length)
+            self.length_changed.emit()
+            self.__song__.schedule_save()
 
-        if self.audioSource is not None:
-            self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+            if self.audioSource is not None:
+                self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+            self.reset_beat_count()
     length = Property(int, length, set_length, notify=length_changed)
 
 
@@ -195,13 +220,15 @@ class zynthiloops_clip(QObject):
     def startPosition(self):
         return self.__start_position__
 
-    def set_start_position(self, position: float):
-        self.__start_position__ = position
-        self.start_position_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_start_position(position)
+    def set_start_position(self, position: float, force_set=False):
+        if self.__start_position__ != position or force_set is True:
+            self.__start_position__ = position
+            self.start_position_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_start_position(position)
+            self.reset_beat_count()
 
     startPosition = Property(float, startPosition, set_start_position, notify=start_position_changed)
 
@@ -217,13 +244,15 @@ class zynthiloops_clip(QObject):
     def pitch(self):
         return self.__pitch__
 
-    def set_pitch(self, pitch: float):
-        self.__pitch__ = pitch
-        self.pitch_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_pitch(pitch)
+    def set_pitch(self, pitch: int, force_set=False):
+        if self.__pitch__ != math.floor(pitch) or force_set is True:
+            self.__pitch__ = math.floor(pitch)
+            self.pitch_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_pitch(pitch)
+            self.reset_beat_count()
 
     pitch = Property(int, pitch, set_pitch, notify=pitch_changed)
 
@@ -231,13 +260,16 @@ class zynthiloops_clip(QObject):
     def time(self):
         return self.__time__
 
-    def set_time(self, time: float):
-        self.__time__ = time
-        self.time_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_speed_ratio(time)
+    def set_time(self, time: float, force_set=False):
+        if self.__time__ != time or force_set is True:
+            self.__time__ = time
+            self.time_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_speed_ratio(time)
+            self.reset_beat_count()
+
     time = Property(float, time, set_time, notify=time_changed)
 
 
@@ -248,6 +280,7 @@ class zynthiloops_clip(QObject):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
         self.__song__.schedule_save()
+        self.reset_beat_count()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
 
@@ -284,13 +317,18 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.reset_beat_count()
 
-        self.startPosition = self.__start_position__
-        self.length = self.__length__
-        self.pitch - self.__pitch__
-        self.time = self.__time__
+        # self.startPosition = self.__start_position__
+        # self.length = self.__length__
+        # self.pitch - self.__pitch__
+        # self.time = self.__time__
+        self.set_length(self.__length__, True)
+        self.set_start_position(self.__start_position__, True)
+        self.set_time(self.__time__, True)
+        self.set_pitch(self.__pitch__, True)
 
-        self.audioSource.set_start_position(self.__start_position__)
+        # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
         self.__song__.schedule_save()
@@ -308,7 +346,18 @@ class zynthiloops_clip(QObject):
         if self.audioSource is None:
             return
 
-        self.stop()
+        track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        clipsModel = track.clipsModel
+
+        for clip_index in range(0, clipsModel.count):
+            clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+            logging.error(f"Track({track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+
+            if clip.__is_playing__:
+                clip.stop()
+
+        self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
+
         self.__song__.get_metronome_manager().start_metronome_request()
         self.__is_playing__ = True
         self.__is_playing_changed__.emit()
@@ -318,6 +367,13 @@ class zynthiloops_clip(QObject):
     def stop(self, only_visual=False):
         logging.error(f"Stopping Clip {self.audioSource}")
 
+        try:
+            self.__song__.get_metronome_manager().current_beat_changed.disconnect(self.update_current_beat)
+        except:
+            logging.error(f"Error disconnecting from current_beat_changed signal. Not yet connected maybe?")
+
+        self.reset_beat_count()
+
         if self.audioSource is None:
             return
         self.__song__.get_metronome_manager().stop_metronome_request()
@@ -326,3 +382,9 @@ class zynthiloops_clip(QObject):
 
         if not only_visual:
             self.audioSource.stop()
+
+        self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+
+    def reset_beat_count(self):
+        self.__current_beat__ = -1
+        self.__playing_started__ = False

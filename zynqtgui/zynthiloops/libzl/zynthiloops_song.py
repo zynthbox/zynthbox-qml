@@ -118,6 +118,15 @@ class zynthiloops_song(QObject):
             return False
 
     def destroy(self):
+        for i in range(0, self.tracksModel.count):
+            clipsModel = self.tracksModel.getTrack(i).clipsModel
+
+            for clip_index in range(0, clipsModel.count):
+                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+
+                logging.error(f"Destroying clip({clip})")
+                clip.destroy()
+
         os.remove(self.__sketch_folder__ + self.__sketch_filename__)
         self.deleteLater()
 

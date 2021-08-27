@@ -50,10 +50,13 @@ Zynthian.BasePlayGrid {
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
         var startingNote = component.settingsStore.property("startingNote")
         
-        for (var row = 0; row < 4; ++row){
+        var rows = component.settingsStore.property("rows");
+        var columns = component.settingsStore.property("columns");
 
-            var rowStartingNote = startingNote + (row * 4);
-            var rowEndingNote = rowStartingNote + 4;
+        for (var row = 0; row < rows; ++row){
+
+            var rowStartingNote = startingNote + (row * columns);
+            var rowEndingNote = rowStartingNote + columns;
             var notes = [];
 
             for(var col = rowStartingNote; col < rowEndingNote; ++col) {
@@ -77,6 +80,8 @@ Zynthian.BasePlayGrid {
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian drumsgrid settings")
         component.settingsStore.setDefault("startingNote", 36);
+        component.settingsStore.setDefault("rows", 4);
+        component.settingsStore.setDefault("columns", 4);
         component.settingsStore.setDefault("positionalVelocity", true);
         component.populateGrid();
     }
@@ -192,6 +197,53 @@ Zynthian.BasePlayGrid {
             objectName: "drumsGridSettings"
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            QQC2.ComboBox {
+                id: optionGrid
+                Layout.fillWidth: true
+                Kirigami.FormData.label: "Grid"
+                model: gridModel
+                textRole: "text"
+                displayText: currentText
+                currentIndex: 2
+
+                onActivated: {
+                    var data = gridModel.get(currentIndex)
+                    if (data.row === 0 && data.column === 0) {
+                        component.settingsStore.setProperty("rows", customRows.currentText);
+                        component.settingsStore.setProperty("columns", customColumns.currentText);
+                    } else {
+                        component.settingsStore.setProperty("rows", data.row);
+                        component.settingsStore.setProperty("columns", data.column);
+                    }
+                }
+            }
+
+            QQC2.ComboBox {
+                id: customRows
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Rows"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    component.settingsStore.setProperty("rows", currentText);
+                }
+            }
+
+            QQC2.ComboBox {
+                id: customColumns
+                Layout.fillWidth: true
+                visible: optionGrid.currentIndex === 0
+                Kirigami.FormData.label: "Custom Grid Columns"
+                model: [3,4,5,6,7,8,9]
+                displayText: currentText
+                currentIndex: 0
+                onActivated: {
+                    component.settingsStore.setProperty("columns", currentText);
+                }
+            }
 
             // QQC2.Button {
             //     Layout.fillWidth: true

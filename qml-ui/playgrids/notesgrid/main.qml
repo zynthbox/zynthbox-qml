@@ -45,7 +45,7 @@ Zynthian.BasePlayGrid {
         
         if (component.model) component.model.clear();
         else component.model = zynthian.playgrid.createNotesModel();
-
+        
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
@@ -379,9 +379,6 @@ Zynthian.BasePlayGrid {
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
-            if (component.settingsStore.mostRecentlyChanged() === "startingNote"){
-                console.log(component.settingsStore.property("startingNote"))
-            }
             populateGridTimer.start()
         }
     }

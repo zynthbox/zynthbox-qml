@@ -69,6 +69,8 @@ def init():
         libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
         libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+        libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
         ### END Type Definition
 
         # Start juce event loop
@@ -166,3 +168,7 @@ class ClipAudioSource(object):
     def addClipToTimer(self):
         if libzl:
             libzl.SyncTimer_addClip(self.obj)
+
+    def destroy(self):
+        if libzl:
+            libzl.ClipAudioSource_destroy(self.obj)

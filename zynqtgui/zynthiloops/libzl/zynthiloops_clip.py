@@ -308,6 +308,10 @@ class zynthiloops_clip(QObject):
     def set_path(self, path):
         self.__path__ = path
         self.stop()
+
+        if self.audioSource is not None:
+            self.audioSource.destroy()
+
         self.audioSource = ClipAudioSource(path.encode('utf-8'))
         print(path)
 
@@ -337,6 +341,7 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def clear(self, loop=True):
         self.stop()
+        self.audioSource.destroy()
         self.audioSource = None
         self.__path__ = None
         self.path_changed.emit()
@@ -388,3 +393,7 @@ class zynthiloops_clip(QObject):
     def reset_beat_count(self):
         self.__current_beat__ = -1
         self.__playing_started__ = False
+
+    def destroy(self):
+        if self.audioSource is not None:
+            self.audioSource.destroy()

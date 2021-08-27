@@ -77,13 +77,13 @@ class zynthiloops_clip(QObject):
             logging.error(f"Song BPM : {self.__song__.bpm}")
             new_ratio = self.__song__.bpm / self.__bpm__
             logging.error(f"Song New Ratio : {new_ratio}")
-            self.set_time(new_ratio)
+            self.set_time(new_ratio, True)
 
             # Set length to recalculate loop time
-            self.set_length(self.__length__)
+            self.set_length(self.__length__, True)
         else:
             # Set length to recalculate loop time
-            self.set_length(self.__length__)
+            self.set_length(self.__length__, True)
 
     def serialize(self):
         return {"name": self.name,
@@ -391,6 +391,7 @@ class zynthiloops_clip(QObject):
         self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
     def reset_beat_count(self):
+        logging.error(f"Resetting beat count")
         self.__current_beat__ = -1
         self.__playing_started__ = False
 

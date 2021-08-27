@@ -22,6 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import math
 
 from . import libzl
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
@@ -180,14 +181,15 @@ class zynthiloops_clip(QObject):
     def length(self):
         return self.__length__
 
-    def set_length(self, length: int):
-        self.__length__ = length
-        self.length_changed.emit()
-        self.__song__.schedule_save()
+    def set_length(self, length: int, force_set=False):
+        if self.__length__ != math.floor(length) or force_set is True:
+            self.__length__ = math.floor(length)
+            self.length_changed.emit()
+            self.__song__.schedule_save()
 
-        if self.audioSource is not None:
-            self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
-        self.reset_beat_count()
+            if self.audioSource is not None:
+                self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+            self.reset_beat_count()
     length = Property(int, length, set_length, notify=length_changed)
 
 
@@ -218,14 +220,15 @@ class zynthiloops_clip(QObject):
     def startPosition(self):
         return self.__start_position__
 
-    def set_start_position(self, position: float):
-        self.__start_position__ = position
-        self.start_position_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_start_position(position)
-        self.reset_beat_count()
+    def set_start_position(self, position: float, force_set=False):
+        if self.__start_position__ != position or force_set is True:
+            self.__start_position__ = position
+            self.start_position_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_start_position(position)
+            self.reset_beat_count()
 
     startPosition = Property(float, startPosition, set_start_position, notify=start_position_changed)
 
@@ -241,14 +244,15 @@ class zynthiloops_clip(QObject):
     def pitch(self):
         return self.__pitch__
 
-    def set_pitch(self, pitch: float):
-        self.__pitch__ = pitch
-        self.pitch_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_pitch(pitch)
-        self.reset_beat_count()
+    def set_pitch(self, pitch: int, force_set=False):
+        if self.__pitch__ != math.floor(pitch) or force_set is True:
+            self.__pitch__ = math.floor(pitch)
+            self.pitch_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_pitch(pitch)
+            self.reset_beat_count()
 
     pitch = Property(int, pitch, set_pitch, notify=pitch_changed)
 
@@ -256,14 +260,16 @@ class zynthiloops_clip(QObject):
     def time(self):
         return self.__time__
 
-    def set_time(self, time: float):
-        self.__time__ = time
-        self.time_changed.emit()
-        self.__song__.schedule_save()
-        if self.audioSource is None:
-            return
-        self.audioSource.set_speed_ratio(time)
-        self.reset_beat_count()
+    def set_time(self, time: float, force_set=False):
+        if self.__time__ != time or force_set is True:
+            self.__time__ = time
+            self.time_changed.emit()
+            self.__song__.schedule_save()
+            if self.audioSource is None:
+                return
+            self.audioSource.set_speed_ratio(time)
+            self.reset_beat_count()
+
     time = Property(float, time, set_time, notify=time_changed)
 
 
@@ -313,12 +319,16 @@ class zynthiloops_clip(QObject):
         self.__bpm__ = 0
         self.reset_beat_count()
 
-        self.startPosition = self.__start_position__
-        self.length = self.__length__
-        self.pitch - self.__pitch__
-        self.time = self.__time__
+        # self.startPosition = self.__start_position__
+        # self.length = self.__length__
+        # self.pitch - self.__pitch__
+        # self.time = self.__time__
+        self.set_length(self.__length__, True)
+        self.set_start_position(self.__start_position__, True)
+        self.set_time(self.__time__, True)
+        self.set_pitch(self.__pitch__, True)
 
-        self.audioSource.set_start_position(self.__start_position__)
+        # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
         self.duration_changed.emit()
         self.__song__.schedule_save()

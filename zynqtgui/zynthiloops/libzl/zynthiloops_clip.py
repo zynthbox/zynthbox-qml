@@ -336,6 +336,16 @@ class zynthiloops_clip(QObject):
         if self.audioSource is None:
             return
 
+        track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        clipsModel = track.clipsModel
+
+        for clip_index in range(0, clipsModel.count):
+            clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+            logging.error(f"Track({track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+
+            if clip.__is_playing__:
+                clip.stop()
+
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
 
         self.__song__.get_metronome_manager().start_metronome_request()

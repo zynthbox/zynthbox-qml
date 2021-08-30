@@ -48,11 +48,12 @@ Controls.ApplicationWindow {
                     delegate: Repeater {
                         model: track.clipsModel
                         delegate: Controls.Button {
+                            id: clipButton
                             text: model.clip.name
                             Component.onCompleted: model.clip.path = "/home/diau/test.wav"
                             onClicked: {
                                 print(model.clip.path)
-                                
+
                                 print(model.clip)
                                 if (model.clip.isPlaying) {
                                     model.clip.stop()
@@ -60,6 +61,13 @@ Controls.ApplicationWindow {
                                     //model.clip.path = "/home/diau/test.wav"
                                     model.clip.play()
                                 }
+                            }
+                            Rectangle {
+                                id: progressRect
+                                visible: model.clip.isPlaying
+                                color: "red"
+                                height: 4
+                                width: (model.clip.progress * clipButton.width) / (model.clip.startPosition + (60/songManager.song.bpm) * model.clip.length)  - model.clip.startPosition*model.clip.duration
                             }
                         }
                     }

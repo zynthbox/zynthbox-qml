@@ -78,6 +78,26 @@ ColumnLayout {
             }
         }
     }
+
+    RowLayout {
+        Layout.fillWidth: parent
+
+        QQC2.Button {
+            Layout.fillWidth: parent
+            text: "-"
+            onClicked: {
+                dial.value = Math.max(dial.from, dial.value - dial.stepSize)
+            }
+        }
+        QQC2.Button {
+            Layout.fillWidth: parent
+            text: "+"
+            onClicked: {
+                dial.value = Math.min(dial.to, dial.value + dial.stepSize)
+            }
+        }
+    }
+
     QQC2.Label {
         id: label
         Layout.fillWidth: parent

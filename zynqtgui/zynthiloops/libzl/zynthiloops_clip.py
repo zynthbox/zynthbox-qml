@@ -25,6 +25,7 @@
 import math
 
 from . import libzl
+from datetime import datetime
 from pathlib import Path
 from PySide2.QtCore import Property, QObject, QThread, QTimer, Signal, Slot
 
@@ -49,6 +50,7 @@ class zynthiloops_clip(QObject):
         self.__should_sync__ = False
         self.__playing_started__ = False
         self.__is_recording__ = False
+        self.recording_path = "/zynthian/zynthian-my-data/capture/"+self.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         self.audioSource: ClipAudioSource = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
@@ -419,10 +421,9 @@ class zynthiloops_clip(QObject):
             self.audioSource.destroy()
 
     def loadRecordedFile(self):
-        filepath = "/zynthian/zynthian-my-data/capture/" + self.name + ".wav"
-        if Path(filepath).exists():
+        if Path(self.recording_path).exists():
             logging.error(f"Recording file exists. Loading file.")
-            self.path = filepath
+            self.path = self.recording_path
         else:
             logging.error(f"Recording file does not exist yet. Rechecking after 100ms.")
             QTimer.singleShot(100, lambda: self.loadRecordedFile())

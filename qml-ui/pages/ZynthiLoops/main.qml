@@ -249,7 +249,7 @@ Zynthian.ScreenPage {
                                         visible: model.clip.isPlaying
                                         color: Kirigami.Theme.textColor
                                         height: Kirigami.Units.smallSpacing
-                                        width: (model.clip.progress * clipCell.width) / (model.clip.startPosition + (60/songManager.song.bpm) * model.clip.length)  - model.clip.startPosition*model.clip.duration
+                                        width: (model.clip.progress * clipCell.width) / (model.clip.startPosition + (60/root.song.bpm) * model.clip.length)  - model.clip.startPosition*model.clip.duration
                                     }
                                 }
                             }

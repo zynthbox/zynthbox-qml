@@ -219,6 +219,7 @@ Zynthian.ScreenPage {
                                 model: track.clipsModel
 
                                 delegate: ClipCell {
+                                    id: clipCell
                                     isPlaying: model.clip.isPlaying
 
                                     Layout.preferredWidth: privateProps.cellWidth
@@ -241,6 +242,14 @@ Zynthian.ScreenPage {
                                     Timer { //FIXME: why onDoubleClicked doesn't work
                                         id: dblTimer
                                         interval: 200
+                                    }
+                                    Rectangle {
+                                        id: progressRect
+                                        anchors.bottom: parent.bottom
+                                        visible: model.clip.isPlaying
+                                        color: Kirigami.Theme.textColor
+                                        height: Kirigami.Units.smallSpacing
+                                        width: (model.clip.progress * clipCell.width) / (model.clip.startPosition + (60/songManager.song.bpm) * model.clip.length)  - model.clip.startPosition*model.clip.duration
                                     }
                                 }
                             }

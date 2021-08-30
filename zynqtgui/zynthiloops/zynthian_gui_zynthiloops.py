@@ -34,6 +34,8 @@ from .libzl import libzl
 from .libzl import zynthiloops_song
 from .libzl import zynthiloops_clip
 
+from datetime import  datetime
+
 from .. import zynthian_qt_gui_base
 
 
@@ -146,7 +148,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     # self.recorder_process.finished.connect(
                     #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
                     # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
-                    self.recorder_process.start("/usr/local/bin/jack_capture", ["--daemon", "/zynthian/zynthian-my-data/capture/"+self.clip_to_record.name+".wav"])
+                    self.recorder_process.start("/usr/local/bin/jack_capture", ["--daemon", self.clip_to_record.recording_path])
+                    logging.error(f"Recording clip to {self.clip_to_record.recording_path}")
                     self.start_clip_recording = False
                     self.clip_to_record.isRecording = True
                 else:

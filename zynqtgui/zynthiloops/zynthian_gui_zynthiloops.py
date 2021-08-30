@@ -27,7 +27,7 @@ import ctypes as ctypes
 import math
 import sys
 
-from PySide2.QtCore import Property, QObject, QTimer, Signal, Slot
+from PySide2.QtCore import Property, QObject, QProcess, QTimer, Signal, Slot
 
 sys.path.insert(1, "./libzl")
 from .libzl import libzl
@@ -48,6 +48,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         zynthian_gui_zynthiloops.__instance__ = self
+        self.recorder_process = None
+        self.clip_to_record = None
+        self.start_clip_recording = False
         self.__current_beat__ = -1
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
@@ -56,8 +59,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
+        self.recorder_process = None
+
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
+
+    def recording_process_started(self):
+        logging.error(f"Started recording {self} at {self.clip_to_record}")
+
+    def recording_process_stopped(self, exitCode, exitStatus):
+        logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
+        logging.error(f"Recording Process Output : {self.recorder_process.readAll()}")
+
+    def recording_process_errored(self, error):
+        logging.error(f"Error recording {self} : Error({error})")
 
     def show(self):
         pass
@@ -92,6 +107,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
+    def queue_clip_record(self, clip):
+        self.clip_to_record = clip
+        self.start_clip_recording = True
+        self.start_metronome_request()
+
     def start_metronome_request(self):
         self.metronome_running_refcount += 1
 
@@ -119,6 +139,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
 
         if self.__current_beat__ == 0:
+            if self.clip_to_record is not None:
+                if self.start_clip_recording:
+                    self.recorder_process = QProcess()
+                    # self.recorder_process.started.connect(lambda: self.recording_process_started())
+                    # self.recorder_process.finished.connect(
+                    #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
+                    # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
+                    self.recorder_process.start("/usr/local/bin/jack_capture", ["--daemon", "/zynthian/zynthian-my-data/capture/"+self.clip_to_record.name+".wav"])
+                    self.start_clip_recording = False
+                    self.clip_to_record.isRecording = True
+                else:
+                    self.recorder_process.terminate()
+                    self.clip_to_record.loadRecordedFile()
+                    self.clip_to_record.isRecording = False
+                    self.clip_to_record = None
+                    self.stop_metronome_request()
+
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
                 self.metronome_running_changed.emit()

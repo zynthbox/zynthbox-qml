@@ -62,6 +62,11 @@ def init():
         libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
 
+        libzl.ClipAudioSource_setProgressCallback.argtypes = [ctypes.c_void_p, ctypes.py_object, ctypes.CFUNCTYPE(None, ctypes.py_object)]
+
+        libzl.ClipAudioSource_getProgress.argtypes = [ctypes.c_void_p]
+        libzl.ClipAudioSource_getProgress.restype = ctypes.c_float
+
         libzl.ClipAudioSource_getFileName.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
 
@@ -128,19 +133,20 @@ def stopClips(clips: list):
 #     if libzl:
 #         libzl.SyncTimer_stopPart(partIndex)
 
+@ctypes.CFUNCTYPE(None, ctypes.py_object)
+def signal_progress(obj):
+    obj.progress_changed.emit()
 
 class ClipAudioSource(object):
-    def __init__(self, filepath: bytes, recording_file_url="", parent=None):
-        self.recorder_process = None
 
-        if len(recording_file_url) > 0:
-            self.can_record = True
-            self.recording_file_url = recording_file_url
-        else:
-            self.can_record = False
-
+    def __init__(self, zl_clip, filepath: bytes):
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
+            libzl.ClipAudioSource_setProgressCallback(self.obj, zl_clip, signal_progress)
+
+    def get_progress(self):
+        if libzl:
+            return libzl.ClipAudioSource_getProgress(self.obj)
 
     def play(self):
         if libzl:

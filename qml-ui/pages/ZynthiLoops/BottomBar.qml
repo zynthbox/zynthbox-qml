@@ -130,7 +130,7 @@ Zynthian.Card {
             SidebarButton {
                 icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
                 visible: root.controlType !== BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable
+                         (controlObj != null) && controlObj.playable && controlObj.path
 
                 onClicked: {
                     if (controlObj.isPlaying) {
@@ -167,9 +167,12 @@ Zynthian.Card {
 
             SidebarButton {
                 icon.name: "media-record-symbolic"
-                visible: (controlObj != null) && controlObj.recordable
+                icon.color: "#f44336"
+                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
+                enabled: !controlObj.isRecording
 
                 onClicked: {
+                    controlObj.queueRecording();
                 }
             }
         }

@@ -25,7 +25,8 @@
 import math
 
 from . import libzl
-from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
+from pathlib import Path
+from PySide2.QtCore import Property, QObject, QThread, QTimer, Signal, Slot
 
 from .libzl import ClipAudioSource
 
@@ -47,6 +48,7 @@ class zynthiloops_clip(QObject):
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
+        self.__is_recording__ = False
         self.audioSource: ClipAudioSource = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
@@ -154,6 +156,10 @@ class zynthiloops_clip(QObject):
     def __is_playing_changed__(self):
         pass
 
+    @Signal
+    def __is_recording_changed__(self):
+        pass
+
     def playable(self):
         return True
     playable = Property(bool, playable, constant=True)
@@ -177,6 +183,14 @@ class zynthiloops_clip(QObject):
     def isPlaying(self):
         return self.__is_playing__
     isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
+
+    def get_isRecording(self):
+        return self.__is_recording__
+
+    def set_isRecording(self, is_recording):
+        self.__is_recording__ = is_recording
+
+    isRecording = Property(bool, get_isRecording, set_isRecording, notify=__is_recording_changed__)
 
     def length(self):
         return self.__length__
@@ -312,11 +326,12 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-        self.audioSource = ClipAudioSource(path.encode('utf-8'))
+        self.audioSource = ClipAudioSource(path.encode('utf-8'), "/home/pi/my_recording.wav", self)
         print(path)
 
         self.__length__ = 1
         self.__is_playing__ = False
+        self.__is_recording__ = False
         self.__start_position__ = 0.0
         self.__pitch__ = 0
         self.__time__ = 1
@@ -402,3 +417,26 @@ class zynthiloops_clip(QObject):
     def destroy(self):
         if self.audioSource is not None:
             self.audioSource.destroy()
+
+    def loadRecordedFile(self):
+        filepath = "/zynthian/zynthian-my-data/capture/" + self.name + ".wav"
+        if Path(filepath).exists():
+            logging.error(f"Recording file exists. Loading file.")
+            self.path = filepath
+        else:
+            logging.error(f"Recording file does not exist yet. Rechecking after 100ms.")
+            QTimer.singleShot(100, lambda: self.loadRecordedFile())
+
+    @Slot(None)
+    def queueRecording(self):
+        self.__song__.get_metronome_manager().queue_clip_record(self)
+    #
+    # def start_recording(self):
+    #     self.audioSource.start_recording()
+    #     self.__is_recording__ = True
+    #     self.__is_recording_changed__.emit()
+    #
+    # def stop_recording(self):
+    #     self.audioSource.stop_recording()
+    #     self.__is_recording__ = False
+    #     self.__is_recording_changed__.emit()

@@ -27,6 +27,7 @@ import ctypes
 import logging
 from os.path import dirname, realpath
 
+from PySide2.QtCore import QProcess
 
 libzl = None
 
@@ -129,7 +130,15 @@ def stopClips(clips: list):
 
 
 class ClipAudioSource(object):
-    def __init__(self, filepath: bytes):
+    def __init__(self, filepath: bytes, recording_file_url="", parent=None):
+        self.recorder_process = None
+
+        if len(recording_file_url) > 0:
+            self.can_record = True
+            self.recording_file_url = recording_file_url
+        else:
+            self.can_record = False
+
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
 
@@ -178,3 +187,12 @@ class ClipAudioSource(object):
     def destroy(self):
         if libzl:
             libzl.ClipAudioSource_destroy(self.obj)
+
+    # def start_recording(self):
+    #     if self.can_record:
+    #         self.recorder_process.startDetached("/usr/local/bin/jack_capture", ["--daemon", self.recording_file_url])
+    #
+    # def stop_recording(self):
+    #     if self.can_record:
+    #         self.recorder_process.kill()
+

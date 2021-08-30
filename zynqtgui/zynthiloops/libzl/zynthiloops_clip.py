@@ -139,6 +139,10 @@ class zynthiloops_clip(QObject):
         pass
 
     @Signal
+    def progress_changed(self):
+        pass
+
+    @Signal
     def pitch_changed(self):
         pass
 
@@ -186,6 +190,7 @@ class zynthiloops_clip(QObject):
         return self.__is_playing__
     isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
 
+
     def get_isRecording(self):
         return self.__is_recording__
 
@@ -193,6 +198,14 @@ class zynthiloops_clip(QObject):
         self.__is_recording__ = is_recording
 
     isRecording = Property(bool, get_isRecording, set_isRecording, notify=__is_recording_changed__)
+
+
+    def progress(self):
+        if self.audioSource is None:
+            return 0.0
+        return self.audioSource.get_progress()
+    progress = Property(float, progress, notify=progress_changed)
+
 
     def length(self):
         return self.__length__
@@ -328,7 +341,7 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-        self.audioSource = ClipAudioSource(path.encode('utf-8'), "/home/pi/my_recording.wav", self)
+        self.audioSource = ClipAudioSource(self, path.encode('utf-8'), "/home/pi/my_recording.wav", self)
         print(path)
 
         self.__length__ = 1

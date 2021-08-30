@@ -41,17 +41,6 @@ from . import zynthian_qt_gui_base
 
 
 class Note(QObject):
-    __note_name__: str = ""
-    __scale_index__: int = 0
-    __octave__: int = 0
-    __is_playing__: bool = False
-    __midi_note__: int = 0
-    __midi_port__: int = 0
-    __midi_note_on_msg__ = None
-    __midi_note_off_msg__ = None
-    __midi_notes_on_msgs__ = []
-    __midi_notes_off_msgs__ = []
-    __subnotes__ = []
     def __init__(
         self,
         name: str,
@@ -67,6 +56,12 @@ class Note(QObject):
         self.__octave__ = octave
         self.__midi_note__ = midi_note
         self.__midi_port__ = midi_port
+        self.__is_playing__: bool = False
+        self.__midi_note_on_msg__ = None
+        self.__midi_note_off_msg__ = None
+        self.__midi_notes_on_msgs__ = []
+        self.__midi_notes_off_msgs__ = []
+        self.__subnotes__ = []
 
     def get_midi_note(self):
         return self.__midi_note__
@@ -158,10 +153,10 @@ class Note(QObject):
 
 class zynthian_gui_grid_notes_model(QAbstractItemModel):
     NoteRole = Qt.DisplayRole
-    __grid_notes__ = []
 
     def __init__(self, parent: QObject = None) -> None:
         super(zynthian_gui_grid_notes_model, self).__init__(parent)
+        self.__grid_notes__ = []
 
     def roleNames(self) -> typing.Dict:
         roles = {self.NoteRole: b"note"}
@@ -229,13 +224,12 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 # values for the properties.
 # TODO Persist settings (load on init, save on set)
 class zynthian_gui_playgrid_settings(QObject):
-    __settings__ = {}
-    __defaults__ = {}
-    __most_recently_changed__: str
-    __name__: str
     def __init__(self, name:str, parent=None):
         super(zynthian_gui_playgrid_settings, self).__init__(parent)
         self.__name__ = name
+        self.__settings__ = {}
+        self.__defaults__ = {}
+        self.__most_recently_changed__: str
 
     @Property(str, constant=True)
     def name(self):
@@ -286,18 +280,17 @@ class zynthian_gui_playgrid_settings(QObject):
         pass
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
-    __play_grid_index__ = 0
-    __pitch__ = 0
-    __models__ = []
-    __notes__ = []
-    __settings_stores__ = {}
-    __note_state_map__ = {}
-
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
         qmlRegisterType(Note, "Zynthian.PlayGrid", 1, 0, "Note")
         qmlRegisterType(zynthian_gui_grid_notes_model, "Zynthian.PlayGrid", 1, 0, "Model")
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
+        self.__play_grid_index__ = 0
+        self.__pitch__ = 0
+        self.__models__ = []
+        self.__notes__ = []
+        self.__settings_stores__ = {}
+        self.__note_state_map__ = {}
 
     def show(self):
         pass

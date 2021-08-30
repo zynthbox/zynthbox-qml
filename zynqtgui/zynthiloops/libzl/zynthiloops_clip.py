@@ -341,7 +341,7 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-        self.audioSource = ClipAudioSource(self, path.encode('utf-8'), "/home/pi/my_recording.wav", self)
+        self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         print(path)
 
         self.__length__ = 1

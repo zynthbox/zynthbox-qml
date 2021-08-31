@@ -89,6 +89,14 @@ Zynthian.Card {
                         Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
                         Layout.preferredHeight: Layout.preferredWidth
                     }
+                    Connections {
+                        target: Qt.inputMethod
+                        onVisibleChanged: {
+                            if (!Qt.inputMethod.visible) {
+                                titleStack.currentIndex = 0;
+                            }
+                        }
+                    }
                 }
                 QQC2.TextField {
                     id: objNameEdit

@@ -39,20 +39,8 @@ Zynthian.ScreenPage {
     topPadding: 5
     bottomPadding: 5
 
-    property QtObject someSettings
-
     Component.onCompleted: {
         applicationWindow().controlsVisible = false
-        component.someSettings = zynthian.playgrid.getSettingsStore("zynthian playgrid main settings");
-        console.log("A settings component called " + component.someSettings.name)
-        component.someSettings.setProperty("a value", ["item 1", "item 2", "item 3"])
-        console.log("Explicitly fetching the value, which is: " + component.someSettings.property("a value"));
-    }
-    Connections {
-        target: component.someSettings
-        onPropertyChanged: {
-            console.log("The property " + component.someSettings.mostRecentlyChanged() + " changed to " + component.someSettings.property(component.someSettings.mostRecentlyChanged()))
-        }
     }
 
     Component.onDestruction: {
@@ -72,7 +60,7 @@ Zynthian.ScreenPage {
     }
 
     property string currentNoteName: keyModel.getName(zynthian.playgrid.startingNote)
-    
+
     ListModel {
         id: keyModel
         function getName(note) {
@@ -107,19 +95,6 @@ Zynthian.ScreenPage {
         ListElement { row: 4; column: 4; text: "4x4" }
         ListElement { row: 5; column: 8; text: "5x8" }
     }
-
-    ListModel {
-        id: playGrids
-        ListElement { url: '../playgrids/notesgrid/main.qml'; name: 'Notes Grid'}
-        ListElement { url: '../playgrids/chordsgrid/main.qml'; name: 'Chords Grid'}
-        ListElement { url: '../playgrids/drumsgrid/main.qml'; name: 'Drums Grid'}
-    }
-
-    property var playGridsModel: [
-        { displayName: "Notes Grid", gridComponent: playGridsRepeater.notesGrid, settingsComponent: playGridsRepeater.notesGridSettings },
-        { displayName: "Chords Grid", gridComponent: playGridsRepeater.chordsGrid, settingsComponent: playGridsRepeater.chordsGridSettings },
-        { displayName: "Drumpads", gridComponent: playGridsRepeater.chordsGrid, settingsComponent: playGridsRepeater.chordsGridSettings }
-    ]
 
     Connections {
         target: zynthian.playgrid
@@ -508,7 +483,7 @@ Zynthian.ScreenPage {
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (xChoice <= playGridsModel.length && zynthian.playgrid.playGridIndex !== xChoice - 1) {
+                                    if (xChoice <= zynthian.playgrid.playgrids.length && zynthian.playgrid.playGridIndex !== xChoice - 1) {
                                         zynthian.playgrid.playGridIndex = xChoice - 1
                                     }
                                 }
@@ -530,11 +505,11 @@ Zynthian.ScreenPage {
 
     Repeater {
         id:playGridsRepeater
-        model: playGrids
+        model: zynthian.playgrid.playgrids
         property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item
         Loader {
             id:playGridLoader
-            source: model.url
+            source: modelData + "/main.qml"
             Binding {
                 target: playGridLoader.item
                 property: 'currentNoteName'

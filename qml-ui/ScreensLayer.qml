@@ -41,21 +41,29 @@ Kirigami.PageRow {
     Component.onCompleted: {
         zynthian.current_screen_id_changed()
     }
+    function screenIdMapping(id) {
+        if (id == "layer") {
+            return "fixed_layers";
+        } else {
+            return id;
+        }
+    }
 
     data: [
         Connections {
             target: zynthian
             onCurrent_screen_idChanged: {
-                print("SCREEN ID CHANGED: "+zynthian.current_screen_id);
+                let screenId = root.screenIdMapping(zynthian.current_screen_id);
+                print("SCREEN ID CHANGED: "+screenId);
 
                 // This should never happen
-                if (zynthian.current_screen_id.length === 0) {
+                if (screenId.length === 0) {
                     print("Warning: empty screen requested")
                     return;
                 }
 
                 // Skipping modal screen requests
-                if (zynthian.current_screen_id === zynthian.current_modal_screen_id) {
+                if (screenId === zynthian.current_modal_screen_id) {
                     return;
                 }
                 if (root.layers.depth > 1) {
@@ -70,28 +78,28 @@ Kirigami.PageRow {
                         var j; // if (.. in ..) doesn't work
                         for (j in child.screenIds) {
                             let id = child.screenIds[j];
-                            if (id === zynthian.current_screen_id) {
+                            if (id === screenId) {
                                 root.currentIndex = i;
                                 return;
                             }
                         }
-                        if (zynthian.current_screen_id in child.screenIds) {
+                        if (screenId in child.screenIds) {
                             root.currentIndex = i;
                             return;
                         }
                     } else if (child.hasOwnProperty("screenId")) {
-                        if (child.screenId === zynthian.current_screen_id) {
+                        if (child.screenId === screenId) {
                             root.currentIndex = i;
                             return;
                         }
                     }
                 }
-                let file = applicationWindow().pageScreenMapping.pageForScreen(zynthian.current_screen_id);
+                let file = applicationWindow().pageScreenMapping.pageForScreen(screenId);
                 if (file.length > 0) {
-					root.currentIndex = 1 // HACK to replace whatever page after the 3 columns layers page
+                    root.currentIndex = 1 // HACK to replace whatever page after the 3 columns layers page
                     root.push(file);
                 } else {
-                    print("Non managed screen " + zynthian.current_screen_id);
+                    print("Non managed screen " + screenId);
                 }
             }
         }

@@ -34,6 +34,8 @@ import Zynthian 1.0 as Zynthian
 Item {
     id: root
     property Component grid
+    // Default to miniGrid being identical to grid, so things still kindofsortof work
+    property Component miniGrid: root.grid
     property Component settings
     property QtObject model
     property string name

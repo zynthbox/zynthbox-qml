@@ -35,6 +35,7 @@ QQC2.AbstractButton {
     id: root
     readonly property int colIndex: index
     property bool isPlaying
+    property bool highlighted: false
 
 
     onPressed: forceActiveFocus()
@@ -80,8 +81,17 @@ QQC2.AbstractButton {
     background: Rectangle {
         color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
 
-        border.width: root.activeFocus ? 1 : 0
+        border.width: root.highlighted ? 1 : 0
         border.color: Kirigami.Theme.highlightColor
+
+        Rectangle {
+            id: progressRect
+            anchors.bottom: parent.bottom
+            visible: model.clip.isPlaying
+            color: Kirigami.Theme.textColor
+            height: Kirigami.Units.smallSpacing
+            width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width)
+        }
     }
 
     onActiveFocusChanged: {

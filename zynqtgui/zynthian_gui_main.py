@@ -57,7 +57,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data.append((self.playgrid, 0, "Play Grid"))
         self.list_metadata.append({"icon":"../../img/playgrid.svg"})
         
-        self.list_data.append((self.layers, 0, "Layers"))
+        self.list_data.append((self.layers, 0, "Library"))
         self.list_metadata.append({"icon":"../../img/layers.svg"})
         
         #if "zynseq" in zynthian_gui_config.experimental_features:

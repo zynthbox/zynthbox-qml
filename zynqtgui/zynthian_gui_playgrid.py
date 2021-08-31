@@ -26,6 +26,8 @@
 import mido
 import typing
 import logging
+import os
+from pathlib import Path
 
 from PySide2.QtCore import (
     Slot,
@@ -286,11 +288,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         qmlRegisterType(zynthian_gui_grid_notes_model, "Zynthian.PlayGrid", 1, 0, "Model")
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
         self.__play_grid_index__ = 0
+        self.__play_grids__ = []
         self.__pitch__ = 0
         self.__models__ = []
         self.__notes__ = []
         self.__settings_stores__ = {}
         self.__note_state_map__ = {}
+        self.__update_play_grids__()
 
     def show(self):
         pass
@@ -299,6 +303,24 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         pass
 
     def refresh_loading(self):
+        pass
+
+    def __update_play_grids__(self):
+        _new_list = []
+        searchlist = [Path("/home/pi/zynthian-ui/qml-ui/playgrids"), Path(Path.home() / ".local/zynthian/playgrids")]
+        for searchdir in searchlist:
+            if searchdir.exists():
+                for playgrid_dir in [f.name for f in os.scandir(searchdir) if f.is_dir()]:
+                    _new_list.append(str(searchdir / playgrid_dir))
+        _new_list = sorted(_new_list, key=lambda s: s.split("/")[-1])
+        self.__play_grids__ = _new_list
+        self.__play_grids_changed__.emit()
+
+    def __get_play_grids__(self):
+        return self.__play_grids__
+
+    @Signal
+    def __play_grids_changed__(self):
         pass
 
     def __get_play_grid_index__(self):
@@ -405,5 +427,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
         return self.__settings_stores__[name]
 
+    playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)
     pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
     playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)

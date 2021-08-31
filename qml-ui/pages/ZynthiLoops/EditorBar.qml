@@ -82,6 +82,36 @@ GridLayout {
                     lastX = mouse.x;
                 }
             }
+            Rectangle {  //Start loop
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                color: Kirigami.Theme.textColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                x: (waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width
+            }
+            Rectangle {  // End loop
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                color: Kirigami.Theme.textColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.bottomBar.controlObj.length) / waveBar.bottomBar.controlObj.duration) * parent.width) + ((waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width)
+            }
+            Rectangle { // Progress
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                visible: waveBar.bottomBar.controlObj.isPlaying
+                color: Kirigami.Theme.textColor
+                width: Kirigami.Units.smallSpacing
+                x: waveBar.bottomBar.controlObj.progress/waveBar.bottomBar.controlObj.duration * parent.width
+            }
         }
     }
 }

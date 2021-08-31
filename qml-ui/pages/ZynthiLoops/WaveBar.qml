@@ -109,10 +109,13 @@ GridLayout {
             horizontalAlignment: TextInput.AlignHCenter
             text: root.bottomBar.controlObj.bpm
             validator: IntValidator {bottom: 1; top: 250}
-            inputMethodHints: Qt.ImhDigitsOnly
+            inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
             enabled: !root.bottomBar.controlObj.shouldSync
             onAccepted: {
                 root.bottomBar.controlObj.bpm = parseInt(text);
+            }
+            onPressed: {
+                Qt.inputMethod.show();
             }
         }
 

@@ -294,7 +294,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__notes__ = []
         self.__settings_stores__ = {}
         self.__note_state_map__ = {}
-        self.__update_play_grids__()
+        self.updatePlayGrids()
 
     def show(self):
         pass
@@ -305,7 +305,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def __update_play_grids__(self):
+    @Slot(None)
+    def updatePlayGrids(self):
         _new_list = []
         searchlist = [Path("/home/pi/zynthian-ui/qml-ui/playgrids"), Path(Path.home() / ".local/zynthian/playgrids")]
         for searchdir in searchlist:

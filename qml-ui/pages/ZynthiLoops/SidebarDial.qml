@@ -74,7 +74,7 @@ ColumnLayout {
                 let delta = mouse.y - startY;
                 let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
 
-                dial.value = value;
+                dial.value = Math.round(value/dial.stepSize) * dial.stepSize;
             }
         }
     }

@@ -107,12 +107,16 @@ class zynthiloops_clip(QObject):
                 self.path = obj["path"]
         if "start" in obj:
             self.__start_position__ = obj["start"]
+            self.set_start_position(self.__start_position__, True)
         if "length" in obj:
             self.__length__ = obj["length"]
+            self.set_length(self.__length__, True)
         if "pitch" in obj:
             self.__pitch__ = obj["pitch"]
+            self.set_pitch(self.__pitch__, True)
         if "time" in obj:
             self.__time__ = obj["time"]
+            self.set_time(self.__time__, True)
 
     @Signal
     def length_changed(self):

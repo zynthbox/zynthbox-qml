@@ -26,6 +26,8 @@ import logging
 import ctypes as ctypes
 import math
 import sys
+from pathlib import Path
+from time import sleep
 
 from PySide2.QtCore import Property, QObject, QProcess, QTimer, Signal, Slot
 
@@ -154,7 +156,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.clip_to_record.isRecording = True
                 else:
                     self.recorder_process.terminate()
-                    self.clip_to_record.loadRecordedFile()
+                    self.load_recorded_file_to_clip(self.clip_to_record)
                     self.clip_to_record.isRecording = False
                     self.clip_to_record = None
                     self.stop_metronome_request()
@@ -173,7 +175,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.current_bar_changed
 
         #if self.__song__.isPlaying:
-            #self.__song__.metronome_update()
+            #self.__song__.metronome_update
+
+    def load_recorded_file_to_clip(self, clip):
+        while not Path(clip.recording_path).exists():
+            sleep(0.1)
+
+        clip.path = clip.recording_path
+        self.__song__.save()
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

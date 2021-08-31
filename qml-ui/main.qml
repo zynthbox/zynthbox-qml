@@ -80,6 +80,8 @@ Kirigami.AbstractApplicationWindow {
                     Repeater {
                         model: zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
+                            visible: index < 5
+                            height: visible ? implicitHeight : 0
                             text: model.display
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index)

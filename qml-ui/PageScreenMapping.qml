@@ -33,55 +33,56 @@ import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 
 QtObject {
-	id: root
-	function pageForScreen(screen) {
-		if (screen in screens) {
-			return Qt.resolvedUrl("./pages/" + screens[screen]);
-		} else {
-			return "";
-		}
-	}
+    id: root
+    function pageForScreen(screen) {
+        if (screen in screens) {
+            return Qt.resolvedUrl("./pages/" + screens[screen]);
+        } else {
+            return "";
+        }
+    }
 
-	function pageForModalScreen(screen) {
-		if (screen in modalScreens) {
-			return Qt.resolvedUrl("./pages/" + modalScreens[screen]);
-		} else {
-			return "";
-		}
-	}
+    function pageForModalScreen(screen) {
+        if (screen in modalScreens) {
+            return Qt.resolvedUrl("./pages/" + modalScreens[screen]);
+        } else {
+            return "";
+        }
+    }
 
-	readonly property var screens: {
-		"main": "MainPage.qml",
-		"layer": "SynthSetupPage.qml",
-		"bank": "SynthSetupPage.qml",
-		"preset": "SynthSetupPage.qml",
-		"control": "ControlPage.qml",
-		"layer_effects": "FXSetupPage.qml",
-		"effect_types": "FXSetupPage.qml",
-		"layer_effect_chooser": "FXSetupPage.qml",
-	}
+    readonly property var screens: {
+        "main": "MainPage.qml",
+        "layer": "SynthSetupPage.qml",
+        "fixed_layers": "SynthSetupPage.qml",
+        "bank": "SynthSetupPage.qml",
+        "preset": "SynthSetupPage.qml",
+        "control": "ControlPage.qml",
+        "layer_effects": "FXSetupPage.qml",
+        "effect_types": "FXSetupPage.qml",
+        "layer_effect_chooser": "FXSetupPage.qml",
+    }
 
-	readonly property var modalScreens: {
-		"engine": "EnginePage.qml",
-		"midi_chan": "MidiChanPage.qml",
-		"layer_options": "LayerOptionsPage.qml",
-		"snapshot": "SnapshotPage.qml",
-		"audio_recorder": "AudioRecorderPage.qml",
-		"midi_recorder": "MidiRecorderPage.qml",
-		"admin": "AdminPage.qml",
-		"info": "InfoPage.qml",
-		"option": "OptionPage.qml",
-		"theme_chooser": "ThemePage.qml",
-		"theme_downloader": "ThemeDownloaderPage.qml",
-		"norns_shield": "NornsPage.qml",
+    readonly property var modalScreens: {
+        "engine": "EnginePage.qml",
+        "midi_chan": "MidiChanPage.qml",
+        "layer_options": "LayerOptionsPage.qml",
+        "snapshot": "SnapshotPage.qml",
+        "audio_recorder": "AudioRecorderPage.qml",
+        "midi_recorder": "MidiRecorderPage.qml",
+        "admin": "AdminPage.qml",
+        "info": "InfoPage.qml",
+        "option": "OptionPage.qml",
+        "theme_chooser": "ThemePage.qml",
+        "theme_downloader": "ThemeDownloaderPage.qml",
+        "norns_shield": "NornsPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
-		"synth_behaviour":"SynthBehaviourPage.qml",
-		"snapshots_menu":"SnapshotsMenuPage.qml",
-		"network":"NetworkPage.qml",
-		"hardware":"HardwarePage.qml",
-		"playgrid": "PlayGrid.qml",
-		"playgrid_downloader": "PlayGridDownloaderPage.qml",
-		"track": "TrackPage.qml",
-		"zynthiloops": "ZynthiLoops/main.qml"
-	}
+        "synth_behaviour":"SynthBehaviourPage.qml",
+        "snapshots_menu":"SnapshotsMenuPage.qml",
+        "network":"NetworkPage.qml",
+        "hardware":"HardwarePage.qml",
+        "playgrid": "PlayGrid.qml",
+        "playgrid_downloader": "PlayGridDownloaderPage.qml",
+        "track": "TrackPage.qml",
+        "zynthiloops": "ZynthiLoops/main.qml"
+    }
 }

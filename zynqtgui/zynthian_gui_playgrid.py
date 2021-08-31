@@ -176,6 +176,12 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def rowCount(self, index):
         return len(self.__grid_notes__)
 
+    def __get_rows__(self):
+        return len(self.__grid_notes__)
+
+    def __rows_changed__(self):
+        pass
+
     def columnCount(self, index):
         if 0 <= index.row() < len(self.__grid_notes__):
             return len(self.__grid_notes__[index.row()])
@@ -220,6 +226,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         self.__grid_notes__.insert(0, notes)
         self.endResetModel()
 
+    rows = Property(int, __get_rows__, notify=__rows_changed__)
 
 # A dictionary wrapper which notifies about changes to the values, and only
 # when the value actually has changed. It supports setting a series of default

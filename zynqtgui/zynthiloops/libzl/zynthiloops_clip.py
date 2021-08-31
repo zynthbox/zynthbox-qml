@@ -433,14 +433,6 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-    def loadRecordedFile(self):
-        if Path(self.recording_path).exists():
-            logging.error(f"Recording file exists. Loading file.")
-            self.path = self.recording_path
-        else:
-            logging.error(f"Recording file does not exist yet. Rechecking after 100ms.")
-            QTimer.singleShot(100, lambda: self.loadRecordedFile())
-
     @Slot(None)
     def queueRecording(self):
         self.__song__.get_metronome_manager().queue_clip_record(self)

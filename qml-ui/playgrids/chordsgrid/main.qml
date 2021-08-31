@@ -34,6 +34,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.BasePlayGrid {
     id: component
     grid: chordsGrid
+    miniGrid: chordsGridMini
     settings: chordsGridSettings
     name:'Chords Grid'
     octave: 5
@@ -150,100 +151,23 @@ Zynthian.BasePlayGrid {
 
     Component {
         id: chordsGrid
-        ColumnLayout {
-            objectName: "chordsGrid"
-            spacing: 0
-            anchors.margins: 5
-            Repeater {
-                model: component.model
-                delegate: RowLayout {
-                    property var row: index
-                    Layout.margins: 2.5
-                    Repeater {
-                        model: component.model.columnCount(component.model.index(index, 0))
-                        delegate: QQC2.Button {
-                            id: playDelegate
-                            property var column: index
-                            property var note: component.model.data(component.model.index(row, column), component.model.roles['note'])
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            background: Rectangle {
-                                radius: 2
-                                border {
-                                    width: 1
-                                    color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
-                                }
-                                color: {
-                                    var color = "white";
-                                    if (note) {
-                                        if (note.isPlaying) {
-                                            color = "#8bc34a";
-                                        } else {
-                                            if (note.name === component.currentNoteName) {
-                                                color = Kirigami.Theme.focusColor;
-                                            } else {
-                                                color = "white";
-                                            }
-                                        }
-                                    }
-                                    return color;
-                                }
+        ChordsGrid {
+            model: component.model
+            settingsStore: component.settingsStore
+            currentNoteName: component.currentNoteName
+            chordRows: component.chordRows
+            positionalVelocity: component.positionalVelocity
+        }
+    }
 
-                                Text {
-                                    anchors.fill: parent
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    wrapMode: Text.Wrap
-                                    text: {
-                                        var text = "";
-                                        if (note) {
-                                            for (var i = 0; i < note.subnotes.length; ++i) {
-                                                text += " " + note.subnotes[i].name + note.subnotes[i].octave
-                                            }
-                                        }
-                                        return text;
-                                    }
-                                }
-                            }
-
-                            MultiPointTouchArea {
-                                anchors.fill: parent
-                                touchPoints: [
-                                    TouchPoint {
-                                        id: chordSlidePoint;
-                                        property double slideX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
-                                        property double slideY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
-                                    }
-                                ]
-                                property var playingNote;
-                                onPressed: {
-                                    if (chordSlidePoint.pressed) {
-                                        var velocityValue = 64;
-                                        if (component.settingsStore.property("positionalVelocity")) {
-                                            velocityValue = 127 - Math.floor(chordSlidePoint.y * 127 / height);
-                                        } else {
-                                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                            velocityValue = chordSlidePoint.pressure > 0.99999 ? 64 : Math.floor(chordSlidePoint.pressure * 127);
-                                        }
-                                        parent.down = true;
-                                        focus = true;
-                                        playingNote = note;
-                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue)
-                                    }
-                                }
-                                onReleased: {
-                                    if (!chordSlidePoint.pressed) {
-                                        parent.down = false;
-                                        focus = false;
-                                        zynthian.playgrid.setNoteOff(playingNote)
-                                        zynthian.playgrid.pitch = 0
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    Component {
+        id: chordsGridMini
+        ChordsGrid {
+            model: component.model
+            settingsStore: component.settingsStore
+            currentNoteName: component.currentNoteName
+            chordRows: 2
+            positionalVelocity: component.positionalVelocity
         }
     }
 

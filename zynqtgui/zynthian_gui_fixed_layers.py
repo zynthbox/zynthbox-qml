@@ -36,50 +36,67 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_fixed_layers, self).__init__('Layer', parent)
+    def __init__(self, parent = None):
+        super(zynthian_gui_fixed_layers, self).__init__('Layer', parent)
 
-		self.fixed_layers_count = 6
-		self.show()
-
-
-	def fill_list(self):
-		self.list_data=[]
-
-		for i in range(6): #FIXME
-			if i in self.zyngui.screens['layer'].layer_midi_map:
-				layer = self.zyngui.screens['layer'].layer_midi_map[i]
-				if layer.preset_name is None:
-					self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
-				else:
-					self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
-			else:
-				self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
-
-		super().fill_list()
+        self.__fixed_layers_count = 5
+        self.__extra_layers_count = 5
+        self.show()
 
 
-	def select_action(self, i, t='S'):
-		self.zyngui.screens['layer'].activate_midichan_layer(i)
+    def fill_list(self):
+        self.list_data=[]
+
+        for i in range(self.__fixed_layers_count): #FIXME
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                layer = self.zyngui.screens['layer'].layer_midi_map[i]
+                if layer.preset_name is None:
+                    self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
+                else:
+                    self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+            else:
+                self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
+
+        self.list_data.append((None,-1, "")) # Separator
+
+        for i in range(self.__fixed_layers_count, self.__fixed_layers_count + self.__extra_layers_count): #FIXME
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                layer = self.zyngui.screens['layer'].layer_midi_map[i]
+                if layer.preset_name is None:
+                    self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
+                else:
+                    self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+            else:
+                self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
+
+        super().fill_list()
 
 
-	def back_action(self):
-		return 'main'
+    def select_action(self, i, t='S'):
+        if self.list_data[i][1] < 0:
+            return
+        self.zyngui.screens['layer'].activate_midichan_layer(self.list_data[i][1])
+        if t=='B':
+            self.zyngui.screens['layer'].layer_options()
 
-	def next_action(self):
-		return 'bank'
+
+    def back_action(self):
+        return 'main'
+
+    def next_action(self):
+        return 'bank'
 
 
-	def index_supports_immediate_activation(self, index=None):
-		return False
+    def index_supports_immediate_activation(self, index=None):
+        return False
 
-	def set_select_path(self):
-		self.select_path = "Layers"
-		#self.select_path_element = str(zyngui.curlayer.engine.name)
-		if self.zyngui.curlayer is None:
-			self.select_path_element = "Layers"
-		else:
-			self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
-		super().set_select_path()
+    def set_select_path(self):
+        self.select_path = "Layers"
+        #self.select_path_element = str(zyngui.curlayer.engine.name)
+        if self.zyngui.curlayer is None:
+            self.select_path_element = "Layers"
+        else:
+            self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
+        super().set_select_path()
 
 #------------------------------------------------------------------------------

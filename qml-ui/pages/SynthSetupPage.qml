@@ -50,7 +50,7 @@ Zynthian.MultiSelectorPage {
         }
     ]
 
-    screenIds: ["layer", "bank", "preset"]
+    screenIds: ["fixed_layers", "bank", "preset"]
     screenTitles: [qsTr("Layers (%1)").arg(zynthian.layer.effective_count || qsTr("None")), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId

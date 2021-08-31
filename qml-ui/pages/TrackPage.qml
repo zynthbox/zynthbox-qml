@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import JuceGraphics 1.0
 
 Zynthian.ScreenPage {
     id: root
@@ -39,6 +40,8 @@ Zynthian.ScreenPage {
 
     screenId: "track"
     title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
+
+    Component.onCompleted: zynthian.fixed_layers.activate_index(6)
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
@@ -132,7 +135,7 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                        QQC2.Button {
+                        /*QQC2.Button {
                             id: midiButton
                             text: qsTr("MIDI")
                             checkable: true
@@ -143,11 +146,36 @@ Zynthian.ScreenPage {
                             checked: true
                             checkable: true
                             autoExclusive: true
-                        }
+                        }*/
                     }
                     RowLayout {
                         Layout.fillWidth: true
-                        ColumnLayout {
+                        Repeater {
+                            model: 5
+                            delegate: ColumnLayout {
+                                Kirigami.Heading {
+                                    id: topSoundHeading
+                                    text: qsTr("Voice %1").arg(index + 1)
+                                    level: 2
+                                    font.capitalization: Font.AllUppercase
+                                }
+                                QQC2.SpinBox {
+                                    Layout.fillWidth: true
+                                    font: topSoundHeading.font
+                                    from: 0
+                                    to: 5
+                                    textFromValue: function(value) {
+                                        return zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(index+6, 0)).substring(3, 15)
+                                    }
+                                    onValueModified: {
+                                        zynthian.layer.copy_midichan_layer(value, index+5);
+                                        zynthian.fixed_layers.activate_index(6)
+                                    }
+
+                                }
+                            }
+                        }
+                        /*ColumnLayout {
                             enabled: false
                             Kirigami.Heading {
                                 id: topSoundHeading
@@ -210,7 +238,7 @@ Zynthian.ScreenPage {
                                     return zynthian.preset.selector_list.data(zynthian.preset.selector_list.index(value, 0)).substring(0, 5)
                                 }
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -236,9 +264,16 @@ Zynthian.ScreenPage {
             }
         }
 
-        Item {
+
+        WaveFormItem {
+            id: wav
             Layout.fillWidth: true
             Layout.fillHeight: true
+            color: Kirigami.Theme.textColor
+            source: {
+                let clipsModel = zynthian.zynthiloops.song.tracksModel.data(zynthian.zynthiloops.song.tracksModel.index(root.track,0), Qt.UserRole + 3).clipsModel;
+                return clipsModel.data(clipsModel.index(root.part,0), Qt.UserRole + 3).path
+            }
         }
     }
 }

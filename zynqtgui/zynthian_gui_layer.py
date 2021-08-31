@@ -1375,6 +1375,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.index = 0
 					self.zyngui.show_screen('layer')
 
+			# Make sure the special layer 6 has something
+			if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
+				self.copy_midichan_layer(0, 5)
+
+
 		except Exception as e:
 			self.zyngui.reset_loading()
 			logging.exception("Invalid snapshot: %s" % e)
@@ -1382,6 +1387,31 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		self.last_snapshot_fpath = fpath
 		return True
+
+
+	@Slot(int, int)
+	def copy_midichan_layer(self, from_midichan: int, to_midichan: int):
+		if from_midichan < 0 or to_midichan < 0:
+			return
+		if from_midichan in self.layer_midi_map:
+			self.zyngui.start_loading()
+			# If there was anything in that midi chan, remove it
+			if to_midichan in self.layer_midi_map:
+				self.remove_root_layer(self.root_layers.index(self.layer_midi_map[to_midichan]), True)
+			layer_to_copy = self.layer_midi_map[from_midichan]
+			logging.error("COPYING {} {}".format(from_midichan, to_midichan))
+			new_layer = zynthian_layer(layer_to_copy.engine, to_midichan, self.zyngui)
+			#new_layer.set_bank(layer_to_copy.bank_index)
+			snapshot = layer_to_copy.get_snapshot()
+			new_layer.restore_snapshot_1(snapshot)
+			new_layer.restore_snapshot_2(snapshot)
+			sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
+			for layer in sublayers:
+				layer.set_midi_chan(to_midichan)
+			self.layers.append(new_layer)
+
+			self.fill_list()
+			self.zyngui.stop_loading()
 
 
 	def get_midi_profile_state(self):

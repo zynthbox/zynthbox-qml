@@ -2,5 +2,5 @@
 Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
 Categories=Playgrids
-TargetDir=zynthian-ui/qml-ui/playgrids
+XdgTargetDir=zynthian/playgrids
 Uncompress=always

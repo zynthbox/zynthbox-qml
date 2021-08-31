@@ -107,6 +107,7 @@ GridLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
+            focus: false
             text: root.bottomBar.controlObj.bpm
             validator: IntValidator {bottom: 1; top: 250}
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
@@ -115,7 +116,15 @@ GridLayout {
                 root.bottomBar.controlObj.bpm = parseInt(text);
             }
             onPressed: {
-                Qt.inputMethod.show();
+                forceActiveFocus()
+            }
+            Connections {
+                target: Qt.inputMethod
+                onVisibleChanged: {
+                    if (!Qt.inputMethod.visible) {
+                        syncSwitch.forceActiveFocus()
+                    }
+                }
             }
         }
 

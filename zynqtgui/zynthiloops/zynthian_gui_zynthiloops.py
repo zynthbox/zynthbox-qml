@@ -25,6 +25,7 @@
 import logging
 import ctypes as ctypes
 import math
+import re
 import sys
 from pathlib import Path
 from time import sleep
@@ -36,9 +37,9 @@ from .libzl import libzl
 from .libzl import zynthiloops_song
 from .libzl import zynthiloops_clip
 
-from datetime import  datetime
-
 from .. import zynthian_qt_gui_base
+
+import jack
 
 
 @ctypes.CFUNCTYPE(None)
@@ -64,9 +65,59 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.recorder_process = None
+        self.recorder_process_arguments = None
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
+
+        # self.update_recorder_jack_port()
+        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+
+    def update_recorder_jack_port(self):
+        layer_index = self.zyngui.screens['layer'].get_layer_selected()
+        jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname
+        # logging.error(f"######## Selected layer index : {layer_index}")
+        #
+        # jack_lsp_filter_re = re.compile("(.*:.*)(?=[\n\t]*.*properties:.*output.*[\n\t]*.*audio)")
+        #
+        # jack_lsp_process = QProcess()
+        # jack_lsp_process.setProgram("/usr/local/bin/jack_lsp")
+        # jack_lsp_process.setArguments(["-p", "-t", jack_basename])
+        #
+        # logging.error(f"###### Running jack_lsp command : /usr/local/bin/jack_lsp -p -t {jack_basename}")
+        #
+        # jack_lsp_process.started.connect(lambda: logging.error(f"####### jack_lsp process started"))
+        # jack_lsp_process.finished.connect(
+        #     lambda exitCode, exitStatus: logging.error(f"####### jack_lsp process finished : exitCode({exitCode}), exitStatus({exitStatus})"))
+        # jack_lsp_process.errorOccurred.connect(lambda error: logging.error(f"####### jack_lsp process errored : {error}"))
+        #
+        # jack_lsp_process.start()
+        #
+        # jack_lsp_process.waitForStarted()
+        # jack_lsp_process.waitForFinished()
+        #
+        # output = jack_lsp_process.readAllStandardOutput()
+        #
+        # logging.error(f"###### Selected Layer jack_lsp output : {str(output)}")
+        # # logging.error(f"###### Selected Layer output Matches : {jack_lsp_filter_re.findall(str(output))}")
+        #
+        # for jack_port in jack_lsp_filter_re.findall(str(output)):
+        #     logging.error(f"####### Selected Layer Port : {jack_port}")
+
+        # jacknames = []
+        # for layer in self.zyngui.screens['layer'].root_layers:
+        #     jacknames.append(f"({layer.jackname}, {layer.audio_out})")
+        # logging.error(f"### Current Layer : {', '.join([x for x in jacknames])}")
+
+        self.recorder_process_arguments = ["--daemon"]
+        jack_client = jack.Client('zynthiloops_client')
+
+        for port in jack_client.get_ports(is_audio=True, is_output=True):
+            if port.name.startswith(jack_basename):
+                self.recorder_process_arguments.append("--port")
+                self.recorder_process_arguments.append(port.name)
+
+        logging.error(f"##### Recorder Process Arguments : {self.recorder_process_arguments}")
 
     def recording_process_started(self):
         logging.error(f"Started recording {self} at {self.clip_to_record}")
@@ -150,7 +201,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     # self.recorder_process.finished.connect(
                     #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
                     # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
-                    self.recorder_process.start("/usr/local/bin/jack_capture", ["--daemon", self.clip_to_record.recording_path])
+                    self.recorder_process.start("/usr/local/bin/jack_capture", [*self.recorder_process_arguments, self.clip_to_record.recording_path])
+                    logging.error(f"Running jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
                     logging.error(f"Recording clip to {self.clip_to_record.recording_path}")
                     self.start_clip_recording = False
                     self.clip_to_record.isRecording = True

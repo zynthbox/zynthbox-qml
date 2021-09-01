@@ -268,11 +268,12 @@ Zynthian.ScreenPage {
                 //Layout.fillHeight: true
                 Layout.preferredHeight: trackCard.height
                 contentItem: ColumnLayout {
-                    Kirigami.Icon {
+                    QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter
-                        source: "media-record"
+                        icon.name: "media-record"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
+                        onClicked: zynthian.zynthiloops.song.getClip(root.track, root.part).queueRecording()
                     }
                     QQC2.ComboBox {
                         Layout.alignment: Qt.AlignCenter
@@ -291,10 +292,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Kirigami.Theme.textColor
-            source: {
-                let clipsModel = zynthian.zynthiloops.song.tracksModel.data(zynthian.zynthiloops.song.tracksModel.index(root.track,0), Qt.UserRole + 3).clipsModel;
-                return clipsModel.data(clipsModel.index(root.part,0), Qt.UserRole + 3).path
-            }
+            source: zynthian.zynthiloops.song.getClip(root.track, root.part).path
         }
     }
 }

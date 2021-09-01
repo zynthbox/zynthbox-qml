@@ -142,7 +142,9 @@ class ClipAudioSource(object):
     def __init__(self, zl_clip, filepath: bytes):
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
-            libzl.ClipAudioSource_setProgressCallback(self.obj, zl_clip, signal_progress)
+
+            if zl_clip is not None:
+                libzl.ClipAudioSource_setProgressCallback(self.obj, zl_clip, signal_progress)
 
     def get_progress(self):
         if libzl:

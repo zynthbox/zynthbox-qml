@@ -66,6 +66,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.recorder_process = None
         self.recorder_process_arguments = None
+        self.is_recording_complete = False
+        self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
@@ -148,6 +150,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song_changed(self):
         pass
 
+    @Signal
+    def recording_complete(self):
+        pass
+
     @Property(QObject, notify=song_changed)
     def song(self):
         return self.__song__
@@ -164,6 +170,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def queue_clip_record(self, clip):
         self.clip_to_record = clip
+        self.is_recording_complete = False
         self.start_clip_recording = True
         self.start_metronome_request()
 
@@ -194,7 +201,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
 
         if self.__current_beat__ == 0:
-            if self.clip_to_record is not None:
+            if self.clip_to_record is not None and self.is_recording_complete is False:
                 if self.start_clip_recording:
                     self.recorder_process = QProcess()
                     # self.recorder_process.started.connect(lambda: self.recording_process_started())
@@ -208,10 +215,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.clip_to_record.isRecording = True
                 else:
                     self.recorder_process.terminate()
-                    self.load_recorded_file_to_clip(self.clip_to_record)
                     self.clip_to_record.isRecording = False
-                    self.clip_to_record = None
+                    self.is_recording_complete = True
                     self.stop_metronome_request()
+                    self.recording_complete.emit()
+                    # self.load_recorded_file_to_clip(self.clip_to_record)
+                    # self.recorded_clip_loader_timer.start()
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
@@ -229,11 +238,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         #if self.__song__.isPlaying:
             #self.__song__.metronome_update
 
-    def load_recorded_file_to_clip(self, clip):
-        while not Path(clip.recording_path).exists():
+    def load_recorded_file_to_clip(self):
+        while not Path(self.clip_to_record.recording_path).exists():
             sleep(0.1)
 
-        clip.path = clip.recording_path
+        self.clip_to_record.path = self.clip_to_record.recording_path
+        self.clip_to_record = None
         self.__song__.save()
 
     @Property(int, notify=current_beat_changed)

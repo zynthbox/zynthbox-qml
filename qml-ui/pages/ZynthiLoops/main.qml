@@ -51,6 +51,10 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Clear Sketch")
             onTriggered: zynthian.zynthiloops.clearCurrentSketch()
+        },
+        Kirigami.Action {
+            text: zynthian.zynthiloops.clickTrackEnabled ? qsTr("Disable Click Track") : qsTr("Enable Click Track")
+            onTriggered: zynthian.zynthiloops.clickTrackEnabled = !zynthian.zynthiloops.clickTrackEnabled
         }
     ]
 

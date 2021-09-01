@@ -75,7 +75,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def update_recorder_jack_port(self):
         layer_index = self.zyngui.screens['layer'].get_layer_selected()
-        jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname
+        jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname.split(":")[0]
         # logging.error(f"######## Selected layer index : {layer_index}")
         #
         # jack_lsp_filter_re = re.compile("(.*:.*)(?=[\n\t]*.*properties:.*output.*[\n\t]*.*audio)")

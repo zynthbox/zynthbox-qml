@@ -170,6 +170,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def queue_clip_record(self, clip):
         self.clip_to_record = clip
+
+        self.recorder_process = QProcess()
+        self.recorder_process.setProgram("/usr/local/bin/jack_capture")
+        self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record.recording_path])
+        # self.recorder_process.started.connect(lambda: self.recording_process_started())
+        # self.recorder_process.finished.connect(
+        #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
+        # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
+        logging.error(
+            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
+
         self.is_recording_complete = False
         self.start_clip_recording = True
         self.start_metronome_request()
@@ -203,14 +214,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__current_beat__ == 0:
             if self.clip_to_record is not None and self.is_recording_complete is False:
                 if self.start_clip_recording:
-                    self.recorder_process = QProcess()
-                    # self.recorder_process.started.connect(lambda: self.recording_process_started())
-                    # self.recorder_process.finished.connect(
-                    #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
-                    # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
-                    self.recorder_process.start("/usr/local/bin/jack_capture", [*self.recorder_process_arguments, self.clip_to_record.recording_path])
-                    logging.error(f"Running jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
-                    logging.error(f"Recording clip to {self.clip_to_record.recording_path}")
+                    self.recorder_process.start()
                     self.start_clip_recording = False
                     self.clip_to_record.isRecording = True
                 else:
@@ -219,8 +223,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.is_recording_complete = True
                     self.stop_metronome_request()
                     self.recording_complete.emit()
-                    # self.load_recorded_file_to_clip(self.clip_to_record)
-                    # self.recorded_clip_loader_timer.start()
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
@@ -244,6 +246,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.clip_to_record.path = self.clip_to_record.recording_path
         self.clip_to_record = None
+        self.recorder_process = None
         self.__song__.save()
 
     @Property(int, notify=current_beat_changed)

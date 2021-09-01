@@ -273,7 +273,11 @@ Zynthian.ScreenPage {
                         icon.name: "media-record"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
-                        onClicked: root.track.clipsModel.getClip(root.partId).queueRecording()
+                        onClicked: {
+                            let clip = root.track.clipsModel.getClip(root.partId);
+                            clip.clear();
+                            clip.queueRecording();
+                        }
                     }
                     QQC2.ComboBox {
                         Layout.alignment: Qt.AlignCenter
@@ -292,10 +296,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Kirigami.Theme.textColor
-            source: {
-                print(root.track+" "+ root.part+" "+root.track.clipsModel.getClip(root.partId).path+" "+root.track.clipsModel.getClip(root.partId))
-                return root.track.clipsModel.getClip(root.partId).path
-            }
+            source: root.track.clipsModel.getClip(root.partId).path
         }
     }
 }

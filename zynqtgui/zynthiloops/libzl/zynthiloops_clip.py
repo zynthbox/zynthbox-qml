@@ -200,6 +200,7 @@ class zynthiloops_clip(QObject):
 
     def set_isRecording(self, is_recording):
         self.__is_recording__ = is_recording
+        self.__is_recording_changed__.emit()
 
     isRecording = Property(bool, get_isRecording, set_isRecording, notify=__is_recording_changed__)
 
@@ -429,7 +430,6 @@ class zynthiloops_clip(QObject):
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
     def reset_beat_count(self):
-        logging.error(f"Resetting beat count")
         self.__current_beat__ = -1
         self.__playing_started__ = False
 

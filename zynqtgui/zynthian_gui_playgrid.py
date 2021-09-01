@@ -290,7 +290,8 @@ class zynthian_gui_playgrid_settings(QObject):
         pass
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
-    searchlist = [Path("/home/pi/zynthian-ui/qml-ui/playgrids"), Path(Path.home() / ".local/share/zynthian/playgrids")]
+    searchlist = [Path(Path.home() / ".local/share/zynthian/playgrids"), Path("/home/pi/zynthian-ui/qml-ui/playgrids")]
+    dir_watcher = QFileSystemWatcher()
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
         qmlRegisterType(Note, "Zynthian.PlayGrid", 1, 0, "Note")
@@ -305,14 +306,18 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__note_state_map__ = {}
         self.updatePlayGrids()
 
-        self.__directory_watchers__ = []
+        self.dir_watcher.directoryChanged.connect(self.updatePlayGrids)
+        self.dir_watcher.fileChanged.connect(self.updatePlayGrids)
         for searchdir in zynthian_gui_playgrid.searchlist:
-            logging.error("Setting up grid file system watching for " + str(searchdir))
+            logging.error("Setting up grid file system watching for " + str(searchdir) + "/")
             if not searchdir.exists():
                 searchdir.mkdir(parents=True)
-            dir_watcher = QFileSystemWatcher(str(searchdir))
-            dir_watcher.directoryChanged.connect(self.updatePlayGrids)
-            self.__directory_watchers__.append(dir_watcher)
+            if not str(searchdir) in self.dir_watcher.directories():
+                success = self.dir_watcher.addPath(str(searchdir) + "/")
+                if not success:
+                    logging.error("Could not set up watching for: " + str(searchdir) + "/")
+            else:
+                logging.error("This dir is already watched")
 
     def show(self):
         pass
@@ -326,13 +331,23 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def updatePlayGrids(self):
         _new_list = []
+
         for searchdir in zynthian_gui_playgrid.searchlist:
             if searchdir.exists():
                 for playgrid_dir in [f.name for f in os.scandir(searchdir) if f.is_dir()]:
                     _new_list.append(str(searchdir / playgrid_dir))
+            else:
+                # A little naughty, but knewstuff kind of removes directories once everything in it's gone
+                searchdir.mkdir(parents=True)
+                if not str(searchdir) in self.dir_watcher.directories():
+                    success = self.dir_watcher.addPath(str(searchdir))
+                    if not success:
+                        logging.error("Could not set up watching for: " + str(searchdir))
+
         _new_list = sorted(_new_list, key=lambda s: s.split("/")[-1])
         self.__play_grids__ = _new_list
         self.__play_grids_changed__.emit()
+        logging.error("We now have the following known grids:\n {}".format('\n '.join(map(str, self.__play_grids__))))
 
     def __get_play_grids__(self):
         return self.__play_grids__

@@ -28,8 +28,7 @@ import logging
 
 # Zynthian specific modules
 from . import zynthian_qt_gui_base
-
-from PySide2.QtCore import Qt, QObject, Signal, Property
+from PySide2.QtCore import Qt, QObject, Signal, Slot, Property
 
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
@@ -89,7 +88,6 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
     @Property(QObject, notify=__part_changed__)
     def part(self):
         return self.zyngui.screens['zynthiloops'].song.partsModel.getPart(self.__part_id__)
-
 
     def set_select_path(self):
         self.select_path = self.title

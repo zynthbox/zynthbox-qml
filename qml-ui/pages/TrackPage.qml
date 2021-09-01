@@ -153,13 +153,15 @@ Zynthian.ScreenPage {
                         Repeater {
                             model: 5
                             delegate: ColumnLayout {
+                                id: channelDelegate
+                                readonly property int targetMidiChan: model.index + 5
                                 Kirigami.Heading {
                                     id: topSoundHeading
                                     text: qsTr("Voice %1").arg(index + 1)
                                     level: 2
                                     font.capitalization: Font.AllUppercase
                                 }
-                                QQC2.SpinBox {
+                                /*QQC2.SpinBox {
                                     Layout.fillWidth: true
                                     font: topSoundHeading.font
                                     from: 0
@@ -171,7 +173,26 @@ Zynthian.ScreenPage {
                                         zynthian.layer.copy_midichan_layer(value, index+5);
                                         zynthian.fixed_layers.activate_index(6)
                                     }
+                                }*/
+                                QQC2.ComboBox {
+                                    Layout.fillWidth: true
+                                    model: zynthian.fixed_layers.selector_list
+                                    displayText: zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0))
+                                    textRole: "display"
+                                    onActivated: {
+                                        print("COPYING "+index+" "+ channelDelegate.targetMidiChan)
+                                        zynthian.layer.copy_midichan_layer(index, channelDelegate.targetMidiChan);
+                                        zynthian.fixed_layers.activate_index(6)
+                                        print("COPIED")
 
+                                        displayText = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0))
+                                    }
+                                    delegate: QQC2.MenuItem {
+                                        text: model.display
+                                        visible: index < 5 && model.display.indexOf("- -") === -1
+                                        height: visible ? implicitHeight : 0
+                                    }
+                                    popup.width: Kirigami.Units.gridUnit * 15
                                 }
                             }
                         }

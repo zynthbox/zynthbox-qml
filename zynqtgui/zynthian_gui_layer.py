@@ -1375,9 +1375,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.index = 0
 					self.zyngui.show_screen('layer')
 
-			# Make sure the special layer 6 has something
+			# Make sure the special Multilayer 6 has something
 			if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
 				self.copy_midichan_layer(0, 5)
+			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
+				self.clone_midi(5, 6)
+			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
+				self.clone_midi(5, 7)
+			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
+				self.clone_midi(5, 8)
+			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
+				self.clone_midi(5, 9)
 
 
 		except Exception as e:
@@ -1388,6 +1396,20 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = fpath
 		return True
 
+
+	@Slot(int, int)
+	def clone_midi(self, from_chan: int, to_chan: int):
+		logging.error("CLONE_MIDI {} {}".format(from_chan, to_chan))
+		if from_chan == to_chan:
+			return
+		logging.error("CLONING {} {}".format(from_chan, to_chan))
+		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
+
+	@Slot(int, int)
+	def remove_clone_midi(self, from_chan: int, to_chan: int):
+		if from_chan == to_chan:
+			return
+		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
 
 	@Slot(int, int)
 	def copy_midichan_layer(self, from_midichan: int, to_midichan: int):
@@ -1408,6 +1430,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
 			for layer in sublayers:
 				layer.set_midi_chan(to_midichan)
+			self.zyngui.zynautoconnect_midi()
 			self.layers.append(new_layer)
 
 			self.fill_list()

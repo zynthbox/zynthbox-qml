@@ -29,10 +29,11 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 
-Item {
+MouseArea {
     id: root
     implicitWidth: Kirigami.Units.gridUnit * 10
 
+    onClicked: popup.visible = true
 
     Connections {
         target: zynthian.status_information
@@ -259,6 +260,17 @@ Item {
                 id: metronomeLabel
                 visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
                 text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+            }
+        }
+    }
+    QQC2.Popup {
+        id: popup
+        y: parent.height
+        modal: true
+        contentItem: ColumnLayout {
+            QQC2.Button {
+                text: qsTr("Stop All Notes")
+                onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
             }
         }
     }

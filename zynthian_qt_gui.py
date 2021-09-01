@@ -925,6 +925,7 @@ class zynthian_gui(QObject):
     # Callable UI Actions
     # -------------------------------------------------------------------
 
+    @Slot(str)
     def callable_ui_action(self, cuia, params=None):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 

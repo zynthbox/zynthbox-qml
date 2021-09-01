@@ -130,6 +130,23 @@ class zynthiloops_song(QObject):
         os.remove(self.__sketch_folder__ + self.__sketch_filename__)
         self.deleteLater()
 
+    @Slot(int, int, result=QObject)
+    def getClip(self, track: int, part: int):
+        logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
+        if track >= self.__tracks_model__.count:
+            return None
+
+        track = self.__tracks_model__.getTrack(track)
+        logging.error(track.clipsModel.count)
+
+        if part >= track.clipsModel.count:
+            return None
+
+        clip = track.clipsModel.getClip(part)
+        logging.error(clip)
+        return clip
+
+
     def get_metronome_manager(self):
         return self.__metronome_manager__
 

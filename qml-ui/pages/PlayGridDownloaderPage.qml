@@ -39,7 +39,8 @@ Zynthian.NewStuffPage {
     Connections {
         target: component.backAction
         onTriggered: {
-            applicationWindow().controlsVisible = false
+            zynthian.playgrid.updatePlayGrids();
+            applicationWindow().controlsVisible = false;
         }
     }
 }

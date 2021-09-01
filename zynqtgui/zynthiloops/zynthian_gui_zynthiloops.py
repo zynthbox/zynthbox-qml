@@ -27,6 +27,7 @@ import ctypes as ctypes
 import math
 import re
 import sys
+from os.path import dirname, realpath
 from pathlib import Path
 from time import sleep
 
@@ -70,7 +71,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process_arguments = None
         self.is_recording_complete = False
         self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
-        self.click_track = ClipAudioSource(None, b"/zynthian/zynthian-my-data/capture/click_track_4-4.wav")
+        self.click_track = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_4-4.wav").encode('utf-8'))
         self.click_track_enabled = False
 
         libzl.registerTimerCallback(cb)

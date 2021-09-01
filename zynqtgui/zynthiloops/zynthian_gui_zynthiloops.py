@@ -102,38 +102,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def update_recorder_jack_port(self):
         layer_index = self.zyngui.screens['layer'].get_layer_selected()
         jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname.split(":")[0]
-        # logging.error(f"######## Selected layer index : {layer_index}")
-        #
-        # jack_lsp_filter_re = re.compile("(.*:.*)(?=[\n\t]*.*properties:.*output.*[\n\t]*.*audio)")
-        #
-        # jack_lsp_process = QProcess()
-        # jack_lsp_process.setProgram("/usr/local/bin/jack_lsp")
-        # jack_lsp_process.setArguments(["-p", "-t", jack_basename])
-        #
-        # logging.error(f"###### Running jack_lsp command : /usr/local/bin/jack_lsp -p -t {jack_basename}")
-        #
-        # jack_lsp_process.started.connect(lambda: logging.error(f"####### jack_lsp process started"))
-        # jack_lsp_process.finished.connect(
-        #     lambda exitCode, exitStatus: logging.error(f"####### jack_lsp process finished : exitCode({exitCode}), exitStatus({exitStatus})"))
-        # jack_lsp_process.errorOccurred.connect(lambda error: logging.error(f"####### jack_lsp process errored : {error}"))
-        #
-        # jack_lsp_process.start()
-        #
-        # jack_lsp_process.waitForStarted()
-        # jack_lsp_process.waitForFinished()
-        #
-        # output = jack_lsp_process.readAllStandardOutput()
-        #
-        # logging.error(f"###### Selected Layer jack_lsp output : {str(output)}")
-        # # logging.error(f"###### Selected Layer output Matches : {jack_lsp_filter_re.findall(str(output))}")
-        #
-        # for jack_port in jack_lsp_filter_re.findall(str(output)):
-        #     logging.error(f"####### Selected Layer Port : {jack_port}")
-
-        # jacknames = []
-        # for layer in self.zyngui.screens['layer'].root_layers:
-        #     jacknames.append(f"({layer.jackname}, {layer.audio_out})")
-        # logging.error(f"### Current Layer : {', '.join([x for x in jacknames])}")
 
         self.recorder_process_arguments = ["--daemon"]
         jack_client = jack.Client('zynthiloops_client')

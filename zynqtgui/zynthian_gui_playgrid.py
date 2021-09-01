@@ -32,6 +32,7 @@ from pathlib import Path
 from PySide2.QtCore import (
     Slot,
     QAbstractItemModel,
+    QFileSystemWatcher,
     Qt,
     QModelIndex,
     QObject,
@@ -289,6 +290,7 @@ class zynthian_gui_playgrid_settings(QObject):
         pass
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
+    searchlist = [Path("/home/pi/zynthian-ui/qml-ui/playgrids"), Path(Path.home() / ".local/share/zynthian/playgrids")]
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
         qmlRegisterType(Note, "Zynthian.PlayGrid", 1, 0, "Note")
@@ -303,6 +305,15 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__note_state_map__ = {}
         self.updatePlayGrids()
 
+        self.__directory_watchers__ = []
+        for searchdir in zynthian_gui_playgrid.searchlist:
+            logging.error("Setting up grid file system watching for " + str(searchdir))
+            if not searchdir.exists():
+                searchdir.mkdir(parents=True)
+            dir_watcher = QFileSystemWatcher(str(searchdir))
+            dir_watcher.directoryChanged.connect(self.updatePlayGrids)
+            self.__directory_watchers__.append(dir_watcher)
+
     def show(self):
         pass
 
@@ -315,8 +326,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def updatePlayGrids(self):
         _new_list = []
-        searchlist = [Path("/home/pi/zynthian-ui/qml-ui/playgrids"), Path(Path.home() / ".local/zynthian/playgrids")]
-        for searchdir in searchlist:
+        for searchdir in zynthian_gui_playgrid.searchlist:
             if searchdir.exists():
                 for playgrid_dir in [f.name for f in os.scandir(searchdir) if f.is_dir()]:
                     _new_list.append(str(searchdir / playgrid_dir))

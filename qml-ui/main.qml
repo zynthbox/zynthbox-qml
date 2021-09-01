@@ -82,7 +82,7 @@ Kirigami.AbstractApplicationWindow {
                         delegate: QQC2.MenuItem {
                             visible: index < 6
                             height: visible ? implicitHeight : 0
-                            text: index === 5 ? qsTr("6 - RECORDING LAYER") : model.display
+                            text: index === 5 ? qsTr("6 - Multilayer") : model.display
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index)
                         }
@@ -169,6 +169,7 @@ Kirigami.AbstractApplicationWindow {
     Zynthian.ModalLoadingOverlay {
         parent: root.contentItem.parent
         anchors.fill: parent
+        z: 9999999
     }
 
     footer: Zynthian.ActionBar {

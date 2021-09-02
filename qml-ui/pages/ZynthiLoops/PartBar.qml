@@ -41,7 +41,7 @@ GridLayout {
 
     property QtObject bottomBar: null
 
-    SidebarDial {
+    Zynthian.ZynthiloopsDial {
         id: lengthDial
         text: qsTr("Length (beats)")
         controlObj: root.bottomBar.controlObj

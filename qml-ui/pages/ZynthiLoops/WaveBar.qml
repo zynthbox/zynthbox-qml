@@ -41,7 +41,7 @@ GridLayout {
 
     property QtObject bottomBar: null
 
-    SidebarDial {
+    Zynthian.ZynthiloopsDial {
         id: startDial
         text: qsTr("Start (msecs)")
         controlObj: root.bottomBar.controlObj
@@ -55,7 +55,7 @@ GridLayout {
         }
     }
 
-    SidebarDial {
+    Zynthian.ZynthiloopsDial {
         id: lengthDial
         text: qsTr("Length (beats)")
         controlObj: root.bottomBar.controlObj
@@ -68,7 +68,7 @@ GridLayout {
         }
     }
 
-    SidebarDial {
+    Zynthian.ZynthiloopsDial {
         id: pitchDial
         text: qsTr("Pitch")
         controlObj: root.bottomBar.controlObj
@@ -81,7 +81,7 @@ GridLayout {
         }
     }
 
-    SidebarDial {
+    Zynthian.ZynthiloopsDial {
         id: timeDial
         text: qsTr("Speed Ratio")
         controlObj: root.bottomBar.controlObj

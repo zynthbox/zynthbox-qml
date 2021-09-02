@@ -1417,8 +1417,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	@Slot(None)
 	def ensure_special_layers_midi_cloned(self):
-		for i in range(5, 9):
-			for j in range(5, 9):
+		for i in range(5, 10):
+			for j in range(5, 10):
 				if i in self.layer_midi_map and j in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					self.clone_midi(i, j)
 				#elif zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):

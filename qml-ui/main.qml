@@ -70,8 +70,8 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
-                        ? (zynthian.engine.midi_channel + 1) + "ˬ"
-                        : zynthian.layer.selector_path_element + "ˬ"
+                        ? Math.min(6, zynthian.engine.midi_channel + 1) + "ˬ"
+                        : Math.min(6, zynthian.layer.selector_path_element) + "ˬ"
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer'
                 QQC2.Menu {

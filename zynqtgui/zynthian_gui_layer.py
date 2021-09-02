@@ -467,7 +467,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def ask_remove_current_layer(self):
 		self.zyngui.show_confirm("Do you really want to remove this layer?", self.remove_current_layer)
 
-	def remove_current_layer(self):
+	def remove_current_layer(self, params=None):
 		logging.error("REMOVING".format(self.index))
 		self.remove_root_layer(self.index)
 
@@ -1419,6 +1419,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = fpath
 		return True
 
+	@Slot(int, int, result=bool)
+	def is_midi_cloned(self, from_chan: int, to_chan: int):
+		return zyncoder.lib_zyncoder.get_midi_filter_clone(from_chan, to_chan)
 
 	@Slot(int, int)
 	def clone_midi(self, from_chan: int, to_chan: int):

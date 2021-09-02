@@ -440,13 +440,4 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def queueRecording(self):
         self.__song__.get_metronome_manager().queue_clip_record(self)
-    #
-    # def start_recording(self):
-    #     self.audioSource.start_recording()
-    #     self.__is_recording__ = True
-    #     self.__is_recording_changed__.emit()
-    #
-    # def stop_recording(self):
-    #     self.audioSource.stop_recording()
-    #     self.__is_recording__ = False
-    #     self.__is_recording_changed__.emit()
+

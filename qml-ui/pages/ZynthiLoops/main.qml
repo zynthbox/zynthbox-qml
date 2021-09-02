@@ -45,16 +45,16 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Add Track")
-            onTriggered: root.song.addTrack()
-        },
-        Kirigami.Action {
             text: qsTr("Sketch")
 
             Kirigami.Action {
                 text: qsTr("New Sketch")
                 onTriggered: zynthian.zynthiloops.clearCurrentSketch()
             }
+        },
+        Kirigami.Action {
+            text: qsTr("Add Track")
+            onTriggered: root.song.addTrack()
         }
     ]
 

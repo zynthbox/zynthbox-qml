@@ -32,6 +32,10 @@ import org.kde.kirigami 2.5 as Kirigami
 Kirigami.Page {
     id: root
 
+    property Kirigami.Action backAction: Kirigami.Action {
+        text: qsTr("Back")
+        onTriggered: applicationWindow().goBack()
+    }
     property string previousScreen
 
     property string screenId

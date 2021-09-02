@@ -132,6 +132,12 @@ Zynthian.ScreenPage {
                 footer: Zynthian.ActionBar {
                     Layout.fillWidth: true
                     currentPage: Item {
+                        property QtObject backAction: Kirigami.Action {
+                            text: "Back"
+                            onTriggered: {
+                                settingsDialog.visible = false;
+                            }
+                        }
                         property list<QtObject> contextualActions: [
                             Kirigami.Action {
                                 text: "Get New Playgrids"

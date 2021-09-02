@@ -25,3 +25,4 @@ StatusInfo 1.0 StatusInfo.qml
 SwitchController 1.0 SwitchController.qml
 TabbedControlViewAction 1.0 TabbedControlViewAction.qml
 TabbedControlView 1.0 TabbedControlView.qml
+ZynthiloopsDial 1.0 ZynthiloopsDial.qml

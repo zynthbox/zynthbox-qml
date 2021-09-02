@@ -36,6 +36,13 @@ Kirigami.Page {
 
     property string screenId
 
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Back")
+            onTriggered: zynthian.go_back()
+        }
+    ]
+
     // This can be a function taking the cuia action name as paramenter. if returns
     // true the python part won't manage that action.
     // Useful for custom navigation in pages

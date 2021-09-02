@@ -113,6 +113,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def select_action(self, i, t='S'):
 		self.index = i
+		if i < len(self.root_layers):
+			self.zyngui.screens['fixed_layers'].current_index = self.root_layers[i].midi_chan
 
 		if self.list_data[i][0] is None:
 			pass
@@ -451,11 +453,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if stop_unused_engines:
 				self.zyngui.screens['engine'].stop_unused_engines()
 
+
+	@Slot(int)
+	def remove_midichan_layer(self, chan: int)
+		if chan < 0:
+			return
+		if chan in self.layer_midi_map:
+			remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]))
+
+
 	@Slot(None)
 	def ask_remove_current_layer(self):
 		self.zyngui.show_confirm("Do you really want to remove this layer?", self.remove_current_layer)
 
 	def remove_current_layer(self):
+		logging.error("REMOVING".format(self.index))
 		self.remove_root_layer(self.index)
 
 	def remove_root_layer(self, i, stop_unused_engines=True):

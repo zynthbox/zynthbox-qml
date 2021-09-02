@@ -107,12 +107,15 @@ GridLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 8
             Layout.alignment: Qt.AlignCenter
 
-            icon.name: "media-record-symbolic"
-            enabled: !controlObj.isRecording
+            icon.name: controlObj.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
             onClicked: {
-                console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-                controlObj.queueRecording();
+                if (!controlObj.isRecording) {
+                    console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
+                    controlObj.queueRecording();
+                } else {
+                    controlObj.stopRecording();
+                }
             }
         }
     }

@@ -445,3 +445,7 @@ class zynthiloops_clip(QObject):
     def queueRecording(self):
         self.__song__.get_metronome_manager().queue_clip_record(self)
 
+    @Slot(None)
+    def stopRecording(self):
+        self.__song__.get_metronome_manager().stop_recording()
+

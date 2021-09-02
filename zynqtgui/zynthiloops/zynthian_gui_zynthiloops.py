@@ -200,6 +200,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.isRecording = True
         self.start_metronome_request()
 
+    def stop_recording(self):
+        self.recorder_process.terminate()
+        self.clip_to_record.isRecording = False
+        self.is_recording_complete = True
+        self.stop_metronome_request()
+        self.recording_complete.emit()
+
     def start_metronome_request(self):
         self.metronome_running_refcount += 1
 
@@ -237,12 +244,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 if self.start_clip_recording:
                     self.recorder_process.start()
                     self.start_clip_recording = False
-                else:
-                    self.recorder_process.terminate()
-                    self.clip_to_record.isRecording = False
-                    self.is_recording_complete = True
-                    self.stop_metronome_request()
-                    self.recording_complete.emit()
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()

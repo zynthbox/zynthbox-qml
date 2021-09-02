@@ -32,6 +32,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.MultiSelectorPage {
 	id: root
+	backAction.visible: false
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Layers")

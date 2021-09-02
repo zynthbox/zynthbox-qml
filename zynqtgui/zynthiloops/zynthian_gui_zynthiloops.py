@@ -72,7 +72,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.is_recording_complete = False
         self.recording_count_in_value = 0
         self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
-        self.click_track = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_4-4.wav").encode('utf-8'))
+        self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
+        self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
 
         libzl.registerTimerCallback(cb)
@@ -93,11 +94,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def set_clickTrackEnabled(self, enabled: bool):
         self.click_track_enabled = enabled
         self.click_track_enabled_changed.emit()
-
-        if enabled:
-            self.click_track.queueClipToStart()
-        else:
-            self.click_track.queueClipToStop()
 
     clickTrackEnabled = Property(bool, get_clickTrackEnabled, set_clickTrackEnabled, notify=click_track_enabled_changed)
 
@@ -172,12 +168,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.song_changed.emit()
 
     def update_timer_bpm(self):
-        # Sync click track speed to bpm
-        self.click_track.set_speed_ratio(self.__song__.bpm / 120)
-
-        # Set length to 4 bets on bpm change
-        self.click_track.set_length((60.0 / self.__song__.bpm) * 4)
-
         if self.metronome_running_refcount > 0:
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
@@ -218,9 +208,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Do not start timer again and remove stop schedule
                 self.metronome_schedule_stop = False
             else:
-                if self.click_track_enabled:
-                    self.click_track.queueClipToStart()
-
                 libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
                 self.metronome_running_changed.emit()
 
@@ -240,6 +227,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         #     self.countInValue -= 1
 
         if self.__current_beat__ == 0:
+            if self.click_track_enabled:
+                self.click_track_click.play(False)
+
             if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
                 if self.start_clip_recording:
                     self.recorder_process.start()
@@ -247,7 +237,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
-                self.click_track.stop()
                 self.metronome_running_changed.emit()
 
                 self.__current_beat__ = -1
@@ -258,6 +247,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             else:
                 self.__current_bar__ += 1
                 self.current_bar_changed
+        else:
+            if self.click_track_enabled:
+                self.click_track_clack.play(False)
 
         #if self.__song__.isPlaying:
             #self.__song__.metronome_update

@@ -42,6 +42,14 @@ Zynthian.ScreenPage {
     rightPadding: 8
     topPadding: 8
     bottomPadding: 8
+    onSongChanged: {
+        console.log("Song Changed :", song)
+
+        // Reset focus to song cell
+        songCell.focus = true
+        bottomBar.controlType = BottomBar.ControlType.Song;
+        bottomBar.controlObj = root.song;
+    }
 
     contextualActions: [
         Kirigami.Action {
@@ -96,6 +104,7 @@ Zynthian.ScreenPage {
                 spacing: 1
 
                 TableHeader {
+                    id: songCell
                     Layout.preferredWidth: privateProps.headerWidth
                     Layout.maximumWidth: privateProps.headerWidth
                     Layout.fillHeight: true

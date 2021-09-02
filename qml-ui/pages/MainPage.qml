@@ -32,6 +32,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     screenId: "main"
+    backAction.visible: false
 
     contentItem:GridView {
 

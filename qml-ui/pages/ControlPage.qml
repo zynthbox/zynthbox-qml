@@ -62,10 +62,6 @@ Zynthian.ScreenPage {
     }
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Back")
-            onTriggered: zynthian.go_back()
-        },
-        Kirigami.Action {
             text: qsTr("Switch View")
             visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {

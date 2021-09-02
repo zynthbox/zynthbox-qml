@@ -51,6 +51,8 @@ GridLayout {
             anchors.fill: parent
             property real scale: 1
             onPinchUpdated: {
+                //FIXME: buggy, disable for now
+                return
                 let actualScale = Math.min(1.2, Math.max(1, scale + pinch.scale - 1));
                 print(actualScale)
                 let ratio = pinch.center.x / width;
@@ -87,7 +89,7 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                color: Kirigami.Theme.textColor
+                color: Kirigami.Theme.positiveTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: (waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width
@@ -97,7 +99,7 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                color: Kirigami.Theme.textColor
+                color: Kirigami.Theme.neutralTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.bottomBar.controlObj.length) / waveBar.bottomBar.controlObj.duration) * parent.width) + ((waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width)
@@ -108,7 +110,7 @@ GridLayout {
                     bottom: parent.bottom
                 }
                 visible: waveBar.bottomBar.controlObj.isPlaying
-                color: Kirigami.Theme.textColor
+                color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.bottomBar.controlObj.progress/waveBar.bottomBar.controlObj.duration * parent.width
             }

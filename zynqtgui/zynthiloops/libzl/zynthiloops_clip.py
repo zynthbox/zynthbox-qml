@@ -376,10 +376,14 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def clear(self, loop=True):
         self.stop()
-        self.audioSource.destroy()
-        self.audioSource = None
+
+        if self.audioSource is not None:
+            self.audioSource.destroy()
+            self.audioSource = None
+
         self.__path__ = None
         self.path_changed.emit()
+        self.__song__.schedule_save()
 
     @Slot(None)
     def play(self):

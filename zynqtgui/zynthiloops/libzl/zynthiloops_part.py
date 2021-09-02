@@ -124,6 +124,22 @@ class zynthiloops_part(QObject):
     name = Property(str, name, set_name, notify=name_changed)
 
     @Slot(None)
+    def clear(self):
+        for i in range(0, self.__song__.tracksModel.count):
+            track = self.__song__.tracksModel.getTrack(i)
+            clipsModel = track.clipsModel
+            logging.error(f"Track {track} ClipsModel {clipsModel}")
+
+            for clip_index in range(0, clipsModel.count):
+                logging.error(f"Track {i} Clip {clip_index}")
+                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+
+                if clip.col == self.partIndex:
+                    logging.error(
+                        f"Clip : clip.row({clip.row}), clip.col({clip.col}), self.partIndex({self.partIndex}),  clip({clip})")
+                    clip.clear()
+
+    @Slot(None)
     def play(self):
         logging.error(f"Playing Part {self.partIndex}")
 

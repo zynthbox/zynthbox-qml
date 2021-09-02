@@ -41,8 +41,6 @@ Zynthian.ScreenPage {
     screenId: "track"
     title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
 
-    Component.onCompleted: zynthian.fixed_layers.activate_index(6)
-
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
         RowLayout {
@@ -171,7 +169,6 @@ Zynthian.ScreenPage {
                                     }
                                     onValueModified: {
                                         zynthian.layer.copy_midichan_layer(value, index+5);
-                                        zynthian.fixed_layers.activate_index(6)
                                     }
                                 }*/
                                 QQC2.ComboBox {
@@ -182,7 +179,6 @@ Zynthian.ScreenPage {
                                     onActivated: {
                                         print("COPYING "+index+" "+ channelDelegate.targetMidiChan)
                                         zynthian.layer.copy_midichan_layer(index, channelDelegate.targetMidiChan);
-                                        zynthian.fixed_layers.activate_index(6)
                                         print("COPIED")
 
                                         displayText = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0))

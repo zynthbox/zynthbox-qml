@@ -153,11 +153,29 @@ Zynthian.ScreenPage {
                             delegate: ColumnLayout {
                                 id: channelDelegate
                                 readonly property int targetMidiChan: model.index + 5
-                                Kirigami.Heading {
-                                    id: topSoundHeading
-                                    text: qsTr("Voice %1").arg(index + 1)
-                                    level: 2
-                                    font.capitalization: Font.AllUppercase
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Kirigami.Heading {
+                                        id: topSoundHeading
+                                        Layout.fillWidth: true
+                                        text: qsTr("Voice %1").arg(index + 1)
+                                        level: 2
+                                        font.capitalization: Font.AllUppercase
+                                    }
+                                    QQC2.Button {
+                                        enabled: index > 0
+                                        opacity: enabled
+                                        icon.name: "link"
+                                        checkable: true
+                                        checked: zynthian.layer.is_midi_cloned(5, channelDelegate.targetMidiChan)
+                                        onToggled: {
+                                            if (checked) {
+                                                zynthian.layer.clone_midi(5, channelDelegate.targetMidiChan);
+                                            } else {
+                                                zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
+                                            }
+                                        }
+                                    }
                                 }
                                 /*QQC2.SpinBox {
                                     Layout.fillWidth: true
@@ -181,12 +199,15 @@ Zynthian.ScreenPage {
                                         for (var i = 0; i < zynthian.fixed_layers.selector_list.count; ++i) {
                                             filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
                                         }
+                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                        displayText = text.length > 4 ? text : qsTr("None")
                                     }
 
-                                    displayText: zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                    displayText: ""
                                     textRole: "display"
                                     onActivated: {
                                         if (index === 0) {
+                                            zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
                                             zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
                                             displayText = qsTr("None");
                                         } else {

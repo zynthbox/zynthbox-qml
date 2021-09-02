@@ -50,16 +50,6 @@ Zynthian.ScreenPage {
         }
     }
 
-    backAction: Kirigami.Action {
-        text: qsTr("Back")
-        onTriggered: {
-            if (stack.depth > 1) {
-                stack.pop();
-            } else {
-                zynthian.go_back()
-            }
-        }
-    }
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Switch View")

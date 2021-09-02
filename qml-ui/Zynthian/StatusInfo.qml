@@ -261,6 +261,13 @@ MouseArea {
                 visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
                 text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
             }
+            Kirigami.Icon {
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
+                source: "emblem-music-symbolic"
+                color: "#ffffff"
+                visible: zynthian.zynthiloops.clickTrackEnabled
+            }
         }
     }
     QQC2.Popup {
@@ -271,6 +278,21 @@ MouseArea {
             QQC2.Button {
                 text: qsTr("Stop All Notes")
                 onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+            }
+            RowLayout {
+                QQC2.Label {
+                    text: qsTr("Click")
+                }
+
+                QQC2.Switch {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    checked: zynthian.zynthiloops.clickTrackEnabled
+                    onToggled: {
+                        zynthian.zynthiloops.clickTrackEnabled = checked
+                    }
+                }
             }
         }
     }

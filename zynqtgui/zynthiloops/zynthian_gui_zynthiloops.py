@@ -70,6 +70,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process = None
         self.recorder_process_arguments = None
         self.is_recording_complete = False
+        self.recording_count_in_value = 0
         self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
         self.click_track = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_4-4.wav").encode('utf-8'))
         self.click_track_enabled = False
@@ -99,6 +100,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.click_track.queueClipToStop()
 
     clickTrackEnabled = Property(bool, get_clickTrackEnabled, set_clickTrackEnabled, notify=click_track_enabled_changed)
+
+    # @Signal
+    # def count_in_value_changed(self):
+    #     pass
+    #
+    # def get_countInValue(self):
+    #     return self.recording_count_in_value
+    #
+    # def set_countInValue(self, value):
+    #     self.recording_count_in_value = value
+    #     self.count_in_value_changed.emit()
+    #
+    # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
 
     def update_recorder_jack_port(self):
         self.recorder_process_arguments = ["--daemon"]
@@ -169,6 +183,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def queue_clip_record(self, clip):
         self.clip_to_record = clip
+        #self.countInValue = countInBars * 4
 
         self.recorder_process = QProcess()
         self.recorder_process.setProgram("/usr/local/bin/jack_capture")
@@ -182,6 +197,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.is_recording_complete = False
         self.start_clip_recording = True
+        self.clip_to_record.isRecording = True
         self.start_metronome_request()
 
     def start_metronome_request(self):
@@ -213,12 +229,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.current_beat_changed.emit()
         self.__current_beat__ = (self.__current_beat__ + 1) % 4
 
+        # if self.countInValue > 0:
+        #     self.countInValue -= 1
+
         if self.__current_beat__ == 0:
-            if self.clip_to_record is not None and self.is_recording_complete is False:
+            if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
                 if self.start_clip_recording:
                     self.recorder_process.start()
                     self.start_clip_recording = False
-                    self.clip_to_record.isRecording = True
                 else:
                     self.recorder_process.terminate()
                     self.clip_to_record.isRecording = False

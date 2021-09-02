@@ -173,16 +173,16 @@ Zynthian.Card {
                 }
             }
 
-            SidebarButton {
-                icon.name: "media-record-symbolic"
-                icon.color: "#f44336"
-                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
-                enabled: !controlObj.isRecording
+//            SidebarButton {
+//                icon.name: "media-record-symbolic"
+//                icon.color: "#f44336"
+//                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
+//                enabled: !controlObj.isRecording
 
-                onClicked: {
-                    controlObj.queueRecording();
-                }
-            }
+//                onClicked: {
+//                    controlObj.queueRecording();
+//                }
+//            }
         }
 
         Zynthian.TabbedControlView {
@@ -197,7 +197,7 @@ Zynthian.Card {
                 case BottomBar.ControlType.Song:
                     return songAction;
                 case BottomBar.ControlType.Clip:
-                    return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : emptyPageAction;
+                    return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
                 case BottomBar.ControlType.Track:
                     return trackAction;
                 case BottomBar.ControlType.Part:
@@ -210,12 +210,12 @@ Zynthian.Card {
             onInitialActionChanged: initialAction.trigger()
 
             tabActions: [
-                Zynthian.TabbedControlViewAction { // Never visible
-                    id: emptyPageAction
-                    text: "Empty"
-                    page: Qt.resolvedUrl("EmptyBar.qml")
-                    visible: false
-                    initialProperties: {"bottomBar": root, "message": qsTr("No Audio Loaded")}
+                Zynthian.TabbedControlViewAction {
+                    id: recordingAction
+                    text: qsTr("Record")
+                    page: Qt.resolvedUrl("RecordingBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.recordable && !controlObj.path
+                    initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     id: songAction

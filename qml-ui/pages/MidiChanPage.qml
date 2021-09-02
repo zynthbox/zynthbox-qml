@@ -32,4 +32,10 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.SelectorPage {
     screenId: "midi_chan"
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Back")
+            onTriggered: zynthian.go_back()
+        }
+    ]
 }

@@ -33,4 +33,14 @@ Zynthian.NewStuffPage {
     title: qsTr("Playgrid Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
     configFile: Qt.resolvedUrl("zynthian-playgrids.knsrc").toString().slice(7)
+
+    /// HACK WARNING This thing means you should NOT use this anywhere that expects the controls to be
+    /// visible when the playgrid downloader page is removed from the stack.
+    Connections {
+        target: component.backAction
+        onTriggered: {
+            zynthian.playgrid.updatePlayGrids();
+            applicationWindow().controlsVisible = false;
+        }
+    }
 }

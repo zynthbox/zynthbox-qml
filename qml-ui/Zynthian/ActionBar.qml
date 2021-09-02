@@ -42,6 +42,10 @@ QQC2.ToolBar {
         spacing: Kirigami.Units.smallSpacing
         ActionButton {
             Layout.fillHeight: true
+            kirigamiAction: root.currentPage && root.currentPage.backAction ? root.currentPage.backAction : null
+        }
+        ActionButton {
+            Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
         }
         ActionButton {
@@ -51,10 +55,6 @@ QQC2.ToolBar {
         ActionButton {
             Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
-        }
-        ActionButton {
-            Layout.fillHeight: true
-            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 3 ? root.currentPage.contextualActions[3] : null
         }
     }
 }

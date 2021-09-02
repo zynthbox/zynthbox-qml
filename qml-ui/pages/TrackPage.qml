@@ -182,9 +182,7 @@ Zynthian.ScreenPage {
                                         id: filteredLayersModel
                                     }
                                     Component.onCompleted: {
-                                        if (channelDelegate.targetMidiChan !== 5) {
-                                            filteredLayersModel.append({"display": qsTr("None")});
-                                        }
+                                        filteredLayersModel.append({"display": qsTr("None")});
                                         for (var i = 0; i < zynthian.fixed_layers.selector_list.count; ++i) {
                                             filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
                                         }
@@ -218,7 +216,7 @@ Zynthian.ScreenPage {
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
-                                        visible: index < 6 && model.display.indexOf("- -") === -1
+                                        visible: index < 6 && model.display.indexOf("- -") === -1 && (channelDelegate.targetMidiChan != 5 || index > 0)
                                         height: visible ? implicitHeight : 0
                                     }
                                     popup.width: Kirigami.Units.gridUnit * 15

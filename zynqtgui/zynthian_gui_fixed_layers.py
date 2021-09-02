@@ -97,6 +97,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.current_index = self.zyngui.curlayer.midi_chan + 1
 
 
+    #special_layer_name = Property(str, get_engine_nick, notify = engine_nick_changed)
+
     def back_action(self):
         return 'main'
 

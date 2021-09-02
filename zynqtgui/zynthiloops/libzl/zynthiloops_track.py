@@ -22,7 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-
+import logging
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
@@ -74,6 +74,20 @@ class zynthiloops_track(QObject):
     def id(self):
         return self.__id__
     id = Property(int, id, constant=True)
+
+    @Slot(None)
+    def clear(self):
+        track = self.__song__.tracksModel.getTrack(self.__id__)
+        clipsModel = track.clipsModel
+
+        logging.error(f"Track {track} ClipsModel {clipsModel}")
+
+        for clip_index in range(0, clipsModel.count):
+            logging.error(f"Track {self.__id__} Clip {clip_index}")
+            clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+            logging.error(
+                f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
+            clip.clear()
 
     @Signal
     def __name_changed__(self):

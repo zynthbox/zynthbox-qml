@@ -63,8 +63,5 @@ Kirigami.Page {
                 child.active = false;
             }
         }
-        if (!root.contextualActions[0]) {
-            root.contextualActions = [backAction]
-        }
     }
 }

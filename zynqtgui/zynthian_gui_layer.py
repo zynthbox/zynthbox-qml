@@ -205,7 +205,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def activate_midichan_layer(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
-		else:
+		elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			self.replace_layer_index = None
 			self.layer_chain_parallel = False
 			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
@@ -1401,14 +1401,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Make sure the special Multilayer 6 has something
 			#if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
 				#self.copy_midichan_layer(0, 5)
-			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
-				#self.clone_midi(5, 6)
-			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
-				#self.clone_midi(5, 7)
-			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
-				#self.clone_midi(5, 8)
-			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
-				#self.clone_midi(5, 9)
+			if 5 in self.layer_midi_map:
+				if 6 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
+					self.clone_midi(5, 6)
+				if 7 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
+					self.clone_midi(5, 7)
+				if 8 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
+					self.clone_midi(5, 8)
+				if 9 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
+					self.clone_midi(5, 9)
 
 
 		except Exception as e:

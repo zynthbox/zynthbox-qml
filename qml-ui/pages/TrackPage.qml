@@ -41,6 +41,8 @@ Zynthian.ScreenPage {
     screenId: "track"
     title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
 
+    Component.onCompleted: zynthian.fixed_layers.activate_index(6)
+
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
         RowLayout {
@@ -153,30 +155,15 @@ Zynthian.ScreenPage {
                             delegate: ColumnLayout {
                                 id: channelDelegate
                                 readonly property int targetMidiChan: model.index + 5
-                                RowLayout {
+
+                                Kirigami.Heading {
+                                    id: topSoundHeading
                                     Layout.fillWidth: true
-                                    Kirigami.Heading {
-                                        id: topSoundHeading
-                                        Layout.fillWidth: true
-                                        text: qsTr("Voice %1").arg(index + 1)
-                                        level: 2
-                                        font.capitalization: Font.AllUppercase
-                                    }
-                                    QQC2.Button {
-                                        enabled: index > 0
-                                        opacity: enabled
-                                        icon.name: "link"
-                                        checkable: true
-                                        checked: zynthian.layer.is_midi_cloned(5, channelDelegate.targetMidiChan)
-                                        onToggled: {
-                                            if (checked) {
-                                                zynthian.layer.clone_midi(5, channelDelegate.targetMidiChan);
-                                            } else {
-                                                zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
-                                            }
-                                        }
-                                    }
+                                    text: qsTr("Voice %1").arg(index + 1)
+                                    level: 2
+                                    font.capitalization: Font.AllUppercase
                                 }
+
                                 /*QQC2.SpinBox {
                                     Layout.fillWidth: true
                                     font: topSoundHeading.font
@@ -200,7 +187,8 @@ Zynthian.ScreenPage {
                                             filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
                                         }
                                         let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
-                                        displayText = text.length > 4 ? text : qsTr("None")
+                                        text = text.split(">")[1];
+                                        currentSoundName["voice"+(index+1)] = text.length > 4 ? (channelDelegate.targetMidiChan > 5 ? " + " + text : text) : ""
                                     }
 
                                     displayText: ""
@@ -209,13 +197,21 @@ Zynthian.ScreenPage {
                                         if (index === 0) {
                                             zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
                                             zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
-                                            displayText = qsTr("None");
+                                            currentSoundName["voice"+(index+1)] = ""
+                                            if (channelDelegate.targetMidiChan !== 5) {
+                                                zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
+                                            }
                                         } else {
                                             print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
                                             zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
                                             print("COPIED")
+                                            if (channelDelegate.targetMidiChan !== 5) {
+                                                zynthian.layer.clone_midi(5, channelDelegate.targetMidiChan);
+                                            }
 
-                                            displayText = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                            let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                            text = text.split(">")[1];
+                                            currentSoundName["voice"+(index+1)] = (channelDelegate.targetMidiChan > 5 ? " + " + text : text)
                                         }
                                     }
                                     delegate: QQC2.MenuItem {
@@ -291,6 +287,15 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }*/
+                    }
+                    QQC2.Label {
+                        id: currentSoundName
+                        property string voice1
+                        property string voice2
+                        property string voice3
+                        property string voice4
+                        property string voice5
+                        text: voice1+voice2+voice3+voice4+voice5
                     }
                 }
             }

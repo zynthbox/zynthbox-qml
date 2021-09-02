@@ -108,6 +108,7 @@ class zynthiloops_song(QObject):
                 self.__name__ = obj["name"]
             if "bpm" in obj:
                 self.__bpm__ = obj["bpm"]
+                self.set_bpm(self.__bpm__, True)
             if "parts" in obj:
                 self.__parts_model__.deserialize(obj["parts"])
             if "tracks" in obj:
@@ -237,8 +238,8 @@ class zynthiloops_song(QObject):
     def bpm(self):
         return self.__bpm__
 
-    def set_bpm(self, bpm: int):
-        if self.__bpm__ != math.floor(bpm):
+    def set_bpm(self, bpm: int, force_set=False):
+        if self.__bpm__ != math.floor(bpm) or force_set is True:
             self.__bpm__ = math.floor(bpm)
             self.bpm_changed.emit()
             self.schedule_save()

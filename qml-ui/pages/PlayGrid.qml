@@ -429,16 +429,28 @@ Zynthian.ScreenPage {
                                     }
                                     color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                                 }
-                                QQC2.Label {
+                                Rectangle {
                                     anchors {
-                                        left: parent.horizontalCenter
-                                        leftMargin: Kirigami.Units.largeSpacing
+                                        left: parent.right
                                         bottom: parent.top
+                                        bottomMargin: -Kirigami.Units.largeSpacing
                                     }
                                     rotation: -45
                                     transformOrigin: Item.BottomLeft
-                                    text: slideDelegate.playGrid.name
-                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                    height: slideDelegateLabel.height + Kirigami.Units.smallSpacing * 2
+                                    width: slideDelegateLabel.width + Kirigami.Units.smallSpacing * 2
+                                    radius: height / 2
+                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                    QQC2.Label {
+                                        id: slideDelegateLabel
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            left: parent.left
+                                            margins: Kirigami.Units.smallSpacing
+                                        }
+                                        text: slideDelegate.playGrid.name
+                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                    }
                                 }
                             }
                         }
@@ -494,7 +506,7 @@ Zynthian.ScreenPage {
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (xChoice <= zynthian.playgrid.playgrids.length && zynthian.playgrid.playGridIndex !== xChoice - 1) {
+                                    if (0 < xChoice && xChoice <= playGridsRepeater.count && zynthian.playgrid.playGridIndex !== xChoice - 1) {
                                         zynthian.playgrid.playGridIndex = xChoice - 1
                                     }
                                 }

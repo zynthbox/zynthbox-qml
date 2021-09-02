@@ -113,6 +113,7 @@ Zynthian.ScreenPage {
 
         ColumnLayout {
             id: controlsPanel
+            z: 1
 
             Layout.preferredWidth: 80
             Layout.maximumWidth: Layout.preferredWidth
@@ -396,6 +397,52 @@ Zynthian.ScreenPage {
                         }
                         color: Kirigami.Theme.backgroundColor
                     }
+                    Row {
+                        anchors {
+                            top: parent.top
+                            left: parent.right
+                            bottom: parent.bottom
+                        }
+                        width: playGridsRepeater.count * settingsButton.width
+                        spacing: 0
+                        opacity: settingsSlidePoint.pressed ? (settingsTouchArea.xChoice > 0 && settingsTouchArea.yChoice === 0 ? 1 : 0.3) : 0
+                        Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                        Repeater {
+                            model: playGridsRepeater.count
+                            delegate: Item {
+                                id: slideDelegate
+                                property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
+                                property var playGrid: playGridsRepeater.itemAt(index).item
+                                height: parent.height
+                                width: settingsButton.width
+                                Rectangle {
+                                    anchors {
+                                        fill: parent
+                                        margins: Kirigami.Units.smallSpacing / 2
+                                    }
+                                    radius: Math.max(width,height) / 2
+                                    Kirigami.Theme.inherit: false
+                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                    border {
+                                        width: 1
+                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                    }
+                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                }
+                                QQC2.Label {
+                                    anchors {
+                                        left: parent.horizontalCenter
+                                        leftMargin: Kirigami.Units.largeSpacing
+                                        bottom: parent.top
+                                    }
+                                    rotation: -45
+                                    transformOrigin: Item.BottomLeft
+                                    text: slideDelegate.playGrid.name
+                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                }
+                            }
+                        }
+                    }
                     function getYChoice() {
                         var choice = 0;
                         if (settingsSlidePoint.pressed) {
@@ -411,41 +458,11 @@ Zynthian.ScreenPage {
                         return choice;
                     }
                     MultiPointTouchArea {
+                        id: settingsTouchArea
                         anchors.fill: parent
                         touchPoints: [ TouchPoint { id: settingsSlidePoint; } ]
                         property int xChoice
                         property int yChoice
-                        property string currentText
-                        function getPositionalText() {
-                            var text = "Do nothing";
-                            var yChoice = settingsButton.getYChoice();
-                            var xChoice = settingsButton.getXChoice();
-                            // We only react to slides when outside the button
-                            if (xChoice === 0 && yChoice !== 0) {
-                                // Sliding upward from the button - switch between slide and not-slide input
-                                switch (yChoice) {
-                                    case -1:
-                                        text = "Use Swipe Input";
-                                        break;
-                                    case -2:
-                                        text = "Disable Swipe Input";
-                                        break;
-                                    default:
-                                        var text = "Do nothing";
-                                        break;
-                                }
-                            } else if (yChoice === 0 && xChoice !== 0) {
-                                // Sliding rightward from the button - switch between grid modes
-                                if (xChoice <= playGridsRepeater.count  && zynthian.playgrid.playGridIndex !== xChoice - 1) {
-                                    text = "Switch to " + playGridsRepeater.itemAt(xChoice - 1).item.name;
-                                } else {
-                                    text = "Do nothing";
-                                }
-                            } else if (yChoice === 0 && xChoice === 0) {
-                                text = "Show Settings";
-                            }
-                            return text;
-                        }
                         onPressed: {
                             if (settingsSlidePoint.pressed) {
                                 xChoice = settingsButton.getXChoice();
@@ -457,17 +474,11 @@ Zynthian.ScreenPage {
                             if (settingsSlidePoint.pressed) {
                                 xChoice = settingsButton.getXChoice();
                                 yChoice = settingsButton.getYChoice();
-                                var positionalText = getPositionalText();
-                                if (positionalText != currentText) {
-                                    applicationWindow().showPassiveNotification(positionalText);
-                                    currentText = positionalText;
-                                }
                             }
                         }
                         onReleased: {
                             if (!settingsSlidePoint.pressed) {
                                 parent.down = false;
-                                currentText = "";
                                 if (xChoice === 0 && yChoice === 0) {
                                     // Then it we just had a tap
                                     settingsDialog.visible = true;
@@ -496,6 +507,7 @@ Zynthian.ScreenPage {
 
         QQC2.StackView {
             id: playGridStack
+            z: 0
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true

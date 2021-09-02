@@ -455,7 +455,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 	@Slot(int)
-	def remove_midichan_layer(self, chan: int)
+	def remove_midichan_layer(self, chan: int):
 		if chan < 0:
 			return
 		if chan in self.layer_midi_map:

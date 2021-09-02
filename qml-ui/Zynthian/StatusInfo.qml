@@ -274,10 +274,23 @@ MouseArea {
         id: popup
         y: parent.height
         modal: true
-        contentItem: ColumnLayout {
-            QQC2.Button {
-                text: qsTr("Stop All Notes")
-                onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+        width: Kirigami.Units.gridUnit * 20
+        height: Kirigami.Units.gridUnit * 15
+        x: parent.width - width
+        contentItem: GridLayout {
+            columns: 2
+            ZynthiloopsDial {
+                id: bpmDial
+                Layout.rowSpan: 2
+                text: qsTr("BPM")
+                controlObj: zynthian.zynthiloops.song
+                controlProperty: "bpm"
+
+                dial {
+                    stepSize: 1
+                    from: 50
+                    to: 200
+                }
             }
             RowLayout {
                 QQC2.Label {
@@ -293,6 +306,10 @@ MouseArea {
                         zynthian.zynthiloops.clickTrackEnabled = checked
                     }
                 }
+            }
+            QQC2.Button {
+                text: qsTr("Stop All Notes")
+                onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
             }
         }
     }

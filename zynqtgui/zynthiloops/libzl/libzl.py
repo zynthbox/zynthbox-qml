@@ -55,7 +55,7 @@ def init():
         libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
         libzl.ClipAudioSource_new.restype = ctypes.c_void_p
 
-        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p]
+        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
         libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
 
@@ -150,9 +150,9 @@ class ClipAudioSource(object):
         if libzl:
             return libzl.ClipAudioSource_getProgress(self.obj)
 
-    def play(self):
+    def play(self, loop=True):
         if libzl:
-            libzl.ClipAudioSource_play(self.obj)
+            libzl.ClipAudioSource_play(self.obj, loop)
 
     def stop(self):
         logging.error(f"Stopping Audio Source : {self.obj}, {libzl}")

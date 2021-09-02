@@ -106,7 +106,6 @@ class Note(QObject):
     def __subnotes_changed__(self):
         pass
 
-    @Slot(int)
     def on(self, _velocity: int = 64):
         if (len(self.__midi_notes_on_msgs__) > 0):
             for i in range(0, len(self.__midi_notes_on_msgs__)):
@@ -120,7 +119,6 @@ class Note(QObject):
             self.__midi_note_on_msg__.velocity = _velocity
             self.__midi_port__.send(self.__midi_note_on_msg__)
 
-    @Slot(None)
     def off(self):
         if (len(self.__midi_notes_off_msgs__) > 0):
             for i in range(0, len(self.__midi_notes_off_msgs__)):
@@ -293,14 +291,19 @@ class zynthian_gui_playgrid_settings(QObject):
         pass
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
+    # Use this when something needs to be signalled to /all/ the instances (such as note states)
+    __playgrid_instances__ = []
+
     searchlist = [Path(Path.home() / ".local/share/zynthian/playgrids"), Path("/home/pi/zynthian-ui/qml-ui/playgrids")]
     dir_watcher = QFileSystemWatcher()
 
     __settings_stores__ = {}
     __note_state_map__ = {}
+    __most_recently_changed_note__ = None
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
+        zynthian_gui_playgrid.__playgrid_instances__.append(self)
         qmlRegisterType(Note, "Zynthian.PlayGrid", 1, 0, "Note")
         qmlRegisterType(zynthian_gui_grid_notes_model, "Zynthian.PlayGrid", 1, 0, "Model")
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
@@ -408,19 +411,35 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                     zynthian_gui_playgrid.__note_state_map__[noteKey] -= 1
                     if zynthian_gui_playgrid.__note_state_map__[noteKey] == 0:
                         note.off()
+                        self.__note_state_changed__(note)
                         zynthian_gui_playgrid.__note_state_map__.pop(noteKey)
                         for model in self.__models__:
                             model.highlight_playing_note(note, False)
             else:
                 if setOn:
                     note.on(velocity)
+                    self.__note_state_changed__(note)
                     zynthian_gui_playgrid.__note_state_map__[noteKey] = 1
                     for model in self.__models__:
                         model.highlight_playing_note(note, True)
                 else:
                     note.off()
+                    self.__note_state_changed__(note)
                     for model in self.__models__:
                         model.highlight_playing_note(note, False)
+
+    def __note_state_changed__(self,note:Note):
+        zynthian_gui_playgrid.__most_recently_changed_note__ = note
+        for playgrid in zynthian_gui_playgrid.__playgrid_instances__:
+            playgrid.noteStateChanged.emit()
+
+    @Slot(result=Note)
+    def mostRecentlyChangedNote(self):
+        return zynthian_gui_playgrid.__most_recently_changed_note__
+
+    @Signal
+    def noteStateChanged(self):
+        pass
 
     def model_deleted(self, model:zynthian_gui_grid_notes_model):
         if model in self.__models__:

@@ -451,6 +451,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if stop_unused_engines:
 				self.zyngui.screens['engine'].stop_unused_engines()
 
+	@Slot(None)
+	def ask_remove_current_layer(self):
+		self.zyngui.show_confirm("Do you really want to remove this layer?", self.remove_current_layer)
+
+	def remove_current_layer(self):
+		self.remove_root_layer(self.index)
 
 	def remove_root_layer(self, i, stop_unused_engines=True):
 		if i>=0 and i<len(self.root_layers):

@@ -213,7 +213,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.layer_index_replace_engine = None
 			self.zyngui.show_modal('engine')
 		else: # HACK Channels 6-10
-			for i in range(5, 9):
+			for i in range(5, 10):
 				if i in self.layer_midi_map:
 					self.activate_index(self.root_layers.index(self.layer_midi_map[i]))
 

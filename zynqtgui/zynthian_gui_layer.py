@@ -133,7 +133,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.add_layer("Special")
 
 		elif self.list_data[i][0]=='RESET':
-			self.zyngui.show_confirm("Do you really want to remove all layers?", self.reset_confirmed)
+			self.ask_reset()
 
 		elif self.list_data[i][0]=='ALL_OFF':
 			self.zyngui.callable_ui_action("ALL_OFF")
@@ -159,6 +159,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def layer_down(self):
 		self.next(zynthian_gui_config.automatically_show_control_page)
 		self.select_action(self.index)
+
+	@Slot(None)
+	def ask_reset(self):
+		self.zyngui.show_confirm("Do you really want to remove all layers?", self.reset_confirmed)
 
 	def reset_confirmed(self, params=None):
 		if len(self.zyngui.screens['layer'].layers)>0:

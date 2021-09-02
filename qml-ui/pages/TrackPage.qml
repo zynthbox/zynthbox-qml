@@ -173,19 +173,33 @@ Zynthian.ScreenPage {
                                 }*/
                                 QQC2.ComboBox {
                                     Layout.fillWidth: true
-                                    model: zynthian.fixed_layers.selector_list
-                                    displayText: zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0))
+                                    model: ListModel {
+                                        id: filteredLayersModel
+                                    }
+                                    Component.onCompleted: {
+                                        filteredLayersModel.append({"display": qsTr("None")});
+                                        for (var i = 0; i < zynthian.fixed_layers.selector_list.count; ++i) {
+                                            filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
+                                        }
+                                    }
+
+                                    displayText: zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
                                     textRole: "display"
                                     onActivated: {
-                                        print("COPYING "+index+" "+ channelDelegate.targetMidiChan)
-                                        zynthian.layer.copy_midichan_layer(index, channelDelegate.targetMidiChan);
-                                        print("COPIED")
+                                        if (index === 0) {
+                                            zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
+                                            displayText = qsTr("None");
+                                        } else {
+                                            print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
+                                            zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
+                                            print("COPIED")
 
-                                        displayText = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0))
+                                            displayText = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                        }
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
-                                        visible: index < 5 && model.display.indexOf("- -") === -1
+                                        visible: index < 6 && model.display.indexOf("- -") === -1
                                         height: visible ? implicitHeight : 0
                                     }
                                     popup.width: Kirigami.Units.gridUnit * 15

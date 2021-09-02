@@ -113,8 +113,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def select_action(self, i, t='S'):
 		self.index = i
-		if i < len(self.root_layers):
-			self.zyngui.screens['fixed_layers'].current_index = self.root_layers[i].midi_chan
 
 		if self.list_data[i][0] is None:
 			pass
@@ -146,6 +144,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			elif t=='B':
 				self.layer_options()
+
+		if i < len(self.root_layers):
+			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
 		#self.zyngui.screens['bank'].show()
 
 	def next_action(self):
@@ -459,7 +460,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if chan < 0:
 			return
 		if chan in self.layer_midi_map:
-			remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]))
+			self.remove_root_layer(self.root_layers.index(self.layer_midi_map[chan]))
 
 
 	@Slot(None)

@@ -34,6 +34,17 @@ Zynthian.MultiSelectorPage {
 	id: root
     contextualActions: [
         Kirigami.Action {
+            text: qsTr("Layers")
+            Kirigami.Action {
+                text: qsTr("Remove Layer")
+                onTriggered: zynthian.layer.ask_remove_current_layer()
+            }
+            Kirigami.Action {
+                text: qsTr("Remove All")
+                onTriggered: zynthian.layer.ask_reset()
+            }
+        },
+        Kirigami.Action {
             text: qsTr("Synths")
             onTriggered: zynthian.layer.select_engine()
         },

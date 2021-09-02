@@ -36,12 +36,11 @@ Kirigami.Page {
 
     property string screenId
 
-    contextualActions: [
-        Kirigami.Action {
-            text: qsTr("Back")
-            onTriggered: zynthian.go_back()
-        }
-    ]
+    Kirigami.Action {
+        id: backAction
+        text: qsTr("Back")
+        onTriggered: zynthian.go_back()
+    }
 
     // This can be a function taking the cuia action name as paramenter. if returns
     // true the python part won't manage that action.
@@ -63,6 +62,9 @@ Kirigami.Page {
             if (child.hasOwnProperty("active") && child.hasOwnProperty("source")) {
                 child.active = false;
             }
+        }
+        if (contextualActions.length === 0) {
+            contextualActions = [backAction]
         }
     }
 }

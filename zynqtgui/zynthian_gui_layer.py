@@ -1386,16 +1386,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.show_screen('layer')
 
 			# Make sure the special Multilayer 6 has something
-			if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
-				self.copy_midichan_layer(0, 5)
-			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
-				self.clone_midi(5, 6)
-			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
-				self.clone_midi(5, 7)
-			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
-				self.clone_midi(5, 8)
-			if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
-				self.clone_midi(5, 9)
+			#if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
+				#self.copy_midichan_layer(0, 5)
+			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
+				#self.clone_midi(5, 6)
+			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
+				#self.clone_midi(5, 7)
+			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
+				#self.clone_midi(5, 8)
+			#if not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
+				#self.clone_midi(5, 9)
 
 
 		except Exception as e:

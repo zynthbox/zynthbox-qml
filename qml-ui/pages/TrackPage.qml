@@ -188,7 +188,7 @@ Zynthian.ScreenPage {
                                         }
                                         let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
                                         text = text.split(">")[1];
-                                        currentSoundName["voice"+(index+1)] = text.length > 4 ? (channelDelegate.targetMidiChan > 5 ? " + " + text : text) : ""
+                                        currentSoundName.text = text.length > 4 ? text : ""
                                     }
 
                                     displayText: ""
@@ -197,29 +197,29 @@ Zynthian.ScreenPage {
                                         if (index === 0) {
                                             zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
                                             zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
-                                            currentSoundName["voice"+(index+1)] = ""
-                                            if (channelDelegate.targetMidiChan !== 5) {
-                                                zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
-                                            }
+                                            currentSoundName.text = ""
+                                            zynthian.layer.ensure_special_layers_midi_cloned()
                                         } else {
                                             print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
                                             zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
                                             print("COPIED")
-                                            if (channelDelegate.targetMidiChan !== 5) {
-                                                zynthian.layer.clone_midi(5, channelDelegate.targetMidiChan);
-                                            }
+                                            zynthian.layer.ensure_special_layers_midi_cloned()
 
                                             let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
                                             text = text.split(">")[1];
-                                            currentSoundName["voice"+(index+1)] = (channelDelegate.targetMidiChan > 5 ? " + " + text : text)
+                                            currentSoundName.text = text
                                         }
+                                        zynthian.fixed_layers.activate_index(6)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
-                                        visible: index < 6 && model.display.indexOf("- -") === -1 && (channelDelegate.targetMidiChan != 5 || index > 0)
+                                        visible: index < 6 && model.display.indexOf("- -") === -1
                                         height: visible ? implicitHeight : 0
                                     }
                                     popup.width: Kirigami.Units.gridUnit * 15
+                                }
+                                QQC2.Label {
+                                    id: currentSoundName
                                 }
                             }
                         }
@@ -287,15 +287,6 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }*/
-                    }
-                    QQC2.Label {
-                        id: currentSoundName
-                        property string voice1
-                        property string voice2
-                        property string voice3
-                        property string voice4
-                        property string voice5
-                        text: voice1+voice2+voice3+voice4+voice5
                     }
                 }
             }

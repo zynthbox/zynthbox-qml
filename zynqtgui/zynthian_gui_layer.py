@@ -212,6 +212,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['engine'].set_midi_channel(midi_chan)
 			self.layer_index_replace_engine = None
 			self.zyngui.show_modal('engine')
+		else: # HACK Channels 6-10
+			for i in range(5, 9):
+				if i in self.layer_midi_map:
+					self.activate_index(self.root_layers.index(self.layer_midi_map[i]))
 
 	def next(self, control=True):
 		self.zyngui.restore_curlayer()
@@ -1401,16 +1405,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Make sure the special Multilayer 6 has something
 			#if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
 				#self.copy_midichan_layer(0, 5)
-			if 5 in self.layer_midi_map:
-				if 6 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 6):
-					self.clone_midi(5, 6)
-				if 7 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 7):
-					self.clone_midi(5, 7)
-				if 8 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 8):
-					self.clone_midi(5, 8)
-				if 9 in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(5, 9):
-					self.clone_midi(5, 9)
-
+			self.ensure_special_layers_midi_cloned()
 
 		except Exception as e:
 			self.zyngui.reset_loading()
@@ -1419,6 +1414,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		self.last_snapshot_fpath = fpath
 		return True
+
+	@Slot(None)
+	def ensure_special_layers_midi_cloned(self):
+		for i in range(5, 9):
+			for j in range(5, 9):
+				if i in self.layer_midi_map and j in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+					self.clone_midi(i, j)
+				#elif zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+					#self.remove_clone_midi(i, j)
 
 	@Slot(int, int, result=bool)
 	def is_midi_cloned(self, from_chan: int, to_chan: int):

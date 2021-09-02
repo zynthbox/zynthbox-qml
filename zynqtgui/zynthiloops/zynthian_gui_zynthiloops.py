@@ -27,6 +27,7 @@ import ctypes as ctypes
 import math
 import re
 import sys
+from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
 from time import sleep
@@ -67,14 +68,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
-        self.recorder_process = None
-        self.recorder_process_arguments = None
         self.is_recording_complete = False
         self.recording_count_in_value = 0
         self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
+        self.jack_client = jack.Client('zynthiloops_client')
+        self.jack_capture_port = self.jack_client.inports.register(f"c{datetime.now().strftime('%H%M%S')}")
+        self.recorder_process = None
+        self.recorder_process_arguments = ["--port", self.jack_capture_port.name]
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
@@ -111,18 +114,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
 
     def update_recorder_jack_port(self):
-        self.recorder_process_arguments = ["--daemon"]
-        jack_client = jack.Client('zynthiloops_client')
+        self.jack_client.deactivate()
+        self.jack_client.activate()
 
-        for port in jack_client.get_ports(is_audio=True, is_output=True):
-            if not (port.name.startswith("JUCE") or port.name.startswith("system")):#port.name.startswith(jack_basename):
+        for port in self.jack_client.get_ports(is_audio=True, is_output=True):
+            if not (port.name.startswith("JUCE") or port.name.startswith("system") or port.name.startswith("fluidsynth:fx")):#port.name.startswith(jack_basename):
                 logging.error("ACCEPTED {}".format(port.name))
-                self.recorder_process_arguments.append("--port")
-                self.recorder_process_arguments.append(port.name)
+                # self.recorder_process_arguments.append("--port")
+                # self.recorder_process_arguments.append(port.name)
+                try:
+                    self.jack_client.connect(port.name, self.jack_capture_port.name)
+                except:
+                    logging.error(f"Error connecting to jack port : {port.name}")
             else:
                 logging.error("REJECTED {}".format(port.name))
 
-        logging.error(f"##### Recorder Process Arguments : {self.recorder_process_arguments}")
+        # logging.error(f"##### Recorder Process Arguments : {self.recorder_process_arguments}")
 
     def recording_process_started(self):
         logging.error(f"Started recording {self} at {self.clip_to_record}")
@@ -178,10 +185,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process = QProcess()
         self.recorder_process.setProgram("/usr/local/bin/jack_capture")
         self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record.recording_path])
-        # self.recorder_process.started.connect(lambda: self.recording_process_started())
-        # self.recorder_process.finished.connect(
-        #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
-        # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
+        self.recorder_process.started.connect(lambda: self.recording_process_started())
+        self.recorder_process.finished.connect(
+            lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
+        self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
         logging.error(
             f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
 

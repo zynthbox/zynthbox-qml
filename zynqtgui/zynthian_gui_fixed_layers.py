@@ -74,14 +74,27 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     def select_action(self, i, t='S'):
         self.index = i
-        if i in self.zyngui.screens['layer'].layer_midi_map:
-            self.zyngui.screens['layer'].current_index = self.root_layers.zyngui.screens['layer'].index(self.zyngui.screens['layer'].layer_midi_map[i])
+        chan = self.list_data[i][1]
 
-        if self.list_data[i][1] < 0:
+        if chan < 0:
             return
-        self.zyngui.screens['layer'].activate_midichan_layer(self.list_data[i][1])
+
+        if chan in self.zyngui.screens['layer'].layer_midi_map:
+            self.zyngui.screens['layer'].current_index = self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[chan])
+
+        self.zyngui.screens['layer'].activate_midichan_layer(chan)
+
         if t=='B':
             self.zyngui.screens['layer'].layer_options()
+
+
+    def sync_index_from_curlayer(self):
+        if not self.zyngui.curlayer:
+            return
+        if self.zyngui.curlayer.midi_chan < self.__fixed_layers_count:
+            self.current_index = self.zyngui.curlayer.midi_chan
+        else:
+            self.current_index = self.zyngui.curlayer.midi_chan + 1
 
 
     def back_action(self):

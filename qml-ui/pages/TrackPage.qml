@@ -302,8 +302,12 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            root.clip.clear();
-                            root.clip.queueRecording();
+                            if (root.clip.isRecording) {
+                                root.clip.clear();
+                                root.clip.queueRecording();
+                            } else {
+                                root.clip.stopRecording();
+                            }
                         }
                     }
                     QQC2.ComboBox {

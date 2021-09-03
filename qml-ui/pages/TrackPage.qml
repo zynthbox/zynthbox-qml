@@ -140,7 +140,7 @@ Zynthian.ScreenPage {
                             id: midiButton
                             text: qsTr("Load Voices From Track")
                             onClicked: {
-                                zynthian.zynthiloops.restoreLayersFromTrack(root.track)
+                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
                                 zynthian.layer.ensure_special_layers_midi_cloned()
                                 zynthian.fixed_layers.activate_index(6)
                             }

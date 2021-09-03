@@ -67,7 +67,7 @@ QtObject {
         "midi_chan": "MidiChanPage.qml",
         "layer_options": "LayerOptionsPage.qml",
         "snapshot": "SnapshotPage.qml",
-        "audio_out": "AudioOut.qml",
+        "audio_out": "AudioOutPage.qml",
         "audio_recorder": "AudioRecorderPage.qml",
         "midi_recorder": "MidiRecorderPage.qml",
         "admin": "AdminPage.qml",

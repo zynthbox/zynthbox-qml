@@ -162,6 +162,11 @@ GridLayout {
                     text: modelData
                 }
             }
+        }        
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
+            visible: controlObj.soundData.length <= 0
+            text: "<No Metadata>"
         }
         Kirigami.Separator {
             Layout.fillWidth: true

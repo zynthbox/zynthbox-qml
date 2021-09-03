@@ -34,6 +34,9 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
+    METADATA_KEY_ACTIVE_LAYER = "ZYNTHBOX_ACTIVELAYER"
+    METADATA_KEY_LAYERS = "ZYNTHBOX_LAYERS"
+
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
         self.__length__ = 1
@@ -458,7 +461,7 @@ class zynthiloops_clip(QObject):
 
     def __read_metadata__(self):
         try:
-            self.audio_metadata = json.loads(taglib.File(self.__path__).tags["ZYNTHBOX_METADATA"][0])
+            self.audio_metadata = taglib.File(self.__path__).tags
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None
@@ -466,11 +469,11 @@ class zynthiloops_clip(QObject):
     def metadata(self):
         return self.audio_metadata
 
-    def write_metadata(self, data: str):
+    def write_metadata(self, key, value: list):
         if self.__path__ is not None:
             try:
                 file = taglib.File(self.__path__)
-                file.tags["ZYNTHBOX_METADATA"] = data
+                file.tags[key] = value
                 file.save()
             except Exception as e:
                 logging.error(f"Error writing metadata : {str(e)}")
@@ -478,11 +481,12 @@ class zynthiloops_clip(QObject):
         self.__read_metadata__()
 
     def get_soundData(self):
-        data = ['Voice 1', 'Voice 2']
+        data = []
 
         if self.audio_metadata is not None:
             try:
-                data = self.audio_metadata["layers"][0]["preset_info"]
+                jsondata = json.loads(self.audio_metadata[zynthiloops_clip.METADATA_KEY_ACTIVE_LAYER][0])
+                data = [f"{jsondata['engine_name']} > {jsondata['preset_name']}"]
             except Exception as e:
                 logging.error(f"Error retrieving from metadata : {str(e)}")
 

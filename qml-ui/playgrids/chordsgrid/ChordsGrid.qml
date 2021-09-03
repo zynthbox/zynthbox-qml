@@ -63,6 +63,13 @@ ColumnLayout {
                     id: playDelegate
                     property var column: index
                     property var note: component.model.data(component.model.index(rowDelegate.row, playDelegate.column), component.model.roles['note'])
+
+                    // Pitch is -8192 to 8191 inclusive
+                    property int pitchValue: Math.max(-8192, Math.min(chordSlidePoint.slideX * 8192 / width, 8191))
+                    onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
+                    property int modulationValue: Math.max(-127, Math.min(chordSlidePoint.slideY * 127 / width, 127))
+                    onModulationValueChanged: zynthian.playgrid.modulation = modulationValue;
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     background: Rectangle {
@@ -134,7 +141,8 @@ ColumnLayout {
                                 parent.down = false;
                                 focus = false;
                                 zynthian.playgrid.setNoteOff(playingNote)
-                                zynthian.playgrid.pitch = 0
+                                zynthian.playgrid.pitch = 0;
+                                zynthian.playgrid.modulation = 0;
                             }
                         }
                     }

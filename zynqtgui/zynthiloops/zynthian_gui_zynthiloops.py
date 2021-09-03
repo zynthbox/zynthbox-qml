@@ -113,11 +113,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def saveLayersToTrack(self, tid):
         if tid < 0 or tid >= self.__song__.tracksModel.count:
             return
-        track_layers_snapshot = []
-        for i in range(5, 10):
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                layer_to_copy = self.zyngui.screens['layer'].layer_midi_map[i]
-                track_layers_snapshot.append(layer_to_copy.get_snapshot())
+        track_layers_snapshot = self.track_layers_snapshot()
         logging.error(track_layers_snapshot)
         self.__song__.tracksModel.getTrack(tid).set_layers_snapshot(track_layers_snapshot)
         self.__song__.schedule_save()

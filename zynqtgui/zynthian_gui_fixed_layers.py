@@ -30,6 +30,8 @@ import logging
 from . import zynthian_gui_layer
 from . import zynthian_gui_selector
 
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+
 #------------------------------------------------------------------------------
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
@@ -69,6 +71,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
 
+        self.special_layer_name_changed.emit()
         super().fill_list()
 
 
@@ -97,7 +100,25 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.current_index = self.zyngui.curlayer.midi_chan + 1
 
 
-    #special_layer_name = Property(str, get_engine_nick, notify = engine_nick_changed)
+    @Signal
+    def special_layer_name_changed(self):
+        pass
+
+    def get_special_layer_name(self):
+        layer_name = "T-RACK: "
+        found = False
+        for chan in range(5, 10):
+            if chan in self.zyngui.screens['layer'].layer_midi_map:
+                found = True
+                if chan > 5:
+                    layer_name += ", {}".format(chan + 1)
+                else:
+                    layer_name += " Sound {}".format(chan + 1)
+                #layer_name += self.zyngui.screens['layer'].layer_midi_map[chan].preset_name
+        if not found:
+            layer_name += "None"
+        return layer_name
+    special_layer_name = Property(str, get_special_layer_name, notify = special_layer_name_changed)
 
     def back_action(self):
         return 'main'

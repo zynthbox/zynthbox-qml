@@ -1452,6 +1452,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for i in range(5, 10):
 			for j in range(5, 10):
 				if i in self.layer_midi_map and j in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+					logging.error("CLONING {} TO {}".format(i, j))
 					self.clone_midi(i, j)
 				#elif zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					#self.remove_clone_midi(i, j)

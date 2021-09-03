@@ -101,6 +101,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     clickTrackEnabled = Property(bool, get_clickTrackEnabled, set_clickTrackEnabled, notify=click_track_enabled_changed)
 
+    def track_layers_snapshot(self):
+        snapshot = []
+        for i in range(5, 10):
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                layer_to_copy = self.zyngui.screens['layer'].layer_midi_map[i]
+                snapshot.append(layer_to_copy.get_snapshot())
+        return snapshot
+
     @Slot(int)
     def saveLayersToTrack(self, tid):
         if tid < 0 or tid >= self.__song__.tracksModel.count:

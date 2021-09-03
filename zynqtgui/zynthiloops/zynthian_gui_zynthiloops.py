@@ -75,7 +75,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
         self.jack_client = jack.Client('zynthiloops_client')
-        self.jack_capture_port = self.jack_client.inports.register(f"c{datetime.now().strftime('%H%M%S')}")
+        self.jack_capture_port = self.jack_client.inports.register(f"capture_port")
         self.recorder_process = None
         self.recorder_process_arguments = ["--port", self.jack_capture_port.name]
 
@@ -118,7 +118,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_client.activate()
 
         for port in self.jack_client.get_ports(is_audio=True, is_output=True):
-            if not (port.name.startswith("JUCE") or port.name.startswith("system") or port.name.startswith("fluidsynth:fx")):#port.name.startswith(jack_basename):
+            if not (port.name.startswith("JUCE") or port.name.startswith("system")):#port.name.startswith(jack_basename):
                 logging.error("ACCEPTED {}".format(port.name))
                 # self.recorder_process_arguments.append("--port")
                 # self.recorder_process_arguments.append(port.name)

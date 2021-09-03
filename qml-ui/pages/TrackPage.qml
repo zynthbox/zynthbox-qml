@@ -37,6 +37,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject track: zynthian.track.track
     readonly property QtObject part: zynthian.track.part
+    readonly property QtObject clip: track.clipsModel.getClip(zynthian.track.partId);
 
     screenId: "track"
     title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
@@ -297,13 +298,12 @@ Zynthian.ScreenPage {
                 contentItem: ColumnLayout {
                     QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter
-                        icon.name: "media-record"
+                        icon.name: root.clip.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            let clip = root.track.clipsModel.getClip(root.partId);
-                            clip.clear();
-                            clip.queueRecording();
+                            root.clip.clear();
+                            root.clip.queueRecording();
                         }
                     }
                     QQC2.ComboBox {
@@ -323,7 +323,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Kirigami.Theme.textColor
-            source: root.track.clipsModel.getClip(root.partId).path
+            source: root.clip.path
         }
     }
 }

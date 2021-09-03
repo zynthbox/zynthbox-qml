@@ -179,6 +179,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
     def queue_clip_record(self, clip):
+        self.update_recorder_jack_port()
         self.clip_to_record = clip
         #self.countInValue = countInBars * 4
 

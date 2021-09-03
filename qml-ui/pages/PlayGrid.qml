@@ -296,7 +296,7 @@ Zynthian.ScreenPage {
                         anchors.fill: parent
                         property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
                         onModulationValueChanged: {
-                            //zynthian.playgrid.modulation = modulationValue;
+                            zynthian.playgrid.modulation = modulationValue;
                         }
                         touchPoints: [ TouchPoint { id: modulationPoint; } ]
                         onPressed: {
@@ -306,7 +306,7 @@ Zynthian.ScreenPage {
                         onReleased: {
                             parent.down = false;
                             focus = false;
-                            //zynthian.playgrid.modulation = 0;
+                            zynthian.playgrid.modulation = 0;
                         }
                     }
                 }

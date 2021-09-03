@@ -307,6 +307,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grid_index__ = 0
         self.__play_grids__ = []
         self.__pitch__ = 0
+        self.__modulation__ = 0
         self.__models__ = []
         self.updatePlayGrids()
 
@@ -385,6 +386,21 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Signal
     def __pitch_changed__(self):
+        pass
+
+    def __get_modulation__(self):
+        return self.__modulation__
+
+    def __set_modulation__(self, modulation):
+        self.__modulation__ = modulation
+        midi_pitch_message = mido.Message(
+            "control_change", channel=0, control=1, value=self.__pitch__
+        )
+        self.__midi_port__.send(midi_pitch_message)
+        self.__modulation_changed__.emit()
+
+    @Signal
+    def __modulation_changed__(self):
         pass
 
     @Slot(Note, int)
@@ -496,4 +512,5 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)
     pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
+    modulation = Property(int, __get_modulation__, __set_modulation__, notify=__modulation_changed__)
     playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)

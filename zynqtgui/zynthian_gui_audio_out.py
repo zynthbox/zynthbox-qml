@@ -42,7 +42,6 @@ class zynthian_gui_audio_out(zynthian_gui_selector):
 		super(zynthian_gui_audio_out, self).__init__("Audio Out", parent)
 		self.layer=None
 		self.end_layer = None
-		super().__init__('Audio Out', True)
 
 
 	def set_layer(self, layer):

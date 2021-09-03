@@ -31,6 +31,7 @@ from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
 from time import sleep
+import json
 
 from PySide2.QtCore import Property, QObject, QProcess, QTimer, Signal, Slot
 
@@ -99,6 +100,29 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_enabled_changed.emit()
 
     clickTrackEnabled = Property(bool, get_clickTrackEnabled, set_clickTrackEnabled, notify=click_track_enabled_changed)
+
+    @Slot(int)
+    def saveLayersToTrack(self, tid):
+        if tid < 0 or tid >= self.__song__.tracksModel.count:
+            return
+        track_layers_snapshot = []
+        for i in range(5, 10):
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                layer_to_copy = self.zyngui.screens['layer'].layer_midi_map[i]
+                track_layers_snapshot.append(layer_to_copy.get_snapshot())
+        logging.error(track_layers_snapshot)
+        self.__song__.tracksModel.getTrack(tid).set_layers_snapshot(track_layers_snapshot)
+        self.__song__.schedule_save()
+
+    @Slot(int)
+    def restoreLayersFromTrack(self, tid):
+        if tid < 0 or tid >= self.__song__.tracksModel.count:
+            return
+        for i in range(5, 10):
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
+        self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.tracksModel.getTrack(tid).get_layers_snapshot())
+
 
     # @Signal
     # def count_in_value_changed(self):

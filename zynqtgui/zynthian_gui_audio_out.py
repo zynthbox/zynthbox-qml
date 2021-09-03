@@ -38,7 +38,8 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_audio_out(zynthian_gui_selector):
 
-	def __init__(self):
+	def __init__(self, parent=None):
+		super(zynthian_gui_audio_out, self).__init__("Audio Out", parent)
 		self.layer=None
 		self.end_layer = None
 		super().__init__('Audio Out', True)
@@ -84,5 +85,6 @@ class zynthian_gui_audio_out(zynthian_gui_selector):
 
 	def set_select_path(self):
 		self.select_path = ("Send Audio to ...")
+		super().set_select_path()
 
 #------------------------------------------------------------------------------

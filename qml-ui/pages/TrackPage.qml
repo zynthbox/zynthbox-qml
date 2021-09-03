@@ -227,17 +227,15 @@ Zynthian.ScreenPage {
                                         if (index === 0) {
                                             zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
                                             zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
-                                            currentSoundName.text = ""
                                             zynthian.layer.ensure_special_layers_midi_cloned()
+                                            voiceCombo.updateText()
                                         } else {
                                             print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
                                             zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
                                             print("COPIED")
                                             zynthian.layer.ensure_special_layers_midi_cloned()
 
-                                            let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
-                                            text = text.split(">")[1];
-                                            currentSoundName.text = text
+                                            voiceCombo.updateText()
                                         }
                                         zynthian.fixed_layers.activate_index(6)
                                         zynthian.zynthiloops.saveLayersToTrack(zynthian.track.trackId)

@@ -137,6 +137,16 @@ Zynthian.ScreenPage {
                             }
                         }
 
+                        QQC2.Button {
+                            id: midiButton
+                            text: qsTr("Load Voices")
+                            visible: metadataRepeater.count > 0
+                            onClicked: {
+                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
+                                zynthian.layer.ensure_special_layers_midi_cloned()
+                                zynthian.fixed_layers.activate_index(6)
+                            }
+                        }
                         /*QQC2.Button {
                             id: midiButton
                             text: qsTr("MIDI")
@@ -192,18 +202,22 @@ Zynthian.ScreenPage {
                                         voiceCombo.updateText();
                                     }
                                     function updateText() {
-                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0));
-                                        text = text.substring(4);
-                                        text = text.split(">")[1];
-                                        if (text) {
-                                            currentSoundName.text = text.length > 4 ? text : "";
-                                        } else {
-                                            currentSoundName.text = "";
+
+                                        for (var i in root.track.soundData) {
+                                            let data = root.track.soundData[i];
+                                            if (data.midi_chan === channelDelegate.targetMidiChan) {
+                                                currentSoundName.text = data.preset_name;
+                                                return;
+                                            }
                                         }
                                     }
                                     Connections {
                                         target: zynthian.fixed_layers
                                         onSpecial_layer_nameChanged: voiceCombo.updateText();
+                                    }
+                                    Connections {
+                                        target: root
+                                        onTrackChanged: voiceCombo.updateText();
                                     }
 
                                     displayText: ""
@@ -304,31 +318,26 @@ Zynthian.ScreenPage {
                             }
                         }*/
                     }
+                    /*
                     RowLayout {
                         Layout.alignment: Qt.AlignRight
                         QQC2.Label {
                             text: metadataRepeater.count === 0 ? qsTr("No Metadata") : qsTr("Metadata:")
                         }
-                        Repeater {
-                            id: metadataRepeater
-                            model: root.track.soundData
+                        //Flow {
+                            Layout.alignment: Qt.AlignRight
+                            Repeater {
+                                id: metadataRepeater
+                                model: root.track.soundData
 
-                            delegate: QQC2.Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: (index > 0 ? ", " : "") + qsTr("Voice %1: %2").arg(modelData.midi_chan - 4).arg(modelData.preset_name)
+                                delegate: QQC2.Label {
+                                    Layout.alignment: Qt.AlignRight
+                                    text: (index > 0 ? ", " : "") + qsTr("Voice %1: %2 > %3").arg(modelData.midi_chan - 4).arg(modelData.engine_name.split("/")[1]).arg(modelData.preset_name)
+                                }
                             }
-                        }
-                        QQC2.Button {
-                            id: midiButton
-                            text: qsTr("Load Voices")
-                            visible: metadataRepeater.count > 0
-                            onClicked: {
-                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
-                                zynthian.layer.ensure_special_layers_midi_cloned()
-                                zynthian.fixed_layers.activate_index(6)
-                            }
-                        }
-                    }
+                        //}
+
+                    }*/
                 }
             }
 

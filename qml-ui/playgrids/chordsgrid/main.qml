@@ -78,7 +78,9 @@ Zynthian.BasePlayGrid {
 
             for (var i = 0; i < row_scale.length; ++i){
 
-                var fake_midi_note = 0;
+                // We use a fake midi note to identify the notes
+                var fake_midi_note = 128;
+                var fake_midi_note_increment = 0;
                 var subnotes = [];
                 for (var subnote_index = 0; subnote_index < diatonic_progressions.length; ++subnote_index){
 
@@ -90,7 +92,8 @@ Zynthian.BasePlayGrid {
                         if (subnote_scale_index >= row_scale.length){
                             subnote_scale_index -= row_scale.length;
                         }
-                        subnote_col += row_scale[subnote_scale_index]
+                        subnote_col += row_scale[subnote_scale_index];
+                        fake_midi_note_increment += row_scale[subnote_scale_index];
                     }
 
                     var subnote = zynthian.playgrid.createNote(
@@ -100,7 +103,7 @@ Zynthian.BasePlayGrid {
                         subnote_col
                     );
                     subnotes.push(subnote);
-                    fake_midi_note += (127 * subnote_index) + subnote_col
+                    fake_midi_note += (127 * fake_midi_note_increment) + subnote_col;
 
                 }
                 // Now create a Note object representing a music note for our current cell

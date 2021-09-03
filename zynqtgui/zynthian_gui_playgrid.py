@@ -293,6 +293,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     searchlist = [Path(Path.home() / ".local/share/zynthian/playgrids"), Path("/home/pi/zynthian-ui/qml-ui/playgrids")]
     dir_watcher = QFileSystemWatcher()
 
+    __models__ = []
     __notes__ = []
     __settings_stores__ = {}
     __note_state_map__ = {}
@@ -308,7 +309,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grids__ = []
         self.__pitch__ = 0
         self.__modulation__ = 0
-        self.__models__ = []
         self.updatePlayGrids()
 
         zynthian_gui_playgrid.dir_watcher.directoryChanged.connect(self.updatePlayGrids)
@@ -417,7 +417,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         if subnoteCount > 0:
             for i in range(0, subnoteCount):
                 self.setNoteState(subnotes[i], velocity, setOn)
-            for model in self.__models__:
+            for model in zynthian_gui_playgrid.__models__:
                 model.highlight_playing_note(note, setOn)
         else:
             noteKey = str(note.get_midi_note())
@@ -430,19 +430,19 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                         note.off()
                         self.__note_state_changed__(note)
                         zynthian_gui_playgrid.__note_state_map__.pop(noteKey)
-                        for model in self.__models__:
+                        for model in zynthian_gui_playgrid.__models__:
                             model.highlight_playing_note(note, False)
             else:
                 if setOn:
                     note.on(velocity)
                     self.__note_state_changed__(note)
                     zynthian_gui_playgrid.__note_state_map__[noteKey] = 1
-                    for model in self.__models__:
+                    for model in zynthian_gui_playgrid.__models__:
                         model.highlight_playing_note(note, True)
                 else:
                     note.off()
                     self.__note_state_changed__(note)
-                    for model in self.__models__:
+                    for model in zynthian_gui_playgrid.__models__:
                         model.highlight_playing_note(note, False)
 
     def __note_state_changed__(self,note:Note):
@@ -459,13 +459,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         pass
 
     def model_deleted(self, model:zynthian_gui_grid_notes_model):
-        if model in self.__models__:
-            self.__models__.remove(model)
+        if model in zynthian_gui_playgrid.__models__:
+            zynthian_gui_playgrid.__models__.remove(model)
 
     @Slot(result=QObject)
     def createNotesModel(self):
         model = zynthian_gui_grid_notes_model(self)
-        self.__models__.append(model)
+        zynthian_gui_playgrid.__models__.append(model)
         model.destroyed.connect(self.model_deleted)
         QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
         return model

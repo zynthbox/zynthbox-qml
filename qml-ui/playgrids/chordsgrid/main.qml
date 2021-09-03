@@ -96,7 +96,7 @@ Zynthian.BasePlayGrid {
                         fake_midi_note_increment += row_scale[subnote_scale_index];
                     }
 
-                    var subnote = zynthian.playgrid.createNote(
+                    var subnote = zynthian.playgrid.getNote(
                         note_int_to_str_map[subnote_col % 12],
                         scale_index,
                         Math.floor(subnote_col / 12),
@@ -108,7 +108,7 @@ Zynthian.BasePlayGrid {
                 }
                 // Now create a Note object representing a music note for our current cell
                 // This one's our container, and it will contain a series of subnotes which make up the scale
-                var note = zynthian.playgrid.createNote(
+                var note = zynthian.playgrid.getNote(
                     note_int_to_str_map[col % 12],
                     scale_index,
                     Math.floor(col / 12),

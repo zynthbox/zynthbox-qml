@@ -185,10 +185,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process = QProcess()
         self.recorder_process.setProgram("/usr/local/bin/jack_capture")
         self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record.recording_path])
-        self.recorder_process.started.connect(lambda: self.recording_process_started())
-        self.recorder_process.finished.connect(
-            lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
-        self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
+        # self.recorder_process.started.connect(lambda: self.recording_process_started())
+        # self.recorder_process.finished.connect(
+        #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
+        # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
         logging.error(
             f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
 

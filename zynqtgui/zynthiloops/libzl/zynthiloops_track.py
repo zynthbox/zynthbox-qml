@@ -53,9 +53,11 @@ class zynthiloops_track(QObject):
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
             self.__layers_snapshot = obj["layers_snapshot"]
+            self.sound_data_changed.emit()
 
     def set_layers_snapshot(self, snapshot):
         self.__layers_snapshot = snapshot
+        self.sound_data_changed.emit()
 
     def get_layers_snapshot(self):
         return self.__layers_snapshot
@@ -83,6 +85,15 @@ class zynthiloops_track(QObject):
     def id(self):
         return self.__id__
     id = Property(int, id, constant=True)
+
+    @Signal
+    def sound_data_changed(self):
+        pass
+
+    def get_soundData(self):
+        return self.__layers_snapshot
+    soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
+
 
     @Slot(None)
     def clear(self):

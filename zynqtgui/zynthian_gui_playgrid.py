@@ -377,6 +377,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __set_pitch__(self, pitch):
         self.__pitch__ = pitch
+        midi_pitch_message = mido.Message(
+            "pitchwheel", channel=0, pitch=self.__pitch__
+        )
+        self.__midi_port__.send(midi_pitch_message)
         self.__pitch_changed__.emit()
 
     @Signal

@@ -212,14 +212,10 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
     @Slot(None)
     def clear(self):
-        temporary_notes = self.__grid_notes__
         self.beginResetModel()
         self.__grid_notes__ = []
         self.endResetModel()
         self.__rows_changed__.emit()
-        for row in temporary_notes:
-            for note in row:
-                note.deleteLater()
 
     @Slot('QVariantList')
     def addRow(self, notes):
@@ -297,6 +293,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     searchlist = [Path(Path.home() / ".local/share/zynthian/playgrids"), Path("/home/pi/zynthian-ui/qml-ui/playgrids")]
     dir_watcher = QFileSystemWatcher()
 
+    __notes__ = []
     __settings_stores__ = {}
     __note_state_map__ = {}
     __most_recently_changed_note__ = None
@@ -311,7 +308,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grids__ = []
         self.__pitch__ = 0
         self.__models__ = []
-        self.__notes__ = []
         self.updatePlayGrids()
 
         zynthian_gui_playgrid.dir_watcher.directoryChanged.connect(self.updatePlayGrids)
@@ -455,8 +451,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return model
 
     def note_deleted(self, note:Note):
-        if note in self.__notes__:
-            self.__notes__.remove(note)
+        if note in zynthian_gui_playgrid.__notes__:
+            zynthian_gui_playgrid.__notes__.remove(note)
 
     @Slot(str, int, int, int, result=QObject)
     def createNote(self,
@@ -464,15 +460,24 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                    _scale_index: int,
                    _octave: int,
                    _midi_note: int):
-        note = Note(
-            name=_name,
-            scale_index=_scale_index,
-            octave=_octave,
-            midi_note=_midi_note,
-            midi_port=self.__midi_port__,
-            parent=self
-        )
-        self.__notes__.append(note)
+        note = None
+        for existingNote in zynthian_gui_playgrid.__notes__:
+            if (existingNote.__note_name__ == _name
+                and existingNote.__scale_index__ == _scale_index
+                and existingNote.__octave__ == _octave
+                and existingNote.__midi_note__ == _midi_note):
+                    note = existingNote
+                    break
+        if note is None:
+            note = Note(
+                name=_name,
+                scale_index=_scale_index,
+                octave=_octave,
+                midi_note=_midi_note,
+                midi_port=self.__midi_port__,
+                parent=self
+            )
+        zynthian_gui_playgrid.__notes__.append(note)
         note.destroyed.connect(self.note_deleted)
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
         return note

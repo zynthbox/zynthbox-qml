@@ -209,6 +209,7 @@ Zynthian.ScreenPage {
                                                 currentSoundName.text = data.preset_name;
                                                 return;
                                             }
+                                            currentSoundName.text = "";
                                         }
                                     }
                                     Connections {

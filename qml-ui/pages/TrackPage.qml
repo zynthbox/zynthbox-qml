@@ -139,7 +139,11 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             id: midiButton
                             text: qsTr("Load Voices From Track")
-                            onClicked: zynthian.zynthiloops.restoreLayersFromTrack(root.track)
+                            onClicked: {
+                                zynthian.zynthiloops.restoreLayersFromTrack(root.track)
+                                zynthian.layer.ensure_special_layers_midi_cloned()
+                                zynthian.fixed_layers.activate_index(6)
+                            }
                         }
 
                         /*QQC2.Button {
@@ -184,7 +188,7 @@ Zynthian.ScreenPage {
                                     }
                                 }*/
                                 QQC2.ComboBox {
-									id: voiceCombo
+                                    id: voiceCombo
                                     Layout.fillWidth: true
                                     model: ListModel {
                                         id: filteredLayersModel
@@ -197,10 +201,14 @@ Zynthian.ScreenPage {
                                         voiceCombo.updateText();
                                     }
                                     function updateText() {
-										let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
                                         text = text.split(">")[1];
                                         currentSoundName.text = text.length > 4 ? text : ""
-									}
+                                    }
+                                    Connections {
+                                        target: zynthian.fixed_layers
+                                        onSpecial_layer_nameChanged: voiceCombo.updateText();
+                                    }
 
                                     displayText: ""
                                     textRole: "display"

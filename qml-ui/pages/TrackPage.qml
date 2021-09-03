@@ -136,15 +136,6 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                        QQC2.Button {
-                            id: midiButton
-                            text: qsTr("Load Voices From Track")
-                            onClicked: {
-                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
-                                zynthian.layer.ensure_special_layers_midi_cloned()
-                                zynthian.fixed_layers.activate_index(6)
-                            }
-                        }
 
                         /*QQC2.Button {
                             id: midiButton
@@ -312,6 +303,31 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }*/
+                    }
+                    RowLayout {
+                        Layout.alignment: Qt.AlignRight
+                        QQC2.Label {
+                            text: metadataRepeater.count === 0 ? qsTr("No Metadata") : qsTr("Metadata:")
+                        }
+                        Repeater {
+                            id: metadataRepeater
+                            model: root.track.soundData
+
+                            delegate: QQC2.Label {
+                                Layout.alignment: Qt.AlignRight
+                                text: (index > 0 ? ", " : "") + qsTr("Voice %1: %2").arg(modelData.midi_chan - 4).arg(modelData.preset_name)
+                            }
+                        }
+                        QQC2.Button {
+                            id: midiButton
+                            text: qsTr("Load Voices")
+                            visible: metadataRepeater.count > 0
+                            onClicked: {
+                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
+                                zynthian.layer.ensure_special_layers_midi_cloned()
+                                zynthian.fixed_layers.activate_index(6)
+                            }
+                        }
                     }
                 }
             }

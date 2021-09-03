@@ -88,8 +88,18 @@ GridLayout {
         }
     }
 
-    Item {
+    ColumnLayout {
+        Layout.fillHeight: true
         Layout.fillWidth: true
+
+        Repeater {
+            model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
+
+            delegate: QQC2.Label {
+                Layout.alignment: Qt.AlignCenter
+                text: modelData
+            }
+        }
 
 //        QQC2.Label {
 //            text: zynthian.zynthiloops.countInValue

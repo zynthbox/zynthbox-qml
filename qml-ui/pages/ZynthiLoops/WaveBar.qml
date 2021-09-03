@@ -151,6 +151,22 @@ GridLayout {
 
     ColumnLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+
+        ColumnLayout {
+            Layout.alignment: Qt.AlignRight
+            Repeater {
+                model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
+
+                delegate: QQC2.Label {
+                    Layout.alignment: Qt.AlignRight
+                    text: modelData
+                }
+            }
+        }
+        Kirigami.Separator {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+        }
         QQC2.Label {
             Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0

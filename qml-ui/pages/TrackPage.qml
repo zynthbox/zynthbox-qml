@@ -136,6 +136,12 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
+                        QQC2.Button {
+                            id: midiButton
+                            text: qsTr("Load Voices From Track")
+                            onClicked: zynthian.zynthiloops.restoreLayersFromTrack(root.track)
+                        }
+
                         /*QQC2.Button {
                             id: midiButton
                             text: qsTr("MIDI")
@@ -178,6 +184,7 @@ Zynthian.ScreenPage {
                                     }
                                 }*/
                                 QQC2.ComboBox {
+									id: voiceCombo
                                     Layout.fillWidth: true
                                     model: ListModel {
                                         id: filteredLayersModel
@@ -187,10 +194,13 @@ Zynthian.ScreenPage {
                                         for (var i = 0; i < zynthian.fixed_layers.selector_list.count; ++i) {
                                             filteredLayersModel.append({"display": zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(i, 0))})
                                         }
-                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                        voiceCombo.updateText();
+                                    }
+                                    function updateText() {
+										let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
                                         text = text.split(">")[1];
                                         currentSoundName.text = text.length > 4 ? text : ""
-                                    }
+									}
 
                                     displayText: ""
                                     textRole: "display"
@@ -211,6 +221,7 @@ Zynthian.ScreenPage {
                                             currentSoundName.text = text
                                         }
                                         zynthian.fixed_layers.activate_index(6)
+                                        zynthian.zynthiloops.saveLayersToTrack(root.track)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display

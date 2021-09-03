@@ -1415,6 +1415,38 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = fpath
 		return True
 
+	# snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
+	def load_channels_snapshot(self, snapshot):
+		if not isinstance(snapshot, list):
+			return
+		self.zyngui.start_loading()
+		for i in range(5, 10):
+			for j in range(5, 10):
+				if i in self.layer_midi_map and j in self.layer_midi_map and zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+					self.remove_clone_midi(i, j)
+		for layer_data in snapshot:
+			if "midi_chan" in layer_data and "engine_nick" in layer_data:
+				midi_chan = layer_data["midi_chan"]
+				if midi_chan >= 5 and midi_chan < 10:
+					logging.error("AAAAAAAAAAAAAAA {}".format(midi_chan))
+					if midi_chan in self.layer_midi_map:
+						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
+					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
+					new_layer = zynthian_layer(engine, midi_chan, self.zyngui)
+					new_layer.restore_snapshot_1(layer_data)
+					new_layer.restore_snapshot_2(layer_data)
+					sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
+					for layer in sublayers:
+						layer.set_midi_chan(midi_chan)
+					new_layer.reset_audio_out()
+					self.zyngui.zynautoconnect_midi()
+					self.layers.append(new_layer)
+
+		self.ensure_special_layers_midi_cloned()
+		self.fill_list()
+		self.zyngui.stop_loading()
+
+
 	@Slot(None)
 	def ensure_special_layers_midi_cloned(self):
 		for i in range(5, 10):

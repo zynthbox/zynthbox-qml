@@ -109,11 +109,11 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         found = False
         for chan in range(5, 10):
             if chan in self.zyngui.screens['layer'].layer_midi_map:
-                found = True
-                if chan > 5:
-                    layer_name += ", {}".format(chan + 1)
+                if found:
+                    layer_name += ", {}".format(self.zyngui.screens['layer'].layer_midi_map[chan].preset_name)
                 else:
-                    layer_name += " Sound {}".format(chan + 1)
+                    layer_name += "{}".format(self.zyngui.screens['layer'].layer_midi_map[chan].preset_name)
+                    found = True
                 #layer_name += self.zyngui.screens['layer'].layer_midi_map[chan].preset_name
         if not found:
             layer_name += "None"

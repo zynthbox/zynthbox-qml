@@ -1428,7 +1428,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
 				if midi_chan >= 5 and midi_chan < 10:
-					logging.error("AAAAAAAAAAAAAAA {}".format(midi_chan))
 					if midi_chan in self.layer_midi_map:
 						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
 					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
@@ -1463,10 +1462,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	@Slot(int, int)
 	def clone_midi(self, from_chan: int, to_chan: int):
-		logging.error("CLONE_MIDI {} {}".format(from_chan, to_chan))
 		if from_chan == to_chan:
 			return
-		logging.error("CLONING {} {}".format(from_chan, to_chan))
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
 
 	@Slot(int, int)
@@ -1486,7 +1483,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				self.remove_root_layer(self.root_layers.index(self.layer_midi_map[to_midichan]), True)
 			layer_to_copy = self.layer_midi_map[from_midichan]
 			logging.error("COPYING {} {}".format(from_midichan, to_midichan))
-			new_layer = zynthian_layer(layer_to_copy.engine, to_midichan, self.zyngui)
+			engine = self.zyngui.screens['engine'].start_engine(layer_to_copy.engine.nickname)
+			new_layer = zynthian_layer(engine, to_midichan, self.zyngui)
 			#new_layer.set_bank(layer_to_copy.bank_index)
 			snapshot = layer_to_copy.get_snapshot()
 			new_layer.restore_snapshot_1(snapshot)
@@ -1495,6 +1493,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			for layer in sublayers:
 				layer.set_midi_chan(to_midichan)
 			self.zyngui.zynautoconnect_midi()
+			new_layer.reset_audio_out()
 			self.layers.append(new_layer)
 
 			self.fill_list()

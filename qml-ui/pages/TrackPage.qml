@@ -201,9 +201,14 @@ Zynthian.ScreenPage {
                                         voiceCombo.updateText();
                                     }
                                     function updateText() {
-                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0)).substring(4)
+                                        let text = zynthian.fixed_layers.selector_list.data(zynthian.fixed_layers.selector_list.index(channelDelegate.targetMidiChan + 1, 0));
+                                        text = text.substring(4);
                                         text = text.split(">")[1];
-                                        currentSoundName.text = text.length > 4 ? text : ""
+                                        if (text) {
+                                            currentSoundName.text = text.length > 4 ? text : "";
+                                        } else {
+                                            currentSoundName.text = "";
+                                        }
                                     }
                                     Connections {
                                         target: zynthian.fixed_layers

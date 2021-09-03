@@ -24,10 +24,10 @@
 # ******************************************************************************
 import math
 
-from . import libzl
 from datetime import datetime
-from pathlib import Path
-from PySide2.QtCore import Property, QObject, QThread, QTimer, Signal, Slot
+from PySide2.QtCore import Property, QObject, Signal, Slot
+import taglib
+import json
 
 from .libzl import ClipAudioSource
 
@@ -52,6 +52,7 @@ class zynthiloops_clip(QObject):
         self.__is_recording__ = False
         self.recording_path = "/zynthian/zynthian-my-data/capture/"+self.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         self.audioSource: ClipAudioSource = None
+        self.audio_metadata = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
@@ -356,6 +357,7 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.__read_metadata__()
         self.reset_beat_count()
 
         # self.startPosition = self.__start_position__
@@ -369,6 +371,7 @@ class zynthiloops_clip(QObject):
 
         # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
+        self.sound_data_changed.emit()
         self.duration_changed.emit()
         self.__song__.schedule_save()
     path = Property(str, path, set_path, notify=path_changed)
@@ -449,3 +452,40 @@ class zynthiloops_clip(QObject):
     def stopRecording(self):
         self.__song__.get_metronome_manager().stop_recording()
 
+    @Signal
+    def sound_data_changed(self):
+        pass
+
+    def __read_metadata__(self):
+        try:
+            self.audio_metadata = json.loads(taglib.File(self.__path__).tags["ZYNTHBOX_METADATA"][0])
+        except Exception as e:
+            logging.error(f"Cannot read metadata : {str(e)}")
+            self.audio_metadata = None
+
+    def metadata(self):
+        return self.audio_metadata
+
+    def write_metadata(self, data: str):
+        if self.__path__ is not None:
+            try:
+                file = taglib.File(self.__path__)
+                file.tags["ZYNTHBOX_METADATA"] = data
+                file.save()
+            except Exception as e:
+                logging.error(f"Error writing metadata : {str(e)}")
+
+        self.__read_metadata__()
+
+    def get_soundData(self):
+        data = ['Voice 1', 'Voice 2']
+
+        if self.audio_metadata is not None:
+            try:
+                data = self.audio_metadata["layers"][0]["preset_info"]
+            except Exception as e:
+                logging.error(f"Error retrieving from metadata : {str(e)}")
+
+        return data
+
+    soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)

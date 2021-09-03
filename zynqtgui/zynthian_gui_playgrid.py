@@ -455,7 +455,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             zynthian_gui_playgrid.__notes__.remove(note)
 
     @Slot(str, int, int, int, result=QObject)
-    def createNote(self,
+    def getNote(self,
                    _name: str,
                    _scale_index: int,
                    _octave: int,

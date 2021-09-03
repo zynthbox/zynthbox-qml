@@ -51,7 +51,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Kirigami.Heading {
                 level: 2
-                text: qsTr("Song %1").arg(root.song.index + 1)
+                text: root.song.name
                 font.capitalization: Font.AllUppercase
             }
             QQC2.SpinBox {
@@ -229,7 +229,7 @@ Zynthian.ScreenPage {
                                             currentSoundName.text = text
                                         }
                                         zynthian.fixed_layers.activate_index(6)
-                                        zynthian.zynthiloops.saveLayersToTrack(root.track)
+                                        zynthian.zynthiloops.saveLayersToTrack(zynthian.track.trackId)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display

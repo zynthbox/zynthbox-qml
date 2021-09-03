@@ -39,17 +39,26 @@ class zynthiloops_track(QObject):
         self.__name__ = f"T{self.__id__ + 1}"
         self.__song__ = song
         self.__clips_model__ = zynthiloops_clips_model(song, self)
+        self.__layers_snapshot = []
 
     def serialize(self):
         return {"name": self.name,
-            "clips": self.__clips_model__.serialize()}
+            "clips": self.__clips_model__.serialize(),
+            "layers_snapshot": self.__layers_snapshot}
 
     def deserialize(self, obj):
         if "name" in obj:
             self.__name__ = obj["name"]
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
+        if "layers_snapshot" in obj:
+            self.__layers_snapshot = obj["layers_snapshot"]
 
+    def set_layers_snapshot(self, snapshot):
+        self.__layers_snapshot = snapshot
+
+    def get_layers_snapshot(self):
+        return self.__layers_snapshot
 
     def playable(self):
         return False

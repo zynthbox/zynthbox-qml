@@ -145,6 +145,7 @@ Zynthian.BasePlayGrid {
                             property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
                             onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
                             property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
+                            onModulationValueChanged: zynthian.playgrid.modulation = modulationValue;
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -220,7 +221,8 @@ Zynthian.BasePlayGrid {
                                         parent.down = false;
                                         focus = false;
                                         zynthian.playgrid.setNoteOff(playingNote);
-                                        zynthian.playgrid.pitch = 0
+                                        zynthian.playgrid.pitch = 0;
+                                        zynthian.playgrid.modulation = 0;
                                     }
                                 }
                             }

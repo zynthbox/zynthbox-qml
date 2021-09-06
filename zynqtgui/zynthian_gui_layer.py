@@ -32,6 +32,7 @@ import logging
 import collections
 from collections import OrderedDict
 from json import JSONEncoder, JSONDecoder
+from pathlib import Path
 
 # Zynthian specific modules
 from zyncoder import *
@@ -61,6 +62,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.layer_index_replace_engine = None
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
 		self.create_amixer_layer()
+		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
+		self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
 		self.show()
 
 
@@ -1402,10 +1405,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.index = 0
 					self.zyngui.show_screen('layer')
 
-			# Make sure the special Multilayer 6 has something
-			#if (not 5 in self.layer_midi_map) and 0 in self.layer_midi_map:
-				#self.copy_midichan_layer(0, 5)
 			self.ensure_special_layers_midi_cloned()
+
 
 		except Exception as e:
 			self.zyngui.reset_loading()
@@ -1444,6 +1445,59 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.ensure_special_layers_midi_cloned()
 		self.fill_list()
 		self.zyngui.stop_loading()
+
+	@Slot(str)
+	def load_channels_snapshot_from_file(self, file_name):
+		try:
+			f = open(self.__soundsets_basepath__ + file_name, "r")
+			self.load_channels_snapshot(json.loads(f.read()))
+		except Exception as e:
+			logging.error(e)
+
+
+	def export_channels_snapshot(self, channels):
+		if not isinstance(channels, list):
+			return
+		snapshot = []
+		for midi_chan in channels:
+			if midi_chan in self.zyngui.screens['layer'].layer_midi_map:
+				layer_to_copy = self.zyngui.screens['layer'].layer_midi_map[midi_chan]
+				snapshot.append(layer_to_copy.get_snapshot())
+		return snapshot
+
+
+	@Slot(str, result=bool)
+	def snapshot_file_exists(self, file_name):
+		final_name = file_name
+		if not final_name.endswith(".json"):
+				final_name += ".json"
+		return os.path.isfile(self.__soundsets_basepath__ + final_name)
+
+
+	@Slot(int, str)
+	def save_channel_snapshot_to_file(self, channel, file_name):
+		if not isinstance(channel, int):
+			return
+		try:
+			Path(self.__sounds_basepath__).mkdir(parents=True, exist_ok=True)
+			f = open(self.__sounds_basepath__ + file_name, "w")
+			f.write(JSONEncoder().encode(self.export_channels_snapshot([channel]))) #TODO: get cloned midi channels
+			f.close()
+		except Exception as e:
+			logging.error(e)
+
+	@Slot(str)
+	def save_soundset_to_file(self, file_name):
+		try:
+			final_name = file_name
+			if not final_name.endswith(".json"):
+				final_name += ".json"
+			Path(self.__soundsets_basepath__).mkdir(parents=True, exist_ok=True)
+			f = open(self.__soundsets_basepath__ + final_name, "w")
+			f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))
+			f.close()
+		except Exception as e:
+			logging.error(e)
 
 
 	@Slot(None)

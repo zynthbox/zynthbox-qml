@@ -1430,6 +1430,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				if i in self.layer_midi_map and j in self.layer_midi_map and zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					self.remove_clone_midi(i, j)
 		restored_layers = []
+		restored_channels = []
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
@@ -1443,18 +1444,26 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					sublayers = self.get_fxchain_layers(new_layer) + self.get_midichain_layers(new_layer)
 					for layer in sublayers:
 						layer.set_midi_chan(midi_chan)
-					logging.error("CHAN {} {}".format(new_layer.engine.nickname, layer_data['engine_nick']))
-					logging.error("JACK {}".format(new_layer.jackname))
-					logging.error("AUDIO {} {}".format(new_layer.audio_out, new_layer.audio_in))
-					logging.error("MIDI {}".format(new_layer.midi_out))
 					self.layers.append(new_layer)
 					restored_layers.append(new_layer)
+					restored_channels.append(new_layer.midi_chan)
 		for layer in restored_layers:
 			#Set Audio Routing
 			if 'audio_routing' in snapshot and layer.get_jackname() in snapshot['audio_routing']:
 				layer.set_audio_out(snapshot['audio_routing'][layer.get_jackname()])
 			else:
 				layer.reset_audio_out()
+		if "clone" in snapshot:
+			for i in range(0,16):
+				for j in range(0,16):
+					if i in restored_channels and j in restored_channels:
+						if isinstance(snapshot["clone"][i][j],dict):
+							zyncoder.lib_zyncoder.set_midi_filter_clone(i,j,snapshot["clone"][i][j]['enabled'])
+							self.zyngui.screens['midi_cc'].set_clone_cc(i,j,snapshot["clone"][i][j]['cc'])
+						else:
+							zyncoder.lib_zyncoder.set_midi_filter_clone(i,j,snapshot["clone"][i][j])
+							zyncoder.lib_zyncoder.reset_midi_filter_clone_cc(i,j)
+
 
 		self.zyngui.zynautoconnect_midi()
 		self.zyngui.zynautoconnect_audio()
@@ -1473,6 +1482,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		except Exception as e:
 			logging.error(e)
 
+	@Slot(str)
+	def load_layer_from_file(self, file_name):
+		try:
+			f = open(self.__sounds_basepath__ + file_name, "r")
+			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16)
+			self.activate_index(self.index)
+		except Exception as e:
+			logging.error(e)
+
 	def export_multichannel_snapshot(self, midi_chan):
 		channels = [midi_chan]
 		for i in range(16):
@@ -1486,31 +1504,48 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def export_channels_snapshot(self, channels):
 		if not isinstance(channels, list):
 			return
-		snapshot = {"layers": [], "audio_routing": {}}
+		snapshot = {"layers": [], "audio_routing": {}, "clone": []}
 		# Double iteration because many layers can be on the same channel (one instrument + arbitrary effects)
 		for layer in self.layers:
 			if layer.midi_chan in channels:
 				snapshot["layers"].append(layer.get_snapshot())
 				snapshot["audio_routing"][layer.get_jackname()] = layer.get_audio_out()
+		#Clone info
+		for i in range(0,16):
+			snapshot['clone'].append([])
+			for j in range(0,16):
+				clone_info = {
+					'enabled': zyncoder.lib_zyncoder.get_midi_filter_clone(i,j),
+					'cc': list(map(int,zyncoder.lib_zyncoder.get_midi_filter_clone_cc(i,j).nonzero()[0]))
+				}
+				snapshot['clone'][i].append(clone_info)
 		return snapshot
 
 
 	@Slot(str, result=bool)
-	def snapshot_file_exists(self, file_name):
+	def soundset_file_exists(self, file_name):
 		final_name = file_name
 		if not final_name.endswith(".json"):
 				final_name += ".json"
 		return os.path.isfile(self.__soundsets_basepath__ + final_name)
 
 
-	@Slot(int, str)
-	def save_channel_snapshot_to_file(self, channel, file_name):
-		if not isinstance(channel, int):
-			return
+	@Slot(str, result=bool)
+	def layer_file_exists(self, file_name):
+		final_name = file_name
+		if not final_name.endswith(".json"):
+				final_name += ".json"
+		return os.path.isfile(self.__sounds_basepath__ + final_name)
+
+	@Slot(str)
+	def save_curlayer_to_file(self, file_name):
 		try:
+			final_name = file_name
+			if not final_name.endswith(".json"):
+				final_name += ".json"
 			Path(self.__sounds_basepath__).mkdir(parents=True, exist_ok=True)
-			f = open(self.__sounds_basepath__ + file_name, "w")
-			f.write(JSONEncoder().encode(self.export_channels_snapshot([channel]))) #TODO: get cloned midi channels
+			f = open(self.__sounds_basepath__ + final_name, "w")
+			f.write(JSONEncoder().encode(self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan))) #TODO: get cloned midi channels
 			f.close()
 		except Exception as e:
 			logging.error(e)

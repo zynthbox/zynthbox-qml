@@ -39,12 +39,32 @@ Zynthian.MultiSelectorPage {
         Kirigami.Action {
             text: qsTr("Layers")
             Kirigami.Action {
+                text: qsTr("Load Sound...")
+                onTriggered: {
+                    pickerDialog.mode = "sound";
+                    pickerDialog.open();
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Save Sound...")
+                onTriggered: {
+                    saveDialog.mode = "sound";
+                    saveDialog.open();
+                }
+            }
+            Kirigami.Action {
                 text: qsTr("Load Soundset...")
-                onTriggered: pickerDialog.open()
+                onTriggered: {
+                    pickerDialog.mode = "soundset";
+                    pickerDialog.open();
+                }
             }
             Kirigami.Action {
                 text: qsTr("Save Soundset...")
-                onTriggered: saveDialog.open()
+                onTriggered: {
+                    saveDialog.mode = "soundset";
+                    saveDialog.open();
+                }
             }
             Kirigami.Action {
                 text: qsTr("Remove Layer")
@@ -79,9 +99,10 @@ Zynthian.MultiSelectorPage {
 
     QQC2.Dialog {
         id: saveDialog
+        property string mode: "sound"
         parent: root.parent
         header: Kirigami.Heading {
-            text: qsTr("Save Soundset As...")
+            text: saveDialog.mode === "soundset" ? qsTr("Save Soundset As...") : qsTr("Save Sound As...")
         }
         modal: true
         z: 999999999
@@ -89,6 +110,13 @@ Zynthian.MultiSelectorPage {
         y: Qt.inputMethod.visible ? Math.round(parent.height/5) : Math.round(parent.height/2 - height/2)
         width: Kirigami.Units.gridUnit * 15
         height: Kirigami.Units.gridUnit * 8
+        onAccepted: {
+            if (mode === "soundset") {
+                zynthian.layer.save_soundset_to_file(fileName.text);
+            } else { //Sound
+                zynthian.layer.save_curlayer_to_file(fileName.text);
+            }
+        }
         onVisibleChanged : {
             cancelSaveButton.forceActiveFocus();
             if (visible) {
@@ -101,8 +129,8 @@ Zynthian.MultiSelectorPage {
             id: delayKeyboardTimer
             interval: 300
             onTriggered: {
-                fileName.forceActiveFocus()
-                Qt.inputMethod.setVisible(true);
+                fileName.forceActiveFocus();
+                Qt.inputMethod.visible = true;
             }
         }
         contentItem: ColumnLayout {
@@ -111,9 +139,8 @@ Zynthian.MultiSelectorPage {
                 Layout.fillWidth: true
                 Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
                 onAccepted: {
-                    if (fileName.text.length > 0 && !zynthian.layer.snapshot_file_exists(fileName.text)) {
-                        zynthian.layer.save_soundset_to_file(fileName.text);
-                        saveDialog.close();
+                    if (fileName.text.length > 0) {
+                        saveDialog.accept();
                     }
                 }
                 onTextChanged: fileCheckTimer.restart()
@@ -121,7 +148,11 @@ Zynthian.MultiSelectorPage {
                     id: fileCheckTimer
                     interval: 300
                     onTriggered: {
-                        conflictRow.visible = zynthian.layer.snapshot_file_exists(fileName.text)
+                        if (saveDialog.mode === "soundset") {
+                            conflictRow.visible = zynthian.layer.soundset_file_exists(fileName.text);
+                        } else {
+                            conflictRow.visible = zynthian.layer.layer_file_exists(fileName.text);
+                        }
                     }
                 }
             }
@@ -157,7 +188,6 @@ Zynthian.MultiSelectorPage {
                     enabled: fileName.text.length > 0
                     onClicked: {
                         if (fileName.text.length > 0) {
-                            zynthian.layer.save_soundset_to_file(fileName.text)
                             saveDialog.accept();
                         }
                     }
@@ -168,8 +198,10 @@ Zynthian.MultiSelectorPage {
     QQC2.Dialog {
         id: pickerDialog
         parent: root.parent
+        modal: true
+        property string mode: "sound"
         header: Kirigami.Heading {
-            text: qsTr("Pick a Soundset file")
+            text: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
         }
         x: Math.round(parent.width/2 - width/2)
         y: Math.round(parent.height/2 - height/2)
@@ -180,12 +212,16 @@ Zynthian.MultiSelectorPage {
                 model: FolderListModel {
                     id: folderModel
                     nameFilters: ["*.json"]
-                    folder: "/zynthian/zynthian-my-data/soundsets/"
+                    folder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
                 }
                 delegate: Kirigami.BasicListItem {
                     label: model.fileName
                     onClicked: {
-                        zynthian.layer.load_soundset_from_file(model.fileName)
+                        if (pickerDialog.mode === "soundset") {
+                            zynthian.layer.load_soundset_from_file(model.fileName)
+                        } else {
+                            zynthian.layer.load_layer_from_file(model.fileName)
+                        }
                         pickerDialog.accept()
                     }
                 }

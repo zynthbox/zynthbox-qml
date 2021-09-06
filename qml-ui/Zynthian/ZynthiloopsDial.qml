@@ -12,6 +12,7 @@ ColumnLayout {
 
     property QtObject controlObj
     property string controlProperty
+    property real buttonStepSize
     onControlObjChanged: dial.value = controlObj[controlProperty]
 
     //visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
@@ -86,14 +87,14 @@ ColumnLayout {
             Layout.fillWidth: parent
             text: "-"
             onClicked: {
-                dial.value = Math.max(dial.from, dial.value - dial.stepSize)
+                dial.value = Math.max(dial.from, dial.value - (buttonStepSize ? buttonStepSize : dial.stepSize))
             }
         }
         QQC2.Button {
             Layout.fillWidth: parent
             text: "+"
             onClicked: {
-                dial.value = Math.min(dial.to, dial.value + dial.stepSize)
+                dial.value = Math.min(dial.to, dial.value + (buttonStepSize ? buttonStepSize : dial.stepSize))
             }
         }
     }

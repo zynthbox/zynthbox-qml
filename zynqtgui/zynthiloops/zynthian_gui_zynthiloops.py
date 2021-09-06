@@ -79,9 +79,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
         self.jack_client = jack.Client('zynthiloops_client')
-        self.jack_capture_port = self.jack_client.inports.register(f"capture_port")
+        self.jack_capture_port_a = self.jack_client.inports.register(f"capture_port_a")
+        self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
-        self.recorder_process_arguments = ["--daemon", "--port", self.jack_capture_port.name]
+        self.recorder_process_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
@@ -160,16 +161,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_client.deactivate()
         self.jack_client.activate()
 
-        for port in self.jack_client.get_ports(is_audio=True, is_output=True):
-            if not (port.name.startswith("JUCE") or port.name.startswith("system")):#port.name.startswith(jack_basename):
-                logging.error("ACCEPTED {}".format(port.name))
+        for port in self.jack_client.get_all_connections('system:playback_1'):
+            self.process_jack_port(port, self.jack_capture_port_a)
 
-                try:
-                    self.jack_client.connect(port.name, self.jack_capture_port.name)
-                except:
-                    logging.error(f"Error connecting to jack port : {port.name}")
-            else:
-                logging.error("REJECTED {}".format(port.name))
+        for port in self.jack_client.get_all_connections('system:playback_2'):
+            self.process_jack_port(port, self.jack_capture_port_b)
+
+    def process_jack_port(self, port, target):
+        if not (port.name.startswith("JUCE") or port.name.startswith("system")):
+            logging.error("ACCEPTED {}".format(port.name))
+
+            try:
+                self.jack_client.connect(port.name, target.name)
+            except:
+                logging.error(f"Error connecting to jack port : {port.name}")
+        else:
+            logging.error("REJECTED {}".format(port.name))
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")

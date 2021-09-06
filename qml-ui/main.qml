@@ -180,6 +180,7 @@ Kirigami.AbstractApplicationWindow {
 
     Loader {
         parent: root.contentItem.parent
+        z: Qt.inputMethod.visible ? 99999999 : 1
         anchors {
             left: parent.left
             bottom: parent.bottom

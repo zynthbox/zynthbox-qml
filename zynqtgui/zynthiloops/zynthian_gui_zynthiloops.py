@@ -312,14 +312,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         while not Path(self.clip_to_record_path).exists():
             sleep(0.1)
 
-        layer_index = self.zyngui.screens['layer'].get_layer_selected()
-        selected_layer = self.zyngui.screens['layer'].root_layers[layer_index].get_snapshot()
-
-        logging.error(f"Selected Layer Snapshot : {json.dumps(selected_layer)}")
+        layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
+        logging.error(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
 
         self.clip_to_record.path = self.clip_to_record_path
-        self.clip_to_record.write_metadata("ZYNTHBOX_LAYERS", [json.dumps(self.track_layers_snapshot())])
-        self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(selected_layer)])
+        self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.recorder_process = None

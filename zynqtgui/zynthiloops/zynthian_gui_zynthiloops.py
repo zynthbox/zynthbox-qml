@@ -60,6 +60,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         zynthian_gui_zynthiloops.__instance__ = self
         self.recorder_process = None
         self.clip_to_record = None
+        self.clip_to_record_path = None
+        self.clip_to_record_path = None
         self.start_clip_recording = False
         self.__current_beat__ = -1
         self.__current_bar__ = -1
@@ -222,17 +224,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def queue_clip_record(self, clip):
         self.update_recorder_jack_port()
         self.clip_to_record = clip
+        self.clip_to_record_path = "/zynthian/zynthian-my-data/capture/"+self.clip_to_record.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         #self.countInValue = countInBars * 4
 
         self.recorder_process = QProcess()
         self.recorder_process.setProgram("/usr/local/bin/jack_capture")
-        self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record.recording_path])
+        self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record_path])
         # self.recorder_process.started.connect(lambda: self.recording_process_started())
         # self.recorder_process.finished.connect(
         #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
         # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
         logging.error(
-            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record.recording_path}")
+            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record_path}")
 
         self.is_recording_complete = False
         self.start_clip_recording = True
@@ -304,7 +307,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             #self.__song__.metronome_update
 
     def load_recorded_file_to_clip(self):
-        while not Path(self.clip_to_record.recording_path).exists():
+        while not Path(self.clip_to_record_path).exists():
             sleep(0.1)
 
         layer_index = self.zyngui.screens['layer'].get_layer_selected()
@@ -312,10 +315,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         logging.error(f"Selected Layer Snapshot : {json.dumps(selected_layer)}")
 
-        self.clip_to_record.path = self.clip_to_record.recording_path
+        self.clip_to_record.path = self.clip_to_record_path
         self.clip_to_record.write_metadata("ZYNTHBOX_LAYERS", [json.dumps(self.track_layers_snapshot())])
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(selected_layer)])
         self.clip_to_record = None
+        self.clip_to_record_path = None
         self.recorder_process = None
         self.__song__.save()
 

@@ -36,13 +36,13 @@ class zynthiloops_track(QObject):
     def __init__(self, id: int, song: QObject, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
         self.__id__ = id
-        self.__name__ = f"T{self.__id__ + 1}"
+        self.__name__ = None
         self.__song__ = song
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
 
     def serialize(self):
-        return {"name": self.name,
+        return {"name": self.__name__,
             "clips": self.__clips_model__.serialize(),
             "layers_snapshot": self.__layers_snapshot}
 
@@ -114,12 +114,16 @@ class zynthiloops_track(QObject):
         pass
 
     def name(self):
-        return self.__name__
+        if self.__name__ is None:
+            return f"T{self.__id__ + 1}"
+        else:
+            return self.__name__
 
     def set_name(self, name):
-        self.__name__ = name
-        self.__name_changed__.emit()
-        self.__song__.schedule_save()
+        if name != f"T{self.__id__ + 1}":
+            self.__name__ = name
+            self.__name_changed__.emit()
+            self.__song__.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
 
@@ -129,4 +133,12 @@ class zynthiloops_track(QObject):
 
     def clipsModel(self):
         return self.__clips_model__
-    clipsModel = Property(QObject, clipsModel, constant=True )
+    clipsModel = Property(QObject, clipsModel, constant=True)
+
+    @Slot(None)
+    def delete(self):
+        self.__song__.tracksModel.delete_track(self)
+
+    def set_id(self, new_id):
+        self.__id__ = new_id
+        self.__name_changed__.emit()

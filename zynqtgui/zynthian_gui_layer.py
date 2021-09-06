@@ -1474,7 +1474,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.error(e)
 
 	def export_multichannel_snapshot(self, midi_chan):
-		channels = []
+		channels = [midi_chan]
 		for i in range(16):
 			if zyncoder.lib_zyncoder.get_midi_filter_clone(midi_chan, i):
 				channels.append(i)

@@ -30,6 +30,7 @@ import sys
 from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
+from subprocess import Popen
 from time import sleep
 import json
 
@@ -80,7 +81,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_client = jack.Client('zynthiloops_client')
         self.jack_capture_port = self.jack_client.inports.register(f"capture_port")
         self.recorder_process = None
-        self.recorder_process_arguments = ["--port", self.jack_capture_port.name]
+        self.recorder_process_arguments = ["--daemon", "--port", self.jack_capture_port.name]
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
@@ -162,8 +163,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         for port in self.jack_client.get_ports(is_audio=True, is_output=True):
             if not (port.name.startswith("JUCE") or port.name.startswith("system")):#port.name.startswith(jack_basename):
                 logging.error("ACCEPTED {}".format(port.name))
-                # self.recorder_process_arguments.append("--port")
-                # self.recorder_process_arguments.append(port.name)
+
                 try:
                     self.jack_client.connect(port.name, self.jack_capture_port.name)
                 except:
@@ -171,17 +171,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             else:
                 logging.error("REJECTED {}".format(port.name))
 
-        # logging.error(f"##### Recorder Process Arguments : {self.recorder_process_arguments}")
-
-    def recording_process_started(self):
-        logging.error(f"Started recording {self} at {self.clip_to_record}")
-
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
-        logging.error(f"Recording Process Output : {self.recorder_process.readAll()}")
-
-    def recording_process_errored(self, error):
-        logging.error(f"Error recording {self} : Error({error})")
 
     def show(self):
         pass
@@ -228,13 +219,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record_path = "/zynthian/zynthian-my-data/capture/"+self.clip_to_record.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         #self.countInValue = countInBars * 4
 
-        self.recorder_process = QProcess()
-        self.recorder_process.setProgram("/usr/local/bin/jack_capture")
-        self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record_path])
-        # self.recorder_process.started.connect(lambda: self.recording_process_started())
+        # self.recorder_process = QProcess()
+        # self.recorder_process.setProgram("/usr/local/bin/jack_capture")
+        # self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record_path])
         # self.recorder_process.finished.connect(
         #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
-        # self.recorder_process.errorOccurred.connect(lambda error: self.recording_process_errored(error))
         logging.error(
             f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record_path}")
 
@@ -286,7 +275,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__current_beat__ == 0:
             if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
                 if self.start_clip_recording:
-                    self.recorder_process.start()
+                    # self.recorder_process.start()
+                    try:
+                        logging.error(f'Staring Recorder process : {("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path)}')
+                        self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
+                    except Exception as e:
+                        logging.error(f"Error starting audio recording : {str(e)}")
                     self.start_clip_recording = False
 
             if self.metronome_schedule_stop:

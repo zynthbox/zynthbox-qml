@@ -457,6 +457,7 @@ class zynthiloops_clip(QObject):
     def __read_metadata__(self):
         try:
             self.audio_metadata = taglib.File(self.__path__).tags
+            self.sound_data_changed.emit()
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None

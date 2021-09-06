@@ -34,9 +34,6 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    METADATA_KEY_ACTIVE_LAYER = "ZYNTHBOX_ACTIVELAYER"
-    METADATA_KEY_LAYERS = "ZYNTHBOX_LAYERS"
-
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
         self.__length__ = 1
@@ -483,8 +480,10 @@ class zynthiloops_clip(QObject):
 
         if self.audio_metadata is not None:
             try:
-                jsondata = json.loads(self.audio_metadata[zynthiloops_clip.METADATA_KEY_ACTIVE_LAYER][0])
-                data = [f"{jsondata['engine_name']} > {jsondata['preset_name']}"]
+                jsondata = json.loads(self.audio_metadata["ZYNTHBOX_ACTIVELAYER"][0])
+                # data = [f"{jsondata['engine_name']} > {jsondata['preset_name']}"]
+                for layer in jsondata["layers"]:
+                    data.append(f"{layer['engine_name']} > {layer['preset_name']}")
             except Exception as e:
                 logging.error(f"Error retrieving from metadata : {str(e)}")
 
@@ -492,6 +491,7 @@ class zynthiloops_clip(QObject):
 
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
+    @Signal
     def sec_per_beat_changed(self):
         pass
 

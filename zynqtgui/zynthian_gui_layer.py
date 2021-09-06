@@ -1417,18 +1417,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		return True
 
 	# snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
-	def load_channels_snapshot(self, snapshot):
+	def load_channels_snapshot(self, snapshot, from_channel, to_channel):
 		if not isinstance(snapshot, list):
 			return
 		self.zyngui.start_loading()
-		for i in range(5, 10):
-			for j in range(5, 10):
+		for i in range(from_channel, to_channel + 1):
+			for j in range(from_channel, to_channel + 1):
 				if i in self.layer_midi_map and j in self.layer_midi_map and zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					self.remove_clone_midi(i, j)
 		for layer_data in snapshot:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
-				if midi_chan >= 5 and midi_chan < 10:
+				if midi_chan >= from_channel and midi_chan <= to_channel:
 					if midi_chan in self.layer_midi_map:
 						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
 					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
@@ -1442,15 +1442,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.zynautoconnect_midi()
 					self.layers.append(new_layer)
 
-		self.ensure_special_layers_midi_cloned()
 		self.fill_list()
 		self.zyngui.stop_loading()
 
 	@Slot(str)
-	def load_channels_snapshot_from_file(self, file_name):
+	def load_soundset_from_file(self, file_name):
 		try:
 			f = open(self.__soundsets_basepath__ + file_name, "r")
-			self.load_channels_snapshot(json.loads(f.read()))
+			for i in range(5):
+				self.remove_midichan_layer(i)
+			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
+			self.activate_index(0)
 		except Exception as e:
 			logging.error(e)
 

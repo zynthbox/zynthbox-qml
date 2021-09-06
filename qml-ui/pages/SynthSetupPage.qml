@@ -28,6 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import Qt.labs.folderlistmodel 2.11
+
 import Zynthian 1.0 as Zynthian
 
 Zynthian.MultiSelectorPage {
@@ -36,6 +38,10 @@ Zynthian.MultiSelectorPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Layers")
+            Kirigami.Action {
+                text: qsTr("Load Soundset...")
+                onTriggered: pickerDialog.open()
+            }
             Kirigami.Action {
                 text: qsTr("Save Soundset...")
                 onTriggered: saveDialog.open()
@@ -84,7 +90,7 @@ Zynthian.MultiSelectorPage {
         width: Kirigami.Units.gridUnit * 15
         height: Kirigami.Units.gridUnit * 8
         onVisibleChanged : {
-			cancelSaveButton.forceActiveFocus();
+            cancelSaveButton.forceActiveFocus();
             if (visible) {
                 delayKeyboardTimer.restart()
             } else {
@@ -95,9 +101,9 @@ Zynthian.MultiSelectorPage {
             id: delayKeyboardTimer
             interval: 300
             onTriggered: {
-				fileName.forceActiveFocus()
-				Qt.inputMethod.setVisible(true);
-			}
+                fileName.forceActiveFocus()
+                Qt.inputMethod.setVisible(true);
+            }
         }
         contentItem: ColumnLayout {
             QQC2.TextField {
@@ -136,7 +142,7 @@ Zynthian.MultiSelectorPage {
             contentItem: RowLayout {
                 Layout.fillWidth: true
                 QQC2.Button {
-					id: cancelSaveButton
+                    id: cancelSaveButton
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     text: qsTr("Cancel")
@@ -152,8 +158,35 @@ Zynthian.MultiSelectorPage {
                     onClicked: {
                         if (fileName.text.length > 0) {
                             zynthian.layer.save_soundset_to_file(fileName.text)
-                            saveDialog.close();
+                            saveDialog.accept();
                         }
+                    }
+                }
+            }
+        }
+    }
+    QQC2.Dialog {
+        id: pickerDialog
+        parent: root.parent
+        header: Kirigami.Heading {
+            text: qsTr("Pick a Soundset file")
+        }
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Math.round(parent.width * 0.8)
+        height: Math.round(parent.height * 0.8)
+        contentItem: QQC2.ScrollView {
+            contentItem: ListView {
+                model: FolderListModel {
+                    id: folderModel
+                    nameFilters: ["*.json"]
+                    folder: "/zynthian/zynthian-my-data/soundsets/"
+                }
+                delegate: Kirigami.BasicListItem {
+                    label: model.fileName
+                    onClicked: {
+                        zynthian.layer.load_soundset_from_file(model.fileName)
+                        pickerDialog.accept()
                     }
                 }
             }

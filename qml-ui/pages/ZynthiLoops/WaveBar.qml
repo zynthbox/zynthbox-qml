@@ -43,13 +43,14 @@ GridLayout {
 
     Zynthian.ZynthiloopsDial {
         id: startDial
-        text: qsTr("Start (msecs)")
+        text: qsTr("Start (secs)")
         controlObj: root.bottomBar.controlObj
         controlProperty: "startPosition"
-        valueString: Math.round(dial.value * 1000)
+        valueString: dial.value.toFixed(2)
+        buttonStepSize: 0.01
 
         dial {
-            stepSize: 0.001
+            stepSize: controlObj.hasOwnProperty("secPerBeat") ? controlObj.secPerBeat : 0.01
             from: 0
             to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
         }

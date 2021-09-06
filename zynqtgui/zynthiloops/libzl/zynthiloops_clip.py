@@ -90,11 +90,9 @@ class zynthiloops_clip(QObject):
             logging.error(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
 
-            # Set length to recalculate loop time
-            self.set_length(self.__length__, True)
-        else:
-            # Set length to recalculate loop time
-            self.set_length(self.__length__, True)
+        # Set length to recalculate loop time
+        self.set_length(self.__length__, True)
+        self.sec_per_beat_changed.emit()
 
     def serialize(self):
         return {"path": self.__path__,
@@ -493,3 +491,11 @@ class zynthiloops_clip(QObject):
         return data
 
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
+
+    def sec_per_beat_changed(self):
+        pass
+
+    def get_secPerBeat(self):
+        return 60.0/self.__song__.bpm
+
+    secPerBeat = Property(float, get_secPerBeat, notify=sec_per_beat_changed)

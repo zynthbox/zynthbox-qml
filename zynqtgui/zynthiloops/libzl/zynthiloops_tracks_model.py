@@ -106,4 +106,22 @@ class zynthiloops_tracks_model(QAbstractListModel):
         return len(self.__tracks__)
     count = Property(int, count, notify=countChanged)
 
+    def delete_track(self, track):
+        for index, r_track in enumerate(self.__tracks__):
+            if r_track is track:
+                self.beginRemoveRows(QModelIndex(), index, index)
+                del self.__tracks__[index]
+                self.endRemoveRows()
+                self.countChanged.emit()
 
+                break
+
+        for index, r_track in enumerate(self.__tracks__):
+            r_track.set_id(index)
+            clipsModel = r_track.clipsModel
+
+            for clip_index in range(0, clipsModel.count):
+                clip = clipsModel.getClip(clip_index)
+                clip.set_row_index(index)
+
+        self.__song__.schedule_save()

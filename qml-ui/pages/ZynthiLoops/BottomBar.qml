@@ -125,6 +125,7 @@ Zynthian.Card {
                 visible: (controlObj != null) && controlObj.deletable
 
                 onClicked: {
+                    controlObj.delete();
                 }
             }
 

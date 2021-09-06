@@ -53,7 +53,6 @@ class zynthiloops_clip(QObject):
         self.__should_sync__ = False
         self.__playing_started__ = False
         self.__is_recording__ = False
-        self.recording_path = "/zynthian/zynthian-my-data/capture/"+self.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
 
@@ -67,6 +66,10 @@ class zynthiloops_clip(QObject):
         else:
             self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
         self.current_beat_changed.emit()
+
+    def set_row_index(self, new_index):
+        self.__row_index__ = new_index
+        self.row_index_changed.emit()
 
     @Signal
     def current_beat_changed(self):
@@ -94,16 +97,13 @@ class zynthiloops_clip(QObject):
             self.set_length(self.__length__, True)
 
     def serialize(self):
-        return {"name": self.name,
-                "path": self.__path__,
+        return {"path": self.__path__,
                 "start": self.__start_position__,
                 "length": self.__length__,
                 "pitch": self.__pitch__,
                 "time": self.__time__}
 
     def deserialize(self, obj):
-        #if "name" in obj:
-            #self.name = obj["name"]
         if "path" in obj:
             if obj["path"] is None:
                 self.__path__ = None
@@ -252,7 +252,7 @@ class zynthiloops_clip(QObject):
 
 
     def name(self):
-        return f"T{self.__row_index__ + 1}-{chr(self.__col_index__+65)}"
+        return f"{self.__song__.tracksModel.getTrack(self.__row_index__).name}-{chr(self.__col_index__+65)}"
     name = Property(str, name, constant=True)
 
     def startPosition(self):

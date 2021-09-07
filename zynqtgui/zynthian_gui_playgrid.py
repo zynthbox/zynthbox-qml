@@ -123,6 +123,7 @@ class Note(QObject):
         elif 0 <= self.__midi_note__ <= 127:
             self.__midi_note_on_msg__.velocity = _velocity
             self.__midi_port__.send(self.__midi_note_on_msg__)
+        self.set_is_playing(True)
 
     def off(self):
         if (len(self.__midi_notes_off_msgs__) > 0):
@@ -130,6 +131,7 @@ class Note(QObject):
                 self.__midi_port__.send(self.__midi_notes_off_msgs__[i])
         elif 0 <= self.__midi_note__ <= 127:
             self.__midi_port__.send(self.__midi_note_off_msg__)
+        self.set_is_playing(False)
 
     @Property(str, constant=True)
     def name(self):
@@ -159,6 +161,9 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def __init__(self, parent: QObject = None) -> None:
         super(zynthian_gui_grid_notes_model, self).__init__(parent)
         self.__grid_notes__ = []
+
+    def __del__(self):
+        self.clear()
 
     def roleNames(self) -> typing.Dict:
         roles = {self.NoteRole: b"note"}
@@ -199,21 +204,34 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         self.__grid_notes__ = grid
         self.endResetModel()
 
-    def highlight_playing_note(
-        self, playingNote: Note, highlight: bool = True
-    ):
-        for row in self.__grid_notes__:
-            for note in row:
-                if note.get_midi_note() == playingNote.get_midi_note():
-                    note.set_is_playing(highlight)
-
     @Property(dict, constant=True)
     def roles(self):
         return {b"note": zynthian_gui_grid_notes_model.NoteRole}
 
     @Slot(None)
+    def note_changed(self):
+        theSender = self.sender()
+        rowIndex = 0
+        found = False
+        for row in self.__grid_notes__:
+            columnIndex = 0
+            for note in row:
+                if note == theSender:
+                    found = True
+                    idx = self.index(rowIndex, columnIndex)
+                    self.dataChanged.emit(idx, idx)
+                    break
+                columnIndex = columnIndex + 1
+            if found:
+                break
+            rowIndex = rowIndex + 1
+
+    @Slot(None)
     def clear(self):
         self.beginResetModel()
+        for row in self.__grid_notes__:
+            for note in row:
+                note.__is_playing_changed__.disconnect(self.note_changed)
         self.__grid_notes__ = []
         self.endResetModel()
         self.__rows_changed__.emit()
@@ -221,6 +239,8 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     @Slot('QVariantList')
     def addRow(self, notes):
         self.beginResetModel()
+        for note in notes:
+            note.__is_playing_changed__.connect(self.note_changed)
         self.__grid_notes__.insert(0, notes)
         self.endResetModel()
         self.__rows_changed__.emit()
@@ -355,9 +375,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             for a_note in zynthian_gui_playgrid.__notes__:
                 if a_note.__midi_note__ == note_value:
                     note = a_note
-                    note.set_is_playing(note_on)
                     break
         if not note is None:
+            note.set_is_playing(note_on)
             zynthian_gui_playgrid.__note_state_changed__(note)
 
     def show(self):
@@ -462,8 +482,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             if subnoteCount > 0:
                 for i in range(0, subnoteCount):
                     self.setNoteState(subnotes[i], velocity, setOn)
-                for model in zynthian_gui_playgrid.__models__:
-                    model.highlight_playing_note(note, setOn)
             else:
                 noteKey = str(note.get_midi_note())
                 if noteKey in zynthian_gui_playgrid.__note_state_map__:
@@ -474,18 +492,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                         if zynthian_gui_playgrid.__note_state_map__[noteKey] == 0:
                             note.off()
                             zynthian_gui_playgrid.__note_state_map__.pop(noteKey)
-                            for model in zynthian_gui_playgrid.__models__:
-                                model.highlight_playing_note(note, False)
                 else:
                     if setOn:
                         note.on(velocity)
                         zynthian_gui_playgrid.__note_state_map__[noteKey] = 1
-                        for model in zynthian_gui_playgrid.__models__:
-                            model.highlight_playing_note(note, True)
                     else:
                         note.off()
-                        for model in zynthian_gui_playgrid.__models__:
-                            model.highlight_playing_note(note, False)
 
     @staticmethod
     def __note_state_changed__(note:Note):
@@ -539,10 +551,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                    _midi_note: int):
         note = None
         for existingNote in zynthian_gui_playgrid.__notes__:
-            if (existingNote.__note_name__ == _name
-                and existingNote.__scale_index__ == _scale_index
-                and existingNote.__octave__ == _octave
-                and existingNote.__midi_note__ == _midi_note):
+            if (existingNote.name == _name
+                and existingNote.scaleIndex == _scale_index
+                and existingNote.octave == _octave
+                and existingNote.midiNote == _midi_note):
                     note = existingNote
                     break
         if note is None:
@@ -574,7 +586,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                     break
             # If not, create it, and stuff it with these subnotes
             if note is None:
-                note = self.getNote("Compound", notes[0].__scale_index__, fake_midi_note // 12, fake_midi_note)
+                note = self.getNote(notes[0].name, notes[0].scaleIndex, fake_midi_note // 12, fake_midi_note)
                 note.set_subnotes(notes)
                 zynthian_gui_playgrid.__notes__.append(note)
         return note

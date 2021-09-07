@@ -400,8 +400,3 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return True
         else:
             return False
-
-    @Slot(str, result=bool)
-    def sketchExists(self, name):
-        sketch_path = self.__sketch_basepath__ / name.lower()
-        return sketch_path.is_dir()

@@ -263,18 +263,34 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.song_changed.emit()
 
-    @Slot(None, result=list)
-    def listSketches(self):
-        sketches = []
+    @Slot(None, result='QVariantMap')
+    def getSketches(self):
+        obj = {}
 
         try:
             with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
-                sketch_obj = json.load(f)
-                sketches = sketch_obj["sketches"]
+                obj = json.load(f)
         except:
             logging.error(f"No sketches found")
 
-        return sketches
+        return obj
+
+    @Slot(str)
+    def loadSketch(self, sketch_id):
+        logging.error(f"Loading sketch {sketch_id}")
+
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / sketch_id) + "/", None, self)
+
+        with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
+            sketch_obj = json.load(f)
+
+        sketch_obj["selected_sketch"] = sketch_id
+
+        with open(self.__sketch_basepath__ / 'sketches.json', 'w+') as f:
+            f.write(json.dumps(sketch_obj))
+
+        self.song_changed.emit()
+
 
     def update_timer_bpm(self):
         if self.metronome_running_refcount > 0:

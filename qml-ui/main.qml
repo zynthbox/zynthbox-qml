@@ -77,12 +77,14 @@ Kirigami.AbstractApplicationWindow {
                 QQC2.Menu {
                     id: layersMenu
                     y: parent.height
+                    modal: true
+                    dim: false
                     Repeater {
                         model: zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
-                            visible: index < 6
                             height: visible ? implicitHeight : 0
-                            text: index === 5 ? qsTr("6 - %1").arg(zynthian.fixed_layers.special_layer_name) : model.display
+                            enabled: index !== 5 && (index < 5 || model.display.indexOf("- -") === -1)
+                            text: model.display
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index === 5 ? 6 : index)
                         }

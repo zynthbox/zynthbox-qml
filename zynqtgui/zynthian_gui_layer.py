@@ -1417,8 +1417,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		return True
 
 	# snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
-	def load_channels_snapshot(self, snapshot, from_channel, to_channel):
+	# All restored channels will be cloned among themselves
+	def load_channels_snapshot(self, snapshot, from_channel, to_channel, channels_mapping = {}):
 		if not isinstance(snapshot, dict):
+			return
+		if not isinstance(channels_mapping, dict):
 			return
 		if not "layers" in snapshot:
 			return
@@ -1434,6 +1437,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
+				if str(midi_chan) in channels_mapping and isinstance(channels_mapping[str(midi_chan)], int):
+					midi_chan = channels_mapping[str(midi_chan)]
 				if midi_chan >= from_channel and midi_chan <= to_channel:
 					if midi_chan in self.layer_midi_map:
 						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
@@ -1453,16 +1458,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				layer.set_audio_out(snapshot['audio_routing'][layer.get_jackname()])
 			else:
 				layer.reset_audio_out()
-		if "clone" in snapshot:
-			for i in range(0,16):
-				for j in range(0,16):
-					if i in restored_channels and j in restored_channels:
-						if isinstance(snapshot["clone"][i][j],dict):
-							zyncoder.lib_zyncoder.set_midi_filter_clone(i,j,snapshot["clone"][i][j]['enabled'])
-							self.zyngui.screens['midi_cc'].set_clone_cc(i,j,snapshot["clone"][i][j]['cc'])
-						else:
-							zyncoder.lib_zyncoder.set_midi_filter_clone(i,j,snapshot["clone"][i][j])
-							zyncoder.lib_zyncoder.reset_midi_filter_clone_cc(i,j)
+		#TODO: always clone?
+		for i in restored_channels:
+			for j in restored_channels:
+				if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
+					zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
 
 
 		self.zyngui.zynautoconnect_midi()
@@ -1482,11 +1482,33 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		except Exception as e:
 			logging.error(e)
 
-	@Slot(str)
-	def load_layer_from_file(self, file_name):
+	@Slot(str, result='QVariantList')
+	def load_layer_channels_from_file(self, file_name):
+		result = []
 		try:
 			f = open(self.__sounds_basepath__ + file_name, "r")
-			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16)
+			snapshot = JSONDecoder().decode(f.read())
+			if not isinstance(snapshot, dict):
+				return
+			if not "layers" in snapshot:
+				return
+			if not isinstance(snapshot["layers"], list):
+				return
+			for layer_data in snapshot["layers"]:
+				if "midi_chan" in layer_data:
+					midi_chan = layer_data['midi_chan']
+					if not midi_chan in result:
+						result.append(midi_chan)
+		except Exception as e:
+			logging.error(e)
+		return result
+
+
+	@Slot(str, 'QVariantMap')
+	def load_layer_from_file(self, file_name, channels_mapping):
+		try:
+			f = open(self.__sounds_basepath__ + file_name, "r")
+			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
 			self.activate_index(self.index)
 		except Exception as e:
 			logging.error(e)

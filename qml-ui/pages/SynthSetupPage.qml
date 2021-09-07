@@ -93,7 +93,7 @@ Zynthian.MultiSelectorPage {
     ]
 
     screenIds: ["fixed_layers", "bank", "preset"]
-    screenTitles: [qsTr("Layers (%1)").arg(zynthian.layer.effective_count || qsTr("None")), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
+    screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
 
@@ -220,10 +220,113 @@ Zynthian.MultiSelectorPage {
                         if (pickerDialog.mode === "soundset") {
                             zynthian.layer.load_soundset_from_file(model.fileName)
                         } else {
-                            zynthian.layer.load_layer_from_file(model.fileName)
+                            //zynthian.layer.load_layer_from_file(model.fileName)
+                            layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(model.fileName);
+                            if (layerReplaceDialog.sourceChannels.length > 1) {
+                                layerReplaceDialog.fileToLoad = model.fileName;
+                                layerReplaceDialog.open();
+                            } else {
+                                let map = {}
+                                map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.current_index;
+                                zynthian.layer.load_layer_from_file(fileToLoad, map);
+                            }
                         }
                         pickerDialog.accept()
                     }
+                }
+            }
+        }
+    }
+    QQC2.Dialog {
+        id: layerReplaceDialog
+        parent: root.parent
+        modal: true
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
+        property var sourceChannels: []
+        property var destinationChannels: []
+        property string fileToLoad
+        onAccepted: {
+            print(sourceChannels)
+            print(destinationChannels)
+            if (sourceChannels.length !== destinationChannels.length) {
+                return;
+            }
+            let map = {};
+            var i = 0;
+            for (i in sourceChannels) {
+                map[sourceChannels[i]] = destinationChannels[i];
+            }
+            print(map)
+            for (i in map) {
+                print(i+": "+map[i]);
+            }
+            zynthian.layer.load_layer_from_file(fileToLoad, map);
+            fileToLoad = "";
+            sourceChannels = [];
+            destinationChannels = [];
+        }
+        onRejected: {
+            fileToLoad = "";
+            sourceChannels = [];
+            destinationChannels = [];
+        }
+        header: Kirigami.Heading {
+            text: qsTr("Pick Layers To Replace")
+        }
+        contentItem: ColumnLayout {
+            QQC2.Label {
+                text: qsTr("The selected sound has %1 layers: select layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
+            }
+            Repeater {
+                model: zynthian.fixed_layers.selector_list
+                delegate: QQC2.CheckBox {
+                    text: model.display
+                    visible: index < 5
+                    checked: index === zynthian.fixed_layers.current_index
+                    enabled: checked || layerReplaceDialog.destinationChannels.length < layerReplaceDialog.sourceChannels.length
+                    opacity: enabled ? 1 : 0.4
+
+                    onCheckedChanged: {
+                        let destIdx = layerReplaceDialog.destinationChannels.indexOf(index);
+                        if (checked) {
+                            if (destIdx === -1) {
+                                layerReplaceDialog.destinationChannels.push(index);
+                                layerReplaceDialog.destinationChannelsChanged();
+                            }
+                        } else {
+                            if (destIdx !== -1) {
+                                layerReplaceDialog.destinationChannels.splice(destIdx, 1);
+                                layerReplaceDialog.destinationChannelsChanged();
+                            }
+                        }
+                    }
+                    Connections {
+                        target: layerReplaceDialog
+                        onFileToLoadChanged: checked = false
+                    }
+                }
+            }
+        }
+        footer: QQC2.Control {
+            leftPadding: saveDialog.leftPadding
+            topPadding: Kirigami.Units.smallSpacing
+            rightPadding: saveDialog.rightPadding
+            bottomPadding: saveDialog.bottomPadding
+            contentItem: RowLayout {
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Cancel")
+                    onClicked: layerReplaceDialog.close()
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    enabled: layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length
+                    text: qsTr("Load && Replace")
+                    onClicked: layerReplaceDialog.accept()
                 }
             }
         }

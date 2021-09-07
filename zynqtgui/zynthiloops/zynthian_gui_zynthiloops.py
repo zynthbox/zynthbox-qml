@@ -25,6 +25,7 @@
 import logging
 import ctypes as ctypes
 import math
+import os.path
 import re
 import sys
 from datetime import datetime
@@ -68,8 +69,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
         self.metronome_running_refcount = 0
-        self.__sketch_basepath__ = "/zynthian/zynthian-my-data/sketches/"
-        self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
+        self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/")
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__), self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording_complete = False
@@ -211,7 +212,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def clearCurrentSketch(self):
         self.__song__.destroy()
-        self.__song__ = zynthiloops_song.zynthiloops_song(self.__sketch_basepath__, self)
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__), self)
         self.song_changed.emit()
 
     def update_timer_bpm(self):
@@ -339,4 +340,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             return False
 
-
+    @Slot(str, result=bool)
+    def sketchExists(self, name):
+        sketch_path = self.__sketch_basepath__ / name
+        return sketch_path.is_dir()

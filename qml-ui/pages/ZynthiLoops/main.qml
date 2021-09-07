@@ -59,7 +59,12 @@ Zynthian.ScreenPage {
                 text: qsTr("New Sketch")
                 onTriggered: {
                     newSketchDialog.open();
-                    // zynthian.zynthiloops.clearCurrentSketch()
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Clear Sketch")
+                onTriggered: {
+                    zynthian.zynthiloops.clearCurrentSketch()
                 }
             }
         },

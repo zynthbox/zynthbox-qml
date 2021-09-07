@@ -211,27 +211,31 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     @Slot(None)
     def note_changed(self):
         theSender = self.sender()
-        rowIndex = 0
-        found = False
-        for row in self.__grid_notes__:
-            columnIndex = 0
-            for note in row:
-                if note == theSender:
-                    found = True
-                    idx = self.index(rowIndex, columnIndex)
-                    self.dataChanged.emit(idx, idx)
+        if self.__grid_notes__:
+            rowIndex = 0
+            found = False
+            for row in self.__grid_notes__:
+                columnIndex = 0
+                for note in row:
+                    if note == theSender:
+                        found = True
+                        idx = self.index(rowIndex, columnIndex)
+                        self.dataChanged.emit(idx, idx)
+                        break
+                    columnIndex = columnIndex + 1
+                if found:
                     break
-                columnIndex = columnIndex + 1
-            if found:
-                break
-            rowIndex = rowIndex + 1
+                rowIndex = rowIndex + 1
+        else:
+            logging.error("Apparently we are notifying a model that no longer exists? Let's disconnect from that.")
+            theSender.__is_playing_changed__.disconnect(self.note_changed)
 
     @Slot(None)
     def clear(self):
         self.beginResetModel()
-        for row in self.__grid_notes__:
-            for note in row:
-                note.__is_playing_changed__.disconnect(self.note_changed)
+        #for row in self.__grid_notes__:
+            #for note in row:
+                #note.__is_playing_changed__.disconnect(self.note_changed)
         self.__grid_notes__ = []
         self.endResetModel()
         self.__rows_changed__.emit()
@@ -239,8 +243,8 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     @Slot('QVariantList')
     def addRow(self, notes):
         self.beginResetModel()
-        for note in notes:
-            note.__is_playing_changed__.connect(self.note_changed)
+        #for note in notes:
+            #note.__is_playing_changed__.connect(self.note_changed)
         self.__grid_notes__.insert(0, notes)
         self.endResetModel()
         self.__rows_changed__.emit()
@@ -376,9 +380,11 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 if a_note.__midi_note__ == note_value:
                     note = a_note
                     break
-        if not note is None:
-            note.set_is_playing(note_on)
-            zynthian_gui_playgrid.__note_state_changed__(note)
+            if note is None:
+                logging.error("Got a message for a note we're apparently not aware of: %s", message_data)
+            else:
+                note.set_is_playing(note_on)
+                zynthian_gui_playgrid.__note_state_changed__(note)
 
     def show(self):
         pass
@@ -551,12 +557,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                    _midi_note: int):
         note = None
         for existingNote in zynthian_gui_playgrid.__notes__:
-            if (existingNote.name == _name
-                and existingNote.scaleIndex == _scale_index
-                and existingNote.octave == _octave
-                and existingNote.midiNote == _midi_note):
-                    note = existingNote
-                    break
+            if (hasattr(existingNote, '__midi_note__') and existingNote.__midi_note__ == _midi_note):
+                note = existingNote
+                break
         if note is None:
             note = Note(
                 name=_name,

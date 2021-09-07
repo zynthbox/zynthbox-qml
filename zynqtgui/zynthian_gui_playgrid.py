@@ -343,7 +343,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @staticmethod
     def handle_input_message(message):
-        logging.error("Mido message did an arrive: %s", message.dict())
+        #logging.error("Mido message did an arrive: %s", message.dict())
         note = None
         velocity = 0
         note_on = False
@@ -489,7 +489,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @staticmethod
     def __note_state_changed__(note:Note):
-        logging.error("New note state for " + str(note.midiNote) + " now playing? " + str(note.isPlaying))
+        #logging.error("New note state for " + str(note.midiNote) + " now playing? " + str(note.isPlaying))
         zynthian_gui_playgrid.__most_recently_changed_note__ = note
         zynthian_gui_playgrid.__most_recently_changed_notes__.append({
             'note': note,

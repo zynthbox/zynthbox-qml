@@ -88,6 +88,38 @@ Zynthian.ScreenPage {
         property int cellHeight: headerHeight
     }
 
+    Zynthian.SaveFileDialog {
+        id: saveDialog
+        visible: false
+
+        headerText: qsTr("New Sketch")
+        conflictText: qsTr("Sketch Exists")
+        overwriteOnConflict: false
+
+        onFileNameChanged: {
+            console.log("File Name : " + fileName)
+            fileCheckTimer.restart()
+        }
+        Timer {
+            id: fileCheckTimer
+            interval: 300
+            onTriggered: {
+                if (saveDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(saveDialog.fileName)) {
+                    saveDialog.conflict = true;
+                } else {
+                    saveDialog.conflict = false;
+                }
+            }
+        }
+
+        onAccepted: {
+            console.log("Save Accepted")
+        }
+        onRejected: {
+            console.log("Save Rejected")
+        }
+    }
+
     contentItem : ColumnLayout {
 
         ColumnLayout {

@@ -73,7 +73,7 @@ Kirigami.AbstractApplicationWindow {
                         ? Math.min(6, zynthian.engine.midi_channel + 1) + "ˬ"
                         : Math.min(6, zynthian.layer.selector_path_element) + "ˬ"
                 onClicked: layersMenu.visible = true
-                highlighted: zynthian.current_screen_id === 'layer'
+                highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers'
                 QQC2.Menu {
                     id: layersMenu
                     y: parent.height

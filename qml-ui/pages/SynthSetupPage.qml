@@ -134,9 +134,15 @@ Zynthian.MultiSelectorPage {
                     text: qsTr("New Synth...")
                     onClicked: {
                         layerSetupDialog.close();
-                        zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+                       // zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+						newSynthWorkaroundTimer.restart()
                     }
                 }
+                Timer {
+					id: newSynthWorkaroundTimer
+					interval: 200
+					onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+				}
             }
         }
     }

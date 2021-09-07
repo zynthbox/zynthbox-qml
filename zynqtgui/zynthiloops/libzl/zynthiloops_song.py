@@ -49,7 +49,7 @@ class zynthiloops_song(QObject):
         self.__metronome_manager__ = parent
 
         self.__sketch_folder__ = sketch_folder
-        self.__sketch_filename__ = "sketch1.json"
+        self.__sketch_filename__ = "sketch.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120

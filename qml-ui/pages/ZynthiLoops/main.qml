@@ -57,7 +57,10 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 text: qsTr("New Sketch")
-                onTriggered: zynthian.zynthiloops.clearCurrentSketch()
+                onTriggered: {
+                    newSketchDialog.open();
+                    // zynthian.zynthiloops.clearCurrentSketch()
+                }
             }
         },
         Kirigami.Action {
@@ -89,7 +92,7 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.SaveFileDialog {
-        id: saveDialog
+        id: newSketchDialog
         visible: false
 
         headerText: qsTr("New Sketch")
@@ -104,19 +107,21 @@ Zynthian.ScreenPage {
             id: fileCheckTimer
             interval: 300
             onTriggered: {
-                if (saveDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(saveDialog.fileName)) {
-                    saveDialog.conflict = true;
+                if (newSketchDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(newSketchDialog.fileName)) {
+                    newSketchDialog.conflict = true;
                 } else {
-                    saveDialog.conflict = false;
+                    newSketchDialog.conflict = false;
                 }
             }
         }
 
         onAccepted: {
-            console.log("Save Accepted")
+            console.log("Accepted")
+            zynthian.zynthiloops.newSketch(newSketchDialog.fileName)
+            console.log("List of sketches : ", zynthian.zynthiloops.listSketches())
         }
         onRejected: {
-            console.log("Save Rejected")
+            console.log("Rejected")
         }
     }
 

@@ -124,6 +124,24 @@ Zynthian.ScreenPage {
         visible: false
 
         headerText: qsTr("New Sketch")
+        conflictText: qsTr("Sketch Exists")
+        overwriteOnConflict: false
+
+        onFileNameChanged: {
+            console.log("File Name : " + fileName)
+            fileCheckTimer.restart()
+        }
+        Timer {
+            id: fileCheckTimer
+            interval: 300
+            onTriggered: {
+                if (newSketchDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(newSketchDialog.fileName)) {
+                    newSketchDialog.conflict = true;
+                } else {
+                    newSketchDialog.conflict = false;
+                }
+            }
+        }
 
         onAccepted: {
             console.log("Accepted")

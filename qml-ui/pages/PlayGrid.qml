@@ -208,177 +208,11 @@ Zynthian.ScreenPage {
                 Layout.margins: 8
                 z: 999
 
-                QQC2.Button {
+                Loader {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    icon.name: "arrow-up"
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-                    }
-                    onClicked: {
-                        if (playGridsRepeater.currentItem.octave + 1 < 11){
-                            playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
-                        } else {
-                            playGridsRepeater.currentItem.octave =  10;
-                        }
-                    }
+                    sourceComponent: playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
                 }
-
-                QQC2.Label {
-                    text: "Octave"
-                    Layout.alignment: Qt.AlignHCenter
-                }
-
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    icon.name: "arrow-down"
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-                    }
-                    onClicked: {
-                        if (playGridsRepeater.currentItem.octave - 1 > 0) {
-                            playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
-                        } else {
-                            playGridsRepeater.currentItem.octave = 0;
-                        }
-                    }
-                }
-
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
-
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-
-                        Text {
-                            anchors.fill: parent
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: Kirigami.Theme.textColor
-                            text: "Mod\nulate"
-                        }
-                    }
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
-                        onModulationValueChanged: {
-                            zynthian.playgrid.modulation = modulationValue;
-                        }
-                        touchPoints: [ TouchPoint { id: modulationPoint; } ]
-                        onPressed: {
-                            parent.down = true;
-                            focus = true;
-                        }
-                        onReleased: {
-                            parent.down = false;
-                            focus = false;
-                            zynthian.playgrid.modulation = 0;
-                        }
-                    }
-                }
-
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
-
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    icon.name: "arrow-up"
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-                    }
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        onPressed: {
-                            parent.down = true;
-                            focus = true;
-                            zynthian.playgrid.pitch = 8191;
-                        }
-                        onReleased: {
-                            parent.down = false;
-                            focus = false;
-                            zynthian.playgrid.pitch = 0;
-                        }
-                    }
-                }
-                QQC2.Label {
-                    text: "Pitch"
-                    Layout.alignment: Qt.AlignHCenter
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    icon.name: "arrow-down"
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-                    }
-                    MultiPointTouchArea {
-                        anchors.fill: parent
-                        onPressed: {
-                            parent.down = true;
-                            focus = true;
-                            zynthian.playgrid.pitch = -8192;
-                        }
-                        onReleased: {
-                            parent.down = false;
-                            focus = false;
-                            zynthian.playgrid.pitch = 0;
-                        }
-                    }
-                }
-
-                Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 QQC2.Button {
                     id: settingsButton
@@ -526,6 +360,184 @@ Zynthian.ScreenPage {
             initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item.grid
         }
     }
+
+    Component {
+        id: defaultSidebar
+        ColumnLayout {
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                icon.name: "arrow-up"
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+                background: Rectangle {
+                    radius: 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.textColor
+                    }
+                    color: Kirigami.Theme.backgroundColor
+                }
+                onClicked: {
+                    if (playGridsRepeater.currentItem.octave + 1 < 11){
+                        playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
+                    } else {
+                        playGridsRepeater.currentItem.octave =  10;
+                    }
+                }
+            }
+
+            QQC2.Label {
+                text: "Octave"
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                icon.name: "arrow-down"
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+                background: Rectangle {
+                    radius: 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.textColor
+                    }
+                    color: Kirigami.Theme.backgroundColor
+                }
+                onClicked: {
+                    if (playGridsRepeater.currentItem.octave - 1 > 0) {
+                        playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
+                    } else {
+                        playGridsRepeater.currentItem.octave = 0;
+                    }
+                }
+            }
+
+            Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                background: Rectangle {
+                    radius: 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.textColor
+                    }
+                    color: Kirigami.Theme.backgroundColor
+
+                    Text {
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.textColor
+                        text: "Mod\nulate"
+                    }
+                }
+                MultiPointTouchArea {
+                    anchors.fill: parent
+                    property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
+                    onModulationValueChanged: {
+                        zynthian.playgrid.modulation = modulationValue;
+                    }
+                    touchPoints: [ TouchPoint { id: modulationPoint; } ]
+                    onPressed: {
+                        parent.down = true;
+                        focus = true;
+                    }
+                    onReleased: {
+                        parent.down = false;
+                        focus = false;
+                        zynthian.playgrid.modulation = 0;
+                    }
+                }
+            }
+
+            Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                icon.name: "arrow-up"
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                background: Rectangle {
+                    radius: 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.textColor
+                    }
+                    color: Kirigami.Theme.backgroundColor
+                }
+                MultiPointTouchArea {
+                    anchors.fill: parent
+                    onPressed: {
+                        parent.down = true;
+                        focus = true;
+                        zynthian.playgrid.pitch = 8191;
+                    }
+                    onReleased: {
+                        parent.down = false;
+                        focus = false;
+                        zynthian.playgrid.pitch = 0;
+                    }
+                }
+            }
+            QQC2.Label {
+                text: "Pitch"
+                Layout.alignment: Qt.AlignHCenter
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                icon.name: "arrow-down"
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                background: Rectangle {
+                    radius: 2
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    border {
+                        width: 1
+                        color: Kirigami.Theme.textColor
+                    }
+                    color: Kirigami.Theme.backgroundColor
+                }
+                MultiPointTouchArea {
+                    anchors.fill: parent
+                    onPressed: {
+                        parent.down = true;
+                        focus = true;
+                        zynthian.playgrid.pitch = -8192;
+                    }
+                    onReleased: {
+                        parent.down = false;
+                        focus = false;
+                        zynthian.playgrid.pitch = 0;
+                    }
+                }
+            }
+
+            Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+        }
+    }
+
 
     Repeater {
         id:playGridsRepeater

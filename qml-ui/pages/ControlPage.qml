@@ -82,6 +82,7 @@ Zynthian.ScreenPage {
         } else {
             stack.push(defaultPage);
         }
+        zynthian.current_screen_id = "control"
     }
     Connections {
         target: zynthian.control

@@ -34,18 +34,16 @@ import Zynthian 1.0 as Zynthian
 Zynthian.BasePlayGrid {
     id: component
     grid: notesGrid
+    miniGrid: notesMiniGrid
     settings: notesGridSettings
     name:'Notes Grid'
     octave: 3
     useOctaves: true
 
     property QtObject settingsStore
+    property QtObject miniGridModel
 
-    function populateGrid(){
-        
-        if (component.model) component.model.clear();
-        else component.model = zynthian.playgrid.createNotesModel();
-        
+    function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
@@ -58,12 +56,6 @@ Zynthian.BasePlayGrid {
             "aeolian": [2, 1, 2, 2, 1, 2, 2],
             "locrian": [1, 2, 2, 1, 2, 2, 2],
         }
-
-        var startingNote = component.settingsStore.property("startingNote")
-        var scale = component.settingsStore.property("scale")
-        var rows = component.settingsStore.property("rows")
-        var columns = component.settingsStore.property("columns")
-        var positionalVelocity = component.settingsStore.property("positionalVelocity")
 
         var col = startingNote;
         var scaleArray = scale_mode_map[scale];
@@ -99,21 +91,52 @@ Zynthian.BasePlayGrid {
                 }
             }
 
-            component.model.addRow(notes);
+            model.addRow(notes);
         }
     }
 
-    Component.onCompleted: {
+    function populateGrid(){
+        var startingNote = component.settingsStore.property("startingNote")
+        var scale = component.settingsStore.property("scale")
+        var rows = component.settingsStore.property("rows")
+        var columns = component.settingsStore.property("columns")
+        var positionalVelocity = component.settingsStore.property("positionalVelocity")
 
+        if (component.model) component.model.clear();
+        else component.model = zynthian.playgrid.createNotesModel();
+        fillModel(component.model, startingNote, scale, rows, columns, positionalVelocity)
+
+        if (component.miniGridModel) component.miniGridModel.clear();
+        else component.miniGridModel = zynthian.playgrid.createNotesModel();
+        fillModel(component.miniGridModel, startingNote + 24, scale, 2, columns, positionalVelocity)
+    }
+
+    Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
-        
+
         component.settingsStore.setDefault("startingNote", component.octave * 12);
         component.settingsStore.setDefault("scale", "ionian");
         component.settingsStore.setDefault("rows", 5);
         component.settingsStore.setDefault("columns", 8);
         component.settingsStore.setDefault("positionalVelocity", true);
-        
-        component.populateGrid();
+
+        populateGridTimer.start()
+    }
+
+    Connections {
+        target: component.settingsStore
+        onPropertyChanged: {
+            populateGridTimer.start()
+        }
+    }
+
+    Timer {
+        id: populateGridTimer
+        interval: 1
+        repeat: false
+        onTriggered: {
+            component.populateGrid();
+        }
     }
 
     onOctaveChanged: {
@@ -126,108 +149,29 @@ Zynthian.BasePlayGrid {
             objectName: "notesGrid"
             spacing: 0
             anchors.margins: 5
-
             Repeater {
                 model: component.model
-                delegate: RowLayout {
-                    property var row: index
-
-                    Layout.margins: 2.5
-
-                    Repeater {
-                        model: component.model.columnCount(component.model.index(index, 0))
-                        delegate: QQC2.Button {
-                            id: playDelegate
-                            property var column: index
-                            property var note: component.model.data(component.model.index(row, column), component.model.roles['note'])
-
-                            // Pitch is -8192 to 8191 inclusive
-                            property int pitchValue: Math.max(-8192, Math.min(pitchModPoint.pitchModX * 8192 / width, 8191))
-                            onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
-                            property int modulationValue: Math.max(-127, Math.min(pitchModPoint.pitchModY * 127 / width, 127))
-                            onModulationValueChanged: zynthian.playgrid.modulation = modulationValue;
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            background: Rectangle {
-                                radius: 2
-                                border {
-                                    width: 1
-                                    color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
-                                }
-                                color: {
-                                    var color = "white";
-                                    if (note) {
-                                        if (note.isPlaying) {
-                                            color = "#8bc34a";
-                                        } else {
-                                            if (component.settingsStore.property("scale") !== "chromatic" &&
-                                                note.name === component.currentNoteName
-                                            ) {
-                                                color = Kirigami.Theme.focusColor;
-                                            } else {
-                                                color = "white";
-                                            }
-                                        }
-                                    }
-                                    return color;
-                                }
-
-                                Text {
-                                    anchors.fill: parent
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    text: {
-                                        var text = "";
-                                        if (note && note.name != "") {
-                                            if (component.settingsStore.property("scale") == "major") {
-                                                text = note.name
-                                            } else {
-                                                text = note.name + note.octave
-                                            }
-                                        }
-                                        return text;
-                                    }
-                                }
-                            }
-
-                            MultiPointTouchArea {
-                                anchors.fill: parent
-                                touchPoints: [
-                                    TouchPoint {
-                                        id: pitchModPoint;
-                                        property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
-                                        property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
-                                    }
-                                ]
-                                property var playingNote;
-                                onPressed: {
-                                    if (pitchModPoint.pressed) {
-                                        var velocityValue = 64;
-                                        if (component.settingsStore.property("positionalVelocity")) {
-                                            velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
-                                        } else {
-                                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                                            velocityValue = pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127);
-                                        }
-                                        parent.down = true;
-                                        focus = true;
-                                        playingNote = note;
-                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue);
-                                    }
-                                }
-                                onReleased: {
-                                    if (!pitchModPoint.pressed) {
-                                        parent.down = false;
-                                        focus = false;
-                                        zynthian.playgrid.setNoteOff(playingNote);
-                                        zynthian.playgrid.pitch = 0;
-                                        zynthian.playgrid.modulation = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                delegate: NotesGridDelegate {
+                    model: component.model
+                    settingsStore: component.settingsStore
+                    currentNoteName: component.currentNoteName
+                }
+            }
+        }
+    }
+    Component {
+        id: notesMiniGrid
+        ColumnLayout {
+            objectName: "notesMiniGrid"
+            spacing: 0
+            anchors.margins: 5
+            Repeater {
+                id: miniGridRepeater
+                model: component.miniGridModel
+                delegate: NotesGridDelegate {
+                    model: component.miniGridModel
+                    settingsStore: component.settingsStore
+                    currentNoteName: component.currentNoteName
                 }
             }
         }
@@ -375,22 +319,6 @@ Zynthian.BasePlayGrid {
                     component.settingsStore.setProperty("positionalVelocity", !positionalVelocity);
                 }
             }
-        }
-    }
-
-    Connections {
-        target: component.settingsStore
-        onPropertyChanged: {
-            populateGridTimer.start()
-        }
-    }
-
-    Timer {
-        id: populateGridTimer
-        interval: 1
-        repeat: false
-        onTriggered: {
-            component.populateGrid();
         }
     }
 }

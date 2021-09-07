@@ -43,7 +43,7 @@ from pathlib import Path
 class zynthiloops_song(QObject):
     __instance__ = None
 
-    def __init__(self, sketch_folder: str, parent=None):
+    def __init__(self, sketch_folder: str, name, parent=None):
         super(zynthiloops_song, self).__init__(parent)
 
         self.__metronome_manager__ = parent
@@ -55,7 +55,6 @@ class zynthiloops_song(QObject):
         self.__bpm__ = 120
         self.__index__ = 0
         self.__is_playing__ = False
-        self.__name__ = f"Sketch {self.__index__+1}"
         self.__save_timer__ = QTimer(self)
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -76,6 +75,7 @@ class zynthiloops_song(QObject):
                 track.clipsModel.add_clip(clip)
                 #self.add_clip_to_part(clip, i)
 
+        self.name = name
         self.bpm_changed.emit()
 
     def serialize(self):

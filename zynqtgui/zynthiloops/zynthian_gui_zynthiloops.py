@@ -28,6 +28,7 @@ import math
 import os.path
 import re
 import sys
+import uuid
 from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
@@ -82,7 +83,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
         self.recorder_process_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / self.get_selected_sketch_name()) + "/", self)
+
+        selected_sketch_info = self.get_selected_sketch_info()
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / selected_sketch_info["id"]) + "/", selected_sketch_info["name"], self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
         libzl.registerTimerCallback(cb)
@@ -209,32 +212,39 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
-    def get_selected_sketch_name(self):
-        selected_sketch = "default"
+    def get_selected_sketch_info(self):
         try:
             with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
-                selected_sketch = json.load(f)["selected_sketch"]
+                obj = json.load(f)
         except:
             logging.error(f"No Sketches loaded. Creating 'default'")
-            self.newSketch(selected_sketch)
+            self.newSketch("Default")
 
-        return selected_sketch
+            with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
+                obj = json.load(f)
+
+        return {
+            "id": obj["selected_sketch"],
+            "name": obj["sketches"][obj["selected_sketch"]]["name"]
+        }
 
     @Slot(None)
     def clearCurrentSketch(self):
         self.__song__.destroy()
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / self.get_selected_sketch_name()) + "/", self)
+        selected_sketch_info = self.get_selected_sketch_info()
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / selected_sketch_info["id"]) + "/", selected_sketch_info["name"], self)
         self.song_changed.emit()
 
     @Slot(str)
     def newSketch(self, name):
-        if hasattr(self, "__song__"):
-            self.__song__.destroy()
+        # if hasattr(self, "__song__"):
+        #     self.__song__.destroy()
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name.lower()) + "/", self)
+        sketch_id = str(uuid.uuid4())
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / sketch_id) + "/", name, self)
         sketch_obj = {
             "selected_sketch": "",
-            "sketches": []
+            "sketches": {}
         }
 
         try:
@@ -243,8 +253,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except:
             logging.error(f"File {self.__sketch_basepath__ / 'sketches.json'} does not exist")
 
-        sketch_obj["selected_sketch"] = name.lower()
-        sketch_obj["sketches"].append(name.lower())
+        sketch_obj["selected_sketch"] = sketch_id
+        sketch_obj["sketches"][sketch_id] = {
+            "name": name
+        }
 
         with open(self.__sketch_basepath__ / 'sketches.json', 'w+') as f:
             f.write(json.dumps(sketch_obj))

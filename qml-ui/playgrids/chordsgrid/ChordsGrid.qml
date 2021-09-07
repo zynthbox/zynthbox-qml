@@ -39,20 +39,9 @@ ColumnLayout {
 
     spacing: 0
     anchors.margins: 5
-
-    // Tiniest littlest hacky friend, or we end up with deleted notes and incorrect delegates...
-    Connections {
-        target: component.model
-        onModelAboutToBeReset: {
-            mainRepeater.model = 0;
-        }
-        onModelReset: {
-            mainRepeater.model = component.chordRows < component.model.rows ? component.chordRows : component.model.rows;
-        }
-    }
     Repeater {
         id: mainRepeater
-        model: component.chordRows < component.model.rows ? component.chordRows : component.model.rows;
+        model: component.model.rows
         delegate: RowLayout {
             id: rowDelegate
             property var row: index

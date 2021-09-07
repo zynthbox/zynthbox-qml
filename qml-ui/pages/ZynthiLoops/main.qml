@@ -62,6 +62,29 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
+                text: qsTr("Load Sketch")
+                onTriggered: {
+                    // loadSketchDialog.open();
+                    var sketchesObj = zynthian.zynthiloops.getSketches()
+                    var sketches = sketchesObj["sketches"]
+                    console.log("Selected Sketch :", sketchesObj["selected_sketch"])
+
+                    sketchListModel.clear()
+
+                    for (var id in sketches) {
+                        if (sketches.hasOwnProperty(id) && id !== sketchesObj["selected_sketch"]) {
+                            console.log("Sketch :", id, sketches[id]["name"])
+                            sketchListModel.append({
+                                id: id,
+                                name: sketches[id]["name"]
+                            })
+                        }
+                    }
+
+                    pickerDialog.open()
+                }
+            }
+            Kirigami.Action {
                 text: qsTr("Clear Sketch")
                 onTriggered: {
                     zynthian.zynthiloops.clearCurrentSketch()
@@ -108,6 +131,35 @@ Zynthian.ScreenPage {
         }
         onRejected: {
             console.log("Rejected")
+        }
+    }
+
+    QQC2.Dialog {
+        id: pickerDialog
+        modal: true
+        header: Kirigami.Heading {
+            padding: 4
+            text: qsTr("Pick a sketch")
+            font.pointSize: 16
+        }
+        x: parent.width/2 - width/2
+        y: parent.height/2 - height/2
+        width: Math.round(parent.width * 0.5)
+        height: Math.round(parent.height * 0.6)
+        contentItem: QQC2.ScrollView {
+            contentItem: ListView {
+                model: ListModel {
+                    id: sketchListModel
+                }
+
+                delegate: Kirigami.BasicListItem {
+                    label: model.name
+                    onClicked: {
+                        zynthian.zynthiloops.loadSketch(model.id)
+                        pickerDialog.close()
+                    }
+                }
+            }
         }
     }
 

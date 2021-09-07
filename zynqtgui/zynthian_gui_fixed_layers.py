@@ -49,7 +49,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     def fill_list(self):
         self.list_data=[]
 
-        for i in range(self.__fixed_layers_count): #FIXME
+        for i in range(self.__fixed_layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
@@ -59,17 +59,18 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
 
-        self.list_data.append((None,-1, "")) # Separator
+        self.list_data.append((None,-1, "{} - T-RACK:".format(self.__fixed_layers_count+1))) # Separator
 
-        for i in range(self.__fixed_layers_count, self.__fixed_layers_count + self.__extra_layers_count): #FIXME
+        for i in range(self.__fixed_layers_count, self.__fixed_layers_count + self.__extra_layers_count):
+            special_layer_number = i - self.__fixed_layers_count + 1
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
-                    self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
+                    self.list_data.append((str(i+1),i,"{}.{} - {}".format(self.__fixed_layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""))))
                 else:
-                    self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+                    self.list_data.append((str(i+1),i,"{}.{} - {} > {}".format(self.__fixed_layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
             else:
-                self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
+                self.list_data.append((str(i+1),i, "{}.{} - -".format(self.__fixed_layers_count+1, special_layer_number)))
 
         self.special_layer_name_changed.emit()
         super().fill_list()

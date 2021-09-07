@@ -100,13 +100,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def next_action(self):
 		return self.next_screen_prop
 
-	#def back_action(self):
-		#if self.show_fav_presets:
-			#self.disable_show_fav_presets()
-			#return ''
-		#else:
-			#return None
-
+	def back_action(self):
+		return "bank"
 
 	def preselect_action(self):
 		return self.zyngui.curlayer.preload_preset(self.index)

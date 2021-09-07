@@ -57,7 +57,8 @@ ScreenPage {
                     let child = layout.children[i];
                     if (child.hasOwnProperty("view")
                         && (child.view.screenId === zynthian.current_screen_id
-                            || child.view.screenId === zynthian.current_modal_screen_id)) {
+                            || child.view.screenId === zynthian.current_modal_screen_id
+                            || (zynthian.current_screen_id === "layer" && child.view.screenId === "fixed_layers"))) {
                         child.view.forceActiveFocus();
                     }
                 }

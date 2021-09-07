@@ -52,6 +52,7 @@ class zynthiloops_clip(QObject):
         self.__is_recording__ = False
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
+        self.recording_basepath = song.sketch_folder
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 

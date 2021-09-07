@@ -48,7 +48,7 @@ class zynthiloops_song(QObject):
 
         self.__metronome_manager__ = parent
 
-        self.__sketch_folder__ = sketch_folder
+        self.sketch_folder = sketch_folder
         self.__sketch_filename__ = "sketch.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
@@ -86,11 +86,11 @@ class zynthiloops_song(QObject):
 
     def save(self):
         try:
-            Path(self.__sketch_folder__).mkdir(parents=True, exist_ok=True)
-            f = open(self.__sketch_folder__ + self.__sketch_filename__, "w")
+            Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
+            f = open(self.sketch_folder + self.__sketch_filename__, "w")
             f.write(json.dumps(self.serialize()))
             f.close()
-            print(self.__sketch_folder__ + self.__sketch_filename__)
+            print(self.sketch_folder + self.__sketch_filename__)
         except Exception as e:
             logging.error(e)
 
@@ -101,7 +101,7 @@ class zynthiloops_song(QObject):
 
     def restore(self):
         try:
-            f = open(self.__sketch_folder__ + self.__sketch_filename__, "r")
+            f = open(self.sketch_folder + self.__sketch_filename__, "r")
             obj = json.loads(f.read())
 
             if "name" in obj:
@@ -128,7 +128,7 @@ class zynthiloops_song(QObject):
                 logging.error(f"Destroying clip({clip})")
                 clip.destroy()
 
-        os.remove(self.__sketch_folder__ + self.__sketch_filename__)
+        os.remove(self.sketch_folder + self.__sketch_filename__)
         self.deleteLater()
 
     @Slot(int, int, result=QObject)

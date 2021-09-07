@@ -41,7 +41,7 @@ ColumnLayout {
     anchors.margins: 5
     Repeater {
         id: mainRepeater
-        model: component.model.rows
+        model: component.model
         delegate: RowLayout {
             id: rowDelegate
             property var row: index

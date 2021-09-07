@@ -180,9 +180,10 @@ class zynthiloops_song(QObject):
         return self.__name__
 
     def set_name(self, name):
-        self.__name__ = name
-        self.__name_changed__.emit()
-        self.schedule_save()
+        if name is not None:
+            self.__name__ = name
+            self.__name_changed__.emit()
+            self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
 

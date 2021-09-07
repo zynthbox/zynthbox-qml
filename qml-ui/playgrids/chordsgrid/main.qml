@@ -77,10 +77,6 @@ Zynthian.BasePlayGrid {
             var col = chord_scales_start;
 
             for (var i = 0; i < row_scale.length; ++i){
-
-                // We use a fake midi note to identify the notes
-                var fake_midi_note = 128;
-                var fake_midi_note_increment = 0;
                 var subnotes = [];
                 for (var subnote_index = 0; subnote_index < diatonic_progressions.length; ++subnote_index){
 
@@ -93,7 +89,6 @@ Zynthian.BasePlayGrid {
                             subnote_scale_index -= row_scale.length;
                         }
                         subnote_col += row_scale[subnote_scale_index];
-                        fake_midi_note_increment += row_scale[subnote_scale_index];
                     }
 
                     var subnote = zynthian.playgrid.getNote(
@@ -103,19 +98,10 @@ Zynthian.BasePlayGrid {
                         subnote_col
                     );
                     subnotes.push(subnote);
-                    fake_midi_note += (127 * fake_midi_note_increment) + subnote_col;
 
                 }
-                // Now create a Note object representing a music note for our current cell
-                // This one's our container, and it will contain a series of subnotes which make up the scale
-                var note = zynthian.playgrid.getNote(
-                    note_int_to_str_map[col % 12],
-                    scale_index,
-                    Math.floor(col / 12),
-                    fake_midi_note
-                );
-
-                note.subnotes = subnotes
+                // Now create a compound note for the notes that make up our chord
+                var note = zynthian.playgrid.getCompoundNote(subnotes);
                 row_data.push(note)
 
                 // Cycle scale index value to 0 if it reaches the end of scale mode map

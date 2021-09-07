@@ -27,6 +27,7 @@ import mido
 import typing
 import logging
 import os
+from datetime import datetime
 from pathlib import Path
 
 from PySide2.QtCore import (
@@ -60,8 +61,16 @@ class Note(QObject):
         self.__midi_note__ = midi_note
         self.__midi_port__ = midi_port
         self.__is_playing__: bool = False
-        self.__midi_note_on_msg__ = None
-        self.__midi_note_off_msg__ = None
+        if midi_note < 128:
+            self.__midi_note_on_msg__ = self.__midi_note_on_msg__ = mido.Message(
+                "note_on", note=self.__midi_note__
+            )
+            self.__midi_note_off_msg__ = self.__midi_note_off_msg__ = mido.Message(
+                "note_off", note=self.__midi_note__
+            )
+        else:
+            self.__midi_note_on_msg__ = None
+            self.__midi_note_off_msg__ = None
         self.__midi_notes_on_msgs__ = []
         self.__midi_notes_off_msgs__ = []
         self.__subnotes__ = []
@@ -112,10 +121,6 @@ class Note(QObject):
                 self.__midi_notes_on_msgs__[i].velocity = _velocity
                 self.__midi_port__.send(self.__midi_notes_on_msgs__[i])
         elif 0 <= self.__midi_note__ <= 127:
-            if self.__midi_note_on_msg__ is None:
-                self.__midi_note_on_msg__ = mido.Message(
-                    "note_on", note=self.__midi_note__
-                )
             self.__midi_note_on_msg__.velocity = _velocity
             self.__midi_port__.send(self.__midi_note_on_msg__)
 
@@ -124,10 +129,6 @@ class Note(QObject):
             for i in range(0, len(self.__midi_notes_off_msgs__)):
                 self.__midi_port__.send(self.__midi_notes_off_msgs__[i])
         elif 0 <= self.__midi_note__ <= 127:
-            if self.__midi_note_off_msg__ is None:
-                self.__midi_note_off_msg__ = mido.Message(
-                    "note_off", note=self.__midi_note__
-                )
             self.__midi_port__.send(self.__midi_note_off_msg__)
 
     @Property(str, constant=True)
@@ -298,6 +299,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __settings_stores__ = {}
     __note_state_map__ = {}
     __most_recently_changed_note__ = None
+    __most_recently_changed_notes__ = [] # List of dicts
+    __input_ports__ = []
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
@@ -310,6 +313,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__pitch__ = 0
         self.__modulation__ = 0
         self.updatePlayGrids()
+        self.listen_to_everything()
 
         zynthian_gui_playgrid.dir_watcher.directoryChanged.connect(self.updatePlayGrids)
         zynthian_gui_playgrid.dir_watcher.fileChanged.connect(self.updatePlayGrids)
@@ -320,6 +324,41 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 success = zynthian_gui_playgrid.dir_watcher.addPath(str(searchdir))
                 if not success:
                     logging.error("Could not set up watching for: " + str(searchdir))
+
+    @staticmethod
+    def listen_to_everything():
+        for port in zynthian_gui_playgrid.__input_ports__:
+            port.close()
+        zynthian_gui_playgrid.__input_ports__ = []
+        # It's entirely possible we'll need to nab this out of zyngine or somesuch, but for now...
+        #for input_name in mido.get_input_names():
+        try:
+            #input_port = mido.open_input(input_name)
+            input_port = mido.open_input()
+            input_port.callback = zynthian_gui_playgrid.handle_input_message
+            zynthian_gui_playgrid.__input_ports__.append(input_port)
+            logging.error("Successfully opened midi input for reading: " + str(input_port))
+        except:
+            logging.error("Failed to open midi input port for reading")
+
+    @staticmethod
+    def handle_input_message(message):
+        logging.error("Mido message did an arrive: %s", message.dict())
+        note = None
+        velocity = 0
+        note_on = False
+        message_data = message.dict()
+        if message_data.get('type') == "note_on" or message_data.get('type') == "note_off":
+            if message_data.get('type') == "note_on":
+                note_on = True
+            note_value = message_data.get('note')
+            for a_note in zynthian_gui_playgrid.__notes__:
+                if a_note.__midi_note__ == note_value:
+                    note = a_note
+                    note.set_is_playing(note_on)
+                    break
+        if not note is None:
+            zynthian_gui_playgrid.__note_state_changed__(note)
 
     def show(self):
         pass
@@ -366,6 +405,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return self.__play_grid_index__
 
     def __set_play_grid_index__(self, play_grid_index):
+        # TODO Put this somewhere better (like e.g. somewhere that detects changes in the hardware setup...)
+        # Even then, this needs to go somewhere... and right now it's here
+        self.listen_to_everything()
         self.__play_grid_index__ = play_grid_index
         self.__play_grid_index_changed__.emit()
 
@@ -412,43 +454,51 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.setNoteState(note = note, setOn = False)
 
     def setNoteState(self, note: Note, velocity: int = 64, setOn: bool = True):
-        subnotes = note.get_subnotes()
-        subnoteCount = len(note.get_subnotes())
-        if subnoteCount > 0:
-            for i in range(0, subnoteCount):
-                self.setNoteState(subnotes[i], velocity, setOn)
-            for model in zynthian_gui_playgrid.__models__:
-                model.highlight_playing_note(note, setOn)
+        if note is None:
+            logging.error("Attempted to set the state of a None-value note")
         else:
-            noteKey = str(note.get_midi_note())
-            if noteKey in zynthian_gui_playgrid.__note_state_map__:
-                if setOn:
-                    zynthian_gui_playgrid.__note_state_map__[noteKey] += 1
+            subnotes = note.get_subnotes()
+            subnoteCount = len(note.get_subnotes())
+            if subnoteCount > 0:
+                for i in range(0, subnoteCount):
+                    self.setNoteState(subnotes[i], velocity, setOn)
+                for model in zynthian_gui_playgrid.__models__:
+                    model.highlight_playing_note(note, setOn)
+            else:
+                noteKey = str(note.get_midi_note())
+                if noteKey in zynthian_gui_playgrid.__note_state_map__:
+                    if setOn:
+                        zynthian_gui_playgrid.__note_state_map__[noteKey] += 1
+                    else:
+                        zynthian_gui_playgrid.__note_state_map__[noteKey] -= 1
+                        if zynthian_gui_playgrid.__note_state_map__[noteKey] == 0:
+                            note.off()
+                            zynthian_gui_playgrid.__note_state_map__.pop(noteKey)
+                            for model in zynthian_gui_playgrid.__models__:
+                                model.highlight_playing_note(note, False)
                 else:
-                    zynthian_gui_playgrid.__note_state_map__[noteKey] -= 1
-                    if zynthian_gui_playgrid.__note_state_map__[noteKey] == 0:
+                    if setOn:
+                        note.on(velocity)
+                        zynthian_gui_playgrid.__note_state_map__[noteKey] = 1
+                        for model in zynthian_gui_playgrid.__models__:
+                            model.highlight_playing_note(note, True)
+                    else:
                         note.off()
-                        self.__note_state_changed__(note)
-                        zynthian_gui_playgrid.__note_state_map__.pop(noteKey)
                         for model in zynthian_gui_playgrid.__models__:
                             model.highlight_playing_note(note, False)
-            else:
-                if setOn:
-                    note.on(velocity)
-                    self.__note_state_changed__(note)
-                    zynthian_gui_playgrid.__note_state_map__[noteKey] = 1
-                    for model in zynthian_gui_playgrid.__models__:
-                        model.highlight_playing_note(note, True)
-                else:
-                    note.off()
-                    self.__note_state_changed__(note)
-                    for model in zynthian_gui_playgrid.__models__:
-                        model.highlight_playing_note(note, False)
 
-    def __note_state_changed__(self,note:Note):
+    @staticmethod
+    def __note_state_changed__(note:Note):
+        logging.error("New note state for " + str(note.midiNote) + " now playing? " + str(note.isPlaying))
         zynthian_gui_playgrid.__most_recently_changed_note__ = note
+        zynthian_gui_playgrid.__most_recently_changed_notes__.append({
+            'note': note,
+            'state': note.isPlaying,
+            'time': datetime.now()
+        })
         for playgrid in zynthian_gui_playgrid.__playgrid_instances__:
             playgrid.noteStateChanged.emit()
+            playgrid.__most_recently_changed_notes_changed__.emit()
 
     @Slot(result=Note)
     def mostRecentlyChangedNote(self):
@@ -456,6 +506,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Signal
     def noteStateChanged(self):
+        pass
+
+    def __get_most_recently_changed_notes__(self):
+        return zynthian_gui_playgrid.__most_recently_changed_notes__
+
+    @Signal
+    def __most_recently_changed_notes_changed__(self):
         pass
 
     def model_deleted(self, model:zynthian_gui_grid_notes_model):
@@ -502,6 +559,26 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
         return note
 
+    @Slot('QVariantList', result=QObject)
+    def getCompoundNote(self, notes:'QVariantList'):
+        note = None
+        if len(notes) > 0:
+            # Make the compound note's fake note value...
+            fake_midi_note = 128;
+            for subnote in notes:
+                fake_midi_note = fake_midi_note + (127 * subnote.__midi_note__)
+            # Find if we've got a note with that note value already
+            for existingNote in zynthian_gui_playgrid.__notes__:
+                if existingNote.__midi_note__ == fake_midi_note:
+                    note = existingNote
+                    break
+            # If not, create it, and stuff it with these subnotes
+            if note is None:
+                note = self.getNote("Compound", notes[0].__scale_index__, fake_midi_note // 12, fake_midi_note)
+                note.set_subnotes(notes)
+                zynthian_gui_playgrid.__notes__.append(note)
+        return note
+
     @Slot(str, result=QObject)
     def getSettingsStore(self, name:str):
         if not name in zynthian_gui_playgrid.__settings_stores__:
@@ -510,6 +587,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
         return zynthian_gui_playgrid.__settings_stores__[name]
 
+    mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)
     playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)
     pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
     modulation = Property(int, __get_modulation__, __set_modulation__, notify=__modulation_changed__)

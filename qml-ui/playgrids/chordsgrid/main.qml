@@ -44,6 +44,7 @@ Zynthian.BasePlayGrid {
     property QtObject miniGridModel
     property int chordRows
     property var chordScales
+    property var miniChordScales
     property bool positionalVelocity
 
     function fillModel(model, chord_rows, chord_scales) {

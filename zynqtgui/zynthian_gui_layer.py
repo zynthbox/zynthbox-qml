@@ -1533,21 +1533,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def export_channels_snapshot(self, channels):
 		if not isinstance(channels, list):
 			return
-		snapshot = {"layers": [], "audio_routing": {}, "clone": []}
+		snapshot = {"layers": [], "audio_routing": {}}
 		# Double iteration because many layers can be on the same channel (one instrument + arbitrary effects)
 		for layer in self.layers:
 			if layer.midi_chan in channels:
 				snapshot["layers"].append(layer.get_snapshot())
 				snapshot["audio_routing"][layer.get_jackname()] = layer.get_audio_out()
-		#Clone info
-		for i in range(0,16):
-			snapshot['clone'].append([])
-			for j in range(0,16):
-				clone_info = {
-					'enabled': zyncoder.lib_zyncoder.get_midi_filter_clone(i,j),
-					'cc': list(map(int,zyncoder.lib_zyncoder.get_midi_filter_clone_cc(i,j).nonzero()[0]))
-				}
-				snapshot['clone'][i].append(clone_info)
 		return snapshot
 
 

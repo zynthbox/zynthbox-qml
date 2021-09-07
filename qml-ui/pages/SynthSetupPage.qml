@@ -77,7 +77,7 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             text: qsTr("Synths")
-            onTriggered: zynthian.layer.select_engine()
+            onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index)
         },
         Kirigami.Action {
             text: qsTr("Audio-FX")
@@ -96,6 +96,50 @@ Zynthian.MultiSelectorPage {
     screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
+
+    Connections {
+        target: zynthian.fixed_layers
+        onCurrent_index_validChanged: {
+            if (!zynthian.fixed_layers.current_index_valid) {
+                layerSetupDialog.open();
+            }
+        }
+    }
+
+    QQC2.Dialog {
+        id: layerSetupDialog
+        x: Math.round(parent.width/6 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        height: footer.implicitHeight + topMargin + bottomMargin
+        modal: true
+        footer: QQC2.Control {
+            leftPadding: layerSetupDialog.leftPadding
+            topPadding: layerSetupDialog.topPadding
+            rightPadding: layerSetupDialog.rightPadding
+            bottomPadding: layerSetupDialog.bottomPadding
+            contentItem: ColumnLayout {
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Load A Sound...")
+                    onClicked: {
+                        layerSetupDialog.close();
+                        pickerDialog.mode = "sound";
+                        pickerDialog.open();
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("New Synth...")
+                    onClicked: {
+                        layerSetupDialog.close();
+                        zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+                    }
+                }
+            }
+        }
+    }
 
     QQC2.Dialog {
         id: saveDialog
@@ -253,8 +297,6 @@ Zynthian.MultiSelectorPage {
             fileToLoad = "";
         }
         onAccepted: {
-            print(sourceChannels)
-            print(destinationChannels)
             if (sourceChannels.length !== destinationChannels.length) {
                 return;
             }
@@ -263,9 +305,8 @@ Zynthian.MultiSelectorPage {
             for (i in sourceChannels) {
                 map[sourceChannels[i]] = destinationChannels[i];
             }
-            print(map)
             for (i in map) {
-                print(i+": "+map[i]);
+                print("Mapping midi channel " + i + " to " + map[i]);
             }
             zynthian.layer.load_layer_from_file(fileToLoad, map);
             clear();

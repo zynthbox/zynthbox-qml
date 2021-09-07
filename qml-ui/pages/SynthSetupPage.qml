@@ -247,6 +247,11 @@ Zynthian.MultiSelectorPage {
         property var sourceChannels: []
         property var destinationChannels: []
         property string fileToLoad
+        function clear () {
+            sourceChannels = [];
+            destinationChannels = [];
+            fileToLoad = "";
+        }
         onAccepted: {
             print(sourceChannels)
             print(destinationChannels)
@@ -263,14 +268,10 @@ Zynthian.MultiSelectorPage {
                 print(i+": "+map[i]);
             }
             zynthian.layer.load_layer_from_file(fileToLoad, map);
-            fileToLoad = "";
-            sourceChannels = [];
-            destinationChannels = [];
+            clear();
         }
         onRejected: {
-            fileToLoad = "";
-            sourceChannels = [];
-            destinationChannels = [];
+            clear();
         }
         header: Kirigami.Heading {
             text: qsTr("Pick Layers To Replace")
@@ -284,7 +285,6 @@ Zynthian.MultiSelectorPage {
                 delegate: QQC2.CheckBox {
                     text: model.display
                     visible: index < 5
-                    checked: index === zynthian.fixed_layers.current_index
                     enabled: checked || layerReplaceDialog.destinationChannels.length < layerReplaceDialog.sourceChannels.length
                     opacity: enabled ? 1 : 0.4
 
@@ -304,7 +304,7 @@ Zynthian.MultiSelectorPage {
                     }
                     Connections {
                         target: layerReplaceDialog
-                        onFileToLoadChanged: checked = false
+                        onFileToLoadChanged: checked = index === zynthian.fixed_layers.current_index
                     }
                 }
             }

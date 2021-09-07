@@ -228,7 +228,7 @@ Zynthian.MultiSelectorPage {
                             } else {
                                 let map = {}
                                 map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.current_index;
-                                zynthian.layer.load_layer_from_file(fileToLoad, map);
+                                zynthian.layer.load_layer_from_file(model.fileName, map);
                             }
                         }
                         pickerDialog.accept()

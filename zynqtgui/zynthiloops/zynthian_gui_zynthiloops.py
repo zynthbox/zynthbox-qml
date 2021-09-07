@@ -301,7 +301,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def queue_clip_record(self, clip):
         self.update_recorder_jack_port()
         self.clip_to_record = clip
-        self.clip_to_record_path = "/zynthian/zynthian-my-data/capture/"+self.clip_to_record.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
+        self.clip_to_record_path = self.clip_to_record.recording_basepath+self.clip_to_record.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
         #self.countInValue = countInBars * 4
 
         # self.recorder_process = QProcess()

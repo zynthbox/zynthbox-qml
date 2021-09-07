@@ -70,8 +70,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.metronome_schedule_stop = False
         self.metronome_running_refcount = 0
         self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/")
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__), self)
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording_complete = False
         self.recording_count_in_value = 0
@@ -84,6 +82,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
         self.recorder_process_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / self.get_selected_sketch_name()) + "/", self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
@@ -209,11 +209,60 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
+    def get_selected_sketch_name(self):
+        selected_sketch = "default"
+        try:
+            with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
+                selected_sketch = json.load(f)["selected_sketch"]
+        except:
+            logging.error(f"No Sketches loaded. Creating 'default'")
+            self.newSketch(selected_sketch)
+
+        return selected_sketch
+
     @Slot(None)
     def clearCurrentSketch(self):
         self.__song__.destroy()
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__), self)
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / self.get_selected_sketch_name()) + "/", self)
         self.song_changed.emit()
+
+    @Slot(str)
+    def newSketch(self, name):
+        if hasattr(self, "__song__"):
+            self.__song__.destroy()
+
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name.lower()) + "/", self)
+        sketch_obj = {
+            "selected_sketch": "",
+            "sketches": []
+        }
+
+        try:
+            with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
+                sketch_obj = json.load(f)
+        except:
+            logging.error(f"File {self.__sketch_basepath__ / 'sketches.json'} does not exist")
+
+        sketch_obj["selected_sketch"] = name.lower()
+        sketch_obj["sketches"].append(name.lower())
+
+        with open(self.__sketch_basepath__ / 'sketches.json', 'w+') as f:
+            f.write(json.dumps(sketch_obj))
+
+        self.song_changed.emit()
+
+    @Slot(None, result=list)
+    def listSketches(self):
+        sketches = []
+
+        try:
+            with open(self.__sketch_basepath__ / 'sketches.json', 'r') as f:
+                sketch_obj = json.load(f)
+                sketches = sketch_obj["sketches"]
+        except:
+            logging.error(f"No sketches found")
+
+        return sketches
 
     def update_timer_bpm(self):
         if self.metronome_running_refcount > 0:
@@ -342,5 +391,5 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str, result=bool)
     def sketchExists(self, name):
-        sketch_path = self.__sketch_basepath__ / name
+        sketch_path = self.__sketch_basepath__ / name.lower()
         return sketch_path.is_dir()

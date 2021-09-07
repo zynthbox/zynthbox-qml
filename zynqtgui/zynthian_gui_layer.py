@@ -208,17 +208,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def activate_midichan_layer(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
-		elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
-			self.replace_layer_index = None
-			self.layer_chain_parallel = False
-			self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
-			self.zyngui.screens['engine'].set_midi_channel(midi_chan)
-			self.layer_index_replace_engine = None
-			self.zyngui.show_modal('engine')
-		else: # HACK Channels 6-10
-			for i in range(5, 10):
-				if i in self.layer_midi_map:
-					self.activate_index(self.root_layers.index(self.layer_midi_map[i]))
+		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
+			#self.replace_layer_index = None
+			#self.layer_chain_parallel = False
+			#self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
+			#self.zyngui.screens['engine'].set_midi_channel(midi_chan)
+			#self.layer_index_replace_engine = None
+			#self.zyngui.show_modal('engine')
+		#else: # HACK Channels 6-10
+			#for i in range(5, 10):
+				#if i in self.layer_midi_map:
+					#self.activate_index(self.root_layers.index(self.layer_midi_map[i]))
 
 	def next(self, control=True):
 		self.zyngui.restore_curlayer()
@@ -310,16 +310,23 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.zyngui.show_modal('engine')
 
 
-	@Slot('void')
-	def select_engine(self):
+	@Slot(int)
+	def select_engine(self, midi_chan = -1):
 		self.add_layer_eng = None
 		self.replace_layer_index = None
 		self.layer_chain_parallel = False
 		self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
-		self.layer_index_replace_engine = self.index
-		self.zyngui.screens['engine'].set_midi_channel(self.layers[self.index].midi_chan)
+		if midi_chan < 0:
+			midi_chan = self.layers[self.index].midi_chan
+		if midi_chan in self.layer_midi_map:
+			self.layer_index_replace_engine = self.index
+		else:
+			self.layer_index_replace_engine = None
+
+		self.zyngui.screens['engine'].set_midi_channel(midi_chan)
 		self.zyngui.show_modal('engine')
-		self.zyngui.screens['engine'].select_by_engine(self.layers[self.index].engine.nickname)
+		if midi_chan in self.layer_midi_map:
+			self.zyngui.screens['engine'].select_by_engine(self.layers[self.index].engine.nickname)
 
 
 	def add_fxchain_layer(self, midi_chan):

@@ -79,6 +79,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     def select_action(self, i, t='S'):
         self.index = i
         chan = self.list_data[i][1]
+        self.current_index_valid_changed.emit()
 
         if chan < 0:
             return
@@ -102,8 +103,25 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     @Signal
+    def current_index_valid_changed(self):
+        pass
+
+    def get_current_index_valid(self):
+        logging.error("index {} list_data {}".format(self.index, len(self.list_data)))
+        logging.error("midichan: {}".format(self.list_data[self.index][1]))
+        midi_chan = self.list_data[self.index][1]
+
+        if midi_chan < 0:
+            return False
+
+        return midi_chan in self.zyngui.screens['layer'].layer_midi_map
+
+    current_index_valid = Property(bool, get_current_index_valid, notify = current_index_valid_changed)
+
+    @Signal
     def special_layer_name_changed(self):
         pass
+
 
     def get_special_layer_name(self):
         layer_name = "T-RACK: "

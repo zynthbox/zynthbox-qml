@@ -37,6 +37,8 @@ Item {
     // Default to miniGrid being identical to grid, so things still kindofsortof work
     property Component miniGrid: root.grid
     property Component settings
+    // Default is none - the system has a default sidebar for those playgrids where basic octave/mod/pitch controls make sense
+    property Component sidebar
     property QtObject model
     property string name
     property string currentNoteName

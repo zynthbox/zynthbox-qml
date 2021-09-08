@@ -256,6 +256,27 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         return obj
 
+    @Slot(str)
+    def loadSketchVersion(self, version):
+        obj = {}
+
+        try:
+            with open(self.__song__.sketch_folder + self.__song__.sketch_filename, "r") as f:
+                obj = json.loads(f.read())
+        except Exception as e:
+            logging.error(e)
+
+        try:
+            with open(self.__song__.sketch_folder + self.__song__.sketch_filename, "w") as f:
+                obj["selected_version"] = version
+                f.write(json.dumps(obj))
+        except Exception as e:
+            logging.error(e)
+
+        sketch_folder = self.__song__.sketch_folder
+        self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, version, self)
+        self.song_changed.emit()
+
     @Slot(str, result=bool)
     def sketchExists(self, name):
         sketch_path = self.__sketch_basepath__ / self.generate_sketch_id_from_name(name)

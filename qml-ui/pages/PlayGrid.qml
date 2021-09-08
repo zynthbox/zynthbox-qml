@@ -217,7 +217,8 @@ Zynthian.ScreenPage {
                 QQC2.Button {
                     id: settingsButton
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    Layout.minimumHeight: width
+                    Layout.maximumHeight: width
                     icon.name: "configure"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button

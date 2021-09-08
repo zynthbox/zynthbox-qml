@@ -219,7 +219,7 @@ class zynthiloops_clip(QObject):
         if self.__length__ != math.floor(length) or force_set is True:
             self.__length__ = math.floor(length)
             self.length_changed.emit()
-            self.__song__.schedule_save()
+            # self.__song__.schedule_save()
 
             if self.audioSource is not None:
                 self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
@@ -258,7 +258,7 @@ class zynthiloops_clip(QObject):
         if self.__start_position__ != position or force_set is True:
             self.__start_position__ = position
             self.start_position_changed.emit()
-            self.__song__.schedule_save()
+            # self.__song__.schedule_save()
             if self.audioSource is None:
                 return
             self.audioSource.set_start_position(position)
@@ -282,7 +282,7 @@ class zynthiloops_clip(QObject):
         if self.__pitch__ != math.floor(pitch) or force_set is True:
             self.__pitch__ = math.floor(pitch)
             self.pitch_changed.emit()
-            self.__song__.schedule_save()
+            # self.__song__.schedule_save()
             if self.audioSource is None:
                 return
             self.audioSource.set_pitch(pitch)
@@ -298,7 +298,7 @@ class zynthiloops_clip(QObject):
         if self.__time__ != time or force_set is True:
             self.__time__ = time
             self.time_changed.emit()
-            self.__song__.schedule_save()
+            # self.__song__.schedule_save()
             if self.audioSource is None:
                 return
             self.audioSource.set_speed_ratio(time)
@@ -313,7 +313,7 @@ class zynthiloops_clip(QObject):
     def set_bpm(self, bpm: int):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
-        self.__song__.schedule_save()
+        # self.__song__.schedule_save()
         self.reset_beat_count()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
@@ -326,7 +326,7 @@ class zynthiloops_clip(QObject):
         self.__should_sync__ = shouldSync
         self.should_sync_changed.emit()
         self.update_synced_values()
-        self.__song__.schedule_save()
+        # self.__song__.schedule_save()
 
         if not shouldSync:
             self.set_time(1.0)
@@ -372,7 +372,7 @@ class zynthiloops_clip(QObject):
         self.path_changed.emit()
         self.sound_data_changed.emit()
         self.duration_changed.emit()
-        self.__song__.schedule_save()
+        # self.__song__.schedule_save()
     path = Property(str, path, set_path, notify=path_changed)
 
     @Slot(None)
@@ -385,7 +385,7 @@ class zynthiloops_clip(QObject):
 
         self.__path__ = None
         self.path_changed.emit()
-        self.__song__.schedule_save()
+        # self.__song__.schedule_save()
 
     @Slot(None)
     def play(self):

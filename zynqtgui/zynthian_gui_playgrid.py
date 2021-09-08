@@ -549,17 +549,21 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         if note in zynthian_gui_playgrid.__notes__:
             zynthian_gui_playgrid.__notes__.remove(note)
 
+    def findExistingNote(self, midi_note):
+        note = None
+        for existingNote in zynthian_gui_playgrid.__notes__:
+            if (hasattr(existingNote, '__midi_note__') and existingNote.__midi_note__ == midi_note):
+                note = existingNote
+                break
+        return note
+
     @Slot(str, int, int, int, result=QObject)
     def getNote(self,
                    _name: str,
                    _scale_index: int,
                    _octave: int,
                    _midi_note: int):
-        note = None
-        for existingNote in zynthian_gui_playgrid.__notes__:
-            if (hasattr(existingNote, '__midi_note__') and existingNote.__midi_note__ == _midi_note):
-                note = existingNote
-                break
+        note = self.findExistingNote(_midi_note)
         if note is None:
             note = Note(
                 name=_name,
@@ -569,29 +573,29 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 midi_port=self.__midi_port__,
                 parent=self
             )
-        zynthian_gui_playgrid.__notes__.append(note)
-        note.destroyed.connect(self.note_deleted)
+            zynthian_gui_playgrid.__notes__.append(note)
+            note.destroyed.connect(self.note_deleted)
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
         return note
 
     @Slot('QVariantList', result=QObject)
     def getCompoundNote(self, notes:'QVariantList'):
         note = None
-        if len(notes) > 0:
-            # Make the compound note's fake note value...
-            fake_midi_note = 128;
-            for subnote in notes:
-                fake_midi_note = fake_midi_note + (127 * subnote.__midi_note__)
-            # Find if we've got a note with that note value already
-            for existingNote in zynthian_gui_playgrid.__notes__:
-                if existingNote.__midi_note__ == fake_midi_note:
-                    note = existingNote
-                    break
-            # If not, create it, and stuff it with these subnotes
-            if note is None:
-                note = self.getNote(notes[0].name, notes[0].scaleIndex, fake_midi_note // 12, fake_midi_note)
+        try:
+            if len(notes) > 0:
+                # Make the compound note's fake note value...
+                fake_midi_note = 128;
+                for subnote in notes:
+                    fake_midi_note = fake_midi_note + (127 * subnote.__midi_note__)
+                # Find if we've got a note with that note value already
+                note = self.findExistingNote(fake_midi_note)
+                # If not, create it, and stuff it with these subnotes
+                if note is None:
+                    note = self.getNote(notes[0].name, notes[0].scaleIndex, fake_midi_note // 12, fake_midi_note)
+                    zynthian_gui_playgrid.__notes__.append(note)
                 note.set_subnotes(notes)
-                zynthian_gui_playgrid.__notes__.append(note)
+        except:
+            logging.error("We have apparently got a broken thing - likely this is because the notes object passed in was an empty list, or a null pointer (which python doesn't know what to do with)")
         return note
 
     @Slot(str, result=QObject)

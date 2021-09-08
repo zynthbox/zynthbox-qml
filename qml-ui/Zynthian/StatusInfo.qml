@@ -285,35 +285,98 @@ MouseArea {
         x: parent.width - width
         contentItem: GridLayout {
             columns: 2
-            ZynthiloopsDial {
-                id: bpmDial
-                Layout.rowSpan: 2
-                text: qsTr("BPM")
-                controlObj: zynthian.zynthiloops.song
-                controlProperty: "bpm"
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                contentItem: ZynthiloopsDial {
+                    id: bpmDial
+                    text: qsTr("BPM")
+                    controlObj: zynthian.zynthiloops.song
+                    controlProperty: "bpm"
 
-                dial {
-                    stepSize: 1
-                    from: 50
-                    to: 200
+                    dial {
+                        stepSize: 1
+                        from: 50
+                        to: 200
+                    }
                 }
             }
-            RowLayout {
-                QQC2.Label {
-                    text: qsTr("Click")
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                contentItem: ColumnLayout {
+                    DialController {
+                        id: volumeDial
+                        heading.level: 5
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.topMargin: -8 //HACK
+                        Layout.bottomMargin: -8
+                        topPadding: 0
+                        leftPadding: 0
+                        rightPadding: 0
+                        bottomPadding: 0
+                        title: ""
+                        controller.category: "amixer_MX#1"
+                        controller.index: 0
+                        stepSize: 5
+                        //background.visible: false
+                        valueLabel: {
+                            return qsTr("%1%").arg(Math.round(dial.value))
+                        }
+                    }
+                    RowLayout {
+                        visible: volumeDial.visible
+                        Layout.fillWidth: true
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            text: "-"
+                            enabled: volumeDial.dial.value > 0
+                            onClicked: volumeDial.dial.decrease()
+                        }
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            text: "+"
+                            enabled: volumeDial.dial.value < 100
+                            onClicked: volumeDial.dial.increase()
+                        }
+                    }
+                    QQC2.Label {
+                        visible: volumeDial.visible
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Volume")
+                    }
                 }
+            }
+            Card {
+                Layout.fillWidth: true
+                Layout.preferredWidth: 1
+                contentItem: RowLayout {
+                    Layout.alignment: Qt.AlignLeft
+                    QQC2.Label {
+                        text: qsTr("Click")
+                    }
 
-                QQC2.Switch {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    checked: zynthian.zynthiloops.clickTrackEnabled
-                    onToggled: {
-                        zynthian.zynthiloops.clickTrackEnabled = checked
+                    QQC2.Switch {
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        onToggled: {
+                            zynthian.zynthiloops.clickTrackEnabled = checked
+                        }
+                    }
+                    Item {
+                        Layout.fillWidth: true
                     }
                 }
             }
             QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
                 text: qsTr("Stop All Notes")
                 onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
             }

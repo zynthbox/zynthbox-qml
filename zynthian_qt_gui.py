@@ -574,7 +574,7 @@ class zynthian_gui(QObject):
 
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
         # Create UI Apps Screens
-        # self.screens['alsa_mixer'] = self.screens['control']
+        self.screens['alsa_mixer'] = self.screens['control']
         self.screens["audio_recorder"] = zynthian_gui_audio_recorder(self)
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)

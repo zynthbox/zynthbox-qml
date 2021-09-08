@@ -100,7 +100,7 @@ class zynthiloops_part(QObject):
     def set_length(self, length: int):
         self.__length__ = length
         self.length_changed.emit()
-        self.__song__.schedule_save()
+        # self.__song__.schedule_save()
     length = Property(int, length, set_length, notify=length_changed)
 
 

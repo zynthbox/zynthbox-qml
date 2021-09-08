@@ -1440,13 +1440,14 @@ class zynthian_gui(QObject):
                             j = 0
                     screen_back = self.screens_sequence[j]
 
+            # TODO: this code is disabled to have a more predictable back navigation, is a good choice? how to make it depend only from qml part?
             # If there is only one preset, go back to bank selection
-            if screen_back == "preset" and len(self.curlayer.preset_list) <= 1:
-                screen_back = "bank"
+            #if screen_back == "preset" and len(self.curlayer.preset_list) <= 1:
+                #screen_back = "bank"
 
-            # If there is only one bank, go back to layer selection
-            if screen_back == "bank" and len(self.curlayer.bank_list) <= 1:
-                screen_back = "layer"
+            ## If there is only one bank, go back to layer selection
+            #if screen_back == "bank" and len(self.curlayer.bank_list) <= 1:
+                #screen_back = "layer"
 
             if screen_back:
                 logging.debug("BACK TO SCREEN => {}".format(screen_back))

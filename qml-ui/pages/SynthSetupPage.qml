@@ -135,14 +135,14 @@ Zynthian.MultiSelectorPage {
                     onClicked: {
                         layerSetupDialog.close();
                        // zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
-						newSynthWorkaroundTimer.restart()
+                        newSynthWorkaroundTimer.restart()
                     }
                 }
                 Timer {
-					id: newSynthWorkaroundTimer
-					interval: 200
-					onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
-				}
+                    id: newSynthWorkaroundTimer
+                    interval: 200
+                    onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+                }
             }
         }
     }

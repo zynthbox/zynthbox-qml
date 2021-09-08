@@ -1441,6 +1441,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.remove_clone_midi(i, j)
 		restored_layers = []
 		restored_channels = []
+		restored_jacknames = []
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
@@ -1459,12 +1460,47 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.layers.append(new_layer)
 					restored_layers.append(new_layer)
 					restored_channels.append(new_layer.midi_chan)
-		for layer in restored_layers:
-			#Set Audio Routing
-			if 'audio_routing' in snapshot and layer.get_jackname() in snapshot['audio_routing']:
-				layer.set_audio_out(snapshot['audio_routing'][layer.get_jackname()])
-			else:
+					restored_jacknames.append(new_layer.get_jackname())
+		# try to map the jacknames of therestored channels with what it was snapshotted
+		snapshotted_jacknames = []
+		for jackname in snapshot['audio_routing']:
+			if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+			for out in snapshot['audio_routing'][jackname]:
+				if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+		restored_jacknames.sort()
+		snapshotted_jacknames.sort()
+		jacknames_r_s_map = {}
+		jacknames_s_r_map = {}
+		for rj in restored_jacknames:
+			rjsize = len(rj)
+			basename = rj[:rjsize - 3]
+			for sj in snapshotted_jacknames:
+				if basename == sj[:rjsize - 3]:
+					jacknames_r_s_map[rj] = sj
+					jacknames_s_r_map[sj] = rj
+					snapshotted_jacknames.remove(sj)
+					break
+
+		if 'audio_routing' in snapshot:
+			for layer in restored_layers:
+				#Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+				if layer.get_jackname() in jacknames_r_s_map:
+					mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+					if mapped_source_jackname in snapshot['audio_routing']:
+						mapped_out_jacknames = []
+						for name in snapshot['audio_routing'][mapped_source_jackname]:
+							if name in jacknames_s_r_map:
+								mapped_out_jacknames.append(jacknames_s_r_map[name])
+						if len(mapped_out_jacknames) > 0:
+							layer.set_audio_out(mapped_out_jacknames)
+						else:
+							layer.reset_audio_out()
+				else:
+					layer.reset_audio_out()
+		else:
+			for layer in restored_layers:
 				layer.reset_audio_out()
+
 		#TODO: always clone?
 		for i in restored_channels:
 			for j in restored_channels:

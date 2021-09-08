@@ -49,7 +49,7 @@ class zynthiloops_song(QObject):
         self.__metronome_manager__ = parent
 
         self.sketch_folder = sketch_folder
-        self.__sketch_filename__ = "sketch.json"
+        self.sketch_filename = "sketch.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120
@@ -85,15 +85,35 @@ class zynthiloops_song(QObject):
                 "parts": self.__parts_model__.serialize()}
 
     def save(self):
+        obj = {}
+
         try:
-            Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
-            f = open(self.sketch_folder + self.__sketch_filename__, "w")
-            f.write(json.dumps(self.serialize()))
-            f.close()
-            print(self.sketch_folder + self.__sketch_filename__)
+            with open(self.sketch_folder + self.sketch_filename, "r") as f:
+                obj = json.loads(f.read())
         except Exception as e:
             logging.error(e)
 
+        try:
+            Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
+
+            with open(self.sketch_folder + self.sketch_filename, "w") as f:
+                obj["selected_version"] = f"{self.__name__}"
+
+                if "versions" in obj:
+                    obj["versions"][f"{self.__name__}"] = self.serialize()
+                else:
+                    obj["versions"] = {
+                        f"{self.__name__}": self.serialize()
+                    }
+
+                logging.error(f"### {obj}")
+                f.write(json.dumps(obj))
+
+            print(self.sketch_folder + self.sketch_filename)
+        except Exception as e:
+            logging.error(e)
+
+        self.versions_changed.emit()
 
     def schedule_save(self):
         self.__save_timer__.start()
@@ -101,19 +121,22 @@ class zynthiloops_song(QObject):
 
     def restore(self):
         try:
-            f = open(self.sketch_folder + self.__sketch_filename__, "r")
-            obj = json.loads(f.read())
+            logging.error(f"Restoring {self.sketch_folder + self.sketch_filename}")
+            with open(self.sketch_folder + self.sketch_filename, "r") as f:
+                obj = json.loads(f.read())
+                sketch = obj["versions"][obj["selected_version"]]
 
-            if "name" in obj:
-                self.__name__ = obj["name"]
-            if "bpm" in obj:
-                self.__bpm__ = obj["bpm"]
-                self.set_bpm(self.__bpm__, True)
-            if "parts" in obj:
-                self.__parts_model__.deserialize(obj["parts"])
-            if "tracks" in obj:
-                self.__tracks_model__.deserialize(obj["tracks"])
-            return True
+                if "name" in sketch:
+                    self.__name__ = sketch["name"]
+                if "bpm" in sketch:
+                    self.__bpm__ = sketch["bpm"]
+                    self.set_bpm(self.__bpm__, True)
+                if "parts" in sketch:
+                    self.__parts_model__.deserialize(sketch["parts"])
+                if "tracks" in sketch:
+                    self.__tracks_model__.deserialize(sketch["tracks"])
+
+                return True
         except Exception as e:
             logging.error(e)
             return False
@@ -128,7 +151,7 @@ class zynthiloops_song(QObject):
                 logging.error(f"Destroying clip({clip})")
                 clip.destroy()
 
-        os.remove(self.sketch_folder + self.__sketch_filename__)
+        os.remove(self.sketch_folder + self.sketch_filename)
         self.deleteLater()
 
     @Slot(int, int, result=QObject)
@@ -172,6 +195,35 @@ class zynthiloops_song(QObject):
     nameEditable = Property(bool, nameEditable, constant=True)
 
     @Signal
+    def versions_changed(self):
+        pass
+
+    def get_versions(self):
+        versions = []
+
+        try:
+            f = open(self.sketch_folder + self.sketch_filename, "r")
+            obj = json.loads(f.read())
+
+            for name, sketch in obj["versions"].items():
+                versions.append(name)
+        except Exception as e:
+            logging.error(e)
+
+        return versions
+
+    versions = Property('QVariantList', get_versions, notify=versions_changed)
+
+    @Signal
+    def is_temp_changed(self):
+        pass
+
+    def get_isTemp(self):
+        return self.sketch_folder == str(Path("/zynthian/zynthian-my-data/sketches/") / "temp") + "/"
+
+    isTemp = Property(bool, get_isTemp, notify=is_temp_changed)
+
+    @Signal
     def __name_changed__(self):
         pass
 
@@ -183,6 +235,8 @@ class zynthiloops_song(QObject):
         if name is not None:
             self.__name__ = name
             self.__name_changed__.emit()
+            self.is_temp_changed.emit()
+            self.versions_changed.emit()
             # self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)

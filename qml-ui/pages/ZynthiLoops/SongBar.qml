@@ -53,5 +53,42 @@ GridLayout {
             to: 200
         }
     }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        Layout.leftMargin: 12
+        visible: !root.bottomBar.controlObj.isTemp
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Versions")
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            radius: 4
+            border.color: Kirigami.Theme.highlightColor
+            color: Kirigami.Theme.backgroundColor
+
+            ListView {
+                anchors.fill: parent
+                model: root.bottomBar.controlObj.versions
+                delegate: Kirigami.BasicListItem {
+                    label: modelData
+                    highlighted: root.bottomBar.controlObj.name === modelData
+                    onClicked: {
+                        zynthian.zynthiloops.loadSketchVersion(modelData)
+                    }
+                }
+            }
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+    }
 }
 

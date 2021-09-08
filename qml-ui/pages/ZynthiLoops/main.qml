@@ -58,36 +58,31 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("New Sketch")
                 onTriggered: {
-                    newSketchDialog.open();
+                    zynthian.zynthiloops.newSketch()
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Save Sketch")
+                onTriggered: {
+                    if (zynthian.zynthiloops.sketchIsTemp()) {
+                        fileNameDialog.fileName = "Sketch-1"
+                        fileNameDialog.open()
+                    } else {
+                        zynthian.zynthiloops.saveSketch()
+                    }
                 }
             }
             Kirigami.Action {
                 text: qsTr("Load Sketch")
                 onTriggered: {
-                    // loadSketchDialog.open();
-                    var sketchesObj = zynthian.zynthiloops.getSketches()
-                    var sketches = sketchesObj["sketches"]
-                    console.log("Selected Sketch :", sketchesObj["selected_sketch"])
-
-                    sketchListModel.clear()
-
-                    for (var id in sketches) {
-                        if (sketches.hasOwnProperty(id) && id !== sketchesObj["selected_sketch"]) {
-                            console.log("Sketch :", id, sketches[id]["name"])
-                            sketchListModel.append({
-                                id: id,
-                                name: sketches[id]["name"]
-                            })
-                        }
-                    }
-
+                    pickerDialog.model = zynthian.zynthiloops.getSketches()
                     pickerDialog.open()
                 }
             }
             Kirigami.Action {
                 text: qsTr("Clear Sketch")
                 onTriggered: {
-                    zynthian.zynthiloops.clearCurrentSketch()
+                    zynthian.zynthiloops.clearSketch()
                 }
             }
         },
@@ -120,7 +115,7 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.SaveFileDialog {
-        id: newSketchDialog
+        id: fileNameDialog
         visible: false
 
         headerText: qsTr("New Sketch")
@@ -135,17 +130,17 @@ Zynthian.ScreenPage {
             id: fileCheckTimer
             interval: 300
             onTriggered: {
-                if (newSketchDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(newSketchDialog.fileName)) {
-                    newSketchDialog.conflict = true;
+                if (fileNameDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                    fileNameDialog.conflict = true;
                 } else {
-                    newSketchDialog.conflict = false;
+                    fileNameDialog.conflict = false;
                 }
             }
         }
 
         onAccepted: {
             console.log("Accepted")
-            zynthian.zynthiloops.newSketch(newSketchDialog.fileName)
+            zynthian.zynthiloops.createSketch(fileNameDialog.fileName)
         }
         onRejected: {
             console.log("Rejected")
@@ -153,6 +148,8 @@ Zynthian.ScreenPage {
     }
 
     QQC2.Dialog {
+        property alias model: listview.model
+
         id: pickerDialog
         modal: true
         header: Kirigami.Heading {
@@ -166,14 +163,12 @@ Zynthian.ScreenPage {
         height: Math.round(parent.height * 0.6)
         contentItem: QQC2.ScrollView {
             contentItem: ListView {
-                model: ListModel {
-                    id: sketchListModel
-                }
+                id: listview
 
                 delegate: Kirigami.BasicListItem {
-                    label: model.name
+                    label: modelData.split("/").pop()
                     onClicked: {
-                        zynthian.zynthiloops.loadSketch(model.id)
+                        zynthian.zynthiloops.loadSketch(modelData)
                         pickerDialog.close()
                     }
                 }

@@ -183,7 +183,7 @@ class zynthiloops_song(QObject):
         if name is not None:
             self.__name__ = name
             self.__name_changed__.emit()
-            self.schedule_save()
+            # self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
 
@@ -234,7 +234,7 @@ class zynthiloops_song(QObject):
             clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
             track.clipsModel.add_clip(clip)
             #self.add_clip_to_part(clip, i)
-        self.schedule_save()
+        # self.schedule_save()
 
     def bpm(self):
         return self.__bpm__
@@ -243,7 +243,7 @@ class zynthiloops_song(QObject):
         if self.__bpm__ != math.floor(bpm) or force_set is True:
             self.__bpm__ = math.floor(bpm)
             self.bpm_changed.emit()
-            self.schedule_save()
+            # self.schedule_save()
 
     bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
 

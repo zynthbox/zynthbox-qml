@@ -136,6 +136,7 @@ class zynthian_engine_mixer(zynthian_engine):
 	#----------------------------------------------------------------------------
 
 	def allow_headphones(self):
+		#return True
 		if self.rbpi_device_name and self.device_name!=self.rbpi_device_name:
 			return True
 		else:

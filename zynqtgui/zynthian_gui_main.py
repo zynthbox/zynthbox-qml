@@ -100,6 +100,9 @@ class zynthian_gui_main(zynthian_gui_selector):
     def next_action(self):
         return "layer"
 
+    def back_action(self):
+        return "main"
+
     def layers(self):
         logging.info("Layers")
         self.zyngui.show_screen("layer")

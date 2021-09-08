@@ -140,7 +140,6 @@ Zynthian.ScreenPage {
                         QQC2.Button {
                             id: midiButton
                             text: qsTr("Load Voices")
-                            visible: metadataRepeater.count > 0
                             onClicked: {
                                 zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
                                 zynthian.layer.ensure_special_layers_midi_cloned()
@@ -317,26 +316,6 @@ Zynthian.ScreenPage {
                             }
                         }*/
                     }
-                    /*
-                    RowLayout {
-                        Layout.alignment: Qt.AlignRight
-                        QQC2.Label {
-                            text: metadataRepeater.count === 0 ? qsTr("No Metadata") : qsTr("Metadata:")
-                        }
-                        //Flow {
-                            Layout.alignment: Qt.AlignRight
-                            Repeater {
-                                id: metadataRepeater
-                                model: root.track.soundData
-
-                                delegate: QQC2.Label {
-                                    Layout.alignment: Qt.AlignRight
-                                    text: (index > 0 ? ", " : "") + qsTr("Voice %1: %2 > %3").arg(modelData.midi_chan - 4).arg(modelData.engine_name.split("/")[1]).arg(modelData.preset_name)
-                                }
-                            }
-                        //}
-
-                    }*/
                 }
             }
 

@@ -145,6 +145,29 @@ class zynthian_gui_control(zynthian_gui_selector):
 		else:
 			return None
 
+	@Slot(str, int, result=QObject)
+	def amixer_controller_by_category(self, cat, index):
+		logging.error(self.zyngui.screens["layer"].amixer_layer)
+		if not self.zyngui.screens["layer"].amixer_layer:
+			return None
+
+		controllers = self.zyngui.screens["layer"].amixer_layer.get_ctrl_screens()
+		if cat in controllers:
+			controllers_cat = controllers[cat]
+			if index < 0 or index >= len(controllers_cat):
+				return None
+
+			zctrl = controllers[cat][index]
+			logging.error(zctrl)
+			logging.error(zctrl in self.zgui_custom_controllers_map)
+			if zctrl in self.zgui_custom_controllers_map:
+				return self.zgui_custom_controllers_map[zctrl]
+			else:
+				self.set_custom_zcontroller(len(self.zgui_custom_controllers), zctrl)
+			return self.zgui_custom_controllers_map[zctrl]
+		else:
+			return None
+
 	def get_custom_control_page(self):
 		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
 			return None

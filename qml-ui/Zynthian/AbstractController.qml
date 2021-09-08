@@ -39,6 +39,7 @@ Card {
 
     // Those are automatically binded by default,
     property alias title: heading.text
+    property alias heading: heading
     property alias legend: legend.text
 
     Layout.fillWidth: true
@@ -59,6 +60,7 @@ Card {
     contentItem: ColumnLayout {
         Kirigami.Heading {
             id: heading
+            visible: text.length > 0
             text: root.controller.ctrl ? root.controller.ctrl.title : ""
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter

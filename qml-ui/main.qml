@@ -70,8 +70,8 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
-                        ? Math.min(6, zynthian.engine.midi_channel + 1) + "ˬ"
-                        : Math.min(6, zynthian.layer.selector_path_element) + "ˬ"
+                        ? zynthian.engine.midi_channel > 5 ? "6." + (zynthian.engine.midi_channel - 5) : zynthian.engine.midi_channel + 1 + "ˬ"
+                        : zynthian.layer.selector_path_element > 5 ? "6." + (zynthian.layer.selector_path_element - 5) : zynthian.layer.selector_path_element + "ˬ"
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers'
                 QQC2.Menu {

@@ -237,13 +237,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.song_changed.emit()
 
     @Slot(None)
-    def clearSketch(self):
-        sketch_folder = self.__song__.sketch_folder
-        name = self.__song__.name
-        zynthiloops_song.zynthiloops_song(sketch_folder, name, self).destroy()
-        self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, name, self)
-        self.__song__.schedule_save()
-        self.song_changed.emit()
+    def clearSketchVersion(self):
+        try:
+            sketch_folder = self.__song__.sketch_folder
+            name = self.__song__.name
+            self.__song__.clear_version(name)
+            self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, name, self)
+            self.__song__.schedule_save()
+            self.song_changed.emit()
+        except Exception as e:
+            logging.error(f"Error clearing sketch version : {str(e)}")
 
     @Slot(None, result='QVariantList')
     def getSketches(self):

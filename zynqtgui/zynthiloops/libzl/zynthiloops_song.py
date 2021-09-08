@@ -106,10 +106,7 @@ class zynthiloops_song(QObject):
                         f"{self.__name__}": self.serialize()
                     }
 
-                logging.error(f"### {obj}")
                 f.write(json.dumps(obj))
-
-            print(self.sketch_folder + self.sketch_filename)
         except Exception as e:
             logging.error(e)
 
@@ -140,6 +137,23 @@ class zynthiloops_song(QObject):
         except Exception as e:
             logging.error(e)
             return False
+
+    def clear_version(self, name):
+        obj = {}
+
+        try:
+            with open(self.sketch_folder + self.sketch_filename, "r") as f:
+                obj = json.loads(f.read())
+        except Exception as e:
+            logging.error(e)
+
+        try:
+            with open(self.sketch_folder + self.sketch_filename, "w") as f:
+                del obj["versions"][f"{name}"]
+
+                f.write(json.dumps(obj))
+        except Exception as e:
+            logging.error(e)
 
     def destroy(self):
         for i in range(0, self.tracksModel.count):

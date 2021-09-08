@@ -1427,13 +1427,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	# All restored channels will be cloned among themselves
 	def load_channels_snapshot(self, snapshot, from_channel, to_channel, channels_mapping = {}):
 		if not isinstance(snapshot, dict):
-			return
+			return []
 		if not isinstance(channels_mapping, dict):
-			return
+			return []
 		if not "layers" in snapshot:
-			return
+			return []
 		if not isinstance(snapshot["layers"], list):
-			return
+			return []
 		self.zyngui.start_loading()
 		for i in range(from_channel, to_channel + 1):
 			for j in range(from_channel, to_channel + 1):
@@ -1507,12 +1507,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
 
-
 		self.zyngui.zynautoconnect_midi()
 		self.zyngui.zynautoconnect_audio()
 
 		self.fill_list()
 		self.zyngui.stop_loading()
+		return restored_layers
+
+
+
 
 	@Slot(str)
 	def load_soundset_from_file(self, file_name):
@@ -1520,8 +1523,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			f = open(self.__soundsets_basepath__ + file_name, "r")
 			for i in range(5):
 				self.remove_midichan_layer(i)
-			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
-			self.activate_index(0)
+			layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
+			if len(layers) > 0:
+				try:
+					self.activate_index(root_layers.index(layers[0]))
+				except:
+					self.activate_index(0)
+			else:
+				self.activate_index(0)
 		except Exception as e:
 			logging.error(e)
 

@@ -109,12 +109,12 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.bottomBar.controlObj.bpm
-            validator: IntValidator {bottom: 1; top: 250}
+            text: root.bottomBar.controlObj.bpm.toFixed(2)
+            validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
             enabled: !root.bottomBar.controlObj.shouldSync
             onAccepted: {
-                root.bottomBar.controlObj.bpm = parseInt(text);
+                root.bottomBar.controlObj.bpm = parseFloat(text);
             }
             onPressed: {
                 forceActiveFocus()

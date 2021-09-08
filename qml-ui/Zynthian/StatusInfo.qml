@@ -264,7 +264,7 @@ MouseArea {
             Kirigami.Icon {
                 Layout.preferredWidth: 24
                 Layout.preferredHeight: 24
-                source: "emblem-music-symbolic"
+                source: Qt.resolvedUrl("../../img/metronome.svg")
                 color: "#ffffff"
                 visible: zynthian.zynthiloops.clickTrackEnabled
             }

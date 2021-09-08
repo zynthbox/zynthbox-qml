@@ -93,6 +93,17 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.zyngui.screens['layer'].layer_options()
 
 
+    def index_supports_immediate_activation(self, index=None):
+        if index is None:
+            return False
+        chan = self.list_data[index][1]
+        logging.error(chan)
+        if chan < 0:
+            return False
+        logging.error(chan in self.zyngui.screens['layer'].layer_midi_map)
+        return chan in self.zyngui.screens['layer'].layer_midi_map
+
+
     def sync_index_from_curlayer(self):
         if not self.zyngui.curlayer:
             return
@@ -145,9 +156,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     def next_action(self):
         return 'bank'
 
-
-    def index_supports_immediate_activation(self, index=None):
-        return False
 
     def set_select_path(self):
         self.select_path = "Layers"

@@ -300,6 +300,9 @@ Zynthian.ScreenPage {
                     clip: true
                     flickableDirection: Flickable.HorizontalAndVerticalFlick
                     boundsBehavior: Flickable.StopAtBounds
+                    QQC2.ScrollBar.horizontal: QQC2.ScrollBar {
+                        height: 4
+                    }
 
                     contentX: partsHeaderRow.contentX
                     contentY: tracksHeaderColumns.contentY

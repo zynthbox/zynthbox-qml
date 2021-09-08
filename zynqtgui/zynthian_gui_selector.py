@@ -261,7 +261,6 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.select_action(self.index, 'S')
 
 	def auto_activation_timeout(self):
-		#HACK
 		if self.screen_at_timer_start == self.zyngui.get_current_screen_id() and self.index_supports_immediate_activation(self.index):
 			old_screen = self.zyngui.get_current_screen_id()
 			self.select_action(self.index, 'S')

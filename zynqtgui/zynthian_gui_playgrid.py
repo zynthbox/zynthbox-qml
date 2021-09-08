@@ -29,10 +29,12 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
+from threading import Lock
 
 from PySide2.QtCore import (
     Slot,
     QAbstractItemModel,
+    QCoreApplication,
     QFileSystemWatcher,
     Qt,
     QModelIndex,
@@ -170,13 +172,12 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         return roles
 
     def data(self, index: QModelIndex, role: int) -> Note:
-        if not index.isValid():
-            return None
-
-        if role == self.NoteRole:
-            return self.__grid_notes__[index.row()][index.column()]
-        else:
-            return None
+        data = None
+        if index.isValid():
+            if 0 <= index.row() < len(self.__grid_notes__) and 0 <= index.column() < len(self.__grid_notes__[index.row()]):
+                if role == self.NoteRole:
+                    data = self.__grid_notes__[index.row()][index.column()]
+        return data
 
     def rowCount(self, index):
         return len(self.__grid_notes__)
@@ -236,7 +237,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         #for row in self.__grid_notes__:
             #for note in row:
                 #note.__is_playing_changed__.disconnect(self.note_changed)
-        self.__grid_notes__ = []
+        self.__grid_notes__.clear()
         self.endResetModel()
         self.__rows_changed__.emit()
 
@@ -325,6 +326,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __most_recently_changed_note__ = None
     __most_recently_changed_notes__ = [] # List of dicts
     __input_ports__ = []
+    #__mutex__ = Lock()
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
@@ -350,10 +352,22 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                     logging.error("Could not set up watching for: " + str(searchdir))
 
     @staticmethod
+    def findExistingNote(midi_note):
+        note = None
+        for existingNote in zynthian_gui_playgrid.__notes__:
+            if (hasattr(existingNote, '__midi_note__') and existingNote.__midi_note__ == midi_note):
+                note = existingNote
+                break
+        return note
+
+    @staticmethod
     def listen_to_everything():
         for port in zynthian_gui_playgrid.__input_ports__:
-            port.close()
-        zynthian_gui_playgrid.__input_ports__ = []
+            try:
+                port.close()
+            except:
+                logging("Attempted to close a port that apparently is broken. It seems we can safely ignore this, so let's do that.")
+        zynthian_gui_playgrid.__input_ports__.clear()
         # It's entirely possible we'll need to nab this out of zyngine or somesuch, but for now...
         #for input_name in mido.get_input_names():
         try:
@@ -376,10 +390,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             if message_data.get('type') == "note_on":
                 note_on = True
             note_value = message_data.get('note')
-            for a_note in zynthian_gui_playgrid.__notes__:
-                if a_note.__midi_note__ == note_value:
-                    note = a_note
-                    break
+            note = zynthian_gui_playgrid.findExistingNote(note_value)
             if note is None:
                 logging.error("Got a message for a note we're apparently not aware of: %s", message_data)
             else:
@@ -431,9 +442,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return self.__play_grid_index__
 
     def __set_play_grid_index__(self, play_grid_index):
-        # TODO Put this somewhere better (like e.g. somewhere that detects changes in the hardware setup...)
-        # Even then, this needs to go somewhere... and right now it's here
-        self.listen_to_everything()
         self.__play_grid_index__ = play_grid_index
         self.__play_grid_index_changed__.emit()
 
@@ -539,23 +547,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(result=QObject)
     def createNotesModel(self):
-        model = zynthian_gui_grid_notes_model(self)
+        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        model = zynthian_gui_grid_notes_model(QCoreApplication.instance())
         zynthian_gui_playgrid.__models__.append(model)
         model.destroyed.connect(self.model_deleted)
         QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
+        #zynthian_gui_playgrid.__mutex__.release()
         return model
 
     def note_deleted(self, note:Note):
         if note in zynthian_gui_playgrid.__notes__:
             zynthian_gui_playgrid.__notes__.remove(note)
-
-    def findExistingNote(self, midi_note):
-        note = None
-        for existingNote in zynthian_gui_playgrid.__notes__:
-            if (hasattr(existingNote, '__midi_note__') and existingNote.__midi_note__ == midi_note):
-                note = existingNote
-                break
-        return note
 
     @Slot(str, int, int, int, result=QObject)
     def getNote(self,
@@ -563,7 +565,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                    _scale_index: int,
                    _octave: int,
                    _midi_note: int):
-        note = self.findExistingNote(_midi_note)
+        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        note = zynthian_gui_playgrid.findExistingNote(_midi_note)
         if note is None:
             note = Note(
                 name=_name,
@@ -571,15 +574,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 octave=_octave,
                 midi_note=_midi_note,
                 midi_port=self.__midi_port__,
-                parent=self
+                parent=QCoreApplication.instance()
             )
             zynthian_gui_playgrid.__notes__.append(note)
             note.destroyed.connect(self.note_deleted)
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
+        #zynthian_gui_playgrid.__mutex__.release()
         return note
 
     @Slot('QVariantList', result=QObject)
     def getCompoundNote(self, notes:'QVariantList'):
+        #zynthian_gui_playgrid.__mutex__.acquire(1)
         note = None
         try:
             if len(notes) > 0:
@@ -588,7 +593,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 for subnote in notes:
                     fake_midi_note = fake_midi_note + (127 * subnote.__midi_note__)
                 # Find if we've got a note with that note value already
-                note = self.findExistingNote(fake_midi_note)
+                note = zynthian_gui_playgrid.findExistingNote(fake_midi_note)
                 # If not, create it, and stuff it with these subnotes
                 if note is None:
                     note = self.getNote(notes[0].name, notes[0].scaleIndex, fake_midi_note // 12, fake_midi_note)
@@ -596,15 +601,19 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 note.set_subnotes(notes)
         except:
             logging.error("We have apparently got a broken thing - likely this is because the notes object passed in was an empty list, or a null pointer (which python doesn't know what to do with)")
+        #zynthian_gui_playgrid.__mutex__.release()
         return note
 
     @Slot(str, result=QObject)
     def getSettingsStore(self, name:str):
+        #zynthian_gui_playgrid.__mutex__.acquire(1)
         if not name in zynthian_gui_playgrid.__settings_stores__:
-            settingsStore = zynthian_gui_playgrid_settings(name, self)
+            settingsStore = zynthian_gui_playgrid_settings(name, QCoreApplication.instance())
             zynthian_gui_playgrid.__settings_stores__[name] = settingsStore
             QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
-        return zynthian_gui_playgrid.__settings_stores__[name]
+        settingsStore = zynthian_gui_playgrid.__settings_stores__[name]
+        #zynthian_gui_playgrid.__mutex__.release()
+        return settingsStore
 
     mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)
     playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)

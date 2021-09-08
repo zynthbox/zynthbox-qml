@@ -310,13 +310,13 @@ class zynthiloops_clip(QObject):
     def bpm(self):
         return self.__bpm__
 
-    def set_bpm(self, bpm: int):
+    def set_bpm(self, bpm: float):
         self.__bpm__ = bpm
         self.bpm_changed.emit()
         # self.__song__.schedule_save()
         self.reset_beat_count()
 
-    bpm = Property(int, bpm, set_bpm, notify=bpm_changed)
+    bpm = Property(float, bpm, set_bpm, notify=bpm_changed)
 
 
     def shouldSync(self):

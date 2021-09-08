@@ -138,6 +138,9 @@ from pathlib import Path
 
 import traceback
 
+import faulthandler
+faulthandler.enable()
+
 # -------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
 # -------------------------------------------------------------------------------

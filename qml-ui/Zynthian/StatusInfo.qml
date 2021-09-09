@@ -70,7 +70,12 @@ MouseArea {
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors {
+            left: parent.left
+            top: parent.top
+            right: parent.right
+        }
+        height: parent.height / 2
 
         Item {
             Layout.fillWidth: true
@@ -189,93 +194,97 @@ MouseArea {
                 color: Kirigami.Theme.positiveTextColor
             }
         }
+    }
 
-        RowLayout {
-            id: statusIconsLayout
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
-            Kirigami.Icon {
-                Layout.fillHeight: true
-                Layout.preferredWidth: height
-                source: "dialog-warning-symbolic"
-                color: Kirigami.Theme.negativeTextColor
-                visible: zynthian.status_information.xrun
-            }
-            Kirigami.Icon {
-                Layout.fillHeight: true
-                Layout.preferredWidth: height
-                source: "preferences-system-power"
-                visible: zynthian.status_information.undervoltage
-            }
-            Kirigami.Icon {
-                Layout.fillHeight: true
-                Layout.preferredWidth: height
-                color: Kirigami.Theme.textColor
-                source: {
-                    switch(zynthian.status_information.audio_recorder) {
-                    case "PLAY":
-                        return "media-playback-start-symbolic";
-                    case "REC":
-                    default:
-                        return "media-record-symbolic";
-                    }
+    RowLayout {
+        id: statusIconsLayout
+        anchors {
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: Math.min(parent.height / 2, Kirigami.Units.iconSizes.smallMedium)
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            source: "dialog-warning-symbolic"
+            color: Kirigami.Theme.negativeTextColor
+            visible: zynthian.status_information.xrun
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            source: "preferences-system-power"
+            visible: zynthian.status_information.undervoltage
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            color: Kirigami.Theme.textColor
+            source: {
+                switch(zynthian.status_information.audio_recorder) {
+                case "PLAY":
+                    return "media-playback-start-symbolic";
+                case "REC":
+                default:
+                    return "media-record-symbolic";
                 }
-                QQC2.Label {
-                    anchors {
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-                    font.pointSize: 6
-                    text: qsTr("Audio")
-                }
-                visible: zynthian.status_information.audio_recorder.length > 0
-            }
-            Kirigami.Icon {
-                Layout.fillHeight: true
-                Layout.preferredWidth: height
-                color: Kirigami.Theme.textColor
-                source: {
-                    switch(zynthian.status_information.audio_recorder) {
-                    case "PLAY":
-                        return "media-playback-start-symbolic";
-                    case "REC":
-                    default:
-                        return "media-record-symbolic";
-                    }
-                }
-                QQC2.Label {
-                    anchors {
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-                    font.pointSize: 6
-                    text: "Midi"
-                }
-                visible: zynthian.status_information.midi_recorder.length > 0
             }
             QQC2.Label {
-                id: metronomeLabel
-                visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
-                text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                font.pointSize: 6
+                text: qsTr("Audio")
             }
-            RowLayout {
-                Kirigami.Icon {
-                    Layout.preferredWidth: 24
-                    Layout.preferredHeight: 24
-                    source: Qt.resolvedUrl("../../img/metronome.svg")
-                    color: "#ffffff"
-                    opacity: zynthian.zynthiloops.clickTrackEnabled ? 1.0 : 0.0
+            visible: zynthian.status_information.audio_recorder.length > 0
+        }
+        Kirigami.Icon {
+            Layout.fillHeight: true
+            Layout.preferredWidth: height
+            color: Kirigami.Theme.textColor
+            source: {
+                switch(zynthian.status_information.audio_recorder) {
+                case "PLAY":
+                    return "media-playback-start-symbolic";
+                case "REC":
+                default:
+                    return "media-record-symbolic";
                 }
-                QQC2.Label {
-                    text: zynthian.zynthiloops.song.bpm
-                    font.pointSize: 9
+            }
+            QQC2.Label {
+                anchors {
+                    right: parent.right
+                    bottom: parent.bottom
                 }
+                font.pointSize: 6
+                text: "Midi"
+            }
+            visible: zynthian.status_information.midi_recorder.length > 0
+        }
+        QQC2.Label {
+            id: metronomeLabel
+            visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
+            text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+        }
+        ColumnLayout {
+            Layout.alignment: Qt.AlignBottom
+            Layout.topMargin: parent.height  -height
+            QQC2.Label {
+                id: bpmLabel
+                text: zynthian.zynthiloops.song.bpm
+                font.pointSize: 9
+            }
+            Kirigami.Icon {
+                Layout.preferredWidth: 24
+                Layout.preferredHeight: 24
+                source: Qt.resolvedUrl("../../img/metronome.svg")
+                color: "#ffffff"
+                opacity: zynthian.zynthiloops.clickTrackEnabled ? 1.0 : 0.0
             }
         }
     }
+
     QQC2.Popup {
         id: popup
         y: parent.height
@@ -314,7 +323,7 @@ MouseArea {
                     valueString: qsTr("%1%").arg(Math.round((dial.value - 50)/50*100)) //FIXME: for some reason the silence point seems to be 50%?
 
                     dial {
-                        stepSize: 1
+                        stepSize: 2.5
                         from: 50
                         to: 100
                     }

@@ -39,6 +39,7 @@ from PySide2.QtCore import (
     Qt,
     QModelIndex,
     QObject,
+    QTimer,
     Property,
     Signal,
 )
@@ -174,9 +175,11 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
     def data(self, index: QModelIndex, role: int) -> Note:
         data = None
         if index.isValid():
-            if 0 <= index.row() < len(self.__grid_notes__) and 0 <= index.column() < len(self.__grid_notes__[index.row()]):
+            try:
                 if role == self.NoteRole:
                     data = self.__grid_notes__[index.row()][index.column()]
+            except:
+                data = "No item at this position"
         return data
 
     def rowCount(self, index):
@@ -238,7 +241,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
             #for note in row:
                 #note.__is_playing_changed__.disconnect(self.note_changed)
         self.__grid_notes__.clear()
-        self.endResetModel()
+        QTimer.singleShot(0, self.endResetModel)
         self.__rows_changed__.emit()
 
     @Slot('QVariantList')
@@ -247,7 +250,7 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
         #for note in notes:
             #note.__is_playing_changed__.connect(self.note_changed)
         self.__grid_notes__.insert(0, notes)
-        self.endResetModel()
+        QTimer.singleShot(0, self.endResetModel)
         self.__rows_changed__.emit()
 
     rows = Property(int, __get_rows__, notify=__rows_changed__)
@@ -326,7 +329,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __most_recently_changed_note__ = None
     __most_recently_changed_notes__ = [] # List of dicts
     __input_ports__ = []
-    #__mutex__ = Lock()
+    __mutex__ = Lock()
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
@@ -548,12 +551,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(result=QObject)
     def createNotesModel(self):
-        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        zynthian_gui_playgrid.__mutex__.acquire()
         model = zynthian_gui_grid_notes_model(QCoreApplication.instance())
         zynthian_gui_playgrid.__models__.append(model)
         model.destroyed.connect(self.model_deleted)
         QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
-        #zynthian_gui_playgrid.__mutex__.release()
+        zynthian_gui_playgrid.__mutex__.release()
         return model
 
     def note_deleted(self, note:Note):
@@ -566,7 +569,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                    _scale_index: int,
                    _octave: int,
                    _midi_note: int):
-        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        zynthian_gui_playgrid.__mutex__.acquire()
         note = zynthian_gui_playgrid.findExistingNote(_midi_note)
         if note is None:
             note = Note(
@@ -580,12 +583,12 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             zynthian_gui_playgrid.__notes__.append(note)
             note.destroyed.connect(self.note_deleted)
         QQmlEngine.setObjectOwnership(note, QQmlEngine.CppOwnership)
-        #zynthian_gui_playgrid.__mutex__.release()
+        zynthian_gui_playgrid.__mutex__.release()
         return note
 
     @Slot('QVariantList', result=QObject)
     def getCompoundNote(self, notes:'QVariantList'):
-        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        zynthian_gui_playgrid.__mutex__.acquire()
         note = None
         try:
             if len(notes) > 0:
@@ -597,23 +600,25 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 note = zynthian_gui_playgrid.findExistingNote(fake_midi_note)
                 # If not, create it, and stuff it with these subnotes
                 if note is None:
+                    zynthian_gui_playgrid.__mutex__.release()
                     note = self.getNote(notes[0].name, notes[0].scaleIndex, fake_midi_note // 12, fake_midi_note)
+                    zynthian_gui_playgrid.__mutex__.acquire()
                     zynthian_gui_playgrid.__notes__.append(note)
                 note.set_subnotes(notes)
         except:
             logging.error("We have apparently got a broken thing - likely this is because the notes object passed in was an empty list, or a null pointer (which python doesn't know what to do with)")
-        #zynthian_gui_playgrid.__mutex__.release()
+        zynthian_gui_playgrid.__mutex__.release()
         return note
 
     @Slot(str, result=QObject)
     def getSettingsStore(self, name:str):
-        #zynthian_gui_playgrid.__mutex__.acquire(1)
+        zynthian_gui_playgrid.__mutex__.acquire()
         if not name in zynthian_gui_playgrid.__settings_stores__:
             settingsStore = zynthian_gui_playgrid_settings(name, QCoreApplication.instance())
             zynthian_gui_playgrid.__settings_stores__[name] = settingsStore
             QQmlEngine.setObjectOwnership(settingsStore, QQmlEngine.CppOwnership)
         settingsStore = zynthian_gui_playgrid.__settings_stores__[name]
-        #zynthian_gui_playgrid.__mutex__.release()
+        zynthian_gui_playgrid.__mutex__.release()
         return settingsStore
 
     mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)

@@ -35,19 +35,27 @@ import alsaaudio
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
-        self.__mixer = alsaaudio.Mixer("Headphone", 0, 1)
+        try:
+            card = alsaaudio.cards().index("Headphones")
+            self.__mixer = alsaaudio.Mixer("Headphone", 0, card)
+        except:
+            self.__mixer = None
 
     @Signal
     def volume_changed(self):
         pass
 
     def get_volume(self):
+        if self.__mixer is None:
+            return 0
         vol = self.__mixer.getvolume()[0]
         if len(vol) == 0:
             return 0
         return vol[0]
 
     def set_volume(self, vol: int):
+        if self.__mixer is None:
+            return
         self.__mixer.setvolume(vol)
         self.volume_changed.emit()
 

@@ -97,6 +97,20 @@ GridLayout {
         }
     }
 
+    Zynthian.ZynthiloopsDial {
+        id: gainDial
+        text: qsTr("Volume (dB)")
+        controlObj: root.bottomBar.controlObj
+        controlProperty: "gain"
+        valueString: dial.value.toFixed(1)
+
+        dial {
+            stepSize: 0.1
+            from: -24
+            to: 8
+        }
+    }
+
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false

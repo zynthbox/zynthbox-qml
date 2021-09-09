@@ -213,13 +213,23 @@ Zynthian.SelectorPage {
                     }
                     QQC2.Label {
                         Layout.fillWidth: true
-                        visible: model.version.length > 0
-                        text: qsTr("Version %1").arg(model.version)
+                        visible: model.status == NewStuff.ItemsModel.UpdateableStatus
+                        text: qsTr("<strong>Update Available</strong>")
                         elide: Text.ElideRight
                     }
                     QQC2.Label {
                         Layout.fillWidth: true
-                        text: qsTr("Released on %1").arg(model.releaseDate.toLocaleDateString())
+                        visible: model.version.length > 0
+                        text: model.status == NewStuff.ItemsModel.UpdateableStatus
+                            ? qsTr("Version %1 (installed %2)").arg(model.updateVersion).arg(model.version)
+                            : qsTr("Version %1").arg(model.version)
+                        elide: Text.ElideRight
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        text: model.status == NewStuff.ItemsModel.UpdateableStatus
+                            ? qsTr("Released on %1\nInstalled release: %2").arg(model.updateReleaseDate.toLocaleDateString()).arg(model.releaseDate.toLocaleDateString())
+                            : qsTr("Released on %1").arg(model.releaseDate.toLocaleDateString())
                         elide: Text.ElideRight
                     }
                     QQC2.Label {

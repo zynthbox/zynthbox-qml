@@ -70,8 +70,8 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
-                        ? zynthian.engine.midi_channel > 5 ? "    6." + (zynthian.engine.midi_channel - 5) : zynthian.engine.midi_channel + 1 + "ˬ"
-                        : zynthian.layer.selector_path_element > 5 ? "    6." + (zynthian.layer.selector_path_element - 5) : zynthian.layer.selector_path_element + "ˬ"
+                        ? zynthian.engine.midi_channel > 5 ? "6." + (zynthian.engine.midi_channel - 5) : zynthian.engine.midi_channel + 1 + "ˬ"
+                        : zynthian.layer.selector_path_element > 5 ? "6." + (zynthian.layer.selector_path_element - 5) : zynthian.layer.selector_path_element + "ˬ"
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers'
                 QQC2.Menu {
@@ -83,11 +83,29 @@ Kirigami.AbstractApplicationWindow {
                         model: zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
                             height: visible ? implicitHeight : 0
-                            enabled: index !== 5 && (index < 5 || model.display.indexOf("- -") === -1)
-                            text: model.display
+                            enabled: index < 5 || model.display.indexOf("- -") === -1
+                            visible: index !== 5
+                            text: ""
+                            //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index === 5 ? 6 : index)
                             highlighted: zynthian.fixed_layers.current_index === index
+                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+                            contentItem: RowLayout {
+                                id: menuItemLayout
+                                QQC2.Label {
+                                    Layout.alignment: Qt.AlignLeft
+                                    Layout.maximumWidth: implicitWidth
+                                    text: qsTr("6 - T-RACK:")
+                                    visible: index >= 6
+                                    opacity: index === 6
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.alignment: Qt.AlignLeft
+                                    text: model.display
+                                }
+                            }
                         }
                     }
                 }

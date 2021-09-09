@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import logging
+import math
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
@@ -38,17 +39,22 @@ class zynthiloops_track(QObject):
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
+        self.__volume__ = 100
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
 
     def serialize(self):
         return {"name": self.__name__,
-            "clips": self.__clips_model__.serialize(),
-            "layers_snapshot": self.__layers_snapshot}
+                "volume": self.__volume__,
+                "clips": self.__clips_model__.serialize(),
+                "layers_snapshot": self.__layers_snapshot}
 
     def deserialize(self, obj):
         if "name" in obj:
             self.__name__ = obj["name"]
+        if "volume" in obj:
+            self.__volume__ = obj["volume"]
+            self.set_volume(self.__volume__, True)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -126,6 +132,22 @@ class zynthiloops_track(QObject):
             # self.__song__.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
+
+
+    @Signal
+    def volume_changed(self):
+        pass
+
+    def get_volume(self):
+        return self.__volume__
+
+    def set_volume(self, volume:int, force_set=False):
+        if self.__volume__ != math.floor(volume) or force_set is True:
+            self.__volume__ = math.floor(volume)
+            self.volume_changed.emit()
+
+    volume = Property(int, get_volume, set_volume, notify=volume_changed)
+
 
     def type(self):
         return self.__type__

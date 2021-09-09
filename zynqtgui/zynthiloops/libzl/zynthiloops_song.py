@@ -53,6 +53,7 @@ class zynthiloops_song(QObject):
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120
+        self.__volume__ = 100
         self.__index__ = 0
         self.__is_playing__ = False
         self.__save_timer__ = QTimer(self)
@@ -81,6 +82,7 @@ class zynthiloops_song(QObject):
     def serialize(self):
         return {"name": self.__name__,
                 "bpm": self.__bpm__,
+                "volume": self.__volume__,
                 "tracks": self.__tracks_model__.serialize(),
                 "parts": self.__parts_model__.serialize()}
 
@@ -128,6 +130,9 @@ class zynthiloops_song(QObject):
                 if "bpm" in sketch:
                     self.__bpm__ = sketch["bpm"]
                     self.set_bpm(self.__bpm__, True)
+                if "volume" in sketch:
+                    self.__volume__ = sketch["volume"]
+                    self.set_volume(self.__volume__, True)
                 if "parts" in sketch:
                     self.__parts_model__.deserialize(sketch["parts"])
                 if "tracks" in sketch:
@@ -254,6 +259,21 @@ class zynthiloops_song(QObject):
             # self.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
+
+
+    @Signal
+    def volume_changed(self):
+        pass
+
+    def get_volume(self):
+        return self.__volume__
+
+    def set_volume(self, volume:int, force_set=False):
+        if self.__volume__ != math.floor(volume) or force_set is True:
+            self.__volume__ = math.floor(volume)
+            self.volume_changed.emit()
+
+    volume = Property(int, get_volume, set_volume, notify=volume_changed)
 
 
     @Signal

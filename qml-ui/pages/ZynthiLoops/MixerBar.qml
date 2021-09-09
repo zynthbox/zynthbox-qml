@@ -99,7 +99,7 @@ GridLayout {
                         height: ListView.view.height
                         headerText: model.track.name
 
-                        slider.value: 100
+                        slider.value: model.track.volume
                     }
                 }
             }

@@ -46,6 +46,7 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.__gain__ = 0
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
@@ -210,6 +211,24 @@ class zynthiloops_clip(QObject):
             return 0.0
         return self.audioSource.get_progress()
     progress = Property(float, progress, notify=progress_changed)
+
+
+    @Signal
+    def gain_changed(self):
+        pass
+
+    def get_gain(self):
+        return self.__gain__
+
+    def set_gain(self, gain: float, force_set=False):
+        if self.__gain__ != gain or force_set is True:
+            self.__gain__ = gain
+            self.gain_changed.emit()
+
+            if self.audioSource is not None:
+                self.audioSource.set_gain(gain)
+
+    gain = Property(float, get_gain, set_gain, notify=gain_changed)
 
 
     def length(self):

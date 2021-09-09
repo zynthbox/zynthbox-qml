@@ -113,6 +113,12 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.current_index = self.zyngui.curlayer.midi_chan + 1
 
 
+    @Slot(int, result=int)
+    def index_to_midi(self, index):
+        if index < 0 or index >= len(self.list_data):
+            return -1;
+        return self.list_data[index][1]
+
     @Signal
     def current_index_valid_changed(self):
         pass

@@ -77,7 +77,7 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             text: qsTr("Synths")
-            onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index)
+            onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
         },
         Kirigami.Action {
             text: qsTr("Audio-FX")
@@ -135,14 +135,14 @@ Zynthian.MultiSelectorPage {
                     text: qsTr("New Synth...")
                     onClicked: {
                         layerSetupDialog.close();
-                       // zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
                         newSynthWorkaroundTimer.restart()
                     }
                 }
-                Timer {
+                Timer { //HACK why is this necessary?
                     id: newSynthWorkaroundTimer
                     interval: 200
-                    onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.current_index);
+                    onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+
                 }
             }
         }
@@ -278,7 +278,7 @@ Zynthian.MultiSelectorPage {
                                 layerReplaceDialog.open();
                             } else {
                                 let map = {}
-                                map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.current_index;
+                                map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index);
                                 zynthian.layer.load_layer_from_file(model.fileName, map);
                             }
                         }

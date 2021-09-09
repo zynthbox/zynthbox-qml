@@ -66,16 +66,20 @@ ColumnLayout {
             preventStealing: true
             property real startY
             property real startValue
+            property real startDiff
             onPressed: {
                 startY = mouse.y;
                 startValue = dial.value
+                // Calculate difference from floored value to apply when writing final value
+                startDiff = startValue - (Math.floor(startValue/dial.stepSize)*dial.stepSize)
                 dial.forceActiveFocus()
             }
             onPositionChanged: {
                 let delta = mouse.y - startY;
                 let value = Math.max(dial.from, Math.min(dial.to, startValue - (dial.to / dial.stepSize) * (delta*dial.stepSize/(Kirigami.Units.gridUnit*10))));
 
-                dial.value = Math.round(value/dial.stepSize) * dial.stepSize;
+                let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
+                dial.value = floored+startDiff
             }
         }
     }

@@ -61,36 +61,10 @@ ColumnLayout {
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    background: Rectangle {
-                        radius: 2
-                        border {
-                            width: 1
-                            color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
-                        }
-                        color: {
-                            var color = "white";
-                            if (playDelegate.note) {
-                                var anyPlaying = false;
-                                for (var i = 0; i < playDelegate.note.subnotes.length; ++i) {
-                                    if (playDelegate.note.subnotes[i].isPlaying) {
-                                        anyPlaying = true
-                                        break;
-                                    }
-                                }
-                                if (anyPlaying) {
-                                    color = "#8bc34a";
-                                } else {
-                                    if (playDelegate.note.name === component.currentNoteName) {
-                                        color = Kirigami.Theme.focusColor;
-                                    } else {
-                                        color = "white";
-                                    }
-                                }
-                            }
-                            return color;
-                        }
+                    background: Item {
                         RowLayout {
                             anchors.fill: parent
+                            spacing: 0
                             Repeater {
                                 model: playDelegate.note.subnotes
                                 Rectangle {
@@ -107,7 +81,15 @@ ColumnLayout {
                                 }
                             }
                         }
-
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 2
+                            border {
+                                width: 1
+                                color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
+                            }
+                            color: "transparent"
+                        }
                     }
 
                     MultiPointTouchArea {

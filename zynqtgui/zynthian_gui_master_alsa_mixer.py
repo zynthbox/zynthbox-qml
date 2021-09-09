@@ -27,7 +27,7 @@
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 import alsaaudio
-
+import logging
 #------------------------------------------------------------------------------
 # Base QObject wrapper for alsaaudio import
 #------------------------------------------------------------------------------
@@ -48,12 +48,13 @@ class zynthian_gui_master_alsa_mixer(QObject):
     def get_volume(self):
         if self.__mixer is None:
             return 0
-        vol = self.__mixer.getvolume()[0]
+        vol = self.__mixer.getvolume()
         if len(vol) == 0:
             return 0
         return vol[0]
 
     def set_volume(self, vol: int):
+        logging.error("SETTING VOLUME TO{}".format(vol))
         if self.__mixer is None:
             return
         self.__mixer.setvolume(vol)

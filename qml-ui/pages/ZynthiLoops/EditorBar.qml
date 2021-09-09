@@ -74,13 +74,18 @@ GridLayout {
                 onPositionChanged: {
                     let pixelToSecs = (wav.end - wav.start) / width
                     let delta = pixelToSecs * (mouse.x - lastX)
-                    if (wav.start - delta < 0) {
-                        delta = wav.start;
-                    } else if (wav.end - delta > wav.length) {
-                        delta = wav.length - wav.end;
-                    }
-                    wav.start -= delta;
-                    wav.end -= delta;
+
+//                    if ((wav.start - delta) < 0) {
+//                        delta = wav.start;
+//                    } else if (wav.end - delta > wav.length) {
+//                        delta = wav.length - wav.end;
+//                    }
+//                    wav.start -= delta;
+//                    wav.end -= delta;
+
+                    // Set startposition on swipe
+                    waveBar.bottomBar.controlObj.startPosition += delta
+
                     lastX = mouse.x;
                 }
             }
@@ -93,6 +98,19 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: (waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width
+            }
+            Repeater {
+                model: 50
+                delegate: Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    color: "#ffffff"
+                    opacity: 0.1
+                    width: 1
+                    x: ((waveBar.bottomBar.controlObj.startPosition+waveBar.bottomBar.controlObj.secPerBeat*modelData) / waveBar.bottomBar.controlObj.duration) * parent.width
+                }
             }
             Rectangle {  // End loop
                 anchors {

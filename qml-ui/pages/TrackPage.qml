@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     screenId: "track"
     title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
 
-    Component.onCompleted: zynthian.fixed_layers.activate_index(6)
+    //Component.onCompleted: zynthian.fixed_layers.activate_index(6)
 
     contentItem: ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
@@ -143,7 +143,7 @@ Zynthian.ScreenPage {
                             onClicked: {
                                 zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
                                 zynthian.layer.ensure_special_layers_midi_cloned()
-                                zynthian.fixed_layers.activate_index(6)
+                                //zynthian.fixed_layers.activate_index(6)
                             }
                         }
                         /*QQC2.Button {
@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
 
                                             voiceCombo.updateText()
                                         }
-                                        zynthian.fixed_layers.activate_index(6)
+                                        //zynthian.fixed_layers.activate_index(6)
                                         zynthian.zynthiloops.saveLayersToTrack(zynthian.track.trackId)
                                     }
                                     delegate: QQC2.MenuItem {

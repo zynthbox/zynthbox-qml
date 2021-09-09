@@ -80,6 +80,7 @@ ColumnLayout {
 
                 let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
                 dial.value = floored+startDiff
+                dial.moved()
             }
         }
     }

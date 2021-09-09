@@ -261,17 +261,17 @@ MouseArea {
                 visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
                 text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
             }
-            ColumnLayout {
-                QQC2.Label {
-                    text: zynthian.zynthiloops.song.bpm
-                    font.pointSize: 9
-                }
+            RowLayout {
                 Kirigami.Icon {
                     Layout.preferredWidth: 24
                     Layout.preferredHeight: 24
                     source: Qt.resolvedUrl("../../img/metronome.svg")
                     color: "#ffffff"
                     opacity: zynthian.zynthiloops.clickTrackEnabled ? 1.0 : 0.0
+                }
+                QQC2.Label {
+                    text: zynthian.zynthiloops.song.bpm
+                    font.pointSize: 9
                 }
             }
         }

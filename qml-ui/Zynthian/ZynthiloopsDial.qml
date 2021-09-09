@@ -35,7 +35,7 @@ ColumnLayout {
 
         value: root.controlObj && root.controlObj.hasOwnProperty(root.controlProperty) ? root.controlObj[root.controlProperty] : 0
 
-        onValueChanged: {
+        onMoved: {
             if (!root.controlObj || !root.controlObj.hasOwnProperty(root.controlProperty)) {
                 return;
             }

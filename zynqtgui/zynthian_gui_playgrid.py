@@ -327,7 +327,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     __settings_stores__ = {}
     __note_state_map__ = {}
     __most_recently_changed_note__ = None
-    __most_recently_changed_notes__ = [] # List of dicts
     __input_ports__ = []
     __mutex__ = Lock()
 
@@ -341,6 +340,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grids__ = []
         self.__pitch__ = 0
         self.__modulation__ = 0
+        self.__most_recently_changed_notes__ = [] # List of dicts
         self.updatePlayGrids()
         self.listen_to_everything()
 
@@ -398,7 +398,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 logging.error("Got a message for a note we're apparently not aware of: %s", message_data)
             else:
                 note.set_is_playing(note_on)
-                zynthian_gui_playgrid.__note_state_changed__(note, message_data)
+                for playgrid in zynthian_gui_playgrid.__playgrid_instances__:
+                    playgrid.__note_state_changed__(note, message_data)
 
     def show(self):
         pass
@@ -516,19 +517,20 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                     else:
                         note.off()
 
-    @staticmethod
-    def __note_state_changed__(note:Note, message_data):
+    def __note_state_changed__(self, note:Note, message_data):
         #logging.error("New note state for " + str(note.midiNote) + " now playing? " + str(note.isPlaying))
-        zynthian_gui_playgrid.__most_recently_changed_note__ = note
-        zynthian_gui_playgrid.__most_recently_changed_notes__.append({
+        zynthian_gui_playgrid.__mutex__.acquire()
+        self.__most_recently_changed_notes__.append({
             'note': note,
             'state': note.isPlaying,
             'metadata': message_data,
             'time': datetime.now()
         })
+        zynthian_gui_playgrid.__mutex__.release()
+        self.__most_recently_changed_notes_changed__.emit()
+        zynthian_gui_playgrid.__most_recently_changed_note__ = note
         for playgrid in zynthian_gui_playgrid.__playgrid_instances__:
             playgrid.noteStateChanged.emit()
-            playgrid.__most_recently_changed_notes_changed__.emit()
 
     @Slot(result=Note)
     def mostRecentlyChangedNote(self):
@@ -539,7 +541,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         pass
 
     def __get_most_recently_changed_notes__(self):
-        return zynthian_gui_playgrid.__most_recently_changed_notes__
+        return self.__most_recently_changed_notes__
 
     @Signal
     def __most_recently_changed_notes_changed__(self):

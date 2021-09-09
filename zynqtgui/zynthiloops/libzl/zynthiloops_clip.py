@@ -57,6 +57,10 @@ class zynthiloops_clip(QObject):
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
+        track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        track.volume_changed.connect(lambda: self.track_volume_changed)
+        self.track_volume = track.volume
+
     def update_current_beat(self):
         if not self.__playing_started__:
             if self.__song__.get_metronome_manager().currentBeat == 0:
@@ -69,6 +73,10 @@ class zynthiloops_clip(QObject):
     def set_row_index(self, new_index):
         self.__row_index__ = new_index
         self.row_index_changed.emit()
+
+    def track_volume_changed(self):
+        self.track_volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
+        self.set_gain(self.__gain__, True)
 
     @Signal
     def current_beat_changed(self):

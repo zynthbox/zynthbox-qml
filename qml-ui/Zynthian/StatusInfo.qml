@@ -306,47 +306,17 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                contentItem: ColumnLayout {
-                    DialController {
-                        id: volumeDial
-                        heading.level: 5
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.topMargin: -8 //HACK
-                        Layout.bottomMargin: -8
-                        topPadding: 0
-                        leftPadding: 0
-                        rightPadding: 0
-                        bottomPadding: 0
-                        title: ""
-                        controller.category: "amixer_MX#1"
-                        controller.index: 0
-                        stepSize: 5
-                        //background.visible: false
-                        valueLabel: {
-                            return qsTr("%1%").arg(Math.round(dial.value))
-                        }
-                    }
-                    RowLayout {
-                        visible: volumeDial.visible
-                        Layout.fillWidth: true
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            text: "-"
-                            enabled: volumeDial.dial.value > 0
-                            onClicked: volumeDial.dial.decrease()
-                        }
-                        QQC2.Button {
-                            Layout.fillWidth: true
-                            text: "+"
-                            enabled: volumeDial.dial.value < 100
-                            onClicked: volumeDial.dial.increase()
-                        }
-                    }
-                    QQC2.Label {
-                        visible: volumeDial.visible
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Volume")
+                contentItem: ZynthiloopsDial {
+                    id: volumeDial
+                    text: qsTr("Volume")
+                    controlObj: zynthian.master_alsa_mixer
+                    controlProperty: "volume"
+                    valueString: qsTr("%1%").arg(Math.round((dial.value - 50)/50*100)) //FIXME: for some reason the silence point seems to be 50%?
+
+                    dial {
+                        stepSize: 1
+                        from: 50
+                        to: 100
                     }
                 }
             }

@@ -473,10 +473,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __set_modulation__(self, modulation):
         self.__modulation__ = modulation
-        midi_pitch_message = mido.Message(
-            "control_change", channel=0, control=1, value=self.__pitch__
+        modulation_message = mido.Message(
+            "control_change", channel=0, control=1, value=self.__modulation__
         )
-        self.__midi_port__.send(midi_pitch_message)
+        self.__midi_port__.send(modulation_message)
         self.__modulation_changed__.emit()
 
     @Signal

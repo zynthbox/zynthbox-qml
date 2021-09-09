@@ -131,8 +131,6 @@ while true; do
 	mkdir -p /root/.local/share/plasma/desktoptheme/zynthian
 	cp -auR zynthian-plasma-theme/* /root/.local/share/plasma/desktoptheme/zynthian/
 	#cp zynthian_envars.sh ../config
-	#HACK 3
-	#export ZYNTHIAN_RBPI_HEADPHONES="1"
 
 	openbox &
 	./zynthian_qt_gui.py

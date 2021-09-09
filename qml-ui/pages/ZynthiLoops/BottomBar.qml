@@ -212,16 +212,15 @@ Zynthian.Card {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    id: recordingAction
-                    text: qsTr("Record")
-                    page: Qt.resolvedUrl("RecordingBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.recordable && !controlObj.path
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
                     id: songAction
                     text: qsTr("Song")
                     page: Qt.resolvedUrl("SongBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Song
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Mixer")
+                    page: Qt.resolvedUrl("MixerBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Song
                     initialProperties: {"bottomBar": root}
                 },
@@ -230,6 +229,13 @@ Zynthian.Card {
                     text: qsTr("Part")
                     page: Qt.resolvedUrl("PartBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Part
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: recordingAction
+                    text: qsTr("Record")
+                    page: Qt.resolvedUrl("RecordingBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.recordable && !controlObj.path
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

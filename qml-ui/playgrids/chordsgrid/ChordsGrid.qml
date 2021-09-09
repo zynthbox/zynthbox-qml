@@ -70,7 +70,14 @@ ColumnLayout {
                         color: {
                             var color = "white";
                             if (playDelegate.note) {
-                                if (playDelegate.note.isPlaying) {
+                                var anyPlaying = false;
+                                for (var i = 0; i < playDelegate.note.subnotes.length; ++i) {
+                                    if (playDelegate.note.subnotes[i].isPlaying) {
+                                        anyPlaying = true
+                                        break;
+                                    }
+                                }
+                                if (anyPlaying) {
                                     color = "#8bc34a";
                                 } else {
                                     if (playDelegate.note.name === component.currentNoteName) {
@@ -82,22 +89,25 @@ ColumnLayout {
                             }
                             return color;
                         }
-
-                        Text {
+                        RowLayout {
                             anchors.fill: parent
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            wrapMode: Text.Wrap
-                            text: {
-                                var text = "";
-                                if (playDelegate.note) {
-                                    for (var i = 0; i < playDelegate.note.subnotes.length; ++i) {
-                                        text += " " + playDelegate.note.subnotes[i].name + playDelegate.note.subnotes[i].octave
+                            Repeater {
+                                model: playDelegate.note.subnotes
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    color: modelData.isPlaying ? "#8bc34a" : (playDelegate.note.name === component.currentNoteName ? Kirigami.Theme.focusColor : "white")
+                                    Text {
+                                        anchors.fill: parent
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        clip: true
+                                        text: modelData.name + modelData.octave
                                     }
                                 }
-                                return text;
                             }
                         }
+
                     }
 
                     MultiPointTouchArea {

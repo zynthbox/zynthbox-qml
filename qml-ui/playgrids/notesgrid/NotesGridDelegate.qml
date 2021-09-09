@@ -99,33 +99,30 @@ RowLayout {
                         id: pitchModPoint;
                         property double pitchModX: x < 0 ? Math.floor(x) : (x > playDelegate.width ? x - playDelegate.width : 0)
                         property double pitchModY: y < 0 ? -Math.floor(y) : (y > playDelegate.height ? -(y - playDelegate.height) : 0)
+                        property var playingNote;
+                        onPressedChanged: {
+                            if (pressed) {
+                                var velocityValue = 64;
+                                if (component.settingsStore.property("positionalVelocity")) {
+                                    velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
+                                } else {
+                                    // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
+                                    velocityValue = pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127);
+                                }
+                                playDelegate.down = true;
+                                playDelegate.focus = true;
+                                playingNote = note;
+                                zynthian.playgrid.setNoteOn(playingNote, velocityValue);
+                            } else {
+                                playDelegate.down = false;
+                                playDelegate.focus = false;
+                                zynthian.playgrid.setNoteOff(playingNote);
+                                zynthian.playgrid.pitch = 0;
+                                zynthian.playgrid.modulation = 0;
+                            }
+                        }
                     }
                 ]
-                property var playingNote;
-                onPressed: {
-                    if (pitchModPoint.pressed) {
-                        var velocityValue = 64;
-                        if (component.settingsStore.property("positionalVelocity")) {
-                            velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
-                        } else {
-                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                            velocityValue = pitchModPoint.pressure > 0.99999 ? 64 : Math.floor(pitchModPoint.pressure * 127);
-                        }
-                        parent.down = true;
-                        focus = true;
-                        playingNote = note;
-                        zynthian.playgrid.setNoteOn(playingNote, velocityValue);
-                    }
-                }
-                onReleased: {
-                    if (!pitchModPoint.pressed) {
-                        parent.down = false;
-                        focus = false;
-                        zynthian.playgrid.setNoteOff(playingNote);
-                        zynthian.playgrid.pitch = 0;
-                        zynthian.playgrid.modulation = 0;
-                    }
-                }
             }
         }
     }

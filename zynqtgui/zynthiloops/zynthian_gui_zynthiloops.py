@@ -314,6 +314,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.start_clip_recording = True
         self.clip_to_record.isRecording = True
         self.start_metronome_request()
+        self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
+        self.start_clip_recording = False
 
     def stop_recording(self):
         self.recorder_process.terminate()
@@ -356,15 +358,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         #     self.countInValue -= 1
 
         if self.__current_beat__ == 0:
-            if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
-                if self.start_clip_recording:
-                    # self.recorder_process.start()
-                    try:
-                        logging.error(f'Staring Recorder process : {("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path)}')
-                        self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
-                    except Exception as e:
-                        logging.error(f"Error starting audio recording : {str(e)}")
-                    self.start_clip_recording = False
+            # if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
+            #     if self.start_clip_recording:
+            #         # self.recorder_process.start()
+            #         try:
+            #             logging.error(f'Staring Recorder process : {("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path)}')
+            #             self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
+            #         except Exception as e:
+            #             logging.error(f"Error starting audio recording : {str(e)}")
+            #         self.start_clip_recording = False
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
@@ -396,7 +398,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.recorder_process = None
-        self.__song__.save()
+        # self.__song__.save()
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

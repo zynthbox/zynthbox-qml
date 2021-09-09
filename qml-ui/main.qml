@@ -87,6 +87,7 @@ Kirigami.AbstractApplicationWindow {
                             text: model.display
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index === 5 ? 6 : index)
+                            highlighted: zynthian.fixed_layers.current_index === index
                         }
                     }
                 }

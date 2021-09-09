@@ -108,6 +108,7 @@ Zynthian.MultiSelectorPage {
 
     QQC2.Dialog {
         id: layerSetupDialog
+        parent: applicationWindow().contentItem
         x: Math.round(parent.width/6 - width/2)
         y: Math.round(parent.height/2 - height/2)
         height: footer.implicitHeight + topMargin + bottomMargin

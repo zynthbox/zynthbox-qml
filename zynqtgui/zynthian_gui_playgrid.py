@@ -395,7 +395,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 logging.error("Got a message for a note we're apparently not aware of: %s", message_data)
             else:
                 note.set_is_playing(note_on)
-                zynthian_gui_playgrid.__note_state_changed__(note)
+                zynthian_gui_playgrid.__note_state_changed__(note, message_data)
 
     def show(self):
         pass
@@ -514,12 +514,13 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                         note.off()
 
     @staticmethod
-    def __note_state_changed__(note:Note):
+    def __note_state_changed__(note:Note, message_data):
         #logging.error("New note state for " + str(note.midiNote) + " now playing? " + str(note.isPlaying))
         zynthian_gui_playgrid.__most_recently_changed_note__ = note
         zynthian_gui_playgrid.__most_recently_changed_notes__.append({
             'note': note,
             'state': note.isPlaying,
+            'metadata': message_data,
             'time': datetime.now()
         })
         for playgrid in zynthian_gui_playgrid.__playgrid_instances__:

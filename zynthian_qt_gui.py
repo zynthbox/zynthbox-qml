@@ -134,12 +134,15 @@ from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 
+from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
+
 from pathlib import Path
 
 import traceback
 
 import faulthandler
 faulthandler.enable()
+
 
 # -------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
@@ -591,6 +594,8 @@ class zynthian_gui(QObject):
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
         self.screens["norns_shield"] = zynthian_gui_selector(self)
+
+        self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -2310,6 +2315,9 @@ class zynthian_gui(QObject):
     def hardware(self):
         return self.screens["hardware"]
 
+    @Property(QObject, constant=True)
+    def master_alsa_mixer(self):
+        return self.screens["master_alsa_mixer"]
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

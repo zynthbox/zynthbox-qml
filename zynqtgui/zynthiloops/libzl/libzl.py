@@ -31,6 +31,7 @@ from PySide2.QtCore import QObject, QProcess, Signal
 
 libzl = None
 AudioLevelChangedCallback = ctypes.CFUNCTYPE(None, ctypes.c_float)
+ProgressChangedCallback = ctypes.CFUNCTYPE(None, ctypes.c_float)
 
 def init():
     global libzl
@@ -63,10 +64,7 @@ def init():
         libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
 
-        libzl.ClipAudioSource_setProgressCallback.argtypes = [ctypes.c_void_p, ctypes.py_object, ctypes.CFUNCTYPE(None, ctypes.py_object)]
-
-        libzl.ClipAudioSource_getProgress.argtypes = [ctypes.c_void_p]
-        libzl.ClipAudioSource_getProgress.restype = ctypes.c_float
+        libzl.ClipAudioSource_setProgressCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
 
         libzl.ClipAudioSource_getFileName.argtypes = [ctypes.c_void_p]
         libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
@@ -126,27 +124,9 @@ def stopClips(clips: list):
             libzl.stopClips(len(clips), arr)
 
 
-# def add_clip_to_part(partIndex, clip):
-#     if libzl:
-#         libzl.SyncTimer_addToPart(partIndex, clip)
-#
-#
-# def play_part(partIndex):
-#     if libzl:
-#         libzl.SyncTimer_playPart(partIndex)
-#
-#
-# def stop_part(partIndex):
-#     if libzl:
-#         libzl.SyncTimer_stopPart(partIndex)
-
-@ctypes.CFUNCTYPE(None, ctypes.py_object)
-def signal_progress(obj):
-    obj.progress_changed.emit()
-
-
 class ClipAudioSource(QObject):
     audioLevelChanged = Signal(float)
+    progressChanged = Signal(float)
 
     def __init__(self, zl_clip, filepath: bytes):
         super(ClipAudioSource, self).__init__()
@@ -156,15 +136,16 @@ class ClipAudioSource(QObject):
 
             if zl_clip is not None:
                 self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)
-                libzl.ClipAudioSource_setProgressCallback(self.obj, zl_clip, signal_progress)
+                self.progress_changed_callback = ProgressChangedCallback(self.progress_changed_callback)
+
+                libzl.ClipAudioSource_setProgressCallback(self.obj, self.progress_changed_callback)
                 libzl.ClipAudioSource_setAudioLevelChangedCallback(self.obj, self.audio_level_changed_callback)
 
     def audio_level_changed_callback(self, level_db):
         self.audioLevelChanged.emit(level_db)
 
-    def get_progress(self):
-        if libzl:
-            return libzl.ClipAudioSource_getProgress(self.obj)
+    def progress_changed_callback(self, progress):
+        self.progressChanged.emit(progress)
 
     def play(self, loop=True):
         if libzl:

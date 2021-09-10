@@ -100,6 +100,9 @@ GridLayout {
                         headerText: model.track.name
 
                         slider.value: model.track.volume
+                        slider.onValueChanged: {
+                            model.track.volume = slider.value
+                        }
                     }
                 }
             }

@@ -80,6 +80,8 @@ def init():
 
         libzl.ClipAudioSource_setGain.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
+        libzl.ClipAudioSource_setVolume.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
         libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
         ### END Type Definition
 
@@ -185,6 +187,10 @@ class ClipAudioSource(object):
     def set_gain(self, gain: float):
         if libzl:
             libzl.ClipAudioSource_setGain(self.obj, gain)
+
+    def set_volume(self, volume: float):
+        if libzl:
+            libzl.ClipAudioSource_setVolume(self.obj, volume)
 
     def set_speed_ratio(self, speed_ratio: float):
         if libzl:

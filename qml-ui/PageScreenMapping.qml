@@ -75,6 +75,7 @@ QtObject {
         "option": "OptionPage.qml",
         "theme_chooser": "ThemePage.qml",
         "theme_downloader": "ThemeDownloaderPage.qml",
+        "module_downloader": "ModuleDownloaderPage.qml",
         "norns_shield": "NornsPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
         "synth_behaviour":"SynthBehaviourPage.qml",

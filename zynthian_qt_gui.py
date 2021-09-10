@@ -568,6 +568,7 @@ class zynthian_gui(QObject):
         # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
         # self.screens['zs3_options'] = zynthian_gui_zs3_options(self)
         self.screens["main"] = zynthian_gui_main(self)
+        self.screens["module_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
@@ -2242,6 +2243,9 @@ class zynthian_gui(QObject):
     def get_layer_effect_chooser(self):
         return self.screens["layer_effect_chooser"]
 
+    def get_module_downloader(self):
+        return self.screens["module_downloader"]
+
     def get_admin(self):
         return self.screens["admin"]
 
@@ -2372,6 +2376,7 @@ class zynthian_gui(QObject):
     layer_effect_chooser = Property(
         QObject, get_layer_effect_chooser, constant=True
     )
+    module_downloader = Property(QObject, get_module_downloader, constant=True)
     admin = Property(QObject, get_admin, constant=True)
     snapshot = Property(QObject, get_snapshot, constant=True)
     midi_chan = Property(QObject, get_midi_chan, constant=True)

@@ -93,6 +93,7 @@ ColumnLayout {
             text: "-"
             onClicked: {
                 dial.value = Math.max(dial.from, dial.value - (buttonStepSize ? buttonStepSize : dial.stepSize))
+                dial.moved()
             }
         }
         QQC2.Button {
@@ -100,6 +101,7 @@ ColumnLayout {
             text: "+"
             onClicked: {
                 dial.value = Math.min(dial.to, dial.value + (buttonStepSize ? buttonStepSize : dial.stepSize))
+                dial.moved()
             }
         }
     }

@@ -144,6 +144,7 @@ class zynthiloops_track(QObject):
     def set_volume(self, volume:int, force_set=False):
         if self.__volume__ != math.floor(volume) or force_set is True:
             self.__volume__ = math.floor(volume)
+            logging.error(f"Track : Setting volume {self.__volume__}")
             self.volume_changed.emit()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)

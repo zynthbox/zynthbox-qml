@@ -58,7 +58,7 @@ class zynthiloops_clip(QObject):
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
         track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        track.volume_changed.connect(lambda: self.track_volume_changed)
+        track.volume_changed.connect(lambda: self.track_volume_changed())
         self.track_volume = track.volume
 
     def update_current_beat(self):
@@ -76,7 +76,10 @@ class zynthiloops_clip(QObject):
 
     def track_volume_changed(self):
         self.track_volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
-        self.set_gain(self.__gain__, True)
+        logging.error(f"Track volume changed : {self.track_volume}")
+
+        if self.audioSource is not None:
+            self.audioSource.set_volume(self.track_volume/100)
 
     @Signal
     def current_beat_changed(self):
@@ -219,7 +222,6 @@ class zynthiloops_clip(QObject):
             return 0.0
         return self.audioSource.get_progress()
     progress = Property(float, progress, notify=progress_changed)
-
 
     @Signal
     def gain_changed(self):

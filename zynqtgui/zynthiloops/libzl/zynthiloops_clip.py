@@ -47,6 +47,7 @@ class zynthiloops_clip(QObject):
         self.__time__ = 1
         self.__bpm__ = 0
         self.__gain__ = 0
+        self.__audio_level__ = 0
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
@@ -57,9 +58,8 @@ class zynthiloops_clip(QObject):
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
-        track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        track.volume_changed.connect(lambda: self.track_volume_changed())
-        self.track_volume = track.volume
+        self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        self.track.volume_changed.connect(lambda: self.track_volume_changed())
 
     def update_current_beat(self):
         if not self.__playing_started__:
@@ -72,14 +72,15 @@ class zynthiloops_clip(QObject):
 
     def set_row_index(self, new_index):
         self.__row_index__ = new_index
+        self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
         self.row_index_changed.emit()
 
     def track_volume_changed(self):
-        self.track_volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
-        logging.error(f"Track volume changed : {self.track_volume}")
+        self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
+        logging.error(f"Track volume changed : {self.track.volume}")
 
         if self.audioSource is not None:
-            self.audioSource.set_volume(self.track_volume/100)
+            self.audioSource.set_volume(self.track.volume/100)
 
     @Signal
     def current_beat_changed(self):
@@ -385,8 +386,15 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.__audio_level__ = 0
         self.__read_metadata__()
         self.reset_beat_count()
+
+        try:
+            self.audioSource.audioLevelChanged.disconnect()
+        except Exception as e:
+            logging.error(f"Not connected : {str(e)}")
+        self.audioSource.audioLevelChanged.connect(lambda leveldB: self.audio_level_changed_cb(leveldB))
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -403,6 +411,20 @@ class zynthiloops_clip(QObject):
         self.duration_changed.emit()
         # self.__song__.schedule_save()
     path = Property(str, path, set_path, notify=path_changed)
+
+    def audio_level_changed_cb(self, leveldB):
+        self.__audio_level__ = leveldB
+        self.audioLevelChanged.emit()
+        self.track.audioLevel = leveldB
+
+    @Signal
+    def audioLevelChanged(self):
+        pass
+
+    def get_audioLevel(self):
+        return self.__audio_level__
+
+    audioLevel = Property(float, get_audioLevel, notify=audioLevelChanged)
 
     @Slot(None)
     def clear(self, loop=True):

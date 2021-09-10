@@ -40,6 +40,7 @@ class zynthiloops_track(QObject):
         self.__name__ = None
         self.__song__ = song
         self.__volume__ = 100
+        self.__audio_level__ = -40
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
 
@@ -165,3 +166,21 @@ class zynthiloops_track(QObject):
     def set_id(self, new_id):
         self.__id__ = new_id
         self.__name_changed__.emit()
+
+
+    @Signal
+    def audioLevelChanged(self):
+        pass
+
+    def get_audioLevel(self):
+        return self.__audio_level__
+
+    def set_audioLevel(self, leveldB):
+        if leveldB < -40:
+            self.__audio_level__ = -40
+        else:
+            self.__audio_level__ = leveldB
+
+        self.audioLevelChanged.emit()
+
+    audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)

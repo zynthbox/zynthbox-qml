@@ -98,6 +98,8 @@ GridLayout {
                         width: privateProps.cellWidth
                         height: ListView.view.height
                         headerText: model.track.name
+                        footerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                        audioLeveldB: model.track.audioLevel
 
                         slider.value: model.track.volume
                         slider.onValueChanged: {

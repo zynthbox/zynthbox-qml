@@ -27,9 +27,10 @@ import ctypes
 import logging
 from os.path import dirname, realpath
 
-from PySide2.QtCore import QProcess
+from PySide2.QtCore import QObject, QProcess, Signal
 
 libzl = None
+AudioLevelChangedCallback = ctypes.CFUNCTYPE(None, ctypes.c_float)
 
 def init():
     global libzl
@@ -81,6 +82,8 @@ def init():
         libzl.ClipAudioSource_setGain.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
         libzl.ClipAudioSource_setVolume.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+        libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
 
         libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
         ### END Type Definition
@@ -141,14 +144,23 @@ def stopClips(clips: list):
 def signal_progress(obj):
     obj.progress_changed.emit()
 
-class ClipAudioSource(object):
+
+class ClipAudioSource(QObject):
+    audioLevelChanged = Signal(float)
 
     def __init__(self, zl_clip, filepath: bytes):
+        super(ClipAudioSource, self).__init__()
+
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath)
 
             if zl_clip is not None:
+                self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)
                 libzl.ClipAudioSource_setProgressCallback(self.obj, zl_clip, signal_progress)
+                libzl.ClipAudioSource_setAudioLevelChangedCallback(self.obj, self.audio_level_changed_callback)
+
+    def audio_level_changed_callback(self, level_db):
+        self.audioLevelChanged.emit(level_db)
 
     def get_progress(self):
         if libzl:
@@ -215,4 +227,3 @@ class ClipAudioSource(object):
     # def stop_recording(self):
     #     if self.can_record:
     #         self.recorder_process.kill()
-

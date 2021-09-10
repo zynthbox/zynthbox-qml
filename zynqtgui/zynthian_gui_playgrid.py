@@ -45,6 +45,7 @@ from PySide2.QtCore import (
 )
 from PySide2.QtQml import QQmlEngine,qmlRegisterType
 from . import zynthian_qt_gui_base
+from .zynthiloops import zynthian_gui_zynthiloops
 
 
 class Note(QObject):
@@ -343,6 +344,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__most_recently_changed_notes__ = [] # List of dicts
         self.updatePlayGrids()
         self.listen_to_everything()
+        self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.screens["zynthiloops"]
 
         zynthian_gui_playgrid.dir_watcher.directoryChanged.connect(self.updatePlayGrids)
         zynthian_gui_playgrid.dir_watcher.fileChanged.connect(self.updatePlayGrids)
@@ -622,6 +624,27 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         settingsStore = zynthian_gui_playgrid.__settings_stores__[name]
         zynthian_gui_playgrid.__mutex__.release()
         return settingsStore
+
+    @Slot(None)
+    def connectMetronomeSignals(self):
+        try:
+            self.__metronome_manager__.current_beat_changed.disconnect(self.metronome_update)
+        except Exception as e:
+            logging.error(f"Failed to disconnect. Not connected maybe? : {str(e)}")
+
+        self.__metronome_manager__.current_beat_changed.connect(self.metronome_update)
+
+    @Slot(None)
+    def startMetronomeRequest(self):
+        self.__metronome_manager__.start_metronome_request()
+
+    @Slot(None)
+    def stopMetronomeRequest(self):
+        self.__metronome_manager__.stop_metronome_request()
+
+    def metronome_update(self):
+        beat = self.__metronome_manager__.currentBeat
+        logging.error(f"Playgrid metronome update({self}) : Beat({beat})")
 
     mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)
     playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)

@@ -33,6 +33,13 @@ from zyngui import zynthian_gui_config
 from zynlibs.zynseq import zynseq
 from PySide2.QtCore import Slot
 
+from json import JSONDecoder
+
+import os
+from pathlib import Path
+from subprocess import Popen
+
+
 # ------------------------------------------------------------------------------
 # Zynthian App Selection GUI Class
 # ------------------------------------------------------------------------------
@@ -90,10 +97,26 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data.append((self.admin, 0, "Settings"))
         self.list_metadata.append({"icon":"../../img/settings.svg"})
 
+        apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+        if Path(apps_folder).exists():
+            for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
+                try:
+                    f = open(apps_folder + appimage_dir + "/metadata.json", "r")
+                    metadata = JSONDecoder().decode(f.read())
+                    if (not "exec" in metadata) or (not "name" in metadata) or (not "icon" in metadata):
+                        continue
+                    self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["exec"], metadata["name"]))
+                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["icon"]})
+                except Exception as e:
+                    logging.error(e)
+
         super().fill_list()
 
     def select_action(self, i, t="S"):
-        if self.list_data[i][0]:
+        if self.list_data[i][0] and self.list_data[i][0] == "appimage":
+            apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+            Popen([self.list_data[i][1]])
+        elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()
 

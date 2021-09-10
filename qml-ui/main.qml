@@ -225,5 +225,52 @@ Kirigami.AbstractApplicationWindow {
 
         contentItem: MiniPlayGrid {}
     }
+
+    Window {
+        id: panel
+        visible: true
+        width: screen.width
+        height: root.footer.height
+        x: 0
+        y: screen.height - height
+        flags: Qt.WindowDoesNotAcceptFocus
+        QQC2.ToolBar {
+            anchors.fill: parent
+            position: QQC2.ToolBar.Footer
+            contentItem: RowLayout {
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitWidth: 1
+                    text: qsTr("CLOSE")
+                    onClicked: zynthian.close_current_window()
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitWidth: 1
+                    enabled: false
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitWidth: 1
+                    enabled: false
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    implicitWidth: 1
+                    enabled: false
+                }
+            }
+        }
+        Component.onCompleted: {
+            zynthian.register_panel(panel)
+           // panel.width = panel.screen.width
+            //TODO: necessary?
+            panel.y = panel.screen.height - height
+        }
+    }
 }
 

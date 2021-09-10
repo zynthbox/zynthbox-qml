@@ -582,10 +582,6 @@ class zynthian_gui(QObject):
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
 
-        self.screens["playgrid"] = zynthian_gui_playgrid(self)
-        self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
-        self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
-
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -594,6 +590,15 @@ class zynthian_gui(QObject):
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
         self.screens["norns_shield"] = zynthian_gui_selector(self)
+
+        ###
+        # Playgrid depends on zynthiloops screen for metronome related functionalities
+        # and hence needs to be initialized after ZL page has been initialized
+        # TODO Make the metronome independant of ZL and more generic
+        ###
+        self.screens["playgrid"] = zynthian_gui_playgrid(self)
+        self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
         self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 

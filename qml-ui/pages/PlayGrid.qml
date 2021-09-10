@@ -147,6 +147,19 @@ Zynthian.ScreenPage {
                                     zynthian.show_modal("playgrid_downloader");
                                     applicationWindow().controlsVisible = true;
                                 }
+                            },
+                            Kirigami.Action {
+                                text: "Start Metronome"
+                                onTriggered: {
+                                    zynthian.playgrid.connectMetronomeSignals()
+                                    zynthian.playgrid.startMetronomeRequest()
+                                }
+                            },
+                            Kirigami.Action {
+                                text: "Stop Metronome"
+                                onTriggered: {
+                                    zynthian.playgrid.stopMetronomeRequest()
+                                }
                             }
                         ]
                     }

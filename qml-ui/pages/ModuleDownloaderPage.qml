@@ -37,7 +37,7 @@ Zynthian.NewStuffPage {
         target: component.backAction
         onTriggered: {
             // or whatever this function would be called
-            //zynthian.modules.updateList();
+            zynthian.main.refresh();
         }
     }
 }

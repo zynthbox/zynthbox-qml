@@ -261,6 +261,10 @@ class zynthian_gui_main(zynthian_gui_selector):
             "Do you really want to power off?", self.power_off_confirmed
         )
 
+    @Slot(None)
+    def refresh(self):
+        self.fill_list()
+
     def power_off_confirmed(self, params=None):
         logging.info("POWER OFF")
         self.last_state_action()

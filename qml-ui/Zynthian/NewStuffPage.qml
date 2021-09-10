@@ -50,6 +50,14 @@ Zynthian.SelectorPage {
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
     }
+    Connections {
+        target: applicationWindow()
+        onCurrentPageChanged: {
+            if (applicationWindow().currentPage.screenId !== component.screenId) {
+                applicationWindow().pageStack.layers.currentItem.pop()
+            }
+        }
+    }
     NewStuff.Engine {
         id: newStuffEngine
         property bool isLoading: false

@@ -47,6 +47,7 @@ class zynthiloops_clip(QObject):
         self.__time__ = 1
         self.__bpm__ = 0
         self.__gain__ = 0
+        self.__progress__ = 0.0
         self.__audio_level__ = 0
         self.__current_beat__ = -1
         self.__should_sync__ = False
@@ -156,10 +157,6 @@ class zynthiloops_clip(QObject):
         pass
 
     @Signal
-    def progress_changed(self):
-        pass
-
-    @Signal
     def pitch_changed(self):
         pass
 
@@ -208,6 +205,18 @@ class zynthiloops_clip(QObject):
     isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
 
 
+    @Signal
+    def progressChanged(self):
+        pass
+
+    def get_progress(self):
+        if self.audioSource is None:
+            return 0.0
+        return self.__progress__
+
+    progress = Property(float, get_progress, notify=progressChanged)
+
+
     def get_isRecording(self):
         return self.__is_recording__
 
@@ -217,12 +226,6 @@ class zynthiloops_clip(QObject):
 
     isRecording = Property(bool, get_isRecording, set_isRecording, notify=__is_recording_changed__)
 
-
-    def progress(self):
-        if self.audioSource is None:
-            return 0.0
-        return self.audioSource.get_progress()
-    progress = Property(float, progress, notify=progress_changed)
 
     @Signal
     def gain_changed(self):
@@ -386,15 +389,19 @@ class zynthiloops_clip(QObject):
         self.__pitch__ = 0
         self.__time__ = 1
         self.__bpm__ = 0
+        self.__progress__ = 0.0
         self.__audio_level__ = 0
         self.__read_metadata__()
         self.reset_beat_count()
 
         try:
             self.audioSource.audioLevelChanged.disconnect()
+            self.audioSource.progressChanged.disconnect()
         except Exception as e:
             logging.error(f"Not connected : {str(e)}")
+
         self.audioSource.audioLevelChanged.connect(lambda leveldB: self.audio_level_changed_cb(leveldB))
+        self.audioSource.progressChanged.connect(lambda progress: self.progress_changed_cb(progress))
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -416,6 +423,10 @@ class zynthiloops_clip(QObject):
         self.__audio_level__ = leveldB
         self.audioLevelChanged.emit()
         self.track.audioLevel = leveldB
+
+    def progress_changed_cb(self, progress):
+        self.__progress__ = progress
+        self.progressChanged.emit()
 
     @Signal
     def audioLevelChanged(self):

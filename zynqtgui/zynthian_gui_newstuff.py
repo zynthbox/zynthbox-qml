@@ -78,12 +78,18 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
 		return self.newstuff_model_data
 
 
+	def background_model_deleted(self):
+		self.newstuff_model_data = None
+		self.newstuff_model_changed.emit()
+		self.fill_list()
+
 	def set_newstuff_model(self,new_model):
 		self.newstuff_model_data = new_model
 		self.newstuff_model_data.rowsInserted.connect(self.fill_list)
 		self.newstuff_model_data.rowsRemoved.connect(self.fill_list)
 		self.newstuff_model_data.dataChanged.connect(self.fill_list)
 		self.newstuff_model_data.modelReset.connect(self.fill_list)
+		self.newstuff_model_data.destroyed.connect(self.background_model_deleted)
 		self.newstuff_model_changed.emit()
 		self.fill_list()
 

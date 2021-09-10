@@ -132,7 +132,7 @@ while true; do
 	cp -auR zynthian-plasma-theme/* /root/.local/share/plasma/desktoptheme/zynthian/
 	#cp zynthian_envars.sh ../config
 
-	openbox &
+	matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes &
 	./zynthian_qt_gui.py
 	status=$?
 

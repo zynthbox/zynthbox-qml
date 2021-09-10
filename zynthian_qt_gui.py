@@ -52,7 +52,7 @@ from PySide2.QtCore import (
     QTimer,
     QEventLoop,
 )
-from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon
+from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QJSValue
@@ -143,6 +143,7 @@ import traceback
 import faulthandler
 faulthandler.enable()
 
+import Xlib.display, Xlib.Xatom, Xlib.X
 
 # -------------------------------------------------------------------------------
 # QObject to bridge status data to QML (ie audio levels, cpu levels etc
@@ -2186,6 +2187,50 @@ class zynthian_gui(QObject):
     def allow_headphones(self):
         return self.screens["layer"].amixer_layer.engine.allow_headphones()
 
+    # ------------------------------------------------------------------
+    # QML bindings
+    # ------------------------------------------------------------------
+
+    @Slot(QWindow)
+    def register_panel(self, panel):
+        display = Xlib.display.Display()
+        window = display.create_resource_object("window", panel.winId())
+        window.change_property(
+            display.intern_atom("_NET_WM_STRUT"),
+            display.intern_atom("CARDINAL"),
+            32, [0, 0, 0, panel.height()])
+
+        _ATOM = display.intern_atom("ATOM")
+        _TYPE = display.intern_atom("_NET_WM_WINDOW_TYPE")
+        _DOCK = display.intern_atom("_NET_WM_WINDOW_TYPE_DOCK")
+        window.change_property(_TYPE, _ATOM, 32, [_DOCK])
+
+        logging.error(panel)
+        logging.error(panel.winId())
+        logging.error(window)
+        display.sync()
+
+    @Slot(None)
+    def close_current_window(self):
+        if zynthian_gui_config.app.focusWindow():
+            return
+        display = Xlib.display.Display()
+        root = display.screen().root
+        wid = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
+
+        logging.error(wid)
+        window = display.create_resource_object("window", wid)
+
+        _NET_CLOSE_WINDOW = display.intern_atom("_NET_CLOSE_WINDOW")
+
+        close_message = Xlib.protocol.event.ClientMessage(window=window, client_type=_NET_CLOSE_WINDOW, data=(32,[0,0,0,0,0]))
+        mask = (Xlib.X.SubstructureRedirectMask | Xlib.X.SubstructureNotifyMask)
+
+        root.send_event(close_message, event_mask=mask)
+        display.flush()
+
+
+
     def get_current_screen_id(self):
         if self.modal_screen:
             return self.modal_screen
@@ -2545,6 +2590,5 @@ if __name__ == "__main__":
     zynthian_gui_config.app = app
 
     sys.exit(app.exec_())
-
 
 # ------------------------------------------------------------------------------

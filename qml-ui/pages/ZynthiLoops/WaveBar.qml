@@ -128,7 +128,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.bottomBar.controlObj.bpm.toFixed(2)
+            text: root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)
             validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
             enabled: !root.bottomBar.controlObj.shouldSync
@@ -172,6 +172,11 @@ GridLayout {
     ColumnLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
 
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
+            text: qsTr("Sounds :")
+        }
+
         ColumnLayout {
             Layout.alignment: Qt.AlignRight
             Repeater {
@@ -182,7 +187,8 @@ GridLayout {
                     text: modelData
                 }
             }
-        }        
+        }
+
         QQC2.Label {
             Layout.alignment: Qt.AlignRight
             visible: controlObj.soundData.length <= 0

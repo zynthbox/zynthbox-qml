@@ -541,6 +541,10 @@ class zynthiloops_clip(QObject):
     def __read_metadata__(self):
         try:
             self.audio_metadata = taglib.File(self.__path__).tags
+
+            if self.__bpm__ <= 0:
+                self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
+
             self.sound_data_changed.emit()
             self.metadata_bpm_changed.emit()
         except Exception as e:

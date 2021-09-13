@@ -584,6 +584,12 @@ class zynthian_gui(QObject):
         self.screens["midi_recorder"] = zynthian_gui_midi_recorder(self)
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
 
+        ###
+        # ZynthiLoops depends on master_alsa_mixer screen for master volume related functionalities
+        # and hence needs to be initialized before ZL page has been initialized
+        ###
+        self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
+
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -601,8 +607,6 @@ class zynthian_gui(QObject):
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
-
-        self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
         # Init Auto-connector
         zynautoconnect.start()

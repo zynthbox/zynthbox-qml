@@ -205,6 +205,11 @@ GridLayout {
         }
         QQC2.Label {
             Layout.alignment: Qt.AlignRight
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+            text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
+        }
+        QQC2.Label {
+            Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
             text: {
                 if (!controlObj || !controlObj.path) {

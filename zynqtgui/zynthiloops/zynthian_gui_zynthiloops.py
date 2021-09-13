@@ -303,10 +303,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
 
     def queue_clip_record(self, clip):
+        layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
         self.update_recorder_jack_port()
         self.clip_to_record = clip
         (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
-        self.clip_to_record_path = self.clip_to_record.recording_basepath+'/wav/'+self.clip_to_record.name+"_"+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+".wav"
+        self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_presetname_{self.__song__.bpm}-BPM.clip.wav"
+
         #self.countInValue = countInBars * 4
 
         # self.recorder_process = QProcess()

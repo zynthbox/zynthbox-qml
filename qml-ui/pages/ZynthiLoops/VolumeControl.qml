@@ -68,4 +68,22 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
         }
     }
+
+    MouseArea {
+        property real startY
+        property real startValue
+        anchors.fill: parent
+
+        onPressed: {
+            startY = mouse.y
+            startValue = slider.value
+        }
+        onPositionChanged: {
+            let delta = mouse.y - startY;
+            let value = Math.max(slider.from, Math.min(slider.to, startValue - (slider.to / slider.stepSize) * (delta*slider.stepSize/(Kirigami.Units.gridUnit*10))));
+            let floored = Math.floor(value/slider.stepSize) * slider.stepSize;
+
+            slider.value = value;
+        }
+    }
 }

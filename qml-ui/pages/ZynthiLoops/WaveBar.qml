@@ -209,8 +209,10 @@ GridLayout {
             text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
         }
         QQC2.Label {
-            Layout.alignment: Qt.AlignRight
+            Layout.fillWidth: true
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideMiddle
             text: {
                 if (!controlObj || !controlObj.path) {
                     return qsTr("No File Loaded");

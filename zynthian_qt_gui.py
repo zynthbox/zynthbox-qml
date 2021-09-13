@@ -1814,6 +1814,7 @@ class zynthian_gui(QObject):
         self.loading_thread.daemon = True  # thread dies with the program
         self.loading_thread.start()
 
+    @Slot(None)
     def start_loading(self):
         self.loading = self.loading + 1
         if self.loading < 1:
@@ -1825,6 +1826,7 @@ class zynthian_gui(QObject):
         self.is_loading_changed.emit()
         # logging.debug("START LOADING %d" % self.loading)
 
+    @Slot(None)
     def stop_loading(self):
         self.loading = self.loading - 1
         if self.loading < 0:

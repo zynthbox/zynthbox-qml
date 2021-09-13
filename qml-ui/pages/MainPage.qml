@@ -50,13 +50,24 @@ Zynthian.ScreenPage {
         cellHeight:iconHeight
 
         model:zynthian.main.selector_list
-        delegate: HomeScreenIcon {                
+        delegate: HomeScreenIcon {
             rectWidth: mainviewGridId.iconWidth
             rectHeight:  mainviewGridId.iconHeight
             imgSrc: model.icon
-            onClicked: zynthian.main.activate_index(model.index)
+            onClicked: {
+                zynthian.main.activate_index(model.index);
+                if (model.action_id === "appimage") {
+                    zynthian.start_loading();
+                    stopLoadingTimer.restart();
+                }
+            }
             text: model.display
         }
+    }
+    Timer {
+        id: stopLoadingTimer
+        interval: 5000
+        onTriggered: zynthian.stop_loading()
     }
 
     contextualActions: [

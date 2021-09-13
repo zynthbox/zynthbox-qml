@@ -31,14 +31,14 @@ import org.kde.kirigami 2.4 as Kirigami
 //NOTE: this is due to a bug in Kirigami.AbstractCard from Buster's version
 Rectangle {
     id: root
-    property bool open
+    property bool open: zynthian.is_loading
 
     z: 999999
     color: Qt.rgba(0, 0,0, 0.8)
 
     QQC2.BusyIndicator {
         anchors.centerIn: parent
-        running: zynthian.is_loading
+        running: root.open
         width: Kirigami.Units.gridUnit * 3
         height: width
     }
@@ -52,7 +52,7 @@ Rectangle {
     states: [
         State {
             name: "visible"
-            when: zynthian.is_loading
+            when: root.open
             PropertyChanges {
                 target: root
                 opacity: 1
@@ -61,7 +61,7 @@ Rectangle {
         },
         State {
             name: "hidden"
-            when: !zynthian.is_loading
+            when: !root.open
             PropertyChanges {
                 target: root
                 opacity: 0
@@ -77,7 +77,7 @@ Rectangle {
                 easing.type: Easing.InOutQuad
             }
             ScriptAction {
-                script: root.visible = zynthian.is_loading
+                script: root.visible = root.open
             }
         }
     }

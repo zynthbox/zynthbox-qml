@@ -228,12 +228,12 @@ Kirigami.AbstractApplicationWindow {
 
     Window {
         id: panel
-        visible: true
         width: screen.width
         height: root.footer.height
         x: 0
         y: screen.height - height
         flags: Qt.WindowDoesNotAcceptFocus
+        visible: !root.active
         QQC2.ToolBar {
             anchors.fill: parent
             position: QQC2.ToolBar.Footer
@@ -265,11 +265,14 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
         }
-        Component.onCompleted: {
-            zynthian.register_panel(panel)
-           // panel.width = panel.screen.width
-            //TODO: necessary?
-            panel.y = panel.screen.height - height
+        onVisibleChanged: {
+            if (visible) {
+                zynthian.register_panel(panel);
+                zynthian.stop_loading();
+                // panel.width = panel.screen.width
+                //TODO: necessary?
+                //panel.y = panel.screen.height - height
+            }
         }
     }
 }

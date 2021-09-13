@@ -99,13 +99,13 @@ GridLayout {
 
     Zynthian.ZynthiloopsDial {
         id: gainDial
-        text: qsTr("Volume (dB)")
+        text: qsTr("Loudness (dB)")
         controlObj: root.bottomBar.controlObj
         controlProperty: "gain"
         valueString: dial.value.toFixed(1)
 
         dial {
-            stepSize: 0.1
+            stepSize: 1
             from: -24
             to: 8
         }

@@ -289,6 +289,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def sketchIsTemp(self):
         return self.__song__.sketch_folder == str(self.__sketch_basepath__ / "temp") + "/"
 
+    @Slot(None)
+    def stopAllPlayback(self):
+        for i in range(self.__song__.partsModel.count):
+            self.__song__.partsModel.getPart(i).stop()
+            for j in range(self.__song__.tracksModel.count):
+                self.__song__.getClip(j, i).stop()
+
     def update_timer_bpm(self):
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)

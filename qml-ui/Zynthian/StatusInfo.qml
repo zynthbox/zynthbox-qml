@@ -293,7 +293,7 @@ MouseArea {
         height: Kirigami.Units.gridUnit * 15
         x: parent.width - width
         contentItem: GridLayout {
-            columns: 2
+            columns: 3
             Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -331,6 +331,12 @@ MouseArea {
             }
             Card {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+            }
+
+            Card {
+                Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 contentItem: RowLayout {
                     Layout.alignment: Qt.AlignLeft
@@ -358,6 +364,16 @@ MouseArea {
                 Layout.preferredWidth: 1
                 text: qsTr("Stop All Notes")
                 onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                text: qsTr("Stop Playback")
+                onClicked: {
+                    zynthian.zynthiloops.stopAllPlayback();
+                    zynthian.playgrid.stopMetronomeRequest();
+                }
             }
         }
     }

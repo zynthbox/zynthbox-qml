@@ -43,6 +43,11 @@ class zynthiloops_track(QObject):
         self.__audio_level__ = -40
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
+        self.master_volume = self.__song__.get_metronome_manager().get_master_volume()
+        self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
+
+    def master_volume_changed(self):
+        self.master_volume = (self.__song__.get_metronome_manager().get_master_volume() - 50)/50
 
     def serialize(self):
         return {"name": self.__name__,
@@ -179,6 +184,9 @@ class zynthiloops_track(QObject):
         lower_limit = -40
         upper_limit = 10
         new_upper_limit = upper_limit - (1 - self.__volume__/100) * (upper_limit - lower_limit)
+
+        if self.master_volume is not None:
+            new_upper_limit = new_upper_limit - (1-self.master_volume) * (new_upper_limit - lower_limit)
 
         # Calculate new value wrt volume
         leveldB = self.map_range(leveldB, lower_limit, upper_limit, lower_limit, new_upper_limit)

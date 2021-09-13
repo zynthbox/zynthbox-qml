@@ -67,12 +67,27 @@ GridLayout {
                 spacing: 1
 
                 VolumeControl {
+                    id: masterVolume
                     Layout.preferredWidth: privateProps.cellWidth
                     Layout.maximumWidth: privateProps.cellWidth
                     Layout.fillHeight: true
                     headerText: "Master"
 
-                    slider.value: 100
+                    Binding {
+                        target: masterVolume.slider
+                        property: "value"
+                        value: zynthian.master_alsa_mixer.volume
+                    }
+
+                    slider {
+                        value: zynthian.master_alsa_mixer.volume
+                        from: 50
+                        to: 100
+                        stepSize: 1
+                        onValueChanged: {
+                            zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
+                        }
+                    }
                 }
 
                 Kirigami.Separator {

@@ -116,6 +116,11 @@ GridLayout {
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: qsTr("BPM")
+        }
+
         QQC2.TextField {
             id: objBpmEdit
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3

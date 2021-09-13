@@ -51,12 +51,14 @@ class zynthian_gui_bank(zynthian_gui_selector):
     
 	def fill_list(self):
 		self.list_data = []
+
 		if not self.zyngui.curlayer:
 			logging.error("Can't fill bank list for None layer!")
 			super().fill_list()
 			return
 		self.zyngui.curlayer.load_bank_list()
 		self.list_data = self.zyngui.curlayer.bank_list
+
 		super().fill_list()
 
 
@@ -75,9 +77,16 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		if self.list_data[i][0]=='*TOP_SOUNDS*':
+			self.zyngui.screens['preset'].set_show_only_favorites(False)
+			self.zyngui.screens['preset'].show_top_sounds(True)
+			self.zyngui.screens['preset'].fill_list()
+			return
 		if self.list_data[i][0]=='*FAVS*':
+			self.zyngui.screens['preset'].show_top_sounds(False)
 			self.zyngui.screens['preset'].set_show_only_favorites(True)
 		else:
+			self.zyngui.screens['preset'].show_top_sounds(False)
 			self.zyngui.screens['preset'].set_show_only_favorites(False)
 
 		if self.zyngui.curlayer.set_bank(i):

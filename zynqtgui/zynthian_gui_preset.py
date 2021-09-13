@@ -26,6 +26,10 @@
 import sys
 import logging
 
+from zyngine import zynthian_layer
+
+from json import JSONEncoder, JSONDecoder
+
 # Zynthian specific modules
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
@@ -48,27 +52,46 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	def __init__(self, parent = None):
 		super(zynthian_gui_preset, self).__init__('Preset', parent)
+		self.__show_top_sounds = False
+		self.__top_sounds = []
 		self.next_screen_prop = 'control'
 		self.show()
-      
-      
+
+
 	def fill_list(self):
 		self.list_data = []
 		self.list_metadata = []
-		if not self.zyngui.curlayer:
-			logging.error("Can't fill preset list for None layer!")
-			super().fill_list()
-			return
 
-		self.zyngui.curlayer.load_preset_list()
-		if not self.zyngui.curlayer.preset_list:
-			self.set_select_path()
+		if self.__show_top_sounds:
+			try:
+				with open("/zynthian/zynthian-my-data/top-sounds.json", "r") as fh:
+					json=fh.read()
+					logging.info("Loading top sounds %s" % (json))
+
+					self.__top_sounds = JSONDecoder().decode(json)
+					logging.error(self.__top_sounds)
+					if isinstance(self.__top_sounds, list):
+						for sound in self.__top_sounds:
+							if isinstance(sound, dict):
+								self.list_data.append(("topsound", len(self.list_data), sound["name"]))
+								self.list_metadata.append({"icon": "", "show_numbers": True})
+			except Exception as e:
+				logging.error("Can't load top sounds: %s" % (e))
+
+		else:
+			if not self.zyngui.curlayer:
+				logging.error("Can't fill preset list for None layer!")
+				return
+
 			self.zyngui.curlayer.load_preset_list()
+			if not self.zyngui.curlayer.preset_list:
+				self.set_select_path()
+				self.zyngui.curlayer.load_preset_list()
 
-		for item in self.zyngui.curlayer.preset_list:
-			self.list_data.append(item)
-			self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
-							  "show_numbers": True})
+			for item in self.zyngui.curlayer.preset_list:
+				self.list_data.append(item)
+				self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
+								"show_numbers": True})
 
 		super().fill_list()
 
@@ -86,6 +109,42 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		if self.list_data[i][0] == "topsound":
+			self.zyngui.start_loading()
+			sound = self.__top_sounds[i]
+			layer = self.zyngui.curlayer
+			if self.zyngui.curlayer.engine.nickname != sound["engine"]:
+				midi_chan = self.zyngui.curlayer.midi_chan
+				self.zyngui.screens['layer'].remove_current_layer()
+				engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
+				layer = zynthian_layer(engine, midi_chan, self.zyngui)
+				self.zyngui.screens['layer'].layers.append(layer)
+				self.zyngui.screens['engine'].stop_unused_engines()
+
+			layer.wait_stop_loading()
+			#Load bank list and set bank
+			try:
+				layer.bank_name=sound['bank']	#tweak for working with setbfree extended config!! => TODO improve it!!
+				layer.load_bank_list()
+				layer.bank_name=None
+				layer.set_bank_by_name(sound['bank'])
+				self.zyngui.screens['layer'].reset_midi_routing()
+				self.zyngui.zynautoconnect_midi(True)
+				self.zyngui.screens['layer'].reset_audio_routing()
+				self.zyngui.zynautoconnect_audio()
+
+			except Exception as e:
+				logging.warning("Invalid Bank on layer {}: {}".format(layer.get_basepath(), e))
+
+			layer.wait_stop_loading()
+
+			#Load preset list and set preset
+			layer.load_preset_list()
+			layer.preset_loaded = layer.set_preset_by_name(sound['preset'])
+			self.zyngui.screens['layer'].fill_list()
+			self.zyngui.stop_loading()
+
+			return
 		if t=='S':
 			self.zyngui.curlayer.set_preset(i)
 			self.zyngui.screens['control'].show()
@@ -94,6 +153,30 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.zyngui.curlayer.toggle_preset_fav(self.list_data[i])
 			self.update_list()
 			self.zyngui.screens['bank'].fill_list()
+
+
+	@Slot(None)
+	def toggle_top_sound(self):
+		if self.__show_top_sounds:
+			self.__top_sounds.remove(self.index)
+		else:
+			self.__top_sounds.append({"name": self.select_path,
+							 "engine": self.zyngui.curlayer.engine.nickname,
+							 "bank": self.zyngui.curlayer.bank_name,
+							 "preset": self.zyngui.curlayer.preset_name})
+		try:
+			f = open("/zynthian/zynthian-my-data/top-sounds.json", "w")
+			f.write(JSONEncoder().encode(self.__top_sounds))
+			f.close()
+		except Exception as e:
+			logging.warning("Can't save top sounds: {}".format(e))
+
+
+
+
+	def show_top_sounds(self, show):
+		self.__show_top_sounds = show
+		self.fill_list()
 
 	def index_supports_immediate_activation(self, index=None):
 		return True

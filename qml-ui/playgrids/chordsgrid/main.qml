@@ -64,6 +64,7 @@ Zynthian.BasePlayGrid {
         var chord_notes = [];
         var diatonic_progressions = [0, 2, 4];
 
+        model.clear();
         for (var row = 0; row < chord_rows; ++row){
 
             var scale_index = 0;
@@ -115,13 +116,7 @@ Zynthian.BasePlayGrid {
 
     function populateGrid(){
         var chord_rows = component.settingsStore.property("chordRows");
-
-        if (component.model) component.model.clear();
-        else component.model = zynthian.playgrid.createNotesModel();
         fillModel(component.model, chord_rows, component.settingsStore.property("chordScales"))
-
-        if (component.miniGridModel) component.miniGridModel.clear();
-        else component.miniGridModel = zynthian.playgrid.createNotesModel();
         fillModel(component.miniGridModel, 2, component.settingsStore.property("miniChordScales"))
     }
 
@@ -143,7 +138,11 @@ Zynthian.BasePlayGrid {
         component.miniChordScales = component.settingsStore.property("miniChordScales");
         component.positionalVelocity = component.settingsStore.property("positionalVelocity")
 
-        populateGridTimer.start()
+        component.model = zynthian.playgrid.getNotesModel("zynthian chordsgrid main")
+        component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian chordsgrid mini")
+        if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
+            populateGridTimer.start()
+        }
     }
 
     Component {

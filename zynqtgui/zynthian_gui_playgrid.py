@@ -323,7 +323,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     searchlist = [Path(Path.home() / ".local/share/zynthian/playgrids"), Path("/home/pi/zynthian-ui/qml-ui/playgrids")]
     dir_watcher = QFileSystemWatcher()
 
-    __models__ = []
+    __models__ = {}
     __notes__ = []
     __settings_stores__ = {}
     __note_state_map__ = {}
@@ -549,19 +549,26 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __most_recently_changed_notes_changed__(self):
         pass
 
-    def model_deleted(self, model:zynthian_gui_grid_notes_model):
-        if model in zynthian_gui_playgrid.__models__:
-            zynthian_gui_playgrid.__models__.remove(model)
+    @Slot(str, result=QObject)
+    def getNotesModel(self, modelName:str):
+        zynthian_gui_playgrid.__mutex__.acquire()
+        if not modelName in zynthian_gui_playgrid.__models__:
+            model = zynthian_gui_grid_notes_model(QCoreApplication.instance())
+            zynthian_gui_playgrid.__models__[modelName] = model
+            QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
+        model = zynthian_gui_playgrid.__models__.get(modelName)
+        zynthian_gui_playgrid.__mutex__.release()
+        return model
 
     @Slot(result=QObject)
     def createNotesModel(self):
         zynthian_gui_playgrid.__mutex__.acquire()
-        model = zynthian_gui_grid_notes_model(QCoreApplication.instance())
-        zynthian_gui_playgrid.__models__.append(model)
-        model.destroyed.connect(self.model_deleted)
-        QQmlEngine.setObjectOwnership(model, QQmlEngine.CppOwnership)
+        if not hasattr(zynthian_gui_playgrid, "__fauxModelName__"):
+            zynthian_gui_playgrid.__fauxModelName__ = ""
+        zynthian_gui_playgrid.__fauxModelName__ = zynthian_gui_playgrid.__fauxModelName__ + "."
+        logging.error("Fetching a new model with a name made up of dots (please port to using getNotesModel(str)): " + zynthian_gui_playgrid.__fauxModelName__)
         zynthian_gui_playgrid.__mutex__.release()
-        return model
+        return self.getNotesModel(zynthian_gui_playgrid.__fauxModelName__)
 
     def note_deleted(self, note:Note):
         if note in zynthian_gui_playgrid.__notes__:

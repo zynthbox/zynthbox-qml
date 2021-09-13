@@ -343,11 +343,12 @@ class zynthiloops_clip(QObject):
     def bpm(self):
         return self.__bpm__
 
-    def set_bpm(self, bpm: float):
-        self.__bpm__ = bpm
-        self.bpm_changed.emit()
-        # self.__song__.schedule_save()
-        self.reset_beat_count()
+    def set_bpm(self, bpm: float, force_set=False):
+        if self.__bpm__ != bpm or force_set is True:
+            self.__bpm__ = bpm
+            self.bpm_changed.emit()
+            # self.__song__.schedule_save()
+            self.reset_beat_count()
 
     bpm = Property(float, bpm, set_bpm, notify=bpm_changed)
 
@@ -402,6 +403,12 @@ class zynthiloops_clip(QObject):
 
         self.audioSource.audioLevelChanged.connect(lambda leveldB: self.audio_level_changed_cb(leveldB))
         self.audioSource.progressChanged.connect(lambda progress: self.progress_changed_cb(progress))
+
+        try:
+            logging.error(f"Setting bpm from metadata : {self.audio_metadata}")
+            self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
+        except Exception as e:
+            logging.error(f"Error setting bpm from metadata : {str(e)}")
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -521,6 +528,7 @@ class zynthiloops_clip(QObject):
         try:
             self.audio_metadata = taglib.File(self.__path__).tags
             self.sound_data_changed.emit()
+            self.metadata_bpm_changed.emit()
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None
@@ -563,3 +571,17 @@ class zynthiloops_clip(QObject):
         return 60.0/self.__song__.bpm
 
     secPerBeat = Property(float, get_secPerBeat, notify=sec_per_beat_changed)
+
+    @Signal
+    def metadata_bpm_changed(self):
+        pass
+
+    def get_metadataBPM(self):
+        try:
+            return int(self.audio_metadata["ZYNTHBOX_BPM"][0])
+        except Exception as e:
+            logging.error(f"Error retrieving from metadata : {str(e)}")
+
+        return None
+
+    metadataBPM = Property(int, get_metadataBPM, notify=metadata_bpm_changed)

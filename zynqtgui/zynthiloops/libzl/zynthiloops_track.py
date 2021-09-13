@@ -176,6 +176,13 @@ class zynthiloops_track(QObject):
         return self.__audio_level__
 
     def set_audioLevel(self, leveldB):
+        lower_limit = -40
+        upper_limit = 10
+        new_upper_limit = upper_limit - (1 - self.__volume__/100) * (upper_limit - lower_limit)
+
+        # Calculate new value wrt volume
+        leveldB = self.map_range(leveldB, lower_limit, upper_limit, lower_limit, new_upper_limit)
+
         if leveldB < -40:
             self.__audio_level__ = -40
         else:
@@ -184,3 +191,15 @@ class zynthiloops_track(QObject):
         self.audioLevelChanged.emit()
 
     audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)
+
+    # Helper method to map value from one range to another
+    @staticmethod
+    def map_range(sourceNumber, fromA, fromB, toA, toB):
+        deltaA = fromB - fromA
+        deltaB = toB - toA
+        scale  = deltaB / deltaA
+        negA   = -1 * fromA
+        offset = (negA * scale) + toA
+        finalNumber = (sourceNumber * scale) + offset
+
+        return finalNumber

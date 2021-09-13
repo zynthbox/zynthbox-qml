@@ -103,10 +103,10 @@ class zynthian_gui_main(zynthian_gui_selector):
                 try:
                     f = open(apps_folder + appimage_dir + "/metadata.json", "r")
                     metadata = JSONDecoder().decode(f.read())
-                    if (not "exec" in metadata) or (not "name" in metadata) or (not "icon" in metadata):
+                    if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
                         continue
-                    self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["exec"], metadata["name"]))
-                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["icon"]})
+                    self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
+                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"]})
                 except Exception as e:
                     logging.error(e)
 

@@ -254,7 +254,6 @@ Zynthian.ScreenPage {
                         width: playGridsRepeater.count * settingsButton.width
                         spacing: 0
                         opacity: settingsSlidePoint.pressed ? 1 : 0
-                        Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                         Repeater {
                             model: playGridsRepeater.count
                             delegate: Item {

@@ -264,8 +264,13 @@ MouseArea {
         }
         QQC2.Label {
             id: metronomeLabel
-            visible: zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0
-            text: (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+            text: {
+                if (zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0 && zynthian.zynthiloops.currentBar >= 0) {
+                    return (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+                } else {
+                    return "1.1"
+                }
+            }
         }
         ColumnLayout {
             Layout.alignment: Qt.AlignBottom

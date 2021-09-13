@@ -61,6 +61,7 @@ Zynthian.BasePlayGrid {
         var scaleArray = scale_mode_map[scale];
         var scale_index = 0;
 
+        model.clear();
         for (var row = 0; row < rows; ++row){
 
             var notes = [];
@@ -102,12 +103,7 @@ Zynthian.BasePlayGrid {
         var columns = component.settingsStore.property("columns")
         var positionalVelocity = component.settingsStore.property("positionalVelocity")
 
-        if (component.model) component.model.clear();
-        else component.model = zynthian.playgrid.createNotesModel();
         fillModel(component.model, startingNote, scale, rows, columns, positionalVelocity)
-
-        if (component.miniGridModel) component.miniGridModel.clear();
-        else component.miniGridModel = zynthian.playgrid.createNotesModel();
         fillModel(component.miniGridModel, startingNote + 24, scale, 2, columns, positionalVelocity)
     }
 
@@ -120,7 +116,11 @@ Zynthian.BasePlayGrid {
         component.settingsStore.setDefault("columns", 8);
         component.settingsStore.setDefault("positionalVelocity", true);
 
-        populateGridTimer.start()
+        component.model = zynthian.playgrid.getNotesModel("zynthian notesgrid main")
+        component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian notesgrid mini")
+        if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
+            populateGridTimer.start()
+        }
     }
 
     Connections {

@@ -93,7 +93,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # self.update_recorder_jack_port()
         self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
 
+        self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
+
         self.update_timer_bpm()
+
+    @Signal
+    def master_volume_changed(self):
+        pass
+
+    def get_master_volume(self):
+        return self.zyngui.master_alsa_mixer.volume
 
     @Signal
     def click_track_enabled_changed(self):

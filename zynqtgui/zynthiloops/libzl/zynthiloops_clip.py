@@ -113,7 +113,9 @@ class zynthiloops_clip(QObject):
                 "start": self.__start_position__,
                 "length": self.__length__,
                 "pitch": self.__pitch__,
-                "time": self.__time__}
+                "time": self.__time__,
+                "bpm": self.__bpm__,
+                "shouldSync": self.__should_sync__}
 
     def deserialize(self, obj):
         if "path" in obj:
@@ -133,6 +135,12 @@ class zynthiloops_clip(QObject):
         if "time" in obj:
             self.__time__ = obj["time"]
             self.set_time(self.__time__, True)
+        if "bpm" in obj:
+            self.__bpm__ = obj["bpm"]
+            self.set_bpm(self.bpm, True)
+        if "shouldSync" in obj:
+            self.__should_sync__ = obj["shouldSync"]
+            self.set_shouldSync(self.__should_sync__, True)
 
         self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
         self.track.volume_changed.connect(lambda: self.track_volume_changed())
@@ -361,16 +369,17 @@ class zynthiloops_clip(QObject):
     def shouldSync(self):
         return self.__should_sync__
 
-    def set_shouldSync(self, shouldSync: bool):
-        self.__should_sync__ = shouldSync
-        self.should_sync_changed.emit()
-        self.update_synced_values()
-        # self.__song__.schedule_save()
+    def set_shouldSync(self, shouldSync: bool, force_set=False):
+        if self.__should_sync__ != shouldSync or force_set is True:
+            self.__should_sync__ = shouldSync
+            self.should_sync_changed.emit()
+            self.update_synced_values()
+            # self.__song__.schedule_save()
 
-        if not shouldSync:
-            self.set_time(1.0)
-            # Set length to recalculate loop time
-            self.set_length(self.__length__)
+            if not shouldSync:
+                self.set_time(1.0)
+                # Set length to recalculate loop time
+                self.set_length(self.__length__)
 
     shouldSync = Property(bool, shouldSync, set_shouldSync, notify=should_sync_changed)
 

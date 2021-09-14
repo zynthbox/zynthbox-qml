@@ -53,8 +53,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
       
       
 	def fill_list(self):
+		self.list_data = []
+		self.list_metadata = []
 		if not self.zyngui.curlayer:
 			logging.error("Can't fill preset list for None layer!")
+			super().fill_list()
 			return
 
 		self.zyngui.curlayer.load_preset_list()
@@ -62,8 +65,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.set_select_path()
 			self.zyngui.curlayer.load_preset_list()
 
-		self.list_data = []
-		self.list_metadata = []
 		for item in self.zyngui.curlayer.preset_list:
 			self.list_data.append(item)
 			self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",

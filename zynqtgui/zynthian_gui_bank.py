@@ -30,6 +30,9 @@ import logging
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
+# Qt modules
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+
 #------------------------------------------------------------------------------
 # Zynthian Bank Selection GUI Class
 #------------------------------------------------------------------------------
@@ -45,22 +48,37 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
 	def __init__(self, parent = None):
 		super(zynthian_gui_bank, self).__init__('Bank', parent)
+		self.__show_top_sounds = False
 		self.auto_next_screen = False
 		self.show()
 
-    
+
 	def fill_list(self):
 		self.list_data = []
-
-		if not self.zyngui.curlayer:
-			logging.error("Can't fill bank list for None layer!")
-			super().fill_list()
-			return
-		self.zyngui.curlayer.load_bank_list()
-		self.list_data = self.zyngui.curlayer.bank_list
-
+		if self.__show_top_sounds:
+			self.zyngui.screens['preset'].reload_top_sounds()
+			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
+			for engine in top_sounds:
+				self.list_data.append((engine, len(self.list_data), "{} ({})".format(engine, len(top_sounds[engine]))))
+		else:
+			if not self.zyngui.curlayer:
+				logging.error("Can't fill bank list for None layer!")
+				super().fill_list()
+				return
+			self.zyngui.curlayer.load_bank_list()
+			self.list_data = self.zyngui.curlayer.bank_list
 		super().fill_list()
 
+	def get_show_top_sounds(self):
+		return self.__show_top_sounds
+
+	def set_show_top_sounds(self, show : bool):
+		if self.__show_top_sounds == show:
+			return
+		self.__show_top_sounds = show
+		self.fill_list()
+		self.select_action(0)
+		self.show_top_sounds_changed.emit()
 
 	def show(self):
 		if not self.zyngui.curlayer:
@@ -77,16 +95,14 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
-		if self.list_data[i][0]=='*TOP_SOUNDS*':
-			self.zyngui.screens['preset'].set_show_only_favorites(False)
-			self.zyngui.screens['preset'].show_top_sounds(True)
-			self.zyngui.screens['preset'].fill_list()
+		if i < 0 or i >= len(self.list_data):
+			return
+		if self.__show_top_sounds:
+			self.zyngui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
 			return
 		if self.list_data[i][0]=='*FAVS*':
-			self.zyngui.screens['preset'].show_top_sounds(False)
 			self.zyngui.screens['preset'].set_show_only_favorites(True)
 		else:
-			self.zyngui.screens['preset'].show_top_sounds(False)
 			self.zyngui.screens['preset'].set_show_only_favorites(False)
 
 		if self.zyngui.curlayer.set_bank(i):
@@ -118,5 +134,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				self.select_path_element = str(self.zyngui.curlayer.engine.name)
 			super().set_select_path()
 
+
+	show_top_sounds_changed = Signal()
+
+	show_top_sounds = Property(bool, get_show_top_sounds, set_show_top_sounds, notify = show_top_sounds_changed)
 
 #-------------------------------------------------------------------------------

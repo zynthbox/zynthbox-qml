@@ -302,10 +302,11 @@ class zynthian_gui_playgrid_settings(QObject):
     @Slot(str,'QVariant')
     def setDefault(self, property:str, value:'QVariant'):
         if not property in self.__defaults__ or not self.__defaults__[property] == value:
+            oldValue = self.property(property)
             self.__defaults__[property] = value
             self.__most_recently_changed__ = property
             self.defaultChanged.emit()
-            if not property in self.__settings__:
+            if value != oldValue:
                 self.propertyChanged.emit()
 
     @Slot(result=str)

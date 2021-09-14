@@ -95,7 +95,10 @@ def midi_autoconnect(force=False):
 	#------------------------------------
 
 	#Get Physical MIDI input ports ...
-	hw_out=jclient.get_ports(is_output=True, is_physical=True, is_midi=True)
+	try:
+		hw_out=jclient.get_ports(is_output=True, is_physical=True, is_midi=True)
+	except:
+		logging.error("Failed to get ports via jack")
 	if len(hw_out)==0:
 		hw_out=[]
 

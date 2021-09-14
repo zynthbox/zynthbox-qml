@@ -341,6 +341,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grids__ = []
         self.__pitch__ = 0
         self.__modulation__ = 0
+        self.__metronome_beat__ = 0
         self.__most_recently_changed_notes__ = [] # List of dicts
         self.updatePlayGrids()
         self.listen_to_everything()
@@ -650,11 +651,19 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__metronome_manager__.stop_metronome_request()
 
     def metronome_update(self):
-        beat = self.__metronome_manager__.currentBeat
-        logging.error(f"Playgrid metronome update({self}) : Beat({beat})")
+        self.__metronome_beat__ = self.__metronome_manager__.currentBeat
+        self.__metronome_beat_changed__.emit()
+
+    def __get_metronome_beat__(self):
+        return self.__metronome_beat__
+
+    @Signal
+    def __metronome_beat_changed__(self):
+        pass
 
     mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)
     playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)
     pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
     modulation = Property(int, __get_modulation__, __set_modulation__, notify=__modulation_changed__)
     playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)
+    metronomeBeat = Property(int, __get_metronome_beat__, notify=__metronome_beat_changed__)

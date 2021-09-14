@@ -25,6 +25,8 @@
 import math
 
 from datetime import datetime
+from pathlib import Path
+
 from PySide2.QtCore import Property, QObject, Signal, Slot
 import taglib
 import json
@@ -606,3 +608,12 @@ class zynthiloops_clip(QObject):
         return None
 
     metadataBPM = Property(int, get_metadataBPM, notify=metadata_bpm_changed)
+
+    @Property(str, constant=True)
+    def recordingDir(self):
+        wav_dir = Path(self.__song__.sketch_folder) / 'wav'
+
+        if wav_dir.exists():
+            return str(wav_dir)
+        else:
+            return self.__song__.sketch_folder

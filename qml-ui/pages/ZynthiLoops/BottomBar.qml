@@ -278,8 +278,34 @@ Zynthian.Card {
     QQC2.Dialog {
         id: pickerDialog
         parent: root.parent
-        header: Kirigami.Heading {
-            text: qsTr("Pick an audio file")
+        modal: true
+        standardButtons: Dialog.Cancel
+        header: ColumnLayout{
+            spacing: 8
+
+            Kirigami.Heading {
+                text: qsTr("Pick an audio file")
+                font.pointSize: 16
+                Layout.leftMargin: 12
+                Layout.topMargin: 12
+            }
+
+            RowLayout {
+                property var folderSplitArray: String(folderModel.folder).replace("file:///", "").split("/").filter(function(e) { return e.length > 0 })
+
+                id: folderBreadcrumbs
+                Layout.leftMargin: 12
+                spacing: 2
+                Repeater {
+                    model: folderBreadcrumbs.folderSplitArray
+                    delegate: Zynthian.BreadcrumbButton {
+                        text: modelData
+                        onClicked: {
+                            folderModel.folder = "/"+folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
+                        }
+                    }
+                }
+            }
         }
         x: parent.width/2 - width/2
         y: parent.height/2 - height/2
@@ -287,16 +313,35 @@ Zynthian.Card {
         height: Math.round(parent.height * 0.8)
         contentItem: QQC2.ScrollView {
             contentItem: ListView {
+                Layout.leftMargin: 8
+                clip: true
                 model: FolderListModel {
                     id: folderModel
                     nameFilters: ["*.wav"]
-                    folder: "/zynthian/zynthian-my-data/capture/"
+                    folder: root.controlObj.recordingDir
+                    showDirs: true
+                    showDirsFirst: true
+                    showDotAndDotDot: true
                 }
                 delegate: Kirigami.BasicListItem {
                     label: model.fileName
+                    icon: {
+                        if (model.fileIsDir) {
+                            return "folder-symbolic"
+                        }
+                        else if (model.filePath.endsWith(".wav")) {
+                            return "folder-music-symbolic"
+                        } else {
+                            return "file-catalog-symbolic"
+                        }
+                    }
                     onClicked: {
-                        root.controlObj.path = model.filePath
-                        pickerDialog.accept()
+                        if (model.fileIsDir) {
+                            folderModel.folder = model.filePath
+                        } else {
+                            root.controlObj.path = model.filePath
+                            pickerDialog.accept()
+                        }
                     }
                 }
             }

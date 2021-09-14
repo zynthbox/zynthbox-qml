@@ -454,7 +454,10 @@ class zynthiloops_clip(QObject):
         pass
 
     def get_audioLevel(self):
-        return self.__audio_level__
+        if self.__is_playing__:
+            return self.__audio_level__
+        else:
+            return -40
 
     audioLevel = Property(float, get_audioLevel, notify=audioLevelChanged)
 

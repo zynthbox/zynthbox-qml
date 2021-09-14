@@ -32,7 +32,7 @@ import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
 
-Zynthian.MultiSelectorPage {
+Zynthian.ScreenPage {
     id: root
     contextualActions: [
         Kirigami.Action {
@@ -94,10 +94,100 @@ Zynthian.MultiSelectorPage {
         }
     ]
 
-    screenIds: ["fixed_layers", "bank", "preset"]
-    screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
+    property var screenIds: ["fixed_layers", "bank", "preset"]
+    property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
+
+    contentItem: RowLayout {
+		spacing: Kirigami.Units.largeSpacing
+		ColumnLayout {
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+			// NOTE: this is to make fillWidth always partition the space in equal sizes
+			implicitWidth: 1
+			Layout.preferredWidth: 1
+			Kirigami.Heading {
+				level: 2
+				text: qsTr("Layers")
+				Kirigami.Theme.inherit: false
+				Kirigami.Theme.colorSet: Kirigami.Theme.View
+			}
+			Zynthian.SelectorView {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				screenId: "fixed_layers"
+				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+				onItemActivated: root.itemActivated(screenId, index)
+				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+			}
+		}
+		ColumnLayout {
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+			implicitWidth: 1
+			Layout.preferredWidth: 1
+			RowLayout {
+				Kirigami.Heading {
+					id: heading
+					Layout.fillWidth: true
+					level: 2
+					text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
+					Kirigami.Theme.inherit: false
+					Kirigami.Theme.colorSet: Kirigami.Theme.View
+				}
+				QQC2.Button {
+					text: qsTr("Top")
+					checkable: true
+					implicitHeight: heading.height
+					checked: zynthian.bank.show_top_sounds
+					onToggled: {
+						zynthian.bank.show_top_sounds = checked;
+					}
+				}
+			}
+			Zynthian.SelectorView {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				screenId: "bank"
+				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+				onItemActivated: root.itemActivated(screenId, index)
+				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+			}
+		}
+		ColumnLayout {
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+			implicitWidth: 1
+			Layout.preferredWidth: 1
+			RowLayout {
+				Kirigami.Heading {
+					Layout.fillWidth: true
+					level: 2
+					text: qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)
+					Kirigami.Theme.inherit: false
+					Kirigami.Theme.colorSet: Kirigami.Theme.View
+				}
+				QQC2.Button {
+					implicitHeight: heading.height
+					visible: false
+					icon.name: "starred-symbolic"
+					checkable: true
+					onToggled: {
+
+					}
+				}
+			}
+			Zynthian.SelectorView {
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				screenId: "preset"
+				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+				onItemActivated: root.itemActivated(screenId, index)
+				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+			}
+		}
+	}
 
     Connections {
         target: zynthian.fixed_layers

@@ -634,20 +634,16 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         return settingsStore
 
     @Slot(None)
-    def connectMetronomeSignals(self):
-        try:
-            self.__metronome_manager__.current_beat_changed.disconnect(self.metronome_update)
-        except Exception as e:
-            logging.error(f"Failed to disconnect. Not connected maybe? : {str(e)}")
-
-        self.__metronome_manager__.current_beat_changed.connect(self.metronome_update)
-
-    @Slot(None)
     def startMetronomeRequest(self):
+        self.__metronome_manager__.current_beat_changed.connect(self.metronome_update)
         self.__metronome_manager__.start_metronome_request()
 
     @Slot(None)
     def stopMetronomeRequest(self):
+        try:
+            self.__metronome_manager__.current_beat_changed.disconnect(self.metronome_update)
+        except Exception as e:
+            logging.error(f"Failed to disconnect. Not connected maybe? : {str(e)}")
         self.__metronome_manager__.stop_metronome_request()
 
     def metronome_update(self):

@@ -151,7 +151,6 @@ Zynthian.ScreenPage {
                             Kirigami.Action {
                                 text: "Start Metronome"
                                 onTriggered: {
-                                    zynthian.playgrid.connectMetronomeSignals()
                                     zynthian.playgrid.startMetronomeRequest()
                                 }
                             },

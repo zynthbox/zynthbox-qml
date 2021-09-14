@@ -43,11 +43,12 @@ Zynthian.BasePlayGrid {
     property QtObject settingsStore
     property QtObject miniGridModel
     property int chordRows
-    property var chordScales
-    property var miniChordScales
+    property var chordScales: ["ionian","dorian","phrygian","aeolian","chromatic"]
+    property var miniChordScales: ["dorian","phrygian"]
     property bool positionalVelocity
 
     function fillModel(model, chord_rows, chord_scales) {
+        console.log("Filling chords model " + model)
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
         var scale_mode_map = {
             "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -129,8 +130,8 @@ Zynthian.BasePlayGrid {
 
         component.settingsStore.setDefault("chordRows", 5);
         component.settingsStore.setDefault("startingNote", component.octave * 12);
-        component.settingsStore.setDefault("chordScales",["ionian","dorian","phrygian","aeolian","chromatic"])
-        component.settingsStore.setDefault("miniChordScales",["dorian","phrygian"])
+        component.settingsStore.setDefault("chordScales", ["ionian","dorian","phrygian","aeolian","chromatic"])
+        component.settingsStore.setDefault("miniChordScales", ["dorian","phrygian"])
         component.settingsStore.setDefault("positionalVelocity",true)
 
         component.chordRows = component.settingsStore.property("chordRows");
@@ -141,7 +142,7 @@ Zynthian.BasePlayGrid {
         component.model = zynthian.playgrid.getNotesModel("zynthian chordsgrid main")
         component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian chordsgrid mini")
         if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
-            populateGridTimer.start()
+            populateGridTimer.restart()
         }
     }
 
@@ -247,20 +248,40 @@ Zynthian.BasePlayGrid {
         }
     }
 
+    function stringListsEqual(list1, list2) {
+        var equal = true;
+        if (list1.length === list2.length) {
+            for (var i = 0; i < list1.length; ++i) {
+                if (list1[i] !== list2[i]) {
+                    equal = false;
+                    break;
+                }
+            }
+        } else {
+            equal = false;
+        }
+        return equal;
+    }
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
-            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged()
-            if (mostRecentlyChanged === "chordRows"){
+            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged();
+//             console.log("A property named " + mostRecentlyChanged + " has changed to " + component.settingsStore.property(mostRecentlyChanged))
+            var changed = true;
+            if (mostRecentlyChanged === "chordRows" && component.chordRows != component.settingsStore.property("chordRows")){
                 component.chordRows = component.settingsStore.property("chordRows");
-            } else if (mostRecentlyChanged === "chordScales"){
+            } else if (mostRecentlyChanged === "chordScales" && !stringListsEqual(component.chordScales, component.settingsStore.property("chordScales"))){
                 component.chordScales = component.settingsStore.property("chordScales");
-            } else if (mostRecentlyChanged === "miniChordScales"){
+            } else if (mostRecentlyChanged === "miniChordScales" && !stringListsEqual(component.miniChordScales, component.settingsStore.property("miniChordScales"))){
                 component.miniChordScales = component.settingsStore.property("miniChordScales");
-            } else if (mostRecentlyChanged === "positionalVelocity"){
+            } else if (mostRecentlyChanged === "positionalVelocity" && component.positionalVelocity != component.settingsStore.property("positionalVelocity")){
                 component.positionalVelocity = component.settingsStore.property("positionalVelocity");
+            } else {
+                changed = false;
             }
-            populateGridTimer.start()
+            if (changed) {
+                populateGridTimer.restart()
+            }
         }
     }
 

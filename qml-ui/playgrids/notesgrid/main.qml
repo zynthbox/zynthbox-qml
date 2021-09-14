@@ -43,7 +43,14 @@ Zynthian.BasePlayGrid {
     property QtObject settingsStore
     property QtObject miniGridModel
 
+    property int startingNote: component.octave * 12;
+    property string scale: "ionian";
+    property int rows: 5;
+    property int columns: 8;
+    property bool positionalVelocity: true;
+
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
+        console.log("Filling notes model " + model)
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
@@ -97,36 +104,54 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
-        var startingNote = component.settingsStore.property("startingNote")
-        var scale = component.settingsStore.property("scale")
-        var rows = component.settingsStore.property("rows")
-        var columns = component.settingsStore.property("columns")
-        var positionalVelocity = component.settingsStore.property("positionalVelocity")
-
-        fillModel(component.model, startingNote, scale, rows, columns, positionalVelocity)
-        fillModel(component.miniGridModel, startingNote + 24, scale, 2, columns, positionalVelocity)
+        fillModel(component.model, component.startingNote, component.scale, component.rows, component.columns, component.positionalVelocity)
+        fillModel(component.miniGridModel, component.startingNote + 24, component.scale, 2, component.columns, component.positionalVelocity)
     }
 
     Component.onCompleted: {
         component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
 
-        component.settingsStore.setDefault("startingNote", component.octave * 12);
-        component.settingsStore.setDefault("scale", "ionian");
-        component.settingsStore.setDefault("rows", 5);
-        component.settingsStore.setDefault("columns", 8);
-        component.settingsStore.setDefault("positionalVelocity", true);
+        component.settingsStore.setDefault("startingNote", component.startingNote);
+        component.settingsStore.setDefault("scale", component.scale);
+        component.settingsStore.setDefault("rows", component.rows);
+        component.settingsStore.setDefault("columns", component.columns);
+        component.settingsStore.setDefault("positionalVelocity", component.positionalVelocity);
+
+        component.startingNote = component.settingsStore.property("startingNote")
+        component.scale = component.settingsStore.property("scale")
+        component.rows = component.settingsStore.property("rows")
+        component.columns = component.settingsStore.property("columns")
+        component.positionalVelocity = component.settingsStore.property("positionalVelocity")
 
         component.model = zynthian.playgrid.getNotesModel("zynthian notesgrid main")
         component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian notesgrid mini")
         if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
-            populateGridTimer.start()
+            populateGridTimer.restart()
         }
     }
 
     Connections {
         target: component.settingsStore
         onPropertyChanged: {
-            populateGridTimer.start()
+            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged();
+//             console.log("A property named " + mostRecentlyChanged + " has changed to " + component.settingsStore.property(mostRecentlyChanged));
+            var changed = true;
+            if (mostRecentlyChanged === "startingNote" && component.startingNote != component.settingsStore.property("startingNote")) {
+                component.startingNote = component.settingsStore.property("startingNote");
+            } else if (mostRecentlyChanged === "scale" && component.scale != component.settingsStore.property("scale")) {
+                component.scale = component.settingsStore.property("scale");
+            } else if (mostRecentlyChanged === "rows" && component.rows != component.settingsStore.property("rows")) {
+                component.rows = component.settingsStore.property("rows");
+            } else if (mostRecentlyChanged === "columns" && component.columns != component.settingsStore.property("columns")) {
+                component.columns = component.settingsStore.property("columns");
+            } else if (mostRecentlyChanged === "positionalVelocity" && component.positionalVelocity != component.settingsStore.property("positionalVelocity")) {
+                component.positionalVelocity = component.settingsStore.property("positionalVelocity");
+            } else {
+                changed = false;
+            }
+            if (changed) {
+                populateGridTimer.restart()
+            }
         }
     }
 

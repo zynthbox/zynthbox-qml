@@ -132,6 +132,7 @@ Zynthian.Card {
             SidebarButton {
                 icon.name: "edit-clear-all"
                 visible: (controlObj != null) && controlObj.clearable
+                enabled: !controlObj.isPlaying
 
                 onClicked: controlObj.clear()
             }

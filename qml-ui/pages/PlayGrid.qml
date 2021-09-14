@@ -147,18 +147,6 @@ Zynthian.ScreenPage {
                                     zynthian.show_modal("playgrid_downloader");
                                     applicationWindow().controlsVisible = true;
                                 }
-                            },
-                            Kirigami.Action {
-                                text: "Start Metronome"
-                                onTriggered: {
-                                    zynthian.playgrid.startMetronomeRequest()
-                                }
-                            },
-                            Kirigami.Action {
-                                text: "Stop Metronome"
-                                onTriggered: {
-                                    zynthian.playgrid.stopMetronomeRequest()
-                                }
                             }
                         ]
                     }
@@ -231,7 +219,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.minimumHeight: width
                     Layout.maximumHeight: width
-                    icon.name: "configure"
+                    icon.name: "application-menu"
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                     background: Rectangle {
@@ -244,6 +232,58 @@ Zynthian.ScreenPage {
                         }
                         color: Kirigami.Theme.backgroundColor
                     }
+                    Item {
+                        id: settingsPopup
+                        visible: false
+                        anchors {
+                            left: parent.right
+                            leftMargin: 8
+                            bottom: parent.bottom
+                            bottomMargin: -8
+                        }
+                        height: controlsPanel.height
+                        width: component.width / 3
+                        Zynthian.Card {
+                            anchors.fill: parent
+                        }
+                        ColumnLayout {
+                            anchors.fill: parent
+                            spacing: 0
+                            Repeater {
+                                model: playGridsRepeater.count
+                                delegate: QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: settingsButton.height
+                                    Layout.maximumHeight: settingsButton.height
+                                    property var playGrid: playGridsRepeater.itemAt(index).item
+                                    icon.name: "view-grid-symbolic"
+                                    text: playGrid.name
+                                    display: QQC2.AbstractButton.TextBesideIcon
+                                    enabled: index !== zynthian.playgrid.playGridIndex
+                                    onClicked: {
+                                        settingsPopup.visible = false;
+                                        zynthian.playgrid.playGridIndex = index
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
+                            QQC2.Button {
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: settingsButton.height
+                                Layout.maximumHeight: settingsButton.height
+                                icon.name: "configure"
+                                text: "Settings..."
+                                display: QQC2.AbstractButton.TextBesideIcon
+                                onClicked: {
+                                    settingsPopup.visible = false;
+                                    settingsDialog.visible = true;
+                                }
+                            }
+                        }
+                    }
                     Row {
                         anchors {
                             top: parent.top
@@ -252,7 +292,7 @@ Zynthian.ScreenPage {
                         }
                         width: playGridsRepeater.count * settingsButton.width
                         spacing: 0
-                        opacity: settingsSlidePoint.pressed ? 1 : 0
+                        opacity: (settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0) ? 1 : 0
                         Repeater {
                             model: playGridsRepeater.count
                             delegate: Item {
@@ -339,7 +379,7 @@ Zynthian.ScreenPage {
                                 parent.down = false;
                                 if (xChoice === 0 && yChoice === 0) {
                                     // Then it we just had a tap
-                                    settingsDialog.visible = true;
+                                    settingsPopup.visible = !settingsPopup.visible
                                 } else if (xChoice === 0 && yChoice !== 0) {
                                     switch (yChoice) {
                                         case -1:

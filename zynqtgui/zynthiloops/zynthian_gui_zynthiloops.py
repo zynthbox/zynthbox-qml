@@ -316,7 +316,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.update_recorder_jack_port()
         self.clip_to_record = clip
         (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
-        self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_presetname_{self.__song__.bpm}-BPM.clip.wav"
+        self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_{layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')}_{self.__song__.bpm}-BPM.clip.wav"
 
         #self.countInValue = countInBars * 4
 

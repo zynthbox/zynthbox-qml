@@ -114,6 +114,7 @@ Zynthian.Card {
             SidebarButton {
                 icon.name: "document-open"
                 visible: root.controlType === BottomBar.ControlType.Clip
+                enabled: !controlObj.isPlaying
 
                 onClicked: {
                     pickerDialog.open()

@@ -31,6 +31,8 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 Zynthian.MultiSelectorPage {
+    id: root
+
 
     screenIds: ["layer_effects", "effect_types", "layer_effect_chooser"]
     screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.effect_types.selector_list.count), qsTr("FX (%1)").arg(zynthian.layer_effect_chooser.selector_list.count)]
@@ -41,6 +43,26 @@ Zynthian.MultiSelectorPage {
     }
     Component.onDestruction: {
         zynthian.preset.next_screen = "control"
+    }
+
+    Connections {
+        id: currentConnection
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            print(zynthian.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
+            if (zynthian.current_screen_id !== "layer_effects" && zynthian.current_screen_id !== "effect_types" && zynthian.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+                pageRemoveTimer.restart()
+            }
+        }
+    }
+    Timer {
+        id: pageRemoveTimer
+        interval: Kirigami.Units.longDuration
+        onTriggered: {
+            if (zynthian.current_screen_id !== "layer_effects" && zynthian.current_screen_id !== "effect_types" && zynthian.current_screen_id !== "layer_effect_chooser" && applicationWindow().pageStack.lastItem === root) {
+                applicationWindow().pageStack.pop();
+            }
+        }
     }
 }
 

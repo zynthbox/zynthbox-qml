@@ -129,7 +129,12 @@ GridLayout {
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
             text: root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)
-            validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
+            // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
+
+            /** Float Matching : Matches exactly one '0' after decimal point
+              *                  or a maximum of two digits
+              */
+            validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
             enabled: !root.bottomBar.controlObj.shouldSync
             onAccepted: {

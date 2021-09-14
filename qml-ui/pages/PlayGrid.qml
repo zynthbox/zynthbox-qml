@@ -284,6 +284,25 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
+                    Item {
+                        anchors {
+                            top: settingsPopup.top
+                            left: settingsPopup.right
+                            leftMargin: Kirigami.Units.largeSpacing
+                            bottom: settingsPopup.bottom
+                        }
+                        width: component.width - settingsPopup.mapToGlobal(settingsPopup.width, 0).x - Kirigami.Units.largeSpacing * 3
+                        visible: settingsPopup.visible && gridSettingsPopup.item !== null
+                        Zynthian.Card {
+                            anchors.fill: parent
+                        }
+                        Loader {
+                            id: gridSettingsPopup
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            sourceComponent: playGridsRepeater.currentItem.popup ? playGridsRepeater.currentItem.popup : null
+                        }
+                    }
                     Row {
                         anchors {
                             top: parent.top
@@ -292,7 +311,7 @@ Zynthian.ScreenPage {
                         }
                         width: playGridsRepeater.count * settingsButton.width
                         spacing: 0
-                        opacity: (settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0) ? 1 : 0
+                        visible: settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0
                         Repeater {
                             model: playGridsRepeater.count
                             delegate: Item {

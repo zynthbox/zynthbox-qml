@@ -34,10 +34,9 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.MultiSelectorPage {
     id: root
-    backAction.visible: false
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Layers")
+            text: qsTr("Sounds")
             Kirigami.Action {
                 text: qsTr("Load Sound...")
                 onTriggered: {
@@ -67,23 +66,26 @@ Zynthian.MultiSelectorPage {
                 }
             }
             Kirigami.Action {
-                text: qsTr("Remove Layer")
+                text: qsTr("Clear Sound")
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
-                text: qsTr("Remove All")
+                text: qsTr("Clear All")
                 onTriggered: zynthian.layer.ask_reset()
             }
         },
         Kirigami.Action {
-            text: qsTr("Synths")
-            onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
-        },
-        Kirigami.Action {
-            text: qsTr("Audio-FX")
-            onTriggered: {
-                zynthian.layer_options.show(); //FIXME: that show() method should change name
-                zynthian.current_screen_id = "layer_effects";
+            text: qsTr("Pick")
+            Kirigami.Action {
+                text: qsTr("Synths")
+                onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+            }
+            Kirigami.Action {
+                text: qsTr("Audio-FX")
+                onTriggered: {
+                    zynthian.layer_options.show(); //FIXME: that show() method should change name
+                    zynthian.current_screen_id = "layer_effects";
+                }
             }
         },
         Kirigami.Action {

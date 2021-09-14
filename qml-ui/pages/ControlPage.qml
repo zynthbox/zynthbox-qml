@@ -95,6 +95,25 @@ Zynthian.ScreenPage {
             }
         }
     }
+    Connections {
+        id: currentConnection
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            print(zynthian.current_screen_id +" "+ applicationWindow().pageStack.lastItem +" "+ root)
+            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.lastItem === root) {
+                pageRemoveTimer.restart()
+            }
+        }
+    }
+    Timer {
+        id: pageRemoveTimer
+        interval: Kirigami.Units.longDuration
+        onTriggered: {
+            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.lastItem === root) {
+                applicationWindow().pageStack.pop();
+            }
+        }
+    }
     onFocusChanged: {
         if (focus) {
             mainView.forceActiveFocus()

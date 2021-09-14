@@ -29,12 +29,12 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.5 as Kirigami
 
 
-Kirigami.Page {
+Kirigami.ScrollablePage {
     id: root
 
     property Kirigami.Action backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: applicationWindow().goBack()
+        onTriggered: zynthian.go_back()
     }
     property string previousScreen
 

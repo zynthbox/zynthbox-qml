@@ -208,6 +208,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def activate_midichan_layer(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
+		else:
+			self.zyngui.set_curlayer(None)
+			self.zyngui.screens['bank'].fill_list()
+			self.zyngui.screens['preset'].fill_list()
+			logging.error("KILLED EM ALL {}".format(self.zyngui.curlayer))
 		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			#self.replace_layer_index = None
 			#self.layer_chain_parallel = False

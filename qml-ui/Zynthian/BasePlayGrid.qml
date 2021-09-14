@@ -37,8 +37,10 @@ Item {
     // Default to miniGrid being identical to grid, so things still kindofsortof work
     property Component miniGrid: root.grid
     property Component settings
-    // Default is none - the system has a default sidebar for those playgrids where basic octave/mod/pitch controls make sense
+    // Default is none - the system has a default sidebar for those playgrids where basic octave/mod/pitch controls make sense (not shown for minigrids)
     property Component sidebar
+    // Default is none - if there is a need, this is a panel the size of about a third of the screen width and about the height of the playgrid which can contain anything, and which is shown beside the playgrid popup menu on the main playgrid (not for miniGrids)
+    property Component popup
     property QtObject model
     property string name
     property string currentNoteName

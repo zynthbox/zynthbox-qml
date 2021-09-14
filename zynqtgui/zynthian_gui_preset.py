@@ -52,7 +52,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	def __init__(self, parent = None):
 		super(zynthian_gui_preset, self).__init__('Preset', parent)
-		self.__show_top_sounds = False
+		self.__top_sounds_engine = None
 		self.__top_sounds = []
 		self.next_screen_prop = 'control'
 		self.show()
@@ -62,21 +62,18 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		self.list_data = []
 		self.list_metadata = []
 
-		if self.__show_top_sounds:
-			try:
-				with open("/zynthian/zynthian-my-data/top-sounds.json", "r") as fh:
-					json=fh.read()
-					logging.info("Loading top sounds %s" % (json))
-
-					self.__top_sounds = JSONDecoder().decode(json)
-					logging.error(self.__top_sounds)
-					if isinstance(self.__top_sounds, list):
-						for sound in self.__top_sounds:
-							if isinstance(sound, dict):
-								self.list_data.append(("topsound", len(self.list_data), sound["name"]))
-								self.list_metadata.append({"icon": "", "show_numbers": True})
-			except Exception as e:
-				logging.error("Can't load top sounds: %s" % (e))
+		if self.__top_sounds_engine != None:
+			self.reload_top_sounds()
+			if isinstance(self.__top_sounds, dict) and self.__top_sounds_engine in self.__top_sounds:
+				logging.error("ISDICT")
+				if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
+					logging.error("ISLIST")
+					for sound in self.__top_sounds:
+						logging.error(sound)
+						if isinstance(sound, dict):
+							logging.error("ISDICT2")
+							self.list_data.append(("topsound", len(self.list_data), sound["name"]))
+							self.list_metadata.append({"icon": "", "show_numbers": True})
 
 		else:
 			if not self.zyngui.curlayer:
@@ -111,7 +108,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def select_action(self, i, t='S'):
 		if self.list_data[i][0] == "topsound":
 			self.zyngui.start_loading()
-			sound = self.__top_sounds[i]
+			sound = self.__top_sounds[self.__top_sounds_engine][i]
 			layer = self.zyngui.curlayer
 			if self.zyngui.curlayer.engine.nickname != sound["engine"]:
 				midi_chan = self.zyngui.curlayer.midi_chan
@@ -154,13 +151,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.update_list()
 			self.zyngui.screens['bank'].fill_list()
 
-
-	@Slot(None)
 	def toggle_top_sound(self):
-		if self.__show_top_sounds:
-			self.__top_sounds.remove(self.index)
+		if self.__top_sounds_engine == None:
+			self.__top_sounds[self.zyngui.curlayer.engine.nickname].remove(self.index)
 		else:
-			self.__top_sounds.append({"name": self.select_path,
+			self.__top_sounds[self.zyngui.curlayer.engine.nickname].append({"name": self.select_path,
 							 "engine": self.zyngui.curlayer.engine.nickname,
 							 "bank": self.zyngui.curlayer.bank_name,
 							 "preset": self.zyngui.curlayer.preset_name})
@@ -168,15 +163,34 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			f = open("/zynthian/zynthian-my-data/top-sounds.json", "w")
 			f.write(JSONEncoder().encode(self.__top_sounds))
 			f.close()
+			self.fill_list()
 		except Exception as e:
 			logging.warning("Can't save top sounds: {}".format(e))
 
 
+	def reload_top_sounds(self):
+		try:
+			with open("/zynthian/zynthian-my-data/top-sounds.json", "r") as fh:
+				json=fh.read()
+				logging.info("Loading top sounds %s" % (json))
 
+				self.__top_sounds = JSONDecoder().decode(json)
+				logging.error(self.__top_sounds)
+		except Exception as e:
+			logging.error("Can't load top sounds: %s" % (e))
 
-	def show_top_sounds(self, show):
-		self.__show_top_sounds = show
+	def get_all_top_sounds(self):
+		return self.__top_sounds
+
+	def set_top_sounds_engine(self, engine : str):
+		self.__top_sounds_engine = engine
+		self.top_sounds_engine_changed.emit()
 		self.fill_list()
+
+
+	def get_top_sounds_engine(self):
+		return self.__top_sounds_engine
+
 
 	def index_supports_immediate_activation(self, index=None):
 		return True
@@ -251,9 +265,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		self.next_screen_changed.emit()
 
 	show_only_favorites_changed = Signal()
+	top_sounds_engine_changed = Signal()
 	next_screen_changed = Signal()
 
 	show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify = show_only_favorites_changed)
+	top_sounds_engine = Property(str, get_top_sounds_engine, set_top_sounds_engine, notify = top_sounds_engine_changed)
 	next_screen = Property(str, next_action, set_next_screen, notify = next_screen_changed)
 
 

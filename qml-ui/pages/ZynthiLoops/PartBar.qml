@@ -41,17 +41,17 @@ GridLayout {
 
     property QtObject bottomBar: null
 
-    Zynthian.ZynthiloopsDial {
-        id: lengthDial
-        text: qsTr("Length (beats)")
-        controlObj: root.bottomBar.controlObj
-        controlProperty: "length"
+//    Zynthian.ZynthiloopsDial {
+//        id: lengthDial
+//        text: qsTr("Length (beats)")
+//        controlObj: root.bottomBar.controlObj
+//        controlProperty: "length"
 
-        dial {
-            stepSize: 1
-            from: 1
-            to: 16
-        }
-    }
+//        dial {
+//            stepSize: 1
+//            from: 1
+//            to: 16
+//        }
+//    }
 }
 

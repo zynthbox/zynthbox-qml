@@ -180,31 +180,31 @@ Zynthian.ScreenPage {
                 }
             }
             Zynthian.SelectorView {
-				id: presetView
+                id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "preset"
-				delegate: Zynthian.SelectorDelegate {
-					id: delegate
-					selector: presetView.selector
-					contentItem:  RowLayout {
-						QQC2.Label {
-							text: (model.show_numbers ? (index + 1) + " - " : "") + delegate.text
-							Layout.fillWidth: true
-							elide: Text.ElideRight
-						}
-						QQC2.Label {
-							text: "T"
-							opacity: model.metadata ? model.metadata.is_top : 0
-						}
-						Kirigami.Icon {
-							source: model.icon
-							Layout.fillHeight: true
-							Layout.preferredWidth: height
-							visible: valid
-						}
-					}
-				}
+                delegate: Zynthian.SelectorDelegate {
+                    id: delegate
+                    selector: presetView.selector
+                    contentItem:  RowLayout {
+                        QQC2.Label {
+                            text: (model.show_numbers ? (index + 1) + " - " : "") + delegate.text
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                        }
+                        QQC2.Label {
+                            text: "T"
+                            opacity: model.metadata ? model.metadata.is_top : 0
+                        }
+                        Kirigami.Icon {
+                            source: model.icon
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: height
+                            visible: valid
+                        }
+                    }
+                }
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)

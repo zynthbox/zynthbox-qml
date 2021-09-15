@@ -215,6 +215,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['preset'].fill_list()
 			self.zyngui.screens['preset'].set_select_path()
 			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
+			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
+			self.zyngui.screens['fixed_layers'].current_index_valid_changed.emit()
+			self.set_select_path()
 		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			#self.replace_layer_index = None
 			#self.layer_chain_parallel = False
@@ -1720,7 +1723,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.select_path = "Layers"
 		#self.select_path_element = str(zyngui.curlayer.engine.name)
 		if self.zyngui.curlayer is None:
-			self.select_path_element = "Layers"
+			midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
+			if midi_chan >= 0:
+				self.select_path_element = str(midi_chan + 1)
+			else:
+				self.select_path_element = "Layers"
 		else:
 			self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
 		super().set_select_path()

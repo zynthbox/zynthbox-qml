@@ -95,378 +95,389 @@ Zynthian.ScreenPage {
     ]
 
     property var screenIds: ["fixed_layers", "bank", "preset"]
-    property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
+    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
 
     contentItem: RowLayout {
-		spacing: Kirigami.Units.largeSpacing
-		ColumnLayout {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-			// NOTE: this is to make fillWidth always partition the space in equal sizes
-			implicitWidth: 1
-			Layout.preferredWidth: 1
-			Kirigami.Heading {
-				level: 2
-				text: qsTr("Layers")
-				Kirigami.Theme.inherit: false
-				Kirigami.Theme.colorSet: Kirigami.Theme.View
-			}
-			Zynthian.SelectorView {
-				Layout.fillWidth: true
-				Layout.fillHeight: true
-				screenId: "fixed_layers"
-				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-				onItemActivated: root.itemActivated(screenId, index)
-				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-			}
-		}
-		ColumnLayout {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-			implicitWidth: 1
-			Layout.preferredWidth: 1
-			RowLayout {
-				Kirigami.Heading {
-					id: heading
-					Layout.fillWidth: true
-					level: 2
-					text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
-					Kirigami.Theme.inherit: false
-					Kirigami.Theme.colorSet: Kirigami.Theme.View
-				}
-				QQC2.Button {
-					text: qsTr("Top")
-					checkable: true
-					implicitHeight: heading.height
-					checked: zynthian.bank.show_top_sounds
-					onToggled: {
-						zynthian.bank.show_top_sounds = checked;
-					}
-				}
-			}
-			Zynthian.SelectorView {
-				Layout.fillWidth: true
-				Layout.fillHeight: true
-				screenId: "bank"
-				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-				onItemActivated: root.itemActivated(screenId, index)
-				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-			}
-		}
-		ColumnLayout {
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-			implicitWidth: 1
-			Layout.preferredWidth: 1
-			RowLayout {
-				Kirigami.Heading {
-					Layout.fillWidth: true
-					level: 2
-					text: qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)
-					Kirigami.Theme.inherit: false
-					Kirigami.Theme.colorSet: Kirigami.Theme.View
-				}
-				QQC2.Button {
-					implicitHeight: heading.height
-					visible: false
-					icon.name: "starred-symbolic"
-					checkable: true
-					onToggled: {
-
-					}
-				}
-			}
-			Zynthian.SelectorView {
-				Layout.fillWidth: true
-				Layout.fillHeight: true
-				screenId: "preset"
-				onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-				onItemActivated: root.itemActivated(screenId, index)
-				onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-			}
-		}
-	}
-
-    Connections {
-        target: zynthian.fixed_layers
-        onCurrent_index_validChanged: {
-            if (!zynthian.fixed_layers.current_index_valid) {
-                layerSetupDialog.open();
+        spacing: Kirigami.Units.gridUnit
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            // NOTE: this is to make fillWidth always partition the space in equal sizes
+            implicitWidth: 1
+            Layout.preferredWidth: 1
+            Kirigami.Heading {
+                level: 2
+                text: qsTr("Layers")
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.View
             }
-        }
-    }
-
-    QQC2.Dialog {
-        id: layerSetupDialog
-        parent: applicationWindow().contentItem
-        x: Math.round(parent.width/6 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        height: footer.implicitHeight + topMargin + bottomMargin
-        modal: true
-        footer: QQC2.Control {
-            leftPadding: layerSetupDialog.leftPadding
-            topPadding: layerSetupDialog.topPadding
-            rightPadding: layerSetupDialog.rightPadding
-            bottomPadding: layerSetupDialog.bottomPadding
-            contentItem: ColumnLayout {
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("Load A Sound...")
-                    onClicked: {
-                        layerSetupDialog.close();
-                        pickerDialog.mode = "sound";
-                        pickerDialog.open();
-                    }
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("New Synth...")
-                    onClicked: {
-                        layerSetupDialog.close();
-                        newSynthWorkaroundTimer.restart()
-                    }
-                }
-                Timer { //HACK why is this necessary?
-                    id: newSynthWorkaroundTimer
-                    interval: 200
-                    onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
-
-                }
-            }
-        }
-    }
-
-    QQC2.Dialog {
-        id: saveDialog
-        property string mode: "sound"
-        parent: root.parent
-        header: Kirigami.Heading {
-            text: saveDialog.mode === "soundset" ? qsTr("Save Soundset As...") : qsTr("Save Sound As...")
-        }
-        modal: true
-        z: 999999999
-        x: Math.round(parent.width/2 - width/2)
-        y: Qt.inputMethod.visible ? Math.round(parent.height/5) : Math.round(parent.height/2 - height/2)
-        width: Kirigami.Units.gridUnit * 15
-        height: Kirigami.Units.gridUnit * 8
-        onAccepted: {
-            if (mode === "soundset") {
-                zynthian.layer.save_soundset_to_file(fileName.text);
-            } else { //Sound
-                zynthian.layer.save_curlayer_to_file(fileName.text);
-            }
-        }
-        onVisibleChanged : {
-            cancelSaveButton.forceActiveFocus();
-            if (visible) {
-                delayKeyboardTimer.restart()
-            } else {
-                fileName.text = "";
-            }
-        }
-        Timer {
-            id: delayKeyboardTimer
-            interval: 300
-            onTriggered: {
-                fileName.forceActiveFocus();
-                Qt.inputMethod.visible = true;
-            }
-        }
-        contentItem: ColumnLayout {
-            QQC2.TextField {
-                id: fileName
+            Zynthian.SelectorView {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
-                onAccepted: {
-                    if (fileName.text.length > 0) {
-                        saveDialog.accept();
-                    }
-                }
-                onTextChanged: fileCheckTimer.restart()
-                Timer {
-                    id: fileCheckTimer
-                    interval: 300
-                    onTriggered: {
-                        if (saveDialog.mode === "soundset") {
-                            conflictRow.visible = zynthian.layer.soundset_file_exists(fileName.text);
-                        } else {
-                            conflictRow.visible = zynthian.layer.layer_file_exists(fileName.text);
-                        }
-                    }
-                }
+                Layout.fillHeight: true
+                screenId: "fixed_layers"
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
             }
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            implicitWidth: 1
+            Layout.preferredWidth: 1
             RowLayout {
-                id: conflictRow
-                visible: false
-                QQC2.Label {
+                Kirigami.Heading {
                     Layout.fillWidth: true
-                    text: qsTr("File exists")
+                    level: 2
+                    text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                QQC2.Button {
+                    text: qsTr("Top")
+                    checkable: true
+                    checked: zynthian.bank.show_top_sounds
+                    onToggled: {
+                        zynthian.bank.show_top_sounds = checked;
+                    }
+                }
+            }
+            Zynthian.SelectorView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                screenId: "bank"
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+            }
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            implicitWidth: 1
+            Layout.preferredWidth: 1
+            RowLayout {
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    level: 2
+                    text: qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                QQC2.Button {
+                    text: qsTr("Top")
+                    checkable: true
+                    checked: zynthian.preset.current_is_top
+                    onToggled: zynthian.preset.current_is_top = !zynthian.preset.current_is_top
+                }
+                QQC2.Button {
+                    icon.name: "non-starred-symbolic"
+                    checkable: true
+                    checked: zynthian.preset.current_is_favorite
+                    onToggled: zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite
+                }
+            }
+            Zynthian.SelectorView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                screenId: "preset"
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+            }
+        }
+
+
+        Connections {
+            target: zynthian.fixed_layers
+            onCurrent_index_validChanged: {
+                if (!zynthian.fixed_layers.current_index_valid) {
+                    layerSetupDialog.open();
                 }
             }
         }
-        footer: QQC2.Control {
-            leftPadding: saveDialog.leftPadding
-            topPadding: Kirigami.Units.smallSpacing
-            rightPadding: saveDialog.rightPadding
-            bottomPadding: saveDialog.bottomPadding
-            contentItem: RowLayout {
-                Layout.fillWidth: true
-                QQC2.Button {
-                    id: cancelSaveButton
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("Cancel")
-                    onClicked: {
-                            saveDialog.close();
+
+        QQC2.Dialog {
+            id: layerSetupDialog
+            parent: applicationWindow().contentItem
+            x: Math.round(parent.width/6 - width/2)
+            y: Math.round(parent.height/2 - height/2)
+            height: footer.implicitHeight + topMargin + bottomMargin
+            modal: true
+            Connections {
+                target: root
+                onIndexValidChanged: {
+                    if (!zynthian.fixed_layers.current_index_valid) {
+                        layerSetupDialog.open();
+                    }
+                }
+            }
+
+            footer: QQC2.Control {
+                leftPadding: layerSetupDialog.leftPadding
+                topPadding: layerSetupDialog.topPadding
+                rightPadding: layerSetupDialog.rightPadding
+                bottomPadding: layerSetupDialog.bottomPadding
+                contentItem: ColumnLayout {
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("Load A Sound...")
+                        onClicked: {
+                            layerSetupDialog.close();
+                            pickerDialog.mode = "sound";
+                            pickerDialog.open();
                         }
                     }
-                QQC2.Button {
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("New Synth...")
+                        onClicked: {
+                            layerSetupDialog.close();
+                            newSynthWorkaroundTimer.restart()
+                        }
+                    }
+                    Timer { //HACK why is this necessary?
+                        id: newSynthWorkaroundTimer
+                        interval: 200
+                        onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+
+                    }
+                }
+            }
+        }
+
+        QQC2.Dialog {
+            id: saveDialog
+            property string mode: "sound"
+            parent: root.parent
+            header: Kirigami.Heading {
+                text: saveDialog.mode === "soundset" ? qsTr("Save Soundset As...") : qsTr("Save Sound As...")
+            }
+            modal: true
+            z: 999999999
+            x: Math.round(parent.width/2 - width/2)
+            y: Qt.inputMethod.visible ? Math.round(parent.height/5) : Math.round(parent.height/2 - height/2)
+            width: Kirigami.Units.gridUnit * 15
+            height: Kirigami.Units.gridUnit * 8
+            onAccepted: {
+                if (mode === "soundset") {
+                    zynthian.layer.save_soundset_to_file(fileName.text);
+                } else { //Sound
+                    zynthian.layer.save_curlayer_to_file(fileName.text);
+                }
+            }
+            onVisibleChanged : {
+                cancelSaveButton.forceActiveFocus();
+                if (visible) {
+                    delayKeyboardTimer.restart()
+                } else {
+                    fileName.text = "";
+                }
+            }
+            Timer {
+                id: delayKeyboardTimer
+                interval: 300
+                onTriggered: {
+                    fileName.forceActiveFocus();
+                    Qt.inputMethod.visible = true;
+                }
+            }
+            contentItem: ColumnLayout {
+                QQC2.TextField {
+                    id: fileName
                     Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: conflictRow.visible ? qsTr("Overwrite") : qsTr("Save")
-                    enabled: fileName.text.length > 0
-                    onClicked: {
+                    Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
+                    onAccepted: {
                         if (fileName.text.length > 0) {
                             saveDialog.accept();
                         }
                     }
-                }
-            }
-        }
-    }
-    QQC2.Dialog {
-        id: pickerDialog
-        parent: root.parent
-        modal: true
-        property string mode: "sound"
-        header: Kirigami.Heading {
-            text: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
-        }
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        width: Math.round(parent.width * 0.8)
-        height: Math.round(parent.height * 0.8)
-        contentItem: QQC2.ScrollView {
-            contentItem: ListView {
-                model: FolderListModel {
-                    id: folderModel
-                    nameFilters: ["*.json"]
-                    folder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
-                }
-                delegate: Kirigami.BasicListItem {
-                    label: model.fileName
-                    onClicked: {
-                        if (pickerDialog.mode === "soundset") {
-                            zynthian.layer.load_soundset_from_file(model.fileName)
-                        } else {
-                            //zynthian.layer.load_layer_from_file(model.fileName)
-                            layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(model.fileName);
-                            if (layerReplaceDialog.sourceChannels.length > 1) {
-                                layerReplaceDialog.fileToLoad = model.fileName;
-                                layerReplaceDialog.open();
+                    onTextChanged: fileCheckTimer.restart()
+                    Timer {
+                        id: fileCheckTimer
+                        interval: 300
+                        onTriggered: {
+                            if (saveDialog.mode === "soundset") {
+                                conflictRow.visible = zynthian.layer.soundset_file_exists(fileName.text);
                             } else {
-                                let map = {}
-                                map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index);
-                                zynthian.layer.load_layer_from_file(model.fileName, map);
+                                conflictRow.visible = zynthian.layer.layer_file_exists(fileName.text);
                             }
                         }
-                        pickerDialog.accept()
+                    }
+                }
+                RowLayout {
+                    id: conflictRow
+                    visible: false
+                    QQC2.Label {
+                        Layout.fillWidth: true
+                        text: qsTr("File exists")
+                    }
+                }
+            }
+            footer: QQC2.Control {
+                leftPadding: saveDialog.leftPadding
+                topPadding: Kirigami.Units.smallSpacing
+                rightPadding: saveDialog.rightPadding
+                bottomPadding: saveDialog.bottomPadding
+                contentItem: RowLayout {
+                    Layout.fillWidth: true
+                    QQC2.Button {
+                        id: cancelSaveButton
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("Cancel")
+                        onClicked: {
+                                saveDialog.close();
+                            }
+                        }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: conflictRow.visible ? qsTr("Overwrite") : qsTr("Save")
+                        enabled: fileName.text.length > 0
+                        onClicked: {
+                            if (fileName.text.length > 0) {
+                                saveDialog.accept();
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-    QQC2.Dialog {
-        id: layerReplaceDialog
-        parent: root.parent
-        modal: true
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
-        property var sourceChannels: []
-        property var destinationChannels: []
-        property string fileToLoad
-        function clear () {
-            sourceChannels = [];
-            destinationChannels = [];
-            fileToLoad = "";
-        }
-        onAccepted: {
-            if (sourceChannels.length !== destinationChannels.length) {
-                return;
+        QQC2.Dialog {
+            id: pickerDialog
+            parent: root.parent
+            modal: true
+            property string mode: "sound"
+            header: Kirigami.Heading {
+                text: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
             }
-            let map = {};
-            var i = 0;
-            for (i in sourceChannels) {
-                map[sourceChannels[i]] = destinationChannels[i];
+            x: Math.round(parent.width/2 - width/2)
+            y: Math.round(parent.height/2 - height/2)
+            width: Math.round(parent.width * 0.8)
+            height: Math.round(parent.height * 0.8)
+            contentItem: QQC2.ScrollView {
+                contentItem: ListView {
+                    model: FolderListModel {
+                        id: folderModel
+                        nameFilters: ["*.json"]
+                        folder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
+                    }
+                    delegate: Kirigami.BasicListItem {
+                        label: model.fileName
+                        onClicked: {
+                            if (pickerDialog.mode === "soundset") {
+                                zynthian.layer.load_soundset_from_file(model.fileName)
+                            } else {
+                                //zynthian.layer.load_layer_from_file(model.fileName)
+                                layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(model.fileName);
+                                if (layerReplaceDialog.sourceChannels.length > 1) {
+                                    layerReplaceDialog.fileToLoad = model.fileName;
+                                    layerReplaceDialog.open();
+                                } else {
+                                    let map = {}
+                                    map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index);
+                                    zynthian.layer.load_layer_from_file(model.fileName, map);
+                                }
+                            }
+                            pickerDialog.accept()
+                        }
+                    }
+                }
             }
-            for (i in map) {
-                print("Mapping midi channel " + i + " to " + map[i]);
+        }
+        QQC2.Dialog {
+            id: layerReplaceDialog
+            parent: root.parent
+            modal: true
+            x: Math.round(parent.width/2 - width/2)
+            y: Math.round(parent.height/2 - height/2)
+            height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
+            property var sourceChannels: []
+            property var destinationChannels: []
+            property string fileToLoad
+            function clear () {
+                sourceChannels = [];
+                destinationChannels = [];
+                fileToLoad = "";
             }
-            zynthian.layer.load_layer_from_file(fileToLoad, map);
-            clear();
-        }
-        onRejected: {
-            clear();
-        }
-        header: Kirigami.Heading {
-            text: qsTr("Pick Layers To Replace")
-        }
-        contentItem: ColumnLayout {
-            QQC2.Label {
-                text: qsTr("The selected sound has %1 layers: select layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
+            onAccepted: {
+                if (sourceChannels.length !== destinationChannels.length) {
+                    return;
+                }
+                let map = {};
+                var i = 0;
+                for (i in sourceChannels) {
+                    map[sourceChannels[i]] = destinationChannels[i];
+                }
+                for (i in map) {
+                    print("Mapping midi channel " + i + " to " + map[i]);
+                }
+                zynthian.layer.load_layer_from_file(fileToLoad, map);
+                clear();
             }
-            Repeater {
-                model: zynthian.fixed_layers.selector_list
-                delegate: QQC2.CheckBox {
-                    text: model.display
-                    visible: index < 5
-                    enabled: checked || layerReplaceDialog.destinationChannels.length < layerReplaceDialog.sourceChannels.length
-                    opacity: enabled ? 1 : 0.4
+            onRejected: {
+                clear();
+            }
+            header: Kirigami.Heading {
+                text: qsTr("Pick Layers To Replace")
+            }
+            contentItem: ColumnLayout {
+                QQC2.Label {
+                    text: qsTr("The selected sound has %1 layers: select layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
+                }
+                Repeater {
+                    model: zynthian.fixed_layers.selector_list
+                    delegate: QQC2.CheckBox {
+                        text: model.display
+                        visible: index < 5
+                        enabled: checked || layerReplaceDialog.destinationChannels.length < layerReplaceDialog.sourceChannels.length
+                        opacity: enabled ? 1 : 0.4
 
-                    onCheckedChanged: {
-                        let destIdx = layerReplaceDialog.destinationChannels.indexOf(index);
-                        if (checked) {
-                            if (destIdx === -1) {
-                                layerReplaceDialog.destinationChannels.push(index);
-                                layerReplaceDialog.destinationChannelsChanged();
-                            }
-                        } else {
-                            if (destIdx !== -1) {
-                                layerReplaceDialog.destinationChannels.splice(destIdx, 1);
-                                layerReplaceDialog.destinationChannelsChanged();
+                        onCheckedChanged: {
+                            let destIdx = layerReplaceDialog.destinationChannels.indexOf(index);
+                            if (checked) {
+                                if (destIdx === -1) {
+                                    layerReplaceDialog.destinationChannels.push(index);
+                                    layerReplaceDialog.destinationChannelsChanged();
+                                }
+                            } else {
+                                if (destIdx !== -1) {
+                                    layerReplaceDialog.destinationChannels.splice(destIdx, 1);
+                                    layerReplaceDialog.destinationChannelsChanged();
+                                }
                             }
                         }
-                    }
-                    Connections {
-                        target: layerReplaceDialog
-                        onFileToLoadChanged: checked = index === zynthian.fixed_layers.current_index
+                        Connections {
+                            target: layerReplaceDialog
+                            onFileToLoadChanged: checked = index === zynthian.fixed_layers.current_index
+                        }
                     }
                 }
             }
-        }
-        footer: QQC2.Control {
-            leftPadding: saveDialog.leftPadding
-            topPadding: Kirigami.Units.smallSpacing
-            rightPadding: saveDialog.rightPadding
-            bottomPadding: saveDialog.bottomPadding
-            contentItem: RowLayout {
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("Cancel")
-                    onClicked: layerReplaceDialog.close()
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    enabled: layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length
-                    text: qsTr("Load && Replace")
-                    onClicked: layerReplaceDialog.accept()
+            footer: QQC2.Control {
+                leftPadding: saveDialog.leftPadding
+                topPadding: Kirigami.Units.smallSpacing
+                rightPadding: saveDialog.rightPadding
+                bottomPadding: saveDialog.bottomPadding
+                contentItem: RowLayout {
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("Cancel")
+                        onClicked: layerReplaceDialog.close()
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        enabled: layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length
+                        text: qsTr("Load && Replace")
+                        onClicked: layerReplaceDialog.accept()
+                    }
                 }
             }
         }

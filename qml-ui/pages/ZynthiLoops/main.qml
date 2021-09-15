@@ -223,7 +223,7 @@ Zynthian.ScreenPage {
 
                     delegate: TableHeader {
                         text: model.track.name
-                        subText: model.track.type === "audio" ? "Audio" : "Midi"
+                        // subText: model.track.type === "audio" ? "Audio" : "Midi"
 
                         width: privateProps.headerWidth
                         height: ListView.view.height

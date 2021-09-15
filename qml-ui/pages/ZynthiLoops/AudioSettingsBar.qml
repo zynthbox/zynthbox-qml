@@ -206,12 +206,12 @@ GridLayout {
         QQC2.Label {
             Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
-            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+            text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
         }
         QQC2.Label {
             Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
-            text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
+            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
         }
         QQC2.Label {
             Layout.fillWidth: true

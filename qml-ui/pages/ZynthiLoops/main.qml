@@ -56,12 +56,6 @@ Zynthian.ScreenPage {
             text: qsTr("Sketch")
 
             Kirigami.Action {
-                text: qsTr("New Sketch")
-                onTriggered: {
-                    zynthian.zynthiloops.newSketch()
-                }
-            }
-            Kirigami.Action {
                 text: qsTr("Save Sketch")
                 onTriggered: {
                     if (zynthian.zynthiloops.sketchIsTemp()) {
@@ -80,11 +74,17 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
-                text: qsTr("Clear Sketch")
+                text: qsTr("New Sketch")
                 onTriggered: {
-                    zynthian.zynthiloops.clearSketchVersion()
+                    zynthian.zynthiloops.newSketch()
                 }
             }
+//            Kirigami.Action {
+//                text: qsTr("Clear Sketch")
+//                onTriggered: {
+//                    zynthian.zynthiloops.clearSketchVersion()
+//                }
+//            }
         },
         Kirigami.Action {
             text: qsTr("Add Track")

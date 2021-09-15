@@ -284,16 +284,14 @@ class zynthian_gui_playgrid_settings(QObject):
         if not property in self.__settings__ or not self.__settings__[property] == value:
             self.__settings__[property] = value
             self.__most_recently_changed__ = property
-            if value != oldValue:
-                self.propertyChanged.emit()
+            self.emitPropertyChanged(oldValue, value)
 
     @Slot(str)
     def clearProperty(self, property:str):
         if property in self.__settings__:
             value = self.__settings__.get(property)
             self.__settings__.remove(property)
-            if value != self.default(property):
-                self.propertyChanged.emit()
+            self.emitPropertyChanged(self.default(property), value)
 
     @Slot(str,result='QVariant')
     def default(self, property:str):
@@ -306,8 +304,25 @@ class zynthian_gui_playgrid_settings(QObject):
             self.__defaults__[property] = value
             self.__most_recently_changed__ = property
             self.defaultChanged.emit()
-            if value != oldValue:
-                self.propertyChanged.emit()
+            self.emitPropertyChanged(oldValue, value)
+
+    def emitPropertyChanged(self, oldValue, newValue):
+        different = False
+        if not oldValue is None and not newValue is None:
+            try:
+                if len(oldValue) == len(newValue):
+                    for i in range(0, len(oldValue)):
+                        if oldValue[i] != newValue[i]:
+                            different = True
+                            break
+                else:
+                    different = True
+            except:
+                different = True
+        else:
+            different = True
+        if different:
+            self.propertyChanged.emit()
 
     @Slot(result=str)
     def mostRecentlyChanged(self):

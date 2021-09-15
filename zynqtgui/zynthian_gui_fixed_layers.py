@@ -30,6 +30,8 @@ import logging
 from . import zynthian_gui_layer
 from . import zynthian_gui_selector
 
+from zyncoder import *
+
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 #------------------------------------------------------------------------------
@@ -103,12 +105,15 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def sync_index_from_curlayer(self):
-        if not self.zyngui.curlayer:
-            return
-        if self.zyngui.curlayer.midi_chan < self.__fixed_layers_count:
-            self.current_index = self.zyngui.curlayer.midi_chan
+        midi_chan = -1
+        if self.zyngui.curlayer:
+            midi_chan = self.zyngui.curlayer.midi_chan
         else:
-            self.current_index = self.zyngui.curlayer.midi_chan + 1
+            midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
+        for i, item in enumerate(self.list_data):
+            if midi_chan == item[1]:
+                self.current_index = i
+                return
 
 
     @Slot(int, result=int)

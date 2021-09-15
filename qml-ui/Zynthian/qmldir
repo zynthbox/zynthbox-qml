@@ -26,3 +26,4 @@ SwitchController 1.0 SwitchController.qml
 TabbedControlViewAction 1.0 TabbedControlViewAction.qml
 TabbedControlView 1.0 TabbedControlView.qml
 ZynthiloopsDial 1.0 ZynthiloopsDial.qml
+FilePickerDialog 1.0 FilePickerDialog.qml

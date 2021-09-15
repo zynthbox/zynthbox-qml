@@ -211,7 +211,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		else:
 			self.zyngui.set_curlayer(None)
 			self.zyngui.screens['bank'].fill_list()
+			self.zyngui.screens['bank'].set_select_path()
 			self.zyngui.screens['preset'].fill_list()
+			self.zyngui.screens['preset'].set_select_path()
+			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
 		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			#self.replace_layer_index = None
 			#self.layer_chain_parallel = False

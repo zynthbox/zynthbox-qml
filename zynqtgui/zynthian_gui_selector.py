@@ -48,6 +48,7 @@ class selector_list_model(QAbstractListModel):
 	ENTRY_INDEX = Qt.UserRole + 3
 	ICON = Qt.UserRole + 4
 	SHOW_NUMBERS = Qt.UserRole + 5
+	METADATA = Qt.UserRole + 6
 
 	def __init__(self, parent=None):
 		super(selector_list_model, self).__init__(parent)
@@ -85,6 +86,7 @@ class selector_list_model(QAbstractListModel):
 			selector_list_model.ENTRY_INDEX : QByteArray(b'entry_index'),
 			selector_list_model.ICON : QByteArray(b'icon'),
 			selector_list_model.SHOW_NUMBERS : QByteArray(b'show_numbers'),
+			selector_list_model.METADATA : QByteArray(b'metadata'),
 			}
 		return keys
 
@@ -105,7 +107,9 @@ class selector_list_model(QAbstractListModel):
 			return None
 
 		metadata_entry = self.metadata[index.row()]
-		if isinstance(metadata_entry, dict) and role_label in metadata_entry:
+		if isinstance(metadata_entry, dict) and role_label == None:
+			return metadata_entry
+		elif isinstance(metadata_entry, dict) and role_label in metadata_entry:
 			return metadata_entry[role_label]
 		else:
 			return None
@@ -130,6 +134,8 @@ class selector_list_model(QAbstractListModel):
 			return self.get_metadata(index, 'icon')
 		elif role == selector_list_model.SHOW_NUMBERS:
 			return self.get_metadata(index, 'show_numbers')
+		elif role == selector_list_model.METADATA:
+			return self.get_metadata(index, None)
 		else:
 			return None
 

@@ -80,6 +80,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.index = i
         chan = self.list_data[i][1]
         self.current_index_valid_changed.emit()
+        logging.error("SELECT ACTION FIXED LAYER {}".format(self.get_current_index_valid()))
 
         if chan < 0:
             return

@@ -292,7 +292,7 @@ Zynthian.Card {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.controlObj.path = filePath
+            root.controlObj.path = file.filePath
         }
     }
 }

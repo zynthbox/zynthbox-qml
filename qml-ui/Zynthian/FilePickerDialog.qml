@@ -30,7 +30,7 @@ import Zynthian 1.0 as Zynthian
 QQC2.Dialog {
     property alias headerText: heading.text
     property alias folderModel: folderModel
-    signal fileSelected(string filePath)
+    signal fileSelected(var file)
 
     id: pickerDialog
     modal: true
@@ -91,7 +91,7 @@ QQC2.Dialog {
                     if (model.fileIsDir) {
                         folderModel.folder = model.filePath
                     } else {
-                        fileSelected(model.filePath)
+                        fileSelected(model)
                         pickerDialog.accept()
                     }
                 }

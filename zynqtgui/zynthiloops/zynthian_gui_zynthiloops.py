@@ -54,10 +54,11 @@ import jack
 def cb(beat):
     if beat % 4 == 0:
         zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdateOneFourth.emit(beat / 4)
-    elif beat % 2 == 0:
+
+    if beat % 2 == 0:
         zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdateOneEighth.emit(beat / 2)
-    else:
-        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdateOneSixteenth.emit(beat)
+
+    zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdateOneSixteenth.emit(beat)
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):

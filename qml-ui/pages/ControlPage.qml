@@ -65,7 +65,6 @@ Zynthian.ScreenPage {
     ]
     Component.onCompleted: {
         mainView.forceActiveFocus()
-        zynthian.preset.next_screen = "control"
         //HACK
         if (zynthian.control.custom_control_page.length > 0) {
             stack.push(zynthian.control.custom_control_page);

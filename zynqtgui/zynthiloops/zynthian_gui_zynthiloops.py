@@ -50,9 +50,24 @@ from .. import zynthian_qt_gui_base
 import jack
 
 
-@ctypes.CFUNCTYPE(None)
-def cb():
-    zynthian_gui_zynthiloops.__instance__.metronome_update()
+@ctypes.CFUNCTYPE(None, ctypes.c_int)
+def cbOneFourth(beat):
+    zynthian_gui_zynthiloops.__instance__.metronome_update_one_fourth(beat)
+
+
+@ctypes.CFUNCTYPE(None, ctypes.c_int)
+def cbOneEighth(beat):
+    zynthian_gui_zynthiloops.__instance__.metronome_update_one_eighth(beat)
+
+
+@ctypes.CFUNCTYPE(None, ctypes.c_int)
+def cbOneSixteenth(beat):
+    zynthian_gui_zynthiloops.__instance__.metronome_update_one_sixteenth(beat)
+
+
+@ctypes.CFUNCTYPE(None, ctypes.c_int)
+def cbOneThirtySecond(beat):
+    zynthian_gui_zynthiloops.__instance__.metronome_update_one_thirtysecond(beat)
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
@@ -87,8 +102,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
-        libzl.registerTimerCallback(cb)
+        libzl.registerTimerCallbackOneFourth(cbOneFourth)
+        libzl.registerTimerCallbackOneEighth(cbOneEighth)
+        libzl.registerTimerCallbackOneSixteenth(cbOneSixteenth)
+        libzl.registerTimerCallbackOneThirtySecond(cbOneThirtySecond)
         libzl.registerGraphicTypes()
+
+        self.metronomeBeatUpdateOneFourth.connect(self.metronome_update)
 
         # self.update_recorder_jack_port()
         self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
@@ -309,7 +329,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)
 
-            libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+            libzl.startTimer(self.__song__.__bpm__)
 
     def queue_clip_record(self, clip):
         layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
@@ -357,7 +377,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.click_track_click.queueClipToStart()
                     self.click_track_clack.queueClipToStart()
 
-                libzl.startTimer(math.floor((60.0 / self.__song__.__bpm__) * 1000))
+                libzl.startTimer(self.__song__.__bpm__)
                 self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
@@ -368,9 +388,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount == 0:
             self.metronome_schedule_stop = True
 
-    def metronome_update(self):
+    def metronome_update_one_fourth(self, beat):
+        self.metronomeBeatUpdateOneFourth.emit(beat)
+
+    def metronome_update_one_eighth(self, beat):
+        self.metronomeBeatUpdateOneEighth.emit(beat)
+
+    def metronome_update_one_sixteenth(self, beat):
+        if beat % 4 == 0:
+            self.metronomeBeatUpdateOneFourth.emit(beat / 4)
+        elif beat % 2 == 0:
+            self.metronomeBeatUpdateOneEighth.emit(beat/2)
+        else:
+            self.metronomeBeatUpdateOneSixteenth.emit(beat)
+
+    def metronome_update_one_thirtysecond(self, beat):
+        self.metronomeBeatUpdateOneThirtySecond.emit(beat)
+
+    def metronome_update(self, beat):
+        self.__current_beat__ = beat
         self.current_beat_changed.emit()
-        self.__current_beat__ = (self.__current_beat__ + 1) % 4
 
         # if self.countInValue > 0:
         #     self.countInValue -= 1
@@ -435,3 +472,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return True
         else:
             return False
+
+    metronomeBeatUpdateOneFourth = Signal(int)
+    metronomeBeatUpdateOneEighth = Signal(int)
+    metronomeBeatUpdateOneSixteenth = Signal(int)
+    metronomeBeatUpdateOneThirtySecond = Signal(int)

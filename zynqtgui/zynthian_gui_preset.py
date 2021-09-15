@@ -70,7 +70,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					for sound in self.__top_sounds[self.__top_sounds_engine]:
 						if isinstance(sound, dict):
 							self.list_data.append(("topsound", len(self.list_data), sound["preset"]))
-							self.list_metadata.append({"icon": "", "show_numbers": True})
+							self.list_metadata.append({"icon": "", "show_numbers": True, "is_top" : True})
 
 		else:
 			if not self.zyngui.curlayer:
@@ -85,8 +85,14 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 			for item in self.zyngui.curlayer.preset_list:
 				self.list_data.append(item)
+				is_top = False
+				if self.zyngui.curlayer != None:
+					for sound in self.__top_sounds[self.zyngui.curlayer.engine.nickname]:
+						if sound["preset"] == item[2]:
+							is_top = True
+							break
 				self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
-								"show_numbers": True})
+								"show_numbers": True, "is_top" : is_top})
 
 		super().fill_list()
 

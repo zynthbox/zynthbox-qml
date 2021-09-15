@@ -242,15 +242,15 @@ Zynthian.Card {
                 },
                 Zynthian.TabbedControlViewAction {
                     id: waveAction
-                    text: qsTr("Wave")
-                    page: Qt.resolvedUrl("WaveBar.qml")
+                    text: qsTr("Audio Settings")
+                    page: Qt.resolvedUrl("AudioSettingsBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     id: editorAction
-                    text: qsTr("Editor")
-                    page: Qt.resolvedUrl("EditorBar.qml")
+                    text: qsTr("Wave Editor")
+                    page: Qt.resolvedUrl("WaveEditorBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },

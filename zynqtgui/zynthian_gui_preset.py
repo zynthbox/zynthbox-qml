@@ -54,7 +54,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		super(zynthian_gui_preset, self).__init__('Preset', parent)
 		self.__top_sounds_engine = None
 		self.__top_sounds = []
-		self.next_screen_prop = 'control'
 		self.reload_top_sounds()
 		self.show()
 
@@ -251,8 +250,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def index_supports_immediate_activation(self, index=None):
 		return True
 
-	def next_action(self):
-		return self.next_screen_prop
+	def next_action(self): #DON't go to edit or effect
+		return "preset"
 
 	def back_action(self):
 		return "bank"
@@ -316,21 +315,15 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					self.select_path_element = self.zyngui.curlayer.preset_name
 		super().set_select_path()
 
-	def set_next_screen(self, screen):
-		self.next_screen_prop = screen
-		self.next_screen_changed.emit()
-
 	show_only_favorites_changed = Signal()
 	current_is_favorite_changed = Signal()
 	current_is_top_changed = Signal()
 	top_sounds_engine_changed = Signal()
-	next_screen_changed = Signal()
 
 	show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify = show_only_favorites_changed)
 	current_is_favorite = Property(bool, get_current_is_favorite, set_current_is_favorite, notify = current_is_favorite_changed)
 	current_is_top = Property(bool, get_current_is_top, set_current_is_top, notify = current_is_top_changed)
 	top_sounds_engine = Property(str, get_top_sounds_engine, set_top_sounds_engine, notify = top_sounds_engine_changed)
-	next_screen = Property(str, next_action, set_next_screen, notify = next_screen_changed)
 
 
 #------------------------------------------------------------------------------

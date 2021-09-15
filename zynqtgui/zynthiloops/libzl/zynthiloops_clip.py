@@ -38,10 +38,10 @@ import logging
 class zynthiloops_clip(QObject):
     def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
         super(zynthiloops_clip, self).__init__(parent)
-        self.__length__ = 1
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__is_playing__ = False
+        self.__length__ = 4
         self.__start_position__ = 0.0
         self.__path__ = None
         self.__song__ = song
@@ -399,7 +399,7 @@ class zynthiloops_clip(QObject):
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         print(path)
 
-        self.__length__ = 1
+        self.__length__ = 4
         self.__is_playing__ = False
         self.__is_recording__ = False
         self.__start_position__ = 0.0

@@ -195,7 +195,7 @@ Zynthian.ScreenPage {
 						}
 						QQC2.Label {
 							text: "T"
-							opacity: model.metadata.is_top
+							opacity: model.metadata ? model.metadata.is_top : 0
 						}
 						Kirigami.Icon {
 							source: model.icon

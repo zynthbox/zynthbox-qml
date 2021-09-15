@@ -73,9 +73,11 @@ QQC2.Dialog {
                 id: folderModel
                 showDirs: true
                 showDirsFirst: true
-                showDotAndDotDot: true
+                showDotAndDotDot: false
             }
             delegate: Kirigami.BasicListItem {
+                width: ListView.view.width
+
                 label: model.fileName
                 icon: {
                     if (model.fileIsDir) {
@@ -88,6 +90,8 @@ QQC2.Dialog {
                     }
                 }
                 onClicked: {
+                    console.log(model.fileName, model.filePath)
+
                     if (model.fileIsDir) {
                         folderModel.folder = model.filePath
                     } else {

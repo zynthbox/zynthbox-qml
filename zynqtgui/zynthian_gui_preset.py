@@ -85,7 +85,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			for item in self.zyngui.curlayer.preset_list:
 				self.list_data.append(item)
 				is_top = False
-				if self.zyngui.curlayer != None:
+				if self.zyngui.curlayer != None and self.zyngui.curlayer.engine.nickname in self.__top_sounds:
 					for sound in self.__top_sounds[self.zyngui.curlayer.engine.nickname]:
 						if sound["preset"] == item[2]:
 							is_top = True
@@ -303,16 +303,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		if self.zyngui.curlayer:
 			if self.zyngui.curlayer.show_fav_presets:
 				self.select_path = (self.zyngui.curlayer.get_basepath() + " > Favorites")
-				if self.zyngui.curlayer is None:
-					self.select_path_element = "Favorites"
-				else:
-					self.select_path_element = self.zyngui.curlayer.preset_name
+				self.select_path_element = self.zyngui.curlayer.preset_name
 			else:
 				self.select_path = self.zyngui.curlayer.get_bankpath()
-				if self.zyngui.curlayer is None:
-					self.select_path_element = "Presets"
-				else:
-					self.select_path_element = self.zyngui.curlayer.preset_name
+				self.select_path_element = self.zyngui.curlayer.preset_name
+		else:
+			self.select_path_element = "Presets"
 		super().set_select_path()
 
 	show_only_favorites_changed = Signal()

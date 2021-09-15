@@ -93,24 +93,9 @@ def init():
         print(f"Can't initialise libzl library: {str(e)}")
 
 
-def registerTimerCallbackOneFourth(callback):
+def registerTimerCallback(callback):
     if libzl:
-        libzl.SyncTimer_registerTimerCallbackOneFourth(callback)
-
-
-def registerTimerCallbackOneEighth(callback):
-    if libzl:
-        libzl.SyncTimer_registerTimerCallbackOneEighth(callback)
-
-
-def registerTimerCallbackOneSixteenth(callback):
-    if libzl:
-        libzl.SyncTimer_registerTimerCallbackOneSixteenth(callback)
-
-
-def registerTimerCallbackOneThirtySecond(callback):
-    if libzl:
-        libzl.SyncTimer_registerTimerCallbackOneThirtySecond(callback)
+        libzl.SyncTimer_registerTimerCallback(callback)
 
 
 def registerGraphicTypes():

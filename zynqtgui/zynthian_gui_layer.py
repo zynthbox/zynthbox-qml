@@ -212,7 +212,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.set_curlayer(None)
 			self.zyngui.screens['bank'].fill_list()
 			self.zyngui.screens['preset'].fill_list()
-			logging.error("KILLED EM ALL {}".format(self.zyngui.curlayer))
 		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			#self.replace_layer_index = None
 			#self.layer_chain_parallel = False

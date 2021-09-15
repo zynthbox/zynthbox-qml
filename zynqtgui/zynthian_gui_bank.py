@@ -59,7 +59,11 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			self.zyngui.screens['preset'].reload_top_sounds()
 			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
 			for engine in top_sounds:
-				self.list_data.append((engine, len(self.list_data), "{} ({})".format(engine, len(top_sounds[engine]))))
+				parts = engine.split("/")
+				readable_name = engine
+				if len(parts) > 1:
+					parts[1]
+				self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
 		else:
 			if not self.zyngui.curlayer:
 				logging.error("Can't fill bank list for None layer!")
@@ -77,10 +81,32 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			return
 		self.__show_top_sounds = show
 		self.fill_list()
-		self.select_action(0)
+		if show and self.zyngui.curlayer:
+			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
+			for i, engine in enumerate(top_sounds):
+				if engine == self.zyngui.curlayer.engine.nickname:
+					self.select_action(i)
+					break
+			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
+				if preset[2] == self.zyngui.curlayer.preset_name:
+					self.zyngui.screens['preset'].select_action(i)
+					break
+		elif self.zyngui.curlayer:
+			for i, bank in enumerate(self.list_data):
+				if bank[2] == self.zyngui.curlayer.bank_name:
+					self.select_action(i)
+					break
+			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
+				if preset[2] == self.zyngui.curlayer.preset_name:
+					self.zyngui.screens['preset'].select_action(i)
+					break
 		self.show_top_sounds_changed.emit()
 
 	def show(self):
+		if self.__show_top_sounds:
+			#TODO: check what top sound we're in
+			super().show()
+			return
 		if not self.zyngui.curlayer:
 			logging.error("Can't show bank list for None layer!")
 			return
@@ -100,6 +126,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		if self.__show_top_sounds:
 			self.zyngui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
 			return
+		else:
+			self.zyngui.screens['preset'].set_top_sounds_engine(None)
+
 		if self.list_data[i][0]=='*FAVS*':
 			self.zyngui.screens['preset'].set_show_only_favorites(True)
 		else:

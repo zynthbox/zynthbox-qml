@@ -7,6 +7,26 @@ import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
 
+/**
+  * EXAMPLE :
+  *
+  * Zynthian.FilePickerDialog {
+  *      id: pickerDialog
+
+  *      x: parent.width/2 - width/2
+  *      y: parent.height/2 - height/2
+  *      width: Math.round(parent.width * 0.8)
+  *      height: Math.round(parent.height * 0.8)
+
+  *      folderModel {
+  *          folder: '/zynthian/zynthian-my-data'
+  *          nameFilters: ["*.wav"]
+  *      }
+  *      onFileSelected: {
+  *          console.log(filePath)
+  *      }
+  * }
+  */
 QQC2.Dialog {
     property alias headerText: heading.text
     property alias folderModel: folderModel

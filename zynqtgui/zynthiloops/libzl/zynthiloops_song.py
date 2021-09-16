@@ -293,7 +293,7 @@ class zynthiloops_song(QObject):
         pass
 
     @Signal
-    def __tracks_model_changed__(self):
+    def tracks_model_changed(self):
         pass
 
     @Signal
@@ -302,7 +302,7 @@ class zynthiloops_song(QObject):
 
     def tracksModel(self):
         return self.__tracks_model__
-    tracksModel = Property(QObject, tracksModel, notify=__tracks_model_changed__)
+    tracksModel = Property(QObject, tracksModel, notify=tracks_model_changed)
 
 
     def partsModel(self):

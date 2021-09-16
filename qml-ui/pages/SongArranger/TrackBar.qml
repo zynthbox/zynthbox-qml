@@ -41,9 +41,21 @@ GridLayout {
 
     property QtObject sideBar: null
 
-    QQC2.Label {
-        Layout.alignment: Qt.AlignCenter
-        text: "Track Controls"
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+
+        QQC2.Label {
+            text: "Clips :"
+        }
+
+        ListView {
+            model: root.sideBar.controlObj.zlTrack.clipsModel
+            delegate: Kirigami.BasicListItem {
+                width: ListView.view.width
+                text: model.clip.name
+            }
+        }
     }
 }
 

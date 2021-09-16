@@ -141,10 +141,10 @@ Zynthian.ScreenPage {
                     contentY: cellGridFlickable.contentY
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.arranger.sketch.tracksModel
+                    model: root.arranger.tracksModel
 
                     delegate: Zynthian.TableHeader {
-                        text: track.name
+                        text: track.zlTrack.name
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
@@ -176,18 +176,15 @@ Zynthian.ScreenPage {
 
                     GridLayout {
                         id: cellGrid
-                        rows: root.arranger.sketch.tracksModel.count
-                        flow: GridLayout.TopToBottom
+                        columns: root.arranger.bars
                         rowSpacing: 1
                         columnSpacing: 1
 
                         Repeater {
-                            model: root.arranger.bars
+                            model: root.arranger.tracksModel
 
                             delegate: Repeater {
-                                property int rowIndex: index
-
-                                model: root.arranger.sketch.tracksModel
+                                model: track.cellsModel
 
                                 delegate: ClipCell {
                                     id: clipCell
@@ -197,7 +194,7 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
 
-                                    cellText: track.name + "-" + (modelData+1)
+                                    cellText: track.zlTrack.name + "-" + (cell.id+1)
 
                                     onPressed: {
                                         sideBar.controlType = SideBar.ControlType.None;

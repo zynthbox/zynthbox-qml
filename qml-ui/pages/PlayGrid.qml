@@ -59,8 +59,6 @@ Zynthian.ScreenPage {
         ListElement { scale: "locrian"; text: "Locrian" }
     }
 
-    property string currentNoteName: keyModel.getName(zynthian.playgrid.startingNote)
-
     ListModel {
         id: keyModel
         function getName(note) {
@@ -617,11 +615,6 @@ Zynthian.ScreenPage {
         Loader {
             id:playGridLoader
             source: modelData + "/main.qml"
-            Binding {
-                target: playGridLoader.item
-                property: 'currentNoteName'
-                value: component.currentNoteName
-            }
         }
     }
 

@@ -30,6 +30,9 @@ from zyngine import zynthian_layer
 
 from json import JSONEncoder, JSONDecoder
 
+from os import listdir
+from os.path import isfile, join
+
 # Zynthian specific modules
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
@@ -53,7 +56,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def __init__(self, parent = None):
 		super(zynthian_gui_preset, self).__init__('Preset', parent)
 		self.__top_sounds_engine = None
-		self.__top_sounds = []
+		self.__top_sounds = {}
+		self.__fav_root = "/zynthian/zynthian-my-data/preset-favorites/"
 		self.reload_top_sounds()
 		self.show()
 
@@ -68,8 +72,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				if isinstance(self.__top_sounds[self.__top_sounds_engine], list):
 					for sound in self.__top_sounds[self.__top_sounds_engine]:
 						if isinstance(sound, dict):
-							self.list_data.append(("topsound", len(self.list_data), sound["preset"]))
-							self.list_metadata.append({"icon": "", "show_numbers": True, "is_top" : True})
+							self.list_data.append(sound["list_item"])
+							self.list_metadata.append({"icon": "starred-symbolic", "show_numbers": True})
 
 		else:
 			if not self.zyngui.curlayer:
@@ -84,14 +88,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 			for item in self.zyngui.curlayer.preset_list:
 				self.list_data.append(item)
-				is_top = False
-				if self.zyngui.curlayer != None and self.zyngui.curlayer.engine.nickname in self.__top_sounds:
-					for sound in self.__top_sounds[self.zyngui.curlayer.engine.nickname]:
-						if sound["preset"] == item[2]:
-							is_top = True
-							break
 				self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
-								"show_numbers": True, "is_top" : is_top})
+								"show_numbers": True})
 
 		super().fill_list()
 
@@ -109,7 +107,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
-		if self.list_data[i][0] == "topsound":
+		if self.__top_sounds_engine != None:
 			sound = self.__top_sounds[self.__top_sounds_engine][i]
 			layer = self.zyngui.curlayer
 			if self.zyngui.curlayer == None:
@@ -162,6 +160,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			return
 
 		if t=='S':
+			logging.error(self.list_data[i])
 			self.zyngui.curlayer.set_preset(i)
 			self.zyngui.screens['control'].show()
 			self.zyngui.screens['layer'].fill_list()
@@ -175,66 +174,113 @@ class zynthian_gui_preset(zynthian_gui_selector):
 	def select(self, index=None):
 		super().select(index)
 		self.current_is_favorite_changed.emit()
-		self.current_is_top_changed.emit()
 
 
 	def get_current_is_favorite(self):
 		if self.index < 0 or self.index >= len(self.list_data):
 			return False
-		if self.list_data[self.index][0] == "topsound":
-			return False  # TODO we don't have a way to know if presets of non loaded engines are favorite
+		if self.__top_sounds_engine != None:
+			return True  # We can assume all topsounds are always favorite
 		if self.index >= len(self.zyngui.curlayer.preset_list):
 			return False
 		return self.zyngui.curlayer.engine.is_preset_fav(self.zyngui.curlayer.preset_list[self.index])
 
-	def set_current_is_favorite(self, fav: bool):
-		self.zyngui.curlayer.toggle_preset_fav(self.list_data[self.index])
+	def set_current_is_favorite(self, new_fav_state: bool):
+		fav_owner_engine = None
+		if self.__top_sounds_engine == None:
+			fav_owner_engine = self.zyngui.curlayer.engine
+		else:
+			for eng in self.zyngui.screens['engine'].zyngines:
+				candidate_engine = self.zyngui.screens['engine'].zyngines[eng]
+				if candidate_engine.nickname == self.__top_sounds_engine and len(candidate_engine.layers) > 0:
+					fav_owner_engine = candidate_engine
+					break
+		# if we are operating on an active engine, we can just use its internal api
+		if fav_owner_engine != None:
+			logging.error("TOGGLING FAV {} {}".format(fav_owner_engine.is_preset_fav(self.list_data[self.index]), new_fav_state))
+			if fav_owner_engine.is_preset_fav(self.list_data[self.index]) != new_fav_state:
+				fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[self.index])
+
+		# otherwise we need to manipulate the json file ourselves, support only fav *removal* for now
+		# TODO: support also adding a fav?
+		elif self.__top_sounds_engine != None and not new_fav_state:
+			try:
+				filename = self.__top_sounds_engine.replace("/", "_").replace() + ".json"
+				parsed = None
+				with open(self.__fav_root + filename, "r") as fh:
+					json = fh.read()
+					fh.close()
+					logging.info("Loading top sounds for update %s" % (json))
+
+					parsed = JSONDecoder().decode(json)
+					if not isinstance(parsed, dict):
+						raise Exception("Unexpected fileformat: not a dict")
+
+				for entry in parsed:
+					if len(entry) == 0:
+						continue
+					if not isinstance(parsed[entry], list):
+						continue
+					if len(parsed[entry]) < 2:
+						continue
+					if len(parsed[entry][0]) < 3:
+						continue
+					if len(parsed[entry][1]) < 3:
+						continue
+					if (parsed[entry][0][2] == self.__top_sounds[self.__top_sounds_engine][self.index]["bank"]
+						and parsed[entry][1][2] == self.__top_sounds[self.__top_sounds_engine][self.index]["preset"]):
+						del parsed[entry]
+						break
+
+				with open(self.__fav_root + filename, "w") as fh:
+					f.write(JSONEncoder().encode(parsed))
+					f.close()
+
+			except Exception as e:
+				logging.error("Can't update top sounds: %s" % (e))
+
 		self.fill_list()
 		self.zyngui.screens['bank'].fill_list()
 		self.current_is_favorite_changed.emit()
 
-	def get_current_is_top(self):
-		if self.zyngui.curlayer is None:
-			return False
-		if self.__top_sounds_engine != None:
-			return True
-		if not self.zyngui.curlayer.engine.nickname in self.__top_sounds:
-			return False
-		for sound in self.__top_sounds[self.zyngui.curlayer.engine.nickname]:
-			if sound["preset"] == self.list_data[self.index][2]:
-				return True
-		return False
-
-	def set_current_is_top(self, top: bool):
-		if not top and self.__top_sounds_engine != None:
-			del self.__top_sounds[self.__top_sounds_engine][self.index]
-		elif top:
-			self.__top_sounds[self.zyngui.curlayer.engine.nickname].append({
-							 "engine": self.zyngui.curlayer.engine.nickname,
-							 "bank": self.zyngui.curlayer.bank_name,
-							 "preset": self.zyngui.curlayer.preset_name})
-		else:
-			return
-		try:
-			f = open("/zynthian/zynthian-my-data/top-sounds.json", "w")
-			f.write(JSONEncoder().encode(self.__top_sounds))
-			f.close()
-			self.fill_list()
-			self.zyngui.screens['bank'].fill_list()
-			self.current_is_top_changed.emit()
-		except Exception as e:
-			logging.warning("Can't save top sounds: {}".format(e))
-
 
 	def reload_top_sounds(self):
-		try:
-			with open("/zynthian/zynthian-my-data/top-sounds.json", "r") as fh:
-				json=fh.read()
-				logging.info("Loading top sounds %s" % (json))
+		self.__top_sounds = {}
+		allfiles = [f for f in listdir(self.__fav_root) if isfile(join(self.__fav_root, f))]
+		for f in allfiles:
+			if not f.endswith(".json"):
+				continue
+			try:
+				with open(self.__fav_root + f, "r") as fh:
+					json = fh.read()
+					fh.close()
+					logging.info("Loading top sounds %s" % (json))
 
-				self.__top_sounds = JSONDecoder().decode(json)
-		except Exception as e:
-			logging.error("Can't load top sounds: %s" % (e))
+					parsed = JSONDecoder().decode(json)
+					if not isinstance(parsed, dict):
+						continue
+					engine = f.replace("_", "/")
+					engine = engine.replace(".json", "")
+					if not engine in self.__top_sounds:
+						self.__top_sounds[engine] = []
+					for entry in parsed:
+						if len(entry) == 0:
+							continue
+						if not isinstance(parsed[entry], list):
+							continue
+						if len(parsed[entry]) < 2:
+							continue
+						if len(parsed[entry][0]) < 3:
+							continue
+						if len(parsed[entry][1]) < 3:
+							continue
+						sound = {"engine": engine,
+							"bank": parsed[entry][0][2],
+							"preset": parsed[entry][1][2],
+							"list_item": parsed[entry][1]}
+						self.__top_sounds[engine].append(sound)
+			except Exception as e:
+				logging.error("Can't load top sounds: %s" % (e))
 
 	def get_all_top_sounds(self):
 		return self.__top_sounds
@@ -250,7 +296,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def index_supports_immediate_activation(self, index=None):
-		return True
+		return self.__top_sounds_engine == None
 
 	def next_action(self): #DON't go to edit or effect
 		return "preset"
@@ -315,12 +361,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	show_only_favorites_changed = Signal()
 	current_is_favorite_changed = Signal()
-	current_is_top_changed = Signal()
 	top_sounds_engine_changed = Signal()
 
 	show_only_favorites = Property(bool, get_show_only_favorites, set_show_only_favorites, notify = show_only_favorites_changed)
 	current_is_favorite = Property(bool, get_current_is_favorite, set_current_is_favorite, notify = current_is_favorite_changed)
-	current_is_top = Property(bool, get_current_is_top, set_current_is_top, notify = current_is_top_changed)
 	top_sounds_engine = Property(str, get_top_sounds_engine, set_top_sounds_engine, notify = top_sounds_engine_changed)
 
 

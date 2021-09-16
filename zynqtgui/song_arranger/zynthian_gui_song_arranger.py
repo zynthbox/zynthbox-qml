@@ -22,16 +22,24 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import logging
+
 from PySide2.QtCore import Property, QObject, Signal
 
+from .song_arranger_cell import song_arranger_cell
+from .song_arranger_track import song_arranger_track
+from .song_arranger_tracks_model import song_arranger_tracks_model
 from .. import zynthian_qt_gui_base
 
 
 class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_song_arranger, self).__init__(parent)
-        self.__bars__ = 240
-        self.__sketch__ = self.zyngui.zynthiloops.song
+        self.__bars__ = 24
+        self.__sketch__ = None
+        self.__tracks_model__ = None
+
+        self.generate_tracks_model()
 
     ### Property bars
     def get_bars(self):
@@ -40,8 +48,34 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     bars = Property(int, get_bars, notify=bars_changed)
     ### END Property bars
 
-    ### Property sketch
-    def get_sketch(self):
-        return self.__sketch__
-    sketch = Property(QObject, get_sketch, constant=True)
-    ### END Property sketch
+    ### Property tracksModel
+    def get_tracksModel(self):
+        return self.__tracks_model__
+    tracks_model_changed = Signal()
+    tracksModel = Property(QObject, get_tracksModel, notify=tracks_model_changed)
+    ### END Property tracksModel
+
+    def generate_tracks_model(self):
+        logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
+
+        self.__sketch__ = self.zyngui.zynthiloops.song
+        self.__tracks_model__ = song_arranger_tracks_model(self)
+
+        try:
+            self.__sketch__.tracksModel.countChanged.disconnect()
+            self.zyngui.zynthiloops.song_changed.disconnect()
+        except:
+            logging.error(f"Cannot disconnect")
+
+        self.__sketch__.tracksModel.countChanged.connect(self.generate_tracks_model)
+        self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)
+
+        for i in range(self.__sketch__.tracksModel.count):
+            track = song_arranger_track(self.__sketch__.tracksModel.getTrack(i))
+            self.__tracks_model__.add_track(track)
+
+            for j in range(self.__bars__):
+                cell = song_arranger_cell(j, self)
+                track.cellsModel.add_cell(cell)
+
+        self.tracks_model_changed.emit()

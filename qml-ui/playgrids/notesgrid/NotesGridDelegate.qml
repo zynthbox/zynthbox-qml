@@ -33,8 +33,7 @@ RowLayout {
     property QtObject model
     property string scale
     property bool positionalVelocity
-    signal noteOn(QtObject note, int velocity)
-    signal noteOff(QtObject note)
+    property Item playgrid
     property var row: index
     Layout.margins: 2.5
     Repeater {
@@ -114,11 +113,11 @@ RowLayout {
                                 playDelegate.down = true;
                                 playDelegate.focus = true;
                                 playingNote = note;
-                                component.noteOn(playingNote, velocityValue);
+                                component.playgrid.setNoteOn(playingNote, velocityValue);
                             } else {
                                 playDelegate.down = false;
                                 playDelegate.focus = false;
-                                component.noteOff(playingNote);
+                                component.playgrid.setNoteOff(playingNote);
                                 zynthian.playgrid.pitch = 0;
                                 zynthian.playgrid.modulation = 0;
                             }

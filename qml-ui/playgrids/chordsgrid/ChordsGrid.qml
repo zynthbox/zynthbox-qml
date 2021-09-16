@@ -53,9 +53,9 @@ ColumnLayout {
 
                     // Pitch is -8192 to 8191 inclusive
                     property int pitchValue: Math.max(-8192, Math.min(chordSlidePoint.slideX * 8192 / width, 8191))
-                    onPitchValueChanged: zynthian.playgrid.pitch = pitchValue
+                    onPitchValueChanged: component.playgrid.pitch = pitchValue
                     property int modulationValue: Math.max(-127, Math.min(chordSlidePoint.slideY * 127 / width, 127))
-                    onModulationValueChanged: zynthian.playgrid.modulation = modulationValue;
+                    onModulationValueChanged: component.playgrid.modulation = modulationValue;
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -115,8 +115,8 @@ ColumnLayout {
                                         playDelegate.down = false;
                                         playDelegate.focus = false;
                                         component.playgrid.setNoteOff(playingNote)
-                                        zynthian.playgrid.pitch = 0;
-                                        zynthian.playgrid.modulation = 0;
+                                        component.playgrid.pitch = 0;
+                                        component.playgrid.modulation = 0;
                                     }
                                 }
                             }

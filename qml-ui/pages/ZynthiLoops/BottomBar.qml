@@ -287,6 +287,7 @@ Zynthian.Card {
         height: Math.round(parent.height * 0.8)
 
         headerText: qsTr("Pick an audio file")
+        rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             folder: root.controlObj.recordingDir
             nameFilters: ["*.wav"]

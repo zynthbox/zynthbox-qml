@@ -81,6 +81,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			return
 		self.__show_top_sounds = show
 		self.fill_list()
+		self.show()
 		if show and self.zyngui.curlayer:
 			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
 			for i, engine in enumerate(top_sounds):
@@ -103,9 +104,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		self.show_top_sounds_changed.emit()
 
 	def show(self):
-		if self.__show_top_sounds:
-			#TODO: check what top sound we're in
-			super().show()
+		if self.__show_top_sounds: #don't support autosync when top sounds is enabled
 			return
 		if not self.zyngui.curlayer:
 			logging.error("Can't show bank list for None layer!")
@@ -113,9 +112,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		if not self.zyngui.curlayer.get_bank_name():
 			self.zyngui.curlayer.set_bank(0)
 		if self.zyngui.screens['preset'].get_show_only_favorites():
-			self.index = 0
+			self.select(0)
 		else:
-			self.index = self.zyngui.curlayer.get_bank_index()
+			self.select(self.zyngui.curlayer.get_bank_index())
 		logging.debug("BANK INDEX => %s" % self.index)
 		super().show()
 

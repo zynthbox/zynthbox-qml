@@ -25,7 +25,7 @@ GridLayout {
     rowSpacing: parent.spacing
     columnSpacing: rowSpacing
 
-    PlasmaCore.IconItem {
+    Kirigami.Icon { //NOTE: use this to not have blue icons on pressed buttons
         id: icon
 
         readonly property int defaultIconSize: root.parent.flat ? Kirigami.Units.iconSizes.smallMedium : Kirigami.Units.iconSizes.small
@@ -35,18 +35,18 @@ GridLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        Layout.minimumWidth: Math.min(parent.width, parent.height, implicitWidth)
-        Layout.minimumHeight: Math.min(parent.width, parent.height, implicitHeight)
+        Layout.minimumWidth: Math.min(parent.width, parent.height, Layout.preferredWidth)
+        Layout.minimumHeight: Math.min(parent.width, parent.height, Layout.preferredHeight)
 
         Layout.maximumWidth: root.parent.icon.width > 0 ? root.parent.icon.width : Number.POSITIVE_INFINITY
         Layout.maximumHeight: root.parent.icon.height > 0 ? root.parent.icon.height : Number.POSITIVE_INFINITY
 
-        implicitWidth: root.parent.icon.width > 0 ? root.parent.icon.width : defaultIconSize
-        implicitHeight: root.parent.icon.height > 0 ? root.parent.icon.height : defaultIconSize
-        colorGroup: parent.PlasmaCore.ColorScope.colorGroup
+        Layout.preferredWidth: root.parent.icon.width > 0 ? root.parent.icon.width : defaultIconSize
+        Layout.preferredHeight: root.parent.icon.height > 0 ? root.parent.icon.height : defaultIconSize
+        //colorGroup: parent.PlasmaCore.ColorScope.colorGroup
+        color:  parent.PlasmaCore.ColorScope.textColor
         visible: source.length > 0 && root.parent.display !== T.Button.TextOnly
         source: root.parent.icon ? (root.parent.icon.name || root.parent.icon.source) : ""
-        status: usingFocusBackground ? PlasmaCore.Svg.Selected : PlasmaCore.Svg.Normal
     }
     PlasmaComponents.Label {
         id: label

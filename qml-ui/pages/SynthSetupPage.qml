@@ -109,6 +109,7 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: 1
             Kirigami.Heading {
                 level: 2
+                Layout.preferredHeight: favToggleButton.height // HACK
                 text: qsTr("Layers")
                 Kirigami.Theme.inherit: false
                 Kirigami.Theme.colorSet: Kirigami.Theme.View
@@ -136,7 +137,7 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
                 QQC2.Button {
-                    text: qsTr("Top")
+                    text: qsTr("Fav")
                     checkable: true
                     checked: zynthian.bank.show_top_sounds
                     onToggled: {
@@ -167,10 +168,14 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
                 QQC2.Button {
-                    icon.name: "non-starred-symbolic"
+                    id: favToggleButton
+                    icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                    text: qsTr("Toggle")
+                    LayoutMirroring.enabled: true
+                    LayoutMirroring.childrenInherit: true
                     checkable: true
                     checked: zynthian.preset.current_is_favorite
-                    onToggled: zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite
+                    onToggled: zynthian.preset.current_is_favorite = checked
                 }
             }
             Zynthian.SelectorView {

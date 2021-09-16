@@ -40,14 +40,24 @@ Zynthian.BasePlayGrid {
     octave: 3
     useOctaves: true
 
-    property QtObject settingsStore
-    property QtObject miniGridModel
+    defaults: {
+        "startingNote": component.octave * 12,
+        "scale": "ionian",
+        "rows": 5,
+        "columns": 8,
+        "positionalVelocity": true
+    }
 
-    property int startingNote: component.octave * 12;
-    property string scale: "ionian";
-    property int rows: 5;
-    property int columns: 8;
-    property bool positionalVelocity: true;
+    QtObject {
+        id: _private
+        property QtObject model
+        property QtObject miniGridModel
+        property int startingNote
+        property string scale
+        property int rows
+        property int columns
+        property bool positionalVelocity
+    }
 
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
         console.log("Filling notes model " + model)
@@ -104,54 +114,42 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
-        fillModel(component.model, component.startingNote, component.scale, component.rows, component.columns, component.positionalVelocity)
-        fillModel(component.miniGridModel, component.startingNote + 24, component.scale, 2, component.columns, component.positionalVelocity)
+        fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
+        fillModel(_private.miniGridModel, _private.startingNote + 24, _private.scale, 2, _private.columns, _private.positionalVelocity)
     }
 
-    Component.onCompleted: {
-        component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian notesgrid settings")
+    onInitialize: {
+        _private.startingNote = component.getProperty("startingNote")
+        _private.scale = component.getProperty("scale")
+        _private.rows = component.getProperty("rows")
+        _private.columns = component.getProperty("columns")
+        _private.positionalVelocity = component.getProperty("positionalVelocity")
 
-        component.settingsStore.setDefault("startingNote", component.startingNote);
-        component.settingsStore.setDefault("scale", component.scale);
-        component.settingsStore.setDefault("rows", component.rows);
-        component.settingsStore.setDefault("columns", component.columns);
-        component.settingsStore.setDefault("positionalVelocity", component.positionalVelocity);
-
-        component.startingNote = component.settingsStore.property("startingNote")
-        component.scale = component.settingsStore.property("scale")
-        component.rows = component.settingsStore.property("rows")
-        component.columns = component.settingsStore.property("columns")
-        component.positionalVelocity = component.settingsStore.property("positionalVelocity")
-
-        component.model = zynthian.playgrid.getNotesModel("zynthian notesgrid main")
-        component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian notesgrid mini")
-        if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
+        _private.model = component.getModel("main")
+        _private.miniGridModel = component.getModel("mini")
+        if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
             populateGridTimer.restart()
         }
     }
 
-    Connections {
-        target: component.settingsStore
-        onPropertyChanged: {
-            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged();
-//             console.log("A property named " + mostRecentlyChanged + " has changed to " + component.settingsStore.property(mostRecentlyChanged));
-            var changed = true;
-            if (mostRecentlyChanged === "startingNote" && component.startingNote != component.settingsStore.property("startingNote")) {
-                component.startingNote = component.settingsStore.property("startingNote");
-            } else if (mostRecentlyChanged === "scale" && component.scale != component.settingsStore.property("scale")) {
-                component.scale = component.settingsStore.property("scale");
-            } else if (mostRecentlyChanged === "rows" && component.rows != component.settingsStore.property("rows")) {
-                component.rows = component.settingsStore.property("rows");
-            } else if (mostRecentlyChanged === "columns" && component.columns != component.settingsStore.property("columns")) {
-                component.columns = component.settingsStore.property("columns");
-            } else if (mostRecentlyChanged === "positionalVelocity" && component.positionalVelocity != component.settingsStore.property("positionalVelocity")) {
-                component.positionalVelocity = component.settingsStore.property("positionalVelocity");
-            } else {
-                changed = false;
-            }
-            if (changed) {
-                populateGridTimer.restart()
-            }
+    onPropertyChanged: {
+        //console.log("A property named " + property + " has changed to " + value);
+        var changed = true;
+        if (property === "startingNote") {
+            component.startingNote = value;
+        } else if (property === "scale") {
+            component.scale = value;
+        } else if (property === "rows") {
+            component.rows = value;
+        } else if (property === "columns") {
+            component.columns = value;
+        } else if (property === "positionalVelocity") {
+            component.positionalVelocity = value;
+        } else {
+            changed = false;
+        }
+        if (changed) {
+            populateGridTimer.restart()
         }
     }
 
@@ -165,7 +163,7 @@ Zynthian.BasePlayGrid {
     }
 
     onOctaveChanged: {
-        component.settingsStore.setProperty("startingNote", component.octave * 12);
+        component.setProperty("startingNote", component.octave * 12);
     }
 
     Component {
@@ -175,11 +173,13 @@ Zynthian.BasePlayGrid {
             spacing: 0
             anchors.margins: 5
             Repeater {
-                model: component.model
+                model: _private.model
                 delegate: NotesGridDelegate {
-                    model: component.model
-                    settingsStore: component.settingsStore
-                    currentNoteName: component.currentNoteName
+                    model: _private.model
+                    scale: _private.scale
+                    positionalVelocity: _private.positionalVelocity
+                    onNoteOn: component.setNoteOn(note, velocity)
+                    onNoteOff: component.setNoteOff(note)
                 }
             }
         }
@@ -192,11 +192,13 @@ Zynthian.BasePlayGrid {
             anchors.margins: 5
             Repeater {
                 id: miniGridRepeater
-                model: component.miniGridModel
+                model: _private.miniGridModel
                 delegate: NotesGridDelegate {
-                    model: component.miniGridModel
-                    settingsStore: component.settingsStore
-                    currentNoteName: component.currentNoteName
+                    model: _private.miniGridModel
+                    scale: _private.scale
+                    positionalVelocity: _private.positionalVelocity
+                    onNoteOn: component.setNoteOn(note, velocity)
+                    onNoteOff: component.setNoteOff(note)
                 }
             }
         }
@@ -219,74 +221,74 @@ Zynthian.BasePlayGrid {
                 currentIndex: 1
 
                 onActivated: {
-                    component.settingsStore.setProperty("startingNote", 36);
-                    component.settingsStore.setProperty("scale", scaleModel.get(currentIndex).scale);
+                    component.setProperty("startingNote", 36);
+                    component.setProperty("scale", scaleModel.get(currentIndex).scale);
                 }
             }
             QQC2.ComboBox {
                 id: comboKey
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Key"
-                visible: component.settingsStore.property("scale") == "chromatic"
+                visible: component.getProperty("scale") == "chromatic"
                 model: keyModel
                 textRole: "text"
                 displayText: currentText
                 currentIndex: 0
 
                 onActivated: {
-                    component.settingsStore.setProperty("startingNote", keyModel.get(currentIndex).note);
+                    component.setProperty("startingNote", keyModel.get(currentIndex).note);
                 }
             }
 
             QQC2.Button {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Transpose"
-                visible: component.settingsStore.property("scale") === "chromatic"
+                visible: component.getProperty("scale") === "chromatic"
                 text: "-"
                 onClicked: {
-                    var startingNote = component.settingsStore.property("startingNote")
+                    var startingNote = component.getProperty("startingNote")
                     if (startingNote - 1 > 0) {
-                        component.settingsStore.setProperty("startingNote", startingNote - 1);
+                        component.setProperty("startingNote", startingNote - 1);
                     } else {
                         startingNote = 0;
-                        component.settingsStore.setProperty("startingNote", 0);
+                        component.setProperty("startingNote", 0);
                     }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
-                visible: component.settingsStore.property("scale") === "chromatic"
+                visible: component.getProperty("scale") === "chromatic"
                 text: "+"
                 onClicked: {
-                    var startingNote = component.settingsStore.property("startingNote")
-                    component.settingsStore.setProperty("startingNote", startingNote + 1);
+                    var startingNote = component.getProperty("startingNote")
+                    component.setProperty("startingNote", startingNote + 1);
                 }
             }
 
             QQC2.Button {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Octave"
-                visible: component.settingsStore.property("scale") !== "chromatic"
+                visible: component.getProperty("scale") !== "chromatic"
                 text: "-"
                 onClicked: {
-                    var startingNote = component.settingsStore.property("startingNote")
+                    var startingNote = component.getProperty("startingNote")
                     if (startingNote - 12 > 0) {
-                        component.settingsStore.setProperty("startingNote", startingNote - 12);
+                        component.setProperty("startingNote", startingNote - 12);
                     } else {
-                        component.settingsStore.setProperty("startingNote",0);
+                        component.setProperty("startingNote",0);
                     }
                 }
             }
             QQC2.Button {
                 Layout.fillWidth: true
-                visible: component.settingsStore.property("scale") != "chromatic"
+                visible: component.getProperty("scale") != "chromatic"
                 text: "+"
                 onClicked: {
-                    var startingNote = component.settingsStore.property("startingNote")
+                    var startingNote = component.getProperty("startingNote")
                     if (startingNote + 12 < 127){
-                        component.settingsStore.setProperty("startingNote", startingNote + 12);
+                        component.setProperty("startingNote", startingNote + 12);
                     } else {
-                        component.settingsStore.setProperty("startingNote", 120);
+                        component.setProperty("startingNote", 120);
                     }
                 }
             }
@@ -302,11 +304,11 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     var data = gridModel.get(currentIndex)
                     if (data.row === 0 && data.column === 0) {
-                        component.settingsStore.setProperty("rows", customRows.currentText);
-                        component.settingsStore.setProperty("columns", customColumns.currentText);
+                        component.setProperty("rows", customRows.currentText);
+                        component.setProperty("columns", customColumns.currentText);
                     } else {
-                        component.settingsStore.setProperty("rows", data.row);
-                        component.settingsStore.setProperty("columns", data.column);
+                        component.setProperty("rows", data.row);
+                        component.setProperty("columns", data.column);
                     }
                 }
             }
@@ -320,7 +322,7 @@ Zynthian.BasePlayGrid {
                 displayText: currentText
                 currentIndex: 0
                 onActivated: {
-                    component.settingsStore.setProperty("rows", currentText);
+                    component.setProperty("rows", currentText);
                 }
             }
             QQC2.ComboBox {
@@ -332,16 +334,16 @@ Zynthian.BasePlayGrid {
                 displayText: currentText
                 currentIndex: 0
                 onActivated: {
-                    component.settingsStore.setProperty("columns", currentText);
+                    component.setProperty("columns", currentText);
                 }
             }
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: component.settingsStore.property("positionalVelocity")
+                checked: component.getProperty("positionalVelocity")
                 onClicked: {
-                    var positionalVelocity = component.settingsStore.property("positionalVelocity")
-                    component.settingsStore.setProperty("positionalVelocity", !positionalVelocity);
+                    var positionalVelocity = component.getProperty("positionalVelocity")
+                    component.setProperty("positionalVelocity", !positionalVelocity);
                 }
             }
         }

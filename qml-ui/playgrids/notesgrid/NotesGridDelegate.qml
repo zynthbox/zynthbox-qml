@@ -31,8 +31,10 @@ import org.kde.kirigami 2.4 as Kirigami
 RowLayout {
     id: component
     property QtObject model
-    property QtObject settingsStore
-    property string currentNoteName
+    property string scale
+    property bool positionalVelocity
+    signal noteOn(QtObject note, int velocity)
+    signal noteOff(QtObject note)
     property var row: index
     Layout.margins: 2.5
     Repeater {
@@ -62,8 +64,8 @@ RowLayout {
                         if (note.isPlaying) {
                             color = "#8bc34a";
                         } else {
-                            if (component.settingsStore.property("scale") !== "chromatic" &&
-                                note.name === component.currentNoteName
+                            if (component.scale !== "chromatic" &&
+                                playDelegate.note.midiNote % 12 === 0
                             ) {
                                 color = Kirigami.Theme.focusColor;
                             } else {
@@ -81,7 +83,7 @@ RowLayout {
                     text: {
                         var text = "";
                         if (note && note.name != "") {
-                            if (component.settingsStore.property("scale") == "major") {
+                            if (component.scale == "major") {
                                 text = note.name
                             } else {
                                 text = note.name + note.octave
@@ -103,7 +105,7 @@ RowLayout {
                         onPressedChanged: {
                             if (pressed) {
                                 var velocityValue = 64;
-                                if (component.settingsStore.property("positionalVelocity")) {
+                                if (component.positionalVelocity) {
                                     velocityValue = 127 - Math.floor(pitchModPoint.y * 127 / height);
                                 } else {
                                     // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
@@ -112,11 +114,11 @@ RowLayout {
                                 playDelegate.down = true;
                                 playDelegate.focus = true;
                                 playingNote = note;
-                                zynthian.playgrid.setNoteOn(playingNote, velocityValue);
+                                component.noteOn(playingNote, velocityValue);
                             } else {
                                 playDelegate.down = false;
                                 playDelegate.focus = false;
-                                zynthian.playgrid.setNoteOff(playingNote);
+                                component.noteOff(playingNote);
                                 zynthian.playgrid.pitch = 0;
                                 zynthian.playgrid.modulation = 0;
                             }

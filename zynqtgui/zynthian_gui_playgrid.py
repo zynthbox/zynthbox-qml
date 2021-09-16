@@ -256,85 +256,34 @@ class zynthian_gui_grid_notes_model(QAbstractItemModel):
 
     rows = Property(int, __get_rows__, notify=__rows_changed__)
 
-# A dictionary wrapper which notifies about changes to the values, and only
-# when the value actually has changed. It supports setting a series of default
-# values for the properties.
+# A basic dictionary wrapper (the majority of the logic is in BasePlayGrid.qml)
 # TODO Persist settings (load on init, save on set)
 class zynthian_gui_playgrid_settings(QObject):
     def __init__(self, name:str, parent=None):
         super(zynthian_gui_playgrid_settings, self).__init__(parent)
         self.__name__ = name
         self.__settings__ = {}
-        self.__defaults__ = {}
-        self.__most_recently_changed__: str
 
     @Property(str, constant=True)
     def name(self):
         return self.__name__
 
     @Slot(str,result='QVariant')
-    def property(self, property:str):
-        if property in self.__settings__:
-            return self.__settings__.get(property)
-        return self.__defaults__.get(property)
+    def getProperty(self, property:str):
+        return self.__settings__.get(property)
 
     @Slot(str,'QVariant')
     def setProperty(self, property:str, value:'QVariant'):
-        oldValue = self.property(property)
-        if not property in self.__settings__ or not self.__settings__[property] == value:
-            self.__settings__[property] = value
-            self.__most_recently_changed__ = property
-            self.emitPropertyChanged(oldValue, value)
+        self.__settings__[property] = value
 
     @Slot(str)
     def clearProperty(self, property:str):
         if property in self.__settings__:
-            value = self.__settings__.get(property)
             self.__settings__.remove(property)
-            self.emitPropertyChanged(self.default(property), value)
 
-    @Slot(str,result='QVariant')
-    def default(self, property:str):
-        return self.__defaults__.get(property)
-
-    @Slot(str,'QVariant')
-    def setDefault(self, property:str, value:'QVariant'):
-        if not property in self.__defaults__ or not self.__defaults__[property] == value:
-            oldValue = self.property(property)
-            self.__defaults__[property] = value
-            self.__most_recently_changed__ = property
-            self.defaultChanged.emit()
-            self.emitPropertyChanged(oldValue, value)
-
-    def emitPropertyChanged(self, oldValue, newValue):
-        different = False
-        if not oldValue is None and not newValue is None:
-            try:
-                if len(oldValue) == len(newValue):
-                    for i in range(0, len(oldValue)):
-                        if oldValue[i] != newValue[i]:
-                            different = True
-                            break
-                else:
-                    different = True
-            except:
-                different = True
-        else:
-            different = True
-        if different:
-            self.propertyChanged.emit()
-
-    @Slot(result=str)
-    def mostRecentlyChanged(self):
-        return self.__most_recently_changed__
-
-    @Signal
-    def propertyChanged(self):
-        pass
-
-    @Signal
-    def defaultChanged(self):
-        pass
+    @Slot(str)
+    def hasProperty(self, property:str):
+        return property in self.__settings__
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     # Use this when something needs to be signalled to /all/ the instances (such as note states)

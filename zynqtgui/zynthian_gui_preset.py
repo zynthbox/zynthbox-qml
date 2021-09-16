@@ -189,6 +189,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	def set_current_is_favorite(self, fav: bool):
 		self.zyngui.curlayer.toggle_preset_fav(self.list_data[self.index])
+		self.fill_list()
+		self.zyngui.screens['bank'].fill_list()
 		self.current_is_favorite_changed.emit()
 
 	def get_current_is_top(self):

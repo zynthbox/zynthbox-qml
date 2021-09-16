@@ -26,11 +26,12 @@ import logging
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 
+
 class song_arranger_tracks_model(QAbstractListModel):
     TrackRole = Qt.UserRole + 1
     ZLTrackRole = TrackRole + 1
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(song_arranger_tracks_model, self).__init__(parent)
         self.__tracks__ = []
 

@@ -22,7 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-
+from PySide2.QtCore import Property, QObject, Signal
 
 from .. import zynthian_qt_gui_base
 
@@ -30,3 +30,18 @@ from .. import zynthian_qt_gui_base
 class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_song_arranger, self).__init__(parent)
+        self.__bars__ = 240
+        self.__sketch__ = self.zyngui.zynthiloops.song
+
+    ### Property bars
+    def get_bars(self):
+        return self.__bars__
+    bars_changed = Signal()
+    bars = Property(int, get_bars, notify=bars_changed)
+    ### END Property bars
+
+    ### Property sketch
+    def get_sketch(self):
+        return self.__sketch__
+    sketch = Property(QObject, get_sketch, constant=True)
+    ### END Property sketch

@@ -310,7 +310,9 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         self.__play_grids__ = []
         self.__pitch__ = 0
         self.__modulation__ = 0
-        self.__metronome_beat__ = 0
+        self.__metronome_beat_4th__ = 0
+        self.__metronome_beat_8th__ = 0
+        self.__metronome_beat_16th__ = 0
         self.__most_recently_changed_notes__ = [] # List of dicts
         self.updatePlayGrids()
         self.listen_to_everything()
@@ -604,26 +606,52 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startMetronomeRequest(self):
-        self.__metronome_manager__.current_beat_changed.connect(self.metronome_update)
+        self.__metronome_manager__.metronomeBeatUpdateOneFourth.connect(self.metronome_update4th)
+        self.__metronome_manager__.metronomeBeatUpdateOneEighth.connect(self.metronome_update8th)
+        self.__metronome_manager__.metronomeBeatUpdateOneSixteenth.connect(self.metronome_update16th)
         self.__metronome_manager__.start_metronome_request()
 
     @Slot(None)
     def stopMetronomeRequest(self):
         try:
-            self.__metronome_manager__.current_beat_changed.disconnect(self.metronome_update)
+            self.__metronome_manager__.metronomeBeatUpdateOneFourth.disconnect(self.metronome_update4th)
+            self.__metronome_manager__.metronomeBeatUpdateOneEighth.disconnect(self.metronome_update8th)
+            self.__metronome_manager__.metronomeBeatUpdateOneSixteenth.disconnect(self.metronome_update16th)
         except Exception as e:
             logging.error(f"Failed to disconnect. Not connected maybe? : {str(e)}")
         self.__metronome_manager__.stop_metronome_request()
 
-    def metronome_update(self):
-        self.__metronome_beat__ = self.__metronome_manager__.currentBeat
-        self.__metronome_beat_changed__.emit()
+    def metronome_update4th(self, beat):
+        self.__metronome_beat_4th__ = beat
+        self.__metronome_beat_4th_changed__.emit()
 
-    def __get_metronome_beat__(self):
-        return self.__metronome_beat__
+    def __get_metronome_beat_4th__(self):
+        return self.__metronome_beat_4th__
 
     @Signal
-    def __metronome_beat_changed__(self):
+    def __metronome_beat_4th_changed__(self):
+        pass
+
+    def metronome_update8th(self, beat):
+        self.__metronome_beat_8th__ = beat
+        self.__metronome_beat_8th_changed__.emit()
+
+    def __get_metronome_beat_8th__(self):
+        return self.__metronome_beat_8th__
+
+    @Signal
+    def __metronome_beat_8th_changed__(self):
+        pass
+
+    def metronome_update16th(self, beat):
+        self.__metronome_beat_16th__ = beat
+        self.__metronome_beat_16th_changed__.emit()
+
+    def __get_metronome_beat_16th__(self):
+        return self.__metronome_beat_16th__
+
+    @Signal
+    def __metronome_beat_16th_changed__(self):
         pass
 
     mostRecentlyChangedNotes = Property('QVariantList', __get_most_recently_changed_notes__, notify=__most_recently_changed_notes_changed__)
@@ -631,4 +659,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     pitch = Property(int, __get_pitch__, __set_pitch__, notify=__pitch_changed__)
     modulation = Property(int, __get_modulation__, __set_modulation__, notify=__modulation_changed__)
     playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)
-    metronomeBeat = Property(int, __get_metronome_beat__, notify=__metronome_beat_changed__)
+    metronomeBeat4th = Property(int, __get_metronome_beat_4th__, notify=__metronome_beat_4th_changed__)
+    metronomeBeat8th = Property(int, __get_metronome_beat_8th__, notify=__metronome_beat_8th_changed__)
+    metronomeBeat16th = Property(int, __get_metronome_beat_16th__, notify=__metronome_beat_16th_changed__)

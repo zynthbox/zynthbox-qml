@@ -41,6 +41,13 @@ GridLayout {
 
     property QtObject sideBar: null
 
+    onSideBarChanged: {
+        console.log("Trackbar Completed")
+        console.log(sideBar)
+        console.log(sideBar.controlObj)
+        console.log("------------")
+    }
+
     ColumnLayout {
         Layout.alignment: Qt.AlignTop
         Layout.fillWidth: true

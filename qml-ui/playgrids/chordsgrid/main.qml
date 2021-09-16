@@ -40,12 +40,23 @@ Zynthian.BasePlayGrid {
     octave: 5
     useOctaves: true
 
-    property QtObject settingsStore
-    property QtObject miniGridModel
-    property int chordRows
-    property var chordScales: ["ionian","dorian","phrygian","aeolian","chromatic"]
-    property var miniChordScales: ["dorian","phrygian"]
-    property bool positionalVelocity
+    defaults: {
+        "chordRows": 5,
+        "startingNote": component.octave * 12,
+        "chordScales": ["ionian","dorian","phrygian","aeolian","chromatic"],
+        "miniChordScales": ["dorian","phrygian"],
+        "positionalVelocity": true
+    }
+
+    QtObject {
+        id: _private
+        property QtObject model
+        property QtObject miniGridModel
+        property int chordRows
+        property var chordScales: ["ionian","dorian","phrygian","aeolian","chromatic"]
+        property var miniChordScales: ["dorian","phrygian"]
+        property bool positionalVelocity
+    }
 
     function fillModel(model, chord_rows, chord_scales) {
         console.log("Filling chords model " + model)
@@ -116,55 +127,73 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
-        var chord_rows = component.settingsStore.property("chordRows");
-        fillModel(component.model, chord_rows, component.settingsStore.property("chordScales"))
-        fillModel(component.miniGridModel, 2, component.settingsStore.property("miniChordScales"))
+        var chord_rows = component.getProperty("chordRows");
+        fillModel(_private.model, chord_rows, component.getProperty("chordScales"))
+        fillModel(_private.miniGridModel, 2, component.getProperty("miniChordScales"))
     }
 
     onOctaveChanged: {
-        component.settingsStore.setProperty("startingNote", component.octave * 12);
+        component.setProperty("startingNote", component.octave * 12);
     }
 
-    Component.onCompleted: {
-        component.settingsStore = zynthian.playgrid.getSettingsStore("zynthian chordsgrid settings")
+    onInitialize: {
+        _private.chordRows = component.getProperty("chordRows");
+        _private.chordScales = component.getProperty("chordScales");
+        _private.miniChordScales = component.getProperty("miniChordScales");
+        _private.positionalVelocity = component.getProperty("positionalVelocity")
 
-        component.settingsStore.setDefault("chordRows", 5);
-        component.settingsStore.setDefault("startingNote", component.octave * 12);
-        component.settingsStore.setDefault("chordScales", ["ionian","dorian","phrygian","aeolian","chromatic"])
-        component.settingsStore.setDefault("miniChordScales", ["dorian","phrygian"])
-        component.settingsStore.setDefault("positionalVelocity",true)
-
-        component.chordRows = component.settingsStore.property("chordRows");
-        component.chordScales = component.settingsStore.property("chordScales");
-        component.miniChordScales = component.settingsStore.property("miniChordScales");
-        component.positionalVelocity = component.settingsStore.property("positionalVelocity")
-
-        component.model = zynthian.playgrid.getNotesModel("zynthian chordsgrid main")
-        component.miniGridModel = zynthian.playgrid.getNotesModel("zynthian chordsgrid mini")
-        if (component.model.rows == 0 || component.miniGridModel.rows == 0) {
+        _private.model = component.getModel("main")
+        _private.miniGridModel = component.getModel("mini")
+        if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
             populateGridTimer.restart()
+        }
+    }
+
+    onPropertyChanged: {
+        //console.log("A property named " + property + " has changed to " + value)
+        var changed = true;
+        if (property === "chordRows"){
+            component.chordRows = value;
+        } else if (property === "chordScales") {
+            component.chordScales = value;
+        } else if (property === "miniChordScales") {
+            component.miniChordScales = value;
+        } else if (property === "positionalVelocity"){
+            component.positionalVelocity = value;
+        } else {
+            changed = false;
+        }
+        if (changed) {
+            populateGridTimer.restart()
+        }
+    }
+
+    Timer {
+        id: populateGridTimer
+        interval: 1
+        repeat: false
+        onTriggered: {
+            component.populateGrid();
         }
     }
 
     Component {
         id: chordsGrid
         ChordsGrid {
-            model: component.model
-            settingsStore: component.settingsStore
-            currentNoteName: component.currentNoteName
-            chordRows: component.chordRows
-            positionalVelocity: component.positionalVelocity
+            model: _private.model
+            positionalVelocity: _private.positionalVelocity
+            onNoteOn: component.setNoteOn(note, velocity)
+            onNoteOff: component.setNoteOff(note)
         }
     }
 
     Component {
         id: chordsGridMini
         ChordsGrid {
-            model: component.miniGridModel
-            settingsStore: component.settingsStore
-            currentNoteName: component.currentNoteName
-            chordRows: 2
-            positionalVelocity: component.positionalVelocity
+            model: _private.miniGridModel
+            positionalVelocity: _private.positionalVelocity
+            onNoteOn: component.setNoteOn(note, velocity)
+            onNoteOff: component.setNoteOff(note)
         }
     }
 
@@ -184,11 +213,11 @@ Zynthian.BasePlayGrid {
                     }
                 }
                 onActivated: {
-                    component.settingsStore.setProperty("chordRows",model[currentIndex])
+                    component.setProperty("chordRows",model[currentIndex])
                 }
             }
             Repeater {
-                model:  component.settingsStore.property("chordRows")
+                model:  component.getProperty("chordRows")
                 QQC2.ComboBox {
                     Layout.fillWidth: true
                     Kirigami.FormData.label: "Scale for row " + (index + 1)
@@ -208,12 +237,12 @@ Zynthian.BasePlayGrid {
                     onActivated: {
                         var chordScales = component.chordScales;
                         chordScales[repeaterIndex] =  scaleModel.get(currentIndex).scale;
-                        component.settingsStore.setProperty("chordScales", chordScales)
+                        component.setProperty("chordScales", chordScales)
                     }
                 }
             }
             Repeater {
-                model:  component.settingsStore.property("miniChordScales")
+                model:  component.getProperty("miniChordScales")
                 QQC2.ComboBox {
                     Layout.fillWidth: true
                     Kirigami.FormData.label: "Scale for minigrid row " + (index + 1)
@@ -233,7 +262,7 @@ Zynthian.BasePlayGrid {
                     onActivated: {
                         var miniChordScales = component.miniChordScales;
                         miniChordScales[repeaterIndex] =  scaleModel.get(currentIndex).scale;
-                        component.settingsStore.setProperty("miniChordScales", miniChordScales)
+                        component.setProperty("miniChordScales", miniChordScales)
                     }
                 }
             }
@@ -242,56 +271,9 @@ Zynthian.BasePlayGrid {
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: component.positionalVelocity
                 onClicked: {
-                    component.settingsStore.setProperty("positionalVelocity", !component.positionalVelocity)
+                    component.setProperty("positionalVelocity", !component.positionalVelocity)
                 }
             }
         }
     }
-
-    function stringListsEqual(list1, list2) {
-        var equal = true;
-        if (list1.length === list2.length) {
-            for (var i = 0; i < list1.length; ++i) {
-                if (list1[i] !== list2[i]) {
-                    equal = false;
-                    break;
-                }
-            }
-        } else {
-            equal = false;
-        }
-        return equal;
-    }
-    Connections {
-        target: component.settingsStore
-        onPropertyChanged: {
-            var mostRecentlyChanged = component.settingsStore.mostRecentlyChanged();
-//             console.log("A property named " + mostRecentlyChanged + " has changed to " + component.settingsStore.property(mostRecentlyChanged))
-            var changed = true;
-            if (mostRecentlyChanged === "chordRows" && component.chordRows != component.settingsStore.property("chordRows")){
-                component.chordRows = component.settingsStore.property("chordRows");
-            } else if (mostRecentlyChanged === "chordScales" && !stringListsEqual(component.chordScales, component.settingsStore.property("chordScales"))){
-                component.chordScales = component.settingsStore.property("chordScales");
-            } else if (mostRecentlyChanged === "miniChordScales" && !stringListsEqual(component.miniChordScales, component.settingsStore.property("miniChordScales"))){
-                component.miniChordScales = component.settingsStore.property("miniChordScales");
-            } else if (mostRecentlyChanged === "positionalVelocity" && component.positionalVelocity != component.settingsStore.property("positionalVelocity")){
-                component.positionalVelocity = component.settingsStore.property("positionalVelocity");
-            } else {
-                changed = false;
-            }
-            if (changed) {
-                populateGridTimer.restart()
-            }
-        }
-    }
-
-    Timer {
-        id: populateGridTimer
-        interval: 1
-        repeat: false
-        onTriggered: {
-            component.populateGrid();
-        }
-    }
-
 }

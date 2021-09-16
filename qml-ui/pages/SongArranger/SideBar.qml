@@ -44,11 +44,6 @@ Zynthian.Card {
     property int controlType: SideBar.ControlType.None
     property QtObject controlObj: null
 
-    onControlObjChanged: {
-        console.log(root)
-        console.log(controlObj)
-    }
-
     contentItem: ColumnLayout {
         ColumnLayout {
             Layout.fillWidth: true

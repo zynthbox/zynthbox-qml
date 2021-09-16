@@ -138,10 +138,14 @@ Item {
      * If this is set to false, the octave buttons in the sidebar will be disabled
      */
     property bool useOctaves: true
+    /**
+     * \brief The octave PlayGrid would prefer you to use
+     *
+     * This property is set by the PlayGrid subsystem itself, and is essentially just a handy shortcut
+     * to being told where to start generating notes from. In other words, you are entirely free to
+     * ignore this, but if you do, you should set `useOctaves` to false.
+     */
     property int octave: 3
-
-    property QtObject model
-    property string currentNoteName
 
     /**
      * \brief The signal which you should use to perform initialisations of your playgrid
@@ -149,6 +153,15 @@ Item {
      * This signal should be used for initialising your playgrid, in place of Component.onCompleted
      */
     signal initialize();
+
+    /**
+     * \brief A way to set the pitch shift value (between -8192 and 8191, 0 being no shift)
+     */
+    property alias pitch: zynthian.playgrid.pitch
+    /**
+     * \brief A way to set the modulation value (between -127 and 127, with 0 being no modulation)
+     */
+    property alias modulation: zynthian.playgrid.modulation
 
     /**
      * \brief Turns the note passed to it on, if it is not already playing

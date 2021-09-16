@@ -157,11 +157,35 @@ Item {
     /**
      * \brief A way to set the pitch shift value (between -8192 and 8191, 0 being no shift)
      */
-    property alias pitch: zynthian.playgrid.pitch
+    property int pitch
+    onPitchChanged: {
+        if (zynthian.playgrid.pitch !== component.pitch) {
+            zynthian.playgrid.pitch = component.pitch;
+        }
+    }
     /**
      * \brief A way to set the modulation value (between -127 and 127, with 0 being no modulation)
      */
-    property alias modulation: zynthian.playgrid.modulation
+    property int modulation
+    onModulationChanged: {
+        if (zynthian.playgrid.modulation !== component.modulation) {
+            zynthian.playgrid.modulation = component.modulation;
+        }
+    }
+
+    Connections {
+        target: zynthian.playgrid
+        onPitchChanged: {
+            if (zynthian.playgrid.pitch !== component.pitch) {
+                component.pitch = zynthian.playgrid.pitch
+            }
+        }
+        onModulationChanged: {
+            if (zynthian.playgrid.modulation !== component.modulation) {
+                component.modulation = zynthian.playgrid.modulation
+            }
+        }
+    }
 
     /**
      * \brief Turns the note passed to it on, if it is not already playing

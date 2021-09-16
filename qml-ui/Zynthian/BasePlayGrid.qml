@@ -105,7 +105,12 @@ import Zynthian 1.0 as Zynthian
  * and your notes will pitch shift and modulate as you desire.
  *
  * \section example An Example
-\include{BasePlayGrid-example.qml}
+ *
+ * The following is an example of a very simple playgrid, which uses the same component for both main
+ * and minigrid. It shows the basic functionality of the playgrid (not including metronome, pitch/mod
+ * and the like), just the very most basic things that you're going to need for basically any playgrid.
+ *
+ * \include[lineno]{BasePlayGrid-example.qml}
  */
 Item {
     id: component

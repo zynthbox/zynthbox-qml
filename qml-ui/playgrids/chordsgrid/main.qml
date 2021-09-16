@@ -182,8 +182,7 @@ Zynthian.BasePlayGrid {
         ChordsGrid {
             model: _private.model
             positionalVelocity: _private.positionalVelocity
-            onNoteOn: component.setNoteOn(note, velocity)
-            onNoteOff: component.setNoteOff(note)
+            playgrid: component
         }
     }
 
@@ -192,8 +191,7 @@ Zynthian.BasePlayGrid {
         ChordsGrid {
             model: _private.miniGridModel
             positionalVelocity: _private.positionalVelocity
-            onNoteOn: component.setNoteOn(note, velocity)
-            onNoteOff: component.setNoteOff(note)
+            playgrid: component
         }
     }
 

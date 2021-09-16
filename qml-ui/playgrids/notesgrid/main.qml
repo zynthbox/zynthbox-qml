@@ -178,8 +178,7 @@ Zynthian.BasePlayGrid {
                     model: _private.model
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
-                    onNoteOn: component.setNoteOn(note, velocity)
-                    onNoteOff: component.setNoteOff(note)
+                    playgrid: component
                 }
             }
         }
@@ -197,8 +196,7 @@ Zynthian.BasePlayGrid {
                     model: _private.miniGridModel
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
-                    onNoteOn: component.setNoteOn(note, velocity)
-                    onNoteOff: component.setNoteOff(note)
+                    playgrid: component
                 }
             }
         }

@@ -33,8 +33,7 @@ ColumnLayout {
     id: component
     property QtObject model
     property bool positionalVelocity
-    signal noteOn(QtObject note, int velocity)
-    signal noteOff(QtObject note)
+    property Item playgrid
 
     spacing: 0
     anchors.margins: 5
@@ -111,11 +110,11 @@ ColumnLayout {
                                         playDelegate.down = true;
                                         playDelegate.focus = true;
                                         playingNote = playDelegate.note;
-                                        component.noteOn(playingNote, velocityValue)
+                                        component.playgrid.setNoteOn(playingNote, velocityValue)
                                     } else {
                                         playDelegate.down = false;
                                         playDelegate.focus = false;
-                                        component.noteOff(playingNote)
+                                        component.playgrid.setNoteOff(playingNote)
                                         zynthian.playgrid.pitch = 0;
                                         zynthian.playgrid.modulation = 0;
                                     }

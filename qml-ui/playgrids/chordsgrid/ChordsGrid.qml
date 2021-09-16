@@ -32,10 +32,9 @@ import org.kde.kirigami 2.4 as Kirigami
 ColumnLayout {
     id: component
     property QtObject model
-    property QtObject settingsStore
-    property string currentNoteName
-    property int chordRows
     property bool positionalVelocity
+    signal noteOn(QtObject note, int velocity)
+    signal noteOff(QtObject note)
 
     spacing: 0
     anchors.margins: 5
@@ -70,7 +69,7 @@ ColumnLayout {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    color: modelData.isPlaying ? "#8bc34a" : (playDelegate.note.name === component.currentNoteName ? Kirigami.Theme.focusColor : "white")
+                                    color: modelData.isPlaying ? "#8bc34a" : (playDelegate.note.midiNote % 12 === 0 ? Kirigami.Theme.focusColor : "white")
                                     Text {
                                         anchors.fill: parent
                                         horizontalAlignment: Text.AlignHCenter
@@ -103,7 +102,7 @@ ColumnLayout {
                                 onPressedChanged: {
                                     if (pressed) {
                                         var velocityValue = 64;
-                                        if (component.settingsStore.property("positionalVelocity")) {
+                                        if (component.positionalVelocity) {
                                             velocityValue = 127 - Math.floor(chordSlidePoint.y * 127 / height);
                                         } else {
                                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
@@ -112,11 +111,11 @@ ColumnLayout {
                                         playDelegate.down = true;
                                         playDelegate.focus = true;
                                         playingNote = playDelegate.note;
-                                        zynthian.playgrid.setNoteOn(playingNote, velocityValue)
+                                        component.noteOn(playingNote, velocityValue)
                                     } else {
                                         playDelegate.down = false;
                                         playDelegate.focus = false;
-                                        zynthian.playgrid.setNoteOff(playingNote)
+                                        component.noteOff(playingNote)
                                         zynthian.playgrid.pitch = 0;
                                         zynthian.playgrid.modulation = 0;
                                     }

@@ -35,7 +35,6 @@ import "pages" as Pages
 RowLayout {
     id: component
     spacing: 0
-    property string currentNoteName: keyModel.getName(zynthian.miniplaygrid.startingNote)
     ColumnLayout {
         z: 1
         Layout.preferredWidth: 64
@@ -244,11 +243,6 @@ RowLayout {
             Loader {
                 id:playGridLoader
                 source: modelData + "/main.qml"
-                Binding {
-                    target: playGridLoader.item
-                    property: 'currentNoteName'
-                    value: component.currentNoteName
-                }
             }
         }
 

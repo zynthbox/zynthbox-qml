@@ -29,9 +29,11 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
-import '../../Zynthian' 1.0 as Zynthian
+import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
+    readonly property QtObject arranger: zynthian.song_arranger
+
     id: root
 
     title: qsTr("Song Arranger")
@@ -64,9 +66,158 @@ Zynthian.ScreenPage {
         property int cellHeight: headerHeight
     }    
 
-    contentItem : ColumnLayout {
-        QQC2.Label {
-            text: "Song Arranger"
+    contentItem : RowLayout {
+        ColumnLayout {
+            id: tableLayout
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            spacing: 1
+
+            // HEADER ROW
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: privateProps.headerHeight
+                Layout.maximumHeight: privateProps.headerHeight
+                spacing: 1
+
+                Zynthian.TableHeader {
+                    id: songCell
+                    Layout.preferredWidth: privateProps.headerWidth
+                    Layout.maximumWidth: privateProps.headerWidth
+                    Layout.fillHeight: true
+
+                    text: "Song"
+
+                    onPressed: {
+                        sideBar.controlType = SideBar.ControlType.None;
+                        sideBar.controlObj = null;
+                    }
+                }
+
+                ListView {
+                    id: barsHeaderRow
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    clip: true
+                    spacing: 1
+                    contentX: cellGridFlickable.contentX
+                    orientation: Qt.Horizontal
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    model: root.arranger.bars
+
+                    delegate: Zynthian.TableHeader {
+                        text: modelData+1
+
+                        width: privateProps.headerWidth
+                        height: ListView.view.height
+
+                        onPressed: {
+                            sideBar.controlType = SideBar.ControlType.None;
+                            sideBar.controlObj = null;
+                        }
+                    }
+                }
+            }
+            // END HEADER ROW
+
+            RowLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+
+                spacing: 1
+
+                ListView {
+                    id: tracksHeaderColumns
+
+                    Layout.preferredWidth: privateProps.headerWidth
+                    Layout.maximumWidth: privateProps.headerWidth
+                    Layout.fillHeight: true
+
+                    clip: true
+                    spacing: 1
+                    contentY: cellGridFlickable.contentY
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    model: root.arranger.sketch.tracksModel
+
+                    delegate: Zynthian.TableHeader {
+                        text: track.name
+
+                        width: ListView.view.width
+                        height: privateProps.headerHeight
+
+                        onPressed: {
+                            sideBar.controlType = SideBar.ControlType.Track;
+                            sideBar.controlObj = model.track;
+                        }
+                    }
+                }
+
+                Flickable {
+                    id: cellGridFlickable
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    contentWidth: cellGrid.width
+                    contentHeight: cellGrid.height
+
+                    clip: true
+                    flickableDirection: Flickable.HorizontalAndVerticalFlick
+                    boundsBehavior: Flickable.StopAtBounds
+                    QQC2.ScrollBar.horizontal: QQC2.ScrollBar {
+                        height: 4
+                    }
+
+                    contentX: barsHeaderRow.contentX
+                    contentY: tracksHeaderColumns.contentY
+
+                    GridLayout {
+                        id: cellGrid
+                        rows: root.arranger.sketch.tracksModel.count
+                        flow: GridLayout.TopToBottom
+                        rowSpacing: 1
+                        columnSpacing: 1
+
+                        Repeater {
+                            model: root.arranger.bars
+
+                            delegate: Repeater {
+                                property int rowIndex: index
+
+                                model: root.arranger.sketch.tracksModel
+
+                                delegate: ClipCell {
+                                    id: clipCell
+
+                                    Layout.preferredWidth: privateProps.cellWidth
+                                    Layout.maximumWidth: privateProps.cellWidth
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    Layout.maximumHeight: privateProps.cellHeight
+
+                                    cellText: track.name + "-" + (modelData+1)
+
+                                    onPressed: {
+                                        sideBar.controlType = SideBar.ControlType.None;
+                                        sideBar.controlObj = null;
+                                        // highlighted = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        SideBar {
+            id: sideBar
+
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            Layout.fillWidth: false
+            Layout.fillHeight: true
         }
     }
 }

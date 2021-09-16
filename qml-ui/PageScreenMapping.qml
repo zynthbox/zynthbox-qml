@@ -85,6 +85,7 @@ QtObject {
         "playgrid": "PlayGrid.qml",
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "track": "TrackPage.qml",
-        "zynthiloops": "ZynthiLoops/main.qml"
+        "zynthiloops": "ZynthiLoops/main.qml",
+        "song_arranger": "SongArranger/main.qml"
     }
 }

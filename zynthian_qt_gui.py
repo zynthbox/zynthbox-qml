@@ -56,6 +56,8 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QJSValue
+
+from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
@@ -607,6 +609,8 @@ class zynthian_gui(QObject):
         self.screens["playgrid"] = zynthian_gui_playgrid(self)
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
+
+        self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -2378,6 +2382,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def master_alsa_mixer(self):
         return self.screens["master_alsa_mixer"]
+
+    @Property(QObject, constant=True)
+    def song_arranger(self):
+        return self.screens["song_arranger"]
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

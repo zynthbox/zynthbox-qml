@@ -60,6 +60,9 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
         self.list_metadata.append({"icon":"../../img/zynthiloops.svg"})
+
+        self.list_data.append((self.song_arranger, 0, "Song Arranger"))
+        self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
         
         self.list_data.append((self.playgrid, 0, "Play Grid"))
         self.list_metadata.append({"icon":"../../img/playgrid.svg"})
@@ -190,6 +193,10 @@ class zynthian_gui_main(zynthian_gui_selector):
     def step_sequencer(self):
         logging.info("Step Sequencer")
         self.zyngui.show_modal("stepseq")
+
+    def song_arranger(self):
+        logging.info("Song Arranger")
+        self.zyngui.show_modal("song_arranger")
 
     #@Slot('void')
     #def start_norns(self):

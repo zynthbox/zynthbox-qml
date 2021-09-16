@@ -41,15 +41,9 @@ GridLayout {
 
     property QtObject sideBar: null
 
-    onSideBarChanged: {
-        console.log("Trackbar Completed")
-        console.log(sideBar)
-        console.log(sideBar.controlObj)
-        console.log("------------")
-    }
-
     ColumnLayout {
         Layout.alignment: Qt.AlignTop
+        Layout.fillHeight: true
         Layout.fillWidth: true
 
         QQC2.Label {
@@ -57,10 +51,16 @@ GridLayout {
         }
 
         ListView {
+            id: clipsList
             model: root.sideBar.controlObj.zlTrack.clipsModel
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            interactive: true
+            clip: true
             delegate: Kirigami.BasicListItem {
                 width: ListView.view.width
-                text: model.clip.name
+                text: model.clip.name + "(" + model.clip.duration.toFixed(2) +"s)"
+                visible: model.clip.path.length > 0
             }
         }
     }

@@ -71,11 +71,11 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)
 
         for i in range(self.__sketch__.tracksModel.count):
-            track = song_arranger_track(self.__sketch__.tracksModel.getTrack(i))
+            track = song_arranger_track(self.__sketch__.tracksModel.getTrack(i), self.__tracks_model__)
             self.__tracks_model__.add_track(track)
 
             for j in range(self.__bars__):
-                cell = song_arranger_cell(j, self)
+                cell = song_arranger_cell(j, track)
                 track.cellsModel.add_cell(cell)
 
         self.tracks_model_changed.emit()

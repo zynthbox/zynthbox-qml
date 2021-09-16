@@ -39,7 +39,7 @@ from . import zynthian_gui_selector
 
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-
+import traceback
 #-------------------------------------------------------------------------------
 # Zynthian Preset/Instrument Selection GUI Class
 #-------------------------------------------------------------------------------
@@ -59,6 +59,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		self.__top_sounds = {}
 		self.__fav_root = "/zynthian/zynthian-my-data/preset-favorites/"
 		self.reload_top_sounds()
+		self.__select_in_progess = False
 		self.show()
 
 
@@ -113,6 +114,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		traceback.print_stack(None, 8)
+		if self.__select_in_progess: #HACK: this is due from the process events in the spinner. should be fixed there
+			return
+		self.__select_in_progess = True
 		if self.__top_sounds_engine != None:
 			sound = self.__top_sounds[self.__top_sounds_engine][i]
 			layer = self.zyngui.curlayer
@@ -125,13 +130,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.screens['engine'].stop_unused_engines()
 			else:
 				if self.zyngui.curlayer.preset_name == sound["preset"] and self.zyngui.curlayer.bank_name == sound["bank"]:
+					self.__select_in_progess = False
 					return
 				self.zyngui.start_loading()
-				#Workaround: make sure that layer is really selected or we risk to replace the old one
-				for i, candidate in enumerate(self.zyngui.screens['layer'].root_layers):
-					if candidate == layer:
-						self.zyngui.screens['layer'].select_action(i)
-						break
+				self.zyngui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zyngui.start_loading() curlayer is changed??
+
 				if self.zyngui.curlayer.engine.nickname != sound["engine"]:
 					midi_chan = self.zyngui.curlayer.midi_chan
 					self.zyngui.screens['layer'].remove_current_layer()
@@ -139,6 +142,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					layer = zynthian_layer(engine, midi_chan, self.zyngui)
 					self.zyngui.screens['layer'].layers.append(layer)
 					self.zyngui.screens['engine'].stop_unused_engines()
+				else:
+					#Workaround: make sure that layer is really selected or we risk to replace the old one
+					for i, candidate in enumerate(self.zyngui.screens['layer'].root_layers):
+						if candidate == self.zyngui.curlayer:
+							self.zyngui.screens['layer'].select_action(i)
+							break
 
 			layer.wait_stop_loading()
 			#Load bank list and set bank
@@ -165,6 +174,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.zyngui.screens['layer'].fill_list()
 			self.show()
 			self.zyngui.stop_loading()
+			self.__select_in_progess = False
 			return
 
 		if t=='S':
@@ -175,6 +185,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.zyngui.curlayer.toggle_preset_fav(self.list_data[i])
 			self.update_list()
 			self.zyngui.screens['bank'].fill_list()
+		self.__select_in_progess = False
 
 
 

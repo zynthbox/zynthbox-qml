@@ -99,7 +99,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			logging.error("Can't show preset list for None layer!")
 			return
 
-		self.select(self.zyngui.curlayer.get_preset_index())
+		if self.__top_sounds_engine == None:
+			for i, item in enumerate(self.list_data):
+				if item[2] == self.zyngui.curlayer.preset_name:
+					self.select(i)
+					break
+		else:
+			self.select(self.zyngui.curlayer.get_preset_index())
 		if not self.zyngui.curlayer.get_preset_name():
 			self.zyngui.curlayer.set_preset(self.zyngui.curlayer.get_preset_index())
 

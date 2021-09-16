@@ -79,6 +79,31 @@ import Zynthian 1.0 as Zynthian
  * property will revert it back to the default (if you have not defined a default, the value will be
  * `undefined`).
  *
+ * * defaults is should be a dictionary which contains sets of property names and their default values.
+ *   As an example, this might be \code defaults: { "some property": "a value", "list property": [] } \endcode
+ * * setProperty() will set the value of the property you pass the name of
+ * * getProperty() will get the value of the property you pass the name of (or the default value if
+ *   none has been set explicitly by calling setProperty above)
+ * * clearProperty() will clear the explicitly set value of the named property (causing a subsequent call
+ *   to getProperty to return the default value). If you need it set to something empty, but have a
+ *   default defined, you will need to set that explicitly.
+ *
+ * \section metronome The Metronome/ Beat Timer
+ *
+ * The PlayGrid subsystem provides you with a way to perform simple beat based operations, based on
+ * a simple beat-sliced timer, which will give you a tick every so many subdivisions of a beat:
+ *
+ * * metronome4thBeat, metronome8thBeat, and metronome16thBeat are properties, and will change each
+ *   time that subdivision of a beat has passed by (and will contain the number of the subdivision,
+ *   so for example metronome8thBeat will contain the numbers from 1 through 8).
+ * * startMetronome() and stopMetronome() will start and stop the metronome respectively
+ *
+ * \section pitchmod Pitch/Mod Support
+ *
+ * To make it a little more fun to play with, there is support for pitch and modulation shifting in
+ * the playgrid. Just set the two appropriate properties, pitch and modulation, to appropriate values
+ * and your notes will pitch shift and modulate as you desire.
+ *
  * \section example An Example
 \include{BasePlayGrid-example.qml}
  */
@@ -172,7 +197,6 @@ Item {
             zynthian.playgrid.modulation = component.modulation;
         }
     }
-
     Connections {
         target: zynthian.playgrid
         onPitchChanged: {
@@ -185,6 +209,63 @@ Item {
                 component.modulation = zynthian.playgrid.modulation
             }
         }
+    }
+
+    /**
+     * \brief Start the system which provides beat updates
+     *
+     * Use the properties matching the beat division you need (metronome4thBeat and so on),
+     * in which you will be told at which subdivision of the beat you are at. The counter
+     * in the properties is 1-indexed, meaning you get numbers from 1 through the number of
+     * the division.
+     *
+     * @see stopMetronome()
+     */
+    function startMetronome() {
+        zynthian.playgrid.startMetronomeRequest();
+    }
+    /**
+     * \brief Stop the beat updates being sent into the playgrid
+     * @see startMetronome()
+     */
+    function stopMetronome() {
+        zynthian.playgrid.stopMetronomeRequest();
+    }
+
+    /**
+     * \brief A number which changes from 1 through 4 every 4th beat when the metronome is running
+     * @see startMetronome()
+     * @see stopMetronome()
+     */
+    property int metronome4thBeat;
+    Binding {
+        target: component
+        property: "metronome4thBeat"
+        value: zynthian.playgrid.metronome4thBeat
+    }
+
+    /**
+     * \brief A number which changes from 1 through 8 every 8th beat when the metronome is running
+     * @see startMetronome()
+     * @see stopMetronome()
+     */
+    property int metronome8thBeat;
+    Binding {
+        target: component
+        property: "metronome8thBeat"
+        value: zynthian.playgrid.metronome8thBeat
+    }
+
+    /**
+     * \brief A number which changes from 1 through 16 every 16th beat when the metronome is running
+     * @see startMetronome()
+     * @see stopMetronome()
+     */
+    property int metronome16thBeat;
+    Binding {
+        target: component
+        property: "metronome16thBeat"
+        value: zynthian.playgrid.metronome16thBeat
     }
 
     /**

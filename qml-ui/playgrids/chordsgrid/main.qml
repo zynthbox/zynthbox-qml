@@ -99,17 +99,14 @@ Zynthian.BasePlayGrid {
                         subnote_col += row_scale[subnote_scale_index];
                     }
 
-                    var subnote = zynthian.playgrid.getNote(
-                        note_int_to_str_map[subnote_col % 12],
-                        scale_index,
-                        Math.floor(subnote_col / 12),
+                    var subnote = component.getNote(
                         subnote_col
                     );
                     subnotes.push(subnote);
 
                 }
                 // Now create a compound note for the notes that make up our chord
-                var note = zynthian.playgrid.getCompoundNote(subnotes);
+                var note = component.getCompoundNote(subnotes);
                 row_data.push(note)
 
                 // Cycle scale index value to 0 if it reaches the end of scale mode map

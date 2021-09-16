@@ -85,10 +85,7 @@ Zynthian.BasePlayGrid {
             
             for (var i = 0; i < columns; ++i) {
 
-                var note = zynthian.playgrid.getNote(
-                    ((0 <= col <= 127) ? note_int_to_str_map[col % 12] : ""),
-                    scale_index,
-                    Math.floor(col / 12),
+                var note = component.getNote(
                     col
                 );
                 if (scale_index >= scaleArray.length){

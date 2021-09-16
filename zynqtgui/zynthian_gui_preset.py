@@ -99,7 +99,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			logging.error("Can't show preset list for None layer!")
 			return
 
-		if self.__top_sounds_engine == None:
+		if self.__top_sounds_engine != None:
 			for i, item in enumerate(self.list_data):
 				if item[2] == self.zyngui.curlayer.preset_name:
 					self.select(i)
@@ -124,7 +124,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.screens['layer'].layers.append(layer)
 				self.zyngui.screens['engine'].stop_unused_engines()
 			else:
-				if self.zyngui.curlayer.preset_name == sound["preset"]:
+				if self.zyngui.curlayer.preset_name == sound["preset"] and self.zyngui.curlayer.bank_name == sound["bank"]:
 					return
 				self.zyngui.start_loading()
 				#Workaround: make sure that layer is really selected or we risk to replace the old one
@@ -151,7 +151,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.zynautoconnect_midi(True)
 				self.zyngui.screens['layer'].reset_audio_routing()
 				self.zyngui.zynautoconnect_audio()
-				self.zyngui.layer_control(layer)
 
 			except Exception as e:
 				logging.warning("Invalid Bank on layer {}: {}".format(layer.get_basepath(), e))
@@ -160,13 +159,15 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 			#Load preset list and set preset
 			layer.load_preset_list()
+			layer.preset_name = None
 			layer.preset_loaded = layer.set_preset_by_name(sound['preset'])
+			self.zyngui.layer_control(layer)
 			self.zyngui.screens['layer'].fill_list()
+			self.show()
 			self.zyngui.stop_loading()
 			return
 
 		if t=='S':
-			logging.error(self.list_data[i])
 			self.zyngui.curlayer.set_preset(i)
 			self.zyngui.screens['control'].show()
 			self.zyngui.screens['layer'].fill_list()
@@ -203,7 +204,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					break
 		# if we are operating on an active engine, we can just use its internal api
 		if fav_owner_engine != None:
-			logging.error("TOGGLING FAV {} {}".format(fav_owner_engine.is_preset_fav(self.list_data[self.index]), new_fav_state))
 			if fav_owner_engine.is_preset_fav(self.list_data[self.index]) != new_fav_state:
 				fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[self.index])
 

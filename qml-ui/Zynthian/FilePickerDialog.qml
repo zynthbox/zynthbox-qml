@@ -12,14 +12,15 @@ import Zynthian 1.0 as Zynthian
   *
   * Zynthian.FilePickerDialog {
   *      id: pickerDialog
-
+  *
   *      x: parent.width/2 - width/2
   *      y: parent.height/2 - height/2
   *      width: Math.round(parent.width * 0.8)
   *      height: Math.round(parent.height * 0.8)
-
+  *
+  *      rootFolder: '/zynthian/zynthian-my-data'
   *      folderModel {
-  *          folder: '/zynthian/zynthian-my-data'
+  *          folder: '/zynthian/zynthian-my-data/sketches'
   *          nameFilters: ["*.wav"]
   *      }
   *      onFileSelected: {
@@ -29,6 +30,7 @@ import Zynthian 1.0 as Zynthian
   */
 QQC2.Dialog {
     property alias headerText: heading.text
+    property string rootFolder: "/"
     property alias folderModel: folderModel
     signal fileSelected(var file)
 
@@ -48,17 +50,25 @@ QQC2.Dialog {
         }
 
         RowLayout {
-            property var folderSplitArray: String(folderModel.folder).replace("file:///", "").split("/").filter(function(e) { return e.length > 0 })
+            property var folderSplitArray: String(folderModel.folder).replace("file://"+pickerDialog.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
 
             id: folderBreadcrumbs
             Layout.leftMargin: 12
             spacing: 2
+
+            Zynthian.BreadcrumbButton {
+                icon.name: "user-home-symbolic"
+                onClicked: {
+                    folderModel.folder = pickerDialog.rootFolder+"/"
+                }
+            }
+
             Repeater {
                 model: folderBreadcrumbs.folderSplitArray
                 delegate: Zynthian.BreadcrumbButton {
                     text: modelData
                     onClicked: {
-                        folderModel.folder = "/"+folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
+                        folderModel.folder = pickerDialog.rootFolder+"/"+folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
                     }
                 }
             }

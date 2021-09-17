@@ -32,66 +32,65 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 
-Kirigami.PageRow {
+Zynthian.Stack {
     id: root
-    defaultColumnWidth: width
-    globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
-    separatorVisible: false
+
+    visible: depth > 0 || busy
+    onVisibleChanged: {
+        if (visible) {
+            root.forceActiveFocus()
+        }
+    }
 
     data: [
         Connections {
             target: zynthian
-            onCurrent_modal_screen_idChanged: {
-                print("MODAL SCREEN ID CHANGED: "+zynthian.current_modal_screen_id);
+            onCurrent_screen_idChanged: {
+                print("SCREEN ID CHANGED, DASHBOARD MANAGER: "+zynthian.current_screen_id);
 
-                if (zynthian.current_modal_screen_id === "confirm") {
-                    applicationWindow().showConfirmationDialog();
-                    return;
-                } else {
-                    applicationWindow().hideConfirmationDialog();
-                }
-
-                // No modal screen anymore
-                if (zynthian.current_modal_screen_id.length === 0) {
-                    applicationWindow().pageStack.layers.clear();
-                    root.clear();
+                // This should never happen
+                if (zynthian.current_screen_id.length === 0) {
+                    print("Warning: empty screen requested")
+                    root.clear(QQC2.StackView.PopTransition);
+                    root.depthChanged() // this old qt didn't emit it after clear
                     return;
                 }
 
-                for (var i = 0; i < root.depth; ++i) {
-                    let child = root.get(i);
 
-                    // It's a MultiSelectorPage
-                    if (child.hasOwnProperty("screenIds")) {
-                        var j; // if (.. in ..) doesn't work
-                        for (j in child.screenIds) {
-                            let id = child.screenIds[j];
-                            if (id === zynthian.current_modal_screen_id) {
-                                root.currentIndex = i;
-                                return;
-                            }
-                        }
-                        if (zynthian.current_modal_screen_id in child.screenIds) {
-                            root.currentIndex = i;
-                            return;
-                        }
-                    } else if (child.hasOwnProperty("screenId")) {
-                        if (child.screenId === zynthian.current_modal_screen_id) {
-                            root.currentIndex = i;
-                            return;
-                        }
-                    }
+                // Skipping modal screen requests
+                if (zynthian.current_screen_id === zynthian.current_modal_screen_id) {
+                    root.clear(QQC2.StackView.PopTransition);
+                    root.depthChanged()
+                    return;
                 }
-                let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
+
+
+                if (root.currentItem && root.currentItem.hasOwnProperty("screenId") && root.currentItem.screenId === zynthian.current_screen_id) {
+                    return;
+                }
+
+
+                let file = applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id);
                 if (file.length > 0) {
-                    if (applicationWindow().pageStack.layers.currentItem != root) {
-                        applicationWindow().pageStack.layers.push(root)
-                    }
-                    root.push(file);
+                    root.replace(file, QQC2.StackView.PushTransition);
                 } else {
-                    print("Non managed modal screen " + zynthian.current_modal_screen_id);
+                    print("Non managed screen " + zynthian.current_screen_id);
+                    root.clear(QQC2.StackView.PopTransition);
+                    root.depthChanged()
                 }
             }
         }
     ]
+    background: Rectangle {
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        color: Kirigami.Theme.backgroundColor
+        opacity: root.depth > 0
+        Behavior on opacity {
+            OpacityAnimator {
+               duration: Kirigami.Units.shortDuration
+               easing.type: Easing.InOutCubic
+            }
+        }
+    }
 }

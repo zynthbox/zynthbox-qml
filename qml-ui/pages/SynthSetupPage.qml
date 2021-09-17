@@ -101,7 +101,12 @@ Zynthian.ScreenPage {
     property var screenIds: ["fixed_layers", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
-    onCurrentScreenIdRequested: zynthian.current_screen_id = screenId
+    onCurrentScreenIdRequested: {
+        //don't remove modal screens
+        if (zynthian.current_modal_screen_id.length === 0) {
+            zynthian.current_screen_id = screenId;
+        }
+    }
 
     contentItem: RowLayout {
         spacing: Kirigami.Units.gridUnit

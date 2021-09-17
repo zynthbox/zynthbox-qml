@@ -5,7 +5,7 @@
 # 
 # Zynthian GUI Info Class
 # 
-# Copyright (C) 2015-2016 Fernando Moyano <jofemodo@zynthian.org>
+# Copyright (C) 2021 Marco MArtin <mart@kde.org>
 #
 #******************************************************************************
 # 
@@ -24,85 +24,36 @@
 #******************************************************************************
 
 import sys
-import tkinter
 import logging
 
 # Zynthian specific modules
-from . import zynthian_gui_config
-
+from . import zynthian_gui_selector
 
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 
 #------------------------------------------------------------------------------
-# Zynthian Info GUI Class
+# Zynthian Session Dashboard GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_info(QObject):
+class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
 	def __init__(self, parent=None):
-		super(zynthian_gui_info, self).__init__(parent)
-		self.shown=False
-		self.zyngui=zynthian_gui_config.zyngui
+		super(zynthian_gui_session_dashboard, self).__init__('Session', parent)
+		self.show()
 
-		self.prop_text = ''
+	def fill_list(self):
+		self.list_data = []
+		self.list_metadata = []
+		super().fill_list()
 
+	def select_action(self, i, t='S'):
+		self.index = i
 
-	def clean(self):
-		self.prop_text = ''
-		self.text_changed.emit()
-
-
-	def add(self, text, tags=None):
-		self.prop_text += '\n' + text
-		self.text_changed.emit()
-
-
-	def set(self, text, tags=None):
-		self.clean()
-		self.add(text+"\n",tags)
-		self.text_changed.emit()
-
-
-	def hide(self):
-		if self.shown:
-			self.shown=False
-
-
-	def show(self, text = ''):
-		self.set(text)
-		if not self.shown:
-			self.shown=True
-
-
-	def zyncoder_read(self):
-		pass
-
-
-	def refresh_loading(self):
-		pass
-
-
-	def switch_select(self, t='S'):
-		pass
-
-	@Slot('void')
-	def back_action(self):
-		self.zyngui.cancel_modal_timer()
-		self.zyngui.screens['admin'].kill_command()
-		self.zyngui.show_modal('admin')
-		return None
-
-
-	def cb_push(self,event):
-		self.zyngui.zynswitch_defered('S',1)
-
-	def get_text(self):
-		return self.prop_text
-
-	text_changed = Signal()
-
-	text = Property(str, get_text, notify = text_changed)
+	def set_select_path(self):
+		self.select_path = "Session"
+		self.select_path_element = "Session"
+		super().set_select_path()
 
 #-------------------------------------------------------------------------------

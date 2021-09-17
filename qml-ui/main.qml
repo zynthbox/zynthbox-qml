@@ -36,7 +36,15 @@ Kirigami.AbstractApplicationWindow {
     id: root
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
-    readonly property Item currentPage: screensLayer.layers.depth > 1 ? modalScreensLayer.currentItem : screensLayer.currentItem
+    readonly property Item currentPage: {
+        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "session_dashboard") {
+            return dashboardLayer.currentItem;
+        } else if (screensLayer.layers.depth > 1) {
+            return modalScreensLayer.currentItem;
+        } else {
+            return screensLayer.currentItem
+        }
+    }
     onCurrentPageChanged: zynthian.current_qml_page = currentPage
 
     property bool headerVisible: true
@@ -66,6 +74,7 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = 'main'
+                onPressAndHold: zynthian.current_screen_id = 'session_dashboard'
                 highlighted: zynthian.current_screen_id === 'main'
             }
             Zynthian.BreadcrumbButton {
@@ -118,13 +127,19 @@ Kirigami.AbstractApplicationWindow {
         id: screensLayer
         parent: root.contentItem
         anchors.fill: parent
-        initialPage: [root.pageScreenMapping.pageForScreen('main'), root.pageScreenMapping.pageForScreen('layer')]
+        initialPage: [root.pageScreenMapping.pageForScreen('layer')]
     }
 
     ModalScreensLayer {
         id: modalScreensLayer
         visible: false
     }
+
+    DashboardScreensLayer {
+        id: dashboardLayer
+        anchors.fill: parent
+    }
+
 
     CustomTheme {
         id: customTheme
@@ -194,6 +209,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     footer: Zynthian.ActionBar {
+		z: 999999
         currentPage: root.currentPage
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)

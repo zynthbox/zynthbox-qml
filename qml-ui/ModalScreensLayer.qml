@@ -53,10 +53,12 @@ Kirigami.PageRow {
 
                 // No modal screen anymore
                 if (zynthian.current_modal_screen_id.length === 0) {
-                    applicationWindow().pageStack.layers.clear();
+                    applicationWindow().pageStack.layers.pop();
                     root.clear();
                     return;
                 }
+
+                root.forceActiveFocus();
 
                 for (var i = 0; i < root.depth; ++i) {
                     let child = root.get(i);

@@ -103,12 +103,14 @@ class zynthian_gui_keybinding(QObject):
 			"STOP_AUDIO_PLAY": { "modifier": 5, "keysym": "a" },
 			"TOGGLE_AUDIO_PLAY": { "modifier": 12, "keysym": "a" },
 
-			"START_MIDI_RECORD": { "modifier": 0, "keysym": "m" },
-			"STOP_MIDI_RECORD": { "modifier": 1, "keysym": "m" },
-			"TOGGLE_MIDI_RECORD": { "modifier": 8, "keysym": "m" },
-			"START_MIDI_PLAY": { "modifier": 4, "keysym": "m" },
-			"STOP_MIDI_PLAY": { "modifier": 5, "keysym": "m" },
-			"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "m" },
+			"START_MIDI_RECORD": { "modifier": 0, "keysym": "r" },
+			"STOP_MIDI_RECORD": { "modifier": 1, "keysym": "r" },
+			"TOGGLE_MIDI_RECORD": { "modifier": 8, "keysym": "r" },
+			"START_MIDI_PLAY": { "modifier": 4, "keysym": "r" },
+			"STOP_MIDI_PLAY": { "modifier": 5, "keysym": "r" },
+			"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
+
+			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
 			# Added in QML version
 			"NEXT_SCREEN": { "modifier": 0, "keysym": "Right" },

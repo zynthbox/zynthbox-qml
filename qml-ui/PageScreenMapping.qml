@@ -34,6 +34,7 @@ import "pages" as Pages
 
 QtObject {
     id: root
+
     function pageForScreen(screen) {
         if (screen in screens) {
             return Qt.resolvedUrl("./pages/" + screens[screen]);
@@ -50,8 +51,17 @@ QtObject {
         }
     }
 
+    function pageForDashboardScreen(screen) {
+        if (screen in dashboardScreens) {
+            return Qt.resolvedUrl("./pages/" + dashboardScreens[screen]);
+        } else {
+            return "";
+        }
+    }
+
+
+
     readonly property var screens: {
-        "main": "MainPage.qml",
         "layer": "SynthSetupPage.qml",
         "fixed_layers": "SynthSetupPage.qml",
         "bank": "SynthSetupPage.qml",
@@ -87,5 +97,10 @@ QtObject {
         "track": "TrackPage.qml",
         "zynthiloops": "ZynthiLoops/main.qml",
         "song_arranger": "SongArranger/main.qml"
+    }
+
+    readonly property var dashboardScreens: {
+        "main": "MainPage.qml",
+        "session_dashboard": "SessionDashboard/SessionDashboardPage.qml",
     }
 }

@@ -34,6 +34,24 @@ Zynthian.ScreenPage {
     id: root
     title: zynthian.control.selector_path_element
 
+    backAction: null
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Power")
+            Kirigami.Action {
+                text: qsTr("Restart UI")
+                onTriggered: zynthian.main.restart_gui()
+            }
+            Kirigami.Action {
+                text: qsTr("Reboot")
+                onTriggered: zynthian.main.reboot()
+            }
+            Kirigami.Action {
+                text: qsTr("Power Off")
+                onTriggered: zynthian.main.power_off()
+            }
+        }
+	]
     screenId: "session_dashboard"
     ColumnLayout {
 		QQC2.Label {

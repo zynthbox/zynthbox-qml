@@ -55,8 +55,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata = []
 
         # Main Apps
-        self.list_data.append((self.track, 0, "Track"))
-        self.list_metadata.append({"icon":"../../img/track.svg"})
+        self.list_data.append((self.session_dashboard, 0, "Session"))
+        self.list_metadata.append({"icon":"../../img/session-dashboard.svg"})
 
         self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
         self.list_metadata.append({"icon":"../../img/zynthiloops.svg"})
@@ -124,7 +124,7 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.last_action()
 
     def next_action(self):
-        return "layer"
+        return "main"
 
     def back_action(self):
         return "main"
@@ -177,6 +177,10 @@ class zynthian_gui_main(zynthian_gui_selector):
     def track(self):
         logging.info("Track")
         self.zyngui.show_modal("track")
+
+    def session_dashboard(self):
+        logging.info("Session")
+        self.zyngui.show_screen("session_dashboard")
 
     def zynthiloops(self):
         logging.info("ZynthiLoops")

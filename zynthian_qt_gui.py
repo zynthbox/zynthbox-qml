@@ -136,6 +136,7 @@ from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 
+from zynqtgui.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
 
 from pathlib import Path
@@ -260,7 +261,17 @@ class zynthian_gui_status_data(QObject):
 class zynthian_gui(QObject):
 
     screens_sequence = (
+        "session_dashboard",  #FIXME or main? make this more configurable?
+        "layer",
+        "bank",
+        "preset",
+        "control",
+        "layer_effects",
+    )
+    non_modal_screens = (
+        "session_dashboard",  #FIXME or main? make this more configurable?
         "main",
+        "fixed_layers",
         "layer",
         "bank",
         "preset",
@@ -338,6 +349,7 @@ class zynthian_gui(QObject):
         super(zynthian_gui, self).__init__(parent)
         self.zynmidi = None
         self.screens = {}
+        self.__home_screen = "session_dashboard" #TODO: make this configurable, put same in static screens_sequence
         self.active_screen = None
         self.modal_screen = None
         self.modal_screen_back = None
@@ -531,7 +543,7 @@ class zynthian_gui(QObject):
             logging.warning("Not supported OSC call '{}'".format(path))
 
         # for a, t in zip(args, types):
-        # 	logging.debug("argument of type '%s': %s" % (t, a))
+        #     logging.debug("argument of type '%s': %s" % (t, a))
 
     # ---------------------------------------------------------------------------
     # GUI Core Management
@@ -592,6 +604,8 @@ class zynthian_gui(QObject):
         ###
         self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
+        self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
+
         self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
@@ -635,7 +649,7 @@ class zynthian_gui(QObject):
             self.init_midi_services()
             self.zynautoconnect()
             # Show initial screen
-            self.show_screen("main")
+            self.show_screen(self.__home_screen)
 
         # Start polling threads
         self.start_polling()
@@ -670,10 +684,11 @@ class zynthian_gui(QObject):
             if self.active_screen:
                 screen = self.active_screen
             else:
-                screen = "main"
+                screen = self.__home_screen
 
         if (
             screen == "layer"
+            or screen == "fixed_layers"
             or screen == "bank"
             or screen == "preset"
             or screen == "control"
@@ -689,7 +704,7 @@ class zynthian_gui(QObject):
         self.modal_screen = None
         self.modal_screen_back = None
         self.lock.release()
-        if screen_scanged:
+        if screen_scanged or modal_screen_scanged:
             self.current_screen_id_changed.emit()
         if modal_screen_scanged:
             self.current_modal_screen_id_changed.emit()
@@ -715,6 +730,7 @@ class zynthian_gui(QObject):
                 mode = "LOAD"
             self.screens["snapshot"].set_action(mode)
 
+        self.lock.acquire()
         if self.modal_screen != screen and self.modal_screen not in (
             "info",
             "confirm",
@@ -723,6 +739,8 @@ class zynthian_gui(QObject):
         self.modal_screen = screen
         self.screens[screen].show()
         self.hide_screens(exclude=screen)
+        self.lock.release()
+
         self.current_modal_screen_id_changed.emit()
         self.current_screen_id_changed.emit()
 
@@ -928,7 +946,7 @@ class zynthian_gui(QObject):
                         )
                     )
                     # if cur_active_chan>=0:
-                    # 	self.all_notes_off_chan(cur_active_chan)
+                    #     self.all_notes_off_chan(cur_active_chan)
 
         lib_zyncoder.set_midi_active_chan(active_chan)
         self.zynswitches_midi_setup(curlayer_chan)
@@ -1113,6 +1131,9 @@ class zynthian_gui(QObject):
         elif cuia == "SWITCH_SELECT_LONG":
             self.zynswitch_long(3)
 
+        elif cuia == "SCREEN_MAIN":
+            self.show_screen("main")
+
         elif cuia == "SCREEN_ADMIN":
             self.show_screen("admin")
 
@@ -1177,7 +1198,7 @@ class zynthian_gui(QObject):
 
             if screen_next:
                 logging.debug("GOING TO NEXT SCREEN => {}".format(screen_next))
-                if screen_next in self.screens_sequence:
+                if screen_next in self.non_modal_screens:
                     self.show_screen(screen_next)
                 else:
                     self.show_modal(screen_next)
@@ -1358,20 +1379,20 @@ class zynthian_gui(QObject):
         elif i == 1:
             if self.modal_screen:
                 logging.debug("CLOSE MODAL => " + self.modal_screen)
-                self.show_screen("main")
+                self.show_screen(self.__home_screen)
 
             elif self.active_screen == "preset":
                 self.screens["preset"].restore_preset()
                 self.show_screen("control")
 
             elif (
-                self.active_screen in ["main", "admin"]
+                self.active_screen in [self.__home_screen, "admin"]
                 and len(self.screens["layer"].layers) > 0
             ):
                 self.show_control()
 
             else:
-                self.show_screen("main")
+                self.show_screen(self.__home_screen)
 
         elif i == 2:
             self.load_snapshot()
@@ -1435,12 +1456,12 @@ class zynthian_gui(QObject):
                 except:
                     pass
 
-                # Back to previous screen or modal
+                # Back to home screen or modal
                 if screen_back is None:
                     if self.modal_screen_back:
                         screen_back = self.modal_screen_back
                     else:
-                        screen_back = self.active_screen
+                        screen_back = self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
 
             else:
                 try:
@@ -1474,7 +1495,7 @@ class zynthian_gui(QObject):
 
             if screen_back:
                 logging.debug("BACK TO SCREEN => {}".format(screen_back))
-                if screen_back in self.screens_sequence:
+                if screen_back in self.non_modal_screens:
                     self.show_screen(screen_back)
                 else:
                     self.show_modal(screen_back)
@@ -1768,7 +1789,7 @@ class zynthian_gui(QObject):
                             )
 
                         # if not self.modal_screen and self.curlayer and chan==self.curlayer.get_midi_chan():
-                        # 	self.show_screen('control')
+                        #     self.show_screen('control')
 
                 # Note-On ...
                 elif evtype == 0x9:
@@ -2265,6 +2286,17 @@ class zynthian_gui(QObject):
     def get_current_qml_page(self):
         return self.current_qml_page_prop
 
+    def get_home_screen(self):
+        return self.__home_screen
+
+    def set_home_screen(self, screen: str):
+        if self.__home_screen == screen:
+            return
+        self.__home_screen = screen
+        self.home_screen_changed.emit()
+
+    # ---------------------------------------------------------------------------
+    # Screens getters
     def get_info(self):
         return self.screens["info"]
 
@@ -2384,6 +2416,10 @@ class zynthian_gui(QObject):
         return self.screens["master_alsa_mixer"]
 
     @Property(QObject, constant=True)
+    def session_dashboard(self):
+        return self.screens["session_dashboard"]
+
+    @Property(QObject, constant=True)
     def song_arranger(self):
         return self.screens["song_arranger"]
 
@@ -2393,6 +2429,7 @@ class zynthian_gui(QObject):
     status_info_changed = Signal()
     current_qml_page_changed = Signal()
     miniPlayGridToggle = Signal()
+    home_screen_changed = Signal()
 
     current_screen_id = Property(
         str,
@@ -2408,6 +2445,8 @@ class zynthian_gui(QObject):
     )
 
     is_loading = Property(bool, get_is_loading, notify=is_loading_changed)
+
+    home_screen = Property(str, get_home_screen, set_home_screen, notify=home_screen_changed)
 
     status_information = Property(
         QObject, get_status_information, constant=True
@@ -2506,7 +2545,7 @@ def delete_window():
 
 
 # Function to handle computer keyboard key press
-# 	event: Key event
+#     event: Key event
 # def cb_keybinding(event):
 # logging.debug("Key press {} {}".format(event.keycode, event.keysym))
 # zynthian_gui_config.top.focus_set() # Must remove focus from listbox to avoid interference with physical keyboard
@@ -2588,7 +2627,7 @@ if __name__ == "__main__":
     # font.setFamily("Roboto")
     # app.setFont(font)
 
-    zyngui.show_screen("main")
+    zyngui.show_screen(zyngui.home_screen)
     zyngui.screens["preset"].disable_show_fav_presets()
 
     engine.addImportPath(os.fspath(Path(__file__).resolve().parent / "qml-ui"))

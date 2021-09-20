@@ -208,6 +208,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def activate_midichan_layer(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
 			self.activate_index(self.root_layers.index(self.layer_midi_map[midi_chan]))
+			self.zyngui.screens['bank'].set_select_path()
+			self.zyngui.screens['preset'].set_select_path()
 		else:
 			self.zyngui.set_curlayer(None)
 			self.zyngui.screens['bank'].fill_list()

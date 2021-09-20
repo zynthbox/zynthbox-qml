@@ -193,9 +193,11 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        sideBar.controlType = SideBar.ControlType.None;
-                                        sideBar.controlObj = null;
-                                        // highlighted = true;
+                                        if (zlClip) {
+                                            zlClip = null;
+                                        } else {
+                                            zlClip = track.selectedClip;
+                                        }
                                     }
                                 }
                             }

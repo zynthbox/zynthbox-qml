@@ -118,11 +118,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		if self.__select_in_progess: #HACK: this is due from the process events in the spinner. should be fixed there
 			return
 		self.__select_in_progess = True
+		spinner_shown = False
 		if self.__top_sounds_engine != None:
 			sound = self.__top_sounds[self.__top_sounds_engine][i]
 			layer = self.zyngui.curlayer
 			if self.zyngui.curlayer == None:
 				self.zyngui.start_loading()
+				spinner_shown = True
 				engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
 				midi_chan = self.zyngui.screens["fixed_layers"].list_data[self.zyngui.screens["fixed_layers"].index][1]
 				layer = zynthian_layer(engine, midi_chan, self.zyngui)
@@ -132,10 +134,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				if self.zyngui.curlayer.preset_name == sound["preset"] and self.zyngui.curlayer.bank_name == sound["bank"]:
 					self.__select_in_progess = False
 					return
-				self.zyngui.start_loading()
+
 				self.zyngui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zyngui.start_loading() curlayer is changed??
 
 				if self.zyngui.curlayer.engine.nickname != sound["engine"]:
+					self.zyngui.start_loading()
+					spinner_shown = True
 					midi_chan = self.zyngui.curlayer.midi_chan
 					self.zyngui.screens['layer'].remove_current_layer()
 					engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
@@ -164,7 +168,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			except Exception as e:
 				logging.warning("Invalid Bank on layer {}: {}".format(layer.get_basepath(), e))
 
-			layer.wait_stop_loading()
+			if spinner_shown:
+				layer.wait_stop_loading()
 
 			#Load preset list and set preset
 			layer.load_preset_list()
@@ -313,7 +318,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def index_supports_immediate_activation(self, index=None):
-		return self.__top_sounds_engine == None
+		return True
 
 	def next_action(self): #DON't go to edit or effect
 		return "preset"

@@ -353,6 +353,7 @@ class zynthian_gui(QObject):
         self.active_screen = None
         self.modal_screen = None
         self.modal_screen_back = None
+        self.screen_back = None
 
         self.modal_timer = QTimer(self)
         self.modal_timer.setInterval(3000)
@@ -701,8 +702,12 @@ class zynthian_gui(QObject):
         screen_scanged = self.active_screen != screen
         modal_screen_scanged = self.modal_screen != None
         self.active_screen = screen
+        if screen == "main": # Main is now transient
+            self.modal_screen_back = self.modal_screen
+        else:
+            self.modal_screen_back = None
+            self.screen_back = self.active_screen
         self.modal_screen = None
-        self.modal_screen_back = None
         self.lock.release()
         if screen_scanged or modal_screen_scanged:
             self.current_screen_id_changed.emit()
@@ -736,6 +741,8 @@ class zynthian_gui(QObject):
             "confirm",
         ):
             self.modal_screen_back = self.modal_screen
+
+        self.screen_back = None
         self.modal_screen = screen
         self.screens[screen].show()
         self.hide_screens(exclude=screen)
@@ -1132,7 +1139,13 @@ class zynthian_gui(QObject):
             self.zynswitch_long(3)
 
         elif cuia == "SCREEN_MAIN":
-            self.show_screen("main")
+            if self.get_current_screen_id() == "main":
+                if self.modal_screen_back:
+                    self.show_modal(self.modal_screen_back)
+                elif self.screen_back:
+                    self.show_screen(self.screen_back)
+            else:
+                self.show_screen("main")
 
         elif cuia == "SCREEN_ADMIN":
             self.show_screen("admin")

@@ -51,11 +51,47 @@ Zynthian.ScreenPage {
                 onTriggered: zynthian.main.power_off()
             }
         }
-	]
+    ]
     screenId: "session_dashboard"
+    Timer {
+        interval: 10 * 1000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        function pad(d) {
+            return (d < 10) ? '0' + d.toString() : d.toString();
+        }
+        onTriggered: {
+            let d = new Date();
+            clockLabel.text = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            let sessionSecs = zynthian.session_dashboard.get_session_time()
+            let sessionMins = Math.floor(sessionSecs / 60);
+            let sessionHours = Math.floor(sessionMins / 60);
+            sessionMins = sessionMins % 60;
+            sessionTimeLabel.text = pad(sessionHours) + ":" + pad(sessionMins);
+        }
+    }
     ColumnLayout {
-		QQC2.Label {
-			text: "This is the Session Page"
-		}
-	}
+        anchors.fill: parent
+        Kirigami.Heading {
+            id: clockLabel
+            Layout.alignment: Qt.AlignCenter
+        }
+        Item {
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+        }
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: "Session time:"
+        }
+
+        Kirigami.Heading {
+            id: sessionTimeLabel
+            Layout.alignment: Qt.AlignCenter
+        }
+
+        Item {
+            Layout.fillHeight: true
+        }
+    }
 }

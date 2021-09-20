@@ -59,8 +59,6 @@ Kirigami.AbstractApplicationWindow {
         root.showFullScreen()
     }
 
-    readonly property var sessionStartDateTime: Date()
-
     width: screen.width
     height: screen.height
 

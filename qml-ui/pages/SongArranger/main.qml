@@ -172,43 +172,66 @@ Zynthian.ScreenPage {
                     contentX: barsHeaderRow.contentX
                     contentY: tracksHeaderColumns.contentY
 
-                    GridLayout {
-                        id: cellGrid
-                        columns: root.arranger.bars
-                        rowSpacing: 1
-                        columnSpacing: 1
+                    Item {
+                        GridLayout {
+                            id: cellGrid
+                            columns: root.arranger.bars
+                            rowSpacing: 1
+                            columnSpacing: 1
 
-                        Repeater {
-                            model: root.arranger.tracksModel
+                            Repeater {
+                                model: root.arranger.tracksModel
 
-                            delegate: Repeater {
-                                model: track.cellsModel
+                                delegate: Repeater {
+                                    model: track.cellsModel
 
-                                delegate: ClipCell {
-                                    id: clipCell
+                                    delegate: ClipCell {
+                                        id: clipCell
 
-                                    Layout.preferredWidth: cellGrid.calculateCellWidth(zlClip)
-                                    Layout.maximumWidth: cellGrid.calculateCellWidth(zlClip)
-                                    Layout.preferredHeight: privateProps.cellHeight
-                                    Layout.maximumHeight: privateProps.cellHeight
+                                        Layout.preferredWidth: privateProps.cellWidth
+                                        Layout.maximumWidth: privateProps.cellWidth
+                                        Layout.preferredHeight: privateProps.cellHeight
+                                        Layout.maximumHeight: privateProps.cellHeight
 
-                                    onPressed: {
-                                        if (zlClip) {
-                                            zlClip = null;
-                                        } else {
-                                            zlClip = track.selectedClip;
+                                        Layout.columnSpan: zlClip ? zlClip.length : 1
+
+                                        onPressed: {
+                                            var component = Qt.createComponent("ClipCell.qml");
+                                            var obj = component.createObject(zlClipsContainer, {
+                                                "width": cellGrid.calculateCellWidth(track.selectedClip),
+                                                "height": privateProps.cellHeight,
+                                                "zlClip": track.selectedClip,
+                                                "x": clipCell.x,
+                                                "y": clipCell.y,
+                                                "z": 9999
+                                            });
+
+                                            obj.onPressed.connect(function() {
+                                                obj.destroy();
+                                            });
+
+                                            if (obj === null) {
+                                                // Error Handling
+                                                console.log("Error creating object");
+                                            }
                                         }
                                     }
                                 }
                             }
+
+                            function calculateCellWidth(clip) {
+                                if (clip) {
+                                    return privateProps.cellWidth*clip.length + cellGrid.columnSpacing*(clip.length-1)
+                                } else {
+                                    return privateProps.cellWidth
+                                }
+                            }
                         }
 
-                        function calculateCellWidth(clip) {
-                            if (clip) {
-                                return privateProps.cellWidth*clip.length
-                            } else {
-                                return privateProps.cellWidth
-                            }
+                        Item {
+                            id: zlClipsContainer
+                            width: cellGrid.width
+                            height: cellGrid.height
                         }
                     }
                 }

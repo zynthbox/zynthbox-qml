@@ -47,6 +47,7 @@ Zynthian.BasePlayGrid {
         "columns": 8,
         "positionalVelocity": true
     }
+    persist: ["scale", "rows", "columns", "positionalVelocity"]
 
     QtObject {
         id: _private

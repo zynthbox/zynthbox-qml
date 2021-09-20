@@ -146,6 +146,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			self.zyngui.screens['layer'].fill_list()
 		else:
 			self.show()
+		self.set_select_path()
 
 	def next_action(self):
 		return "preset"

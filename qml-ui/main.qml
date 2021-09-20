@@ -59,6 +59,8 @@ Kirigami.AbstractApplicationWindow {
         root.showFullScreen()
     }
 
+    readonly property var sessionStartDateTime: Date()
+
     width: screen.width
     height: screen.height
 
@@ -73,9 +75,9 @@ Kirigami.AbstractApplicationWindow {
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
                 rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: zynthian.current_screen_id = 'main'
-                onPressAndHold: zynthian.current_screen_id = 'session_dashboard'
-                highlighted: zynthian.current_screen_id === 'main'
+                onClicked: zynthian.current_screen_id = 'session_dashboard'
+                onPressAndHold: zynthian.current_screen_id = 'main'
+                highlighted: zynthian.current_screen_id === 'session_dashboard'
             }
             Zynthian.BreadcrumbButton {
                 text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'

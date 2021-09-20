@@ -107,7 +107,7 @@ Zynthian.ScreenPage {
                     model: root.arranger.bars
 
                     delegate: Zynthian.TableHeader {
-                        text: modelData+1
+                        text: modelData%4 === 0 ? (modelData+1) : ""
 
                         width: privateProps.cellWidth
                         height: ListView.view.height

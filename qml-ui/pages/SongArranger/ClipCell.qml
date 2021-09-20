@@ -43,7 +43,7 @@ QQC2.AbstractButton {
     contentItem: Item {
         Zynthian.TableHeaderLabel {
             id: label
-            text: zlClip ? zlClip.name : ""
+            text: zlClip ? zlClip.partName : ""
 
             anchors.centerIn: parent
         }

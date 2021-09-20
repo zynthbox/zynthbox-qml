@@ -44,6 +44,18 @@ Zynthian.ScreenPage {
     bottomPadding: 8
 
     contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Start")
+            onTriggered: {
+                arranger.start()
+            }
+        },
+        Kirigami.Action {
+            text: qsTr("Stop")
+            onTriggered: {
+                arranger.stop()
+            }
+        }
     ]
 
     Component.onCompleted: {
@@ -185,7 +197,7 @@ Zynthian.ScreenPage {
                                 delegate: Repeater {
                                     model: track.cellsModel
 
-                                    delegate: ClipCell {
+                                    delegate: Rectangle {
                                         id: clipCell
 
                                         Layout.preferredWidth: privateProps.cellWidth
@@ -195,27 +207,35 @@ Zynthian.ScreenPage {
 
                                         Layout.columnSpan: zlClip ? zlClip.length : 1
 
-                                        onPressed: {
-                                            if (track.selectedClip) {
-                                                cell.zlClip = track.selectedClip;
+                                        color: cell.isPlaying ?
+                                                   Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5) :
+                                                   Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
 
-                                                var component = Qt.createComponent("ClipCell.qml");
-                                                var obj = component.createObject(zlClipsContainer, {
-                                                    "width": cellGrid.calculateCellWidth(track.selectedClip),
-                                                    "height": privateProps.cellHeight,
-                                                    "zlClip": track.selectedClip,
-                                                    "x": clipCell.x,
-                                                    "y": clipCell.y,
-                                                    "z": 9999
-                                                });
 
-                                                obj.onPressed.connect(function() {
-                                                    obj.destroy();
-                                                });
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onPressed: {
+                                                if (track.selectedClip) {
+                                                    cell.zlClip = track.selectedClip;
 
-                                                if (obj === null) {
-                                                    // Error Handling
-                                                    console.log("Error creating object");
+                                                    var component = Qt.createComponent("ClipCell.qml");
+                                                    var obj = component.createObject(zlClipsContainer, {
+                                                        "width": cellGrid.calculateCellWidth(track.selectedClip),
+                                                        "height": privateProps.cellHeight,
+                                                        "zlClip": track.selectedClip,
+                                                        "x": clipCell.x,
+                                                        "y": clipCell.y,
+                                                        "z": 9999
+                                                    });
+
+                                                    obj.onPressed.connect(function() {
+                                                        obj.destroy();
+                                                    });
+
+                                                    if (obj === null) {
+                                                        // Error Handling
+                                                        console.log("Error creating object");
+                                                    }
                                                 }
                                             }
                                         }

@@ -33,8 +33,8 @@ import Zynthian 1.0 as Zynthian
 
 
 QQC2.AbstractButton {
-    property alias cellText: label.text
     property bool highlighted: false
+    property var zlClip
 
     id: root
 
@@ -43,6 +43,7 @@ QQC2.AbstractButton {
     contentItem: Item {
         Zynthian.TableHeaderLabel {
             id: label
+            text: zlClip ? zlClip.name : ""
 
             anchors.centerIn: parent
         }

@@ -411,7 +411,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.metronome_schedule_stop = False
             else:
                 self.__current_bar__ += 1
-                self.current_bar_changed
+                self.current_bar_changed.emit()
 
         #if self.__song__.isPlaying:
             #self.__song__.metronome_update

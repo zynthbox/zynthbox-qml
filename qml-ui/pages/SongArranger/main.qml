@@ -225,7 +225,8 @@ Zynthian.ScreenPage {
 
                             function calculateCellWidth(clip) {
                                 if (clip) {
-                                    return privateProps.cellWidth*clip.length + cellGrid.columnSpacing*(clip.length-1)
+                                    var bars = Math.ceil(clip.length/4)
+                                    return privateProps.cellWidth*bars + cellGrid.columnSpacing*(bars-1)
                                 } else {
                                     return privateProps.cellWidth
                                 }

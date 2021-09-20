@@ -196,23 +196,27 @@ Zynthian.ScreenPage {
                                         Layout.columnSpan: zlClip ? zlClip.length : 1
 
                                         onPressed: {
-                                            var component = Qt.createComponent("ClipCell.qml");
-                                            var obj = component.createObject(zlClipsContainer, {
-                                                "width": cellGrid.calculateCellWidth(track.selectedClip),
-                                                "height": privateProps.cellHeight,
-                                                "zlClip": track.selectedClip,
-                                                "x": clipCell.x,
-                                                "y": clipCell.y,
-                                                "z": 9999
-                                            });
+                                            if (track.selectedClip) {
+                                                cell.zlClip = track.selectedClip;
 
-                                            obj.onPressed.connect(function() {
-                                                obj.destroy();
-                                            });
+                                                var component = Qt.createComponent("ClipCell.qml");
+                                                var obj = component.createObject(zlClipsContainer, {
+                                                    "width": cellGrid.calculateCellWidth(track.selectedClip),
+                                                    "height": privateProps.cellHeight,
+                                                    "zlClip": track.selectedClip,
+                                                    "x": clipCell.x,
+                                                    "y": clipCell.y,
+                                                    "z": 9999
+                                                });
 
-                                            if (obj === null) {
-                                                // Error Handling
-                                                console.log("Error creating object");
+                                                obj.onPressed.connect(function() {
+                                                    obj.destroy();
+                                                });
+
+                                                if (obj === null) {
+                                                    // Error Handling
+                                                    console.log("Error creating object");
+                                                }
                                             }
                                         }
                                     }

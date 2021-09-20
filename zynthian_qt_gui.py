@@ -625,6 +625,10 @@ class zynthian_gui(QObject):
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
+        ###
+        # Song Arranger depends on zynthiloops screen for metronome related functionalities
+        # and hence needs to be initialized after ZL page has been initialized
+        ###
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
 
         # Init Auto-connector

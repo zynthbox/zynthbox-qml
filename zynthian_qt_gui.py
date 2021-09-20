@@ -625,10 +625,6 @@ class zynthian_gui(QObject):
         self.screens["playgrid_downloader"] = zynthian_gui_newstuff(self)
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
-        ###
-        # Song Arranger depends on zynthiloops screen for metronome related functionalities
-        # and hence needs to be initialized after ZL page has been initialized
-        ###
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
 
         # Init Auto-connector
@@ -690,6 +686,8 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
+        elif screen is "layer":  #HACK replace completely layer with fixed_layers
+            screen = "fixed_layers"
 
         if (
             screen == "layer"
@@ -930,6 +928,7 @@ class zynthian_gui(QObject):
             self.screens["control"].show()
 
             self.set_active_channel()
+            self.screens["fixed_layers"].set_select_path()
         else:
             self.curlayer = None
 

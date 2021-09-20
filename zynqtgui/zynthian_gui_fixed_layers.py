@@ -79,7 +79,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def select_action(self, i, t='S'):
-        self.index = i
         chan = self.list_data[i][1]
         self.current_index_valid_changed.emit()
 

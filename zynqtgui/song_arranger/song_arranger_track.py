@@ -33,6 +33,7 @@ class song_arranger_track(QObject):
         super(song_arranger_track, self).__init__(parent)
         self.__cells_model__ = song_arranger_cells_model(self)
         self.__zl_track__ = zl_track
+        self.__selected_clip__ = None
 
     ### Property cellsModel
     def get_cellsModel(self):
@@ -51,3 +52,15 @@ class song_arranger_track(QObject):
         return self.__zl_track__.name
     name = Property(str, get_name, constant=True)
     ### END Property name
+
+    ### Property selectedClip
+    @Signal
+    def selected_clip_changed(self):
+        pass
+    def get_selected_clip(self):
+        return self.__selected_clip__
+    def set_selected_clip(self, clip):
+        self.__selected_clip__ = clip
+        self.selected_clip_changed.emit()
+    selectedClip = Property(QObject, get_selected_clip, set_selected_clip, notify=selected_clip_changed)
+    ### END Property selectedClip

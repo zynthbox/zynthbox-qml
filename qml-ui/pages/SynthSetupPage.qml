@@ -151,6 +151,7 @@ Zynthian.ScreenPage {
                     checked: zynthian.bank.show_top_sounds
                     onToggled: {
                         zynthian.bank.show_top_sounds = checked;
+                        zynthian.current_screen_id = "bank";
                     }
                 }
             }
@@ -184,7 +185,10 @@ Zynthian.ScreenPage {
                     LayoutMirroring.childrenInherit: true
                     checkable: true
                     checked: zynthian.preset.current_is_favorite
-                    onToggled: zynthian.preset.current_is_favorite = checked
+                    onToggled: {
+                        zynthian.preset.current_is_favorite = checked;
+                        zynthian.current_screen_id = "preset";
+                    }
                 }
             }
             Zynthian.SelectorView {

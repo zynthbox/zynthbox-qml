@@ -117,9 +117,10 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		if self.__select_in_progess: #HACK: this is due from the process events in the spinner. should be fixed there
 			return
 		self.__select_in_progess = True
+		self.select(i)
 		engine_created = False
 		if self.__top_sounds_engine != None:
-			sound = self.__top_sounds[self.__top_sounds_engine][i]
+			sound = self.__top_sounds[self.__top_sounds_engine][min(i, len(self.__top_sounds[self.__top_sounds_engine]) - 1)]
 			layer = self.zyngui.curlayer
 			old_audio_out = None
 			if self.zyngui.curlayer == None:
@@ -130,6 +131,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				layer = zynthian_layer(engine, midi_chan, self.zyngui)
 				self.zyngui.screens['layer'].layers.append(layer)
 				self.zyngui.screens['engine'].stop_unused_engines()
+				self.zyngui.set_curlayer(layer)
+				self.zyngui.screens['layer'].reset_midi_routing()
+				self.zyngui.zynautoconnect_midi(True)
+				self.zyngui.screens['layer'].reset_audio_routing()
+				self.zyngui.zynautoconnect_audio()
 			else:
 				if self.zyngui.curlayer.preset_name == sound["preset"] and self.zyngui.curlayer.bank_name == sound["bank"]:
 					self.__select_in_progess = False
@@ -137,8 +143,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 				self.zyngui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zyngui.start_loading() curlayer is changed??
 				old_audio_out = layer.get_audio_out()
-				logging.error(layer.get_audio_out())
-				logging.error(old_audio_out)
 
 				if self.zyngui.curlayer.engine.nickname != sound["engine"]:
 					self.zyngui.start_loading()
@@ -179,6 +183,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.show()
 			self.zyngui.stop_loading()
 			self.__select_in_progess = False
+			self.zyngui.screens['bank'].set_select_path()
 			return
 
 		if t=='S':
@@ -199,6 +204,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def get_current_is_favorite(self):
+		if self.zyngui.curlayer == None:
+			return False
 		if self.index < 0 or self.index >= len(self.list_data):
 			return False
 		if self.__top_sounds_engine != None:

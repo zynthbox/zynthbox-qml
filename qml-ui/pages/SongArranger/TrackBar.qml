@@ -58,6 +58,7 @@ GridLayout {
             interactive: true
             clip: true
             delegate: Kirigami.BasicListItem {
+                leftPadding: 0
                 width: ListView.view.width
                 text: model.clip.name + "(" + model.clip.duration.toFixed(2) +"s)"
                 visible: model.clip.path.length > 0

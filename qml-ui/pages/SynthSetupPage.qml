@@ -146,7 +146,7 @@ Zynthian.ScreenPage {
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }
                 QQC2.Button {
-                    text: qsTr("Fav")
+                    text: qsTr("Fav-Mode")
                     checkable: true
                     checked: zynthian.bank.show_top_sounds
                     onToggled: {

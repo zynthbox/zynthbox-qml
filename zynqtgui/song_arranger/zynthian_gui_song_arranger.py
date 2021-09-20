@@ -63,9 +63,13 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
 
         try:
             self.__sketch__.tracksModel.countChanged.disconnect()
+        except Exception as e:
+            logging.error(f"Already disconnected : {str(e)}")
+
+        try:
             self.zyngui.zynthiloops.song_changed.disconnect()
-        except:
-            logging.error(f"Cannot disconnect")
+        except Exception as e:
+            logging.error(f"Already disconnected: {str(e)}")
 
         self.__sketch__.tracksModel.countChanged.connect(self.generate_tracks_model)
         self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)

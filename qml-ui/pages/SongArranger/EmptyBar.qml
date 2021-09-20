@@ -43,7 +43,7 @@ GridLayout {
 
     QQC2.Label {
         Layout.alignment: Qt.AlignCenter
-        text: "Select a Cell"
+        text: "Select a Track"
         font.italic: true
     }
 }

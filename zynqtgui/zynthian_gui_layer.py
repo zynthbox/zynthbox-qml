@@ -175,6 +175,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['snapshot'].save_last_state_snapshot()
 		self.reset()
 		self.zyngui.show_screen('layer')
+		self.zyngui.screens['layer'].set_select_path()
+		self.zyngui.screens['bank'].fill_list()
+		self.zyngui.screens['bank'].set_select_path()
+		self.zyngui.screens['preset'].fill_list()
+		self.zyngui.screens['preset'].set_select_path()
 
 
 	def create_amixer_layer(self):

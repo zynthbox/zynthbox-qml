@@ -82,11 +82,13 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		self.__show_top_sounds = show
 		self.fill_list()
 		self.show()
+		bank_found = False
 		if show and self.zyngui.curlayer:
 			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
 			for i, engine in enumerate(top_sounds):
 				if engine == self.zyngui.curlayer.engine.nickname:
 					self.select_action(i)
+					bank_found = True
 					break
 			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
 				if preset[2] == self.zyngui.curlayer.preset_name:
@@ -96,11 +98,14 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			for i, bank in enumerate(self.list_data):
 				if bank[2] == self.zyngui.curlayer.bank_name:
 					self.select_action(i)
+					bank_found = True
 					break
 			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
 				if preset[2] == self.zyngui.curlayer.preset_name:
 					self.zyngui.screens['preset'].select_action(i)
 					break
+		if not bank_found:
+			self.select_action(0)
 		self.show_top_sounds_changed.emit()
 
 	def show(self):
@@ -120,6 +125,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		self.select(i)
 		if i < 0 or i >= len(self.list_data):
 			return
 		if self.__show_top_sounds:

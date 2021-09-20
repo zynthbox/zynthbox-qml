@@ -127,7 +127,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         return "main"
 
     def back_action(self):
-        return "main"
+        return "session_dashboard"
 
     def layers(self):
         logging.info("Layers")

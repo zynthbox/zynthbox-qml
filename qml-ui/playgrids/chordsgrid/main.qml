@@ -47,6 +47,7 @@ Zynthian.BasePlayGrid {
         "miniChordScales": ["dorian","phrygian"],
         "positionalVelocity": true
     }
+    persist: ["chordRows", "chordScales", "miniChordScales", "positionalVelocity"]
 
     QtObject {
         id: _private

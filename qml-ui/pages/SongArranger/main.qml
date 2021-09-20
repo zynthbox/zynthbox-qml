@@ -187,8 +187,8 @@ Zynthian.ScreenPage {
                                 delegate: ClipCell {
                                     id: clipCell
 
-                                    Layout.preferredWidth: privateProps.cellWidth
-                                    Layout.maximumWidth: privateProps.cellWidth
+                                    Layout.preferredWidth: cellGrid.calculateCellWidth(zlClip)
+                                    Layout.maximumWidth: cellGrid.calculateCellWidth(zlClip)
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
 
@@ -200,6 +200,14 @@ Zynthian.ScreenPage {
                                         }
                                     }
                                 }
+                            }
+                        }
+
+                        function calculateCellWidth(clip) {
+                            if (clip) {
+                                return privateProps.cellWidth*clip.length
+                            } else {
+                                return privateProps.cellWidth
                             }
                         }
                     }

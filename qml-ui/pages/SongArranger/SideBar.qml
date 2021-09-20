@@ -51,16 +51,7 @@ Zynthian.Card {
 
             Kirigami.Heading {
                 id: heading
-                text: {
-                    let text = root.controlObj ? root.controlObj.name : "";
-
-                    switch (root.controlType) {
-                        case SideBar.ControlType.Track:
-                            return qsTr("TRACK: %1").arg(text);
-                        default:
-                            return text;
-                    }
-                }
+                text: root.controlObj ? root.controlObj.name : ""
                 wrapMode: Text.NoWrap
             }
 

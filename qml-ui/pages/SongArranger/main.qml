@@ -58,11 +58,9 @@ Zynthian.ScreenPage {
         id: privateProps
 
         //Try to fit exactly until a minimum allowed size
-        property int headerWidth: Math.round(
-                                    Math.max(Kirigami.Units.gridUnit * 5,
-                                            tableLayout.width / 9))
-        property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
-        property int cellWidth: headerWidth
+        property int headerWidth: 100
+        property int headerHeight: 50
+        property int cellWidth: 50
         property int cellHeight: headerHeight
     }    
 
@@ -111,7 +109,7 @@ Zynthian.ScreenPage {
                     delegate: Zynthian.TableHeader {
                         text: modelData+1
 
-                        width: privateProps.headerWidth
+                        width: privateProps.cellWidth
                         height: ListView.view.height
 
                         onPressed: {
@@ -194,8 +192,6 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: privateProps.cellHeight
                                     Layout.maximumHeight: privateProps.cellHeight
 
-                                    cellText: track.zlTrack.name + "-" + (cell.id+1)
-
                                     onPressed: {
                                         sideBar.controlType = SideBar.ControlType.None;
                                         sideBar.controlObj = null;
@@ -212,7 +208,7 @@ Zynthian.ScreenPage {
         SideBar {
             id: sideBar
 
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 7
             Layout.fillWidth: false
             Layout.fillHeight: true
         }

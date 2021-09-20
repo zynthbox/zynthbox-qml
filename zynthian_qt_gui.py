@@ -707,7 +707,8 @@ class zynthian_gui(QObject):
         modal_screen_scanged = self.modal_screen != None
         self.active_screen = screen
         if screen == "main": # Main is now transient
-            self.modal_screen_back = self.modal_screen
+            if self.modal_screen != "confirm":
+                self.modal_screen_back = self.modal_screen
         else:
             self.modal_screen_back = None
             self.screen_back = self.active_screen
@@ -748,7 +749,10 @@ class zynthian_gui(QObject):
 
         self.screen_back = None
         self.modal_screen = screen
-        self.screens[screen].show()
+        logging.error(self.screens[screen])
+        if screen != "confirm":
+            self.screens[screen].show()
+
         self.hide_screens(exclude=screen)
         self.lock.release()
 
@@ -791,7 +795,8 @@ class zynthian_gui(QObject):
             return self.screens[self.active_screen]
 
     def show_confirm(self, text, callback=None, cb_params=None):
-        self.modal_screen_back = self.modal_screen
+        if self.modal_screen != "confirm":
+            self.modal_screen_back = self.modal_screen
         self.modal_screen = "confirm"
         self.screens["confirm"].show(text, callback, cb_params)
         self.hide_screens(exclude="confirm")
@@ -805,7 +810,8 @@ class zynthian_gui(QObject):
         self.current_modal_screen_id_changed.emit()
 
     def show_info(self, text, tms=None):
-        self.modal_screen_back = self.modal_screen
+        if self.modal_screen != "confirm":
+            self.modal_screen_back = self.modal_screen
         self.modal_screen = "info"
         self.screens["info"].show(text)
         self.hide_screens(exclude="info")

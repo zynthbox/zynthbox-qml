@@ -114,17 +114,17 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
-		traceback.print_stack(None, 8)
 		if self.__select_in_progess: #HACK: this is due from the process events in the spinner. should be fixed there
 			return
 		self.__select_in_progess = True
-		spinner_shown = False
+		engine_created = False
 		if self.__top_sounds_engine != None:
 			sound = self.__top_sounds[self.__top_sounds_engine][i]
 			layer = self.zyngui.curlayer
+			old_audio_out = None
 			if self.zyngui.curlayer == None:
 				self.zyngui.start_loading()
-				spinner_shown = True
+				engine_created = True
 				engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
 				midi_chan = self.zyngui.screens["fixed_layers"].list_data[self.zyngui.screens["fixed_layers"].index][1]
 				layer = zynthian_layer(engine, midi_chan, self.zyngui)
@@ -136,16 +136,19 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					return
 
 				self.zyngui.set_curlayer(layer) # FIXME: sometimes after the event processing in self.zyngui.start_loading() curlayer is changed??
+				old_audio_out = layer.get_audio_out()
+				logging.error(layer.get_audio_out())
+				logging.error(old_audio_out)
 
 				if self.zyngui.curlayer.engine.nickname != sound["engine"]:
 					self.zyngui.start_loading()
-					spinner_shown = True
+					engine_created = True
 					midi_chan = self.zyngui.curlayer.midi_chan
-					self.zyngui.screens['layer'].remove_current_layer()
-					engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
-					layer = zynthian_layer(engine, midi_chan, self.zyngui)
-					self.zyngui.screens['layer'].layers.append(layer)
-					self.zyngui.screens['engine'].stop_unused_engines()
+					self.zyngui.screens['layer'].replace_layer_index = midi_chan
+					self.zyngui.screens['layer'].layer_chain_parallel = False
+					self.zyngui.screens['layer'].layer_index_replace_engine = self.zyngui.screens['layer'].root_layers.index(layer)
+					self.zyngui.screens['layer'].add_layer_engine(sound['engine'], midi_chan, True)
+					layer = self.zyngui.curlayer
 				else:
 					#Workaround: make sure that layer is really selected or we risk to replace the old one
 					for i, candidate in enumerate(self.zyngui.screens['layer'].root_layers):
@@ -160,15 +163,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				layer.load_bank_list()
 				layer.bank_name=None
 				layer.set_bank_by_name(sound['bank'])
-				self.zyngui.screens['layer'].reset_midi_routing()
-				self.zyngui.zynautoconnect_midi(True)
-				self.zyngui.screens['layer'].reset_audio_routing()
-				self.zyngui.zynautoconnect_audio()
 
 			except Exception as e:
 				logging.warning("Invalid Bank on layer {}: {}".format(layer.get_basepath(), e))
 
-			if spinner_shown:
+			if engine_created:
 				layer.wait_stop_loading()
 
 			#Load preset list and set preset

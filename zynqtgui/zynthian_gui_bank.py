@@ -106,6 +106,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 					break
 		if not bank_found:
 			self.select_action(0)
+			self.zyngui.screens['preset'].select(0)
 		self.show_top_sounds_changed.emit()
 
 	def show(self):

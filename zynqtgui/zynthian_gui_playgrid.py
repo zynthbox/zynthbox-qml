@@ -47,7 +47,6 @@ from PySide2.QtQml import QQmlEngine,qmlRegisterType
 from . import zynthian_qt_gui_base
 from .zynthiloops import zynthian_gui_zynthiloops
 
-
 class Note(QObject):
     def __init__(
         self,
@@ -284,6 +283,44 @@ class zynthian_gui_playgrid_settings(QObject):
     @Slot(str)
     def hasProperty(self, property:str):
         return property in self.__settings__
+
+    def getDataDir(self):
+        return os.environ.get('ZYNTHIAN_MY_DATA_DIR') + "/playgrid/" + self.__name__
+
+    def getSafeFilename(self, unsafe:str):
+        keepcharacters = (' ','.','_')
+        return self.getDataDir() + "/" + "".join(c for c in unsafe if c.isalnum() or c in keepcharacters).rstrip()
+
+    @Slot(str,result=str)
+    def loadData(self, key:str):
+        confpath = self.getSafeFilename(key)
+        data = ""
+        if os.path.isfile(confpath):
+            # Get config file content
+            try:
+                with open(confpath, encoding='utf-8') as f:
+                    data = f.readlines()
+            except Exception as e:
+                logging.error("Failed to read data from file: %s" % e)
+        return data
+
+    @Slot(str,str,result=bool)
+    def saveData(self, key:str, data:str):
+        confpath = self.getDataDir()
+        success = False
+        if not os.path.isdir(confpath):
+            os.makedirs(confpath, exist_ok=True)
+        if os.path.isdir(confpath):
+            datapath = self.getSafeFilename(key)
+            try:
+                with open(datapath, 'w', encoding='utf-8') as f:
+                    f.write(data)
+                success = True
+            except Exception as e:
+                logging.error("Failed to write data to file: %s" % e)
+        else:
+            logging.error("Could not save data, location is unavailable: %s" % confpath)
+        return success
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     # Use this when something needs to be signalled to /all/ the instances (such as note states)

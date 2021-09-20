@@ -928,7 +928,6 @@ class zynthian_gui(QObject):
             self.screens["control"].show()
 
             self.set_active_channel()
-            self.screens["fixed_layers"].set_select_path()
         else:
             self.curlayer = None
 

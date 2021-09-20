@@ -79,14 +79,28 @@ import Zynthian 1.0 as Zynthian
  * property will revert it back to the default (if you have not defined a default, the value will be
  * `undefined`).
  *
- * * defaults is should be a dictionary which contains sets of property names and their default values.
+ * * defaults is be a dictionary which contains sets of property names and their default values.
  *   As an example, this might be \code defaults: { "some property": "a value", "list property": [] } \endcode
+ * * persist is a list of property names for those properties whose values should be kept between
+ *   sessions (if this is not defined, no settings will be stored)
  * * setProperty() will set the value of the property you pass the name of
  * * getProperty() will get the value of the property you pass the name of (or the default value if
  *   none has been set explicitly by calling setProperty above)
  * * clearProperty() will clear the explicitly set value of the named property (causing a subsequent call
  *   to getProperty to return the default value). If you need it set to something empty, but have a
  *   default defined, you will need to set that explicitly.
+ *
+ * \subsection storage Data Storage
+ *
+ * Your PlayGrid has a unique area in which it is allowed to store data. You can use the saveData
+ * and loadData functions to do this. The data must be in the form of a string. We recommend json,
+ * since we generally use this internally, and there are convenient ways of dealing with the format
+ * built in to QML through the ECMAScript JSON functions, but any string data can be stored.
+ *
+ * This is stored alongside the playgrid's settings, which also mean you must avoid using the key
+ * "settings", as that is the key in which the properties are persisted to. The call will fail
+ * if you attempt to use this key for saving, and return false, but you can use loadData to see
+ * what it will return (this only happens to avoid unintentionally ruining your own playgrid).
  *
  * \section metronome The Metronome/ Beat Timer
  *
@@ -354,6 +368,16 @@ Item {
      */
     property variant defaults: {}
     /**
+     * \brief The names of the properties whose values should be saved between sessions
+     *
+     * Setting this property will ensure that any setting which matches a name in the list will be saved
+     * to disk when changed in the UI, and also loaded back from disk the next time the PlayGrid is
+     * initialised.
+     *
+     * If you leave this list empty, no properties will be saved between sessions.
+     */
+    property variant persist: []
+    /**
      * \brief A signal which is fired whenever a property changes (with property name, and new value)
      *
      * @param property The name of the property which has changed
@@ -402,8 +426,36 @@ Item {
         _private.clearProperty();
     }
 
+    /**
+     * \brief Load a string value saved to disk under a specified name
+     * @param key The name of the data you wish to retrieve
+     * @return A string containing the data contained in the specified key (an empty string if none was found)
+     */
+    function loadData(key)
+    {
+        return _private.loadData(key);
+    }
+    /**
+     * \brief Save a string value to disk under a specified name
+     *
+     * @note The key will be turned into a filesystem-safe string before attempting to save the data
+     *       to disk. This also means that if you are overly clever with naming, you may end up with
+     *       naming clashes. In other words, be sensible in naming your keys, and your behaviour will
+     *       be more predictable.
+     * @param key The name of the data you wish to store
+     * @param data The contents you wish to store, in string form
+     * @return True if successful, false if unsuccessful
+     */
+    function saveData(key, data)
+    {
+        return _private.saveData(key, data);
+    }
     Component.onCompleted: {
-        initialisationTimer.restart()
+        _private.loadSettings();
+        initialisationTimer.restart();
+    }
+    Component.onDestruction: {
+        _private.saveSettings();
     }
     Timer {
         id: initialisationTimer
@@ -459,9 +511,11 @@ Item {
                 if (Array.isArray(value) && Array.isArray(oldValue)) {
                     if (!listsEqual(value, oldValue)) {
                         component.propertyChanged(property, value);
+                        settingsSaver.restart();
                     }
                 } else if (oldValue != value) {
                     component.propertyChanged(property, value);
+                    settingsSaver.restart();
                 }
             }
         }
@@ -474,6 +528,64 @@ Item {
             newValue = getProperty(property);
             if (oldValue != newValue) {
                 component.propertyChanged(property, newValue);
+                settingsSaver.restart();
+            }
+        }
+
+        function loadData(key)
+        {
+            ensureContainer();
+            return settingsContainer.loadData(key);
+        }
+
+        function saveData(key, data)
+        {
+            var success = false;
+            if (key == "settings") {
+                ensureContainer();
+                success = settingsContainer.saveData(key, data);
+            }
+            return success;
+        }
+
+        function loadSettings()
+        {
+            ensureContainer()
+            var jsonString = settingsContainer.loadData("settings")
+            if (jsonString.length > 0) {
+                var loadedData = JSON.parse(jsonString);
+                for (var i = 0; i < component.persist.length; ++i) {
+                    var propName = component.persist[i];
+                    var oldValue = getProperty(propName);
+                    settingsContainer.clearProperty(propName);
+                    if (loadedData[propName] != undefined) {
+                        settingsContainer.setProperty(loadedData[propName]);
+                    }
+                    var newValue = getProperty(propName);
+                    if (oldValue !== newValue) {
+                        component.propertyChanged(property, newValue);
+                    }
+                }
+            }
+        }
+
+        function saveSettings()
+        {
+            ensureContainer();
+            var data = {};
+            for (var i = 0; i < component.persist.length; ++i) {
+                var propName = component.persist[i];
+                if (settingsContainer.hasProperty(propName)) {
+                    data[propName] = settingsContainer.getProperty(propName);
+                }
+            }
+            settingsContainer.saveData("settings", JSON.stringify(data));
+        }
+        property QtObject settingsSaver: Timer {
+            interval: 500
+            repeat: false
+            onTriggered: {
+                _private.saveSettings();
             }
         }
     }

@@ -7,26 +7,21 @@ import org.kde.kirigami 2.4 as Kirigami
 import Zynthian 1.0 as Zynthian
 
 Rectangle {
-    id:rectId
-    property alias rectX: rectId.x
-    property alias rectY: rectId.y
-    property alias rectWidth: rectId.width
-    property alias rectHeight: rectId.height 
+    id: rectId
     property alias imgSrc: imageId.source
     property alias text: heading.text
     signal clicked
+    property bool highlighted: false
 
-    width:rectWidth
-    height:rectHeight
-    x:rectX
-    y:rectY
-    color:"transparent"
+
+    color: highlighted ? Qt.rgba(buttonId.palette.highlight.r, buttonId.palette.highlight.g, buttonId.palette.highlight.b, 0.3) : "transparent"
 
     QQC2.Button {
-        id:buttonId
+        id: buttonId
+        z: -1
         anchors.fill: parent
         onClicked: rectId.clicked();
-    
+
         Image {
             id:imageId
             anchors.centerIn: parent

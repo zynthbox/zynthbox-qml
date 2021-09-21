@@ -95,6 +95,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 					self.zyngui.screens['preset'].select_action(i)
 					break
 		elif self.zyngui.curlayer:
+			self.zyngui.screens['preset'].set_top_sounds_engine(None)
 			for i, bank in enumerate(self.list_data):
 				if bank[2] == self.zyngui.curlayer.bank_name:
 					self.select_action(i)
@@ -104,6 +105,9 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				if preset[2] == self.zyngui.curlayer.preset_name:
 					self.zyngui.screens['preset'].select_action(i)
 					break
+		else:
+			self.zyngui.screens['preset'].set_top_sounds_engine(None)
+			self.zyngui.screens['preset'].fill_list()
 		if not bank_found:
 			self.select_action(0)
 			self.zyngui.screens['preset'].select(0)

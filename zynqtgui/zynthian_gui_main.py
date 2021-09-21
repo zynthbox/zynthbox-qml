@@ -50,6 +50,10 @@ class zynthian_gui_main(zynthian_gui_selector):
         super(zynthian_gui_main, self).__init__("Main", parent)
         self.show()
 
+    def show(self):
+        self.select(-1)
+        super().show()
+
     def fill_list(self):
         self.list_data = []
         self.list_metadata = []

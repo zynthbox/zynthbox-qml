@@ -135,7 +135,7 @@ class zynthiloops_track(QObject):
         if name != f"T{self.__id__ + 1}":
             self.__name__ = name
             self.__name_changed__.emit()
-            # self.__song__.schedule_save()
+            self.__song__.schedule_save()
 
     name = Property(str, name, set_name, notify=__name_changed__)
 

@@ -44,7 +44,7 @@ class song_arranger_cell(QObject):
 
     def current_bar_changed_handler(self):
         if self.__arranger__ is not None and self.__arranger__.isPlaying:
-            current_bar = self.__metronome_manager__.currentBar
+            current_bar = self.__metronome_manager__.currentBar + self.__arranger__.startFromBar
 
             if current_bar == self.__bar__:
                 if not self.__is_playing__:

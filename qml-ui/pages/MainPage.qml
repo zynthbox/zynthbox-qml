@@ -34,7 +34,29 @@ Zynthian.ScreenPage {
     screenId: "main"
     backAction.visible: false
 
-    contentItem:GridView {
+
+    cuiaCallback: function(cuia) {
+        switch (cuia) {
+        case "SELECT_UP":
+            mainviewGridId.moveCurrentIndexUp();
+            return true;
+        case "SELECT_DOWN":
+            mainviewGridId.moveCurrentIndexDown();
+            return true;
+        case "NAVIGATE_LEFT":
+            mainviewGridId.moveCurrentIndexLeft();
+            return true;
+        case "NAVIGATE_RIGHT":
+            mainviewGridId.moveCurrentIndexRight();
+            return true;
+        default:
+            return false;
+        }
+    }
+
+
+    contentItem: GridView {
+        id: mainviewGridId
 
         property int gridWidth: screen.width - (Kirigami.Units.gridUnit * 2) - 4
         property int gridHeight: screen.height - (Kirigami.Units.gridUnit * 8) - 4
@@ -42,18 +64,25 @@ Zynthian.ScreenPage {
         property int iconWidth: (gridWidth / 6)
         property int iconHeight:  (gridHeight / 2)
 
-        id:mainviewGridId
         width: gridWidth
         height: gridHeight
         Layout.fillWidth: true
         cellWidth:iconWidth
         cellHeight:iconHeight
+        currentIndex: zynthian.main.current_index
 
         model:zynthian.main.selector_list
         delegate: HomeScreenIcon {
-            rectWidth: mainviewGridId.iconWidth
-            rectHeight:  mainviewGridId.iconHeight
+            readonly property bool isCurrent: mainviewGridId.currentIndex === index
+            width: mainviewGridId.iconWidth
+            height:  mainviewGridId.iconHeight
             imgSrc: model.icon
+            highlighted: isCurrent
+            onIsCurrentChanged: {
+                if (isCurrent) {
+                    zynthian.main.current_index = index;
+                }
+            }
             onClicked: {
                 zynthian.main.activate_index(model.index);
                 if (model.action_id === "appimage") {

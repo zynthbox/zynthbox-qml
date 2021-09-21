@@ -45,11 +45,14 @@ QQC2.ScrollView {
     signal itemActivated(string screenId, int index)
     signal itemActivatedSecondary(string screenId, int index)
 
-    Component.onCompleted: view.forceActiveFocus()
+    Component.onCompleted: {
+        if (zynthian.current_screen_id === root.screenId) {
+            view.forceActiveFocus();
+        }
+    }
     onActiveFocusChanged: {
         if (activeFocus) {
             root.currentScreenIdRequested(root.screenId);
-            view.forceActiveFocus()
         }
     }
 

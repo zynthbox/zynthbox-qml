@@ -49,6 +49,13 @@ AbstractController {
         property real to: root.controller.ctrl ? root.controller.ctrl.max_value : 0
         property real stepSize: root.controller.ctrl ? (root.controller.ctrl.step_size === 0 ? 1 : root.controller.ctrl.step_size) : 0
 
+        function increase() {
+            root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value + multiSwitch.stepSize));
+        }
+        function decrease() {
+            root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value - multiSwitch.stepSize));
+        }
+
         Kirigami.Heading {
             id: valueLabel
             anchors.fill: parent
@@ -64,7 +71,7 @@ AbstractController {
                 bottom: parent.verticalCenter
             }
             onClicked: {
-                root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value + multiSwitch.stepSize));
+                multiSwitch.increase();
                 multiSwitch.forceActiveFocus();
             }
             Kirigami.Icon {
@@ -84,7 +91,7 @@ AbstractController {
                 bottom: parent.bottom
             }
             onClicked: {
-                root.controller.ctrl.value = Math.min(multiSwitch.to, Math.max(multiSwitch.from, multiSwitch.value - multiSwitch.stepSize));
+                multiSwitch.decrease();
                 multiSwitch.forceActiveFocus();
             }
             Kirigami.Icon {

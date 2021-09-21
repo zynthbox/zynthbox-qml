@@ -52,6 +52,11 @@ Item {
         case "SWITCH_SELECT_SHORT":
         case "SWITCH_SELECT_BOLD":
         case "SWITCH_SELECT_LONG":
+            if (focusedScope === internalStack) {
+                if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+                    Window.activeFocusItem.toggle()
+                }
+            }
             return true;
         case "NAVIGATE_LEFT":
             if (focusedScope === primaryTabsScope) {
@@ -105,6 +110,10 @@ Item {
                 var button = nextFocusItemInScope(primaryTabsScope, true);
                 if (button) {
                     button.forceActiveFocus();
+                    if (button.hasOwnProperty("checked") && button.checked) {
+                        button = nextFocusItemInScope(primaryTabsScope, true);
+                        button.forceActiveFocus();
+                    }
                     button.tabAction.trigger();
                 }
             } else if (focusedScope === internalStack) {
@@ -137,6 +146,10 @@ Item {
                 var button = nextFocusItemInScope(secondaryTabsScope, true);
                 if (button) {
                     button.forceActiveFocus();
+                    if (button.hasOwnProperty("checked") && button.checked) {
+                        button = nextFocusItemInScope(secondaryTabsScope, true);
+                        button.forceActiveFocus();
+                    }
                     button.tabAction.trigger();
                 }
             }
@@ -145,6 +158,8 @@ Item {
             if (focusedScope === internalStack) {
                 if (Window.activeFocusItem && Window.activeFocusItem.increase) {
                     Window.activeFocusItem.increase();
+                } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+                    Window.activeFocusItem.toggle()
                 }
             }
             return true;
@@ -152,6 +167,8 @@ Item {
             if (focusedScope === internalStack) {
                 if (Window.activeFocusItem && Window.activeFocusItem.decrease) {
                     Window.activeFocusItem.decrease();
+                } else if (Window.activeFocusItem && Window.activeFocusItem.toggle) {
+                    Window.activeFocusItem.toggle()
                 }
             }
             return true;
@@ -203,7 +220,7 @@ Item {
         return null;
     }
 
-    Component.onCompleted: internalStack.forceActiveFocus()
+    Component.onCompleted: Qt.callLater(primaryTabsScope.forceActiveFocus)
 
     GridLayout {
         columns: root.orientation === Qt.Horizontal ? 2 : 1
@@ -217,6 +234,16 @@ Item {
             Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 1.6
             Layout.fillHeight: root.orientation === Qt.Horizontal
             Layout.fillWidth: root.orientation !== Qt.Horizontal
+            Rectangle {
+                anchors {
+                    fill: parent
+                    margins: -1
+                }
+                color: "transparent"
+                border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
+                visible: primaryTabsScope.focus
+                radius: 3
+            }
             GridLayout {
                 id: tabsLayout
                 columns: root.orientation === Qt.Horizontal ? 1 : undefined
@@ -275,7 +302,7 @@ Item {
             Zynthian.Stack {
                 id: internalStack
                 property Zynthian.TabbedControlViewAction activeAction: root.initialAction
-                property Zynthian.TabbedControlViewAction activeSubAction: root.initialAction.children[0]
+                property Zynthian.TabbedControlViewAction activeSubAction: root.initialAction.children.length > 0 ? root.initialAction.children[0] : null
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
@@ -287,6 +314,7 @@ Item {
                 }
                 Component.onCompleted: {
                     internalStack.push(Qt.resolvedUrl(root.initialAction.page), root.initialAction.initialProperties);
+
                 }
             }
             FocusScope {
@@ -294,6 +322,16 @@ Item {
                 implicitHeight: secondaryTabLayout.implicitHeight
                 Layout.fillWidth: true
                 visible: internalStack.activeAction && internalStack.activeAction.children.length > 0
+                Rectangle {
+                    anchors {
+                        fill: parent
+                        margins: -1
+                    }
+                    color: "transparent"
+                    border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
+                    visible: secondaryTabsScope.focus
+                    radius: 3
+                }
                 RowLayout {
                     id: secondaryTabLayout
                     anchors.fill: parent
@@ -309,9 +347,20 @@ Item {
                             visible: modelData.visible
                             checkable: true
                             checked: internalStack.activeSubAction === modelData
-                            onClicked: {
-                                internalStack.replace(modelData.page, modelData.initialProperties);
-                                internalStack.activeSubAction = modelData;
+                            onCheckedChanged: {
+                                if (checked) {
+                                    modelData.trigger();
+                                }
+                            }
+                            Connections {
+                                target: modelData
+                                onTriggered: {
+                                    if (internalStack.activeSubAction === modelData) {
+                                        return;
+                                    }
+                                    internalStack.replace(modelData.page, modelData.initialProperties);
+                                    internalStack.activeSubAction = modelData;
+                                }
                             }
                         }
                     }

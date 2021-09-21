@@ -552,18 +552,22 @@ Item {
         {
             ensureContainer()
             var jsonString = settingsContainer.loadData("settings")
-            if (jsonString.length > 0) {
+//             console.log("Loading settings for " + component.name + " which has the following data available: " + jsonString);
+            if (jsonString.length > 2) { // an empty json object is just {}, so we can ignore that situation
                 var loadedData = JSON.parse(jsonString);
+                //console.log("That string was longer than 0, and parsed it becomes: " + loadedData);
                 for (var i = 0; i < component.persist.length; ++i) {
                     var propName = component.persist[i];
+                    //console.log("Resetting, and checking if it contains a value for " + propName);
                     var oldValue = getProperty(propName);
                     settingsContainer.clearProperty(propName);
                     if (loadedData[propName] != undefined) {
-                        settingsContainer.setProperty(loadedData[propName]);
+                        //console.log("It does contain a value! Let's set that to " + loadedData[propName]);
+                        settingsContainer.setProperty(propName, loadedData[propName]);
                     }
                     var newValue = getProperty(propName);
                     if (oldValue !== newValue) {
-                        component.propertyChanged(property, newValue);
+                        component.propertyChanged(propName, newValue);
                     }
                 }
             }
@@ -573,12 +577,16 @@ Item {
         {
             ensureContainer();
             var data = {};
+            //console.log("Saving settings for " + component.name);
             for (var i = 0; i < component.persist.length; ++i) {
                 var propName = component.persist[i];
+                //console.log("Checking property " + propName);
                 if (settingsContainer.hasProperty(propName)) {
                     data[propName] = settingsContainer.getProperty(propName);
+                    //console.log("Adding property to container, value is " + data[propName]);
                 }
             }
+            //console.log("Got all the settings, data is " + data + " which when stringified this becomes " + JSON.stringify(data));
             settingsContainer.saveData("settings", JSON.stringify(data));
         }
         property QtObject settingsSaver: Timer {

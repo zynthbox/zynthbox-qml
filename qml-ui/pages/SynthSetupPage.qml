@@ -101,6 +101,7 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
+        layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
         switch (cuia) {
         case "NAVIGATE_LEFT":
             var newIndex = Math.max(0, currentScreenIndex - 1);

@@ -90,6 +90,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 					self.select_action(i)
 					bank_found = True
 					break
+			self.zyngui.screens['preset'].select(-1)
 			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
 				if preset[2] == self.zyngui.curlayer.preset_name:
 					self.zyngui.screens['preset'].select_action(i)
@@ -101,6 +102,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 					self.select_action(i)
 					bank_found = True
 					break
+			self.zyngui.screens['preset'].select(-1)
 			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
 				if preset[2] == self.zyngui.curlayer.preset_name:
 					self.zyngui.screens['preset'].select_action(i)

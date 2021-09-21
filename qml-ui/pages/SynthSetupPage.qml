@@ -177,9 +177,7 @@ Zynthian.ScreenPage {
                     text: qsTr("Fav-Mode")
                     checkable: true
                     checked: zynthian.bank.show_top_sounds
-                    property bool userSelectedValue: false
                     onToggled: {
-                        userSelectedValue = checked;
                         zynthian.bank.show_top_sounds = checked;
                         zynthian.current_screen_id = "bank";
                     }
@@ -237,10 +235,8 @@ Zynthian.ScreenPage {
             onCurrent_index_validChanged: {
                 if (!zynthian.fixed_layers.current_index_valid) {
                     layerSetupDialog.open();
-                    zynthian.bank.show_top_sounds = true;
                 } else {
                     layerSetupDialog.close();
-                    zynthian.bank.show_top_sounds = favModeButton.userSelectedValue;
                 }
             }
         }
@@ -284,6 +280,15 @@ Zynthian.ScreenPage {
                         onClicked: {
                             layerSetupDialog.close();
                             newSynthWorkaroundTimer.restart()
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("Favorites...")
+                        onClicked: {
+                            layerSetupDialog.close();
+                            zynthian.bank.show_top_sounds = true;
                         }
                     }
                     Timer { //HACK why is this necessary?

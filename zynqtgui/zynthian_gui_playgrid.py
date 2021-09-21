@@ -278,9 +278,9 @@ class zynthian_gui_playgrid_settings(QObject):
     @Slot(str)
     def clearProperty(self, property:str):
         if property in self.__settings__:
-            self.__settings__.remove(property)
+            self.__settings__.pop(property)
 
-    @Slot(str)
+    @Slot(str, result=bool)
     def hasProperty(self, property:str):
         return property in self.__settings__
 
@@ -299,7 +299,7 @@ class zynthian_gui_playgrid_settings(QObject):
             # Get config file content
             try:
                 with open(confpath, encoding='utf-8') as f:
-                    data = f.readlines()
+                    data = f.read()
             except Exception as e:
                 logging.error("Failed to read data from file: %s" % e)
         return data

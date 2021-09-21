@@ -78,6 +78,11 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         super().fill_list()
 
 
+    def select(self, index=None):
+        super().select(index)
+        self.set_select_path()
+
+
     def select_action(self, i, t='S'):
         chan = self.list_data[i][1]
         self.current_index_valid_changed.emit()
@@ -167,11 +172,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     def set_select_path(self):
         self.select_path = "Layers"
-        #self.select_path_element = str(zyngui.curlayer.engine.name)
-        if self.zyngui.curlayer is None:
-            self.select_path_element = "Layers"
-        else:
-            self.select_path_element = str(self.zyngui.curlayer.midi_chan + 1)
+        self.select_path_element = str(self.list_data[self.index][1] + 1)
         super().set_select_path()
 
 #------------------------------------------------------------------------------

@@ -46,12 +46,14 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Start")
+            enabled: !arranger.isPlaying
             onTriggered: {
                 arranger.start()
             }
         },
         Kirigami.Action {
             text: qsTr("Stop")
+            enabled: arranger.isPlaying
             onTriggered: {
                 arranger.stop()
             }
@@ -211,7 +213,6 @@ Zynthian.ScreenPage {
                                                    Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5) :
                                                    Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
 
-
                                         MouseArea {
                                             anchors.fill: parent
                                             onPressed: {
@@ -229,6 +230,7 @@ Zynthian.ScreenPage {
                                                     });
 
                                                     obj.onPressed.connect(function() {
+                                                        cell.zlClip = null;
                                                         obj.destroy();
                                                     });
 

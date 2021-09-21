@@ -151,7 +151,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track_layers_snapshot = self.track_layers_snapshot()
         logging.error(track_layers_snapshot)
         self.__song__.tracksModel.getTrack(tid).set_layers_snapshot(track_layers_snapshot)
-        # self.__song__.schedule_save()
+        self.__song__.schedule_save()
 
     @Slot(int)
     def restoreLayersFromTrack(self, tid):

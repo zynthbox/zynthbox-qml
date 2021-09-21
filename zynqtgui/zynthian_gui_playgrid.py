@@ -494,6 +494,16 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def __modulation_changed__(self):
         pass
 
+    @Slot('QVariantList','QVariantList')
+    def setNotesOn(self, notes, velocities):
+        for i in range(0, len(notes)):
+            self.setNoteState(note = notes[i], velocity = velocities[i], setOn = True)
+
+    @Slot('QVariantList','QVariantList')
+    def setNotesOff(self, notes):
+        for note in notes:
+            self.setNoteState(note = note, setOn = True)
+
     @Slot(Note, int)
     def setNoteOn(self, note: Note, velocity: int = 64):
         self.setNoteState(note = note, velocity = velocity, setOn = True)

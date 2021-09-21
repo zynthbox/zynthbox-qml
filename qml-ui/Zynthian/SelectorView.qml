@@ -37,6 +37,7 @@ QQC2.ScrollView {
     property alias model: view.model
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
+    property alias highlighted: background.highlighted
 
     property string screenId
     //TODO: Bind the base selector type to qml?

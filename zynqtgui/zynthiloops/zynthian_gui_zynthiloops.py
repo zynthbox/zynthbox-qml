@@ -233,7 +233,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def newSketch(self):
+        try:
+            self.__song__.bpm_changed.disconnect()
+        except Exception as e:
+            logging.error(f"Already disconnected : {str(e)}")
+
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(None)
@@ -250,7 +256,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def loadSketch(self, sketch):
         logging.error(f"Loading sketch : {sketch}")
 
+        try:
+            self.__song__.bpm_changed.disconnect()
+        except Exception as e:
+            logging.error(f"Already disconnected : {str(e)}")
+
         self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", None, self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(None)
@@ -259,7 +271,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             sketch_folder = self.__song__.sketch_folder
             name = self.__song__.name
             self.__song__.clear_version(name)
+
+            try:
+                self.__song__.bpm_changed.disconnect()
+            except Exception as e:
+                logging.error(f"Already disconnected : {str(e)}")
+
             self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, name, self)
+            self.__song__.bpm_changed.connect(self.update_timer_bpm)
             self.__song__.schedule_save()
             self.song_changed.emit()
         except Exception as e:
@@ -294,7 +313,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(e)
 
         sketch_folder = self.__song__.sketch_folder
+
+        try:
+            self.__song__.bpm_changed.disconnect()
+        except Exception as e:
+            logging.error(f"Already disconnected : {str(e)}")
+
         self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, version, self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(str, result=bool)
@@ -380,8 +406,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.metronome_schedule_stop = True
 
     def metronome_update(self, beat):
-        logging.error(f"Metronome Update beat {beat}")
-
         self.__current_beat__ = beat
 
         # if self.countInValue > 0:

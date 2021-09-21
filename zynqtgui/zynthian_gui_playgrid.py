@@ -499,7 +499,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         for i in range(0, len(notes)):
             self.setNoteState(note = notes[i], velocity = velocities[i], setOn = True)
 
-    @Slot('QVariantList','QVariantList')
+    @Slot('QVariantList')
     def setNotesOff(self, notes):
         for note in notes:
             self.setNoteState(note = note, setOn = True)

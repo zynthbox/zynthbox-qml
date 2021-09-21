@@ -62,7 +62,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				parts = engine.split("/")
 				readable_name = engine
 				if len(parts) > 1:
-					parts[1]
+					readable_name = parts[1]
 				self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
 		else:
 			if not self.zyngui.curlayer:

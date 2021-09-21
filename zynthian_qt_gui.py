@@ -1450,7 +1450,7 @@ class zynthian_gui(QObject):
                     else:
                         screen_back = self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
 
-            else:
+            elif self.active_screen != "session_dashboard": # Session dashboard is always at the end of the back chain
                 try:
                     screen_back = self.screens[
                         self.active_screen

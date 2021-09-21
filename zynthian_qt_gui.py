@@ -333,7 +333,7 @@ class zynthian_gui(QObject):
         "93": "MODAL_MIDI_RECORDER",
         "94": "MODAL_ALSA_MIXER",
         "95": "MODAL_STEPSEQ",
-        "96": "NEXT_SCREEN",
+        "96": "NAVIGATE_RIGHT",
         "101": "LAYER_ONE",
         "102": "LAYER_TWO",
         "103": "LAYER_THREE",
@@ -1191,7 +1191,7 @@ class zynthian_gui(QObject):
         ):
             self.toggle_modal("stepseq")
 
-        elif cuia == "NEXT_SCREEN":
+        elif cuia == "NAVIGATE_RIGHT":
             screen_next = None
             # If modal screen ...
             if self.modal_screen:

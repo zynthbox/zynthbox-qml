@@ -62,6 +62,7 @@ QQC2.ScrollView {
 
     QQC2.ScrollBar.vertical.x: view.x + view.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
 
+
     ListView {
         id: view
         keyNavigationEnabled: true
@@ -72,6 +73,16 @@ QQC2.ScrollView {
         onActiveFocusChanged: {
             if (activeFocus) {
                 root.currentScreenIdRequested(root.screenId);
+            }
+        }
+
+        Connections {
+            id: focusConnection
+            target: zynthian
+            onCurrent_screen_idChanged: {
+                if (zynthian.current_screen_id === root.screenId) {
+                    view.forceActiveFocus();
+                }
             }
         }
 

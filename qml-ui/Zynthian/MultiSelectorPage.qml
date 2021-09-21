@@ -38,6 +38,22 @@ ScreenPage {
     property var screenIds: []
     property var screenTitles: []
 
+    cuiaCallback: function(cuia) {
+        let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
+        switch (cuia) {
+        case "NAVIGATE_LEFT":
+            var newIndex = Math.max(0, currentScreenIndex - 1);
+            zynthian.current_screen_id = root.screenIds[newIndex];
+            return true;
+        case "NAVIGATE_RIGHT":
+            var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
+            zynthian.current_screen_id = root.screenIds[newIndex];
+            return true;
+        default:
+            return false;
+        }
+    }
+
     bottomPadding: Kirigami.Units.gridUnit
     Component.onCompleted: focusConnection.syncFocus()
 
@@ -46,27 +62,6 @@ ScreenPage {
             focusConnection.syncFocus();
         }
     }
-
-    data: [
-        Connections {
-            id: focusConnection
-            target: zynthian
-            function syncFocus() {
-                var i
-                for (i in layout.children) {
-                    let child = layout.children[i];
-                    if (child.hasOwnProperty("view")
-                        && (child.view.screenId === zynthian.current_screen_id
-                            || child.view.screenId === zynthian.current_modal_screen_id
-                            || (zynthian.current_screen_id === "layer" && child.view.screenId === "fixed_layers"))) {
-                        child.view.forceActiveFocus();
-                    }
-                }
-            }
-            onCurrent_screen_idChanged: syncFocus()
-            onCurrent_modal_screen_idChanged: syncFocus()
-        }
-    ]
 
     contentItem: RowLayout {
         id: layout

@@ -69,9 +69,9 @@ Kirigami.AbstractApplicationWindow {
             spacing: 0
             Zynthian.BreadcrumbButton {
                 id: homeButton
-                implicitWidth: height
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("Home")
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = 'session_dashboard'
                 onPressAndHold: zynthian.current_screen_id = 'main'

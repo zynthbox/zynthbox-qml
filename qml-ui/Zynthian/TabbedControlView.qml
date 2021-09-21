@@ -53,9 +53,7 @@ Item {
         case "SWITCH_SELECT_BOLD":
         case "SWITCH_SELECT_LONG":
             return true;
-        case "SWITCH_BACK_SHORT":
-        case "SWITCH_BACK_BOLD":
-        case "SWITCH_BACK_LONG":
+        case "NAVIGATE_LEFT":
             if (focusedScope === primaryTabsScope) {
                 return false;
             } else if (focusedScope === internalStack) {
@@ -127,7 +125,7 @@ Item {
             }
 
             return true;
-        case "NEXT_SCREEN":
+        case "NAVIGATE_RIGHT":
             if (focusedScope === primaryTabsScope) {
                 internalStack.forceActiveFocus()
             } else if (focusedScope === internalStack) {

@@ -98,6 +98,24 @@ Zynthian.ScreenPage {
         }
     ]
 
+
+    cuiaCallback: function(cuia) {
+        let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
+        switch (cuia) {
+        case "NAVIGATE_LEFT":
+            var newIndex = Math.max(0, currentScreenIndex - 1);
+            zynthian.current_screen_id = root.screenIds[newIndex];
+            return true;
+        case "NAVIGATE_RIGHT":
+            var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
+            zynthian.current_screen_id = root.screenIds[newIndex];
+            return true;
+        default:
+            return false;
+        }
+    }
+
+
     property var screenIds: ["fixed_layers", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
@@ -109,7 +127,9 @@ Zynthian.ScreenPage {
     }
 
     contentItem: RowLayout {
+        id: layout
         spacing: Kirigami.Units.gridUnit
+
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true

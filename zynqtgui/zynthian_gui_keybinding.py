@@ -77,9 +77,9 @@ class zynthian_gui_keybinding(QObject):
 			"SWITCH_SELECT_SHORT": { "modifier": 0, "keysym": "Return" },
 			"SWITCH_SELECT_BOLD": { "modifier": 1, "keysym": "Return" },
 			"SWITCH_SELECT_LONG": { "modifier": 4, "keysym": "Return" },
-			"SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape, Left" },
-			"SWITCH_BACK_BOLD": { "modifier": 1, "keysym": "BackSpace, Escape, Left" },
-			"SWITCH_BACK_LONG": { "modifier": 4, "keysym": "BackSpace, Escape, Left" },
+			"SWITCH_BACK_SHORT": { "modifier": 0, "keysym": "BackSpace, Escape" },
+			"SWITCH_BACK_BOLD": { "modifier": 1, "keysym": "BackSpace, Escape" },
+			"SWITCH_BACK_LONG": { "modifier": 4, "keysym": "BackSpace, Escape" },
 			"SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
 			"SWITCH_LAYER_BOLD": { "modifier": 1, "keysym": "l" },
 			"SWITCH_LAYER_LONG": { "modifier": 4, "keysym": "l" },
@@ -113,7 +113,8 @@ class zynthian_gui_keybinding(QObject):
 			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
 			# Added in QML version
-			"NEXT_SCREEN": { "modifier": 0, "keysym": "Right" },
+			"NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
+			"NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
 
 			"LAYER_ONE": { "modifier": 0, "keysym": "1" },
 			"LAYER_TWO": { "modifier": 0, "keysym": "2" },

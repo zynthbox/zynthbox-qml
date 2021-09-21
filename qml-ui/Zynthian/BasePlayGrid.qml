@@ -68,6 +68,7 @@ import Zynthian 1.0 as Zynthian
  * * getNote: Fetches an object which represents a specific midi note
  * * getCompoundNote: Fetches an object which represents multiple midi notes
  * * setNoteOn/setNoteOff: Turns the note passed to the function on or off
+ * * setNotesOn/setNotesOff: As above, except they work with multiple notes for convenience
  *
  * @note When fetching your model, you can use the `rows` property to check whether it has already
  * been filled (which can save considerable resources by avoiding filling an already filled model)

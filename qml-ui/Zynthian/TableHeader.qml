@@ -40,11 +40,24 @@ QQC2.AbstractButton {
     Layout.fillHeight: true
 
     property alias subText: contents.text2
+    property alias iconSource: icon.source
 
-    contentItem: TableHeaderLabel {
-        id: contents
-        text: root.text
-        text2: root.subText
+    contentItem: Item {
+        Kirigami.Icon {
+            id: icon
+
+            anchors.centerIn: parent
+            width: 18
+            height: 18
+            color: "white"
+        }
+
+        TableHeaderLabel {
+            id: contents
+            anchors.centerIn: parent
+            text: root.text
+            text2: root.subText
+        }
     }
 
     onPressed: root.forceActiveFocus();

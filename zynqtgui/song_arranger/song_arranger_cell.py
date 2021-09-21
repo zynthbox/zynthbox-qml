@@ -3,17 +3,19 @@ import logging
 from PySide2.QtCore import Property, QObject, Signal
 
 from zynqtgui.zynthiloops import zynthian_gui_zynthiloops
+from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
 
 
 class song_arranger_cell(QObject):
-    def __init__(self, bar, metronome_manager, track=None):
+    def __init__(self, bar, metronome_manager, track, arranger):
         super(song_arranger_cell, self).__init__(track)
 
         self.__bar__ = bar
-        self.__zl_clip__ = None
+        self.__zl_clip__: zynthiloops_clip = None
         self.__metronome_manager__: zynthian_gui_zynthiloops = metronome_manager
         self.__is_playing__ = False
         self.__track__ = track
+        self.__arranger__ = arranger
 
         self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)
 
@@ -41,14 +43,17 @@ class song_arranger_cell(QObject):
     ### END Property isPlaying
 
     def current_bar_changed_handler(self):
-        current_bar = self.__metronome_manager__.currentBar
-        logging.error(f"Cell Current Bar : {current_bar}")
+        if self.__arranger__ is not None and self.__arranger__.isPlaying:
+            current_bar = self.__metronome_manager__.currentBar
+            logging.error(f"Cell Current Bar : {current_bar}")
 
-        if current_bar == self.__bar__:
-            if not self.__is_playing__:
-                self.__is_playing__ = True
-                self.is_playing_changed.emit()
-        else:
-            if self.__is_playing__:
-                self.__is_playing__ = False
-                self.is_playing_changed.emit()
+            if current_bar == self.__bar__:
+                if not self.__is_playing__:
+                    if self.__zl_clip__ is not None:
+                        self.__zl_clip__.play_audio(False)
+                    self.__is_playing__ = True
+                    self.is_playing_changed.emit()
+            else:
+                if self.__is_playing__:
+                    self.__is_playing__ = False
+                    self.is_playing_changed.emit()

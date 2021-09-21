@@ -623,3 +623,11 @@ class zynthiloops_clip(QObject):
             return str(wav_dir)
         else:
             return self.__song__.sketch_folder
+
+    def play_audio(self, loop=True):
+        if self.audioSource is not None:
+            self.audioSource.play(loop)
+
+    def stop_audio(self):
+        if self.audioSource is not None:
+            self.audioSource.stop()

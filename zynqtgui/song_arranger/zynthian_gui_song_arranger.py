@@ -40,6 +40,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__sketch__ = None
         self.__tracks_model__ = None
         self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.zynthiloops
+        self.__is_playing__ = False
 
         self.generate_tracks_model()
 
@@ -57,13 +58,24 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     tracksModel = Property(QObject, get_tracksModel, notify=tracks_model_changed)
     ### END Property tracksModel
 
+    ### Property isPlaying
+    def get_is_playing(self):
+        return self.__is_playing__
+    is_playing_changed = Signal()
+    isPlaying = Property(int, get_is_playing, notify=is_playing_changed)
+    ### END Property isPlaying
+
     @Slot(None)
     def start(self):
         self.__metronome_manager__.start_metronome_request()
+        self.__is_playing__ = True
+        self.is_playing_changed.emit()
 
     @Slot(None)
     def stop(self):
         self.__metronome_manager__.stop_metronome_request()
+        self.__is_playing__ = False
+        self.is_playing_changed.emit()
 
     def generate_tracks_model(self):
         logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
@@ -89,7 +101,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
             self.__tracks_model__.add_track(track)
 
             for j in range(self.__bars__):
-                cell = song_arranger_cell(j, self.__metronome_manager__, track)
+                cell = song_arranger_cell(j, self.__metronome_manager__, track, self)
                 track.cellsModel.add_cell(cell)
 
         self.tracks_model_changed.emit()

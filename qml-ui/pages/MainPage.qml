@@ -41,7 +41,11 @@ Zynthian.ScreenPage {
             mainviewGridId.moveCurrentIndexUp();
             return true;
         case "SELECT_DOWN":
-            mainviewGridId.moveCurrentIndexDown();
+            if (mainviewGridId.currentIndex === -1) {
+                mainviewGridId.currentIndex = 0;
+            } else {
+                mainviewGridId.moveCurrentIndexDown();
+            }
             return true;
         case "NAVIGATE_LEFT":
             mainviewGridId.moveCurrentIndexLeft();

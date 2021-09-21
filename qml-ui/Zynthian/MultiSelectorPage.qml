@@ -61,13 +61,6 @@ ScreenPage {
     }
 
     bottomPadding: Kirigami.Units.gridUnit
-    Component.onCompleted: focusConnection.syncFocus()
-
-    onFocusChanged: {
-        if (focus) {
-            focusConnection.syncFocus();
-        }
-    }
 
     contentItem: RowLayout {
         id: layout

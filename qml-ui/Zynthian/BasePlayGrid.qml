@@ -316,6 +316,26 @@ Item {
         zynthian.playgrid.setNoteOff(note);
     }
     /**
+     * \brief Turn a list of notes on, with the specified velocities
+     *
+     * @param notes A list of notes
+     * @param velocities A list of velocities (must be equal length to notes)
+     */
+    function setNotesOn(notes, velocities)
+    {
+        zynthian.setNotesOn(notes, velocities);
+    }
+    /**
+     * \brief Turn a list of notes off
+     *
+     * @param notes A list of notes
+     */
+    function setNotesOff(notes)
+    {
+        zynthian.playgrid.setNotesOff(notes);
+    }
+
+    /**
      * \brief Get a note object representing the midi note passed to it
      *
      * @param midiNote The midi note you want an object representation of

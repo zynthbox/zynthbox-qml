@@ -122,7 +122,7 @@ Item {
                     var newIndex = Number(layoutInfo.position) + layoutInfo.layout.columns;
                     if (newIndex < layoutInfo.layout.children.length) {
                         layoutInfo.layout.children[newIndex].forceActiveFocus();
-                    } else {
+                    } else if (secondaryTabLayout.children.length > 2) {
                         secondaryTabsScope.forceActiveFocus();
                     }
                 } else {
@@ -201,17 +201,21 @@ Item {
                 && candidate.parent instanceof GridLayout) {
                 let layout = candidate.parent;
                 let index = -1;
+                let partialIndex = 0;
+                let layoutItem = null;
                 var i;
                 for (i in layout.children) {
                     let child = layout.children[i];
                     if (child === candidate) {
-                        index = i;
+                        index = partialIndex;
+                        layoutItem = child;
                         break;
                     }
+                    partialIndex += Math.max(child.Layout.columnSpan, 1)
                 }
 
                 if (index >= 0) {
-                    return {"layout": layout, "position": index};
+                    return {"layout": layout, "position": index, "layoutItem": layoutItem};
                 } else {
                     return null;
                 }

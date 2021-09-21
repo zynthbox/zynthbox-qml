@@ -41,6 +41,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__tracks_model__ = None
         self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.zynthiloops
         self.__is_playing__ = False
+        self.__start_from_bar__ = 0
 
         self.generate_tracks_model()
 
@@ -64,6 +65,16 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     is_playing_changed = Signal()
     isPlaying = Property(int, get_is_playing, notify=is_playing_changed)
     ### END Property isPlaying
+
+    ### Property startFromBar
+    def get_start_from_bar(self):
+        return self.__start_from_bar__
+    def set_start_from_bar(self, start):
+        self.__start_from_bar__ = start
+        self.start_from_bar_changed.emit()
+    start_from_bar_changed = Signal()
+    startFromBar = Property(int, get_start_from_bar, set_start_from_bar, notify=start_from_bar_changed)
+    ### END Property startFromBar
 
     @Slot(None)
     def start(self):

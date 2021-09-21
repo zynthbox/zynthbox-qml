@@ -85,6 +85,48 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             spacing: 1
 
+            // STATUS ROW
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: privateProps.headerHeight/1.5
+                Layout.maximumHeight: privateProps.headerHeight/1.5
+                spacing: 1
+
+                Zynthian.TableHeader {
+                    id: statusCell
+                    Layout.preferredWidth: privateProps.headerWidth
+                    Layout.maximumWidth: privateProps.headerWidth
+                    Layout.fillHeight: true
+
+                    text: "Start : "+(arranger.startFromBar+1)+".1"
+                }
+
+                ListView {
+                    id: statusHeaderRow
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    clip: true
+                    spacing: 1
+                    contentX: cellGridFlickable.contentX
+                    orientation: Qt.Horizontal
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    model: root.arranger.bars
+
+                    delegate: Zynthian.TableHeader {
+                        iconSource: modelData === arranger.startFromBar
+                                        ? "media-playback-start"
+                                        : ""
+
+                        width: privateProps.cellWidth
+                        height: ListView.view.height
+                    }
+                }
+            }
+            // END STATUS ROW
+
             // HEADER ROW
             RowLayout {
                 Layout.fillWidth: true
@@ -129,6 +171,13 @@ Zynthian.ScreenPage {
                         onPressed: {
                             sideBar.controlType = SideBar.ControlType.None;
                             sideBar.controlObj = null;
+
+                            if (arranger.startFromBar === modelData) {
+                                arranger.startFromBar = 0
+                            }
+                            else {
+                                arranger.startFromBar = modelData;
+                            }
                         }
                     }
                 }

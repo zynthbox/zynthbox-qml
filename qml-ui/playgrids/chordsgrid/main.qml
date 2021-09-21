@@ -149,19 +149,21 @@ Zynthian.BasePlayGrid {
 
     onPropertyChanged: {
         //console.log("A property named " + property + " has changed to " + value)
-        var changed = true;
+        var gridContentsChanged = true;
         if (property === "chordRows"){
-            component.chordRows = value;
+            _private.chordRows = value;
         } else if (property === "chordScales") {
-            component.chordScales = value;
+            _private.chordScales = value;
         } else if (property === "miniChordScales") {
-            component.miniChordScales = value;
+            _private.miniChordScales = value;
         } else if (property === "positionalVelocity"){
-            component.positionalVelocity = value;
+            _private.positionalVelocity = value;
+            // This one is a runtime thing, so...
+            gridContentsChanged = false;
         } else {
-            changed = false;
+            gridContentsChanged = false;
         }
-        if (changed) {
+        if (gridContentsChanged) {
             populateGridTimer.restart()
         }
     }
@@ -203,7 +205,7 @@ Zynthian.BasePlayGrid {
                 model: [3, 4, 5]
                 currentIndex: {
                     for (var i = 0; i < count; ++i) {
-                        if (component.chordRows === model[i]) {
+                        if (_private.chordRows === model[i]) {
                             return i;
                         }
                     }
@@ -222,7 +224,7 @@ Zynthian.BasePlayGrid {
                     textRole: "text"
                     displayText: currentText
                     currentIndex: {
-                        var theScale = component.chordScales[repeaterIndex];
+                        var theScale = _private.chordScales[repeaterIndex];
                         for (var i = 0; i < count; ++i) {
                             if (scaleModel.get(i).scale === theScale) {
                                 return i;
@@ -231,7 +233,7 @@ Zynthian.BasePlayGrid {
                         return 0;
                     }
                     onActivated: {
-                        var chordScales = component.chordScales;
+                        var chordScales = _private.chordScales;
                         chordScales[repeaterIndex] =  scaleModel.get(currentIndex).scale;
                         component.setProperty("chordScales", chordScales)
                     }
@@ -247,7 +249,7 @@ Zynthian.BasePlayGrid {
                     textRole: "text"
                     displayText: currentText
                     currentIndex: {
-                        var theScale = component.miniChordScales[repeaterIndex];
+                        var theScale = _private.miniChordScales[repeaterIndex];
                         for (var i = 0; i < count; ++i) {
                             if (scaleModel.get(i).scale === theScale) {
                                 return i;
@@ -256,7 +258,7 @@ Zynthian.BasePlayGrid {
                         return 0;
                     }
                     onActivated: {
-                        var miniChordScales = component.miniChordScales;
+                        var miniChordScales = _private.miniChordScales;
                         miniChordScales[repeaterIndex] =  scaleModel.get(currentIndex).scale;
                         component.setProperty("miniChordScales", miniChordScales)
                     }
@@ -265,9 +267,9 @@ Zynthian.BasePlayGrid {
             QQC2.Switch {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: component.positionalVelocity
+                checked: _private.positionalVelocity
                 onClicked: {
-                    component.setProperty("positionalVelocity", !component.positionalVelocity)
+                    component.setProperty("positionalVelocity", !_private.positionalVelocity)
                 }
             }
         }

@@ -132,7 +132,7 @@ Zynthian.BasePlayGrid {
 
     onPropertyChanged: {
         //console.log("A property named " + property + " has changed to " + value);
-        var changed = true;
+        var gridContentsChanged = true;
         if (property === "startingNote") {
             component.startingNote = value;
         } else if (property === "scale") {
@@ -143,10 +143,11 @@ Zynthian.BasePlayGrid {
             component.columns = value;
         } else if (property === "positionalVelocity") {
             component.positionalVelocity = value;
+            gridContentsChanged = false;
         } else {
-            changed = false;
+            gridContentsChanged = false;
         }
-        if (changed) {
+        if (gridContentsChanged) {
             populateGridTimer.restart()
         }
     }

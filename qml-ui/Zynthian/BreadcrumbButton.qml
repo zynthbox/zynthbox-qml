@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
-QQC2.ToolButton {
+QQC2.Button {
     id: root
     Layout.fillHeight: true
     rightPadding: breadcrumbSeparator.width + Kirigami.Units.largeSpacing

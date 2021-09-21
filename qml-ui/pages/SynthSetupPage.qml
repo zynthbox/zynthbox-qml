@@ -184,12 +184,21 @@ Zynthian.ScreenPage {
                 }
             }
             Zynthian.SelectorView {
+                id: bankView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "bank"
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                delegate: Zynthian.SelectorDelegate {
+                    text: model.display === "None" ? qsTr("Single") : model.display
+                    screenId: bankView.screenId
+                    selector: bankView.selector
+                    onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
+                    onItemActivated: bankView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
+                }
             }
         }
         ColumnLayout {

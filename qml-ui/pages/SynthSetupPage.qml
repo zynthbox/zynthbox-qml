@@ -110,6 +110,12 @@ Zynthian.ScreenPage {
             var newIndex = Math.min(root.screenIds.length - 1, currentScreenIndex + 1);
             zynthian.current_screen_id = root.screenIds[newIndex];
             return true;
+        case "SWITCH_BACK_SHORT":
+        case "SWITCH_BACK_BOLD":
+        case "SWITCH_BACK_LONG":
+            zynthian.current_screen_id = "fixed_layers";
+            zynthian.go_back();
+            return true;
         default:
             return false;
         }

@@ -124,4 +124,4 @@ class zynthiloops_tracks_model(QAbstractListModel):
                 clip = clipsModel.getClip(clip_index)
                 clip.set_row_index(index)
 
-        # self.__song__.schedule_save()
+        self.__song__.schedule_save()

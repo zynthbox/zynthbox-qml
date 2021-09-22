@@ -163,10 +163,12 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			layer.wait_stop_loading()
 			#Load bank list and set bank
 			try:
+				layer.wait_stop_loading()
 				layer.bank_name=sound['bank']	#tweak for working with setbfree extended config!! => TODO improve it!!
 				layer.load_bank_list()
 				layer.bank_name=None
 				layer.set_bank_by_name(sound['bank'])
+				layer.wait_stop_loading()
 
 			except Exception as e:
 				logging.warning("Invalid Bank on layer {}: {}".format(layer.get_basepath(), e))
@@ -177,13 +179,17 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			#Load preset list and set preset
 			layer.load_preset_list()
 			layer.preset_name = None
+			layer.preload_info = True
 			layer.preset_loaded = layer.set_preset_by_name(sound['preset'])
+			layer.refresh_controllers()
 			self.zyngui.layer_control(layer)
 			self.zyngui.screens['layer'].fill_list()
 			self.show()
 			self.zyngui.stop_loading()
 			self.__select_in_progess = False
 			self.zyngui.screens['bank'].set_select_path()
+			self.zyngui.screens['control'].show()
+			self.set_select_path()
 			return
 
 		if t=='S':
@@ -195,11 +201,13 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.update_list()
 			self.zyngui.screens['bank'].fill_list()
 		self.__select_in_progess = False
+		self.set_select_path()
 
 
 
 	def select(self, index=None):
 		super().select(index)
+		self.set_select_path()
 		self.current_is_favorite_changed.emit()
 
 
@@ -333,7 +341,22 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		return "bank"
 
 	def preselect_action(self):
-		return self.zyngui.curlayer.preload_preset(self.index)
+		if self.index < 0 or self.index >= len(self.list_data):
+			return False
+		if self.__top_sounds_engine == None:
+			return self.zyngui.curlayer.preload_preset(self.index)
+		else:
+			mapped_index = -1
+			for i in range(len(self.zyngui.curlayer.preset_list)):
+				name_i=self.zyngui.curlayer.preset_list[i][2]
+				try:
+					if name_i[0] == '*':
+						name_i = name_i[1:]
+					if preset_name == name_i:
+						return self.zyngui.curlayer.preload_preset(i)
+				except:
+					return False
+
 
 
 	def restore_preset(self):

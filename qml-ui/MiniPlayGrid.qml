@@ -132,24 +132,28 @@ RowLayout {
                             }
                             color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                         }
-                        Rectangle {
+                        Item {
                             anchors {
-                                left: parent.right
-                                bottom: parent.top
-                                bottomMargin: -Kirigami.Units.largeSpacing
+                                left: parent.horizontalCenter
+                                verticalCenter: parent.verticalCenter
                             }
+                            transformOrigin: Item.Left
+                            width: parent.width / 2 + Kirigami.Units.smallSpacing
                             rotation: -45
-                            transformOrigin: Item.BottomLeft
-                            height: slideDelegateLabel.height + Kirigami.Units.smallSpacing * 2
-                            width: slideDelegateLabel.width + Kirigami.Units.smallSpacing * 2
-                            radius: height / 2
-                            color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                            Rectangle {
+                                anchors {
+                                    fill: slideDelegateLabel
+                                    margins: -Kirigami.Units.smallSpacing
+                                }
+                                radius: height / 2
+                                color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                            }
                             QQC2.Label {
                                 id: slideDelegateLabel
                                 anchors {
                                     verticalCenter: parent.verticalCenter
                                     left: parent.left
-                                    margins: Kirigami.Units.smallSpacing
+                                    leftMargin: parent.width
                                 }
                                 text: slideDelegate.playGrid.name
                                 color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor

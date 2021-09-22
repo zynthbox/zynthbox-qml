@@ -79,12 +79,6 @@ Zynthian.ScreenPage {
                     zynthian.zynthiloops.newSketch()
                 }
             }
-//            Kirigami.Action {
-//                text: qsTr("Clear Sketch")
-//                onTriggered: {
-//                    zynthian.zynthiloops.clearSketchVersion()
-//                }
-//            }
         },
         Kirigami.Action {
             text: qsTr("Add Track")

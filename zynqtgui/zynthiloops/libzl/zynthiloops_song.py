@@ -63,6 +63,7 @@ class zynthiloops_song(QObject):
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
+        self.__name__ = name
 
         if not self.restore():
             # Add default parts
@@ -76,7 +77,6 @@ class zynthiloops_song(QObject):
                 track.clipsModel.add_clip(clip)
                 #self.add_clip_to_part(clip, i)
 
-        self.name = name
         self.bpm_changed.emit()
 
     def serialize(self):
@@ -87,28 +87,13 @@ class zynthiloops_song(QObject):
                 "parts": self.__parts_model__.serialize()}
 
     def save(self):
-        obj = {}
-
-        try:
-            with open(self.sketch_folder + self.sketch_filename, "r") as f:
-                obj = json.loads(f.read())
-        except Exception as e:
-            logging.error(e)
+        filename = self.__name__ + ".json"
 
         try:
             Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
 
-            with open(self.sketch_folder + self.sketch_filename, "w") as f:
-                obj["selected_version"] = f"{self.__name__}"
-
-                if "versions" in obj:
-                    obj["versions"][f"{self.__name__}"] = self.serialize()
-                else:
-                    obj["versions"] = {
-                        f"{self.__name__}": self.serialize()
-                    }
-
-                f.write(json.dumps(obj))
+            with open(self.sketch_folder + filename, "w") as f:
+                f.write(json.dumps(self.serialize()))
         except Exception as e:
             logging.error(e)
 
@@ -117,13 +102,13 @@ class zynthiloops_song(QObject):
     def schedule_save(self):
         self.__save_timer__.start()
 
-
     def restore(self):
+        filename = self.__name__ + ".json"
+
         try:
-            logging.error(f"Restoring {self.sketch_folder + self.sketch_filename}")
-            with open(self.sketch_folder + self.sketch_filename, "r") as f:
-                obj = json.loads(f.read())
-                sketch = obj["versions"][obj["selected_version"]]
+            logging.error(f"Restoring {self.sketch_folder + filename}")
+            with open(self.sketch_folder + filename, "r") as f:
+                sketch = json.loads(f.read())
 
                 if "name" in sketch:
                     self.__name__ = sketch["name"]
@@ -142,36 +127,6 @@ class zynthiloops_song(QObject):
         except Exception as e:
             logging.error(e)
             return False
-
-    def clear_version(self, name):
-        obj = {}
-
-        try:
-            with open(self.sketch_folder + self.sketch_filename, "r") as f:
-                obj = json.loads(f.read())
-        except Exception as e:
-            logging.error(e)
-
-        try:
-            with open(self.sketch_folder + self.sketch_filename, "w") as f:
-                del obj["versions"][f"{name}"]
-
-                f.write(json.dumps(obj))
-        except Exception as e:
-            logging.error(e)
-
-    def destroy(self):
-        for i in range(0, self.tracksModel.count):
-            clipsModel = self.tracksModel.getTrack(i).clipsModel
-
-            for clip_index in range(0, clipsModel.count):
-                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-
-                logging.error(f"Destroying clip({clip})")
-                clip.destroy()
-
-        os.remove(self.sketch_folder + self.sketch_filename)
-        self.deleteLater()
 
     @Slot(int, int, result=QObject)
     def getClip(self, track: int, part: int):
@@ -218,16 +173,7 @@ class zynthiloops_song(QObject):
         pass
 
     def get_versions(self):
-        versions = []
-
-        try:
-            f = open(self.sketch_folder + self.sketch_filename, "r")
-            obj = json.loads(f.read())
-
-            for name, sketch in obj["versions"].items():
-                versions.append(name)
-        except Exception as e:
-            logging.error(e)
+        versions = [f.name for f in Path(self.sketch_folder).glob("*.json") if f.name != "sketch.json"]
 
         return versions
 

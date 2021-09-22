@@ -42,6 +42,7 @@ import Zynthian 1.0 as Zynthian
  * A PlayGrid has a number of basic properties that you will need to set for it to be useful:
  *
  * * name: The name of your playgrid
+ * * icon: A small graphic used to represent your playgrid
  * * grid: The component which is used in the PlayGrid section to paint the main area
  * * miniGrid: The component which is used in the popup mini grid
  * * settings: The component used to display settings to the user in the main PlayGrid section's settings dialog
@@ -131,12 +132,19 @@ Item {
     id: component
 
     /**
-     * \brief The human-facing name of your PlayGrid (shown anywhere the grid is referred to in the UI)
+     * \brief The human-facing name of your playgrid (shown anywhere the grid is referred to in the UI)
      *
      * You should not make this overly long or awkward, as it is used as the visual identifier by your user.
      * Clever is fine, but always remember: unique is not a selling point in its own right.
      */
     property string name
+    /**
+     * \brief An icon used to represent the playgrid in the UI (in places where an icon makes sense)
+     *
+     * Either the name of an icon, as available on Zynthian, or the local filesystem location of one.
+     * If you don't set one, this will default to using a generic grid styled icon
+     */
+    property string icon: "view-grid-symbolic"
     /**
      * \brief A component which is used for the large grid (in the PlayGrid section of Zynthian)
      *

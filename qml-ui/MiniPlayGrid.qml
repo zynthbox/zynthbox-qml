@@ -27,6 +27,7 @@ import QtQuick 2.11
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Window 2.1
+import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -101,6 +102,15 @@ RowLayout {
                 }
                 color: Kirigami.Theme.backgroundColor
             }
+            Rectangle {
+                id: slideDelegateIconMask
+                anchors {
+                    fill: parent
+                    margins: Kirigami.Units.largeSpacing
+                }
+                radius: width / 2
+                visible: false
+            }
             Row {
                 anchors {
                     top: parent.top
@@ -133,6 +143,17 @@ RowLayout {
                                 color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                             }
                             color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                        }
+                        Kirigami.Icon {
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing
+                            }
+                            source: playGrid.icon
+                            layer.enabled: true
+                            layer.effect: OpacityMask {
+                                maskSource: slideDelegateIconMask
+                            }
                         }
                         Item {
                             anchors {

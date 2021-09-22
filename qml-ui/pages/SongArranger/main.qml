@@ -166,7 +166,10 @@ Zynthian.ScreenPage {
                         text: modelData%4 === 0 ? (modelData+1) : ""
 
                         width: privateProps.cellWidth
-                        height: ListView.view.height
+                        height: ListView.view.height                        
+                        color: arranger.isPlaying && arranger.playingBar === modelData
+                                ? "#888888"
+                                : null
 
                         onPressed: {
                             sideBar.controlType = SideBar.ControlType.None;
@@ -236,7 +239,7 @@ Zynthian.ScreenPage {
                     contentY: tracksHeaderColumns.contentY
 
                     Item {
-                        GridLayout {
+                        Grid {
                             id: cellGrid
                             columns: root.arranger.bars
                             rowSpacing: 1
@@ -248,36 +251,25 @@ Zynthian.ScreenPage {
                                 delegate: Repeater {
                                     model: track.cellsModel
 
-                                    delegate: Rectangle {
-                                        id: clipCell
+                                    delegate: Item {
+                                        width: privateProps.cellWidth
+                                        height: privateProps.cellHeight
+                                        z: root.arranger.bars - cell.bar
 
-                                        Layout.preferredWidth: privateProps.cellWidth
-                                        Layout.maximumWidth: privateProps.cellWidth
-                                        Layout.preferredHeight: privateProps.cellHeight
-                                        Layout.maximumHeight: privateProps.cellHeight
+                                        ClipCell {
+                                            id: clipCell
 
-                                        color: cell.isPlaying ?
-                                                   Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5) :
-                                                   Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+                                            zlClip: cell.zlClip
 
-                                        Component.onCompleted: {
-                                            drawZlClipCell(clipCell, cell);
-                                        }
+                                            width: cellGrid.calculateCellWidth(cell.zlClip)
+                                            height: privateProps.cellHeight
 
-                                        Connections {
-                                            target: cell
-                                            onZlClipChanged: {
-                                                console.log("###### Clip changed", cell, cell.zlClip)
-
-                                                drawZlClipCell(clipCell, cell);
-                                            }
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
                                             onPressed: {
-                                                if (track.selectedClip) {
-                                                    console.log("###### Setting Clip to cell", cell)
+                                                if (cell.zlClip) {
+                                                    // Clip already selected. Remove clip.
+                                                    cell.zlClip = null;
+                                                } else if (track.selectedClip) {
+                                                    // No clips selected. Add clip
                                                     cell.zlClip = track.selectedClip;
                                                 }
                                             }
@@ -295,12 +287,6 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-
-                        Item {
-                            id: zlClipsContainer
-                            width: cellGrid.width
-                            height: cellGrid.height
-                        }
                     }
                 }
             }
@@ -312,32 +298,6 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 7
             Layout.fillWidth: false
             Layout.fillHeight: true
-        }
-    }
-
-    function drawZlClipCell(clipCell, cell) {
-        if (cell.zlClip) {
-            console.log("### Drawing clip cell at ", clipCell.x, clipCell.y, " for cell ", clipCell);
-
-            var component = Qt.createComponent("ClipCell.qml");
-            var obj = component.createObject(zlClipsContainer, {
-                "width": cellGrid.calculateCellWidth(cell.zlClip),
-                "height": privateProps.cellHeight,
-                "zlClip": cell.zlClip,
-                "x": clipCell.x,
-                "y": clipCell.y,
-                "z": 9999
-            });
-
-            obj.onPressed.connect(function() {
-                cell.zlClip = null;
-                obj.destroy();
-            });
-
-            if (obj === null) {
-                // Error Handling
-                console.log("Error creating object");
-            }
         }
     }
 }

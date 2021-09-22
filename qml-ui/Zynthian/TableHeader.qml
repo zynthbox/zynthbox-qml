@@ -41,6 +41,7 @@ QQC2.AbstractButton {
 
     property alias subText: contents.text2
     property alias iconSource: icon.source
+    property var color
 
     contentItem: Item {
         Kirigami.Icon {
@@ -70,6 +71,6 @@ QQC2.AbstractButton {
         border.width: root.activeFocus ? 1 : 0
         border.color: Kirigami.Theme.highlightColor
 
-        color: Kirigami.Theme.backgroundColor
+        color: root.color ? root.color : Kirigami.Theme.backgroundColor
     }
 }

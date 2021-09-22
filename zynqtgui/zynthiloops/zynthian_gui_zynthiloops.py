@@ -252,7 +252,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
         shutil.copy(self.__sketch_basepath__ / name / (self.__song__.name + ".json"), self.__sketch_basepath__ / name / (name + ".json"))
         os.remove(self.__sketch_basepath__ / name / (self.__song__.name + ".json"))
-        Path(self.__sketch_basepath__ / name / "sketch.json").touch(exist_ok=True)
+
+        try:
+            with open(self.__sketch_basepath__ / name / "sketch.json", "w") as f:
+                f.write(json.dumps({
+                    "type": "sketch",
+                    "created": datetime.now()
+                }))
+        except Exception as e:
+            logging.error(e)
 
         obj = {}
 
@@ -285,7 +293,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", sketch.split("/").pop(), self)
+        for file in Path(sketch).glob("**/*.json"):
+            if file.name != "sketch.json":
+                self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", file.name.replace(".json", ""), self)
+                break
+
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 

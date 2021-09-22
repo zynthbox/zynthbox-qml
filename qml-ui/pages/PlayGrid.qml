@@ -28,6 +28,7 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import QtGraphicalEffects 1.0
 
 import Zynthian 1.0 as Zynthian
 
@@ -224,6 +225,15 @@ Zynthian.ScreenPage {
                         }
                         color: Kirigami.Theme.backgroundColor
                     }
+                    Rectangle {
+                        id: slideDelegateIconMask
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        radius: width / 2
+                        visible: false
+                    }
                     Item {
                         id: settingsPopup
                         visible: false
@@ -250,7 +260,7 @@ Zynthian.ScreenPage {
                                     width: ListView.view.width
                                     height: settingsButton.height
                                     property var playGrid: playGridsRepeater.itemAt(index).item
-                                    icon.name: "view-grid-symbolic"
+                                    icon.name: playGrid.icon
                                     text: playGrid.name
                                     display: QQC2.AbstractButton.TextBesideIcon
                                     enabled: index !== zynthian.playgrid.playGridIndex
@@ -325,6 +335,17 @@ Zynthian.ScreenPage {
                                         color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                                     }
                                     color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                }
+                                Kirigami.Icon {
+                                    anchors {
+                                        fill: parent
+                                        margins: Kirigami.Units.largeSpacing
+                                    }
+                                    source: playGrid.icon
+                                    layer.enabled: true
+                                    layer.effect: OpacityMask {
+                                        maskSource: slideDelegateIconMask
+                                    }
                                 }
                                 Item {
                                     anchors {

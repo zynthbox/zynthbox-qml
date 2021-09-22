@@ -173,7 +173,7 @@ class zynthiloops_song(QObject):
         pass
 
     def get_versions(self):
-        versions = [f.name for f in Path(self.sketch_folder).glob("*.json") if f.name != "sketch.json"]
+        versions = [f.name.replace(".json", "") for f in Path(self.sketch_folder).glob("*.json") if f.name != "sketch.json"]
 
         return versions
 

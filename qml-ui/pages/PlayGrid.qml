@@ -241,12 +241,14 @@ Zynthian.ScreenPage {
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: 0
-                            Repeater {
+                            ListView {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                                 model: playGridsRepeater.count
+                                interactive: playGridsRepeater.count >= (height / settingsButton.height)
                                 delegate: QQC2.Button {
-                                    Layout.fillWidth: true
-                                    Layout.minimumHeight: settingsButton.height
-                                    Layout.maximumHeight: settingsButton.height
+                                    width: ListView.view.width
+                                    height: settingsButton.height
                                     property var playGrid: playGridsRepeater.itemAt(index).item
                                     icon.name: "view-grid-symbolic"
                                     text: playGrid.name
@@ -257,10 +259,6 @@ Zynthian.ScreenPage {
                                         zynthian.playgrid.playGridIndex = index
                                     }
                                 }
-                            }
-                            Item {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true

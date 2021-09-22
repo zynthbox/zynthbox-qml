@@ -187,7 +187,7 @@ Zynthian.ScreenPage {
                                 }
                                 readonly property bool isCurrent: view.currentIndex == index
                                 opacity: isCurrent ? 0.2 : 0.1
-                                color: isCurrent ? Kirigami.Theme.highlightColor : root.stringToColor(model.display)
+                                color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor//root.stringToColor(model.display)
                                 //Image {
                                     //anchors.fill: parent
                                     //source: "../../img/noisebackground.png"
@@ -195,7 +195,7 @@ Zynthian.ScreenPage {
                             }
                             Rectangle {
                                 anchors.fill: colorBackground
-                                border.color: Qt.rgba(0.1,0.1,0.1, 1)
+                                border.color: Qt.rgba(0, 0, 0, 0.6)
                                 color: "transparent"
                                 radius: 2
                                 Rectangle {

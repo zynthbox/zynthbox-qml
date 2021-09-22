@@ -1447,8 +1447,10 @@ class zynthian_gui(QObject):
                 if screen_back is None:
                     if self.modal_screen_back:
                         screen_back = self.modal_screen_back
+                    elif self.active_screen == "main": #HACK
+                        screen_back = self.__home_screen
                     else:
-                        screen_back = self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
+                        screen_back = self.active_screen #self.__home_screen #FIXME: it was self.active_screen should be somewhat configurable
 
             elif self.active_screen != "session_dashboard": # Session dashboard is always at the end of the back chain
                 try:

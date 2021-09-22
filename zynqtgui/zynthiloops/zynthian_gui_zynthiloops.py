@@ -257,7 +257,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             with open(self.__sketch_basepath__ / name / "sketch.json", "w") as f:
                 f.write(json.dumps({
                     "type": "sketch",
-                    "created": datetime.now()
+                    "created": datetime.now().isoformat()
                 }))
         except Exception as e:
             logging.error(e)

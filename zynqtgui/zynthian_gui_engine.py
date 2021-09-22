@@ -30,6 +30,7 @@ import logging
 import subprocess
 from time import sleep
 from collections import OrderedDict
+from functools import cmp_to_key
 
 # Zynthian specific modules
 import zynautoconnect
@@ -48,6 +49,14 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 def initializator(cls):
 	cls.init_engine_info()
 	return cls
+
+def customSort(item1, item2):
+	if item1[2].upper() > item2[2].upper():
+		return 1
+	elif item1[2].upper() == item2[2].upper():
+		return 0
+	else:
+		return -1
 
 @initializator
 class zynthian_gui_engine(zynthian_gui_selector):
@@ -162,6 +171,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		# Display help if no engines are enabled ...
 		if len(self.list_data)==0:
 			self.list_data.append((None,len(self.list_data),"Enable LV2-plugins on webconf".format(os.uname().nodename)))
+
+		self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 
 		# Select the first element that is not a category heading
 		if self.reset_index:

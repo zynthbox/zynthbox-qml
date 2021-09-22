@@ -55,6 +55,7 @@ class zynthiloops_clip(QObject):
         self.__should_sync__ = False
         self.__playing_started__ = False
         self.__is_recording__ = False
+        self.__arranger_bar_positions__ = []
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
         self.recording_basepath = song.sketch_folder
@@ -117,7 +118,8 @@ class zynthiloops_clip(QObject):
                 "pitch": self.__pitch__,
                 "time": self.__time__,
                 "bpm": self.__bpm__,
-                "shouldSync": self.__should_sync__}
+                "shouldSync": self.__should_sync__,
+                "arrangerBarPositions": self.__arranger_bar_positions__}
 
     def deserialize(self, obj):
         if "path" in obj:
@@ -143,6 +145,9 @@ class zynthiloops_clip(QObject):
         if "shouldSync" in obj:
             self.__should_sync__ = obj["shouldSync"]
             self.set_shouldSync(self.__should_sync__, True)
+        if "arrangerBarPositions" in obj:
+            self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
+            self.arranger_bar_positions_changed.emit()
 
         self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
         self.track.volume_changed.connect(lambda: self.track_volume_changed())
@@ -218,6 +223,27 @@ class zynthiloops_clip(QObject):
     def isPlaying(self):
         return self.__is_playing__
     isPlaying = Property(bool, isPlaying, notify=__is_playing_changed__)
+
+
+    @Signal
+    def arranger_bar_positions_changed(self):
+        pass
+
+    def get_arranger_bar_positions(self):
+        return self.__arranger_bar_positions__
+
+    def add_arranger_bar_position(self, pos):
+        if pos not in self.__arranger_bar_positions__:
+            self.__arranger_bar_positions__.append(pos)
+        self.arranger_bar_positions_changed.emit()
+        self.__song__.schedule_save()
+
+    def remove_arranger_bar_position(self, pos):
+        self.__arranger_bar_positions__.remove(pos)
+        self.arranger_bar_positions_changed.emit()
+        self.__song__.schedule_save()
+
+    arrangerBarPositions = Property('QVariantList', get_arranger_bar_positions, notify=arranger_bar_positions_changed)
 
 
     @Signal

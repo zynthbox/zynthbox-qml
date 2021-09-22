@@ -37,6 +37,14 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 # Zynthian Bank Selection GUI Class
 #------------------------------------------------------------------------------
 
+def customSort(item1, item2):
+	if item1[2].upper() > item2[2].upper():
+		return 1
+	elif item1[2].upper() == item2[2].upper():
+		return 0
+	else:
+		return -1
+
 class zynthian_gui_bank(zynthian_gui_selector):
 
 	buttonbar_config = [

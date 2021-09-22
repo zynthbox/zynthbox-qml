@@ -45,7 +45,9 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.zynthiloops
         self.__is_playing__ = False
         self.__start_from_bar__ = 0
+        self.__playing_bar__ = -1
 
+        self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)
         self.generate_tracks_model()
 
     ### Property bars
@@ -79,6 +81,13 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     startFromBar = Property(int, get_start_from_bar, set_start_from_bar, notify=start_from_bar_changed)
     ### END Property startFromBar
 
+    ### Property playingBar
+    def get_playing_bar(self):
+        return self.__playing_bar__
+    playing_bar_changed = Signal()
+    playingBar = Property(int, get_playing_bar, notify=playing_bar_changed)
+    ### END Property playingBar
+
     @Slot(None)
     def start(self):
         self.__metronome_manager__.start_metronome_request()
@@ -90,6 +99,10 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__metronome_manager__.stop_metronome_request()
         self.__is_playing__ = False
         self.is_playing_changed.emit()
+
+    def current_bar_changed_handler(self):
+        self.__playing_bar__ = self.__metronome_manager__.currentBar + self.__start_from_bar__
+        self.playing_bar_changed.emit()
 
     def generate_tracks_model(self):
         logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
@@ -122,9 +135,10 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
             for j in range(2):
                 zl_clip: zynthiloops_clip = self.__sketch__.getClip(zl_track.id, j)
 
-                for pos in zl_clip.arrangerBarPositions:
-                    cell = track.cellsModel.getCell(pos)
-                    logging.error(f"Restoring arranger clip({zl_clip}) to {pos} for {cell}")
-                    cell.zlClip = zl_clip
+                if zl_clip is not None:
+                    for pos in zl_clip.arrangerBarPositions:
+                        cell = track.cellsModel.getCell(pos)
+                        logging.error(f"Restoring arranger clip({zl_clip}) to {pos} for {cell}")
+                        cell.zlClip = zl_clip
 
         self.tracks_model_changed.emit()

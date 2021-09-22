@@ -206,12 +206,6 @@ Zynthian.ScreenPage {
                 Layout.margins: 8
                 z: 999
 
-                Loader {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    sourceComponent: playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
-                }
-
                 QQC2.Button {
                     id: settingsButton
                     Layout.fillWidth: true
@@ -236,8 +230,8 @@ Zynthian.ScreenPage {
                         anchors {
                             left: parent.right
                             leftMargin: 8
-                            bottom: parent.bottom
-                            bottomMargin: -8
+                            top: parent.top
+                            topMargin: -8
                         }
                         height: controlsPanel.height
                         width: component.width / 3
@@ -316,14 +310,14 @@ Zynthian.ScreenPage {
                                 id: slideDelegate
                                 property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
                                 property var playGrid: playGridsRepeater.itemAt(index).item
-                                height: parent.height
                                 width: settingsButton.width
+                                height: width
                                 Rectangle {
                                     anchors {
                                         fill: parent
                                         margins: Kirigami.Units.smallSpacing / 2
                                     }
-                                    radius: Math.max(width,height) / 2
+                                    radius: width / 2
                                     Kirigami.Theme.inherit: false
                                     Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                     border {
@@ -332,24 +326,28 @@ Zynthian.ScreenPage {
                                     }
                                     color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                                 }
-                                Rectangle {
+                                Item {
                                     anchors {
-                                        left: parent.right
-                                        bottom: parent.top
-                                        bottomMargin: -Kirigami.Units.largeSpacing
+                                        left: parent.horizontalCenter
+                                        verticalCenter: parent.verticalCenter
                                     }
-                                    rotation: -45
-                                    transformOrigin: Item.BottomLeft
-                                    height: slideDelegateLabel.height + Kirigami.Units.smallSpacing * 2
-                                    width: slideDelegateLabel.width + Kirigami.Units.smallSpacing * 2
-                                    radius: height / 2
-                                    color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                    transformOrigin: Item.Left
+                                    width: parent.width / 2 + Kirigami.Units.smallSpacing
+                                    rotation: 45
+                                    Rectangle {
+                                        anchors {
+                                            fill: slideDelegateLabel
+                                            margins: -Kirigami.Units.smallSpacing
+                                        }
+                                        radius: height / 2
+                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                    }
                                     QQC2.Label {
                                         id: slideDelegateLabel
                                         anchors {
                                             verticalCenter: parent.verticalCenter
                                             left: parent.left
-                                            margins: Kirigami.Units.smallSpacing
+                                            leftMargin: parent.width
                                         }
                                         text: slideDelegate.playGrid.name
                                         color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
@@ -416,6 +414,12 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
+                }
+
+                Loader {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    sourceComponent: playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
                 }
             }
         }

@@ -27,6 +27,7 @@ import ctypes as ctypes
 import math
 import os.path
 import re
+import shutil
 import sys
 import uuid
 from datetime import datetime
@@ -228,15 +229,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
-    def generate_sketch_id_from_name(self, name):
-        return name.replace(" ", "_")
-
     @Slot(None)
     def newSketch(self):
         try:
             self.__song__.bpm_changed.disconnect()
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
+
+        if (self.__sketch_basepath__ / 'temp').exists():
+            shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -248,9 +249,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def createSketch(self, name):
-        self.__song__.sketch_folder = str(self.__sketch_basepath__ / name) + "/"
-        self.__song__.name = name
-        self.__song__.schedule_save()
+        Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
+        shutil.copy(self.__sketch_basepath__ / name / (self.__song__.name + ".json"), self.__sketch_basepath__ / name / (name + ".json"))
+        os.remove(self.__sketch_basepath__ / name / (self.__song__.name + ".json"))
+        Path(self.__sketch_basepath__ / name / "sketch.json").touch(exist_ok=True)
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name) + "/", name, self)
+        self.__song__.bpm_changed.connect(self.update_timer_bpm)
+        self.song_changed.emit()
 
     @Slot(str)
     def loadSketch(self, sketch):
@@ -261,28 +266,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", None, self)
+        self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", sketch.split("/").pop(), self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
-
-    @Slot(None)
-    def clearSketchVersion(self):
-        try:
-            sketch_folder = self.__song__.sketch_folder
-            name = self.__song__.name
-            self.__song__.clear_version(name)
-
-            try:
-                self.__song__.bpm_changed.disconnect()
-            except Exception as e:
-                logging.error(f"Already disconnected : {str(e)}")
-
-            self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, name, self)
-            self.__song__.bpm_changed.connect(self.update_timer_bpm)
-            self.__song__.schedule_save()
-            self.song_changed.emit()
-        except Exception as e:
-            logging.error(f"Error clearing sketch version : {str(e)}")
 
     @Slot(None, result='QVariantList')
     def getSketches(self):
@@ -297,21 +283,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def loadSketchVersion(self, version):
-        obj = {}
-
-        try:
-            with open(self.__song__.sketch_folder + self.__song__.sketch_filename, "r") as f:
-                obj = json.loads(f.read())
-        except Exception as e:
-            logging.error(e)
-
-        try:
-            with open(self.__song__.sketch_folder + self.__song__.sketch_filename, "w") as f:
-                obj["selected_version"] = version
-                f.write(json.dumps(obj))
-        except Exception as e:
-            logging.error(e)
-
         sketch_folder = self.__song__.sketch_folder
 
         try:
@@ -319,13 +290,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, version, self)
+        self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, version.replace(".json", ""), self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(str, result=bool)
     def sketchExists(self, name):
-        sketch_path = self.__sketch_basepath__ / self.generate_sketch_id_from_name(name)
+        sketch_path = self.__sketch_basepath__ / name
         return sketch_path.is_dir()
 
     @Slot(None, result=bool)

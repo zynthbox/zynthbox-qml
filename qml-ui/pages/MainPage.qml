@@ -105,6 +105,15 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
+            enabled: false
+        },
+        Kirigami.Action {
+            enabled: false
+        },
+        Kirigami.Action {
+            enabled: false
+        },
+        Kirigami.Action {
             text: qsTr("Power")
             Kirigami.Action {
                 text: qsTr("Restart UI")

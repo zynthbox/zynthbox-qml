@@ -82,7 +82,7 @@ RowLayout {
             }
         }
 
-        Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
         QQC2.Button {
             id: settingsButton

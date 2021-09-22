@@ -186,7 +186,6 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		# during hte event processing done while the spinner is running, sometimes a spurious secondary action is invked...
 		# this causes a second invisible layer to be added, causing the sound of two engines at a time to be heard.
 		#FIXME: this needs a proper solution
-		logging.error("HHHHHHHHHHHH {} {}".format(i, self.list_data[i]))
 		if t != 'S':
 			return
 		if i is not None and self.list_data[i][0]:

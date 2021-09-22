@@ -138,8 +138,9 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		# Sort category headings, but headings starting with "Zynthian" are shown first
 		
 		for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
+
 			# Add category header...
-			if cat and self.single_category == None:
+			if self.single_category == None:
 				if self.engine_type=="MIDI Synth":
 					if self.only_categories:
 						self.list_data.append((cat,len(self.list_data),"LV2 {}".format(cat)))
@@ -151,7 +152,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 					else:
 						self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
-			if not self.only_categories and (self.single_category == None or self.single_category == cat):
+			if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
 				# Add engines on this category...
 				for eng, info in infos.items():
 					# For some engines, check if needed channels are free ...
@@ -185,6 +186,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		# during hte event processing done while the spinner is running, sometimes a spurious secondary action is invked...
 		# this causes a second invisible layer to be added, causing the sound of two engines at a time to be heard.
 		#FIXME: this needs a proper solution
+		logging.error("HHHHHHHHHHHH {} {}".format(i, self.list_data[i]))
 		if t != 'S':
 			return
 		if i is not None and self.list_data[i][0]:
@@ -241,6 +243,16 @@ class zynthian_gui_engine(zynthian_gui_selector):
 	def get_engine_info(self, eng):
 		return self.engine_info[eng]
 
+	def get_shown_category(self):
+		return self.single_category
+
+	def set_shown_category(self, shown):
+		if self.single_category == shown:
+			return
+		self.single_category = shown
+		self.fill_list()
+		self.shown_category_changed.emit()
+
 
 	def set_select_path(self):
 		self.select_path = "Engine"
@@ -249,7 +261,10 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 
 	midi_channel_changed = Signal()
+	shown_category_changed = Signal()
 
 	midi_channel = Property(int, get_midi_channel, set_midi_channel, notify = midi_channel_changed)
+
+	shown_category = Property(str, get_shown_category, set_shown_category, notify = shown_category_changed)
 
 #------------------------------------------------------------------------------

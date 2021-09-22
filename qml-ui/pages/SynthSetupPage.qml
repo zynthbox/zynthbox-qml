@@ -243,7 +243,12 @@ Zynthian.ScreenPage {
             target: zynthian.fixed_layers
             onCurrent_index_validChanged: {
                 if (!zynthian.fixed_layers.current_index_valid) {
-                    layerSetupDialog.open();
+                    if (zynthian.current_screen_id !== "layer" &&
+                        zynthian.current_screen_id !== "fixed_layers" &&
+                        zynthian.current_screen_id !== "bank" &&
+                        zynthian.current_screen_id !== "preset") {
+                        layerSetupDialog.open();
+                    }
                 } else {
                     layerSetupDialog.close();
                 }
@@ -257,14 +262,6 @@ Zynthian.ScreenPage {
             y: Math.round(parent.height/2 - height/2)
             height: footer.implicitHeight + topMargin + bottomMargin
             modal: true
-            Connections {
-                target: root
-                onIndexValidChanged: {
-                    if (!zynthian.fixed_layers.current_index_valid) {
-                        layerSetupDialog.open();
-                    }
-                }
-            }
 
             footer: QQC2.Control {
                 leftPadding: layerSetupDialog.leftPadding
@@ -289,15 +286,6 @@ Zynthian.ScreenPage {
                         onClicked: {
                             layerSetupDialog.close();
                             newSynthWorkaroundTimer.restart()
-                        }
-                    }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Favorites...")
-                        onClicked: {
-                            layerSetupDialog.close();
-                            zynthian.bank.show_top_sounds = true;
                         }
                     }
                     Timer { //HACK why is this necessary?

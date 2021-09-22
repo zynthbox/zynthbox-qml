@@ -310,12 +310,14 @@ Zynthian.ScreenPage {
                                 id: slideDelegate
                                 property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
                                 property var playGrid: playGridsRepeater.itemAt(index).item
+                                property int labelRotation: 45
                                 width: settingsButton.width
                                 height: width
                                 Rectangle {
+                                    id: slideDelegateBackground
                                     anchors {
                                         fill: parent
-                                        margins: Kirigami.Units.smallSpacing / 2
+                                        margins: Kirigami.Units.smallSpacing
                                     }
                                     radius: width / 2
                                     Kirigami.Theme.inherit: false
@@ -331,26 +333,25 @@ Zynthian.ScreenPage {
                                         left: parent.horizontalCenter
                                         verticalCenter: parent.verticalCenter
                                     }
-                                    transformOrigin: Item.Left
                                     width: parent.width / 2 + Kirigami.Units.smallSpacing
-                                    rotation: 45
+                                    transformOrigin: Item.Left
+                                    rotation: slideDelegate.labelRotation
                                     Rectangle {
                                         anchors {
                                             fill: slideDelegateLabel
                                             margins: -Kirigami.Units.smallSpacing
                                         }
                                         radius: height / 2
-                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                        color: slideDelegateBackground.color
                                     }
                                     QQC2.Label {
                                         id: slideDelegateLabel
                                         anchors {
                                             verticalCenter: parent.verticalCenter
-                                            left: parent.left
-                                            leftMargin: parent.width
+                                            left: parent.right
                                         }
                                         text: slideDelegate.playGrid.name
-                                        color: slideDelegate.hovered ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                        color: slideDelegateBackground.border.color
                                     }
                                 }
                             }

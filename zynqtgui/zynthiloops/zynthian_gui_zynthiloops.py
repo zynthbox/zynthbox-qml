@@ -276,6 +276,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             with open(self.__sketch_basepath__ / name / (name + ".json"), "w") as f:
                 obj["name"] = name
 
+                for i, track in enumerate(obj["tracks"]):
+                    for j, clip in enumerate(track["clips"]):
+                        if clip['path'] is not None:
+                            path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
+                            logging.error(f"Clip Path : {clip['path']}")
+                            obj["tracks"][i]["clips"][j]["path"] = path
+
                 f.write(json.dumps(obj))
         except Exception as e:
             logging.error(e)

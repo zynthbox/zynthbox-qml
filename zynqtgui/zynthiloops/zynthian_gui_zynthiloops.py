@@ -245,7 +245,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def saveSketch(self):
-        self.__song__.schedule_save()
+        self.__song__.save()
 
     @Slot(str)
     def createSketch(self, name):

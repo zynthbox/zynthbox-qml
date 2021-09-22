@@ -50,7 +50,8 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+        // color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+        color: "#444444"
 
         border.width: root.highlighted ? 1 : focus ? 1 : 0
         border.color: Kirigami.Theme.highlightColor

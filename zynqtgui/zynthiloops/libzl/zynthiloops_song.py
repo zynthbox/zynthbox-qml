@@ -100,7 +100,8 @@ class zynthiloops_song(QObject):
         self.versions_changed.emit()
 
     def schedule_save(self):
-        self.__save_timer__.start()
+        if self.isTemp:
+            self.__save_timer__.start()
 
     def restore(self):
         filename = self.__name__ + ".json"

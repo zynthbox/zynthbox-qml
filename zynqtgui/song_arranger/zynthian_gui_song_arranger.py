@@ -31,6 +31,9 @@ from .song_arranger_track import song_arranger_track
 from .song_arranger_tracks_model import song_arranger_tracks_model
 from .. import zynthian_qt_gui_base
 from ..zynthiloops import zynthian_gui_zynthiloops
+from ..zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
+from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
+from ..zynthiloops.libzl.zynthiloops_track import zynthiloops_track
 
 
 class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
@@ -91,7 +94,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
     def generate_tracks_model(self):
         logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
 
-        self.__sketch__ = self.zyngui.zynthiloops.song
+        self.__sketch__:zynthiloops_song = self.zyngui.zynthiloops.song
         self.__tracks_model__ = song_arranger_tracks_model(self)
 
         try:
@@ -108,11 +111,20 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)
 
         for i in range(self.__sketch__.tracksModel.count):
-            track = song_arranger_track(self.__sketch__.tracksModel.getTrack(i), self.__tracks_model__)
+            zl_track: zynthiloops_track = self.__sketch__.tracksModel.getTrack(i)
+            track = song_arranger_track(zl_track, self.__tracks_model__)
             self.__tracks_model__.add_track(track)
 
             for j in range(self.__bars__):
                 cell = song_arranger_cell(j, self.__metronome_manager__, track, self)
                 track.cellsModel.add_cell(cell)
+
+            for j in range(2):
+                zl_clip: zynthiloops_clip = self.__sketch__.getClip(zl_track.id, j)
+
+                for pos in zl_clip.arrangerBarPositions:
+                    cell = track.cellsModel.getCell(pos)
+                    logging.error(f"Restoring arranger clip({zl_clip}) to {pos} for {cell}")
+                    cell.zlClip = zl_clip
 
         self.tracks_model_changed.emit()

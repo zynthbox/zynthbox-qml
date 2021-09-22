@@ -256,37 +256,29 @@ Zynthian.ScreenPage {
                                         Layout.preferredHeight: privateProps.cellHeight
                                         Layout.maximumHeight: privateProps.cellHeight
 
-                                        Layout.columnSpan: zlClip ? zlClip.length : 1
-
                                         color: cell.isPlaying ?
                                                    Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5) :
                                                    Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+
+                                        Component.onCompleted: {
+                                            drawZlClipCell(clipCell, cell);
+                                        }
+
+                                        Connections {
+                                            target: cell
+                                            onZlClipChanged: {
+                                                console.log("###### Clip changed", cell, cell.zlClip)
+
+                                                drawZlClipCell(clipCell, cell);
+                                            }
+                                        }
 
                                         MouseArea {
                                             anchors.fill: parent
                                             onPressed: {
                                                 if (track.selectedClip) {
+                                                    console.log("###### Setting Clip to cell", cell)
                                                     cell.zlClip = track.selectedClip;
-
-                                                    var component = Qt.createComponent("ClipCell.qml");
-                                                    var obj = component.createObject(zlClipsContainer, {
-                                                        "width": cellGrid.calculateCellWidth(track.selectedClip),
-                                                        "height": privateProps.cellHeight,
-                                                        "zlClip": track.selectedClip,
-                                                        "x": clipCell.x,
-                                                        "y": clipCell.y,
-                                                        "z": 9999
-                                                    });
-
-                                                    obj.onPressed.connect(function() {
-                                                        cell.zlClip = null;
-                                                        obj.destroy();
-                                                    });
-
-                                                    if (obj === null) {
-                                                        // Error Handling
-                                                        console.log("Error creating object");
-                                                    }
                                                 }
                                             }
                                         }
@@ -320,6 +312,32 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 7
             Layout.fillWidth: false
             Layout.fillHeight: true
+        }
+    }
+
+    function drawZlClipCell(clipCell, cell) {
+        if (cell.zlClip) {
+            console.log("### Drawing clip cell at ", clipCell.x, clipCell.y, " for cell ", clipCell);
+
+            var component = Qt.createComponent("ClipCell.qml");
+            var obj = component.createObject(zlClipsContainer, {
+                "width": cellGrid.calculateCellWidth(cell.zlClip),
+                "height": privateProps.cellHeight,
+                "zlClip": cell.zlClip,
+                "x": clipCell.x,
+                "y": clipCell.y,
+                "z": 9999
+            });
+
+            obj.onPressed.connect(function() {
+                cell.zlClip = null;
+                obj.destroy();
+            });
+
+            if (obj === null) {
+                // Error Handling
+                console.log("Error creating object");
+            }
         }
     }
 }

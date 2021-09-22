@@ -28,7 +28,12 @@ class song_arranger_cell(QObject):
     ### Property zlClip
     def get_zl_clip(self):
         return self.__zl_clip__
-    def set_zl_clip(self, clip):
+    def set_zl_clip(self, clip: zynthiloops_clip):
+        if clip is not None:
+            clip.add_arranger_bar_position(self.__bar__)
+        else:
+            self.__zl_clip__.remove_arranger_bar_position(self.__bar__)
+
         self.__zl_clip__ = clip
         self.zl_clip_changed.emit()
     zl_clip_changed = Signal()

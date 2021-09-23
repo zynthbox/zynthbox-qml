@@ -249,10 +249,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def createSketch(self, name):
+        # Rename temp sketch folder to the user defined name
         Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
-        shutil.copy(self.__sketch_basepath__ / name / (self.__song__.name + ".json"), self.__sketch_basepath__ / name / (name + ".json"))
-        os.remove(self.__sketch_basepath__ / name / (self.__song__.name + ".json"))
 
+        # Rename temp sketch json filename to user defined name
+        Path(self.__sketch_basepath__ / name / (self.__song__.name + ".json")).rename(self.__sketch_basepath__ / name / (name + ".json"))
+
+        # Create sketch.json to store sketch metadata
         try:
             with open(self.__sketch_basepath__ / name / "sketch.json", "w") as f:
                 f.write(json.dumps({
@@ -264,14 +267,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         obj = {}
 
+        # Read sketch json data to dict
         try:
             with open(self.__sketch_basepath__ / name / (name + ".json"), "r") as f:
                 obj = json.loads(f.read())
         except Exception as e:
             logging.error(e)
 
-        print(obj)
-
+        # Update temp sketch name to user defined name and update clip paths to point to new sketch dir
         try:
             with open(self.__sketch_basepath__ / name / (name + ".json"), "w") as f:
                 obj["name"] = name

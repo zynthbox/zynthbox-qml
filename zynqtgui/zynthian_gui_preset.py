@@ -359,7 +359,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def index_supports_immediate_activation(self, index=None):
-		return True
+		return self.__top_sounds_engine == None or (self.zyngui.curlayer != None and self.zyngui.curlayer.engine.nickname == self.__top_sounds_engine)
 
 	def next_action(self): #DON't go to edit or effect
 		return "preset"

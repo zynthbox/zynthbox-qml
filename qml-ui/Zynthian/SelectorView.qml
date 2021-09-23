@@ -82,6 +82,9 @@ QQC2.ScrollView {
             }
         }
 
+        onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
+        onCountChanged: positionViewAtIndex(currentIndex, ListView.Contain)
+
         Connections {
             id: focusConnection
             target: zynthian

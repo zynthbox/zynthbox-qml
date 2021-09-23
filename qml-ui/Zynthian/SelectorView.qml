@@ -28,6 +28,8 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import Zynthian 1.0 as Zynthian
+
 import "private"
 
 QQC2.ScrollView {
@@ -95,6 +97,7 @@ QQC2.ScrollView {
         delegate: SelectorDelegate {
             screenId: root.screenId
             selector: root.selector
+            highlighted: zynthian.current_screen_id === root.screenId
             onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
             onItemActivated: root.itemActivated(screenId, index)
             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)

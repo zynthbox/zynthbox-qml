@@ -33,6 +33,6 @@ PlasmaCore.FrameSvgItem {
     property QQC2.ItemDelegate delegate
     visible: delegate.ListView.isCurrentItem || delegate.pressed
     imagePath: "widgets/viewitem"
-    prefix: (delegate.ListView.view.activeFocus && !delegate.pressed || !delegate.ListView.view.activeFocus && delegate.pressed) ? "selected+hover" : "hover"
+    prefix: (delegate.highlighted && !delegate.pressed || !delegate.highlighted && delegate.pressed) ? "selected+hover" : "hover"
 }
 

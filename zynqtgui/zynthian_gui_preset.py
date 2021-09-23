@@ -200,6 +200,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.zyngui.curlayer.toggle_preset_fav(self.list_data[i])
 			self.update_list()
 			self.zyngui.screens['bank'].fill_list()
+			self.zyngui.screens['bank'].select()
+			if len(self.list_data) == 0: # If the current item was favorites and has been removed, , load the first bank in this list
+				self.zyngui.screens['bank'].select_action(0)
 		self.__select_in_progess = False
 		self.set_select_path()
 
@@ -277,6 +280,9 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 		self.fill_list()
 		self.zyngui.screens['bank'].fill_list()
+		self.zyngui.screens['bank'].select()
+		if len(self.list_data) == 0: # If the current item was favorites and has been removed, , load the first bank in this list
+			self.zyngui.screens['bank'].select_action(0)
 		self.current_is_favorite_changed.emit()
 
 

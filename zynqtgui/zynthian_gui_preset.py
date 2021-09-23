@@ -209,10 +209,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select(self, index=None):
-		actual_index = index
-		if index == None and self.zyngui.curlayer != None:
-			actual_index = self.zyngui.curlayer.preset_index
-		super().select(actual_index)
+		super().select(index)
 		self.set_select_path()
 		self.current_is_favorite_changed.emit()
 

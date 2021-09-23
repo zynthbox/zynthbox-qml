@@ -514,6 +514,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				root_layers_to_delete = [self.root_layers[i]]
 
+			midi_chan_to_restore = root_layers_to_delete[0].midi_chan
+
 			# Mute Audio Layers & build list of layers to delete
 			layers_to_delete = []
 			for root_layer in root_layers_to_delete:
@@ -569,6 +571,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				except:
 					self.zyngui.set_curlayer(None)
 
+			self.activate_midichan_layer(midi_chan_to_restore)
 			self.set_selector()
 
 

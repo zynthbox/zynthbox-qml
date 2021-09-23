@@ -126,7 +126,7 @@ QQC2.ScrollView {
 
     background: SelectorViewBackground {
         id: background
-        highlighted: view.activeFocus || zynthian.current_screen_id === root.screenId || (zynthian.current_screen_id === "layer" && root.screenId === "fixed_layers")
+        //highlighted: view.activeFocus || zynthian.current_screen_id === root.screenId || (zynthian.current_screen_id === "layer" && root.screenId === "fixed_layers")
     }
 }
 

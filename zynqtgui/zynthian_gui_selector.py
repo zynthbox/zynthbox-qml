@@ -306,16 +306,17 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		return False
 
 	def select_up(self, n=1):
+		new_index = max(0, self.index - n)
 		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
 		self.auto_activation_timer.start()
-		self.select(self.index-n)
+		self.select(new_index)
 
 
 	def select_down(self, n=1):
+		new_index = min(len(self.list_data) - 1, self.index + n)
 		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
 		self.auto_activation_timer.start()
-		self.select(self.index+n)
-
+		self.select(self.index + n)
 
 	# TODO: remove
 	def click_listbox(self, index=None, t='S'):

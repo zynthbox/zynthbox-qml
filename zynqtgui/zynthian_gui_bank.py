@@ -72,7 +72,8 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				readable_name = engine
 				if len(parts) > 1:
 					readable_name = parts[1]
-				self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
+				if len(top_sounds[engine]) > 0:
+					self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
 			self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 		else:
 			if not self.zyngui.curlayer:
@@ -95,7 +96,8 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		bank_found = False
 		if show and self.zyngui.curlayer:
 			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
-			for i, engine in enumerate(top_sounds):
+			for i, item in enumerate(self.list_data):
+				engine = item[0]
 				if engine == self.zyngui.curlayer.engine.nickname:
 					self.select_action(i)
 					bank_found = True
@@ -151,6 +153,11 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			return
 		if self.__show_top_sounds:
 			self.zyngui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
+			self.zyngui.screens['preset'].select_action(0)
+			self.select(i)
+			self.zyngui.screens['preset'].select(0)
+			self.zyngui.show_screen("bank")
+			self.set_select_path()
 			return
 		else:
 			self.zyngui.screens['preset'].set_top_sounds_engine(None)

@@ -300,6 +300,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.index = index
 		if self.zselector and self.zselector.value != self.index:
 			self.zselector.set_value(self.index, True, False)
+		self.set_select_path()
 		self.current_index_changed.emit()
 
 	def index_supports_immediate_activation(self, index=None):

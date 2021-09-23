@@ -410,6 +410,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 				#print('Read Control ' + str(self.zgui_controllers[i].title))
 
 				if not zcnums or i in zcnums:
+					if i >= len(self.zgui_controllers):
+						continue
 					res=self.zgui_controllers[i].read_zyncoder()
 					
 					if res and self.zyngui.midi_learn_mode:

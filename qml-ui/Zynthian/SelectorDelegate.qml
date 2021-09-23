@@ -41,7 +41,7 @@ QQC2.ItemDelegate {
     leftPadding: Kirigami.Units.largeSpacing
     bottomPadding: Kirigami.Units.largeSpacing
     rightPadding: Kirigami.Units.largeSpacing
-    highlighted: ListView.isCurrentItem
+    highlighted: delegate.ListView.view.activeFocus
 
     property string screenId
     property QtObject selector

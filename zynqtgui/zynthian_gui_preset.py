@@ -352,8 +352,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		return self.__top_sounds
 
 	def set_top_sounds_engine(self, engine : str):
-		traceback.print_stack(None, 8)
-		logging.error("AAAA{}".format(engine))
 		self.__top_sounds_engine = engine
 		self.top_sounds_engine_changed.emit()
 		self.fill_list()

@@ -82,7 +82,12 @@ QQC2.ScrollView {
             }
         }
 
-        onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
+        onCurrentIndexChanged: {
+            positionViewAtIndex(currentIndex, ListView.Contain)
+            if (currentIndex != root.selector.current_index) {
+                root.selector.current_index = currentIndex;
+            }
+        }
         onCountChanged: positionViewAtIndex(currentIndex, ListView.Contain)
 
         Connections {

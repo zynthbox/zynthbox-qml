@@ -410,7 +410,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		else:
 			self.add_layer_midich(midi_chan, select)
-			self.zyngui.screens['bank'].set_show_top_sounds(False)
 
 
 	def add_layer_midich(self, midich, select=True):
@@ -424,7 +423,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				self.zyngui.screens['engine'].stop_unused_engines()
 				# initialize the bank
 				self.zyngui.screens['bank'].show()
-				self.zyngui.screens['bank'].select_action(0)
+				if not self.zyngui.screens['bank'].get_show_top_sounds():
+					self.zyngui.screens['bank'].select_action(0)
 			else:
 				layer = zynthian_layer(zyngine, midich, self.zyngui)
 
@@ -462,7 +462,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if layer.engine.type != "Audio Effect":
 			self.zyngui.show_screen('layer')
 			self.zyngui.screens['layer'].select_action(self.zyngui.screens['layer'].index)
-			self.zyngui.screens['bank'].select_action(0)
+			if not self.zyngui.screens['bank'].get_show_top_sounds():
+				self.zyngui.screens['bank'].select_action(0)
 
 
 	def remove_layer(self, i, stop_unused_engines=True):
@@ -1550,7 +1551,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.activate_index(0)
 			else:
 				self.activate_index(0)
-			self.zyngui.screens['bank'].set_show_top_sounds(False)
 		except Exception as e:
 			logging.error(e)
 
@@ -1571,7 +1571,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					midi_chan = layer_data['midi_chan']
 					if not midi_chan in result:
 						result.append(midi_chan)
-			self.zyngui.screens['bank'].set_show_top_sounds(False)
 		except Exception as e:
 			logging.error(e)
 		return result
@@ -1583,7 +1582,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			f = open(self.__sounds_basepath__ + file_name, "r")
 			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
 			self.activate_index(self.index)
-			self.zyngui.screens['bank'].set_show_top_sounds(False)
 		except Exception as e:
 			logging.error(e)
 

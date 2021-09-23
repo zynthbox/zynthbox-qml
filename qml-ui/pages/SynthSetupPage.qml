@@ -195,6 +195,7 @@ Zynthian.ScreenPage {
                     text: model.display === "None" ? qsTr("Single") : model.display
                     screenId: bankView.screenId
                     selector: bankView.selector
+                    highlighted: zynthian.current_screen_id === bankView.screenId
                     onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
                     onItemActivated: bankView.itemActivated(screenId, index)
                     onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
@@ -432,6 +433,7 @@ Zynthian.ScreenPage {
                                     zynthian.layer.load_layer_from_file(model.fileName, map);
                                 }
                             }
+                            zynthian.bank.show_top_sounds = false;
                             pickerDialog.accept()
                         }
                     }

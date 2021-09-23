@@ -247,6 +247,7 @@ Zynthian.ScreenPage {
                     if (zynthian.current_screen_id !== "layer" &&
                         zynthian.current_screen_id !== "fixed_layers" &&
                         zynthian.current_screen_id !== "bank" &&
+                        zynthian.current_screen_id !== "confirm" &&
                         zynthian.current_screen_id !== "preset") {
                         layerSetupDialog.open();
                     }

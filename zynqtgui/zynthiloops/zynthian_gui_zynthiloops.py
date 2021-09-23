@@ -189,15 +189,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.process_jack_port(port, self.jack_capture_port_b)
 
     def process_jack_port(self, port, target):
-        if not (port.name.startswith("JUCE") or port.name.startswith("system")):
-            logging.error("ACCEPTED {}".format(port.name))
-
-            try:
+        try:
+            if not (port.name.startswith("JUCE") or port.name.startswith("system")):
+                logging.error("ACCEPTED {}".format(port.name))
                 self.jack_client.connect(port.name, target.name)
-            except:
-                logging.error(f"Error connecting to jack port : {port.name}")
-        else:
-            logging.error("REJECTED {}".format(port.name))
+            else:
+                logging.error("REJECTED {}".format(port.name))
+        except Exception as e:
+            logging.error(f"Error processing jack port : {port}({str(e)})")
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")

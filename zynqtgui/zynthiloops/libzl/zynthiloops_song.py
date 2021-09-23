@@ -61,6 +61,7 @@ class zynthiloops_song(QObject):
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
+        self.__history_length__ = 0
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -107,6 +108,8 @@ class zynthiloops_song(QObject):
                                 logging.error(f"Error while trying to remove cache file .cache/{history}.json : {str(e)}")
 
                     obj["history"] = []
+                    self.__history_length__ = 0
+                    self.history_length_changed.emit()
 
                     json.dump(obj, f)
                     f.truncate()
@@ -134,20 +137,37 @@ class zynthiloops_song(QObject):
             logging.error(f"Storing to cache {cache_id}.json")
 
             try:
-                with open(cache_dir / (cache_id + ".json"), "w") as f:
-                    f.write(json.dumps(self.serialize()))
-
                 with open(self.sketch_folder + filename, "r+") as f:
                     obj = json.load(f)
                     f.seek(0)
 
-                    if "history" not in obj:
-                        obj["history"] = []
+                    comparing_obj = {}
+                    if "history" in obj and len(obj["history"]) > 0:
+                        with open(self.sketch_folder + filename, "r+") as f_last_cache:
+                            comparing_obj = json.load(f_last_cache)
+                    else:
+                        comparing_obj = obj
 
-                    obj["history"].append(cache_id)
+                    comparing_obj.pop("history", None)
 
-                    json.dump(obj, f)
-                    f.truncate()
+                    logging.error(f"Comparing cache and saved dicts : {self.serialize()}")
+                    logging.error(f"Comparing cache and saved dicts : {comparing_obj}")
+                    logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
+
+                    if self.serialize() != comparing_obj:
+                        with open(cache_dir / (cache_id + ".json"), "w") as f_cache:
+                            f_cache.write(json.dumps(self.serialize()))
+
+                        if "history" not in obj:
+                            obj["history"] = []
+
+                        obj["history"].append(cache_id)
+
+                        self.__history_length__ = len(obj["history"])
+                        self.history_length_changed.emit()
+
+                        json.dump(obj, f)
+                        f.truncate()
             except Exception as e:
                 logging.error(e)
 
@@ -349,5 +369,43 @@ class zynthiloops_song(QObject):
 
     index = Property(int, index, set_index, notify=index_changed)
 
-    # def add_clip_to_part(self, clip, part_index):
+
+    @Signal
+    def history_length_changed(self):
+        pass
+
+    def get_history_length(self):
+        return self.__history_length__
+
+    historyLength = Property(int, get_history_length, notify=history_length_changed)
+
+    @Slot(None)
+    def undo(self):
+        cache_dir = Path(self.sketch_folder) / ".cache"
+
+        try:
+            with open(self.sketch_folder + self.__initial_name__ + ".json", "r+") as f:
+                obj = json.load(f)
+                f.seek(0)
+
+                if "history" in obj and len(obj["history"]) > 0:
+                    cache_file = obj["history"].pop()
+
+                try:
+                    Path(cache_dir / (cache_file + ".json")).unlink()
+                except:
+                    pass
+
+                self.__history_length__ = len(obj["history"])
+                self.history_length_changed.emit()
+
+                json.dump(obj, f)
+                f.truncate()
+        except Exception as e:
+            logging.error(e)
+            return False
+
+        self.__metronome_manager__.loadSketchVersion(self.__initial_name__)
+
+# def add_clip_to_part(self, clip, part_index):
     #     self.__parts_model__.getPart(part_index).add_clip(clip)

@@ -204,6 +204,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], None)
 			else:
 				self.zyngui.start_loading()
+				self.zyngui.screens['bank'].set_show_top_sounds(False)
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.midi_chan)
 				self.zyngui.stop_loading()
 

@@ -298,14 +298,6 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			else:
 				self.zyngui.screens['bank'].select_action(0)
 
-		# If the current item was favorites and has been removed, load the first bank in this list
-		#if len(self.list_data) == 0 and fav_bank_name != None:
-			#self.zyngui.curlayer.set_bank_by_name(fav_bank_name)
-			#self.zyngui.curlayer.set_show_fav_presets(False)
-			#self.zyngui.curlayer.load_preset_list()
-			#self.zyngui.curlayer.set_preset_by_name(self.zyngui.curlayer.preset_name) #Make sure preset_index is correct
-			#self.fill_list()
-
 		self.show()
 		self.current_is_favorite_changed.emit()
 
@@ -360,6 +352,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		return self.__top_sounds
 
 	def set_top_sounds_engine(self, engine : str):
+		traceback.print_stack(None, 8)
+		logging.error("AAAA{}".format(engine))
 		self.__top_sounds_engine = engine
 		self.top_sounds_engine_changed.emit()
 		self.fill_list()

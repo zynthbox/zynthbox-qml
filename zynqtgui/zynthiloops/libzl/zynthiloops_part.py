@@ -121,6 +121,7 @@ class zynthiloops_part(QObject):
     def set_name(self, name):
         self.__name__ = name
         self.name_changed.emit()
+        self.__song__.schedule_save()
     name = Property(str, name, set_name, notify=name_changed)
 
     @Slot(None)

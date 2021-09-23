@@ -571,7 +571,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				except:
 					self.zyngui.set_curlayer(None)
 
-			self.activate_midichan_layer(midi_chan_to_restore)
 			self.set_selector()
 
 

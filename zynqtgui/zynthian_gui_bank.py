@@ -135,7 +135,11 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			self.zyngui.curlayer.set_bank(0)
 		if self.zyngui.screens['preset'].get_show_only_favorites():
 			self.select(0)
-		else:
+		elif self.zyngui.curlayer != None:
+			for i in range(len(self.zyngui.curlayer.bank_list)):
+				if self.zyngui.curlayer.bank_name == self.zyngui.curlayer.bank_list[i][2]:
+					self.zyngui.curlayer.bank_index = i
+					break
 			self.select(self.zyngui.curlayer.get_bank_index())
 		logging.debug("BANK INDEX => %s" % self.index)
 		super().show()

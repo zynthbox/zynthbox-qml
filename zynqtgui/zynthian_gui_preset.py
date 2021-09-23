@@ -114,6 +114,8 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def select_action(self, i, t='S'):
+		if i < 0 or i >= len(self.list_data):
+			return
 		if self.__select_in_progess: #HACK: this is due from the process events in the spinner. should be fixed there
 			return
 		self.__select_in_progess = True
@@ -197,19 +199,20 @@ class zynthian_gui_preset(zynthian_gui_selector):
 			self.zyngui.screens['control'].show()
 			self.zyngui.screens['layer'].fill_list()
 		else:
-			self.zyngui.curlayer.toggle_preset_fav(self.list_data[i])
-			self.update_list()
-			self.zyngui.screens['bank'].fill_list()
-			self.zyngui.screens['bank'].select()
-			if len(self.list_data) == 0: # If the current item was favorites and has been removed, , load the first bank in this list
-				self.zyngui.screens['bank'].select_action(0)
+			# We selected i as current index so we can assume we're working on the current index
+			self.__select_in_progess = False
+			self.set_current_is_favorite(not self.get_current_is_favorite())
+
 		self.__select_in_progess = False
 		self.set_select_path()
 
 
 
 	def select(self, index=None):
-		super().select(index)
+		actual_index = index
+		if index == None and self.zyngui.curlayer != None:
+			actual_index = self.zyngui.curlayer.preset_index
+		super().select(actual_index)
 		self.set_select_path()
 		self.current_is_favorite_changed.emit()
 
@@ -227,6 +230,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 	def set_current_is_favorite(self, new_fav_state: bool):
 		fav_owner_engine = None
+		fav_bank_name = None
 		if self.__top_sounds_engine == None:
 			fav_owner_engine = self.zyngui.curlayer.engine
 		else:
@@ -237,6 +241,11 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					break
 		# if we are operating on an active engine, we can just use its internal api
 		if fav_owner_engine != None:
+			preset_id = str(self.list_data[self.index][0])
+			# Find the bank name we might have to restore
+			if preset_id in self.zyngui.curlayer.engine.preset_favs:
+				fav_bank_name = self.zyngui.curlayer.engine.preset_favs[preset_id][0][2]
+
 			if fav_owner_engine.is_preset_fav(self.list_data[self.index]) != new_fav_state:
 				fav_owner_engine.toggle_preset_fav(fav_owner_engine.layers[0], self.list_data[self.index])
 
@@ -280,10 +289,33 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 		self.fill_list()
 		self.zyngui.screens['bank'].fill_list()
-		self.zyngui.screens['bank'].select()
-		if len(self.list_data) == 0: # If the current item was favorites and has been removed, , load the first bank in this list
-			self.zyngui.screens['bank'].select_action(0)
+		self.zyngui.screens['bank'].show()
+
+		#if we were showing only favorites and removed the current one, select another
+		if not new_fav_state and self.zyngui.curlayer != None and (self.zyngui.curlayer.show_fav_presets or self.__top_sounds_engine != None):
+			if len(self.list_data) > 0:
+				self.select_action(max(0, self.index - 1))
+			else:
+				self.zyngui.screens['bank'].select_action(0)
+
+		# If the current item was favorites and has been removed, load the first bank in this list
+		#if len(self.list_data) == 0 and fav_bank_name != None:
+			#self.zyngui.curlayer.set_bank_by_name(fav_bank_name)
+			#self.zyngui.curlayer.set_show_fav_presets(False)
+			#self.zyngui.curlayer.load_preset_list()
+			#self.zyngui.curlayer.set_preset_by_name(self.zyngui.curlayer.preset_name) #Make sure preset_index is correct
+			#self.fill_list()
+
+		self.show()
 		self.current_is_favorite_changed.emit()
+
+
+	def sync_current_bank(self):
+		if self.zyngui.curlayer == None:
+			return
+		self.zyngui.screens['bank'].select(self.zyngui.curlayer.bank_index)
+		self.zyngui.screens['preset'].fill_list()
+		self.zyngui.screens['preset'].select(self.zyngui.curlayer.preset_index)
 
 
 	def reload_top_sounds(self):

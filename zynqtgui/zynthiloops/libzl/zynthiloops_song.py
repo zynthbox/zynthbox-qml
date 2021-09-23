@@ -24,6 +24,7 @@
 # ******************************************************************************
 import ctypes as ctypes
 import math
+import uuid
 
 from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
@@ -64,6 +65,7 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__name__ = name
+        self.__initial_name__ = name # To be used while storing cache details when name changes
 
         if not self.restore():
             # Add default parts
@@ -86,22 +88,71 @@ class zynthiloops_song(QObject):
                 "tracks": self.__tracks_model__.serialize(),
                 "parts": self.__parts_model__.serialize()}
 
-    def save(self):
-        filename = self.__name__ + ".json"
+    def save(self, cache=True):
+        cache_dir = Path(self.sketch_folder) / ".cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
 
-        try:
-            Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
+        if self.isTemp or not cache:
+            if not self.isTemp:
+                # Clear previous history and remove cache files if not temp
+                with open(self.sketch_folder + self.__initial_name__ + ".json", "r+") as f:
+                    obj = json.load(f)
+                    f.seek(0)
 
-            with open(self.sketch_folder + filename, "w") as f:
-                f.write(json.dumps(self.serialize()))
-        except Exception as e:
-            logging.error(e)
+                    if "history" in obj and len(obj["history"]) > 0:
+                        for history in obj["history"]:
+                            try:
+                                Path(cache_dir / (history + ".json")).unlink()
+                            except Exception as e:
+                                logging.error(f"Error while trying to remove cache file .cache/{history}.json : {str(e)}")
 
-        self.versions_changed.emit()
+                    obj["history"] = []
+
+                    json.dump(obj, f)
+                    f.truncate()
+
+            filename = self.__name__ + ".json"
+            self.__initial_name__ = self.name
+
+            logging.error(f"Storing to {filename}")
+            # Handle saving to sketch json file
+            try:
+                Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
+
+                with open(self.sketch_folder + filename, "w") as f:
+                    f.write(json.dumps(self.serialize()))
+            except Exception as e:
+                logging.error(e)
+
+            self.versions_changed.emit()
+        else:
+            filename = self.__initial_name__ + ".json"
+
+            # Handle saving to cache
+            cache_id = str(uuid.uuid1())
+
+            logging.error(f"Storing to cache {cache_id}.json")
+
+            try:
+                with open(cache_dir / (cache_id + ".json"), "w") as f:
+                    f.write(json.dumps(self.serialize()))
+
+                with open(self.sketch_folder + filename, "r+") as f:
+                    obj = json.load(f)
+                    f.seek(0)
+
+                    if "history" not in obj:
+                        obj["history"] = []
+
+                    obj["history"].append(cache_id)
+
+                    json.dump(obj, f)
+                    f.truncate()
+            except Exception as e:
+                logging.error(e)
 
     def schedule_save(self):
-        if self.isTemp:
-            self.__save_timer__.start()
+        self.__save_timer__.start()
 
     def restore(self):
         filename = self.__name__ + ".json"
@@ -110,6 +161,11 @@ class zynthiloops_song(QObject):
             logging.error(f"Restoring {self.sketch_folder + filename}")
             with open(self.sketch_folder + filename, "r") as f:
                 sketch = json.loads(f.read())
+
+                if "history" in sketch and len(sketch["history"]) > 0:
+                    cache_dir = Path(self.sketch_folder) / ".cache"
+                    with open(cache_dir / (sketch["history"][-1] + ".json"), "r") as f_cache:
+                        sketch = json.load(f_cache)
 
                 if "name" in sketch:
                     self.__name__ = sketch["name"]

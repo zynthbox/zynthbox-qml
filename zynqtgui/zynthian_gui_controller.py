@@ -236,19 +236,22 @@ class zynthian_gui_controller(QObject):
 
 	def config(self, zctrl):
 		#logging.debug("CONFIG CONTROLLER %s => %s" % (self.index,zctrl.name))
-		self.zctrl=zctrl
-		self.step=1
-		self.mult=1
-		self.val0=0
-		self.ctrl_value=None
-		self.n_values=127
-		self.inverted=False
-		self.selmode = False
-		self.logarithmic = zctrl.is_logarithmic
-		self.scale_value=1
-		self.format_print=None
-		self.set_title(zctrl.short_name)
-		self.set_midi_bind()
+		try:
+			self.zctrl=zctrl
+			self.step=1
+			self.mult=1
+			self.val0=0
+			self.ctrl_value=None
+			self.n_values=127
+			self.inverted=False
+			self.selmode = False
+			self.logarithmic = zctrl.is_logarithmic
+			self.scale_value=1
+			self.format_print=None
+			self.set_title(zctrl.short_name)
+			self.set_midi_bind()
+		except:
+			pass
 
 		logging.debug("ZCTRL '%s': %s (%s -> %s), %s, %s" % (zctrl.short_name,zctrl.value,zctrl.value_min,zctrl.value_max,zctrl.labels,zctrl.ticks))
 

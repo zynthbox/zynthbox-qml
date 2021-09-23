@@ -84,6 +84,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def select_action(self, i, t='S'):
+        if i < 0 or i >= len(self.list_data):
+            return
+
+        self.zyngui.screens['bank'].set_show_top_sounds(False)
+
+        self.select(i)
+
         chan = self.list_data[i][1]
         self.current_index_valid_changed.emit()
 

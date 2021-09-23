@@ -136,6 +136,9 @@ class zynthiloops_clip(QObject):
         if "pitch" in obj:
             self.__pitch__ = obj["pitch"]
             self.set_pitch(self.__pitch__, True)
+        if "gain" in obj:
+            self.__gain__ = obj["gain"]
+            self.set_gain(self.__gain__, True)
         if "time" in obj:
             self.__time__ = obj["time"]
             self.set_time(self.__time__, True)
@@ -279,6 +282,7 @@ class zynthiloops_clip(QObject):
         if self.__gain__ != gain or force_set is True:
             self.__gain__ = gain
             self.gain_changed.emit()
+            self.__song__.schedule_save()
 
             if self.audioSource is not None:
                 self.audioSource.set_gain(gain)

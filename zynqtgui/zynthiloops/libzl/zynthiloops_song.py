@@ -275,6 +275,7 @@ class zynthiloops_song(QObject):
         if self.__volume__ != math.floor(volume) or force_set is True:
             self.__volume__ = math.floor(volume)
             self.volume_changed.emit()
+            self.schedule_save()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 

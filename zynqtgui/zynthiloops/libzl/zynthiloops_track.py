@@ -152,6 +152,7 @@ class zynthiloops_track(QObject):
             self.__volume__ = math.floor(volume)
             logging.error(f"Track : Setting volume {self.__volume__}")
             self.volume_changed.emit()
+            self.__song__.schedule_save()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 

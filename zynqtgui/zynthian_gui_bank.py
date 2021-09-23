@@ -25,6 +25,7 @@
 
 import sys
 import logging
+from functools import cmp_to_key
 
 # Zynthian specific modules
 from . import zynthian_gui_config
@@ -72,6 +73,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				if len(parts) > 1:
 					readable_name = parts[1]
 				self.list_data.append((engine, len(self.list_data), "{} ({})".format(readable_name, len(top_sounds[engine]))))
+			self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 		else:
 			if not self.zyngui.curlayer:
 				logging.error("Can't fill bank list for None layer!")

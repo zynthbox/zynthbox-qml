@@ -50,6 +50,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Save Sound...")
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     saveDialog.mode = "sound";
                     saveDialog.open();
@@ -71,6 +72,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Clear Sound")
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {

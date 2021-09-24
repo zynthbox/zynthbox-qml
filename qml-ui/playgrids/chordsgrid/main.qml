@@ -88,9 +88,7 @@ Zynthian.BasePlayGrid {
             for (var i = 0; i < row_scale.length; ++i){
                 var subnotes = [];
                 for (var subnote_index = 0; subnote_index < diatonic_progressions.length; ++subnote_index){
-
                     var subnote_col = col;
-
                     for (var j = 0; j < diatonic_progressions[subnote_index]; ++j){
 
                         var subnote_scale_index = scale_index + j;
@@ -100,9 +98,7 @@ Zynthian.BasePlayGrid {
                         subnote_col += row_scale[subnote_scale_index];
                     }
 
-                    var subnote = component.getNote(
-                        subnote_col
-                    );
+                    var subnote = component.getNote(subnote_col);
                     subnotes.push(subnote);
 
                 }

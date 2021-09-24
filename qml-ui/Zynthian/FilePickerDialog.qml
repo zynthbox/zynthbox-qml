@@ -36,7 +36,6 @@ QQC2.Dialog {
 
     id: pickerDialog
     modal: true
-    standardButtons: Dialog.Cancel
     header: ColumnLayout{
         spacing: 8
 
@@ -74,6 +73,7 @@ QQC2.Dialog {
             }
         }
     }
+    footer: null
 
     contentItem: QQC2.ScrollView {
         contentItem: ListView {

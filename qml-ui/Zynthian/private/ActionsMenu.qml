@@ -38,6 +38,7 @@ QQC2.Menu
     property Component itemDelegate: QQC2.MenuItem {
         property Kirigami.Action kirigamiAction
         visible: kirigamiAction.visible === undefined || kirigamiAction.visible
+        enabled: kirigamiAction.enabled === undefined || kirigamiAction.enabled
         height: visible ? implicitHeight : 0
         width: parent.width
 

@@ -53,13 +53,22 @@ import jack
 
 @ctypes.CFUNCTYPE(None, ctypes.c_int)
 def cb(beat):
+    if beat % 32 == 0:
+        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate4th.emit(beat / 32)
+
+    if beat % 16 == 0:
+        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate8th.emit(beat / 16)
+
+    if beat % 8 == 0:
+        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate16th.emit(beat / 8)
+
     if beat % 4 == 0:
-        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate4th.emit(beat / 4)
+        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate32th.emit(beat / 4)
 
     if beat % 2 == 0:
-        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate8th.emit(beat / 2)
+        zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate64th.emit(beat / 2)
 
-    zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate16th.emit(beat)
+    zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate128th.emit(beat)
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
@@ -124,11 +133,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_enabled = enabled
 
         if enabled:
-            logging.error(f"Setting Click Track Length : {(60.0 / self.__song__.__bpm__) * 4}")
-            logging.error(f"Setting Clack Track Length : {(60.0 / self.__song__.__bpm__)}")
-
-            self.click_track_click.set_length((60.0 / self.__song__.__bpm__) * 4)
-            self.click_track_clack.set_length((60.0 / self.__song__.__bpm__))
+            self.click_track_click.set_length(4, self.__song__.bpm)
+            self.click_track_clack.set_length(1, self.__song__.bpm)
 
             self.click_track_click.queueClipToStart()
             self.click_track_clack.queueClipToStart()
@@ -354,11 +360,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__.getClip(j, i).stop()
 
     def update_timer_bpm(self):
-        logging.error(f"Setting Click Track Length : {(60.0 / self.__song__.__bpm__) * 4}")
-        logging.error(f"Setting Clack Track Length : {(60.0 / self.__song__.__bpm__)}")
-
-        self.click_track_click.set_length((60.0 / self.__song__.__bpm__) * 4)
-        self.click_track_clack.set_length((60.0 / self.__song__.__bpm__))
+        self.click_track_click.set_length(4, self.__song__.bpm)
+        self.click_track_clack.set_length(1, self.__song__.bpm)
 
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)
@@ -494,3 +497,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)
     metronomeBeatUpdate16th = Signal(int)
+    metronomeBeatUpdate32th = Signal(int)
+    metronomeBeatUpdate64th = Signal(int)
+    metronomeBeatUpdate128th = Signal(int)

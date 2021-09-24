@@ -32,6 +32,7 @@ QQC2.Dialog {
     property alias headerText: heading.text
     property string rootFolder: "/"
     property alias folderModel: folderModel
+    property alias filesListView: filesListView
     signal fileSelected(var file)
 
     id: pickerDialog
@@ -56,6 +57,7 @@ QQC2.Dialog {
             spacing: 2
 
             Zynthian.BreadcrumbButton {
+                id: homeButton
                 icon.name: "user-home-symbolic"
                 onClicked: {
                     folderModel.folder = pickerDialog.rootFolder+"/"
@@ -63,6 +65,7 @@ QQC2.Dialog {
             }
 
             Repeater {
+                id: breadcrumbsRepeater
                 model: folderBreadcrumbs.folderSplitArray
                 delegate: Zynthian.BreadcrumbButton {
                     text: modelData
@@ -73,12 +76,30 @@ QQC2.Dialog {
             }
         }
     }
-    footer: null
+    footer: Item {
+        height: 0
+    }
 
     contentItem: QQC2.ScrollView {
+        Keys.onPressed: {
+            console.log("Pressed")
+        }
+        Keys.onUpPressed: {
+            console.log("Up pressed")
+            currentIndex = currentIndex > 0 ? currentIndex-1 : currentIndex
+        }
+        Keys.onDownPressed: {
+            console.log("Down pressed")
+            currentIndex = currentIndex > 0 ? currentIndex+1 : currentIndex
+        }
+
         contentItem: ListView {
+            id: filesListView
+            focus: true
+
             Layout.leftMargin: 8
             clip: true
+
             model: FolderListModel {
                 id: folderModel
                 showDirs: true
@@ -87,6 +108,7 @@ QQC2.Dialog {
             }
             delegate: Kirigami.BasicListItem {
                 width: ListView.view.width
+                highlighted: ListView.isCurrentItem
 
                 label: model.fileName
                 icon: {
@@ -103,13 +125,30 @@ QQC2.Dialog {
                     console.log(model.fileName, model.filePath)
 
                     if (model.fileIsDir) {
-                        folderModel.folder = model.filePath
+                        var path = model.filePath
+
+                        if (path.endsWith("/")) {
+                            path = path.slice(0, path.length-1)
+                        }
+
+                        folderModel.folder = path
                     } else {
                         fileSelected(model)
                         pickerDialog.accept()
                     }
                 }
             }
+        }
+    }
+
+    function goBack() {
+        var path = folderModel.folder;
+        path.replace(rootFolder, "").replace("/", "");
+
+        if (path.length > 0) {
+            arr = folderModel.folder.split("/");
+            arr.pop();
+            folderModel.folder = arr().join("/");
         }
     }
 }

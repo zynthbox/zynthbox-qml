@@ -89,7 +89,7 @@ QQC2.ScrollView {
             interval: 100
             onTriggered: {
                 view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
-                view.contentY++ //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
+                view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
                 view.forceLayout()
             }
         }

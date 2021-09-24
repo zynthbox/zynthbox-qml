@@ -32,9 +32,15 @@ import org.kde.kirigami 2.4 as Kirigami
 import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
+    property alias zlScreen: root
+
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    signal cuiaNavUp();
+    signal cuiaNavDown();
+    signal cuiaNavBack();
+    signal cuiaSelect();
 
     title: qsTr("Zynthiloops")
     screenId: "zynthiloops"
@@ -93,6 +99,37 @@ Zynthian.ScreenPage {
             }
         }
     ]
+
+    cuiaCallback: function(cuia) {
+        console.log("ZL Cuia Handler :", cuia)
+
+        switch (cuia) {
+            case "SELECT_UP":
+                root.cuiaNavUp();
+                return true;
+
+            case "SELECT_DOWN":
+                root.cuiaNavDown();
+                return true;
+
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                root.cuiaSelect();
+
+                return true;
+
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                root.cuiaNavBack();
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
 
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;

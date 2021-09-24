@@ -136,7 +136,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		if self.__show_top_sounds:
 			self.zyngui.screens['preset'].set_top_sounds_engine(self.list_data[i][0])
 			if self.zyngui.curlayer != None and self.zyngui.curlayer.engine.nickname == self.list_data[i][0]:
-				self.zyngui.screens['preset'].select_action(0)
+				self.zyngui.screens['preset'].select_action(0) #TODO Enable /disable whether is wanted to switch on touch
 				self.select(i)
 				self.zyngui.screens['preset'].select(0)
 			else:

@@ -261,7 +261,7 @@ Zynthian.ScreenPage {
             id: presetSyncPosTimer
             interval: 100
             onTriggered: {
-                presetView.view.positionViewAtIndex(presetView.view.currentIndex, ListView.Beginning)
+                presetView.view.positionViewAtIndex(presetView.view.currentIndex, ListView.SnapPosition)
             }
         }
         Connections {

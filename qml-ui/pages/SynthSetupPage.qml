@@ -262,6 +262,8 @@ Zynthian.ScreenPage {
             interval: 100
             onTriggered: {
                 presetView.view.positionViewAtIndex(presetView.view.currentIndex, ListView.SnapPosition)
+                presetView.view.contentY++ //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
+                presetView.view.forceLayout()
             }
         }
         Connections {

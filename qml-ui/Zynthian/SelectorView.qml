@@ -75,6 +75,7 @@ QQC2.ScrollView {
         keyNavigationWraps: false
         clip: true
         currentIndex: root.selector.current_index
+        cacheBuffer: height
 
         onActiveFocusChanged: {
             if (activeFocus) {
@@ -88,6 +89,8 @@ QQC2.ScrollView {
             interval: 100
             onTriggered: {
                 view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
+                view.contentY++ //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
+                view.forceLayout()
             }
         }
         //highlightRangeMode: ListView.ApplyRange

@@ -27,10 +27,11 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
 import QtGraphicalEffects 1.0
+import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.ScreenPage {
     id: component
@@ -96,10 +97,10 @@ Zynthian.ScreenPage {
     }
 
     Connections {
-        target: zynthian.playgrid
-        onPlayGridIndexChanged: {
+        target: ZynQuick.PlayGridManager
+        onCurrentPlaygridsChanged: {
             if (playGridsRepeater.count > 0){
-                var playgrid = playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item
+                var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
                 playGridStack.replace(playgrid.grid);
                 settingsStack.replace(playgrid.settings);
             }
@@ -158,7 +159,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                         Layout.margins: 8
                         model: playGridsRepeater.count
-                        currentIndex: zynthian.playgrid.playGridIndex
+                        currentIndex: ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]
                         delegate: QQC2.ItemDelegate {
                             id: settingsSelectorDelegate
                             property Item gridComponent: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(model.index).item
@@ -187,7 +188,7 @@ Zynthian.ScreenPage {
                                 elide: Text.ElideRight
                             }
                             onClicked: {
-                                zynthian.playgrid.playGridIndex = model.index;
+                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", model.index);
                             }
                         }
                     }
@@ -196,7 +197,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         clip: true
-                        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item.settings
+                        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.settings
                     }
                 }
             }
@@ -263,10 +264,10 @@ Zynthian.ScreenPage {
                                     icon.name: playGrid.icon
                                     text: playGrid.name
                                     display: QQC2.AbstractButton.TextBesideIcon
-                                    enabled: index !== zynthian.playgrid.playGridIndex
+                                    enabled: index !== ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]
                                     onClicked: {
                                         settingsPopup.visible = false;
-                                        zynthian.playgrid.playGridIndex = index
+                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
                                     }
                                 }
                             }
@@ -427,8 +428,8 @@ Zynthian.ScreenPage {
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (0 < xChoice && xChoice <= playGridsRepeater.count && zynthian.playgrid.playGridIndex !== xChoice - 1) {
-                                        zynthian.playgrid.playGridIndex = xChoice - 1
+                                    if (0 < xChoice && xChoice <= playGridsRepeater.count && ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
+                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
                                     }
                                 }
                             }
@@ -450,13 +451,15 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item.grid
+            initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.grid
         }
     }
 
     Component {
         id: defaultSidebar
         ColumnLayout {
+            Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
+
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -545,7 +548,7 @@ Zynthian.ScreenPage {
                     anchors.fill: parent
                     property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
                     onModulationValueChanged: {
-                        zynthian.playgrid.modulation = modulationValue;
+                        ZynQuick.PlayGridManager.modulation = modulationValue;
                     }
                     touchPoints: [ TouchPoint { id: modulationPoint; } ]
                     onPressed: {
@@ -555,7 +558,7 @@ Zynthian.ScreenPage {
                     onReleased: {
                         parent.down = false;
                         focus = false;
-                        zynthian.playgrid.modulation = 0;
+                        ZynQuick.PlayGridManager.modulation = 0;
                     }
                 }
             }
@@ -583,12 +586,12 @@ Zynthian.ScreenPage {
                     onPressed: {
                         parent.down = true;
                         focus = true;
-                        zynthian.playgrid.pitch = 8191;
+                        ZynQuick.PlayGridManager.pitch = 8191;
                     }
                     onReleased: {
                         parent.down = false;
                         focus = false;
-                        zynthian.playgrid.pitch = 0;
+                        ZynQuick.PlayGridManager.pitch = 0;
                     }
                 }
             }
@@ -617,25 +620,23 @@ Zynthian.ScreenPage {
                     onPressed: {
                         parent.down = true;
                         focus = true;
-                        zynthian.playgrid.pitch = -8192;
+                        ZynQuick.PlayGridManager.pitch = -8192;
                     }
                     onReleased: {
                         parent.down = false;
                         focus = false;
-                        zynthian.playgrid.pitch = 0;
+                        ZynQuick.PlayGridManager.pitch = 0;
                     }
                 }
             }
-
-            Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
         }
     }
 
 
     Repeater {
         id:playGridsRepeater
-        model: zynthian.playgrid.playgrids
-        property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.playgrid.playGridIndex).item
+        model: ZynQuick.PlayGridManager.playgrids
+        property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
         Loader {
             id:playGridLoader
             source: modelData + "/main.qml"

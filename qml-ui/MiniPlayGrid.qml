@@ -31,6 +31,7 @@ import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 import "pages" as Pages
 
 RowLayout {
@@ -235,8 +236,8 @@ RowLayout {
                                     break;
                             }
                         } else if (yChoice === 0 && xChoice !== 0) {
-                            if (0 < xChoice && xChoice <= playGridsRepeater.count && zynthian.miniplaygrid.playGridIndex !== xChoice - 1) {
-                                zynthian.miniplaygrid.playGridIndex = xChoice - 1
+                            if (0 < xChoice && xChoice <= playGridsRepeater.count && ZynQuick.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
+                                ZynQuick.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
                             }
                         }
                     }
@@ -250,12 +251,12 @@ RowLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         clip: true
-        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.miniplaygrid.playGridIndex).item.miniGrid
+        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item.miniGrid
         Connections {
-            target: zynthian.miniplaygrid
-            onPlayGridIndexChanged: {
+            target: ZynQuick.PlayGridManager
+            onCurrentPlaygridsChanged: {
                 if (playGridsRepeater.count > 0) {
-                    var playgrid = playGridsRepeater.itemAt(zynthian.miniplaygrid.playGridIndex).item
+                    var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
                     playGridStack.replace(playgrid.miniGrid);
                     //settingsStack.replace(playgrid.settings);
                 }
@@ -264,8 +265,8 @@ RowLayout {
 
         Repeater {
             id:playGridsRepeater
-            model: zynthian.miniplaygrid.playgrids
-            property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(zynthian.miniplaygrid.playGridIndex).item
+            model: ZynQuick.PlayGridManager.playgrids
+            property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
             Loader {
                 id:playGridLoader
                 source: modelData + "/main.qml"

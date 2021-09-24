@@ -41,7 +41,7 @@ from . import zynthian_gui_selector
 from zyngine import zynthian_layer
 
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-
+import traceback
 #------------------------------------------------------------------------------
 # Zynthian Layer Selection GUI Class
 #------------------------------------------------------------------------------
@@ -432,17 +432,20 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.replace_on_fxchain(layer)
 				else:
 					self.add_to_fxchain(layer, self.layer_chain_parallel)
-					self.layers.append(layer)
+					if layer not in self.layers:
+						self.layers.append(layer)
 			# Try to connect MIDI tools ...
 			elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
 				if self.replace_layer_index is not None:
 					self.replace_on_midichain(layer)
 				else:
 					self.add_to_midichain(layer, self.layer_chain_parallel)
-					self.layers.append(layer)
+					if layer not in self.layers:
+						self.layers.append(layer)
 			# New root layer
 			else:
-				self.layers.append(layer)
+				if layer not in self.layers:
+					self.layers.append(layer)
 
 			self.zyngui.zynautoconnect()
 
@@ -500,11 +503,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.zyngui.show_confirm("Do you really want to remove this layer?", self.remove_current_layer)
 
 	def remove_current_layer(self, params=None):
-		logging.error("REMOVING".format(self.index))
+		logging.error("REMOVING {}".format(self.index))
 		self.remove_root_layer(self.index)
 
 	def remove_root_layer(self, i, stop_unused_engines=True):
 		if i>=0 and i<len(self.root_layers):
+			traceback.print_stack(None, 8)
 			# For some engines (Aeolus, setBfree), delete all layers from the same engine
 			if self.root_layers[i].engine.nickname in ['BF', 'AE']:
 				root_layers_to_delete = copy.copy(self.root_layers[i].engine.layers)
@@ -557,13 +561,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Recalculate selector and root_layers list
 			self.fill_list()
 
-			logging.error("REMOVED CURLAYER{}{}".format(self.zyngui.curlayer, (self.zyngui.curlayer in self.root_layers)))
 			if self.zyngui.curlayer in self.root_layers:
 				self.index = self.root_layers.index(self.zyngui.curlayer)
 			else:
 				self.zyngui.set_curlayer(None)
 				#FIXME: different behavior: leave an empty layer as active when deleting
-				#self.index=0
+				self.index=-1
+				self.zyngui.screens['bank'].set_show_top_sounds(False)
 				#try:
 					#self.zyngui.set_curlayer(self.root_layers[self.index])
 				#except:

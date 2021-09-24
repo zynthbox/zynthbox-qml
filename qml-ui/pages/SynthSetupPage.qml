@@ -230,6 +230,7 @@ Zynthian.ScreenPage {
                 }
             }
             Zynthian.SelectorView {
+                id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "preset"
@@ -240,6 +241,17 @@ Zynthian.ScreenPage {
         }
 
 
+        Connections {
+            target: zynthian
+            onActive_midi_channelChanged: presetSyncPosTimer.restart()
+        }
+        Timer {
+            id: presetSyncPosTimer
+            interval: 100
+            onTriggered: {
+                presetView.view.positionViewAtIndex(presetView.view.currentIndex, ListView.Beginning)
+            }
+        }
         Connections {
             target: zynthian.fixed_layers
             onCurrent_index_validChanged: {

@@ -87,9 +87,12 @@ QQC2.ScrollView {
             id: syncPosTimer
             interval: 100
             onTriggered: {
-                view.positionViewAtIndex(currentIndex, ListView.Beginning)
+                view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
             }
         }
+        //highlightRangeMode: ListView.ApplyRange
+        preferredHighlightBegin: Kirigami.Units.gridUnit * 2
+        preferredHighlightEnd: Kirigami.Units.gridUnit * 4
 
         Connections {
             id: focusConnection

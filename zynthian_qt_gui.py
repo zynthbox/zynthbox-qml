@@ -920,16 +920,20 @@ class zynthian_gui(QObject):
             if save:
                 self._curlayer = self.curlayer
             self.curlayer = layer
-            self.screens["bank"].fill_list()
-            self.screens["bank"].show()
-            self.screens["preset"].fill_list()
-            self.screens["preset"].show()
-            self.screens["control"].fill_list()
-            self.screens["control"].show()
-
             self.set_active_channel()
+            try:
+                self.screens["layer"].select(self.screens["layer"].root_layers.index(layer))
+            except:
+                pass
         else:
             self.curlayer = None
+        self.screens["fixed_layers"].sync_index_from_curlayer()
+        self.screens["bank"].fill_list()
+        self.screens["bank"].show()
+        self.screens["preset"].fill_list()
+        self.screens["preset"].show()
+        self.screens["control"].fill_list()
+        self.screens["control"].show()
         self.active_midi_channel_changed.emit()
 
     def restore_curlayer(self):

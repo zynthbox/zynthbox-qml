@@ -219,15 +219,25 @@ Zynthian.ScreenPage {
                 }
                 QQC2.Button {
                     id: favToggleButton
-                    icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                    icon.name: zynthian.preset.current_is_favorite ? "starred-symbolic" : "non-starred-symbolic"
                     text: qsTr("Toggle")
                     LayoutMirroring.enabled: true
                     LayoutMirroring.childrenInherit: true
-                    checkable: true
-                    checked: zynthian.preset.current_is_favorite
-                    onToggled: {
-                        zynthian.preset.current_is_favorite = checked;
+                    onClicked: {
+                        zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite;
                         zynthian.current_screen_id = "preset";
+                    }
+                    MouseArea { //HACK: try to enlarge hit area a bit, probably useless
+                        anchors {
+                            fill: parent
+                            leftMargin: -16
+                            topMargin: -16
+                            rightMargin: -16
+                        }
+                        onClicked: {
+                            zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite;
+                            zynthian.current_screen_id = "preset";
+                        }
                     }
                 }
             }

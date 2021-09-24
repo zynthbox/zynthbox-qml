@@ -300,7 +300,7 @@ class zynthiloops_clip(QObject):
             self.__song__.schedule_save()
 
             if self.audioSource is not None:
-                self.audioSource.set_length(min(self.duration - self.__start_position__, (60.0 / self.__song__.bpm) * self.__length__))
+                self.audioSource.set_length(self.__length__, self.__song__.bpm)
             self.reset_beat_count()
     length = Property(int, length, set_length, notify=length_changed)
 

@@ -82,13 +82,14 @@ QQC2.ScrollView {
             }
         }
 
-        onCurrentIndexChanged: {
-            positionViewAtIndex(currentIndex, ListView.Contain)
-            if (currentIndex != root.selector.current_index) {
-                root.selector.current_index = currentIndex;
+        onCountChanged: syncPosTimer.restart()
+        Timer {
+            id: syncPosTimer
+            interval: 100
+            onTriggered: {
+                view.positionViewAtIndex(currentIndex, ListView.Beginning)
             }
         }
-        onCountChanged: positionViewAtIndex(currentIndex, ListView.Beginning)
 
         Connections {
             id: focusConnection

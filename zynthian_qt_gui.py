@@ -930,6 +930,7 @@ class zynthian_gui(QObject):
             self.set_active_channel()
         else:
             self.curlayer = None
+        self.active_midi_channel_changed.emit()
 
     def restore_curlayer(self):
         if self._curlayer:
@@ -2250,6 +2251,10 @@ class zynthian_gui(QObject):
         display.flush()
 
 
+    def get_active_midi_channel(self):
+        if self.curlayer == None:
+            return -1
+        return self.curlayer.midi_chan
 
     def get_current_screen_id(self):
         if self.modal_screen:
@@ -2419,6 +2424,7 @@ class zynthian_gui(QObject):
     current_qml_page_changed = Signal()
     miniPlayGridToggle = Signal()
     home_screen_changed = Signal()
+    active_midi_channel_changed = Signal()
 
     current_screen_id = Property(
         str,
@@ -2436,6 +2442,8 @@ class zynthian_gui(QObject):
     is_loading = Property(bool, get_is_loading, notify=is_loading_changed)
 
     home_screen = Property(str, get_home_screen, set_home_screen, notify=home_screen_changed)
+
+    active_midi_channel = Property(str, get_active_midi_channel, notify = active_midi_channel_changed)
 
     status_information = Property(
         QObject, get_status_information, constant=True

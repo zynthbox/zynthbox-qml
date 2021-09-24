@@ -111,7 +111,8 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            enabled: false
+            text: qsTr("Get New Modules")
+            onTriggered: zynthian.show_modal("module_downloader")
         },
         Kirigami.Action {
             text: qsTr("Power")
@@ -127,10 +128,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Power Off")
                 onTriggered: zynthian.main.power_off()
             }
-        },
-        Kirigami.Action {
-            text: qsTr("Get New Modules")
-            onTriggered: zynthian.show_modal("module_downloader")
         }
     ]
 }

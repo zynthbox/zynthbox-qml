@@ -653,17 +653,17 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startMetronomeRequest(self):
-        self.__metronome_manager__.metronomeBeatUpdateOneFourth.connect(self.metronome_update4th)
-        self.__metronome_manager__.metronomeBeatUpdateOneEighth.connect(self.metronome_update8th)
-        self.__metronome_manager__.metronomeBeatUpdateOneSixteenth.connect(self.metronome_update16th)
+        self.__metronome_manager__.metronomeBeatUpdate4th.connect(self.metronome_update4th)
+        self.__metronome_manager__.metronomeBeatUpdate8th.connect(self.metronome_update8th)
+        self.__metronome_manager__.metronomeBeatUpdate16th.connect(self.metronome_update16th)
         self.__metronome_manager__.start_metronome_request()
 
     @Slot(None)
     def stopMetronomeRequest(self):
         try:
-            self.__metronome_manager__.metronomeBeatUpdateOneFourth.disconnect(self.metronome_update4th)
-            self.__metronome_manager__.metronomeBeatUpdateOneEighth.disconnect(self.metronome_update8th)
-            self.__metronome_manager__.metronomeBeatUpdateOneSixteenth.disconnect(self.metronome_update16th)
+            self.__metronome_manager__.metronomeBeatUpdate4th.disconnect(self.metronome_update4th)
+            self.__metronome_manager__.metronomeBeatUpdate8th.disconnect(self.metronome_update8th)
+            self.__metronome_manager__.metronomeBeatUpdate16th.disconnect(self.metronome_update16th)
         except Exception as e:
             logging.error(f"Failed to disconnect. Not connected maybe? : {str(e)}")
         self.__metronome_manager__.stop_metronome_request()

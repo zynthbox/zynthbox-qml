@@ -148,9 +148,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			elif t=='B':
 				self.layer_options()
 
-		if i < len(self.root_layers):
-			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
-		#self.zyngui.screens['bank'].show()
 
 	def next_action(self):
 		return "bank"
@@ -560,14 +557,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Recalculate selector and root_layers list
 			self.fill_list()
 
+			logging.error("REMOVED CURLAYER{}{}".format(self.zyngui.curlayer, (self.zyngui.curlayer in self.root_layers)))
 			if self.zyngui.curlayer in self.root_layers:
 				self.index = self.root_layers.index(self.zyngui.curlayer)
 			else:
-				self.index=0
-				try:
-					self.zyngui.set_curlayer(self.root_layers[self.index])
-				except:
-					self.zyngui.set_curlayer(None)
+				self.zyngui.set_curlayer(None)
+				#FIXME: different behavior: leave an empty layer as active when deleting
+				#self.index=0
+				#try:
+					#self.zyngui.set_curlayer(self.root_layers[self.index])
+				#except:
+					#self.zyngui.set_curlayer(None)
 
 			self.set_selector()
 

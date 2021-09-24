@@ -129,9 +129,11 @@ class zynthian_gui_bank(zynthian_gui_selector):
 
 	def show(self):
 		if self.__show_top_sounds: #don't support autosync when top sounds is enabled
+			super().show()
 			return
 		if not self.zyngui.curlayer:
 			logging.error("Can't show bank list for None layer!")
+			super().show()
 			return
 		if not self.zyngui.curlayer.get_bank_name():
 			self.zyngui.curlayer.set_bank(0)

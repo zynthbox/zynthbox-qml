@@ -93,38 +93,18 @@ class zynthian_gui_bank(zynthian_gui_selector):
 		self.__show_top_sounds = show
 		self.fill_list()
 		self.show()
-		bank_found = False
 		if show and self.zyngui.curlayer:
 			top_sounds = self.zyngui.screens['preset'].get_all_top_sounds()
-			for i, item in enumerate(self.list_data):
-				engine = item[0]
-				if engine == self.zyngui.curlayer.engine.nickname:
-					self.select_action(i)
-					bank_found = True
-					break
-			self.zyngui.screens['preset'].select(-1)
-			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
-				if preset[2] == self.zyngui.curlayer.preset_name:
-					self.zyngui.screens['preset'].select_action(i)
-					break
+			self.select_action(0)
+			self.zyngui.screens['preset'].select(0)
 		elif self.zyngui.curlayer:
 			self.zyngui.screens['preset'].set_top_sounds_engine(None)
-			for i, bank in enumerate(self.list_data):
-				if bank[2] == self.zyngui.curlayer.bank_name:
-					self.select_action(i)
-					bank_found = True
-					break
-			self.zyngui.screens['preset'].select(-1)
-			for i, preset in enumerate(self.zyngui.screens['preset'].list_data):
-				if preset[2] == self.zyngui.curlayer.preset_name:
-					self.zyngui.screens['preset'].select_action(i)
-					break
+			self.zyngui.screens['bank'].show()
+			self.zyngui.screens['preset'].show()
 		else:
 			self.zyngui.screens['preset'].set_top_sounds_engine(None)
 			self.zyngui.screens['preset'].fill_list()
-		if not bank_found:
-			self.select_action(0)
-			self.zyngui.screens['preset'].select(0)
+
 		self.show_top_sounds_changed.emit()
 
 	def show(self):

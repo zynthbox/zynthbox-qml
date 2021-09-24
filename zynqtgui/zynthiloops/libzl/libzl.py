@@ -71,7 +71,7 @@ def init():
 
         libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-        libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float]
+        libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
 
         libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
@@ -169,9 +169,9 @@ class ClipAudioSource(QObject):
         if libzl:
             libzl.ClipAudioSource_setStartPosition(self.obj, start_position_in_seconds)
 
-    def set_length(self, length_in_seconds: float):
+    def set_length(self, length: int, bpm: int):
         if libzl:
-            libzl.ClipAudioSource_setLength(self.obj, length_in_seconds)
+            libzl.ClipAudioSource_setLength(self.obj, length, bpm)
 
     def set_pitch(self, pitch: float):
         if libzl:

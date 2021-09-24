@@ -189,9 +189,6 @@ class zynthiloops_song(QObject):
 
                 if "name" in sketch:
                     self.__name__ = sketch["name"]
-                if "bpm" in sketch:
-                    self.__bpm__ = sketch["bpm"]
-                    self.set_bpm(self.__bpm__, True)
                 if "volume" in sketch:
                     self.__volume__ = sketch["volume"]
                     self.set_volume(self.__volume__, True)
@@ -199,6 +196,9 @@ class zynthiloops_song(QObject):
                     self.__parts_model__.deserialize(sketch["parts"])
                 if "tracks" in sketch:
                     self.__tracks_model__.deserialize(sketch["tracks"])
+                if "bpm" in sketch:
+                    self.__bpm__ = sketch["bpm"]
+                    self.set_bpm(self.__bpm__, True)
 
                 return True
         except Exception as e:

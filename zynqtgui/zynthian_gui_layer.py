@@ -105,6 +105,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		if 'fixed_layers' in self.zyngui.screens:
 			self.zyngui.screens['fixed_layers'].fill_list()
+		if 'main_layers_view' in self.zyngui.screens:
+			self.zyngui.screens['main_layers_view'].fill_list()
 
 		# Should be emitted only when the actual curlayer or its engine change
 		self.engine_nick_changed.emit()
@@ -222,6 +224,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
 			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
 			self.zyngui.screens['fixed_layers'].current_index_valid_changed.emit()
+			self.zyngui.screens['main_layers_view'].sync_index_from_curlayer()
+			self.zyngui.screens['main_layers_view'].current_index_valid_changed.emit()
 			self.set_select_path()
 		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
 			#self.replace_layer_index = None

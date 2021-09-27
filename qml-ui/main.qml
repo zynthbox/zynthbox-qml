@@ -78,9 +78,23 @@ Kirigami.AbstractApplicationWindow {
                 highlighted: zynthian.current_screen_id === 'session_dashboard'
             }
             Zynthian.BreadcrumbButton {
-                text: screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine'
-                        ? zynthian.engine.midi_channel > 5 ? "6." + (zynthian.engine.midi_channel - 5) : zynthian.engine.midi_channel + 1 + "ˬ"
-                        : zynthian.fixed_layers.selector_path_element > 5 ? "6." + (zynthian.fixed_layers.selector_path_element - 5) : zynthian.fixed_layers.selector_path_element + "ˬ"
+                text: {
+                    if (screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
+                        if (zynthian.engine.midi_channel > 10) {
+                            return "7." + (zynthian.engine.midi_channel - 10) + "ˬ";
+                        } else if (zynthian.engine.midi_channel > 5) {
+                            return  "6." + (zynthian.engine.midi_channel - 5) + "ˬ";
+                        } else {
+                            return zynthian.engine.midi_channel + 1 + "ˬ";
+                        }
+                    } else if (zynthian.main_layers_view.selector_path_element > 10) {
+                        return "7." + (zynthian.main_layers_view.selector_path_element - 10) + "ˬ";
+                    } else if (zynthian.main_layers_view.selector_path_element > 5) {
+                        return "6." + (zynthian.main_layers_view.selector_path_element - 5) + "ˬ";
+                    } else {
+                        return zynthian.main_layers_view.selector_path_element + "ˬ";
+                    }
+                }
                 onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers'
                 QQC2.Menu {
@@ -127,7 +141,7 @@ Kirigami.AbstractApplicationWindow {
         id: screensLayer
         parent: root.contentItem
         anchors.fill: parent
-        initialPage: [root.pageScreenMapping.pageForScreen('layer')]
+        initialPage: [root.pageScreenMapping.pageForScreen('main_layers_view')]
     }
 
     ModalScreensLayer {

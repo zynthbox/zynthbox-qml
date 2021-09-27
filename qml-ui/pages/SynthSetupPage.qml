@@ -234,6 +234,7 @@ Zynthian.ScreenPage {
                                     zynthian.layer.clone_midi(index, index + 1);
                                     zynthian.layer.clone_midi(index + 1, index);
                                 }
+                                zynthian.layer.ensure_contiguous_cloned_layers();
                                 delegate.clicked();
                             }
                             onClicked: delegate.clicked();

@@ -1686,6 +1686,30 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
 		self.zyngui.screens['main_layers_view'].fill_list()
 
+	@Slot(None)
+	def ensure_contiguous_cloned_layers(self):
+		groups = []
+		current_group = []
+		for i in range(16):
+			if zyncoder.lib_zyncoder.get_midi_filter_clone(i, i+1):
+				if i not in current_group:
+					current_group.append(i)
+				current_group.append(i+1)
+			elif len(current_group) > 0:
+				groups.append(current_group)
+				current_group = []
+
+		for group in groups:
+			for chan1 in group:
+				for i in range(16): #remove associations now invalid
+					if i not in group:
+						zyncoder.lib_zyncoder.set_midi_filter_clone(chan1, i, 0)
+						zyncoder.lib_zyncoder.set_midi_filter_clone(i, chan1, 0)
+				for chan2 in group:
+					if chan1 != chan2 and not zyncoder.lib_zyncoder.get_midi_filter_clone(chan1, chan2):
+						zyncoder.lib_zyncoder.set_midi_filter_clone(chan1, chan2, 1)
+
+
 	@Slot(int, int)
 	def copy_midichan_layer(self, from_midichan: int, to_midichan: int):
 		if from_midichan < 0 or to_midichan < 0:

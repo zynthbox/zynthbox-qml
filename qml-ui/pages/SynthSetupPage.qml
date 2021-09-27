@@ -223,8 +223,7 @@ Zynthian.ScreenPage {
                                     margins: -Kirigami.Units.smallSpacing
                                 }
                                 radius: 3
-                                color: Kirigami.Theme.highlightColor
-                                border.color: Kirigami.Theme.backgroundColor
+                                color: layersView.currentIndex == index ? Kirigami.Theme.backgroundColor : Kirigami.Theme.highlightColor
                                 opacity: parent.pressed ? 0.4 : 0
                             }
                             onPressAndHold: {

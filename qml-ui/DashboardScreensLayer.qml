@@ -74,7 +74,7 @@ Zynthian.Stack {
                 if (file.length > 0) {
                     root.replace(file, QQC2.StackView.PushTransition);
                 } else {
-                    print("Non managed screen " + zynthian.current_screen_id);
+                    print("Non managed dashboard screen " + zynthian.current_screen_id);
                     root.clear(QQC2.StackView.PopTransition);
                     root.depthChanged()
                 }

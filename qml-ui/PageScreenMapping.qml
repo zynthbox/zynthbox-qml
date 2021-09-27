@@ -64,6 +64,7 @@ QtObject {
     readonly property var screens: {
         "layer": "SynthSetupPage.qml",
         "fixed_layers": "SynthSetupPage.qml",
+        "main_layers_view": "SynthSetupPage.qml",
         "bank": "SynthSetupPage.qml",
         "preset": "SynthSetupPage.qml",
         "control": "ControlPage.qml",

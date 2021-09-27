@@ -41,19 +41,12 @@ Kirigami.PageRow {
     Component.onCompleted: {
         zynthian.current_screen_id_changed()
     }
-    function screenIdMapping(id) {
-        if (id == "layer") {
-            return "fixed_layers";
-        } else {
-            return id;
-        }
-    }
 
     data: [
         Connections {
             target: zynthian
             onCurrent_screen_idChanged: {
-                let screenId = root.screenIdMapping(zynthian.current_screen_id);
+                let screenId = zynthian.current_screen_id;
                 print("SCREEN ID CHANGED: "+screenId);
 
                 // This should never happen

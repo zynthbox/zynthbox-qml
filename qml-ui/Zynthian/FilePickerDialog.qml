@@ -142,13 +142,14 @@ QQC2.Dialog {
     }
 
     function goBack() {
-        var path = folderModel.folder;
-        path.replace(rootFolder, "").replace("/", "");
+        var newPath = String(folderModel.folder).replace("file://", "").split("/");
+        newPath.pop();
+        newPath = newPath.join("/");
 
-        if (path.length > 0) {
-            arr = folderModel.folder.split("/");
-            arr.pop();
-            folderModel.folder = arr().join("/");
+        if (newPath.includes(rootFolder)) {
+            folderModel.folder = newPath;
+        } else {
+            folderModel.folder = rootFolder;
         }
     }
 }

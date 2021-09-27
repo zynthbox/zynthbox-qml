@@ -42,6 +42,8 @@ def init():
         ### Type Definition
         libzl.stopClips.argTypes = [ctypes.c_int, ]
 
+        libzl.SyncTimer_instance.restype = QObject
+
         libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
 
         libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
@@ -92,6 +94,9 @@ def init():
         libzl = None
         print(f"Can't initialise libzl library: {str(e)}")
 
+def getSyncTimerInstance():
+    if libzl:
+        return libzl.SyncTimer_instance()
 
 def registerTimerCallback(callback):
     if libzl:

@@ -117,7 +117,8 @@ Zynthian.Card {
                 enabled: !controlObj.isPlaying
 
                 onClicked: {
-                    pickerDialog.open()
+                    pickerDialog.folderModel.folder = root.controlObj.recordingDir;
+                    pickerDialog.open();
                 }
             }
 
@@ -312,7 +313,6 @@ Zynthian.Card {
         headerText: qsTr("Pick an audio file")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
-            folder: root.controlObj.recordingDir
             nameFilters: ["*.wav"]
         }
         onFileSelected: {

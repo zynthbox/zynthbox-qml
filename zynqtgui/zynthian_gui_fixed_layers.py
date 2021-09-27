@@ -52,30 +52,65 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     def fill_list(self):
         self.list_data=[]
+        self.list_metadata=[]
 
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__fixed_layers_count):
+            metadata = {}
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
                     self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
                 else:
                     self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+                effects_label = ""
+                first = True
+                for sl in self.zyngui.screens['layer'].get_fxchain_layers(layer):
+                    sl0 = None
+                    bullet = ""
+                    if sl.is_parallel_audio_routed(sl0):
+                        bullet = " || "
+                    else:
+                        bullet = " -> "
+                    if not first:
+                        effects_label += bullet + sl.engine.get_path(sl).replace("JV/","")
+                    first = False
+                    sl0 = sl
+                metadata["effects_label"] = effects_label
             else:
                 self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
+                metadata["effects_label"] = ""
+
+            metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
+            self.list_metadata.append(metadata)
 
         if self.__extra_layers_count > 0:
             self.list_data.append((None,-1, "{} - T-RACK:".format(self.__fixed_layers_count+1))) # Separator
 
         for i in range(self.__start_midi_chan + self.__fixed_layers_count, self.__start_midi_chan + self.__fixed_layers_count + self.__extra_layers_count):
             special_layer_number = i - self.__fixed_layers_count + 1
+            metadata = {}
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
                     self.list_data.append((str(i+1),i,"    {}.{} - {}".format(self.__fixed_layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""))))
                 else:
                     self.list_data.append((str(i+1),i,"    {}.{} - {} > {}".format(self.__fixed_layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+                effects_label = ""
+                for layer in self.zyngui.screens['layer'].get_fxchain_layers(layer):
+                    layer0 = None
+                    bullet = ""
+                    if layer.is_parallel_audio_routed(layer0):
+                        bullet = " || "
+                    else:
+                        bullet = " -> "
+                    effects_label += bullet + layer.engine.get_path(layer).replace("JV/","")
+                    layer0 = layer
+                metadata["effects_label"] = effects_label
             else:
                 self.list_data.append((str(i+1),i, "    {}.{} - -".format(self.__fixed_layers_count+1, special_layer_number)))
+                metadata["effects_label"] = ""
+            metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
+            self.list_metadata.append(metadata)
 
         self.special_layer_name_changed.emit()
         super().fill_list()

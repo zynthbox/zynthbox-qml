@@ -131,6 +131,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		self.audiofx_layer = None
 		self.fill_list()
+		self.zyngui.screens['main_layers_view'].fill_list()
 
 
 	def audiofx_reset_confirmed(self, params=None):

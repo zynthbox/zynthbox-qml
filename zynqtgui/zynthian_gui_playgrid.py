@@ -143,9 +143,10 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStop.connect(self.stopMetronomeRequest)
             zynthian_gui_playgrid.__zynquick_pgmanager__.pitchChanged.connect(self.__set_pitch__)
             zynthian_gui_playgrid.__zynquick_pgmanager__.modulationChanged.connect(self.__set_modulation__)
+            zynthian_gui_playgrid.__zynquick_pgmanager__.syncTimer = libzl.getSyncTimerInstance()
             self.__zynquick_pgmanager_changed__.emit()
-            logging.error("Really, we should be registering this function, but we need to get at it properly. Maybe pass the libzl instance into the qtquick module instead, though (which needs libzl to be installed and findable, with headers). " + str(getattr(zynthian_gui_playgrid.__zynquick_pgmanager__, "metronomeTick")))
-            libzl.registerTimerCallback(playgrid_cb)
+            #logging.error("Really, we should be registering this function, but we need to get at it properly. Maybe pass the libzl instance into the qtquick module instead, though (which needs libzl to be installed and findable, with headers). " + str(getattr(zynthian_gui_playgrid.__zynquick_pgmanager__, "metronomeTick")))
+            #libzl.registerTimerCallback(playgrid_cb)
 
     @Signal
     def __zynquick_pgmanager_changed__(self):

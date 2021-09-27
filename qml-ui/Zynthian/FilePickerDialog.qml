@@ -37,6 +37,7 @@ QQC2.Dialog {
 
     id: pickerDialog
     modal: true
+
     header: ColumnLayout{
         spacing: 8
 
@@ -71,6 +72,7 @@ QQC2.Dialog {
                     text: modelData
                     onClicked: {
                         folderModel.folder = pickerDialog.rootFolder+"/"+folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
+                        filesListView.currentIndex = 0;
                     }
                 }
             }
@@ -81,18 +83,6 @@ QQC2.Dialog {
     }
 
     contentItem: QQC2.ScrollView {
-        Keys.onPressed: {
-            console.log("Pressed")
-        }
-        Keys.onUpPressed: {
-            console.log("Up pressed")
-            currentIndex = currentIndex > 0 ? currentIndex-1 : currentIndex
-        }
-        Keys.onDownPressed: {
-            console.log("Down pressed")
-            currentIndex = currentIndex > 0 ? currentIndex+1 : currentIndex
-        }
-
         contentItem: ListView {
             id: filesListView
             focus: true
@@ -136,6 +126,8 @@ QQC2.Dialog {
                         fileSelected(model)
                         pickerDialog.accept()
                     }
+
+                    filesListView.currentIndex = 0;
                 }
             }
         }

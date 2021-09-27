@@ -86,6 +86,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 			self.zyngui.screens['layer'].replace_layer_index = None
 
+			self.zyngui.screens['main_layers_view'].fill_list()
 			self.zyngui.stop_loading()
 
 

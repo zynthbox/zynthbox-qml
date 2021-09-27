@@ -163,7 +163,7 @@ Zynthian.ScreenPage {
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
-                    text: qsTr("6 - 10")
+                    text: qsTr("6.x")
                     implicitWidth: 1
                     checkable: true
                     checked: zynthian.main_layers_view.start_midi_chan === 5
@@ -191,12 +191,77 @@ Zynthian.ScreenPage {
                 }
             }
             Zynthian.SelectorView {
+                id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "main_layers_view"
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                delegate: Zynthian.SelectorDelegate {
+                    id: delegate
+                    screenId: layersView.screenId
+                    selector: layersView.selector
+                    highlighted: zynthian.current_screen_id === layersView.screenId
+                    onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
+                    onItemActivated: layersView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
+                    contentItem: ColumnLayout {
+                        QQC2.Label {
+                            id: mainLabel
+                            Layout.fillWidth: true
+                            text: model.display
+                        }
+                        MouseArea {
+                            implicitWidth: fxLayout.implicitWidth
+                            implicitHeight: fxLayout.implicitHeight
+                            Layout.fillWidth: true
+                            enabled: index < layersView.view.count - 1
+                            Rectangle {
+                                anchors {
+                                    fill: parent
+                                    margins: -Kirigami.Units.smallSpacing
+                                }
+                                radius: 3
+                                color: Kirigami.Theme.highlightColor
+                                border.color: Kirigami.Theme.backgroundColor
+                                opacity: parent.pressed ? 0.4 : 0
+                            }
+                            onPressAndHold: {
+                                if (model.metadata.midi_cloned) {
+                                    zynthian.layer.remove_clone_midi(index, index + 1);
+                                    zynthian.layer.remove_clone_midi(index + 1, index);
+                                } else {
+                                    zynthian.layer.clone_midi(index, index + 1);
+                                    zynthian.layer.clone_midi(index + 1, index);
+                                }
+                                delegate.clicked();
+                            }
+                            onClicked: delegate.clicked();
+                            RowLayout {
+                                id: fxLayout
+                                anchors.fill: parent
+                                Item {
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    font.pointSize: mainLabel.font.pointSize * 0.9
+                                    text: model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                    elide: Text.ElideRight
+                                }
+                                Kirigami.Icon {
+                                    visible: index < layersView.view.count - 1
+                                    source: model.metadata.midi_cloned ? "remove-link" : "insert-link"
+                                    color: Kirigami.Theme.textColor
+                                    isMask: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: height
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         ColumnLayout {

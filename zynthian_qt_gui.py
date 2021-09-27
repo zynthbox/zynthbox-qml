@@ -57,6 +57,7 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, QJSValue
 
+from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.zynthiloops.libzl import libzl
 
@@ -629,6 +630,7 @@ class zynthian_gui(QObject):
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
+        self.screens["sketch_copier"] = zynthian_gui_sketch_copier(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -2428,6 +2430,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def song_arranger(self):
         return self.screens["song_arranger"]
+
+    @Property(QObject, constant=True)
+    def sketch_copier(self):
+        return self.screens["sketch_copier"]
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

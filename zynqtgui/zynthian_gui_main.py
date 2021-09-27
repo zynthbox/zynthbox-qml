@@ -67,6 +67,9 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         self.list_data.append((self.song_arranger, 0, "Song Arranger"))
         self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
+
+        self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
+        self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
         
         self.list_data.append((self.playgrid, 0, "Play Grid"))
         self.list_metadata.append({"icon":"../../img/playgrid.svg"})
@@ -205,6 +208,10 @@ class zynthian_gui_main(zynthian_gui_selector):
     def song_arranger(self):
         logging.info("Song Arranger")
         self.zyngui.show_modal("song_arranger")
+
+    def sketch_copier(self):
+        logging.info("Sketch Copier")
+        self.zyngui.show_modal("sketch_copier")
 
     #@Slot('void')
     #def start_norns(self):

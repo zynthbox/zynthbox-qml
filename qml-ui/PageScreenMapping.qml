@@ -97,7 +97,8 @@ QtObject {
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "track": "TrackPage.qml",
         "zynthiloops": "ZynthiLoops/main.qml",
-        "song_arranger": "SongArranger/main.qml"
+        "song_arranger": "SongArranger/main.qml",
+        "sketch_copier": "SketchCopier/main.qml"
     }
 
     readonly property var dashboardScreens: {

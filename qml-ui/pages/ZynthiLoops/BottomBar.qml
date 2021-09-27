@@ -289,9 +289,9 @@ Zynthian.Card {
                                                         ? pickerDialog.filesListView.currentIndex + 1
                                                         : pickerDialog.filesListView.count-1
         }
-        /*onCuiaNavBack: {
+        onCuiaNavBack: {
             pickerDialog.goBack();
-        }*/
+        }
         onCuiaSelect: {
             if (pickerDialog.filesListView.currentIndex >= 0 &&
                 pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count) {

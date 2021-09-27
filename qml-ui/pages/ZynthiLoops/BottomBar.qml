@@ -34,6 +34,8 @@ import Qt.labs.folderlistmodel 2.11
 import Zynthian 1.0 as Zynthian
 
 Zynthian.Card {
+    property alias filePickerDialog: pickerDialog
+
     id: root
     enum ControlType {
         Song,

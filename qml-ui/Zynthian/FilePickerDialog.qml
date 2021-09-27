@@ -133,6 +133,42 @@ QQC2.Dialog {
         }
     }
 
+    function cuiaCallback(cuia) {
+        switch (cuia) {
+            case "SELECT_UP":
+                pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex > 0
+                                                            ? pickerDialog.filesListView.currentIndex - 1
+                                                            : 0
+                return true;
+
+            case "SELECT_DOWN":
+                pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count-1
+                                                            ? pickerDialog.filesListView.currentIndex + 1
+                                                            : pickerDialog.filesListView.count-1
+                return true;
+
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                if (pickerDialog.filesListView.currentIndex >= 0 &&
+                    pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count) {
+                    pickerDialog.filesListView.currentItem.clicked();
+                }
+
+                return true;
+
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                pickerDialog.goBack();
+
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     function goBack() {
         var newPath = String(folderModel.folder).replace("file://", "").split("/");
         newPath.pop();

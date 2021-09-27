@@ -263,6 +263,7 @@ class zynthian_gui(QObject):
     screens_sequence = (
         "session_dashboard",  #FIXME or main? make this more configurable?
         "layer",
+        "main_layers_view",
         "bank",
         "preset",
         "control",
@@ -271,8 +272,7 @@ class zynthian_gui(QObject):
     non_modal_screens = (
         "session_dashboard",  #FIXME or main? make this more configurable?
         "main",
-        "fixed_layers",
-        "layer",
+        "main_layers_view",
         "bank",
         "preset",
         "control",
@@ -562,6 +562,9 @@ class zynthian_gui(QObject):
         self.screens["engine"] = zynthian_gui_engine(self)
         self.screens["layer"] = zynthian_gui_layer(self)
         self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
+        self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
+        self.screens["main_layers_view"].set_extra_layers_count(0)
+
         self.screens["layer_options"] = zynthian_gui_layer_options(self)
         self.screens["layer_effects"] = zynthian_gui_layer_effects(self)
         self.screens["effect_types"] = zynthian_gui_effect_types(self)
@@ -686,12 +689,13 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
-        elif screen is "layer":  #HACK replace completely layer with fixed_layers
-            screen = "fixed_layers"
+        elif screen is "layer" or screen is "fixed_layers":  #HACK replace completely layer with fixed_layers
+            screen = "main_layers_view"
 
         if (
             screen == "layer"
             or screen == "fixed_layers"
+            or screen == "main_layers_view"
             or screen == "bank"
             or screen == "preset"
             or screen == "control"
@@ -928,6 +932,7 @@ class zynthian_gui(QObject):
         else:
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
+        self.screens["main_layers_view"].sync_index_from_curlayer()
         self.screens["bank"].fill_list()
         self.screens["bank"].show()
         self.screens["preset"].fill_list()
@@ -2316,6 +2321,9 @@ class zynthian_gui(QObject):
     def get_fixed_layers(self):
         return self.screens["fixed_layers"]
 
+    def get_main_layers_view(self):
+        return self.screens["main_layers_view"]
+
     def get_layer_options(self):
         return self.screens["layer_options"]
 
@@ -2469,6 +2477,7 @@ class zynthian_gui(QObject):
     engine = Property(QObject, get_engine, constant=True)
     layer = Property(QObject, get_layer, constant=True)
     fixed_layers = Property(QObject, get_fixed_layers, constant=True)
+    main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)
     layer_effects = Property(QObject, get_layer_effects, constant=True)
     effect_types = Property(QObject, get_effect_types, constant=True)

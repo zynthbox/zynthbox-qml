@@ -50,7 +50,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Save Sound...")
-                enabled: zynthian.fixed_layers.current_index_valid
+                enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     saveDialog.mode = "sound";
                     saveDialog.open();
@@ -72,7 +72,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Clear Sound")
-                enabled: zynthian.fixed_layers.current_index_valid
+                enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
@@ -84,7 +84,7 @@ Zynthian.ScreenPage {
             text: qsTr("Pick")
             Kirigami.Action {
                 text: qsTr("Synths")
-                onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+                onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
@@ -116,7 +116,7 @@ Zynthian.ScreenPage {
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            zynthian.current_screen_id = "fixed_layers";
+            zynthian.current_screen_id = "main_layers_view";
             zynthian.go_back();
             return true;
         default:
@@ -125,7 +125,7 @@ Zynthian.ScreenPage {
     }
 
 
-    property var screenIds: ["fixed_layers", "bank", "preset"]
+    property var screenIds: ["main_layers_view", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
@@ -145,17 +145,55 @@ Zynthian.ScreenPage {
             // NOTE: this is to make fillWidth always partition the space in equal sizes
             implicitWidth: 1
             Layout.preferredWidth: 1
-            Kirigami.Heading {
-                level: 2
-                Layout.preferredHeight: favToggleButton.height // HACK
-                text: qsTr("Layers")
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
+            RowLayout {
+                Layout.fillWidth: true
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    implicitWidth: 1
+                    text: qsTr("1 - 5")
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 0
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 0;
+                            zynthian.main_layers_view.activate_index(0);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("6 - 10")
+                    implicitWidth: 1
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 5
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 5;
+                            zynthian.main_layers_view.activate_index(5);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("11 - 15")
+                    implicitWidth: 1
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 10
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 10;
+                            zynthian.main_layers_view.activate_index(10);
+                        }
+                    }
+                }
             }
             Zynthian.SelectorView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: "fixed_layers"
+                screenId: "main_layers_view"
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -267,11 +305,12 @@ Zynthian.ScreenPage {
             }
         }
         Connections {
-            target: zynthian.fixed_layers
+            target: zynthian.main_layers_view
             onCurrent_index_validChanged: {
-                if (!zynthian.fixed_layers.current_index_valid) {
+                if (!zynthian.main_layers_view.current_index_valid) {
                     if (zynthian.current_screen_id !== "layer" &&
                         zynthian.current_screen_id !== "fixed_layers" &&
+                        zynthian.current_screen_id !== "main_layers_view" &&
                         zynthian.current_screen_id !== "bank" &&
                         zynthian.current_screen_id !== "confirm" &&
                         zynthian.current_screen_id !== "preset") {
@@ -319,7 +358,7 @@ Zynthian.ScreenPage {
                     Timer { //HACK why is this necessary?
                         id: newSynthWorkaroundTimer
                         interval: 200
-                        onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+                        onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
 
                     }
                 }
@@ -456,7 +495,7 @@ Zynthian.ScreenPage {
                                     layerReplaceDialog.open();
                                 } else {
                                     let map = {}
-                                    map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index);
+                                    map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
                                     zynthian.layer.load_layer_from_file(model.fileName, map);
                                 }
                             }
@@ -508,7 +547,7 @@ Zynthian.ScreenPage {
                     text: qsTr("The selected sound has %1 layers: select layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
                 }
                 Repeater {
-                    model: zynthian.fixed_layers.selector_list
+                    model: zynthian.main_layers_view.selector_list
                     delegate: QQC2.CheckBox {
                         text: model.display
                         visible: index < 5
@@ -531,7 +570,7 @@ Zynthian.ScreenPage {
                         }
                         Connections {
                             target: layerReplaceDialog
-                            onFileToLoadChanged: checked = index === zynthian.fixed_layers.current_index
+                            onFileToLoadChanged: checked = index === zynthian.main_layers_view.current_index
                         }
                     }
                 }

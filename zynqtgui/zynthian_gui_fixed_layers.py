@@ -25,6 +25,7 @@
 
 import sys
 import logging
+import math
 
 # Zynthian specific modules
 from . import zynthian_gui_layer
@@ -45,13 +46,14 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.__fixed_layers_count = 5
         self.__extra_layers_count = 5
+        self.__start_midi_chan = 0
         self.show()
 
 
     def fill_list(self):
         self.list_data=[]
 
-        for i in range(self.__fixed_layers_count):
+        for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__fixed_layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
@@ -61,9 +63,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
 
-        self.list_data.append((None,-1, "{} - T-RACK:".format(self.__fixed_layers_count+1))) # Separator
+        if self.__extra_layers_count > 0:
+            self.list_data.append((None,-1, "{} - T-RACK:".format(self.__fixed_layers_count+1))) # Separator
 
-        for i in range(self.__fixed_layers_count, self.__fixed_layers_count + self.__extra_layers_count):
+        for i in range(self.__start_midi_chan + self.__fixed_layers_count, self.__start_midi_chan + self.__fixed_layers_count + self.__extra_layers_count):
             special_layer_number = i - self.__fixed_layers_count + 1
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
@@ -106,6 +109,33 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.zyngui.screens['layer'].layer_options()
 
 
+    @Signal
+    def start_midi_chan_changed(self):
+        pass
+
+    def set_start_midi_chan(self, chan):
+        if self.__start_midi_chan == chan:
+            return
+        self.__start_midi_chan = chan
+        self.fill_list()
+        self.start_midi_chan_changed.emit()
+
+    def get_start_midi_chan(self):
+        return self.__start_midi_chan
+
+    start_midi_chan = Property(int, get_start_midi_chan, set_start_midi_chan, notify = start_midi_chan_changed)
+
+    def get_extra_layers_count(self):
+        return self.__extra_layers_count
+
+
+    def set_extra_layers_count(self, count):
+        if self.__extra_layers_count == count:
+            return
+        self.__extra_layers_count = count
+        self.fill_list()
+
+
     def index_supports_immediate_activation(self, index=None):
         if index is None:
             return False
@@ -121,6 +151,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             midi_chan = self.zyngui.curlayer.midi_chan
         else:
             midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
+
+        if midi_chan < self.__start_midi_chan or midi_chan >= self.__start_midi_chan + self.__fixed_layers_count:
+            self.set_start_midi_chan(math.floor(midi_chan / 5) * 5)
         for i, item in enumerate(self.list_data):
             if midi_chan == item[1]:
                 self.current_index = i

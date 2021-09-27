@@ -302,6 +302,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
+        logging.error("### Saving sketch to session")
+        self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
+
     @Slot(str)
     def loadSketch(self, sketch):
         logging.error(f"Loading sketch : {sketch}")

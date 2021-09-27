@@ -1677,12 +1677,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if from_chan == to_chan:
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
+		self.zyngui.screens['main_layers_view'].fill_list()
 
 	@Slot(int, int)
 	def remove_clone_midi(self, from_chan: int, to_chan: int):
 		if from_chan == to_chan:
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
+		self.zyngui.screens['main_layers_view'].fill_list()
 
 	@Slot(int, int)
 	def copy_midichan_layer(self, from_midichan: int, to_midichan: int):

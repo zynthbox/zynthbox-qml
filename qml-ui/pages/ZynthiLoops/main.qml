@@ -103,32 +103,11 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         console.log("ZL Cuia Handler :", cuia)
 
-        switch (cuia) {
-            case "SELECT_UP":
-                root.cuiaNavUp();
-                return true;
-
-            case "SELECT_DOWN":
-                root.cuiaNavDown();
-                return true;
-
-            case "SWITCH_SELECT_SHORT":
-            case "SWITCH_SELECT_BOLD":
-            case "SWITCH_SELECT_LONG":
-                root.cuiaSelect();
-
-                return true;
-
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
-                root.cuiaNavBack();
-
-                return true;
-
-            default:
-                return false;
+        if (bottomBar.filePickerDialog.opened) {
+            return bottomBar.filePickerDialog.cuiaCallback(cuia);
         }
+
+        return true;
     }
 
     Component.onCompleted: {

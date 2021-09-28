@@ -82,7 +82,9 @@ Zynthian.Card {
                     }
                     QQC2.Button {
                         icon.name: "document-edit"
-                        visible: controlObj && controlObj.nameEditable
+                        visible: controlObj &&
+                                 controlType !== BottomBar.ControlType.Song &&
+                                 controlObj.nameEditable
                         onClicked: {
                             titleStack.currentIndex = 1;
                             objNameEdit.text = root.controlObj ? root.controlObj.name : "";

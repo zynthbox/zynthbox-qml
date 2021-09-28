@@ -50,7 +50,12 @@ Zynthian.ScreenPage {
             text: "Sketch"
 
             Kirigami.Action {
-                text: "Add Sketch"
+                text: "Add New Sketch"
+                onTriggered: {
+                }
+            }
+            Kirigami.Action {
+                text: "Add Existing Sketch"
                 onTriggered: {
                 }
             }
@@ -98,6 +103,14 @@ Zynthian.ScreenPage {
         applicationWindow().controlsVisible = true;
     }
 
+    QtObject {
+        id: privateProps
+
+        // 12 buttons for both sketches and tracks
+        property real buttonWidth: contentColumn.width/12 - contentColumn.spacing*2 - 10
+        property real buttonHeight: Kirigami.Units.gridUnit*6
+    }
+
     contentItem : ColumnLayout {
         id: contentColumn
         Item {
@@ -121,6 +134,9 @@ Zynthian.ScreenPage {
 
             id: sketchesData
             Layout.fillWidth: true
+
+            // Available height: Total container height - header height - 2 seperator height
+            // Height set: AvailableHeight/2
             Layout.preferredHeight: (contentColumn.height-headerData.height-2)/2
 
             RowLayout {
@@ -139,7 +155,11 @@ Zynthian.ScreenPage {
             }
 
             RowLayout {
-                QQC2.Button {
+                CopierButton {
+                    Layout.preferredWidth: privateProps.buttonWidth
+                    Layout.preferredHeight: privateProps.buttonHeight
+
+                    highlighted: sketchesData.selectedSketch == curSketch
                     text: "1"
                     onClicked: {
                         sketchesData.selectedSketch = curSketch;
@@ -149,15 +169,37 @@ Zynthian.ScreenPage {
 
                 Repeater {
                     model: Object.keys(copier.sketches)
-                    delegate: QQC2.Button {
+                    delegate: CopierButton {
                         property var sketch: copier.sketches[modelData]
 
+                        Layout.preferredWidth: privateProps.buttonWidth
+                        Layout.preferredHeight: privateProps.buttonHeight
+
+                        highlighted: sketchesData.selectedSketch === sketch
                         text: sketch ? (sketch.id+1) : ""
                         enabled: sketch ? true : false
                         onClicked: {
                             sketchesData.selectedSketch = sketch;
                             sketchesData.selectedIndex = parseInt(modelData);
                         }
+                    }
+                }
+
+                ColumnLayout {
+                    id: sketchesInfoBar
+
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.leftMargin: Kirigami.Units.gridUnit*2
+
+                    QQC2.Label {
+                        text: qsTr("%1 BPM").arg(sketchesData.selectedSketch.bpm)
+                    }
+                    Item {
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                    }
+                    QQC2.Label {
+                        text: qsTr("%1 Tracks").arg(sketchesData.selectedSketch.tracksModel.count)
                     }
                 }
             }
@@ -181,8 +223,12 @@ Zynthian.ScreenPage {
             RowLayout {
                 Repeater {
                     model: sketchesData.selectedSketch.tracksModel
-                    delegate: QQC2.Button {
-                        text: track.name
+                    delegate: CopierButton {
+                        Layout.preferredWidth: privateProps.buttonWidth
+                        Layout.preferredHeight: privateProps.buttonHeight
+
+                        highlighted: tracksData.selectedTrack === track
+                        text: (index+1)
                         onClicked: {
                             tracksData.selectedTrack = track;
                         }
@@ -193,9 +239,23 @@ Zynthian.ScreenPage {
                     model: 12 - (sketchesData.selectedSketch.tracksModel.count
                                    ? sketchesData.selectedSketch.tracksModel.count
                                    : 0)
-                    delegate: QQC2.Button {
+                    delegate: CopierButton {
+                        Layout.preferredWidth: privateProps.buttonWidth
+                        Layout.preferredHeight: privateProps.buttonHeight
+
                         text: ""
                         enabled: false
+                    }
+                }
+
+                ColumnLayout {
+                    id: tracksInfoBar
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignTop
+                    Layout.leftMargin: Kirigami.Units.gridUnit*2
+
+                    QQC2.Label {
+                        text: qsTr("Sounds:")
                     }
                 }
             }

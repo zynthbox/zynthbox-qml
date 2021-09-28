@@ -81,7 +81,7 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: qsTr("Pick")
+            text: qsTr("Slot")
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
@@ -171,7 +171,7 @@ Zynthian.ScreenPage {
                     onToggled: {
                         if (checked) {
                             zynthian.main_layers_view.start_midi_chan = 5;
-                            zynthian.main_layers_view.activate_index(5);
+                            zynthian.main_layers_view.activate_index(0);
                         }
                     }
                 }
@@ -185,7 +185,16 @@ Zynthian.ScreenPage {
                     onToggled: {
                         if (checked) {
                             zynthian.main_layers_view.start_midi_chan = 10;
-                            zynthian.main_layers_view.activate_index(10);
+                            zynthian.main_layers_view.activate_index(0);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    text: "|"
+                    enabled: layersView.view.currentIndex < layersView.view.count - 1
+                    onClicked: {
+                        if (layersView.view.currentItem) {
+                            layersView.view.currentItem.toggleCloned();
                         }
                     }
                 }
@@ -206,6 +215,17 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
+                    function toggleCloned() {
+                        print(model.metadata.midi_channel)
+                        if (model.metadata.midi_cloned) {
+                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
+                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
+                        } else {
+                            zynthian.layer.clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
+                            zynthian.layer.clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
+                        }
+                        zynthian.layer.ensure_contiguous_cloned_layers();
+                    }
                     contentItem: ColumnLayout {
                         QQC2.Label {
                             id: mainLabel
@@ -227,36 +247,22 @@ Zynthian.ScreenPage {
                                 opacity: parent.pressed ? 0.4 : 0
                             }
                             onPressAndHold: {
-                                if (model.metadata.midi_cloned) {
-                                    zynthian.layer.remove_clone_midi(index, index + 1);
-                                    zynthian.layer.remove_clone_midi(index + 1, index);
-                                } else {
-                                    zynthian.layer.clone_midi(index, index + 1);
-                                    zynthian.layer.clone_midi(index + 1, index);
-                                }
-                                zynthian.layer.ensure_contiguous_cloned_layers();
+                                delegate.toggleCloned();
                                 delegate.clicked();
                             }
                             onClicked: delegate.clicked();
                             RowLayout {
                                 id: fxLayout
                                 anchors.fill: parent
-                                Item {
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                QQC2.Label {
+                                    text: "|"
+                                    opacity: model.metadata.midi_cloned
                                 }
                                 QQC2.Label {
                                     Layout.fillWidth: true
                                     font.pointSize: mainLabel.font.pointSize * 0.9
                                     text: model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
                                     elide: Text.ElideRight
-                                }
-                                Kirigami.Icon {
-                                    visible: index < layersView.view.count - 1
-                                    source: model.metadata.midi_cloned ? "remove-link" : "insert-link"
-                                    color: Kirigami.Theme.textColor
-                                    isMask: true
-                                    Layout.fillHeight: true
-                                    Layout.preferredWidth: height
                                 }
                             }
                         }

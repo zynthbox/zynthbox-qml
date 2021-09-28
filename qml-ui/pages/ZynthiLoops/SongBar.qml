@@ -54,7 +54,8 @@ GridLayout {
         }
     }
 
-    ColumnLayout {
+    // Disable showing versions here in SongBar
+    /*ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -85,7 +86,7 @@ GridLayout {
                 }
             }
         }
-    }
+    }*/
 
     Item {
         Layout.fillWidth: true

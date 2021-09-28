@@ -248,6 +248,14 @@ Zynthian.ScreenPage {
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
+                                        text: qsTr("Add Audio FX...")
+                                        onClicked: {
+                                            zynthian.layer_options.show();
+                                            zynthian.current_screen_id = "layer_effects";
+                                        }
+                                    }
+                                    QQC2.MenuItem {
+                                        width: parent.width
                                         text: qsTr("Layer Options...")
                                         onClicked: layersView.itemActivatedSecondary(delegate.screenId, index)
                                     }

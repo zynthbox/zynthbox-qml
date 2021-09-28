@@ -37,61 +37,71 @@ def init():
     global libzl
 
     try:
-        libzl = ctypes.cdll.LoadLibrary(dirname(realpath(__file__)) + "/prebuilt/libzl.so")
-
-        ### Type Definition
-        libzl.stopClips.argTypes = [ctypes.c_int, ]
-
-        libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
-
-        libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
-
-        libzl.SyncTimer_queueClipToStop.argtypes = [ctypes.c_void_p]
-
-        # libzl.SyncTimer_addToPart.argtypes = [ctypes.c_int, ctypes.c_void_p]
-        #
-        # libzl.SyncTimer_playPart.argtypes = [ctypes.c_int]
-        #
-        # libzl.SyncTimer_stopPart.argtypes = [ctypes.c_int]
-
-        libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
-        libzl.ClipAudioSource_new.restype = ctypes.c_void_p
-
-        libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
-
-        libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
-
-        libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
-        libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
-
-        libzl.ClipAudioSource_setProgressCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
-
-        libzl.ClipAudioSource_getFileName.argtypes = [ctypes.c_void_p]
-        libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
-
-        libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-        libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
-
-        libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-        libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-        libzl.ClipAudioSource_setGain.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-        libzl.ClipAudioSource_setVolume.argtypes = [ctypes.c_void_p, ctypes.c_float]
-
-        libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
-
-        libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
-        ### END Type Definition
-
-        # Start juce event loop
-        libzl.initJuce()
+        libzl = ctypes.cdll.LoadLibrary("libzl.so")
     except Exception as e:
-        libzl = None
-        print(f"Can't initialise libzl library: {str(e)}")
+        print(f"Could not load the libzl shared library (at a guess, the libzl package has not been installed): {str(e)}")
 
+    if not libzl is None:
+        try:
+            ### Type Definition
+            libzl.stopClips.argTypes = [ctypes.c_int, ]
+
+            libzl.SyncTimer_instance.restype = ctypes.c_void_p
+
+            libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
+
+            libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
+
+            libzl.SyncTimer_queueClipToStop.argtypes = [ctypes.c_void_p]
+
+            # libzl.SyncTimer_addToPart.argtypes = [ctypes.c_int, ctypes.c_void_p]
+            #
+            # libzl.SyncTimer_playPart.argtypes = [ctypes.c_int]
+            #
+            # libzl.SyncTimer_stopPart.argtypes = [ctypes.c_int]
+
+            libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
+            libzl.ClipAudioSource_new.restype = ctypes.c_void_p
+
+            libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
+
+            libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
+
+            libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
+
+            libzl.ClipAudioSource_setProgressCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
+
+            libzl.ClipAudioSource_getFileName.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_getFileName.restype = ctypes.c_char_p
+
+            libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+            libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+
+            libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+            libzl.ClipAudioSource_setPitch.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+            libzl.ClipAudioSource_setGain.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+            libzl.ClipAudioSource_setVolume.argtypes = [ctypes.c_void_p, ctypes.c_float]
+
+            libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
+
+            libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
+            ### END Type Definition
+
+            # Start juce event loop
+            libzl.initJuce()
+        except Exception as e:
+            libzl = None
+            print(f"Failed to initialise libzl library: {str(e)}")
+
+@ctypes.CFUNCTYPE(ctypes.c_void_p)
+def getSyncTimerInstance():
+    if libzl:
+        return libzl.SyncTimer_instance()
 
 def registerTimerCallback(callback):
     if libzl:

@@ -68,7 +68,7 @@ ColumnLayout {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    color: modelData.isPlaying ? "#8bc34a" : (playDelegate.note.midiNote % 12 === 0 ? Kirigami.Theme.focusColor : "white")
+                                    color: modelData.isPlaying ? "#8bc34a" : (modelData.midiNote % 12 === 0 ? Kirigami.Theme.focusColor : "white")
                                     Text {
                                         anchors.fill: parent
                                         horizontalAlignment: Text.AlignHCenter

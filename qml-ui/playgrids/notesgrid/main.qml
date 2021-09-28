@@ -53,7 +53,7 @@ Zynthian.BasePlayGrid {
         id: _private
         property QtObject model
         property QtObject miniGridModel
-        property int startingNote
+        property int startingNote: component.octave * 12
         property string scale
         property int rows
         property int columns
@@ -134,15 +134,15 @@ Zynthian.BasePlayGrid {
         //console.log("A property named " + property + " has changed to " + value);
         var gridContentsChanged = true;
         if (property === "startingNote") {
-            component.startingNote = value;
+            _private.startingNote = value;
         } else if (property === "scale") {
-            component.scale = value;
+            _private.scale = value;
         } else if (property === "rows") {
-            component.rows = value;
+            _private.rows = value;
         } else if (property === "columns") {
-            component.columns = value;
+            _private.columns = value;
         } else if (property === "positionalVelocity") {
-            component.positionalVelocity = value;
+            _private.positionalVelocity = value;
             gridContentsChanged = false;
         } else {
             gridContentsChanged = false;

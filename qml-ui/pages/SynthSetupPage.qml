@@ -233,6 +233,14 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 text: model.display
                             }
+                            QQC2.Label {
+                                visible: model.metadata.note_high < 64 || model.metadata.note_low >= 64
+                                text: model.metadata.note_high < 64 ? "L" : "U"
+                            }
+                            QQC2.Label {
+                                visible: model.metadata.octave_transpose !== 0
+                                text: model.metadata.octave_transpose > 0 ? "+" + model.metadata.octave_transpose : model.metadata.octave_transpose
+                            }
                             QQC2.Button {
                                 icon.name: "configure"
                                 onClicked: optionsMenu.open()

@@ -30,6 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 /**
  * \brief This is the base component for all PlayGrids
@@ -128,16 +129,10 @@ import Zynthian 1.0 as Zynthian
  *
  * \include[lineno]{BasePlayGrid-example.qml}
  */
-Item {
+ZynQuick.PlayGrid {
     id: component
+    playGridManager: ZynQuick.PlayGridManager
 
-    /**
-     * \brief The human-facing name of your playgrid (shown anywhere the grid is referred to in the UI)
-     *
-     * You should not make this overly long or awkward, as it is used as the visual identifier by your user.
-     * Clever is fine, but always remember: unique is not a selling point in its own right.
-     */
-    property string name
     /**
      * \brief An icon used to represent the playgrid in the UI (in places where an icon makes sense)
      *
@@ -199,196 +194,6 @@ Item {
      * ignore this, but if you do, you should set `useOctaves` to false.
      */
     property int octave: 3
-
-    /**
-     * \brief The signal which you should use to perform initialisations of your playgrid
-     *
-     * This signal should be used for initialising your playgrid, in place of Component.onCompleted
-     */
-    signal initialize();
-
-    /**
-     * \brief A way to set the pitch shift value (between -8192 and 8191, 0 being no shift)
-     */
-    property int pitch
-    onPitchChanged: {
-        if (zynthian.playgrid.pitch !== component.pitch) {
-            zynthian.playgrid.pitch = component.pitch;
-        }
-    }
-    /**
-     * \brief A way to set the modulation value (between -127 and 127, with 0 being no modulation)
-     */
-    property int modulation
-    onModulationChanged: {
-        if (zynthian.playgrid.modulation !== component.modulation) {
-            zynthian.playgrid.modulation = component.modulation;
-        }
-    }
-    Connections {
-        target: zynthian.playgrid
-        onPitchChanged: {
-            if (zynthian.playgrid.pitch !== component.pitch) {
-                component.pitch = zynthian.playgrid.pitch
-            }
-        }
-        onModulationChanged: {
-            if (zynthian.playgrid.modulation !== component.modulation) {
-                component.modulation = zynthian.playgrid.modulation
-            }
-        }
-    }
-
-    /**
-     * \brief Start the system which provides beat updates
-     *
-     * Use the properties matching the beat division you need (metronome4thBeat and so on),
-     * in which you will be told at which subdivision of the beat you are at. The counter
-     * in the properties is 1-indexed, meaning you get numbers from 1 through the number of
-     * the division.
-     *
-     * @see stopMetronome()
-     */
-    function startMetronome() {
-        zynthian.playgrid.startMetronomeRequest();
-    }
-    /**
-     * \brief Stop the beat updates being sent into the playgrid
-     * @see startMetronome()
-     */
-    function stopMetronome() {
-        zynthian.playgrid.stopMetronomeRequest();
-    }
-
-    /**
-     * \brief A number which changes from 1 through 4 every 4th beat when the metronome is running
-     * @see startMetronome()
-     * @see stopMetronome()
-     */
-    property int metronome4thBeat;
-    Binding {
-        target: component
-        property: "metronome4thBeat"
-        value: zynthian.playgrid.metronome4thBeat
-    }
-
-    /**
-     * \brief A number which changes from 1 through 8 every 8th beat when the metronome is running
-     * @see startMetronome()
-     * @see stopMetronome()
-     */
-    property int metronome8thBeat;
-    Binding {
-        target: component
-        property: "metronome8thBeat"
-        value: zynthian.playgrid.metronome8thBeat
-    }
-
-    /**
-     * \brief A number which changes from 1 through 16 every 16th beat when the metronome is running
-     * @see startMetronome()
-     * @see stopMetronome()
-     */
-    property int metronome16thBeat;
-    Binding {
-        target: component
-        property: "metronome16thBeat"
-        value: zynthian.playgrid.metronome16thBeat
-    }
-
-    /**
-     * \brief Turns the note passed to it on, if it is not already playing
-     *
-     * This will turn on the note, but it will not turn the note off and back on again if it is already
-     * turned on. If you wish to release and fire the note again, you can either check the note's
-     * isPlaying property first and then turn it off first, or you can simply call setNoteOff, and then
-     * call setNoteOn immediately.
-     *
-     * @param note The note which should be turned on
-     * @param velocity The velocity at which the note should be played (defaults to 64)
-     */
-    function setNoteOn(note, velocity)
-    {
-        if (velocity == undefined) {
-            zynthian.playgrid.setNoteOn(note, 64);
-        } else {
-            zynthian.playgrid.setNoteOn(note, velocity);
-        }
-    }
-    /**
-     * \brief Turns the note passed to it off
-     *
-     * @param note The note which should be turned off
-     */
-    function setNoteOff(note)
-    {
-        zynthian.playgrid.setNoteOff(note);
-    }
-    /**
-     * \brief Turn a list of notes on, with the specified velocities
-     *
-     * @param notes A list of notes
-     * @param velocities A list of velocities (must be equal length to notes)
-     */
-    function setNotesOn(notes, velocities)
-    {
-        zynthian.setNotesOn(notes, velocities);
-    }
-    /**
-     * \brief Turn a list of notes off
-     *
-     * @param notes A list of notes
-     */
-    function setNotesOff(notes)
-    {
-        zynthian.playgrid.setNotesOff(notes);
-    }
-
-    /**
-     * \brief Get a note object representing the midi note passed to it
-     *
-     * @param midiNote The midi note you want an object representation of
-     * @return The note representing the specified midi note
-     */
-    function getNote(midiNote)
-    {
-        var scale_index = 0; // This seems to be entirely unneeded...
-        var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-        var note = zynthian.playgrid.getNote(
-            note_int_to_str_map[midiNote % 12],
-            scale_index,
-            Math.floor(midiNote / 12),
-            midiNote
-        );
-        return note;
-    }
-    /**
-     * \brief Get a single note representing a single note
-     *
-     * @param notes A list of note objects
-     * @return The single note representing all the notes passed to the function
-     */
-    function getCompoundNote(notes)
-    {
-        return zynthian.playgrid.getCompoundNote(notes);
-    }
-    /**
-     * \brief Returns a model suitable for storing notes in
-     *
-     * Use this function to fetch a named model, which will persist for the duration of the application
-     * session. What this means is that you can use this function to get a specific model that you have
-     * previously created, and avoid having to refill it every time you need to show your playgrid. You
-     * can thus fetch this model, and before attempting to fill it up, you can check whether there are
-     * any notes in the model already, by using the `rows` property on it to check how many rows of
-     * notes are currently in the model.
-     *
-     * @param modelName The name of the model
-     * @return A model with the given name
-     */
-    function getModel(modelName)
-    {
-        return zynthian.playgrid.getNotesModel(component.name + modelName);
-    }
 
     /**
      * \brief The default values of properties you wish to interact with
@@ -455,31 +260,8 @@ Item {
         _private.clearProperty();
     }
 
-    /**
-     * \brief Load a string value saved to disk under a specified name
-     * @param key The name of the data you wish to retrieve
-     * @return A string containing the data contained in the specified key (an empty string if none was found)
-     */
-    function loadData(key)
-    {
-        return _private.loadData(key);
-    }
-    /**
-     * \brief Save a string value to disk under a specified name
-     *
-     * @note The key will be turned into a filesystem-safe string before attempting to save the data
-     *       to disk. This also means that if you are overly clever with naming, you may end up with
-     *       naming clashes. In other words, be sensible in naming your keys, and your behaviour will
-     *       be more predictable.
-     * @param key The name of the data you wish to store
-     * @param data The contents you wish to store, in string form
-     * @return True if successful, false if unsuccessful
-     */
-    function saveData(key, data)
-    {
-        return _private.saveData(key, data);
-    }
     Component.onCompleted: {
+        zynthian.playgrid.zynquickPgmanager = ZynQuick.PlayGridManager;
         _private.loadSettings();
         initialisationTimer.restart();
     }
@@ -501,7 +283,7 @@ Item {
         function ensureContainer()
         {
             if (settingsContainer == null) {
-                settingsContainer = zynthian.playgrid.getSettingsStore(component.name);
+                settingsContainer = ZynQuick.PlayGridManager.getSettingsStore(component.name);
             }
         }
         function listsEqual(list1, list2) {
@@ -561,26 +343,10 @@ Item {
             }
         }
 
-        function loadData(key)
-        {
-            ensureContainer();
-            return settingsContainer.loadData(key);
-        }
-
-        function saveData(key, data)
-        {
-            var success = false;
-            if (key == "settings") {
-                ensureContainer();
-                success = settingsContainer.saveData(key, data);
-            }
-            return success;
-        }
-
         function loadSettings()
         {
             ensureContainer()
-            var jsonString = settingsContainer.loadData("settings")
+            var jsonString = component.loadData("settings")
 //             console.log("Loading settings for " + component.name + " which has the following data available: " + jsonString);
             if (jsonString.length > 2) { // an empty json object is just {}, so we can ignore that situation
                 var loadedData = JSON.parse(jsonString);
@@ -616,7 +382,7 @@ Item {
                 }
             }
             //console.log("Got all the settings, data is " + data + " which when stringified this becomes " + JSON.stringify(data));
-            settingsContainer.saveData("settings", JSON.stringify(data));
+            component.saveData("settings", JSON.stringify(data));
         }
         property QtObject settingsSaver: Timer {
             interval: 500

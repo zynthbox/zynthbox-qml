@@ -941,6 +941,8 @@ class zynthian_gui(QObject):
         self.screens["preset"].show()
         self.screens["control"].fill_list()
         self.screens["control"].show()
+        if self.curlayer:
+            self.screens["midi_key_range"].config(self.curlayer.midi_chan)
         self.active_midi_channel_changed.emit()
 
     def restore_curlayer(self):

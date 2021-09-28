@@ -1690,7 +1690,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def ensure_contiguous_cloned_layers(self):
 		groups = []
 		current_group = []
-		for i in range(16):
+		for i in range(15):
 			if zyncoder.lib_zyncoder.get_midi_filter_clone(i, i+1):
 				if i not in current_group:
 					current_group.append(i)
@@ -1701,7 +1701,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		for group in groups:
 			for chan1 in group:
-				for i in range(16): #remove associations now invalid
+				for i in range(15): #remove associations now invalid
 					if i not in group:
 						zyncoder.lib_zyncoder.set_midi_filter_clone(chan1, i, 0)
 						zyncoder.lib_zyncoder.set_midi_filter_clone(i, chan1, 0)

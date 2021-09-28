@@ -227,10 +227,32 @@ Zynthian.ScreenPage {
                         zynthian.layer.ensure_contiguous_cloned_layers();
                     }
                     contentItem: ColumnLayout {
-                        QQC2.Label {
-                            id: mainLabel
-                            Layout.fillWidth: true
-                            text: model.display
+                        RowLayout {
+                            QQC2.Label {
+                                id: mainLabel
+                                Layout.fillWidth: true
+                                text: model.display
+                            }
+                            QQC2.Button {
+                                icon.name: "configure"
+                                onClicked: optionsMenu.open()
+                                QQC2.Menu {
+                                    id: optionsMenu
+                                    y: parent.height
+                                    modal: true
+                                    dim: false
+                                    QQC2.MenuItem {
+                                        width: parent.width
+                                        text: qsTr("Range && Transpose...")
+                                        onClicked: zynthian.current_modal_screen_id = "midi_key_range";
+                                    }
+                                    QQC2.MenuItem {
+                                        width: parent.width
+                                        text: qsTr("Layer Options...")
+                                        onClicked: layersView.itemActivatedSecondary(delegate.screenId, index)
+                                    }
+                                }
+                            }
                         }
                         MouseArea {
                             implicitWidth: fxLayout.implicitWidth

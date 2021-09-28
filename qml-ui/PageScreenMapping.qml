@@ -74,6 +74,7 @@ QtObject {
     }
 
     readonly property var modalScreens: {
+        "midi_key_range": "MidiKeyRangePage.qml",
         "engine": "EnginePage.qml",
         "midi_chan": "MidiChanPage.qml",
         "layer_options": "LayerOptionsPage.qml",

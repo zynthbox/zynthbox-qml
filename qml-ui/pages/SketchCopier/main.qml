@@ -70,12 +70,16 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 text: "Copy Track"
+                enabled: !copier.isCopyInProgress
                 onTriggered: {
+                    copier.copyTrack(tracksData.selectedTrack);
                 }
             }
             Kirigami.Action {
                 text: "Paste Track"
+                enabled: copier.isCopyInProgress
                 onTriggered: {
+                    copier.pasteTrack(sketchesData.selectedSketch);
                 }
             }
         },
@@ -228,6 +232,7 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: privateProps.buttonHeight
 
                         highlighted: tracksData.selectedTrack === track
+                        isCopySource: copier.trackCopySource === track
                         text: (index+1)
                         onClicked: {
                             tracksData.selectedTrack = track;

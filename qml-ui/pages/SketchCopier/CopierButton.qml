@@ -35,6 +35,7 @@ import Zynthian 1.0 as Zynthian
 QQC2.AbstractButton {
     id: root
     property bool highlighted: false
+    property bool isCopySource: false
     property alias text2: label.text2
 
     onPressed: forceActiveFocus()
@@ -49,11 +50,15 @@ QQC2.AbstractButton {
 
     background: Rectangle {
         color: root.enabled
-                ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
+                ? root.isCopySource
+                   ? Qt.rgba(76, 175, 80, 0.4)
+                   : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
                 : "transparent"
 
-        border.color: Kirigami.Theme.highlightColor
-        border.width: root.highlighted ? 1 : 0
+        border.color: root.isCopySource
+                        ? "#4caf50"
+                        : Kirigami.Theme.highlightColor
+        border.width: root.highlighted || root.isCopySource ? 2 : 0
         radius: 4
 
         Shape {

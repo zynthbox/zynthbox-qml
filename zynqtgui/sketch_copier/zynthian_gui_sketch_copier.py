@@ -25,10 +25,11 @@
 import logging
 from pathlib import Path
 
-from PySide2.QtCore import Property, Signal, Slot
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from .. import zynthian_qt_gui_base
 from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
+from ..zynthiloops.libzl.zynthiloops_track import zynthiloops_track
 
 
 class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
@@ -47,6 +48,8 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
             "10": None,
             "11": None,
         }
+        self.__track_copy_cache__ = None
+        self.__track_copy_source__ = None
 
         # self.generate_sketches_from_session(True)
 
@@ -56,6 +59,40 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     sketches_changed = Signal()
     sketches = Property('QVariantMap', get_sketches, notify=sketches_changed)
     ### END Property sketches
+
+    ### Property isCopyInProgress
+    def get_is_copy_in_progress(self):
+        return self.__track_copy_cache__ is not None
+    is_copy_in_progress_changed = Signal()
+    isCopyInProgress = Property(bool, get_is_copy_in_progress, notify=is_copy_in_progress_changed)
+    ### END Property isCopyInProgress
+
+    ### Property trackCopySource
+    def get_track_copy_source(self):
+        return self.__track_copy_source__
+    track_copy_source_changed = Signal()
+    trackCopySource = Property(QObject, get_track_copy_source, notify=track_copy_source_changed)
+    ### END Property trackCopySource
+
+    @Slot(QObject)
+    def copyTrack(self, track):
+        self.__track_copy_cache__ = track.serialize()
+        self.__track_copy_source__ = track
+        self.is_copy_in_progress_changed.emit()
+        self.track_copy_source_changed.emit()
+
+        logging.error(f"Copied track : {self.__track_copy_cache__}")
+
+    @Slot(QObject)
+    def pasteTrack(self, sketch):
+        logging.error(f"Pasting track to sketch : {sketch.name}")
+        pasted_track = zynthiloops_track(sketch.tracksModel.count, sketch, self)
+        sketch.tracksModel.add_track(pasted_track)
+        pasted_track.deserialize(self.__track_copy_cache__)
+        self.__track_copy_cache__ = None
+        self.__track_copy_source__ = None
+        self.is_copy_in_progress_changed.emit()
+        self.track_copy_source_changed.emit()
 
     # @Slot(None)
     # def generate_sketches_from_session(self, connect_to_signal=False):

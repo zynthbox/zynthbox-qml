@@ -34,9 +34,21 @@ from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
 class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_sketch_copier, self).__init__(parent)
-        self.__sketches__ = {}
+        self.__sketches__ = {
+            "1": None,
+            "2": None,
+            "3": None,
+            "4": None,
+            "5": None,
+            "6": None,
+            "7": None,
+            "8": None,
+            "9": None,
+            "10": None,
+            "11": None,
+        }
 
-        self.generate_sketches_from_session(True)
+        # self.generate_sketches_from_session(True)
 
     ### Property sketches
     def get_sketches(self):
@@ -45,20 +57,20 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     sketches = Property('QVariantMap', get_sketches, notify=sketches_changed)
     ### END Property sketches
 
-    @Slot(None)
-    def generate_sketches_from_session(self, connect_to_signal=False):
-        logging.error("### Generating sketches from session")
-
-        if connect_to_signal:
-            self.zyngui.session_dashboard.sketches_changed.connect(self.generate_sketches_from_session)
-
-        for slot in self.zyngui.session_dashboard.sketches:
-            sketch = self.zyngui.session_dashboard.sketches[slot]
-            logging.error(f"Loading sketch from slot[{slot}] : {sketch}")
-
-            for file in Path(sketch).glob("**/*.json"):
-                if file.name != "sketch.json":
-                    self.__sketches__[slot] = zynthiloops_song(sketch + "/", file.name.replace(".json", ""), self.zyngui.zynthiloops)
-                    break
-
-        self.sketches_changed.emit()
+    # @Slot(None)
+    # def generate_sketches_from_session(self, connect_to_signal=False):
+    #     logging.error("### Generating sketches from session")
+    #
+    #     if connect_to_signal:
+    #         self.zyngui.session_dashboard.sketches_changed.connect(self.generate_sketches_from_session)
+    #
+    #     for slot in self.zyngui.session_dashboard.sketches:
+    #         sketch = self.zyngui.session_dashboard.sketches[slot]
+    #         logging.error(f"Loading sketch from slot[{slot}] : {sketch}")
+    #
+    #         for file in Path(sketch).glob("**/*.json"):
+    #             if file.name != "sketch.json":
+    #                 self.__sketches__[slot] = zynthiloops_song(sketch + "/", file.name.replace(".json", ""), self.zyngui.zynthiloops)
+    #                 break
+    #
+    #     self.sketches_changed.emit()

@@ -243,7 +243,10 @@ Zynthian.ScreenPage {
                             }
                             QQC2.Button {
                                 icon.name: "configure"
-                                onClicked: optionsMenu.open()
+                                onClicked: {
+                                    delegate.clicked();
+                                    optionsMenu.open();
+                                }
                                 QQC2.Menu {
                                     id: optionsMenu
                                     y: parent.height

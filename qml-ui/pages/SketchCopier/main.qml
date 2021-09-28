@@ -34,6 +34,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     readonly property QtObject copier: zynthian.sketch_copier
     readonly property QtObject session: zynthian.session_dashboard
+    readonly property QtObject curSketch: zynthian.zynthiloops.song
 
     id: root
 
@@ -46,12 +47,47 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            text: "Reload"
-            onTriggered: {
-                copier.generate_sketches_from_session()
+            text: "Sketch"
+
+            Kirigami.Action {
+                text: "Add Sketch"
+                onTriggered: {
+                }
+            }
+            Kirigami.Action {
+                text: "Remove Sketch"
+                onTriggered: {
+                }
+            }
+        },
+        Kirigami.Action {
+            text: "Track"
+
+            Kirigami.Action {
+                text: "Copy Track"
+                onTriggered: {
+                }
+            }
+            Kirigami.Action {
+                text: "Paste Track"
+                onTriggered: {
+                }
+            }
+        },
+        Kirigami.Action {
+            text: "Session"
+
+            Kirigami.Action {
+                text: "Save Session"
+                onTriggered: {
+                }
+            }
+            Kirigami.Action {
+                text: "Load Session"
+                onTriggered: {
+                }
             }
         }
-
     ]
 
     Component.onCompleted: {
@@ -62,32 +98,105 @@ Zynthian.ScreenPage {
         applicationWindow().controlsVisible = true;
     }
 
-    QtObject {
-        id: privateProps
-    }    
+    contentItem : ColumnLayout {
+        id: contentColumn
+        Item {
+            id: headerData
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit*4
 
-    contentItem : RowLayout {
-        ColumnLayout {
             QQC2.Label {
+                anchors.centerIn: parent
                 text: qsTr("Session: %1").arg(session.name)
+                font.pointSize: 18
             }
+        }
+        Kirigami.Separator {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+        }
+        ColumnLayout {
+            property var selectedSketch: curSketch
+            property int selectedIndex: 0
+
+            id: sketchesData
+            Layout.fillWidth: true
+            Layout.preferredHeight: (contentColumn.height-headerData.height-2)/2
+
+            RowLayout {
+                QQC2.Label {
+                    text: qsTr("Sketch %1: %2").arg(sketchesData.selectedIndex+1).arg(sketchesData.selectedSketch.name)
+                    opacity: 0.7
+                }
+
+                Item {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                }
+
+                QQC2.Label {
+                    text: qsTr("%1 BPM").arg(sketchesData.selectedSketch.bpm)
+                }
+            }
+
+            RowLayout {
+                QQC2.Button {
+                    text: "1"
+                    onClicked: {
+                        sketchesData.selectedSketch = curSketch;
+                        sketchesData.selectedIndex = 0;
+                    }
+                }
+
+                Repeater {
+                    model: Object.keys(copier.sketches)
+                    delegate: QQC2.Button {
+                        property var sketch: copier.sketches[modelData]
+
+                        text: sketch ? (sketch.id+1) : ""
+                        enabled: sketch ? true : false
+                        onClicked: {
+                            sketchesData.selectedSketch = sketch;
+                            sketchesData.selectedIndex = parseInt(modelData);
+                        }
+                    }
+                }
+            }
+        }
+        Kirigami.Separator {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+        }
+        ColumnLayout {
+            property var selectedTrack
+
+            id: tracksData
+            Layout.fillWidth: true
+            Layout.preferredHeight: sketchesData.height
 
             QQC2.Label {
-                text: "No sketches found in session"
-                font.italic: true
-                visible: copier.sketches[0] === undefined
+                text: qsTr("Track %1: %2").arg(tracksData.selectedTrack.id+1).arg(tracksData.selectedTrack.name)
+                opacity: 0.7
             }
 
-            QQC2.Label {
-                text: "Song : " + copier.sketches[0].name
-                font.italic: true
-                visible: copier.sketches[0] !== undefined
-            }
+            RowLayout {
+                Repeater {
+                    model: sketchesData.selectedSketch.tracksModel
+                    delegate: QQC2.Button {
+                        text: track.name
+                        onClicked: {
+                            tracksData.selectedTrack = track;
+                        }
+                    }
+                }
 
-            Repeater {
-                model: copier.sketches[0].tracksModel
-                delegate: QQC2.Label {
-                    text: track.name
+                Repeater {
+                    model: 12 - (sketchesData.selectedSketch.tracksModel.count
+                                   ? sketchesData.selectedSketch.tracksModel.count
+                                   : 0)
+                    delegate: QQC2.Button {
+                        text: ""
+                        enabled: false
+                    }
                 }
             }
         }

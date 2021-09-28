@@ -76,7 +76,6 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		note_names = ("C","C#","D","D#","E","F","F#","G","G#","A","A#","B")
 		scale = int(num/12)-2
 		num = int(num%12)
-		logging.error("{}{}".format(note_names[num],scale))
 		return "{}{}".format(note_names[num],scale)
 
 	def set_zctrls(self):
@@ -167,7 +166,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 					self.note_low = self.note_high-1
 				else:
 					self.note_low = self.nlow_zctrl.value
-					logging.error("SETTING FILTER NOTE_LOW: {}".format(self.note_low))
+					logging.debug("SETTING FILTER NOTE_LOW: {}".format(self.note_low))
 					zyncoder.lib_zyncoder.set_midi_filter_note_low(self.chan, int(self.note_low))
 					self.replot = True
 
@@ -178,23 +177,25 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 					self.note_high = self.note_low+1
 				else:
 					self.note_high = self.nhigh_zctrl.value
-				logging.error("SETTING FILTER NOTE_HIGH: {}".format(self.note_high))
+				logging.debug("SETTING FILTER NOTE_HIGH: {}".format(self.note_high))
 				zyncoder.lib_zyncoder.set_midi_filter_note_high(self.chan, int(self.note_high))
 				self.replot = True
 
 			self.octave_zctrl.read_zyncoder()
 			if (self.octave_trans+5)!=self.octave_zctrl.value:
 				self.octave_trans = self.octave_zctrl.value-5
-				logging.error("SETTING FILTER OCTAVE TRANS.: {}".format(self.octave_trans))
+				logging.debug("SETTING FILTER OCTAVE TRANS.: {}".format(self.octave_trans))
 				zyncoder.lib_zyncoder.set_midi_filter_octave_trans(self.chan, int(self.octave_trans))
 				self.replot = True
 
 			self.halftone_zctrl.read_zyncoder()
 			if (self.halftone_trans+12)!=self.halftone_zctrl.value:
 				self.halftone_trans = self.halftone_zctrl.value-12
-				logging.error("SETTING FILTER HALFTONE TRANS.: {}".format(self.halftone_trans))
+				logging.debug("SETTING FILTER HALFTONE TRANS.: {}".format(self.halftone_trans))
 				zyncoder.lib_zyncoder.set_midi_filter_halftone_trans(self.chan, int(self.halftone_trans))
 				self.replot = True
+
+			self.zyngui.screens["fixed_layers"].fill_list()
 
 		return [0]
 

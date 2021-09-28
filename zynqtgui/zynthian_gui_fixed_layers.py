@@ -85,6 +85,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 metadata["midi_cloned"] = False
             metadata["midi_channel"] = i
+            metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
+            metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
+            metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
+            metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
             self.list_metadata.append(metadata)
 
         if self.__extra_layers_count > 0:
@@ -118,6 +122,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             else:
                 metadata["midi_cloned"] = False
             metadata["midi_channel"] = i
+            metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
+            metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
+            metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
+            metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
             self.list_metadata.append(metadata)
 
         self.special_layer_name_changed.emit()

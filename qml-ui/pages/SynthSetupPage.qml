@@ -218,12 +218,12 @@ Zynthian.ScreenPage {
                     id: delegate
                     screenId: layersView.screenId
                     selector: layersView.selector
+                    readonly property int ownIndex: index
                     highlighted: zynthian.current_screen_id === layersView.screenId
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
                     function toggleCloned() {
-                        print(model.metadata.midi_channel)
                         if (model.metadata.midi_cloned) {
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
@@ -274,8 +274,24 @@ Zynthian.ScreenPage {
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
+                                        text: qsTr("Add Midi FX...")
+                                        onClicked: {
+                                            zynthian.layer_options.show();
+                                            zynthian.current_screen_id = "layer_midi_effects";
+                                        }
+                                    }
+                                    QQC2.MenuItem {
+                                        width: parent.width
                                         text: qsTr("Layer Options...")
-                                        onClicked: layersView.itemActivatedSecondary(delegate.screenId, index)
+                                        onClicked: {
+                                            let oldCurrent_screen_id = zynthian.current_screen_id;
+                                            delegate.selector.current_index = delegate.ownIndex;
+                                            delegate.selector.activate_index_secondary(delegate.ownIndex);
+                                            delegate.itemActivatedSecondary(delegate.screenId, delegate.ownIndex);
+                                            if (zynthian.current_screen_id === oldCurrent_screen_id) {
+                                                delegate.currentScreenIdRequested(screenId);
+                                            }
+                                        }
                                     }
                                 }
                             }

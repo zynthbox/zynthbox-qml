@@ -613,16 +613,15 @@ class zynthian_gui(QObject):
         ###
         self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
-        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
-
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
+
+        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
         # if "zynseq" in zynthian_gui_config.experimental_features:
         # self.screens['stepseq'] = zynthian_gui_stepsequencer(self)
         self.screens["theme_chooser"] = zynthian_gui_theme_chooser(self)
         self.screens["theme_downloader"] = zynthian_gui_newstuff(self)
-        self.screens["norns_shield"] = zynthian_gui_selector(self)
 
         ###
         # Playgrid depends on zynthiloops screen for metronome related functionalities
@@ -2404,9 +2403,6 @@ class zynthian_gui(QObject):
     def get_theme_downloader(self):
         return self.screens["theme_downloader"]
 
-    def get_norns_shield(self):
-        return self.screens["norns_shield"]
-
     @Property(QObject, constant=True)
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
@@ -2529,7 +2525,6 @@ class zynthian_gui(QObject):
     playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)
     theme_chooser = Property(QObject, get_theme_chooser, constant=True)
     theme_downloader = Property(QObject, get_theme_downloader, constant=True)
-    norns_shield = Property(QObject, get_norns_shield, constant=True)
 
 
 # ------------------------------------------------------------------------------

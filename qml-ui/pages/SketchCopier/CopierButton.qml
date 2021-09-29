@@ -35,6 +35,7 @@ import Zynthian 1.0 as Zynthian
 QQC2.AbstractButton {
     id: root
     property bool highlighted: false
+    property bool dummy: false
     property bool isCopySource: false
     property alias text2: label.text2
 
@@ -49,7 +50,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: root.enabled
+        color: !root.dummy
                 ? root.isCopySource
                    ? Qt.rgba(76, 175, 80, 0.4)
                    : Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.05)
@@ -64,7 +65,7 @@ QQC2.AbstractButton {
         Shape {
             id: shape
             anchors.fill: parent
-            visible: !root.enabled
+            visible: root.dummy
 
             ShapePath {
                 strokeWidth: 2

@@ -306,6 +306,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         sketch_path = Path(sketch)
 
+        logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
         self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
 
         self.__song__.bpm_changed.connect(self.update_timer_bpm)

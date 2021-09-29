@@ -180,7 +180,7 @@ Zynthian.ScreenPage {
             nameFilters: ["*.json"]
         }
         onFileSelected: {
-            console.log("Selected Sketch : " + file.name + "("+ file.filePath +")")
+            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
             zynthian.zynthiloops.loadSketch(file.filePath)
         }
     }

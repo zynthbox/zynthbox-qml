@@ -37,6 +37,7 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_sketch_copier, self).__init__(parent)
         self.__track_copy_cache__ = None
         self.__track_copy_source__ = None
+        self.__add_sketch_path__ = ""
 
     ### Property isCopyInProgress
     def get_is_copy_in_progress(self):
@@ -44,6 +45,16 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     is_copy_in_progress_changed = Signal()
     isCopyInProgress = Property(bool, get_is_copy_in_progress, notify=is_copy_in_progress_changed)
     ### END Property isCopyInProgress
+
+    ### Property addSketchPath
+    def get_add_sketch_path(self):
+        return self.__add_sketch_path__
+    def set_add_sketch_path(self, path):
+        self.__add_sketch_path__ = path
+        self.add_sketch_path_changed.emit()
+    add_sketch_path_changed = Signal()
+    addSketchPath = Property(str, get_add_sketch_path, set_add_sketch_path, notify=add_sketch_path_changed)
+    ### END Property addSketchPath
 
     ### Property trackCopySource
     def get_track_copy_source(self):
@@ -81,3 +92,9 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.__track_copy_source__ = None
         self.is_copy_in_progress_changed.emit()
         self.track_copy_source_changed.emit()
+
+    @Slot(int)
+    def setSketchSlot(self, slot):
+        self.zyngui.session_dashboard.setSketchSlot(slot, self.__add_sketch_path__)
+        self.__add_sketch_path__ = ""
+        self.add_sketch_path_changed.emit()

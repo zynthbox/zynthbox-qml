@@ -32,7 +32,7 @@ from datetime import datetime
 # Zynthian specific modules
 from pathlib import Path
 
-from . import zynthian_gui_selector
+from zynqtgui import zynthian_gui_selector
 
 # Qt modules
 from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property

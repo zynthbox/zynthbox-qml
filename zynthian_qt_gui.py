@@ -34,17 +34,13 @@ import signal
 import logging
 import threading
 import time
-from os.path import isfile
 from datetime import datetime
 from threading import Thread, Lock
 from subprocess import check_output
 from ctypes import c_float, c_double, CDLL
-import sched
-
 
 # Qt modules
 from PySide2.QtCore import (
-    Qt,
     QObject,
     Slot,
     Signal,
@@ -55,7 +51,7 @@ from PySide2.QtCore import (
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 
 # from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine, QJSValue
+from PySide2.QtQml import QQmlApplicationEngine
 
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
@@ -67,15 +63,14 @@ sys.path.insert(1, "./zynqtgui")
 # Zynthian specific modules
 import zynconf
 import zynautoconnect
-from zynlibs.jackpeak import lib_jackpeak, lib_jackpeak_init
+from zynlibs.jackpeak import lib_jackpeak_init
 from zyncoder import *
-from zyncoder.zyncoder import lib_zyncoder, lib_zyncoder_init
+from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_zcmidi
 from zyngine import zynthian_midi_filter
 
 # from zyngine import zynthian_engine_transport
 from zynqtgui import zynthian_gui_config
-from zynqtgui.zynthian_gui_controller import zynthian_gui_controller
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
 from zynqtgui.zynthian_gui_option import zynthian_gui_option
@@ -137,12 +132,10 @@ from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
 
-from zynqtgui.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
+from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
 
 from pathlib import Path
-
-import traceback
 
 import faulthandler
 faulthandler.enable()

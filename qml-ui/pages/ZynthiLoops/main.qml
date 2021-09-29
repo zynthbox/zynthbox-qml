@@ -75,8 +75,8 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Load Sketch")
                 onTriggered: {
-                    pickerDialog.model = zynthian.zynthiloops.getSketches()
-                    pickerDialog.open()
+                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
+                    sketchPickerDialog.open();
                 }
             }
             Kirigami.Action {
@@ -165,32 +165,23 @@ Zynthian.ScreenPage {
         }
     }
 
-    QQC2.Dialog {
-        property alias model: listview.model
+    Zynthian.FilePickerDialog {
+        id: sketchPickerDialog
+        parent: root
 
-        id: pickerDialog
-        modal: true
-        header: Kirigami.Heading {
-            padding: 4
-            text: qsTr("Pick a sketch")
-            font.pointSize: 16
-        }
         x: parent.width/2 - width/2
         y: parent.height/2 - height/2
-        width: Math.round(parent.width * 0.5)
-        height: Math.round(parent.height * 0.6)
-        contentItem: QQC2.ScrollView {
-            contentItem: ListView {
-                id: listview
+        width: Math.round(parent.width * 0.8)
+        height: Math.round(parent.height * 0.8)
 
-                delegate: Kirigami.BasicListItem {
-                    label: modelData.split("/").pop()
-                    onClicked: {
-                        zynthian.zynthiloops.loadSketch(modelData)
-                        pickerDialog.close()
-                    }
-                }
-            }
+        headerText: qsTr("Pick a sketch")
+        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        folderModel {
+            nameFilters: ["*.json"]
+        }
+        onFileSelected: {
+            console.log("Selected Sketch : " + file.name + "("+ file.filePath +")")
+            zynthian.zynthiloops.loadSketch(file.filePath)
         }
     }
 

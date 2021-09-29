@@ -100,9 +100,6 @@ class zynthian_gui_main(zynthian_gui_selector):
             # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
-        self.list_data.append((self.norns_shield, 0, "Norns"))
-        self.list_metadata.append({"icon":"../../img/norns-qml-shield.svg","type":"modal","screenId":"norns_shield"})
-
         # self.list_data.append((None, 0, ""))
         self.list_data.append((self.admin, 0, "Settings"))
         self.list_metadata.append({"icon":"../../img/settings.svg"})
@@ -151,10 +148,6 @@ class zynthian_gui_main(zynthian_gui_selector):
     def snapshots_menu(self):
         logging.info("Snapshots")
         self.zyngui.show_modal("snapshots_menu")
-
-    def norns_shield(self):
-        logging.info("Norns");
-        self.zyngui.show_modal("norns_shield");
 
     def clean_all(self):
         self.zyngui.show_confirm(
@@ -212,39 +205,6 @@ class zynthian_gui_main(zynthian_gui_selector):
     def sketch_copier(self):
         logging.info("Sketch Copier")
         self.zyngui.show_modal("sketch_copier")
-
-    #@Slot('void')
-    #def start_norns(self):
-        #self.zyngui.start_loading()
-        #cmd = "/usr/bin/norns-qml-shield";
-        #logging.info("Executing Command: %s" % cmd)
-        #self.zyngui.add_info("EXECUTING:\n", "EMPHASIS")
-        #self.zyngui.add_info("{}\n".format(cmd))
-        #try:
-            #self.proc = Popen(
-                #cmd,
-                #shell=True,
-                #stdout=PIPE,
-                #stderr=STDOUT,
-                #universal_newlines=True,
-            #)
-            #self.zyngui.add_info("RESULT:\n", "EMPHASIS")
-            #for line in self.proc.stdout:
-                #if re.search("ERROR", line, re.IGNORECASE):
-                    #tag = "ERROR"
-                #elif re.search("Already", line, re.IGNORECASE):
-                    #tag = "SUCCESS"
-                #else:
-                    #tag = None
-                #logging.info(line.rstrip())
-                #self.zyngui.add_info(line, tag)
-            #self.zyngui.add_info("\n")
-        #except Exception as e:
-            #logging.error(e)
-            #self.zyngui.add_info("ERROR: %s\n" % e, "ERROR")
-        #self.zyngui.add_info("\n\n")
-        #self.zyngui.hide_info_timer(3000)
-        #self.zyngui.stop_loading()
 
     def admin(self):
         logging.info("Admin")

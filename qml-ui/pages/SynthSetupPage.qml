@@ -93,6 +93,13 @@ Zynthian.ScreenPage {
                     zynthian.current_screen_id = "layer_effects";
                 }
             }
+             Kirigami.Action {
+                text: qsTr("MIDI-FX")
+                onTriggered: {
+                    zynthian.layer_options.show() //FIXME: that show() method should change name
+                    zynthian.current_screen_id = "layer_midi_effects";
+                }
+            }
         },
         Kirigami.Action {
             text: qsTr("Edit")

@@ -39,41 +39,56 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 		super(zynthian_gui_effect_types, self).__init__(parent)
 
 		self.selector_caption = "FX Type"
+		self.midi_mode = False
+		self.effects_screen = "layer_effects"
+		self.effect_chooser_screen = "layer_effect_chooser"
 
-		if self.zyngui.curlayer:
-			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+		#if self.zyngui.curlayer:
+			#self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 		self.only_categories = True
 
 
 	def show(self):
+		if self.midi_mode:
+			self.effects_screen = "layer_midi_effects"
+			self.effect_chooser_screen = "layer_midi_effect_chooser"
+		else:
+			self.effects_screen = "layer_effects"
+			self.effect_chooser_screen = "layer_effect_chooser"
 		if self.zyngui.curlayer:
-			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+			if self.midi_mode:
+				self.set_midichain_mode(self.zyngui.curlayer.midi_chan)
+			else:
+				self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 			self.reset_index = False
 		super().show()
 
-		if self.zyngui.screens['layer_effects'].audiofx_layer != None and self.zyngui.get_current_screen_id() != 'effect_types':
-			cat = self.engine_info[self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer)][3]
+		if self.zyngui.screens[self.effects_screen].fx_layer != None and self.zyngui.get_current_screen_id() != 'effect_types':
+			cat = self.engine_info[self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer)][3]
 			for i, item in enumerate(self.list_data):
 				if item[2] == cat:
 					self.activate_index(i)
 					return
-		if self.zyngui.screens['layer_effect_chooser'].single_category == "    ":
-			self.zyngui.screens['layer_effect_chooser'].single_category == self.list_data[0][0]
-		self.zyngui.screens['layer_effect_chooser'].show()
+		if self.zyngui.screens[self.effect_chooser_screen].single_category == "    ":
+			self.zyngui.screens[self.effect_chooser_screen].single_category == self.list_data[0][0]
+		self.zyngui.screens[self.effect_chooser_screen].show()
 
 
 	def select_action(self, i, t='S'):
 		if i is not None and self.list_data[i][0]:
-			self.zyngui.screens['layer_effect_chooser'].single_category = self.list_data[i][0]
-			self.zyngui.screens['layer_effect_chooser'].show()
+			self.zyngui.screens[self.effect_chooser_screen].single_category = self.list_data[i][0]
+			self.zyngui.screens[self.effect_chooser_screen].show()
+			#If first column is not pointing to a layer, preselect slot 0 of effect_chooser_screen
+			if isinstance( self.zyngui.screens[self.effects_screen].list_data[self.zyngui.screens[self.effects_screen].index][1], int):
+				self.zyngui.screens[self.effect_chooser_screen].select(0)
 		self.set_select_path()
 
 
 	def back_action(self):
-		return 'layer_effects'
+		return self.effects_screen
 
 	def next_action(self):
-		return 'layer_effect_chooser'
+		return self.effect_chooser_screen
 
 
 	def index_supports_immediate_activation(self, index=None):
@@ -84,8 +99,8 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 		self.select_path = ''
 		self.select_path_element = ''
 
-		if self.zyngui.screens['layer_effects'].audiofx_layer != None:
-			self.select_path_element = self.engine_info[self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer)][3]
+		if self.zyngui.screens[self.effects_screen].fx_layer != None:
+			self.select_path_element = self.engine_info[self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer)][3]
 			self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
 
 		self.selector_path_changed.emit()

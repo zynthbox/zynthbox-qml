@@ -71,6 +71,8 @@ QtObject {
         "layer_effects": "FXSetupPage.qml",
         "effect_types": "FXSetupPage.qml",
         "layer_effect_chooser": "FXSetupPage.qml",
+        "layer_midi_effects": "MidiFXSetupPage.qml",
+        "midi_effect_types": "MidiFXSetupPage.qml",
     }
 
     readonly property var modalScreens: {

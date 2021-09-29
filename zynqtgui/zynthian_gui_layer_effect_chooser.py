@@ -40,6 +40,9 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 		self.selector_caption = "FX"
 		self.layer_chain_parallel = False
+		self.midi_mode = False
+		self.effects_screen = "layer_effects"
+		self.effects_types_screen = "effect_types"
 
 		self.single_category = "    " # Hack to get an empty list
 		if self.zyngui.curlayer:
@@ -47,15 +50,25 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 
 	def show(self):
+		if self.midi_mode:
+			self.effects_screen = "layer_midi_effects"
+			self.effects_types_screen = "midi_effect_types"
+		else:
+			self.effects_screen = "layer_effects"
+			self.effects_types_screen = "effect_types"
+
 		if self.zyngui.curlayer:
-			self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
+			if self.midi_mode:
+				self.set_midichain_mode(self.zyngui.curlayer.midi_chan)
+			else:
+				self.set_fxchain_mode(self.zyngui.curlayer.midi_chan)
 			self.reset_index = False
 
 		super().show()
 
-		if self.zyngui.screens['layer_effects'].audiofx_layer != None:
+		if self.zyngui.screens[self.effects_screen].fx_layer != None:
 			for i, item in enumerate(self.list_data):
-				if item[0] == self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer):
+				if item[0] == self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer):
 					self.select(i)
 					return
 
@@ -67,37 +80,40 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 	def select_action(self, i, t='S'):
 		if i is not None and self.list_data[i][0]:
 			self.zyngui.start_loading()
-			if self.zyngui.screens['layer_effects'].audiofx_layer != None and self.zyngui.screens['layer_effects'].audiofx_layer in self.zyngui.screens['layer'].layers:
-				self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens['layer_effects'].audiofx_layer)
+			if self.zyngui.screens[self.effects_screen].fx_layer != None and self.zyngui.screens[self.effects_screen].fx_layer in self.zyngui.screens['layer'].layers:
+				self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens[self.effects_screen].fx_layer)
 
 			else:
 				self.zyngui.screens['layer'].replace_layer_index = None
-
+			logging.error(self.layer_chain_parallel)
 			self.zyngui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
-
 			self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zyngui.curlayer.midi_chan, False)
 
-			self.zyngui.screens['layer_effects'].show()
+			self.zyngui.screens[self.effects_screen].show()
 
 			if self.zyngui.screens['layer'].replace_layer_index is None:
-				self.zyngui.screens['layer_effects'].select_action(len(self.zyngui.screens['layer_effects'].audiofx_layers) - 1)
+				self.zyngui.screens[self.effects_screen].select_action(len(self.zyngui.screens[self.effects_screen].fx_layers) - 1)
 			else:
-				self.zyngui.screens['layer_effects'].select_action(self.zyngui.screens['layer'].replace_layer_index)
+				self.zyngui.screens[self.effects_screen].select_action(self.zyngui.screens['layer'].replace_layer_index)
 
 			self.zyngui.screens['layer'].replace_layer_index = None
 
 			self.zyngui.screens['main_layers_view'].fill_list()
 			self.zyngui.stop_loading()
+			if self.midi_mode:
+				self.zyngui.show_screen("layer_midi_effect_chooser")
+			else:
+				self.zyngui.show_screen("layer_effect_chooser")
 
 
 	def back_action(self):
-		return 'effect_types'
+		return self.effects_types_screen
 
 
 	def set_select_path(self):
 		self.select_path = ''
-		if self.zyngui.screens['layer_effects'].audiofx_layer != None:
-			self.select_path = self.engine_info[self.zyngui.screens['layer_effects'].audiofx_layer.engine.get_path(self.zyngui.screens['layer_effects'].audiofx_layer)][0]
+		if self.zyngui.screens[self.effects_screen].fx_layer != None:
+			self.select_path = self.engine_info[self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer)][0]
 		self.selector_path_changed.emit()
 		self.selector_path_element_changed.emit()
 

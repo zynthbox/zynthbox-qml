@@ -145,9 +145,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.list_data=[]
 
 		# Sort category headings, but headings starting with "Zynthian" are shown first
-		
-		for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
 
+		for cat, infos in sorted(self.filtered_engines_by_cat().items(), key = lambda kv:"!" if kv[0] is None else kv[0]):
 			# Add category header...
 			if self.single_category == None:
 				if self.engine_type=="MIDI Synth":

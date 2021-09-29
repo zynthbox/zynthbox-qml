@@ -50,7 +50,6 @@ class zynthiloops_song(QObject):
         self.__metronome_manager__ = parent
 
         self.sketch_folder = sketch_folder
-        self.sketch_filename = "sketch.json"
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__bpm__ = 120
@@ -250,8 +249,7 @@ class zynthiloops_song(QObject):
         pass
 
     def get_versions(self):
-        versions = [f.name.replace(".json", "") for f in Path(self.sketch_folder).glob("*.json") if f.name != "sketch.json"]
-
+        versions = [f.name.replace(".json", "") for f in Path(self.sketch_folder).glob("*.json")]
         return versions
 
     versions = Property('QVariantList', get_versions, notify=versions_changed)

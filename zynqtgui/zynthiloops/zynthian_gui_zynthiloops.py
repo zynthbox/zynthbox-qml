@@ -263,16 +263,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # Rename temp sketch json filename to user defined name
         Path(self.__sketch_basepath__ / name / (self.__song__.name + ".json")).rename(self.__sketch_basepath__ / name / (name + ".json"))
 
-        # Create sketch.json to store sketch metadata
-        try:
-            with open(self.__sketch_basepath__ / name / "sketch.json", "w") as f:
-                f.write(json.dumps({
-                    "type": "sketch",
-                    "created": datetime.now().isoformat()
-                }))
-        except Exception as e:
-            logging.error(e)
-
         obj = {}
 
         # Read sketch json data to dict
@@ -314,24 +304,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
 
-        for file in Path(sketch).glob("**/*.json"):
-            if file.name != "sketch.json":
-                self.__song__ = zynthiloops_song.zynthiloops_song(sketch + "/", file.name.replace(".json", ""), self)
-                break
+        sketch_path = Path(sketch)
+
+        self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
 
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
-
-    @Slot(None, result='QVariantList')
-    def getSketches(self):
-        basepath = Path(self.__sketch_basepath__)
-        obj = []
-
-        for file in basepath.glob("**/sketch.json"):
-            logging.error(f"Sketch Folder Name : {file.parent.name}")
-            obj.append(str(file.parent))
-
-        return obj
 
     @Slot(str)
     def loadSketchVersion(self, version):

@@ -68,6 +68,7 @@ Zynthian.ScreenPage {
         property int iconWidth: (gridWidth / 6)
         property int iconHeight:  (gridHeight / 2)
 
+        clip: true
         width: gridWidth
         height: gridHeight
         Layout.fillWidth: true

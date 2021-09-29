@@ -51,8 +51,6 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.__track_copy_cache__ = None
         self.__track_copy_source__ = None
 
-        # self.generate_sketches_from_session(True)
-
     ### Property sketches
     def get_sketches(self):
         return self.__sketches__
@@ -83,9 +81,19 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
 
         logging.error(f"Copied track : {self.__track_copy_cache__}")
 
+    @Slot(None)
+    def cancelCopyTrack(self):
+        self.__track_copy_cache__ = None
+        self.__track_copy_source__ = None
+        self.is_copy_in_progress_changed.emit()
+        self.track_copy_source_changed.emit()
+
+        logging.error(f"Track Copy Cancelled")
+
     @Slot(QObject)
     def pasteTrack(self, sketch):
         logging.error(f"Pasting track to sketch : {sketch.name}")
+
         pasted_track = zynthiloops_track(sketch.tracksModel.count, sketch, self)
         sketch.tracksModel.add_track(pasted_track)
         pasted_track.deserialize(self.__track_copy_cache__)
@@ -93,21 +101,3 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.__track_copy_source__ = None
         self.is_copy_in_progress_changed.emit()
         self.track_copy_source_changed.emit()
-
-    # @Slot(None)
-    # def generate_sketches_from_session(self, connect_to_signal=False):
-    #     logging.error("### Generating sketches from session")
-    #
-    #     if connect_to_signal:
-    #         self.zyngui.session_dashboard.sketches_changed.connect(self.generate_sketches_from_session)
-    #
-    #     for slot in self.zyngui.session_dashboard.sketches:
-    #         sketch = self.zyngui.session_dashboard.sketches[slot]
-    #         logging.error(f"Loading sketch from slot[{slot}] : {sketch}")
-    #
-    #         for file in Path(sketch).glob("**/*.json"):
-    #             if file.name != "sketch.json":
-    #                 self.__sketches__[slot] = zynthiloops_song(sketch + "/", file.name.replace(".json", ""), self.zyngui.zynthiloops)
-    #                 break
-    #
-    #     self.sketches_changed.emit()

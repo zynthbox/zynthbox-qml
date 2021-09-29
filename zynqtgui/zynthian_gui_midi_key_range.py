@@ -30,6 +30,7 @@ from ctypes import c_ubyte, c_byte
 # Zynthian specific modules
 from zyncoder import *
 from zyngine import zynthian_controller
+from zyngine import zynthian_midi_filter
 from . import zynthian_gui_config
 from . import zynthian_qt_gui_base
 from . import zynthian_gui_controller
@@ -61,6 +62,17 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		self.halftone_zctrl=None
 
 		self.replot = True
+
+		## TODO: Heuristics to automatically split keyboard
+		#if self.note_high < 127:
+			#zynthian_gui_config.midi_filter_rules = "MAP CH#{ch} NON#0:{high} => CH#{ch2} NON#0:{high}\nMAP CH#{ch} NOFF#0:{high} => CH#{ch2} NOFF#0:{high}\n".format(ch = self.chan, high = self.note_high, ch2 = self.chan+1)
+		#else:
+			#zynthian_gui_config.midi_filter_rules = None
+		#if self.zyngui.midi_filter_script:
+			#self.zyngui.midi_filter_script.clean()
+		#self.zyngui.midi_filter_script = zynthian_midi_filter.MidiFilterScript(
+			#zynthian_gui_config.midi_filter_rules
+		#)
 
 
 	def config(self, chan):

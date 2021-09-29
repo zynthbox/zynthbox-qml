@@ -41,6 +41,8 @@ from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property
 #------------------------------------------------------------------------------
 # Zynthian Session Dashboard GUI Class
 #------------------------------------------------------------------------------
+from zynqtgui.session_dashboard.session_dashboard_session_sketches_model import session_dashboard_session_sketches_model
+
 
 class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
@@ -53,7 +55,12 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         if not self.restore():
             self.__name__ = None
             self.__id__ = 0
-            self.__sketches__ = {}
+            self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
+
+            for i in range(1, 12):
+                self.__session_sketches_model__.add_sketch(i, None)
+
+            self.session_sketches_model_changed.emit()
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -81,29 +88,24 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     id = Property(int, get_id, notify=id_changed)
     ### END Property name
 
-    ### Property sketches
-    def get_sketches(self):
-        return self.__sketches__
-    def set_sketch(self, sketch, slot=0):
-        logging.error(f"Setting session sketch slot[{slot}] : {sketch}")
-
-        self.__sketches__[slot] = sketch
-        self.sketches_changed.emit()
-        self.schedule_save()
-    sketches_changed = Signal()
-    sketches = Property('QVariantMap', get_sketches, notify=sketches_changed)
-    ### END Property sketches
+    ### Property sessionSketchesModel
+    def get_session_sketches_model(self):
+        return self.__session_sketches_model__
+    session_sketches_model_changed = Signal()
+    sessionSketchesModel = Property(QObject, get_session_sketches_model, notify=session_sketches_model_changed)
+    ### END Property sessionSketchesModel
 
     def serialize(self):
         return {
             "name": self.__name__,
             "id": self.__id__,
-            "sketches": self.__sketches__
+            "sketches": self.__session_sketches_model__.serialize()
         }
 
     def schedule_save(self):
         self.__save_timer__.start()
 
+    @Slot(None)
     def save(self):
         session_json_path = self.__sessions_base_dir__ / "session.json"
         logging.error(f"Saving session : {session_json_path}")
@@ -128,8 +130,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.__id__ = session["id"]
                 self.id_changed.emit()
             if "sketches" in session:
-                self.__sketches__ = session["sketches"]
-                self.sketches_changed.emit()
+                self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
+                self.__session_sketches_model__.deserialize(session["sketches"])
+                self.session_sketches_model_changed.emit()
 
             return True
         except Exception as e:
@@ -144,7 +147,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def select_action(self, i, t='S'):
         self.index = i
 
-
     @Slot(None, result=float)
     def get_session_time(self):
         logging.error((datetime.now() - self.__sessionStartTime).total_seconds())
@@ -154,5 +156,3 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.select_path = "Session"
         self.select_path_element = "Session"
         super().set_select_path()
-
-#-------------------------------------------------------------------------------

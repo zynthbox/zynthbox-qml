@@ -35,28 +35,8 @@ from ..zynthiloops.libzl.zynthiloops_track import zynthiloops_track
 class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_sketch_copier, self).__init__(parent)
-        self.__sketches__ = {
-            "1": None,
-            "2": None,
-            "3": None,
-            "4": None,
-            "5": None,
-            "6": None,
-            "7": None,
-            "8": None,
-            "9": None,
-            "10": None,
-            "11": None,
-        }
         self.__track_copy_cache__ = None
         self.__track_copy_source__ = None
-
-    ### Property sketches
-    def get_sketches(self):
-        return self.__sketches__
-    sketches_changed = Signal()
-    sketches = Property('QVariantMap', get_sketches, notify=sketches_changed)
-    ### END Property sketches
 
     ### Property isCopyInProgress
     def get_is_copy_in_progress(self):

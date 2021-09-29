@@ -51,16 +51,21 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 text: "Add New Sketch"
+                iconName: "document-new-symbolic"
                 onTriggered: {
                 }
             }
             Kirigami.Action {
                 text: "Add Existing Sketch"
+                iconName: "folder-new-symbolic"
                 onTriggered: {
+                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
+                    sketchPickerDialog.open();
                 }
             }
             Kirigami.Action {
                 text: "Remove Sketch"
+                iconName: "edit-delete-symbolic"
                 onTriggered: {
                 }
             }
@@ -70,14 +75,27 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 text: "Copy Track"
+                iconName: "edit-copy-symbolic"
                 enabled: !copier.isCopyInProgress
+                visible: !copier.isCopyInProgress
                 onTriggered: {
                     copier.copyTrack(tracksData.selectedTrack);
                 }
             }
             Kirigami.Action {
-                text: "Paste Track"
+                text: "Cancel Track Copy"
+                iconName: "dialog-cancel"
                 enabled: copier.isCopyInProgress
+                visible: copier.isCopyInProgress
+                onTriggered: {
+                    copier.cancelCopyTrack();
+                }
+            }
+            Kirigami.Action {
+                text: "Paste Track"
+                iconName: "edit-paste-symbolic"
+                enabled: copier.isCopyInProgress
+                visible: copier.isCopyInProgress
                 onTriggered: {
                     copier.pasteTrack(sketchesData.selectedSketch);
                 }
@@ -88,11 +106,14 @@ Zynthian.ScreenPage {
 
             Kirigami.Action {
                 text: "Save Session"
+                iconName: "document-save-symbolic"
                 onTriggered: {
+                    session.save();
                 }
             }
             Kirigami.Action {
                 text: "Load Session"
+                iconName: "folder-download-symbolic"
                 onTriggered: {
                 }
             }
@@ -113,6 +134,25 @@ Zynthian.ScreenPage {
         // 12 buttons for both sketches and tracks
         property real buttonWidth: contentColumn.width/12 - contentColumn.spacing*2 - 10
         property real buttonHeight: Kirigami.Units.gridUnit*6
+    }
+
+    Zynthian.FilePickerDialog {
+        id: sketchPickerDialog
+        parent: root
+
+        x: parent.width/2 - width/2
+        y: parent.height/2 - height/2
+        width: Math.round(parent.width * 0.8)
+        height: Math.round(parent.height * 0.8)
+
+        headerText: qsTr("Pick a sketch")
+        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        folderModel {
+            nameFilters: ["*.json"]
+        }
+        onFileSelected: {
+            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
+        }
     }
 
     contentItem : ColumnLayout {
@@ -172,9 +212,9 @@ Zynthian.ScreenPage {
                 }
 
                 Repeater {
-                    model: Object.keys(copier.sketches)
+                    model: session.sessionSketchesModel
                     delegate: CopierButton {
-                        property var sketch: copier.sketches[modelData]
+                        property var sketch: model.sketch
 
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
@@ -182,6 +222,7 @@ Zynthian.ScreenPage {
                         highlighted: sketchesData.selectedSketch === sketch
                         text: sketch ? (sketch.id+1) : ""
                         enabled: sketch ? true : false
+                        dummy: sketch ? false : true
                         onClicked: {
                             sketchesData.selectedSketch = sketch;
                             sketchesData.selectedIndex = parseInt(modelData);
@@ -231,6 +272,7 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
 
+                        enabled: !copier.isCopyInProgress
                         highlighted: tracksData.selectedTrack === track
                         isCopySource: copier.trackCopySource === track
                         text: (index+1)
@@ -250,6 +292,7 @@ Zynthian.ScreenPage {
 
                         text: ""
                         enabled: false
+                        dummy: true
                     }
                 }
 

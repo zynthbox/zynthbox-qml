@@ -74,7 +74,8 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 				self.select(0)
 		else:
-			self.select(-1)
+			self.select(0)
+
 
 
 	def select_action(self, i, t='S'):

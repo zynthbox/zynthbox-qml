@@ -51,16 +51,11 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__sessionStartTime = datetime.now()
         self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/sessions/")
         self.__save_timer__ = QTimer(self)
+        self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
 
         if not self.restore():
             self.__name__ = None
             self.__id__ = 0
-            self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
-
-            for i in range(1, 12):
-                self.__session_sketches_model__.add_sketch(i, None)
-
-            self.session_sketches_model_changed.emit()
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -130,7 +125,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.__id__ = session["id"]
                 self.id_changed.emit()
             if "sketches" in session:
-                self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
                 self.__session_sketches_model__.deserialize(session["sketches"])
                 self.session_sketches_model_changed.emit()
 
@@ -156,3 +150,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.select_path = "Session"
         self.select_path_element = "Session"
         super().set_select_path()
+
+    @Slot(int, str)
+    def setSketchSlot(self, slot, sketch):
+        self.__session_sketches_model__.add_sketch(slot, sketch)

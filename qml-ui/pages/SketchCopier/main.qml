@@ -151,7 +151,7 @@ Zynthian.ScreenPage {
             nameFilters: ["*.json"]
         }
         onFileSelected: {
-            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
+            copier.addSketchPath = file.filePath;
         }
     }
 
@@ -203,6 +203,7 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: privateProps.buttonWidth
                     Layout.preferredHeight: privateProps.buttonHeight
 
+                    enabled: copier.addSketchPath.length <= 0
                     highlighted: sketchesData.selectedSketch == curSketch
                     text: "1"
                     onClicked: {
@@ -215,17 +216,23 @@ Zynthian.ScreenPage {
                     model: session.sessionSketchesModel
                     delegate: CopierButton {
                         property var sketch: model.sketch
+                        property int slot: model.slot
 
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
 
                         highlighted: sketchesData.selectedSketch === sketch
-                        text: sketch ? (sketch.id+1) : ""
-                        enabled: sketch ? true : false
+                        text: sketch ? (index+2) : ""
+                        enabled: copier.addSketchPath.length > 0 || (sketch ? true : false)
                         dummy: sketch ? false : true
                         onClicked: {
-                            sketchesData.selectedSketch = sketch;
-                            sketchesData.selectedIndex = parseInt(modelData);
+                            if (copier.addSketchPath.length > 0) {
+                                console.log("Set sketch to slot " + slot);
+                                copier.setSketchSlot(slot);
+                            } else {
+                                sketchesData.selectedSketch = sketch;
+                                sketchesData.selectedIndex = slot+1;
+                            }
                         }
                     }
                 }

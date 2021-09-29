@@ -22,6 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import logging
 from pathlib import Path
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
@@ -30,11 +31,16 @@ from zynqtgui.zynthiloops.libzl.zynthiloops_song import zynthiloops_song
 
 
 class session_dashboard_session_sketches_model(QAbstractListModel):
-    Sketch = Qt.UserRole + 1
+    SketchRole = Qt.UserRole + 1
+    SlotRole = SketchRole + 1
 
     def __init__(self, parent=None):
         super(session_dashboard_session_sketches_model, self).__init__(parent)
         self.__sketches__ = {}
+        self.__session_dashboard__ = parent
+
+        for i in range(0, 11):
+            self.add_sketch(i, None)
 
     ### Property count
     def count(self):
@@ -45,26 +51,29 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
     ### END Property count
 
     @Slot(int, result=QObject)
-    def getSketch(self, id: int):
-        if id < 0 or id >= len(self.__sketches__):
+    def getSketch(self, slot: int):
+        if slot not in self.__sketches__:
             return None
-        return self.__sketches__[id]
+        return self.__sketches__[slot]
 
     def data(self, index, role=None):
         if not index.isValid():
             return None
 
-        if index.row() >= len(self.__sketches__):
+        if index.row() not in self.__sketches__:
             return None
 
         if role == self.SketchRole:
             return self.__sketches__[index.row()]
+        elif role == self.SlotRole:
+            return index.row()
         else:
             return None
 
     def roleNames(self):
         role_names = {
             self.SketchRole: b"sketch",
+            self.SlotRole: b"slot",
         }
 
         return role_names
@@ -72,11 +81,20 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
     def rowCount(self, index):
         return len(self.__sketches__)
 
-    def add_sketch(self, id, sketch):
-        self.beginInsertRows(QModelIndex(), id, id)
-        self.__sketches__[id] = sketch
+    def add_sketch(self, slot, sketch):
+        self.beginRemoveRows(QModelIndex(), slot, slot)
+        self.endRemoveRows()
+
+        self.beginInsertRows(QModelIndex(), slot, slot)
+
+        if sketch is None:
+            self.__sketches__[slot] = sketch
+        else:
+            sketch_path = Path(sketch)
+            self.__sketches__[slot] = zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self.__session_dashboard__.zyngui.zynthiloops)
+            logging.error(f"Session add sketch : {slot}, {sketch_path}, {self.__sketches__[slot]}")
+
         self.endInsertRows()
-        self.countChanged.emit()
 
     def serialize(self):
         res = {}
@@ -87,9 +105,14 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
         return res
 
     def deserialize(self, obj):
-        for i in range(1, 12):
-            if i in obj and obj[i] is not None:
-                sketch_path = Path(obj[i])
-                self.add_sketch(i, zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self))
+        logging.error(f"Deserializing session sketches : {obj}")
+        for i in range(0, 11):
+            try:
+                logging.error(f"{i}, {obj[str(i)]}")
+            except:
+                pass
+
+            if str(i) in obj and obj[str(i)]:
+                self.add_sketch(i, obj[str(i)])
             else:
                 self.add_sketch(i, None)

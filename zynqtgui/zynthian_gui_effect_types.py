@@ -79,8 +79,6 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 			self.zyngui.screens[self.effect_chooser_screen].single_category = self.list_data[i][0]
 			self.zyngui.screens[self.effect_chooser_screen].show()
 			#If first column is not pointing to a layer, preselect slot 0 of effect_chooser_screen
-			if isinstance( self.zyngui.screens[self.effects_screen].list_data[self.zyngui.screens[self.effects_screen].index][1], int):
-				self.zyngui.screens[self.effect_chooser_screen].select(0)
 		self.set_select_path()
 
 

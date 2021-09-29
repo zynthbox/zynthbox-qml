@@ -613,9 +613,13 @@ class zynthian_gui(QObject):
         ###
         self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
+        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
+
+        ###
+        # Session Dashboard depends on ZL to load sketches and hence needs to be initialized after ZL page
+        ###
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
 
-        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)
         # if "zynseq" in zynthian_gui_config.experimental_features:

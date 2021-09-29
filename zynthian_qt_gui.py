@@ -80,6 +80,7 @@ from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
+from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_effect_types import zynthian_gui_effect_types
 from zynqtgui.zynthian_gui_layer_effect_chooser import (
     zynthian_gui_layer_effect_chooser,
@@ -262,6 +263,7 @@ class zynthian_gui(QObject):
         "preset",
         "control",
         "layer_effects",
+        "layer_midi_effects",
     )
     non_modal_screens = (
         "session_dashboard",  #FIXME or main? make this more configurable?
@@ -271,6 +273,11 @@ class zynthian_gui(QObject):
         "preset",
         "control",
         "layer_effects",
+        "effect_types",
+        "layer_effect_chooser",
+        "layer_midi_effects",
+        "midi_effect_types",
+        "layer_midi_effect_chooser",
     )
 
     note2cuia = {
@@ -561,10 +568,14 @@ class zynthian_gui(QObject):
 
         self.screens["layer_options"] = zynthian_gui_layer_options(self)
         self.screens["layer_effects"] = zynthian_gui_layer_effects(self)
+        self.screens["layer_midi_effects"] = zynthian_gui_layer_effects(self)
+        self.screens["layer_midi_effects"].midi_mode = True
         self.screens["effect_types"] = zynthian_gui_effect_types(self)
-        self.screens[
-            "layer_effect_chooser"
-        ] = zynthian_gui_layer_effect_chooser(self)
+        self.screens["midi_effect_types"] = zynthian_gui_effect_types(self)
+        self.screens["midi_effect_types"].midi_mode = True
+        self.screens["layer_effect_chooser"] = zynthian_gui_layer_effect_chooser(self)
+        self.screens["layer_midi_effect_chooser"] = zynthian_gui_layer_effect_chooser(self)
+        self.screens["layer_midi_effect_chooser"].midi_mode = True
         self.screens["snapshot"] = zynthian_gui_snapshot(self)
         self.screens["midi_chan"] = zynthian_gui_midi_chan(self)
         self.screens["midi_cc"] = zynthian_gui_midi_cc(self)
@@ -881,6 +892,8 @@ class zynthian_gui(QObject):
                     self.screens["bank"].select_action(0)
                 self.screens["layer_effects"].show()
                 self.screens["layer_effects"].select_action(0)
+                self.screens["layer_midi_effects"].show()
+                self.screens["layer_midi_effects"].select_action(0)
 
     def show_control(self):
         self.restore_curlayer()
@@ -2327,11 +2340,20 @@ class zynthian_gui(QObject):
     def get_layer_effects(self):
         return self.screens["layer_effects"]
 
+    def get_layer_midi_effects(self):
+        return self.screens["layer_midi_effects"]
+
     def get_effect_types(self):
         return self.screens["effect_types"]
 
+    def get_midi_effect_types(self):
+        return self.screens["midi_effect_types"]
+
     def get_layer_effect_chooser(self):
         return self.screens["layer_effect_chooser"]
+
+    def get_layer_midi_effect_chooser(self):
+        return self.screens["layer_midi_effect_chooser"]
 
     def get_module_downloader(self):
         return self.screens["module_downloader"]
@@ -2484,9 +2506,14 @@ class zynthian_gui(QObject):
     main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)
     layer_effects = Property(QObject, get_layer_effects, constant=True)
+    layer_midi_effects = Property(QObject, get_layer_midi_effects, constant=True)
     effect_types = Property(QObject, get_effect_types, constant=True)
+    midi_effect_types = Property(QObject, get_midi_effect_types, constant=True)
     layer_effect_chooser = Property(
         QObject, get_layer_effect_chooser, constant=True
+    )
+    layer_midi_effect_chooser = Property(
+        QObject, get_layer_midi_effect_chooser, constant=True
     )
     module_downloader = Property(QObject, get_module_downloader, constant=True)
     admin = Property(QObject, get_admin, constant=True)

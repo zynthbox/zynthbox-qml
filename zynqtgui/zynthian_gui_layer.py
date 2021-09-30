@@ -1492,14 +1492,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					restored_jacknames.append(new_layer.get_jackname())
 		# try to map the jacknames of therestored channels with what it was snapshotted
 		snapshotted_jacknames = []
-		for jackname in snapshot['audio_routing']:
-			if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-			for out in snapshot['audio_routing'][jackname]:
-				if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
-		for jackname in snapshot['midi_routing']:
-			if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
-			for out in snapshot['midi_routing'][jackname]:
-				if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+		if 'audio_routing' in snapshot:
+			for jackname in snapshot['audio_routing']:
+				if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+				for out in snapshot['audio_routing'][jackname]:
+					if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+		if 'midi_routing' in snapshot:
+			for jackname in snapshot['midi_routing']:
+				if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+				for out in snapshot['midi_routing'][jackname]:
+					if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
 		restored_jacknames.sort()
 		snapshotted_jacknames.sort()
 		jacknames_r_s_map = {}

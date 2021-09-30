@@ -71,9 +71,9 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        //Try to fit exactly until a minimum allowed size
         property int headerWidth: 100
-        property int headerHeight: 50
+        // Try to fix 12 tracks
+        property int headerHeight: Math.round(cellGridFlickable.height/13 - cellGrid.rowSpacing*2)
         property int cellWidth: 50
         property int cellHeight: headerHeight
     }    
@@ -235,8 +235,8 @@ Zynthian.ScreenPage {
                         height: 4
                     }
 
-                    contentX: barsHeaderRow.contentX
-                    contentY: tracksHeaderColumns.contentY
+                    contentX: barsHeaderRow.contentX - barsHeaderRow.originX
+                    contentY: tracksHeaderColumns.contentY - tracksHeaderColumns.originY
 
                     Item {
                         Grid {

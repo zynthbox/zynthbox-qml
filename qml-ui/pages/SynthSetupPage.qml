@@ -84,7 +84,10 @@ Zynthian.ScreenPage {
             text: qsTr("Slot")
             Kirigami.Action {
                 text: qsTr("Synths")
-                onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                onTriggered: {
+                    print(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                    zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                }
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
@@ -259,6 +262,7 @@ Zynthian.ScreenPage {
                             }
                             QQC2.Button {
                                 icon.name: "configure"
+                                visible: model.display != "-"
                                 onClicked: {
                                     delegate.clicked();
                                     optionsMenu.open();

@@ -78,7 +78,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 for sl in self.zyngui.screens['layer'].get_midichain_layers(layer):
                     sl0 = None
                     bullet = ""
-                    if sl.is_parallel_audio_routed(sl0):
+                    if sl.is_parallel_midi_routed(sl0):
                         bullet = " || "
                     else:
                         bullet = " -> "

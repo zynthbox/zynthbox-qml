@@ -132,10 +132,12 @@ while true; do
 	cp -auR zynthian-plasma-theme/* /root/.local/share/plasma/desktoptheme/zynthian/
 	#cp zynthian_envars.sh ../config
 
-	matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
-	#kwin_x11&
+	#matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
+	kwin_x11&
+	#openbox&
 	export QT_SCALE_FACTOR=1
 	export QT_SCREEN_SCALE_FACTORS=1
+	export QT_AUTO_SCREEN_SCALE_FACTOR=0
 	export QT_QPA_PLATFORMTHEME=generic
 	./zynthian_qt_gui.py
 	status=$?

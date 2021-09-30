@@ -52,6 +52,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/sessions/")
         self.__save_timer__ = QTimer(self)
         self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
+        self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
 
         if not self.restore():
             self.__name__ = None
@@ -72,6 +73,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_name(self, name):
         self.__name__ = name
         self.name_changed.emit()
+        self.schedule_save()
     name_changed = Signal()
     name = Property(str, get_name, set_name, notify=name_changed)
     ### END Property name
@@ -100,21 +102,42 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def schedule_save(self):
         self.__save_timer__.start()
 
-    @Slot(None)
     def save(self):
-        session_json_path = self.__sessions_base_dir__ / "session.json"
-        logging.error(f"Saving session : {session_json_path}")
-
+        # Save session to cache
         self.__sessions_base_dir__.mkdir(parents=True, exist_ok=True)
+
+        logging.error(f"Saving session to cache : {self.__cache_json_path__}")
+
+        with open(self.__cache_json_path__, "w") as f:
+            json.dump(self.serialize(), f)
+
+    @Slot(str)
+    def saveAs(self, fileName):
+        session_json_path = self.__sessions_base_dir__ / (fileName + ".json")
+        logging.error(f"Saving session to file : {session_json_path}")
 
         with open(session_json_path, "w") as f:
             json.dump(self.serialize(), f)
 
-    def restore(self):
-        session_json_path = self.__sessions_base_dir__ / "session.json"
+        logging.error(f"Deleting cache : {self.__cache_json_path__}")
 
         try:
-            logging.error(f"Restoring session : {session_json_path}")
+            self.__cache_json_path__.unlink()
+        except:
+            pass
+
+    def restore(self, sketch=""):
+        if self.__cache_json_path__.exists():
+            logging.error(f"Cache found. Restoring Session from {self.__cache_json_path__}")
+            session_json_path = self.__cache_json_path__
+        elif len(sketch) > 0 and Path(sketch).exists():
+            session_json_path = Path(sketch)
+            logging.error(f"Cache not found. Restoring Session from {session_json_path}")
+        else:
+            logging.error("Nothing to restore session from")
+            return False
+
+        try:
             with open(session_json_path, "r") as f:
                 session = json.load(f)
 
@@ -154,3 +177,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(int, str)
     def setSketchSlot(self, slot, sketch):
         self.__session_sketches_model__.add_sketch(slot, sketch)
+        self.schedule_save()
+
+    @Slot(str)
+    def load(self, sketch):
+        self.__session_sketches_model__.clear()
+        self.restore(sketch)
+
+    @Slot(str, result=bool)
+    def exists(self, filename):
+        return (Path(self.__sessions_base_dir__) / (filename + ".json")).exists()

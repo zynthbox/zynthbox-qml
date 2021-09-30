@@ -512,7 +512,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def remove_root_layer(self, i, stop_unused_engines=True):
 		if i>=0 and i<len(self.root_layers):
-			traceback.print_stack(None, 8)
 			# For some engines (Aeolus, setBfree), delete all layers from the same engine
 			if self.root_layers[i].engine.nickname in ['BF', 'AE']:
 				root_layers_to_delete = copy.copy(self.root_layers[i].engine.layers)
@@ -1474,6 +1473,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
+
 				if str(midi_chan) in channels_mapping and isinstance(channels_mapping[str(midi_chan)], int):
 					midi_chan = channels_mapping[str(midi_chan)]
 				if midi_chan >= from_channel and midi_chan <= to_channel:
@@ -1495,6 +1495,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for jackname in snapshot['audio_routing']:
 			if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
 			for out in snapshot['audio_routing'][jackname]:
+				if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
+		for jackname in snapshot['midi_routing']:
+			if not jackname in snapshotted_jacknames: snapshotted_jacknames.append(jackname)
+			for out in snapshot['midi_routing'][jackname]:
 				if not out in snapshotted_jacknames: snapshotted_jacknames.append(out)
 		restored_jacknames.sort()
 		snapshotted_jacknames.sort()
@@ -1526,9 +1530,46 @@ class zynthian_gui_layer(zynthian_gui_selector):
 							layer.reset_audio_out()
 				else:
 					layer.reset_audio_out()
+		if 'midi_routing' in snapshot:
+			for layer in restored_layers:
+				#Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+				if layer.get_jackname() in jacknames_r_s_map:
+					mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+					if mapped_source_jackname in snapshot['midi_routing']:
+						mapped_out_jacknames = []
+						for name in snapshot['midi_routing'][mapped_source_jackname]:
+							if name in jacknames_s_r_map:
+								mapped_out_jacknames.append(jacknames_s_r_map[name])
+						if len(mapped_out_jacknames) > 0:
+							layer.set_midi_out(mapped_out_jacknames)
+
+		if 'audio_capture' in snapshot:
+			for layer in restored_layers:
+				#Set Audio Routing: we have to remap all the jacknames that were saved on audio routing
+				if layer.get_jackname() in jacknames_r_s_map:
+					mapped_source_jackname = jacknames_r_s_map[layer.get_jackname()]
+					if mapped_source_jackname in snapshot['audio_capture']:
+						mapped_out_jacknames = []
+						for name in snapshot['audio_capture'][mapped_source_jackname]:
+							if name in jacknames_s_r_map:
+								mapped_out_jacknames.append(jacknames_s_r_map[name])
+						if len(mapped_out_jacknames) > 0:
+							layer.set_audio_in(mapped_out_jacknames)
+						else:
+							layer.reset_audio_in()
+				else:
+					layer.reset_audio_in()
 		else:
 			for layer in restored_layers:
-				layer.reset_audio_out()
+				layer.reset_audio_in()
+
+		if 'note_range' in snapshot:
+			new_roots = self.get_fxchain_roots()
+			for layer in restored_layers:
+				i = 0
+				if i < 2 and layer in new_roots:
+					zyncoder.lib_zyncoder.set_midi_filter_note_range(layer.midi_chan, snapshot['note_range'][i]['note_low'], snapshot['note_range'][i]['note_high'], snapshot['note_range'][i]['octave_trans'], snapshot['note_range'][i]['halftone_trans'])
+					i += 1
 
 		#TODO: always clone?
 		for i in restored_channels:
@@ -1607,12 +1648,26 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def export_channels_snapshot(self, channels):
 		if not isinstance(channels, list):
 			return
-		snapshot = {"layers": [], "audio_routing": {}}
+		snapshot = {"layers": [], "note_range": [], "audio_routing": {}, "midi_routing": {}, "audio_capture": {}}
+		midi_chans = []
 		# Double iteration because many layers can be on the same channel (one instrument + arbitrary effects)
 		for layer in self.layers:
 			if layer.midi_chan in channels:
 				snapshot["layers"].append(layer.get_snapshot())
 				snapshot["audio_routing"][layer.get_jackname()] = layer.get_audio_out()
+				snapshot["midi_routing"][layer.get_jackname()] = layer.get_midi_out()
+				snapshot["audio_capture"][layer.get_jackname()] = layer.get_audio_in()
+				if not layer.midi_chan in midi_chans:
+					midi_chans.append(layer.midi_chan)
+		for i in midi_chans:
+			#Note-range info
+			info = {
+				'note_low': zyncoder.lib_zyncoder.get_midi_filter_note_low(i),
+				'note_high': zyncoder.lib_zyncoder.get_midi_filter_note_high(i),
+				'octave_trans': zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i),
+				'halftone_trans': zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
+			}
+			snapshot['note_range'].append(info)
 		return snapshot
 
 

@@ -1806,7 +1806,8 @@ class zynthian_gui(QObject):
                     self.screens["midi_chan"].midi_chan_activity(chan)
                     # Preload preset (note-on)
                     if (
-                        zynthian_gui_config.preset_preload_noteon
+                        self.curlayer
+                        and zynthian_gui_config.preset_preload_noteon
                         and self.active_screen == "preset"
                         and chan == self.curlayer.get_midi_chan()
                     ):

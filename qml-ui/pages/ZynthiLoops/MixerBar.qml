@@ -44,10 +44,8 @@ GridLayout {
     QtObject {
         id: privateProps
 
-        //Try to fit exactly until a minimum allowed size
-        property int cellWidth: Math.round(
-                                    Math.max(Kirigami.Units.gridUnit * 5,
-                                            tableLayout.width / 9))
+        //Try to fit exactly 12 mixers + master (same width as loopgrid)
+        property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
     }
 
     ColumnLayout {

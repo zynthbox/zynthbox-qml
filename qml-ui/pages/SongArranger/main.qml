@@ -73,7 +73,7 @@ Zynthian.ScreenPage {
 
         property int headerWidth: 100
         // Try to fix 12 tracks
-        property int headerHeight: Math.round(cellGridFlickable.height/13 - cellGrid.rowSpacing*2)
+        property int headerHeight: Math.round(tableLayout.height/14 - cellGrid.rowSpacing*2)
         property int cellWidth: 50
         property int cellHeight: headerHeight
     }    

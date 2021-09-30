@@ -564,8 +564,6 @@ class zynthian_gui(QObject):
         self.screens["layer"] = zynthian_gui_layer(self)
         self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
         self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
-        self.screens["main_layers_view"].set_extra_layers_count(0)
-
         self.screens["layer_options"] = zynthian_gui_layer_options(self)
         self.screens["layer_effects"] = zynthian_gui_layer_effects(self)
         self.screens["layer_midi_effects"] = zynthian_gui_layer_effects(self)

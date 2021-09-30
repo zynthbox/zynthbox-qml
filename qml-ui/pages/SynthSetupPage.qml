@@ -184,7 +184,7 @@ Zynthian.ScreenPage {
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
-                    text: qsTr("11 - 15")
+                    text: qsTr("7.x")
                     implicitWidth: 1
                     checkable: true
                     checked: zynthian.main_layers_view.start_midi_chan === 10
@@ -197,8 +197,9 @@ Zynthian.ScreenPage {
                     }
                 }
                 QQC2.Button {
+                    implicitWidth: Math.round(parent.width/3.2)
                     text: "|"
-                    enabled: layersView.view.currentIndex < layersView.view.count - 1
+                    enabled: zynthian.main_layers_view.start_midi_chan !== 5 && layersView.view.currentIndex < layersView.view.count - 1
                     onClicked: {
                         if (layersView.view.currentItem) {
                             layersView.view.currentItem.toggleCloned();
@@ -238,7 +239,15 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 id: mainLabel
                                 Layout.fillWidth: true
-                                text: model.display
+                                text: {
+                                    let numPrefix = model.metadata.midi_channel + 1;
+                                    if (numPrefix > 10) {
+                                        numPrefix = "7." + (numPrefix - 10);
+                                    } else if (numPrefix > 5) {
+                                        numPrefix = "6." + (numPrefix - 5);
+                                    }
+                                    return numPrefix + " - " + model.display;
+                                }
                             }
                             QQC2.Label {
                                 visible: model.metadata.note_high < 64 || model.metadata.note_low >= 64
@@ -320,7 +329,7 @@ Zynthian.ScreenPage {
                                 anchors.fill: parent
                                 QQC2.Label {
                                     text: "|"
-                                    opacity: model.metadata.midi_cloned
+                                    opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
                                 }
                                 QQC2.Label {
                                     Layout.fillWidth: true

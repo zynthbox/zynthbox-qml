@@ -39,8 +39,7 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
         self.__sketches__ = {}
         self.__session_dashboard__ = parent
 
-        for i in range(0, 11):
-            self.add_sketch(i, None)
+        self.clear()
 
     ### Property count
     def count(self):
@@ -116,3 +115,11 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
                 self.add_sketch(i, obj[str(i)])
             else:
                 self.add_sketch(i, None)
+
+    def clear(self):
+        self.beginRemoveRows(QModelIndex(), 0, len(self.__sketches__)-1)
+        self.__sketches__ = {}
+        self.endRemoveRows()
+
+        for i in range(0, 11):
+            self.add_sketch(i, None)

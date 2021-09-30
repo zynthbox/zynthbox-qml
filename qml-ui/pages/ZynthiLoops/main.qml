@@ -123,7 +123,7 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        //Try to fit exactly until a minimum allowed size
+        //Try to fit exactly 12 cells + a header cell
         property int headerWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
         property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
         property int cellWidth: headerWidth

@@ -41,10 +41,12 @@ Rectangle {
                 minimumValue: -40
                 maximumValue: 10
 
+                font.pointSize: 9
+
                 style: GaugeStyle {
                     valueBar: Rectangle {
                         color: Kirigami.Theme.highlightColor
-                        implicitWidth: 8
+                        implicitWidth: 6
                     }
                 }
             }
@@ -54,18 +56,38 @@ Rectangle {
 
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: 14
+                Layout.preferredWidth: parent.width/2
 
                 orientation: Qt.Vertical
                 from: 0
                 to: 100
                 stepSize: 1
+
+                background: Rectangle {
+                    x: 0 //slider.leftPadding
+                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
+                    implicitWidth: 4
+                    implicitHeight: parent.height
+                    width: implicitWidth
+                    height: slider.availableHeight
+                    radius: 2
+                    color: "#bdbebf"
+
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height * (1 - slider.visualPosition)
+                        color: Kirigami.Theme.highlightColor
+                        radius: 2
+                        anchors.bottom: parent.bottom
+                    }
+                }
             }
         }
 
         QQC2.Label {
             id: footerLabel
             Layout.alignment: Qt.AlignCenter
+            font.pointSize: 9
         }
     }
 

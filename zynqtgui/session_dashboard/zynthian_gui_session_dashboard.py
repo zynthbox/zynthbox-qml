@@ -108,23 +108,31 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
         logging.error(f"Saving session to cache : {self.__cache_json_path__}")
 
-        with open(self.__cache_json_path__, "w") as f:
-            json.dump(self.serialize(), f)
+        try:
+            with open(self.__cache_json_path__, "w") as f:
+                json.dump(self.serialize(), f)
+        except Exception as e:
+            logging.error(f"Error saving cache : {str(e)}")
 
     @Slot(str)
     def saveAs(self, fileName):
+        self.__sessions_base_dir__.mkdir(parents=True, exist_ok=True)
+
         session_json_path = self.__sessions_base_dir__ / (fileName + ".json")
         logging.error(f"Saving session to file : {session_json_path}")
 
-        with open(session_json_path, "w") as f:
-            json.dump(self.serialize(), f)
+        try:
+            with open(session_json_path, "w") as f:
+                json.dump(self.serialize(), f)
+        except Exception as e:
+            logging.error(f"Error saving session : {str(e)}")
 
         logging.error(f"Deleting cache : {self.__cache_json_path__}")
 
         try:
             self.__cache_json_path__.unlink()
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"Error deleting cache : {str(e)}")
 
     def restore(self, sketch=""):
         if self.__cache_json_path__.exists():

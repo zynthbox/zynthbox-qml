@@ -102,12 +102,12 @@ Kirigami.AbstractApplicationWindow {
                     y: parent.height
                     modal: true
                     dim: false
+                    Component.onCompleted: zynthian.fixed_layers.layers_count = 10;
                     Repeater {
                         model: zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
                             height: visible ? implicitHeight : 0
-                            enabled: index < 5 || model.display.indexOf("- -") === -1
-                            visible: index !== 5
+                            //enabled: index < 5 || model.display.indexOf("- -") === -1
                             text: ""
                             //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
                             width: parent.width
@@ -120,13 +120,21 @@ Kirigami.AbstractApplicationWindow {
                                     Layout.alignment: Qt.AlignLeft
                                     Layout.maximumWidth: implicitWidth
                                     text: qsTr("6 - T-RACK:")
-                                    visible: index >= 6
-                                    opacity: index === 6
+                                    visible: index >= 5
+                                    opacity: index === 5
                                 }
                                 QQC2.Label {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignLeft
-                                    text: model.display
+                                    text: {
+										let numPrefix = model.metadata.midi_channel + 1;
+										if (numPrefix > 10) {
+											numPrefix = "7." + (numPrefix - 10);
+										} else if (numPrefix > 5) {
+											numPrefix = "6." + (numPrefix - 5);
+										}
+										return numPrefix + " - " + model.display;
+									}
                                 }
                             }
                         }

@@ -45,7 +45,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         super(zynthian_gui_fixed_layers, self).__init__('Layer', parent)
 
         self.__layers_count = 5
-        self.__extra_layers_count = 5
         self.__start_midi_chan = 0
         self.show()
 
@@ -59,9 +58,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]
                 if layer.preset_name is None:
-                    self.list_data.append((str(i+1),i,"{} - {}".format(i + 1, layer.engine.name.replace("Jalv/", ""))))
+                    self.list_data.append((str(i+1),i,"{}".format(layer.engine.name.replace("Jalv/", ""))))
                 else:
-                    self.list_data.append((str(i+1),i,"{} - {} > {}".format(i + 1, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
+                    self.list_data.append((str(i+1),i,"{} > {}".format(layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
                 effects_label = ""
                 first = True
                 for sl in self.zyngui.screens['layer'].get_fxchain_layers(layer):
@@ -77,46 +76,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     sl0 = sl
                 metadata["effects_label"] = effects_label
             else:
-                self.list_data.append((str(i+1),i, "{} - -".format(i+1)))
+                self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
 
-            if i < 15:
-                metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
-            else:
-                metadata["midi_cloned"] = False
-            metadata["midi_channel"] = i
-            metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
-            metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
-            metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
-            metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
-            self.list_metadata.append(metadata)
-
-        if self.__extra_layers_count > 0:
-            self.list_data.append((None,-1, "{} - T-RACK:".format(self.__layers_count+1))) # Separator
-
-        for i in range(self.__start_midi_chan + self.__layers_count, self.__start_midi_chan + self.__layers_count + self.__extra_layers_count):
-            special_layer_number = i - self.__layers_count + 1
-            metadata = {}
-            if i in self.zyngui.screens['layer'].layer_midi_map:
-                layer = self.zyngui.screens['layer'].layer_midi_map[i]
-                if layer.preset_name is None:
-                    self.list_data.append((str(i+1),i,"    {}.{} - {}".format(self.__layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""))))
-                else:
-                    self.list_data.append((str(i+1),i,"    {}.{} - {} > {}".format(self.__layers_count+1, special_layer_number, layer.engine.name.replace("Jalv/", ""), layer.preset_name)))
-                effects_label = ""
-                for layer in self.zyngui.screens['layer'].get_fxchain_layers(layer):
-                    layer0 = None
-                    bullet = ""
-                    if layer.is_parallel_audio_routed(layer0):
-                        bullet = " || "
-                    else:
-                        bullet = " -> "
-                    effects_label += bullet + layer.engine.get_path(layer).replace("JV/","")
-                    layer0 = layer
-                metadata["effects_label"] = effects_label
-            else:
-                self.list_data.append((str(i+1),i, "    {}.{} - -".format(self.__layers_count+1, special_layer_number)))
-                metadata["effects_label"] = ""
             if i < 15:
                 metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
             else:
@@ -191,16 +153,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         return self.__layers_count
 
     layers_count = Property(int, get_layers_count, set_layers_count, notify = layers_count_changed)
-
-    def get_extra_layers_count(self):
-        return self.__extra_layers_count
-
-
-    def set_extra_layers_count(self, count):
-        if self.__extra_layers_count == count:
-            return
-        self.__extra_layers_count = count
-        self.fill_list()
 
 
     def index_supports_immediate_activation(self, index=None):

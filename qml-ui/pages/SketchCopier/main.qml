@@ -269,11 +269,12 @@ Zynthian.ScreenPage {
             Layout.preferredHeight: sketchesData.height
 
             QQC2.Label {
-                text: qsTr("Track %1: %2")
-                        .arg(tracksData.selectedTrack ? (tracksData.selectedTrack.id+1) : "")
-                        .arg(tracksData.selectedTrack ? tracksData.selectedTrack.name : "")
+                text: tracksData.selectedTrack
+                        ? qsTr("Track %1: %2")
+                            .arg(tracksData.selectedTrack ? (tracksData.selectedTrack.id+1) : "")
+                            .arg(tracksData.selectedTrack ? tracksData.selectedTrack.name : "")
+                        : ""
                 opacity: 0.7
-                visible: tracksData.selectedTrack ? true : false
             }
 
             RowLayout {

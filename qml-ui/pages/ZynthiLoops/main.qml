@@ -124,9 +124,7 @@ Zynthian.ScreenPage {
         id: privateProps
 
         //Try to fit exactly until a minimum allowed size
-        property int headerWidth: Math.round(
-                                    Math.max(Kirigami.Units.gridUnit * 5,
-                                            tableLayout.width / 9))
+        property int headerWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
         property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
@@ -313,7 +311,7 @@ Zynthian.ScreenPage {
                         height: 4
                     }
 
-                    contentX: partsHeaderRow.contentX
+                    contentX: partsHeaderRow.contentX - partsHeaderRow.originX
                     contentY: tracksHeaderColumns.contentY
 
                     GridLayout {

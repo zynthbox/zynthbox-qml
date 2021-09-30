@@ -74,7 +74,21 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                         effects_label += bullet + sl.engine.get_path(sl).replace("JV/","")
                     first = False
                     sl0 = sl
+                first = True
+                for sl in self.zyngui.screens['layer'].get_midichain_layers(layer):
+                    sl0 = None
+                    bullet = ""
+                    if sl.is_parallel_audio_routed(sl0):
+                        bullet = " || "
+                    else:
+                        bullet = " -> "
+                    if not first:
+                        effects_label += bullet + sl.engine.get_path(sl).replace("JV/","") + "(m)"
+                    first = False
+                    sl0 = sl
                 metadata["effects_label"] = effects_label
+                logging.error("{} {}".format(layer.engine.nickname, layer.engine._ctrls))
+
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""

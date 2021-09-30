@@ -27,5 +27,6 @@ TabbedControlViewAction 1.0 TabbedControlViewAction.qml
 TabbedControlView 1.0 TabbedControlView.qml
 ZynthiloopsDial 1.0 ZynthiloopsDial.qml
 FilePickerDialog 1.0 FilePickerDialog.qml
+SaveFileDialog 1.0 SaveFileDialog.qml
 TableHeader 1.0 TableHeader.qml
 TableHeaderLabel 1.0 TableHeaderLabel.qml

@@ -29,7 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
 
-import Zynthian 1.0 as Zynthian
+import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     readonly property QtObject copier: zynthian.sketch_copier
@@ -108,13 +108,16 @@ Zynthian.ScreenPage {
                 text: "Save Session"
                 iconName: "document-save-symbolic"
                 onTriggered: {
-                    session.save();
+                    fileNameDialog.fileName = "";
+                    fileNameDialog.open();
                 }
             }
             Kirigami.Action {
                 text: "Load Session"
                 iconName: "folder-download-symbolic"
                 onTriggered: {
+                    sessionPickerDialog.folderModel.folder = sessionPickerDialog.rootFolder;
+                    sessionPickerDialog.open();
                 }
             }
         }
@@ -137,6 +140,25 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.FilePickerDialog {
+        id: sessionPickerDialog
+        parent: root
+
+        x: parent.width/2 - width/2
+        y: parent.height/2 - height/2
+        width: Math.round(parent.width * 0.8)
+        height: Math.round(parent.height * 0.8)
+
+        headerText: qsTr("Pick a session")
+        rootFolder: "/zynthian/zynthian-my-data/sessions"
+        folderModel {
+            nameFilters: ["*.json"]
+        }
+        onFileSelected: {
+            session.load(file.filePath);
+        }
+    }
+
+    Zynthian.FilePickerDialog {
         id: sketchPickerDialog
         parent: root
 
@@ -152,6 +174,38 @@ Zynthian.ScreenPage {
         }
         onFileSelected: {
             copier.addSketchPath = file.filePath;
+        }
+    }
+
+    Zynthian.SaveFileDialog {
+        id: fileNameDialog
+        visible: false
+
+        headerText: qsTr("New Session")
+        conflictText: qsTr("Session Exists")
+        overwriteOnConflict: false
+
+        onFileNameChanged: {
+            fileCheckTimer.restart()
+        }
+        Timer {
+            id: fileCheckTimer
+            interval: 300
+            onTriggered: {
+                if (fileNameDialog.fileName.length > 0 && session.exists(fileNameDialog.fileName)) {
+                    fileNameDialog.conflict = true;
+                } else {
+                    fileNameDialog.conflict = false;
+                }
+            }
+        }
+
+        onAccepted: {
+            console.log("Accepted")
+            session.saveAs(fileNameDialog.fileName);
+        }
+        onRejected: {
+            console.log("Rejected")
         }
     }
 

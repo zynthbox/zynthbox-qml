@@ -378,6 +378,7 @@ MouseArea {
                 onClicked: {
                     zynthian.zynthiloops.stopAllPlayback();
                     zynthian.playgrid.stopMetronomeRequest();
+                    zynthian.song_arranger.stop();
                 }
             }
         }

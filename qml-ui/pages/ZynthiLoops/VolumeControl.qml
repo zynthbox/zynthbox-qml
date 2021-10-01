@@ -22,7 +22,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 24
+        spacing: 4
 
         QQC2.Label {
             id: headerLabel
@@ -32,14 +32,15 @@ Rectangle {
 
         RowLayout {
             Layout.fillHeight: true
-            Layout.alignment: Qt.AlignCenter
+            Layout.alignment: Qt.AlignLeft
             spacing: 8
 
             Extras.Gauge {
                 id: audioGauge
 
                 Layout.fillHeight: true
-                Layout.alignment: Qt.AlignCenter
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                Layout.leftMargin: 2
 
                 minimumValue: -40
                 maximumValue: 10
@@ -48,7 +49,7 @@ Rectangle {
 
                 style: GaugeStyle {
                     valueBar: Rectangle {
-                        color: Kirigami.Theme.highlightColor
+                        color: Qt.rgba(187, 222, 251, 0.5)
                         implicitWidth: 6
                     }
                     minorTickmark: Item {
@@ -82,6 +83,8 @@ Rectangle {
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignCenter
                 Layout.preferredWidth: parent.width/2
+                Layout.topMargin: 6
+                Layout.bottomMargin: 6
 
                 orientation: Qt.Vertical
                 from: 0
@@ -99,11 +102,22 @@ Rectangle {
                     color: "#bdbebf"
 
                     Rectangle {
+                        id: valueBox
                         width: parent.width
                         height: parent.height * (1 - slider.visualPosition)
                         color: Kirigami.Theme.highlightColor
                         radius: 2
                         anchors.bottom: parent.bottom
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 2
+
+                        anchors.top: valueBox.top
+                        anchors.left: valueBox.right
+                        color: "white"
+                        opacity: 0.7
                     }
                 }
             }
@@ -111,7 +125,7 @@ Rectangle {
 
         QQC2.Label {
             id: footerLabel
-            Layout.alignment: Qt.AlignCenter
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             font.pointSize: 9
         }
     }

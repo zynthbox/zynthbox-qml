@@ -48,8 +48,12 @@ Rectangle {
                 font.pointSize: 8
 
                 style: GaugeStyle {
+                    background: Rectangle {
+                        color: "#ff888888"
+                        implicitWidth: 6
+                    }                    
                     valueBar: Rectangle {
-                        color: Qt.rgba(187, 222, 251, 0.5)
+                        color: "#ff81d4fa"
                         implicitWidth: 6
                     }
                     minorTickmark: Item {
@@ -99,7 +103,7 @@ Rectangle {
                     width: implicitWidth
                     height: slider.availableHeight
                     radius: 2
-                    color: "#bdbebf"
+                    color: "#ff888888"
 
                     Rectangle {
                         id: valueBox

@@ -87,16 +87,15 @@ Kirigami.AbstractApplicationWindow {
                         } else {
                             return zynthian.engine.midi_channel + 1 + "ˬ";
                         }
-                    } else if (zynthian.main_layers_view.selector_path_element > 10) {
-                        return "7." + (zynthian.main_layers_view.selector_path_element - 10) + "ˬ";
-                    } else if (zynthian.main_layers_view.selector_path_element > 5) {
+                    } else if (zynthian.main_layers_view.selector_path_element > 5 && zynthian.main_layers_view.selector_path_element <= 10) {
                         return "6." + (zynthian.main_layers_view.selector_path_element - 5) + "ˬ";
                     } else {
                         return zynthian.main_layers_view.selector_path_element + "ˬ";
                     }
                 }
+                onTextChanged: zynthian.fixed_layers.start_midi_chan = 0;
                 onClicked: layersMenu.visible = true
-                highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers'
+                highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers' || zynthian.current_screen_id === 'main_layers_view'
                 QQC2.Menu {
                     id: layersMenu
                     y: parent.height
@@ -112,7 +111,7 @@ Kirigami.AbstractApplicationWindow {
                             //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index === 5 ? 6 : index)
-                            highlighted: zynthian.fixed_layers.current_index === index
+                            highlighted: zynthian.active_midi_channel === model.metadata.midi_channel
                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                             contentItem: RowLayout {
                                 id: menuItemLayout
@@ -127,14 +126,12 @@ Kirigami.AbstractApplicationWindow {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignLeft
                                     text: {
-										let numPrefix = model.metadata.midi_channel + 1;
-										if (numPrefix > 10) {
-											numPrefix = "7." + (numPrefix - 10);
-										} else if (numPrefix > 5) {
-											numPrefix = "6." + (numPrefix - 5);
-										}
-										return numPrefix + " - " + model.display;
-									}
+                                        let numPrefix = model.metadata.midi_channel + 1;
+                                        if (numPrefix > 5 && numPrefix <= 10) {
+                                            numPrefix = "6." + (numPrefix - 5);
+                                        }
+                                        return numPrefix + " - " + model.display
+                                    }
                                 }
                             }
                         }
@@ -231,7 +228,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     footer: Zynthian.ActionBar {
-		z: 999999
+        z: 999999
         currentPage: root.currentPage
         visible: root.controlsVisible
        // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)

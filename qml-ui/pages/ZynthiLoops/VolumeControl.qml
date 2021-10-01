@@ -17,20 +17,23 @@ Rectangle {
     border.width: highlight ? 1 : 0
     color: Kirigami.Theme.backgroundColor
     radius: 2
+    anchors.leftMargin: 8
+    anchors.rightMargin: 8
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: 8
+        spacing: 24
 
         QQC2.Label {
             id: headerLabel
             Layout.alignment: Qt.AlignCenter
+            Layout.topMargin: 8
         }
 
         RowLayout {
-            Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 16
+            Layout.alignment: Qt.AlignCenter
+            spacing: 8
 
             Extras.Gauge {
                 id: audioGauge
@@ -41,12 +44,34 @@ Rectangle {
                 minimumValue: -40
                 maximumValue: 10
 
-                font.pointSize: 9
+                font.pointSize: 8
 
                 style: GaugeStyle {
                     valueBar: Rectangle {
                         color: Kirigami.Theme.highlightColor
                         implicitWidth: 6
+                    }
+                    minorTickmark: Item {
+                        implicitWidth: 8
+                        implicitHeight: 1
+
+                        Rectangle {
+                            color: "#cccccc"
+                            anchors.fill: parent
+                            anchors.leftMargin: 2
+                            anchors.rightMargin: 4
+                        }
+                    }
+                    tickmark: Item {
+                        implicitWidth: 12
+                        implicitHeight: 1
+
+                        Rectangle {
+                            color: "#dfdfdf"
+                            anchors.fill: parent
+                            anchors.leftMargin: 3
+                            anchors.rightMargin: 3
+                        }
                     }
                 }
             }
@@ -64,9 +89,9 @@ Rectangle {
                 stepSize: 1
 
                 background: Rectangle {
-                    x: 0 //slider.leftPadding
+                    x: slider.leftPadding
                     y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                    implicitWidth: 4
+                    implicitWidth: 8
                     implicitHeight: parent.height
                     width: implicitWidth
                     height: slider.availableHeight

@@ -71,6 +71,9 @@ GridLayout {
                     Layout.fillHeight: true
                     headerText: "Master"
 
+                    border.width: 1
+                    border.color: Kirigami.Theme.highlightColor
+
                     Binding {
                         target: masterVolume.slider
                         property: "value"
@@ -86,12 +89,6 @@ GridLayout {
                             zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
                         }
                     }
-                }
-
-                Kirigami.Separator {
-                    Layout.preferredWidth: 2
-                    Layout.fillHeight: true
-                    color: Kirigami.Theme.highlightColor
                 }
 
                 ListView {

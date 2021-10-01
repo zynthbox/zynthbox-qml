@@ -36,6 +36,9 @@ import Zynthian 1.0 as Zynthian
 Zynthian.Card {
     property alias filePickerDialog: pickerDialog
 
+    leftPadding: 0
+    rightPadding: 0
+
     id: root
     enum ControlType {
         Song,

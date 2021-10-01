@@ -109,7 +109,7 @@ Zynthian.ScreenPage {
             return bottomBar.filePickerDialog.cuiaCallback(cuia);
         }
 
-        return true;
+        return false;
     }
 
     Component.onCompleted: {

@@ -41,7 +41,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_song_arranger, self).__init__(parent)
         self.__bars__ = 24
         self.__sketch__ = None
-        self.__tracks_model__ = None
+        self.__tracks_model__ = song_arranger_tracks_model(self)
         self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.zynthiloops
         self.__is_playing__ = False
         self.__start_from_bar__ = 0
@@ -108,7 +108,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
 
         self.__sketch__:zynthiloops_song = self.zyngui.zynthiloops.song
-        self.__tracks_model__ = song_arranger_tracks_model(self)
+        self.__tracks_model__.clear()
 
         try:
             self.__sketch__.tracksModel.countChanged.disconnect()

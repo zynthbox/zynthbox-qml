@@ -64,3 +64,7 @@ class song_arranger_cell(QObject):
         else:
             self.__is_playing__ = False
             self.is_playing_changed.emit()
+
+    def destroy(self):
+        self.__metronome_manager__.current_bar_changed.disconnect(self.current_bar_changed_handler)
+        self.deleteLater()

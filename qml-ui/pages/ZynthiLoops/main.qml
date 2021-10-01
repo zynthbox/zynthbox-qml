@@ -89,15 +89,17 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Add Track")
             onTriggered: root.song.addTrack()
-        },
-        Kirigami.Action {
+        }
+
+        // Disable undo for now
+        /*Kirigami.Action {
             text: qsTr("Undo")
             enabled: root.song.historyLength > 0
             visible: !root.song.isTemp
             onTriggered: {
                 root.song.undo();
             }
-        }
+        }*/
     ]
 
     cuiaCallback: function(cuia) {

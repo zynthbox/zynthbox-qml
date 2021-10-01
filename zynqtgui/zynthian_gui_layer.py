@@ -1680,24 +1680,28 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str, result=bool)
 	def soundset_file_exists(self, file_name):
 		final_name = file_name
-		if not final_name.endswith(".json"):
-				final_name += ".json"
+		if not final_name.endswith(".soundset"):
+				final_name += ".soundset"
 		return os.path.isfile(self.__soundsets_basepath__ + final_name)
 
 
 	@Slot(str, result=bool)
 	def layer_file_exists(self, file_name):
-		final_name = file_name
-		if not final_name.endswith(".json"):
-				final_name += ".json"
+		n_layers = 1
+		for i in range(16):
+			if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
+				n_layers += 1
+		final_name = file_name + "." + str(n_layers) + ".sound"
 		return os.path.isfile(self.__sounds_basepath__ + final_name)
 
 	@Slot(str)
 	def save_curlayer_to_file(self, file_name):
 		try:
-			final_name = file_name
-			if not final_name.endswith(".json"):
-				final_name += ".json"
+			n_layers = 1
+			for i in range(16):
+				if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
+					n_layers += 1
+			final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
 			Path(self.__sounds_basepath__).mkdir(parents=True, exist_ok=True)
 			f = open(self.__sounds_basepath__ + final_name, "w")
 			f.write(JSONEncoder().encode(self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan))) #TODO: get cloned midi channels
@@ -1709,8 +1713,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def save_soundset_to_file(self, file_name):
 		try:
 			final_name = file_name
-			if not final_name.endswith(".json"):
-				final_name += ".json"
+			if not final_name.endswith(".soundset"):
+				final_name += ".soundset"
 			Path(self.__soundsets_basepath__).mkdir(parents=True, exist_ok=True)
 			f = open(self.__soundsets_basepath__ + final_name, "w")
 			f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))

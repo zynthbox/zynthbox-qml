@@ -91,6 +91,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
+                enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show(); //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_effects";
@@ -98,6 +99,7 @@ Zynthian.ScreenPage {
             }
              Kirigami.Action {
                 text: qsTr("MIDI-FX")
+                enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show() //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_midi_effects";
@@ -692,33 +694,54 @@ Zynthian.ScreenPage {
             }
             contentItem: ColumnLayout {
                 QQC2.Label {
-                    text: qsTr("The selected sound has %1 layers: select layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
+                    text: qsTr("The selected sound has %1 layers: select %1 adjacent layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
                 }
                 Repeater {
+                    id: channelReplaceRepeater
                     model: zynthian.main_layers_view.selector_list
-                    delegate: QQC2.CheckBox {
-                        text: model.display
-                        visible: index < 5
-                        enabled: checked || layerReplaceDialog.destinationChannels.length < layerReplaceDialog.sourceChannels.length
-                        opacity: enabled ? 1 : 0.4
-
+                    delegate: QQC2.RadioButton {
+                        id: delegate
+                        enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
+                        autoExclusive: true
                         onCheckedChanged: {
-                            let destIdx = layerReplaceDialog.destinationChannels.indexOf(index);
-                            if (checked) {
-                                if (destIdx === -1) {
-                                    layerReplaceDialog.destinationChannels.push(index);
-                                    layerReplaceDialog.destinationChannelsChanged();
-                                }
-                            } else {
-                                if (destIdx !== -1) {
-                                    layerReplaceDialog.destinationChannels.splice(destIdx, 1);
-                                    layerReplaceDialog.destinationChannelsChanged();
-                                }
+                            layerReplaceDialog.destinationChannels = [];
+                            var i = 0;
+                            let chan = model.metadata.midi_channel
+                            for (i in layerReplaceDialog.sourceChannels) {
+                                layerReplaceDialog.destinationChannels.push(chan);
+                                chan++;
                             }
+                            layerReplaceDialog.destinationChannelsChanged();
+                            layerReplaceDialog.sourceChannelsChanged();
+                            print(layerReplaceDialog.sourceChannels)
+                            print(layerReplaceDialog.destinationChannels)
+                            print(layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length)
                         }
                         Connections {
                             target: layerReplaceDialog
                             onFileToLoadChanged: checked = index === zynthian.main_layers_view.current_index
+                        }
+                        indicator.opacity: enabled
+                        indicator.x: 0
+                        contentItem: RowLayout {
+                            Item {
+                                Layout.preferredWidth: delegate.indicator.width
+                            }
+                            QQC2.CheckBox {
+                                enabled: false
+                                checked: layerReplaceDialog.destinationChannels.indexOf(model.metadata.midi_channel) !== -1
+                            }
+                            QQC2.Label {
+                                text: {
+                                    let numPrefix = model.metadata.midi_channel + 1;
+                                    if (numPrefix > 10) {
+                                        numPrefix = "7." + (numPrefix - 10);
+                                    } else if (numPrefix > 5) {
+                                        numPrefix = "6." + (numPrefix - 5);
+                                    }
+                                    return numPrefix + " - " + model.display;
+                                }
+                            }
                         }
                     }
                 }

@@ -232,10 +232,12 @@ Zynthian.ScreenPage {
 
             id: sketchesData
             Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
 
             // Available height: Total container height - header height - 2 seperator height
             // Height set: AvailableHeight/2
-            Layout.preferredHeight: (contentColumn.height-headerData.height-2)/2
+            //Layout.preferredHeight: (contentColumn.height-headerData.height-2)/2
 
             RowLayout {
                 QQC2.Label {
@@ -320,7 +322,8 @@ Zynthian.ScreenPage {
 
             id: tracksData
             Layout.fillWidth: true
-            Layout.preferredHeight: sketchesData.height
+            Layout.fillHeight: true
+            Layout.preferredHeight: 1
 
             QQC2.Label {
                 text: qsTr("Track %1: %2")

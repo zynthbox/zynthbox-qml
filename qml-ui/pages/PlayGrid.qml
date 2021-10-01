@@ -301,7 +301,7 @@ Zynthian.ScreenPage {
                             id: gridSettingsPopup
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            sourceComponent: playGridsRepeater.currentItem.popup ? playGridsRepeater.currentItem.popup : null
+                            sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.popup ? playGridsRepeater.currentItem.popup : null
                         }
                     }
                     Row {
@@ -440,7 +440,7 @@ Zynthian.ScreenPage {
                 Loader {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    sourceComponent: playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
+                    sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
                 }
             }
         }

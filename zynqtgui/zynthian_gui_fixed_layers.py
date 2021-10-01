@@ -110,6 +110,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     def select(self, index=None):
         super().select(index)
+        self.active_midi_channel_changed.emit()
         self.set_select_path()
 
 
@@ -242,6 +243,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     def next_action(self):
         return 'bank'
 
+    active_midi_channel_changed = Signal()
+    def get_active_midi_channel(self):
+        if self.index >=0 and self.index < len(self.list_data):
+            return self.list_data[self.index][1]
+        else:
+            return -1
+    active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
 
     def set_select_path(self):
         self.select_path = "Layers"

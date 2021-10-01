@@ -1006,7 +1006,7 @@ class zynthian_gui(QObject):
     def callable_ui_action(self, cuia, params=None):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 
-        if self.current_qml_page != None:
+        if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
             js_value = self.current_qml_page_prop.property("cuiaCallback")
             if js_value != None and js_value.isCallable():
                 if js_value.call([cuia]).toBool():
@@ -1925,6 +1925,10 @@ class zynthian_gui(QObject):
     def exit(self, code=0):
         self.exit_flag = True
         self.exit_code = code
+
+    @Slot(str, result=bool)
+    def file_exists(self, file_path):
+        return os.path.isfile(file_path)
 
     # ------------------------------------------------------------------
     # Polling

@@ -613,49 +613,84 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        QQC2.Dialog {
+
+        Zynthian.FilePickerDialog {
             id: pickerDialog
-            parent: root.parent
-            modal: true
+            parent: root
             property string mode: "sound"
-            header: Kirigami.Heading {
-                text: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
-            }
+
             x: Math.round(parent.width/2 - width/2)
             y: Math.round(parent.height/2 - height/2)
             width: Math.round(parent.width * 0.8)
             height: Math.round(parent.height * 0.8)
-            contentItem: QQC2.ScrollView {
-                contentItem: ListView {
-                    model: FolderListModel {
-                        id: folderModel
-                        nameFilters: ["*.json"]
-                        folder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
-                    }
-                    delegate: Kirigami.BasicListItem {
-                        label: model.fileName
-                        onClicked: {
-                            if (pickerDialog.mode === "soundset") {
-                                zynthian.layer.load_soundset_from_file(model.fileName)
-                            } else {
-                                //zynthian.layer.load_layer_from_file(model.fileName)
-                                layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(model.fileName);
-                                if (layerReplaceDialog.sourceChannels.length > 1) {
-                                    layerReplaceDialog.fileToLoad = model.fileName;
-                                    layerReplaceDialog.open();
-                                } else {
-                                    let map = {}
-                                    map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
-                                    zynthian.layer.load_layer_from_file(model.fileName, map);
-                                }
-                            }
-                            zynthian.bank.show_top_sounds = false;
-                            pickerDialog.accept()
+
+            headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
+            rootFolder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
+            folderModel {
+                nameFilters: ["*.*." + pickerDialog.mode]
+            }
+            onVisibleChanged: folderModel.folder = rootFolder
+            filesListView.delegate: Kirigami.BasicListItem {
+                width: ListView.view.width
+                highlighted: ListView.isCurrentItem
+
+                label: model.fileName
+                icon: "emblem-music-symbolic"
+                QQC2.Label {
+                    visible: pickerDialog.mode === sound
+                    text: {
+                        let parts = model.fileName.split(".");
+                        if (parts.length < 2) {
+                            return qsTr("Single Synth");
+                        }
+                        let num = Number(parts[1])
+                        if (num < 2) {
+                            return qsTr("Single Synth");
+                        } else {
+                            return qsTr("%1 Synths").arg(num);
                         }
                     }
                 }
+                onClicked: {
+                    console.log(model.fileName, model.filePath)
+
+                    if (model.fileIsDir) {
+                        var path = model.filePath
+
+                        if (path.endsWith("/")) {
+                            path = path.slice(0, path.length-1)
+                        }
+
+                        folderModel.folder = path
+                    } else {
+                        pickerDialog.fileSelected(model)
+                        pickerDialog.accept()
+                    }
+
+                    filesListView.currentIndex = 0;
+                }
+            }
+            onFileSelected: {
+                console.log(file.filePath);
+                if (pickerDialog.mode === "soundset") {
+                    zynthian.layer.load_soundset_from_file(file.fileName)
+                } else {
+                    //zynthian.layer.load_layer_from_file(file.fileName)
+                    layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(file.fileName);
+                    if (layerReplaceDialog.sourceChannels.length > 1) {
+                        layerReplaceDialog.fileToLoad = file.fileName;
+                        layerReplaceDialog.open();
+                    } else {
+                        let map = {}
+                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
+                        zynthian.layer.load_layer_from_file(file.fileName, map);
+                    }
+                }
+                zynthian.bank.show_top_sounds = false;
+                pickerDialog.accept()
             }
         }
+
         QQC2.Dialog {
             id: layerReplaceDialog
             parent: root.parent

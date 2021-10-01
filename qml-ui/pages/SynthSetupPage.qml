@@ -189,7 +189,7 @@ Zynthian.ScreenPage {
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
-                    text: qsTr("7.x")
+                    text: qsTr("11-15")
                     implicitWidth: 1
                     checkable: true
                     checked: zynthian.main_layers_view.start_midi_chan === 10
@@ -246,9 +246,7 @@ Zynthian.ScreenPage {
                                 Layout.fillWidth: true
                                 text: {
                                     let numPrefix = model.metadata.midi_channel + 1;
-                                    if (numPrefix > 10) {
-                                        numPrefix = "7." + (numPrefix - 10);
-                                    } else if (numPrefix > 5) {
+                                    if (numPrefix > 5 && numPrefix <= 10) {
                                         numPrefix = "6." + (numPrefix - 5);
                                     }
                                     return numPrefix + " - " + model.display;
@@ -529,6 +527,46 @@ Zynthian.ScreenPage {
             }
             onVisibleChanged: folderModel.folder = rootFolder
 
+            filesListView.delegate: Kirigami.BasicListItem {
+                width: ListView.view.width
+                highlighted: ListView.isCurrentItem
+
+                label: model.fileName
+                icon: "emblem-music-symbolic"
+                QQC2.Label {
+                    visible: saveDialog.mode === sound
+                    text: {
+                        let parts = model.fileName.split(".");
+                        if (parts.length < 2) {
+                            return ""
+                        }
+                        let num = Number(parts[1])
+                        if (num < 2) {
+                            return ""
+                        } else {
+                            return qsTr("%1 Synths").arg(num);
+                        }
+                    }
+                }
+                onClicked: {
+                    console.log(model.fileName, model.filePath)
+
+                    if (model.fileIsDir) {
+                        var path = model.filePath
+
+                        if (path.endsWith("/")) {
+                            path = path.slice(0, path.length-1)
+                        }
+
+                        folderModel.folder = path
+                        filesListView.currentIndex = 0;
+                    } else {
+                        saveDialog.fileNameToSave = model.fileName
+                        saveDialog.fileSelected(model)
+                    }
+                }
+            }
+
             onFileSelected: {
                 console.log(file.filePath);
                 if (mode === "soundset") {
@@ -569,11 +607,11 @@ Zynthian.ScreenPage {
                     text: {
                         let parts = model.fileName.split(".");
                         if (parts.length < 2) {
-                            return qsTr("Single Synth");
+                            return ""
                         }
                         let num = Number(parts[1])
                         if (num < 2) {
-                            return qsTr("Single Synth");
+                            return ""
                         } else {
                             return qsTr("%1 Synths").arg(num);
                         }

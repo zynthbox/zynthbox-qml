@@ -87,7 +87,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     first = False
                     sl0 = sl
                 metadata["effects_label"] = effects_label
-                logging.error("{} {}".format(layer.engine.nickname, layer.engine._ctrls))
 
             else:
                 self.list_data.append((str(i+1),i, "-"))
@@ -105,6 +104,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.list_metadata.append(metadata)
 
         self.special_layer_name_changed.emit()
+        self.current_index_valid_changed.emit()
         super().fill_list()
 
 

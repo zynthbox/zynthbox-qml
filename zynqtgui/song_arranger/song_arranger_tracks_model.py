@@ -83,3 +83,15 @@ class song_arranger_tracks_model(QAbstractListModel):
         self.__tracks__.append(track)
         self.endInsertRows()
         self.countChanged.emit()
+
+    def clear(self):
+        if len(self.__tracks__) > 0:
+            self.beginRemoveRows(QModelIndex(), 0, len(self.__tracks__)-1)
+
+            for track in self.__tracks__:
+                for cell_index in range(0, track.cellsModel.count):
+                    cell = track.cellsModel.getCell(cell_index)
+                    cell.destroy()
+
+            self.__tracks__ = []
+            self.endRemoveRows()

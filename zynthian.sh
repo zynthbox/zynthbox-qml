@@ -133,7 +133,7 @@ while true; do
 	#cp zynthian_envars.sh ../config
 
 	matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
-	kwin_x11&
+	#kwin_x11&
 	#openbox&
 	export QT_SCALE_FACTOR=1
 	export QT_SCREEN_SCALE_FACTORS=1

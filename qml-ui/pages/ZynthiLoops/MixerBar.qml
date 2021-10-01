@@ -104,16 +104,28 @@ GridLayout {
 
                     model: root.song.tracksModel
 
-                    delegate: VolumeControl {
+                    delegate: RowLayout {
                         width: privateProps.cellWidth
                         height: ListView.view.height
-                        headerText: model.track.name
-                        footerText: model.track.audioLevel.toFixed(2) + " (dB)"
-                        audioLeveldB: model.track.audioLevel
 
-                        slider.value: model.track.volume
-                        slider.onValueChanged: {
-                            model.track.volume = slider.value
+                        VolumeControl {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            headerText: model.track.name
+                            footerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                            audioLeveldB: model.track.audioLevel
+
+                            slider.value: model.track.volume
+                            slider.onValueChanged: {
+                                model.track.volume = slider.value
+                            }
+                        }
+
+                        Kirigami.Separator {
+                            Layout.preferredWidth: 2
+                            Layout.fillHeight: true
+                            color: "#ff666666"
                         }
                     }
                 }

@@ -216,10 +216,32 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit*4
 
-            QQC2.Label {
+            StackLayout {
+                id: nameStack
                 anchors.centerIn: parent
-                text: qsTr("Session: %1").arg(session.name)
-                font.pointSize: 18
+
+                RowLayout {
+                    QQC2.Label {
+                        text: qsTr("Project: %1").arg(session.name)
+                        font.pointSize: 18
+                    }
+                    QQC2.Button {
+                        icon.name: "document-edit"
+                        onClicked: {
+                            nameStack.currentIndex = 1;
+                            objNameEdit.text = session.name;
+                            objNameEdit.forceActiveFocus();
+                        }
+                    }
+                }
+
+                QQC2.TextField {
+                    id: objNameEdit
+                    onAccepted: {
+                        session.name = text;
+                        nameStack.currentIndex = 0;
+                    }
+                }
             }
         }
         Kirigami.Separator {

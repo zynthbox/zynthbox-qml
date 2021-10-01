@@ -69,7 +69,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         if self.__name__ is not None:
             return self.__name__
         else:
-            return f"Session {self.__id__ + 1}"
+            return f"Project {self.__id__ + 1}"
     def set_name(self, name):
         self.__name__ = name
         self.name_changed.emit()

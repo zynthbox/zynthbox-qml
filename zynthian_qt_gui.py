@@ -2484,7 +2484,7 @@ class zynthian_gui(QObject):
 
     home_screen = Property(str, get_home_screen, set_home_screen, notify=home_screen_changed)
 
-    active_midi_channel = Property(str, get_active_midi_channel, notify = active_midi_channel_changed)
+    active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
 
     status_information = Property(
         QObject, get_status_information, constant=True

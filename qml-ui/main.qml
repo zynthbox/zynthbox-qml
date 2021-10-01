@@ -111,7 +111,7 @@ Kirigami.AbstractApplicationWindow {
                             //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
                             width: parent.width
                             onClicked: zynthian.fixed_layers.activate_index(index === 5 ? 6 : index)
-                            highlighted: zynthian.active_midi_channel === model.metadata.midi_channel
+                            highlighted: zynthian.main_layers_view.active_midi_channel === model.metadata.midi_channel
                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                             contentItem: RowLayout {
                                 id: menuItemLayout

@@ -515,103 +515,30 @@ Zynthian.ScreenPage {
             }
         }
 
-        QQC2.Dialog {
+        Zynthian.FilePickerDialog {
             id: saveDialog
             property string mode: "sound"
-            parent: root.parent
-            header: Kirigami.Heading {
-                text: saveDialog.mode === "soundset" ? qsTr("Save Soundset As...") : qsTr("Save Sound As...")
+
+            conflictMessageLabel.visible: saveDialog.mode === "soundset" ? zynthian.layer.soundset_file_exists(fileNameToSave) : zynthian.layer.layer_file_exists(fileNameToSave);
+            breadcrumb.visible: false
+            headerText: saveDialog.mode === "soundset" ? qsTr("Save a Soundset file") : qsTr("Save a Sound file")
+            rootFolder: saveDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
+            noFilesMessage: saveDialog.mode === "soundset" ? qsTr("No Soundsets present") : qsTr("No sounds present")
+            folderModel {
+                nameFilters: [saveDialog.mode === "soundset" ? "*.soundset" : "*.*.sound"]
             }
-            modal: true
-            z: 999999999
-            x: Math.round(parent.width/2 - width/2)
-            y: Qt.inputMethod.visible ? Math.round(parent.height/5) : Math.round(parent.height/2 - height/2)
-            width: Kirigami.Units.gridUnit * 15
-            height: Kirigami.Units.gridUnit * 8
-            onAccepted: {
+            onVisibleChanged: folderModel.folder = rootFolder
+
+            onFileSelected: {
+                console.log(file.filePath);
                 if (mode === "soundset") {
-                    zynthian.layer.save_soundset_to_file(fileName.text);
+                    zynthian.layer.save_soundset_to_file(file.fileName);
                 } else { //Sound
-                    zynthian.layer.save_curlayer_to_file(fileName.text);
+                    zynthian.layer.save_curlayer_to_file(file.fileName);
                 }
             }
-            onVisibleChanged : {
-                cancelSaveButton.forceActiveFocus();
-                if (visible) {
-                    delayKeyboardTimer.restart()
-                } else {
-                    fileName.text = "";
-                }
-            }
-            Timer {
-                id: delayKeyboardTimer
-                interval: 300
-                onTriggered: {
-                    fileName.forceActiveFocus();
-                    Qt.inputMethod.visible = true;
-                }
-            }
-            contentItem: ColumnLayout {
-                QQC2.TextField {
-                    id: fileName
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.6)
-                    onAccepted: {
-                        if (fileName.text.length > 0) {
-                            saveDialog.accept();
-                        }
-                    }
-                    onTextChanged: fileCheckTimer.restart()
-                    Timer {
-                        id: fileCheckTimer
-                        interval: 300
-                        onTriggered: {
-                            if (saveDialog.mode === "soundset") {
-                                conflictRow.visible = zynthian.layer.soundset_file_exists(fileName.text);
-                            } else {
-                                conflictRow.visible = zynthian.layer.layer_file_exists(fileName.text);
-                            }
-                        }
-                    }
-                }
-                RowLayout {
-                    id: conflictRow
-                    visible: false
-                    QQC2.Label {
-                        Layout.fillWidth: true
-                        text: qsTr("File exists")
-                    }
-                }
-            }
-            footer: QQC2.Control {
-                leftPadding: saveDialog.leftPadding
-                topPadding: Kirigami.Units.smallSpacing
-                rightPadding: saveDialog.rightPadding
-                bottomPadding: saveDialog.bottomPadding
-                contentItem: RowLayout {
-                    Layout.fillWidth: true
-                    QQC2.Button {
-                        id: cancelSaveButton
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Cancel")
-                        onClicked: {
-                                saveDialog.close();
-                            }
-                        }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: conflictRow.visible ? qsTr("Overwrite") : qsTr("Save")
-                        enabled: fileName.text.length > 0
-                        onClicked: {
-                            if (fileName.text.length > 0) {
-                                saveDialog.accept();
-                            }
-                        }
-                    }
-                }
-            }
+
+            saveMode: true
         }
 
         Zynthian.FilePickerDialog {
@@ -623,6 +550,7 @@ Zynthian.ScreenPage {
             y: Math.round(parent.height/2 - height/2)
             width: Math.round(parent.width * 0.8)
             height: Math.round(parent.height * 0.8)
+            breadcrumb.visible: false
 
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
             rootFolder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
@@ -748,9 +676,6 @@ Zynthian.ScreenPage {
                             }
                             layerReplaceDialog.destinationChannelsChanged();
                             layerReplaceDialog.sourceChannelsChanged();
-                            print(layerReplaceDialog.sourceChannels)
-                            print(layerReplaceDialog.destinationChannels)
-                            print(layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length)
                         }
                         Connections {
                             target: layerReplaceDialog

@@ -29,14 +29,25 @@ import Zynthian 1.0 as Zynthian
   * }
   */
 QQC2.Dialog {
+    id: pickerDialog
     property alias headerText: heading.text
     property string rootFolder: "/"
     property alias folderModel: folderModel
     property alias filesListView: filesListView
+    property alias breadcrumb: folderBreadcrumbs
     signal fileSelected(var file)
+    property bool saveMode
+    property alias fileNameToSave: nameFiled.text
+    property alias noFilesMessage: noFilesMessage.text
+    property alias conflictMessageLabel: conflictLabel
 
-    id: pickerDialog
     modal: true
+
+    y: saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(parent.height/2 - height/2)
+    x: Math.round(parent.width/2 - width/2)
+    width: Math.round(parent.width * 0.8)
+    height: saveMode && Qt.inputMethod.visible ? Math.round(parent.height / 2) : Math.round(parent.height * 0.8)
+    z: 999999999
 
     header: ColumnLayout{
         spacing: 8
@@ -61,7 +72,7 @@ QQC2.Dialog {
                 id: homeButton
                 icon.name: "user-home-symbolic"
                 onClicked: {
-                    folderModel.folder = pickerDialog.rootFolder+"/"
+                    folderModel.folder = pickerDialog.rootFolder + "/"
                 }
             }
 
@@ -71,66 +82,130 @@ QQC2.Dialog {
                 delegate: Zynthian.BreadcrumbButton {
                     text: modelData
                     onClicked: {
-                        folderModel.folder = pickerDialog.rootFolder+"/"+folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
+                        folderModel.folder = pickerDialog.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
                         filesListView.currentIndex = 0;
                     }
                 }
             }
         }
     }
-    footer: Item {
-        height: 0
-    }
-
-    contentItem: QQC2.ScrollView {
-        contentItem: ListView {
-            id: filesListView
-            focus: true
-
-            Layout.leftMargin: 8
-            clip: true
-
-            model: FolderListModel {
-                id: folderModel
-                showDirs: true
-                showDirsFirst: true
-                showDotAndDotDot: false
-            }
-            delegate: Kirigami.BasicListItem {
-                width: ListView.view.width
-                highlighted: ListView.isCurrentItem
-
-                label: model.fileName
-                icon: {
-                    if (model.fileIsDir) {
-                        return "folder-symbolic"
-                    }
-                    else if (model.filePath.endsWith(".wav")) {
-                        return "folder-music-symbolic"
-                    } else {
-                        return "file-catalog-symbolic"
-                    }
+    onVisibleChanged: nameFiled.text = ""
+    footer: QQC2.Control {
+        visible: pickerDialog.saveMode
+        leftPadding: pickerDialog.leftPadding
+        topPadding: Kirigami.Units.smallSpacing
+        rightPadding: pickerDialog.rightPadding
+        bottomPadding: pickerDialog.bottomPadding
+        contentItem: ColumnLayout {
+            RowLayout {
+                visible: pickerDialog.saveMode
+                QQC2.Label {
+                    text: qsTr("File Name:")
                 }
-                onClicked: {
-                    console.log(model.fileName, model.filePath)
+                QQC2.TextField {
+                    id: nameFiled
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.6
+                }
+            }
+            QQC2.Label {
+                id: conflictLabel
+                visible: zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text)
+                Layout.fillWidth: true
+                text: qsTr("File Exists: overwrite?")
+                horizontalAlignment: Text.AlignHCenter
+            }
 
-                    if (model.fileIsDir) {
-                        var path = model.filePath
-
-                        if (path.endsWith("/")) {
-                            path = path.slice(0, path.length-1)
+            RowLayout {
+                Layout.fillWidth: true
+                QQC2.Button {
+                    id: cancelSaveButton
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Cancel")
+                    onClicked: pickerDialog.close();
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save")
+                    enabled: nameFiled.text.length > 0
+                    onClicked: {
+                        if (nameFiled.text.length > 0) {
+                            let file = {};
+                            file.fileName = nameFiled.text;
+                            file.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                            pickerDialog.fileSelected(file);
+                            pickerDialog.accept();
                         }
-
-                        folderModel.folder = path
-                    } else {
-                        fileSelected(model)
-                        pickerDialog.accept()
                     }
-
-                    filesListView.currentIndex = 0;
                 }
             }
         }
+    }
+
+
+    contentItem: QQC2.ScrollView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            contentItem: ListView {
+                id: filesListView
+                focus: true
+
+                QQC2.Label {
+                    id: noFilesMessage
+                    parent: filesListView
+                    anchors.centerIn: parent
+                    visible: filesListView.count === 0
+                    text: qsTr("There are no files present")
+                }
+                Layout.leftMargin: 8
+                clip: true
+
+                model: FolderListModel {
+                    id: folderModel
+                    showDirs: true
+                    showDirsFirst: true
+                    showDotAndDotDot: false
+                }
+                delegate: Kirigami.BasicListItem {
+                    width: ListView.view.width
+                    highlighted: ListView.isCurrentItem
+
+                    label: model.fileName
+                    icon: {
+                        if (model.fileIsDir) {
+                            return "folder-symbolic"
+                        }
+                        else if (model.filePath.endsWith(".wav")) {
+                            return "folder-music-symbolic"
+                        } else {
+                            return "file-catalog-symbolic"
+                        }
+                    }
+                    onClicked: {
+                        console.log(model.fileName, model.filePath)
+
+                        if (model.fileIsDir) {
+                            var path = model.filePath
+
+                            if (path.endsWith("/")) {
+                                path = path.slice(0, path.length-1)
+                            }
+
+                            folderModel.folder = path
+                            filesListView.currentIndex = 0;
+                        } else if (pickerDialog.saveMode) {
+                            nameFiled.text = model.fileName
+                        } else {
+                            fileSelected(model)
+                            pickerDialog.accept()
+                            filesListView.currentIndex = 0;
+                        }
+                    }
+                }
+            }
     }
 
     function cuiaCallback(cuia) {

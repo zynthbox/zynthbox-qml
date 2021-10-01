@@ -1691,8 +1691,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for i in range(16):
 			if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
 				n_layers += 1
-		final_name = file_name + "." + str(n_layers) + ".sound"
+		final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
+		logging.error(self.__sounds_basepath__ + final_name)
+		logging.error(os.path.isfile(self.__sounds_basepath__ + final_name))
 		return os.path.isfile(self.__sounds_basepath__ + final_name)
+
 
 	@Slot(str)
 	def save_curlayer_to_file(self, file_name):

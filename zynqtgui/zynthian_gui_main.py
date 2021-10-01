@@ -62,8 +62,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data.append((self.session_dashboard, 0, "Session"))
         self.list_metadata.append({"icon":"../../img/session-dashboard.svg"})
 
-        self.list_data.append((self.zynthiloops, 0, "ZynthiLoops"))
-        self.list_metadata.append({"icon":"../../img/zynthiloops.svg"})
+        self.list_data.append((self.zynthiloops, 0, "Looper"))
+        self.list_metadata.append({"icon":"../../img/looper.svg"})
 
         self.list_data.append((self.song_arranger, 0, "Song Arranger"))
         self.list_metadata.append({"icon":"../../img/song_arranger.svg"})

@@ -40,6 +40,8 @@ QQC2.Button {
     font.capitalization: Font.AllUppercase
 
     text: kirigamiAction && kirigamiAction.visible ? kirigamiAction.text : ""
+    checkable: kirigamiAction && kirigamiAction.checkable
+    checked: kirigamiAction && kirigamiAction.checked
 
     onClicked: {
         if (!kirigamiAction || !kirigamiAction.visible || !kirigamiAction.enabled) {

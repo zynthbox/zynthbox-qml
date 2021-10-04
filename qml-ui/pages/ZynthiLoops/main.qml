@@ -93,12 +93,11 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Mixer")
             checkable: true
-            checked: bottomStack.currentIndex === 1
-            onTriggered: {
-                if (bottomStack.currentIndex === 1) {
-                    bottomStack.currentIndex = 0;
-                } else {
+            onCheckedChanged: {
+                if (checked) {
                     bottomStack.currentIndex = 1;
+                } else {
+                    bottomStack.currentIndex = 0;
                 }
             }
         }

@@ -61,6 +61,8 @@ class zynthiloops_song(QObject):
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
         self.__history_length__ = 0
+        self.__scale_model__ = ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F']
+        self.__selected_scale_index__ = 0
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -85,6 +87,7 @@ class zynthiloops_song(QObject):
         return {"name": self.__name__,
                 "bpm": self.__bpm__,
                 "volume": self.__volume__,
+                "selectedScaleIndex": self.__selected_scale_index__,
                 "tracks": self.__tracks_model__.serialize(),
                 "parts": self.__parts_model__.serialize()}
 
@@ -191,6 +194,8 @@ class zynthiloops_song(QObject):
                 if "volume" in sketch:
                     self.__volume__ = sketch["volume"]
                     self.set_volume(self.__volume__, True)
+                if "selectedScaleIndex" in sketch:
+                    self.set_selected_scale_index(sketch["selectedScaleIndex"], True)
                 if "parts" in sketch:
                     self.__parts_model__.deserialize(sketch["parts"])
                 if "tracks" in sketch:
@@ -405,5 +410,20 @@ class zynthiloops_song(QObject):
 
         self.__metronome_manager__.loadSketchVersion(self.__initial_name__)
 
-# def add_clip_to_part(self, clip, part_index):
-    #     self.__parts_model__.getPart(part_index).add_clip(clip)
+    ### Property scaleModel
+    def get_scale_model(self):
+        return self.__scale_model__
+    scaleModel = Property('QVariantList', get_scale_model, constant=True)
+    ### END Property scaleModel
+
+    ### Property selectedScaleIndex
+    def get_selected_scale_index(self):
+        return self.__selected_scale_index__
+    def set_selected_scale_index(self, index, force_set=False):
+        if self.__selected_scale_index__ != index or force_set is True:
+            self.__selected_scale_index__ = index
+            self.selected_scale_index_changed.emit()
+            self.schedule_save()
+    selected_scale_index_changed = Signal()
+    selectedScaleIndex = Property(int, get_selected_scale_index, set_selected_scale_index, selected_scale_index_changed)
+    ### END Property selectedScaleIndex

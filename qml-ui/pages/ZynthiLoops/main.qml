@@ -127,7 +127,7 @@ Zynthian.ScreenPage {
 
         //Try to fit exactly 12 cells + a header cell
         property int headerWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
-        property int headerHeight: Math.round(Kirigami.Units.gridUnit * 2.5)
+        property int headerHeight: Math.round(Kirigami.Units.gridUnit * 3)
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
     }
@@ -208,6 +208,11 @@ Zynthian.ScreenPage {
 
                     text: root.song.name
                     subText: "BPM: " + root.song.bpm
+                    subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
+
+                    textSize: 10
+                    subTextSize: 9
+                    subSubTextSize: 9
 
                     onPressed: {
                         bottomBar.controlType = BottomBar.ControlType.Song;

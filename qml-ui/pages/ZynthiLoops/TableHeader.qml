@@ -40,11 +40,15 @@ QQC2.AbstractButton {
     Layout.fillHeight: true
 
     property alias subText: contents.text2
+    property alias subSubText: contents.text3
+
+    property alias textSize: contents.text1Size
+    property alias subTextSize: contents.text2Size
+    property alias subSubTextSize: contents.text3Size
 
     contentItem: TableHeaderLabel {
         id: contents
         text: root.text
-        text2: root.subText
     }
 
     onPressed: root.forceActiveFocus();

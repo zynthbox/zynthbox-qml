@@ -173,6 +173,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 		self.fx_layer = None
 		self.fill_list()
+		self.zyngui.screens['main_layers_view'].fill_list()
 
 	def index_supports_immediate_activation(self, index=None):
 		return True

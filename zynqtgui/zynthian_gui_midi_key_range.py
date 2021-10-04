@@ -161,12 +161,13 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		super().show()
 		self.zyngui.screens["control"].unlock_controllers()
 		self.set_zctrls()
-		zyncoder.lib_zyncoder.set_midi_learning_mode(1)
+		#Disable automatic learning for now
+		#zyncoder.lib_zyncoder.set_midi_learning_mode(1)
 
 
 	def hide(self):
 		super().hide()
-		zyncoder.lib_zyncoder.set_midi_learning_mode(0)
+		#zyncoder.lib_zyncoder.set_midi_learning_mode(0)
 
 
 	def zyncoder_read(self, zcnums=None):
@@ -212,15 +213,15 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		return [0]
 
 
-	def learn_note_range(self, num):
-		if self.learn_toggle==0 or num<=self.note_low:
-			self.nlow_zctrl.set_value(num, True)
-			if self.note_low>self.note_high:
-				self.nhigh_zctrl.set_value(127, True)
-			self.learn_toggle = 1
-		else:
-			self.nhigh_zctrl.set_value(num, True)
-			self.learn_toggle = 0
+	#def learn_note_range(self, num):
+		#if self.learn_toggle==0 or num<=self.note_low:
+			#self.nlow_zctrl.set_value(num, True)
+			#if self.note_low>self.note_high:
+				#self.nhigh_zctrl.set_value(127, True)
+			#self.learn_toggle = 1
+		#else:
+			#self.nhigh_zctrl.set_value(num, True)
+			#self.learn_toggle = 0
 
 
 

@@ -229,12 +229,6 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Mixer")
-                    page: Qt.resolvedUrl("MixerBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Song
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
                     id: partAction
                     text: qsTr("Part")
                     page: Qt.resolvedUrl("PartBar.qml")

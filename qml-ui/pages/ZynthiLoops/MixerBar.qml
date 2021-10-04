@@ -31,101 +31,103 @@ import org.kde.kirigami 2.4 as Kirigami
 
 //import Zynthian 1.0 as Zynthian
 
-// GridLayout so TabbedControlView knows how to navigate it
-GridLayout {
-    id: root
-    rows: 1
+Rectangle {
     Layout.fillWidth: true
+    color: Kirigami.Theme.backgroundColor
 
-    property QtObject bottomBar: null
-    readonly property QtObject song: zynthian.zynthiloops.song
+    GridLayout {
+        id: root
+        rows: 1
+        anchors.fill: parent
 
+        readonly property QtObject song: zynthian.zynthiloops.song
 
-    QtObject {
-        id: privateProps
+        QtObject {
+            id: privateProps
 
-        //Try to fit exactly 12 mixers + master (same width as loopgrid)
-        property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
-    }
-
-    ColumnLayout {
-        Layout.fillHeight: true
-        Layout.fillWidth: true
+            //Try to fit exactly 12 mixers + master (same width as loopgrid)
+            property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
+        }
 
         ColumnLayout {
-            id: tableLayout
-
             Layout.fillHeight: true
             Layout.fillWidth: true
-            spacing: 1
 
-            RowLayout {
-                Layout.fillWidth: true
+            ColumnLayout {
+                id: tableLayout
+
                 Layout.fillHeight: true
+                Layout.fillWidth: true
                 spacing: 1
 
-                VolumeControl {
-                    id: masterVolume
-                    Layout.preferredWidth: privateProps.cellWidth
-                    Layout.maximumWidth: privateProps.cellWidth
-                    Layout.fillHeight: true
-                    headerText: "Master"
-
-                    border.width: 1
-                    border.color: Kirigami.Theme.highlightColor
-
-                    Binding {
-                        target: masterVolume.slider
-                        property: "value"
-                        value: zynthian.master_alsa_mixer.volume
-                    }
-
-                    slider {
-                        value: zynthian.master_alsa_mixer.volume
-                        from: 50
-                        to: 100
-                        stepSize: 1
-                        onValueChanged: {
-                            zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
-                        }
-                    }
-                }
-
-                ListView {
-                    id: tracksVolumeRow
-
+                RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-
-                    clip: true
                     spacing: 1
-                    orientation: Qt.Horizontal
-                    boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.song.tracksModel
+                    VolumeControl {
+                        id: masterVolume
+                        Layout.preferredWidth: privateProps.cellWidth
+                        Layout.maximumWidth: privateProps.cellWidth
+                        Layout.fillHeight: true
+                        headerText: "Master"
 
-                    delegate: RowLayout {
-                        width: privateProps.cellWidth
-                        height: ListView.view.height
+                        border.width: 1
+                        border.color: Kirigami.Theme.highlightColor
 
-                        VolumeControl {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-
-                            headerText: model.track.name
-                            footerText: model.track.audioLevel.toFixed(2) + " (dB)"
-                            audioLeveldB: model.track.audioLevel
-
-                            slider.value: model.track.volume
-                            slider.onValueChanged: {
-                                model.track.volume = slider.value
-                            }
+                        Binding {
+                            target: masterVolume.slider
+                            property: "value"
+                            value: zynthian.master_alsa_mixer.volume
                         }
 
-                        Kirigami.Separator {
-                            Layout.preferredWidth: 2
-                            Layout.fillHeight: true
-                            color: "#ff666666"
+                        slider {
+                            value: zynthian.master_alsa_mixer.volume
+                            from: 50
+                            to: 100
+                            stepSize: 1
+                            onValueChanged: {
+                                zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
+                            }
+                        }
+                    }
+
+                    ListView {
+                        id: tracksVolumeRow
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        clip: true
+                        spacing: 1
+                        orientation: Qt.Horizontal
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        model: root.song.tracksModel
+
+                        delegate: RowLayout {
+                            width: privateProps.cellWidth
+                            height: ListView.view.height
+
+                            VolumeControl {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                headerText: model.track.name
+                                footerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                                audioLeveldB: model.track.audioLevel
+
+                                slider.value: model.track.volume
+                                slider.onValueChanged: {
+                                    model.track.volume = slider.value
+                                }
+                            }
+
+                            Kirigami.Separator {
+                                Layout.preferredWidth: 2
+                                Layout.fillHeight: true
+                                color: "#ff666666"
+                            }
                         }
                     }
                 }
@@ -133,4 +135,3 @@ GridLayout {
         }
     }
 }
-

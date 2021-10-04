@@ -97,6 +97,8 @@ Zynthian.ScreenPage {
         anchors.fill: parent
         FocusScope {
             id: tabbarScope
+            visible: (zynthian.engine.synth_engine_type !== "Audio Effect" &&
+                        zynthian.engine.synth_engine_type !== "MIDI Tool")
             Layout.fillWidth: true
             implicitHeight: tabbarLayout.implicitHeight
             Zynthian.Card {
@@ -126,9 +128,25 @@ Zynthian.ScreenPage {
                     }
                     onClicked: view.forceActiveFocus()
                     Component.onCompleted: {
-                        zynthian.engine.shown_category = "Instrument";
+                        if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
+                            zynthian.engine.synth_engine_type !== "MIDI Tool") {
+                            zynthian.engine.shown_category = "Instrument";
+                        } else {
+                            zynthian.engine.shown_category = null;
+                        }
                         zynthian.engine.current_index = -1;
                         view.contentY = 0;
+                    }
+                    Connections {
+                        target: zynthian.engine
+                        onSynth_engine_typeChanged: {
+                            if (zynthian.engine.synth_engine_type !== "Audio Effect" &&
+                                zynthian.engine.synth_engine_type !== "MIDI Tool") {
+                                zynthian.engine.shown_category = "Instrument";
+                            } else {
+                                zynthian.engine.shown_category = null;
+                            }
+                        }
                     }
                 }
                 QQC2.Button {
@@ -164,6 +182,7 @@ Zynthian.ScreenPage {
                     delegate: QQC2.AbstractButton {
                         width: view.cellWidth
                         height: view.cellHeight
+                        enabled: model.action_id !== undefined
                         leftPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
                         rightPadding: Kirigami.Units.largeSpacing

@@ -179,9 +179,15 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 	def set_select_path(self):
 		if self.midi_mode:
-			self.select_path = self.zyngui.curlayer.get_basepath() + " Midi-FX"
+			if self.zyngui.curlayer:
+				self.select_path = self.zyngui.curlayer.get_basepath() + " Midi-FX"
+			else:
+				self.select_path = "Midi-FX"
 		else:
-			self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
+			if self.zyngui.curlayer:
+				self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
+			else:
+				self.select_path = "Audio-FX"
 		if len(self.fx_layers) > 0:
 			self.select_path_element = "FX {}".format(min(self.index, len(self.fx_layers) - 1) + 1)
 		else:

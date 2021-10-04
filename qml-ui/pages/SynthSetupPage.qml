@@ -101,7 +101,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
-				enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show(); //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_effects";

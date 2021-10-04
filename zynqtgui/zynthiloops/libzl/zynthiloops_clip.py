@@ -66,6 +66,7 @@ class zynthiloops_clip(QObject):
 
         if self.track is not None:
             self.track.volume_changed.connect(lambda: self.track_volume_changed())
+            self.track_volume_changed()
 
     def update_current_beat(self):
         if not self.__playing_started__:
@@ -154,6 +155,7 @@ class zynthiloops_clip(QObject):
 
         self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
         self.track.volume_changed.connect(lambda: self.track_volume_changed())
+        self.track_volume_changed()
 
     @Signal
     def length_changed(self):
@@ -446,6 +448,7 @@ class zynthiloops_clip(QObject):
         self.__audio_level__ = 0
         self.__read_metadata__()
         self.reset_beat_count()
+        self.track_volume_changed()
 
         try:
             self.audioSource.audioLevelChanged.disconnect()

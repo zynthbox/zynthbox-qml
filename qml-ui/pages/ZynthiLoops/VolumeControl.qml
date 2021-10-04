@@ -49,12 +49,13 @@ Rectangle {
                 font.pointSize: 8
 
                 style: GaugeStyle {
+                    foreground: null
                     background: Rectangle {
                         color: "#ff888888"
                         implicitWidth: 6
                     }                    
                     valueBar: Rectangle {
-                        color: "#ff81d4fa"
+                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
                         implicitWidth: 6
                     }
                     minorTickmark: Item {

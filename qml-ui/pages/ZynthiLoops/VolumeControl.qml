@@ -28,6 +28,7 @@ Rectangle {
             id: headerLabel
             Layout.alignment: Qt.AlignCenter
             Layout.topMargin: 8
+            font.pointSize: 9
         }
 
         RowLayout {
@@ -130,7 +131,6 @@ Rectangle {
         QQC2.Label {
             id: footerLabel
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            font.pointSize: 9
         }
     }
 

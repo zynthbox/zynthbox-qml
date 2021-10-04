@@ -38,6 +38,7 @@ GridLayout {
     id: root
     rows: 1
     Layout.fillWidth: true
+    columnSpacing: Kirigami.Units.gridUnit*3
 
     property QtObject bottomBar: null
 
@@ -87,6 +88,27 @@ GridLayout {
             }
         }
     }*/
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: qsTr("Scale")
+        }
+
+        QQC2.ComboBox {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignCenter
+            model: root.bottomBar.controlObj.scaleModel
+            currentIndex: root.bottomBar.controlObj.selectedScaleIndex
+            onActivated: {
+                root.bottomBar.controlObj.selectedScaleIndex = index;
+            }
+        }
+    }
 
     Item {
         Layout.fillWidth: true

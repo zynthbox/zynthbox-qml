@@ -38,9 +38,9 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_audio_in(zynthian_gui_selector):
 
-	def __init__(self):
+	def __init__(self, parent = None):
+		super(zynthian_gui_audio_in, self).__init__('Audio Capture', parent)
 		self.layer=None
-		super().__init__('Audio Capture', True)
 
 
 	def set_layer(self, layer):
@@ -70,6 +70,7 @@ class zynthian_gui_audio_in(zynthian_gui_selector):
 
 	def set_select_path(self):
 		self.select_path = ("Capture Audio from ...")
+		super().set_select_path()
 
 
 #------------------------------------------------------------------------------

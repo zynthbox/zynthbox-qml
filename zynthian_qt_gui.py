@@ -92,7 +92,7 @@ from zynqtgui.zynthian_gui_midi_cc import zynthian_gui_midi_cc
 from zynqtgui.zynthian_gui_midi_key_range import zynthian_gui_midi_key_range
 from zynqtgui.zynthian_gui_audio_out import zynthian_gui_audio_out
 # from zynqtgui.zynthian_gui_midi_out import zynthian_gui_midi_out
-# from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
+from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
 from zynqtgui.zynthian_gui_control import zynthian_gui_control
@@ -580,7 +580,7 @@ class zynthian_gui(QObject):
         self.screens['midi_key_range'] = zynthian_gui_midi_key_range(self)
         self.screens['audio_out'] = zynthian_gui_audio_out(self)
         # self.screens['midi_out'] = zynthian_gui_midi_out(self)
-        # self.screens['audio_in'] = zynthian_gui_audio_in(self)
+        self.screens['audio_in'] = zynthian_gui_audio_in(self)
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
         self.screens["control"] = zynthian_gui_control(self)
@@ -2391,6 +2391,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def audio_out(self):
         return self.screens["audio_out"]
+
+    @Property(QObject, constant=True)
+    def audio_in(self):
+        return self.screens["audio_in"]
 
     def get_audio_recorder(self):
         return self.screens["audio_recorder"]

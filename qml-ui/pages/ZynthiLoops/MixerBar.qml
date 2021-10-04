@@ -39,6 +39,7 @@ Rectangle {
         id: root
         rows: 1
         anchors.fill: parent
+        anchors.margins: Kirigami.Units.gridUnit*0.3
 
         readonly property QtObject song: zynthian.zynthiloops.song
 
@@ -52,6 +53,10 @@ Rectangle {
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            Kirigami.Heading {
+                text: qsTr("Mixer : %1").arg(song.name)
+            }
 
             ColumnLayout {
                 id: tableLayout

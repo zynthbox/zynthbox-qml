@@ -121,6 +121,31 @@ Zynthian.ScreenPage {
             }
         }
 
+        RowLayout {
+            QQC2.Button {
+                text: "-"
+                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.max(0, zynthian.midi_key_range.note_low_controller.value - 1)
+            }
+            QQC2.Button {
+                text: "+"
+                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.min(126, zynthian.midi_key_range.note_low_controller.value + 1)
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        RowLayout {
+            Layout.alignment: Qt.AlignRight
+            QQC2.Button {
+                text: "-"
+                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.max(0, zynthian.midi_key_range.note_high_controller.value - 1)
+            }
+            QQC2.Button {
+                text: "+"
+                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.min(126, zynthian.midi_key_range.note_high_controller.value + 1)
+            }
+        }
         Item {
             Layout.fillWidth: true
             Layout.columnSpan: 3

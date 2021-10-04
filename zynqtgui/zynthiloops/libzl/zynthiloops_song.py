@@ -427,3 +427,9 @@ class zynthiloops_song(QObject):
     selected_scale_index_changed = Signal()
     selectedScaleIndex = Property(int, get_selected_scale_index, set_selected_scale_index, selected_scale_index_changed)
     ### END Property selectedScaleIndex
+
+    ### Property selectedScale
+    def get_selected_scale(self):
+        return self.__scale_model__[self.__selected_scale_index__]
+    selectedScale = Property(str, get_selected_scale, notify=selected_scale_index_changed)
+    ### END Property selectedScale

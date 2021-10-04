@@ -108,16 +108,26 @@ class zynthian_gui_engine(zynthian_gui_selector):
 	def get_midi_channel(self):
 		return self.midi_chan
 
+
+	@Signal
+	def engine_type_changed(self):
+		pass
+
+	def get_engine_type(self):
+		return self.engine_type
+
 	def set_engine_type(self, etype):
 		self.engine_type = etype
 		self.set_midi_channel(None)
 		self.reset_index = True
+		self.engine_type_changed.emit()
 
 
 	def set_fxchain_mode(self, midi_chan):
 		self.engine_type = "Audio Effect"
 		self.set_midi_channel(midi_chan)
 		self.reset_index = True
+		self.engine_type_changed.emit()
 
 
 	def set_midichain_mode(self, midi_chan):
@@ -125,7 +135,9 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.set_midi_channel(midi_chan)
 		self.reset_index = True
 		self.init_engine_info()
+		self.engine_type_changed.emit()
 
+	synth_engine_type = Property(str, get_engine_type, notify = engine_type_changed)
 
 	def filtered_engines_by_cat(self):
 		result = OrderedDict()
@@ -160,18 +172,19 @@ class zynthian_gui_engine(zynthian_gui_selector):
 					else:
 						self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
+			cat_entries = []
 			if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
 				# Add engines on this category...
 				for eng, info in infos.items():
 					# For some engines, check if needed channels are free ...
 					if eng not in self.check_channels_engines or all(chan in self.zyngui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
-						self.list_data.append((eng,len(self.list_data),info[1],info[0]))
+						cat_entries.append((eng,len(self.list_data),info[1],info[0]))
+			cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))
+			self.list_data.extend(cat_entries)
 
 		# Display help if no engines are enabled ...
 		if len(self.list_data)==0:
 			self.list_data.append((None,len(self.list_data),"Enable LV2-plugins on webconf".format(os.uname().nodename)))
-
-		self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 
 		# Select the first element that is not a category heading
 		if self.reset_index:
@@ -256,10 +269,13 @@ class zynthian_gui_engine(zynthian_gui_selector):
 	def get_shown_category(self):
 		return self.single_category
 
-	def set_shown_category(self, shown):
-		if self.single_category == shown:
-			return
-		self.single_category = shown
+	def set_shown_category(self, shown : str):
+		if len(shown) == 0:
+			self.single_category = None
+		else:
+			if self.single_category == shown:
+				return
+			self.single_category = shown
 		self.fill_list()
 		self.shown_category_changed.emit()
 

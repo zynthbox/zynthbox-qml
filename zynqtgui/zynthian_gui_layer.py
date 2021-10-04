@@ -348,6 +348,25 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['engine'].select_by_engine(self.layers[self.index].engine.nickname)
 
 
+	@Slot(int)
+	def new_effect_layer(self, midi_chan = -1):
+		self.add_layer_eng = None
+		self.replace_layer_index = None
+		self.layer_chain_parallel = False
+		self.zyngui.screens['engine'].set_engine_type("Audio Effect")
+		if midi_chan < 0:
+			midi_chan = self.layers[self.index].midi_chan
+		if midi_chan in self.layer_midi_map:
+			self.layer_index_replace_engine = self.index
+		else:
+			self.layer_index_replace_engine = None
+
+		self.zyngui.screens['engine'].set_midi_channel(midi_chan)
+		self.zyngui.show_modal('engine')
+		if midi_chan in self.layer_midi_map:
+			self.zyngui.screens['engine'].select_by_engine(self.layers[self.index].engine.nickname)
+
+
 	def add_fxchain_layer(self, midi_chan):
 		self.add_layer_eng = None
 		self.replace_layer_index = None

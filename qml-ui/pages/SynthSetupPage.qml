@@ -90,13 +90,18 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: {
-                    print(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
-                    zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                    zynthian.layer.select_engine(zynthian.main_layers_view.active_midi_channel)
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Effect Layer")
+                onTriggered: {
+                    zynthian.layer.new_effect_layer(zynthian.main_layers_view.active_midi_channel)
                 }
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+				enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show(); //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_effects";

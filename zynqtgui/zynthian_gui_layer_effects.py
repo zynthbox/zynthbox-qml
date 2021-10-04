@@ -192,9 +192,9 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			self.select_path_element = "FX {}".format(min(self.index, len(self.fx_layers) - 1) + 1)
 		else:
 			if self.midi_mode:
-				self.select_path_element = "Choose Midi-FX"
+				self.select_path_element = "Midi-FX"
 			else:
-				self.select_path_element = "Choose Audio-FX"
+				self.select_path_element = "Audio-FX"
 		super().set_select_path()
 
 #------------------------------------------------------------------------------

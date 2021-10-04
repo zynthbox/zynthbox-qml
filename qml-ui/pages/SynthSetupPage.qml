@@ -76,6 +76,11 @@ Zynthian.ScreenPage {
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
+                text: qsTr("Clear Block")
+                enabled: zynthian.main_layers_view.current_index_valid
+                onTriggered: zynthian.main_layers_view.ask_clear_visible_range()
+            }
+            Kirigami.Action {
                 text: qsTr("Clear All")
                 onTriggered: zynthian.layer.ask_reset()
             }

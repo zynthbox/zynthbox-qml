@@ -125,6 +125,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         chan = self.list_data[i][1]
         self.current_index_valid_changed.emit()
 
+        logging.error(chan)
         if chan < 0:
             return
 
@@ -133,7 +134,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.zyngui.screens['layer'].activate_midichan_layer(chan)
 
-        if t=='B':
+        if t=='B' and chan in self.zyngui.screens['layer'].layer_midi_map:
             self.zyngui.screens['layer'].layer_options()
 
 

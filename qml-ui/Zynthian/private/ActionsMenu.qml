@@ -39,6 +39,8 @@ QQC2.Menu
         property Kirigami.Action kirigamiAction
         visible: kirigamiAction.visible === undefined || kirigamiAction.visible
         enabled: kirigamiAction.enabled === undefined || kirigamiAction.enabled
+        checkable: kirigamiAction.checkable !== undefined && kirigamiAction.checkable
+        checked: kirigamiAction.checked !== undefined && kirigamiAction.checked
         height: visible ? implicitHeight : 0
         width: parent.width
 

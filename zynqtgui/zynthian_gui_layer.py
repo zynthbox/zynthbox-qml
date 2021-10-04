@@ -1590,9 +1590,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		if 'note_range' in snapshot:
 			new_roots = self.get_fxchain_roots()
+			i = 0
 			for layer in restored_layers:
-				i = 0
-				if i < 2 and layer in new_roots:
+				if i < len(snapshot['note_range']) and layer in new_roots:
 					zyncoder.lib_zyncoder.set_midi_filter_note_range(layer.midi_chan, snapshot['note_range'][i]['note_low'], snapshot['note_range'][i]['note_high'], snapshot['note_range'][i]['octave_trans'], snapshot['note_range'][i]['halftone_trans'])
 					i += 1
 

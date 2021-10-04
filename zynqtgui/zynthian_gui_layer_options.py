@@ -306,7 +306,8 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 	@Slot('void')
 	def audiofx_add(self):
 		midi_chan=self.layer.midi_chan
-		self.zyngui.screens['layer'].add_fxchain_layer(midi_chan)
+		#self.zyngui.screens['layer'].add_fxchain_layer(midi_chan)
+		self.zyngui.show_screen("layer_effects")
 
 
 	def audiofx_reset(self):
@@ -370,7 +371,8 @@ class zynthian_gui_layer_options(zynthian_gui_selector):
 	@Slot('void')
 	def midifx_add(self):
 		midi_chan=self.layer.midi_chan
-		self.zyngui.screens['layer'].add_midichain_layer(midi_chan)
+		#self.zyngui.screens['layer'].add_midichain_layer(midi_chan)
+		self.zyngui.show_screen("layer_midi_effects")
 
 
 	def midifx_reset(self):

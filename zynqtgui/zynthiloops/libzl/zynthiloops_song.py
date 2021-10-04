@@ -425,7 +425,7 @@ class zynthiloops_song(QObject):
             self.selected_scale_index_changed.emit()
             self.schedule_save()
     selected_scale_index_changed = Signal()
-    selectedScaleIndex = Property(int, get_selected_scale_index, set_selected_scale_index, selected_scale_index_changed)
+    selectedScaleIndex = Property(int, get_selected_scale_index, set_selected_scale_index, notify=selected_scale_index_changed)
     ### END Property selectedScaleIndex
 
     ### Property selectedScale

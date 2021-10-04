@@ -89,6 +89,18 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Add Track")
             onTriggered: root.song.addTrack()
+        },
+        Kirigami.Action {
+            text: qsTr("Mixer")
+            checkable: true
+            checked: bottomStack.currentIndex === 1
+            onTriggered: {
+                if (bottomStack.currentIndex === 1) {
+                    bottomStack.currentIndex = 0;
+                } else {
+                    bottomStack.currentIndex = 1;
+                }
+            }
         }
 
         // Disable undo for now
@@ -371,12 +383,23 @@ Zynthian.ScreenPage {
             }
         }
 
-        BottomBar {
-            id: bottomBar
-
+        StackLayout {
+            id: bottomStack
             Layout.preferredHeight: Kirigami.Units.gridUnit * 15
             Layout.fillWidth: true
             Layout.fillHeight: false
+
+            BottomBar {
+                id: bottomBar
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            MixerBar {
+                id: mixerBar
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
         }
     }
 }

@@ -129,7 +129,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.start_loading()
 				engine_created = True
 				engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
-				midi_chan = self.zyngui.screens["fixed_layers"].list_data[self.zyngui.screens["fixed_layers"].index][1]
+				midi_chan = self.zyngui.screens["main_layers_view"].list_data[self.zyngui.screens["main_layers_view"].index][1]
 				layer = zynthian_layer(engine, midi_chan, self.zyngui)
 				self.zyngui.screens['layer'].layers.append(layer)
 				self.zyngui.screens['engine'].stop_unused_engines()

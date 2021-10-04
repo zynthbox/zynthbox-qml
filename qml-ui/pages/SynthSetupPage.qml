@@ -251,10 +251,11 @@ Zynthian.ScreenPage {
                                     }
                                     return numPrefix + " - " + model.display;
                                 }
+                                elide: Text.ElideRight
                             }
                             QQC2.Label {
-                                visible: model.metadata.note_high < 64 || model.metadata.note_low >= 64
-                                text: model.metadata.note_high < 64 ? "L" : "U"
+                                visible: model.metadata.note_high < 60 || model.metadata.note_low >= 60
+                                text: model.metadata.note_high < 60 ? "L" : "U"
                             }
                             QQC2.Label {
                                 visible: model.metadata.octave_transpose !== 0

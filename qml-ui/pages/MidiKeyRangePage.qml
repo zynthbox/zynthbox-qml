@@ -46,6 +46,11 @@ Zynthian.ScreenPage {
         rowSpacing: Kirigami.Units.gridUnit
 
         Zynthian.MultiSwitchController {
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            Layout.preferredHeight: Layout.preferredWidth
+            Layout.fillWidth: false
+            Layout.fillHeight: false
             legend: ""
             controller.ctrl: zynthian.midi_key_range.octave_controller
             valueLabel: {
@@ -55,11 +60,57 @@ Zynthian.ScreenPage {
             }
             //stepSize: 1
         }
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        Zynthian.Card {
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            Layout.preferredHeight: Layout.preferredWidth
+            Layout.fillWidth: false
+            Layout.fillHeight: false
+            contentItem: Item {
+                GridLayout {
+                    anchors.centerIn: parent
+                    columns: 2
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.columnSpan: 2
+                        text: qsTr("Full Keyboard")
+                        checkable: true
+                        checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126
+                        onToggled: {
+                            zynthian.midi_key_range.note_low_controller.value = 0;
+                            zynthian.midi_key_range.note_high_controller.value = 126;
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        text: qsTr("Low Half")
+                        checkable: true
+                        checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
+                        onToggled: {
+                            zynthian.midi_key_range.note_low_controller.value = 0;
+                            zynthian.midi_key_range.note_high_controller.value = 59;
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        text: qsTr("High Half")
+                        checkable: true
+                        checked: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
+                        onToggled: {
+                            zynthian.midi_key_range.note_high_controller.value = 126;
+                            zynthian.midi_key_range.note_low_controller.value = 60;
+                            zynthian.midi_key_range.note_low_controller.value = 60;
+                        }
+                    }
+                }
+            }
         }
         Zynthian.MultiSwitchController {
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            Layout.preferredHeight: Layout.preferredWidth
+            Layout.fillWidth: false
+            Layout.fillHeight: false
             legend: ""
             controller.ctrl: zynthian.midi_key_range.get_halftone_controller
             stepSize: 1
@@ -70,6 +121,31 @@ Zynthian.ScreenPage {
             }
         }
 
+        RowLayout {
+            QQC2.Button {
+                text: "-"
+                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.max(0, zynthian.midi_key_range.note_low_controller.value - 1)
+            }
+            QQC2.Button {
+                text: "+"
+                onClicked: zynthian.midi_key_range.note_low_controller.value = Math.min(126, zynthian.midi_key_range.note_low_controller.value + 1)
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+        RowLayout {
+            Layout.alignment: Qt.AlignRight
+            QQC2.Button {
+                text: "-"
+                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.max(0, zynthian.midi_key_range.note_high_controller.value - 1)
+            }
+            QQC2.Button {
+                text: "+"
+                onClicked: zynthian.midi_key_range.note_high_controller.value = Math.min(126, zynthian.midi_key_range.note_high_controller.value + 1)
+            }
+        }
         Item {
             Layout.fillWidth: true
             Layout.columnSpan: 3
@@ -102,7 +178,7 @@ Zynthian.ScreenPage {
                         Rectangle {
                             visible: !parent.white
                             x: -width / 2
-                            width: keyboardLayout.width / 64 / 2
+                            width: keyboardLayout.width / 59 / 2
                             height: parent.height / 3 * 2
                             Layout.fillWidth: true
                             color: "black"

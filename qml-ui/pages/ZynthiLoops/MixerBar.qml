@@ -35,20 +35,20 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
+    QtObject {
+        id: privateProps
+
+        //Try to fit exactly 12 mixers + a master mixer
+        property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2) + 1
+    }
+
     GridLayout {
         id: root
         rows: 1
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.gridUnit*0.3
+        anchors.topMargin: Kirigami.Units.gridUnit*0.3
 
         readonly property QtObject song: zynthian.zynthiloops.song
-
-        QtObject {
-            id: privateProps
-
-            //Try to fit exactly 12 mixers + master (same width as loopgrid)
-            property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
-        }
 
         ColumnLayout {
             Layout.fillHeight: true
@@ -104,7 +104,7 @@ Rectangle {
                         Layout.fillHeight: true
 
                         clip: true
-                        spacing: 1
+                        spacing: 0
                         orientation: Qt.Horizontal
                         boundsBehavior: Flickable.StopAtBounds
 
@@ -118,8 +118,8 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                headerText: model.track.name
-                                footerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                                headerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                                footerText: model.track.name
                                 audioLeveldB: model.track.audioLevel
 
                                 slider.value: model.track.volume
@@ -129,9 +129,10 @@ Rectangle {
                             }
 
                             Kirigami.Separator {
-                                Layout.preferredWidth: 2
                                 Layout.fillHeight: true
-                                color: "#ff666666"
+                                Layout.preferredWidth: 1
+                                color: "#ff31363b"
+                                visible: index != root.song.tracksModel.count-1
                             }
                         }
                     }

@@ -65,11 +65,21 @@ Zynthian.ScreenPage {
                 text: qsTr("Save Sketch")
                 onTriggered: {
                     if (zynthian.zynthiloops.sketchIsTemp()) {
-                        fileNameDialog.fileName = "Sketch-1"
-                        fileNameDialog.open()
+                        fileNameDialog.dialogType = "save";
+                        fileNameDialog.fileName = "Sketch-1";
+                        fileNameDialog.open();
                     } else {
-                        zynthian.zynthiloops.saveSketch()
+                        zynthian.zynthiloops.saveSketch();
                     }
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Save Sketch As")
+                visible: !root.song.isTemp
+                onTriggered: {
+                    fileNameDialog.dialogType = "saveas";
+                    fileNameDialog.fileName = "";
+                    fileNameDialog.open();
                 }
             }
             Kirigami.Action {
@@ -142,6 +152,8 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.SaveFileDialog {
+        property string dialogType: "save"
+
         id: fileNameDialog
         visible: false
 
@@ -167,7 +179,13 @@ Zynthian.ScreenPage {
 
         onAccepted: {
             console.log("Accepted")
-            zynthian.zynthiloops.createSketch(fileNameDialog.fileName)
+
+            if (dialogType === "save") {
+                zynthian.zynthiloops.createSketch(fileNameDialog.fileName)
+            } else if (dialogType === "saveas") {
+                root.song.name = fileNameDialog.fileName;
+                zynthian.zynthiloops.saveSketch();
+            }
         }
         onRejected: {
             console.log("Rejected")

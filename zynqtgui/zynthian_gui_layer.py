@@ -77,7 +77,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.remove_all_layers(True)
 		self.reset_midi_profile()
 
-
 	def fill_list(self):
 		self.list_data=[]
 		self.layer_midi_map = {}
@@ -175,6 +174,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.reset()
 		self.zyngui.show_screen('layer')
 		self.zyngui.screens['layer'].set_select_path()
+		self.zyngui.screens['layer_options'].fill_list()
 		self.zyngui.screens['bank'].fill_list()
 		self.zyngui.screens['bank'].set_select_path()
 		self.zyngui.screens['preset'].fill_list()
@@ -434,12 +434,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 	def add_layer_midich(self, midich, select=True):
+		traceback.print_stack(None, 8)
 		if self.add_layer_eng:
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
 			self.add_layer_eng = None
 
-			if not self.layer_index_replace_engine == None and len(self.layers) > self.index:
-				layer = self.layers[self.layer_index_replace_engine]
+			if self.layer_index_replace_engine != None and len(self.layers) > self.index:
+				layer = self.root_layers[self.layer_index_replace_engine]
+				# The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
+				if layer.engine.type != zyngine.type:
+					layer.set_midi_out([])
+					layer.reset_audio_out()
+					layer.reset_audio_in()
 				layer.set_engine(zyngine);
 				self.zyngui.screens['engine'].stop_unused_engines()
 				# initialize the bank

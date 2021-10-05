@@ -83,6 +83,15 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
+                text: qsTr("Save A Copy")
+                visible: !root.song.isTemp
+                onTriggered: {
+                    fileNameDialog.dialogType = "savecopy";
+                    fileNameDialog.fileName = "";
+                    fileNameDialog.open();
+                }
+            }
+            Kirigami.Action {
                 text: qsTr("Load Sketch")
                 onTriggered: {
                     sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
@@ -185,6 +194,8 @@ Zynthian.ScreenPage {
             } else if (dialogType === "saveas") {
                 root.song.name = fileNameDialog.fileName;
                 zynthian.zynthiloops.saveSketch();
+            } else if (dialogType === "savecopy") {
+                zynthian.zynthiloops.saveCopy(fileNameDialog.fileName);
             }
         }
         onRejected: {

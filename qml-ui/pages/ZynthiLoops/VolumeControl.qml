@@ -44,7 +44,7 @@ Rectangle {
                 Layout.leftMargin: 4
 
                 minimumValue: -40
-                maximumValue: 10
+                maximumValue: 20
 
                 font.pointSize: 8
 

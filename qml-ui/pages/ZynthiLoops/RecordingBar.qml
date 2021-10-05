@@ -87,6 +87,7 @@ GridLayout {
 
                 ListElement { text: "Left Channel"; value: "1" }
                 ListElement { text: "Right Channel"; value: "2" }
+                ListElement { text: "Stereo"; value: "*" }
             }
             textRole: "text"
         }

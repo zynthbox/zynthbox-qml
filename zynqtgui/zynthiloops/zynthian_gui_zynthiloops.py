@@ -99,6 +99,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
         self.recorder_process_internal_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
+        self.__last_recording_type__ = ""
 
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -368,8 +369,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.start_metronome_request()
 
             if source == 'internal':
+                self.__last_recording_type__ = "Internal"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
             else:
+                if channel == "1":
+                    self.__last_recording_type__ = "External (Mono Left)"
+                elif channel == "2":
+                    self.__last_recording_type__ = "External (Mono Right)"
+                else:
+                    self.__last_recording_type__ = "External (Stereo)"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
 
             self.start_clip_recording = False
@@ -456,9 +464,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.path = self.clip_to_record_path
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+        self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.recorder_process = None
+        self.__last_recording_type__ = ""
         # self.__song__.save()
 
     @Property(int, notify=current_beat_changed)

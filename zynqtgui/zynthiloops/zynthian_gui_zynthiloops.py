@@ -351,27 +351,30 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.startTimer(self.__song__.__bpm__)
 
     def queue_clip_record(self, clip, source, channel):
-        layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-        self.update_recorder_jack_port()
-        self.clip_to_record = clip
-        (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
-        self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_{layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')}_{self.__song__.bpm}-BPM.clip.wav"
+        if self.zyngui.curlayer is not None:
+            layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
+            self.update_recorder_jack_port()
+            self.clip_to_record = clip
+            (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
+            self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_{layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')}_{self.__song__.bpm}-BPM.clip.wav"
 
-        #self.countInValue = countInBars * 4
-        logging.error(
-            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
+            #self.countInValue = countInBars * 4
+            logging.error(
+                f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
-        self.is_recording_complete = False
-        self.start_clip_recording = True
-        self.clip_to_record.isRecording = True
-        self.start_metronome_request()
+            self.is_recording_complete = False
+            self.start_clip_recording = True
+            self.clip_to_record.isRecording = True
+            self.start_metronome_request()
 
-        if source == 'internal':
-            self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
+            if source == 'internal':
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
+            else:
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
+
+            self.start_clip_recording = False
         else:
-            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
-
-        self.start_clip_recording = False
+            logging.error("Empty layer selected. Cannot record.")
 
     def stop_recording(self):
         self.recorder_process.terminate()

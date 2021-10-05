@@ -396,6 +396,7 @@ class zynthian_gui(QObject):
         self.midi_filter_script = None
         self.midi_learn_mode = False
         self.midi_learn_zctrl = None
+        self.__notes_on = []
 
         self.status_info = {}
         self.status_object = zynthian_gui_status_data(self)
@@ -1681,6 +1682,7 @@ class zynthian_gui(QObject):
                     self.status_info["midi_clock"] = True
                 else:
                     self.status_info["midi"] = True
+                logging.error("TYPE {}".format(evtype))
 
                 # logging.info("MIDI_UI MESSAGE: {}".format(hex(ev)))
                 # logging.info("MIDI_UI MESSAGE DETAILS: {}, {}".format(chan,evtype))
@@ -1801,6 +1803,15 @@ class zynthian_gui(QObject):
                         # if not self.modal_screen and self.curlayer and chan==self.curlayer.get_midi_chan():
                         #     self.show_screen('control')
 
+
+                # Note-Off ...
+                elif evtype == 0x8:
+                    self.screens["midi_chan"].midi_chan_activity(chan)
+                    note = (ev & 0x7F00) >> 8
+                    logging.error("NOTE OFF {}".format(note))
+                    self.__notes_on = list(filter(lambda a: a != note, self.__notes_on))
+                    self.last_note_changed.emit()
+
                 # Note-On ...
                 elif evtype == 0x9:
                     self.screens["midi_chan"].midi_chan_activity(chan)
@@ -1814,9 +1825,14 @@ class zynthian_gui(QObject):
                         self.start_loading()
                         self.screens["preset"].preselect_action()
                         self.stop_loading()
+
+                    note = (ev & 0x7F00) >> 8
+                    logging.error("NOTE ON {}".format(note))
+                    if not note in self.__notes_on:
+                        self.__notes_on.append(note)
+                        self.last_note_changed.emit()
                     # Note Range Learn
                     if self.modal_screen == "midi_key_range":
-                        note = (ev & 0x7F00) >> 8
                         self.screens["midi_key_range"].learn_note_range(note)
 
                 # Control Change ...
@@ -2314,6 +2330,15 @@ class zynthian_gui(QObject):
         self.__home_screen = screen
         self.home_screen_changed.emit()
 
+    def get_last_note(self):
+        if not self.__notes_on:
+            return ""
+        note_names = ("C","C#","D","D#","E","F","F#","G","G#","A","A#","B")
+        num = self.__notes_on[len(self.__notes_on) - 1]
+        scale = int(num / 12) - 1
+        num = int(num % 12)
+        return "{}{}".format(note_names[num], scale)
+
     # ---------------------------------------------------------------------------
     # Screens getters
     def get_info(self):
@@ -2470,6 +2495,7 @@ class zynthian_gui(QObject):
     miniPlayGridToggle = Signal()
     home_screen_changed = Signal()
     active_midi_channel_changed = Signal()
+    last_note_changed = Signal()
 
     current_screen_id = Property(
         str,
@@ -2482,6 +2508,12 @@ class zynthian_gui(QObject):
         get_current_modal_screen_id,
         show_modal,
         notify=current_modal_screen_id_changed,
+    )
+
+    last_note = Property(
+        str,
+        get_last_note,
+        notify=last_note_changed
     )
 
     is_loading = Property(bool, get_is_loading, notify=is_loading_changed)

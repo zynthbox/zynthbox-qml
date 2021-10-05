@@ -159,7 +159,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                         Layout.margins: 8
                         model: playGridsRepeater.count
-                        currentIndex: ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]
+                        currentIndex: ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] != undefined ? ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] : -1
                         delegate: QQC2.ItemDelegate {
                             id: settingsSelectorDelegate
                             property Item gridComponent: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(model.index).item

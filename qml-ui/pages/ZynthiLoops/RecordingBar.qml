@@ -48,10 +48,12 @@ GridLayout {
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
-            text: "Source"
+            text: qsTr("Source")
         }
 
         QQC2.ComboBox {
+            id: sourceCombo
+
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
             model: ListModel {
@@ -68,10 +70,36 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        visible: sourceCombo.currentIndex === 1
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
-            text: "Count In (Bars)"
+            text: qsTr("Channel")
+        }
+
+        QQC2.ComboBox {
+            id: channelCombo
+
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignCenter
+            model: ListModel {
+                id: channelComboModel
+
+                ListElement { text: "Left Channel"; value: "1" }
+                ListElement { text: "Right Channel"; value: "2" }
+            }
+            textRole: "text"
+        }
+    }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: qsTr("Count In (Bars)")
         }
 
         QQC2.ComboBox {
@@ -121,8 +149,11 @@ GridLayout {
 
             onClicked: {
                 if (!controlObj.isRecording) {
-                    console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-                    controlObj.queueRecording();
+                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
+                    controlObj.queueRecording(
+                        sourceComboModel.get(sourceCombo.currentIndex).value,
+                        channelComboModel.get(channelCombo.currentIndex).value
+                    );
                 } else {
                     controlObj.stopRecording();
                 }

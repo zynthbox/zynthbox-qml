@@ -39,7 +39,7 @@ class zynthiloops_track(QObject):
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
-        self.__volume__ = 100
+        self.__volume__ = 67
         self.__audio_level__ = -40
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
@@ -183,7 +183,7 @@ class zynthiloops_track(QObject):
 
     def set_audioLevel(self, leveldB):
         lower_limit = -40
-        upper_limit = 10
+        upper_limit = 20
         new_upper_limit = upper_limit - (1 - self.__volume__/100) * (upper_limit - lower_limit)
 
         if self.master_volume is not None:

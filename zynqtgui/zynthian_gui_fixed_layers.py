@@ -207,10 +207,9 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.zyngui.show_confirm("Do you really want to remove all layers in the current block?", self.clear_visible_range)
 
     def clear_visible_range(self, params=None):
-        logging.error("clear_visible_range")
-        for chan in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
-            logging.error("KILLING {}".format(chan))
+        for chan in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1):
             self.zyngui.screens['layer'].remove_midichan_layer(chan)
+        self.zyngui.screens['layer'].reset_channel_status_range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1)
 
     @Signal
     def current_index_valid_changed(self):

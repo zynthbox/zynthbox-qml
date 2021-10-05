@@ -297,6 +297,29 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
 
     @Slot(str)
+    def saveCopy(self, name):
+        old_folder = self.__song__.sketch_folder
+        shutil.copytree(old_folder, self.__sketch_basepath__ / name)
+
+        for json_path in (self.__sketch_basepath__ / name).glob("**/*.json"):
+            try:
+                with open(json_path, "r+") as f:
+                    obj = json.load(f)
+                    f.seek(0)
+
+                    for i, track in enumerate(obj["tracks"]):
+                        for j, clip in enumerate(track["clips"]):
+                            if clip['path'] is not None:
+                                path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
+                                logging.error(f"Clip Path : {clip['path']}")
+                                obj["tracks"][i]["clips"][j]["path"] = path
+
+                    json.dump(obj, f)
+                    f.truncate()
+            except Exception as e:
+                logging.error(e)
+
+    @Slot(str)
     def loadSketch(self, sketch):
         logging.error(f"Loading sketch : {sketch}")
 

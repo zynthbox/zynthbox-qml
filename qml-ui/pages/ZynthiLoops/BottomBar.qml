@@ -118,6 +118,17 @@ Zynthian.Card {
                 Layout.fillWidth: true
             }
 
+            QQC2.Label {
+                visible: root.controlType === BottomBar.ControlType.Clip
+                text: {
+                    if (!controlObj || !controlObj.path) {
+                        return qsTr("No File Loaded");
+                    }
+                    var arr = controlObj.path.split('/');
+                    return qsTr("File: %1").arg(arr[arr.length - 1]);
+                }
+            }
+
             SidebarButton {
                 icon.name: "document-open"
                 visible: root.controlType === BottomBar.ControlType.Clip

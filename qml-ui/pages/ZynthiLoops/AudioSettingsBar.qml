@@ -177,7 +177,7 @@ GridLayout {
     ColumnLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
 
-        QQC2.Label {
+        /*QQC2.Label {
             Layout.alignment: Qt.AlignRight
             text: qsTr("Sounds :")
         }
@@ -192,31 +192,47 @@ GridLayout {
                     text: modelData
                 }
             }
+        }*/
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignLeft
+            text: qsTr("Sounds")
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            radius: 4
+            border.color: Kirigami.Theme.highlightColor
+            color: Kirigami.Theme.backgroundColor
+
+            ListView {
+                anchors.fill: parent
+                clip: true
+                model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
+                delegate: Kirigami.BasicListItem {
+                    label: modelData
+                    highlighted: false
+                    hoverEnabled: false
+                }
+            }
         }
 
         QQC2.Label {
-            Layout.alignment: Qt.AlignRight
             visible: controlObj.soundData.length <= 0
             text: "<No Metadata>"
         }
-        Kirigami.Separator {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 1
-        }
         QQC2.Label {
-            Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
             text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
         }
         QQC2.Label {
-            Layout.alignment: Qt.AlignRight
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
             text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
         }
         QQC2.Label {
             Layout.fillWidth: true
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip
-            horizontalAlignment: Text.AlignRight
             elide: Text.ElideMiddle
             text: {
                 if (!controlObj || !controlObj.path) {

@@ -100,7 +100,7 @@ Zynthian.ScreenPage {
     }
     Timer {
         id: stopLoadingTimer
-        interval: 5000
+        interval: 30000
         onTriggered: zynthian.stop_loading()
     }
 

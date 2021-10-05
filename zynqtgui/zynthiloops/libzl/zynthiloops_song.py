@@ -433,3 +433,9 @@ class zynthiloops_song(QObject):
         return self.__scale_model__[self.__selected_scale_index__]
     selectedScale = Property(str, get_selected_scale, notify=selected_scale_index_changed)
     ### END Property selectedScale
+
+    ### Property sketchFolderName
+    def get_sketch_folder_name(self):
+        return Path(self.sketch_folder).stem
+    sketchFolderName = Property(str, get_sketch_folder_name, constant=True)
+    ### END Property sketchFolderName

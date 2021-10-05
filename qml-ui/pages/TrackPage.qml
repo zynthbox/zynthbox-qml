@@ -329,20 +329,43 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            if (root.clip.isRecording) {
+                            if (!root.clip.isRecording) {
                                 root.clip.clear();
-                                root.clip.queueRecording();
+                                root.clip.queueRecording(
+                                    sourceComboModel.get(sourceCombo.currentIndex).value,
+                                    channelComboModel.get(channelCombo.currentIndex).value
+                                );
                             } else {
                                 root.clip.stopRecording();
                             }
                         }
                     }
                     QQC2.ComboBox {
+                        id: sourceCombo
+
+                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
-                            ListElement { text: "None" }
-                            ListElement { text: "Playgrid" }
+                            id: sourceComboModel
+
+                            ListElement { text: "Internal (Active Layer)"; value: "internal" }
+                            ListElement { text: "External (Audio In)"; value: "external" }
                         }
+                        textRole: "text"
+                    }
+                    QQC2.ComboBox {
+                        id: channelCombo
+
+                        enabled: sourceCombo.currentIndex === 1
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: channelComboModel
+
+                            ListElement { text: "Left Channel"; value: "1" }
+                            ListElement { text: "Right Channel"; value: "2" }
+                        }
+                        textRole: "text"
                     }
                 }
             }

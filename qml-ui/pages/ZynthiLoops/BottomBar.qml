@@ -244,8 +244,8 @@ Zynthian.Card {
                 },
                 Zynthian.TabbedControlViewAction {
                     id: waveAction
-                    text: qsTr("Audio Settings")
-                    page: Qt.resolvedUrl("AudioSettingsBar.qml")
+                    text: qsTr("Clip Settings")
+                    page: Qt.resolvedUrl("ClipSettingsBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },

@@ -570,9 +570,9 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
 
-    @Slot(None)
-    def queueRecording(self):
-        self.__song__.get_metronome_manager().queue_clip_record(self)
+    @Slot(str, str)
+    def queueRecording(self, source, channel):
+        self.__song__.get_metronome_manager().queue_clip_record(self, source, channel)
 
     @Slot(None)
     def stopRecording(self):

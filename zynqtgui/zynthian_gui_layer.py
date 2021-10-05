@@ -76,6 +76,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.reset_note_range()
 		self.remove_all_layers(True)
 		self.reset_midi_profile()
+		self.reset_midi_channels_status(range(16))
 
 	def fill_list(self):
 		self.list_data=[]
@@ -545,6 +546,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			# Mute Audio Layers & build list of layers to delete
 			layers_to_delete = []
+			midi_chans_to_delete = []
 			for root_layer in root_layers_to_delete:
 				# Midichain layers
 				midichain_layers = self.get_midichain_layers(root_layer)
@@ -568,6 +570,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				layers_to_delete.append(root_layer)
 				root_layer.mute_midi_out()
 				root_layer.mute_audio_out()
+				midi_chans_to_delete.append(root_layer.midi_chan)
 
 			self.zyngui.zynautoconnect(True)
 
@@ -585,6 +588,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Stop unused engines
 			if stop_unused_engines:
 				self.zyngui.screens['engine'].stop_unused_engines()
+
+			self.reset_midi_channels_status(midi_chans_to_delete)
 
 			# Recalculate selector and root_layers list
 			self.fill_list()
@@ -1760,6 +1765,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.clone_midi(i, j)
 				#elif zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					#self.remove_clone_midi(i, j)
+
+	def reset_midi_channels_status(self, channels):
+		for i in channels:
+			zyncoder.lib_zyncoder.set_midi_filter_note_low(i, 0)
+			zyncoder.lib_zyncoder.set_midi_filter_note_high(i, 127)
+			zyncoder.lib_zyncoder.set_midi_filter_octave_trans(i, 0)
+			zyncoder.lib_zyncoder.set_midi_filter_halftone_trans(i, 0)
+		for i in range(16):
+			for j in range(16):
+				if i != j and (i in channels or j in channels):
+					self.remove_clone_midi(i, j)
 
 	@Slot(int, int, result=bool)
 	def is_midi_cloned(self, from_chan: int, to_chan: int):

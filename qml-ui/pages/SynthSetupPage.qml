@@ -529,7 +529,6 @@ Zynthian.ScreenPage {
             property string mode: "sound"
 
             conflictMessageLabel.visible: saveDialog.mode === "soundset" ? zynthian.layer.soundset_file_exists(fileNameToSave) : zynthian.layer.layer_file_exists(fileNameToSave);
-            breadcrumb.visible: false
             headerText: saveDialog.mode === "soundset" ? qsTr("Save a Soundset file") : qsTr("Save a Sound file")
             rootFolder: saveDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
             noFilesMessage: saveDialog.mode === "soundset" ? qsTr("No Soundsets present") : qsTr("No sounds present")
@@ -599,7 +598,6 @@ Zynthian.ScreenPage {
             y: Math.round(parent.height/2 - height/2)
             width: Math.round(parent.width * 0.8)
             height: Math.round(parent.height * 0.8)
-            breadcrumb.visible: false
 
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
             rootFolder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"

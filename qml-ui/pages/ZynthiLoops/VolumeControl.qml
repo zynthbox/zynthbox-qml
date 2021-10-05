@@ -41,7 +41,7 @@ Rectangle {
 
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                Layout.leftMargin: 2
+                Layout.leftMargin: 4
 
                 minimumValue: -40
                 maximumValue: 10
@@ -49,11 +49,6 @@ Rectangle {
                 font.pointSize: 8
 
                 style: GaugeStyle {
-                    foreground: null
-                    background: Rectangle {
-                        color: "#ff888888"
-                        implicitWidth: 6
-                    }                    
                     valueBar: Rectangle {
                         color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
                         implicitWidth: 6
@@ -105,7 +100,31 @@ Rectangle {
                     width: implicitWidth
                     height: slider.availableHeight
                     radius: 2
-                    color: "#ff888888"
+                    color: "transparent"
+
+                    Canvas {
+                        readonly property real xCenter: width / 2
+                        readonly property real yCenter: height / 2
+                        property real shineLength: height * 0.95
+
+                        anchors.fill: parent
+                        z: 5
+
+                        onPaint: {
+                            var ctx = getContext("2d");
+                            ctx.reset();
+
+                            ctx.beginPath();
+                            ctx.rect(0, 0, width, height);
+
+                            var gradient = ctx.createLinearGradient(0, yCenter, width, yCenter);
+
+                            gradient.addColorStop(0, Qt.rgba(1, 1, 1, 0.08));
+                            gradient.addColorStop(1, Qt.rgba(1, 1, 1, 0.20));
+                            ctx.fillStyle = gradient;
+                            ctx.fill();
+                        }
+                    }
 
                     Rectangle {
                         id: valueBox
@@ -131,7 +150,7 @@ Rectangle {
 
         QQC2.Label {
             id: footerLabel
-            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            Layout.alignment: Qt.AlignCenter
         }
     }
 

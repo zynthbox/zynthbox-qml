@@ -75,10 +75,7 @@ Rectangle {
                         Layout.preferredWidth: privateProps.cellWidth
                         Layout.maximumWidth: privateProps.cellWidth
                         Layout.fillHeight: true
-                        headerText: "Master"
-
-                        border.width: 1
-                        border.color: Kirigami.Theme.highlightColor
+                        footerText: "Master"
 
                         Binding {
                             target: masterVolume.slider
@@ -95,6 +92,12 @@ Rectangle {
                                 zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
                             }
                         }
+                    }
+
+                    Kirigami.Separator {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
+                        color: "#ff31363b"
                     }
 
                     ListView {
@@ -115,10 +118,12 @@ Rectangle {
                             height: ListView.view.height
 
                             VolumeControl {
+                                property var audioLevelText: model.track.audioLevel.toFixed(2)
+
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                headerText: model.track.audioLevel.toFixed(2) + " (dB)"
+                                headerText: audioLevelText === "-40.00" ? "" : (audioLevelText + " (dB)")
                                 footerText: model.track.name
                                 audioLeveldB: model.track.audioLevel
 

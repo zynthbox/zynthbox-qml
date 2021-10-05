@@ -177,47 +177,6 @@ GridLayout {
     ColumnLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
 
-        /*QQC2.Label {
-            Layout.alignment: Qt.AlignRight
-            text: qsTr("Sounds :")
-        }
-
-        ColumnLayout {
-            Layout.alignment: Qt.AlignRight
-            Repeater {
-                model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
-
-                delegate: QQC2.Label {
-                    Layout.alignment: Qt.AlignRight
-                    text: modelData
-                }
-            }
-        }*/
-
-        QQC2.Label {
-            Layout.alignment: Qt.AlignLeft
-            text: qsTr("Sounds")
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: 4
-            border.color: Kirigami.Theme.highlightColor
-            color: Kirigami.Theme.backgroundColor
-
-            ListView {
-                anchors.fill: parent
-                clip: true
-                model: controlObj.hasOwnProperty("soundData") ? controlObj.soundData : []
-                delegate: Kirigami.BasicListItem {
-                    label: modelData
-                    highlighted: false
-                    hoverEnabled: false
-                }
-            }
-        }
-
         QQC2.Label {
             visible: controlObj.soundData.length <= 0
             text: "<No Metadata>"

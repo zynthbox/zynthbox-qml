@@ -102,7 +102,8 @@ QtObject {
         "track": "TrackPage.qml",
         "zynthiloops": "ZynthiLoops/main.qml",
         "song_arranger": "SongArranger/main.qml",
-        "sketch_copier": "SketchCopier/main.qml"
+        "sketch_copier": "SketchCopier/main.qml",
+        "sound_downloader": "SoundDownloaderPage.qml",
     }
 
     readonly property var dashboardScreens: {

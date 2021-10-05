@@ -57,6 +57,10 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
+                text: qsTr("Get New Sounds...")
+                onTriggered: zynthian.show_modal("sound_downloader")
+            }
+            Kirigami.Action {
                 text: qsTr("Load Soundset...")
                 onTriggered: {
                     pickerDialog.mode = "soundset";

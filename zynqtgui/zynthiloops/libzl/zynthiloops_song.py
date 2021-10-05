@@ -74,12 +74,12 @@ class zynthiloops_song(QObject):
             for i in range(0, 2):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
 
-            track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
-            self.__tracks_model__.add_track(track)
-            for i in range(0, 2):
-                clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
-                track.clipsModel.add_clip(clip)
-                #self.add_clip_to_part(clip, i)
+            for _ in range(0, 12):
+                track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
+                self.__tracks_model__.add_track(track)
+                for i in range(0, 2):
+                    clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
+                    track.clipsModel.add_clip(clip)
 
         self.bpm_changed.emit()
 

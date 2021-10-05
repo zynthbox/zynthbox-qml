@@ -87,7 +87,7 @@ class zynthiloops_track(QObject):
     clearable = Property(bool, clearable, constant=True)
 
     def deletable(self):
-        return True
+        return False
     deletable = Property(bool, deletable, constant=True)
 
     def nameEditable(self):

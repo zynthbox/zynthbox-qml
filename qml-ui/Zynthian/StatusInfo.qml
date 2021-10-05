@@ -277,7 +277,7 @@ MouseArea {
             Layout.topMargin: parent.height  -height
             QQC2.Label {
                 id: bpmLabel
-                text: zynthian.zynthiloops.song.bpm
+                text: zynthian.zynthiloops.song.selectedScale +" "+ zynthian.zynthiloops.song.bpm
                 font.pointSize: 9
             }
             Kirigami.Icon {
@@ -320,6 +320,22 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
+                /*MultiSwitchController {
+					controller: QtObject {
+						property QtObject ctrl: QtObject {
+							property int value: zynthian.zynthiloops.song.selectedScaleIndex
+							property int value0: 0
+							property int max_value: 11
+							property int step_size: 1
+						}
+					}
+					valueLabel: zynthian.zynthiloops.song.selectedScale
+				}*/
+            }
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
                 contentItem: ZynthiloopsDial {
                     id: volumeDial
                     text: qsTr("Volume")
@@ -333,11 +349,6 @@ MouseArea {
                         to: 100
                     }
                 }
-            }
-            Card {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
             }
 
             Card {

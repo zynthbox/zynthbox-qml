@@ -75,6 +75,22 @@ Rectangle {
                             anchors.rightMargin: 3
                         }
                     }
+                    tickmarkLabel: QQC2.Label {
+                        text: {
+                            switch (styleData.value) {
+                                case -40:
+                                    return "-40"
+                                case 0:
+                                    return "0"
+                                case 20:
+                                    return "+6"
+                                default:
+                                    return ""
+                            }
+                        }
+
+                        font: audioGauge.font
+                    }
                 }
             }
 

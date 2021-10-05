@@ -31,6 +31,8 @@ import org.kde.newstuff 1.0 as NewStuff
 
 import Zynthian 1.0 as Zynthian
 
+import "private" as Private
+
 Zynthian.SelectorPage {
     id: component
 
@@ -43,10 +45,6 @@ Zynthian.SelectorPage {
      */
     property alias configFile: newStuffEngine.configFile
 
-    view.delegate: newStuffDelegate
-    onItemActivated: {
-        proxyView.currentIndex = index;
-    }
     Component.onCompleted: {
         selector.newstuff_model = newStuffModel;
     }
@@ -99,39 +97,84 @@ Zynthian.SelectorPage {
     ]
     Component {
         id: newStuffDelegate
-        Zynthian.SelectorDelegate {
-            screenId: component.screenId
-            selector: ListView.view.parent.selector
-            onCurrentScreenIdRequested: ListView.view.parent.currentScreenIdRequested(screenId)
-            onItemActivated: ListView.view.parent.itemActivated(screenId, index)
-            onItemActivatedSecondary: ListView.view.parent.itemActivatedSecondary(screenId, index)
-            Kirigami.Icon {
-                id: updateAvailableBadge;
-                // We're filling the selector model's action_id with the newstuff status id
-                // A bit of a hack, but action_id is more a generic data container than anything else
-                opacity: (model.action_id == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
-                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
-                anchors {
-                    bottom: parent.bottom;
-                    right: parent.right;
-                    top: parent.top;
-                    rightMargin: proxyView.width + Kirigami.Units.smallSpacing
-                }
-                width: height;
-                source: "vcs-update-required";
+        QQC2.ItemDelegate {
+            id: nsDelegate
+            width: ListView.view.width
+            topPadding: Kirigami.Units.largeSpacing
+            leftPadding: Kirigami.Units.largeSpacing
+            bottomPadding: Kirigami.Units.largeSpacing
+            rightPadding: Kirigami.Units.largeSpacing
+            highlighted: ListView.view.activeFocus
+            onClicked: {
+                component.selector.current_index = index;
             }
-            Kirigami.Icon {
-                id: installedBadge;
-                opacity: (model.action_id == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
-                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
-                anchors {
-                    bottom: parent.bottom;
-                    right: parent.right;
-                    top: parent.top;
-                    rightMargin: proxyView.width + Kirigami.Units.smallSpacing
+            background: Private.DelegateBackground {
+                delegate: nsDelegate
+            }
+            contentItem: RowLayout {
+                Item {
+                    Layout.fillHeight: true
+                    Layout.maximumWidth: height
+                    Layout.minimumWidth: height
+                    Kirigami.Icon {
+                        anchors.fill: parent;
+                        visible: previewImage.status != Image.Ready;
+                        source: "viewimage";
+                    }
+                    Image {
+                        id: previewImage
+                        anchors.fill: parent;
+                        asynchronous: true;
+                        smooth: true;
+                        fillMode: Image.PreserveAspectFit;
+                        source: model.previewsSmall.length > 0 ? model.previewsSmall[0] : "viewimage";
+                    }
                 }
-                width: height;
-                source: "vcs-normal";
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    text: model.name
+                }
+                QQC2.Label {
+                    visible: installedBadge.visible
+                    text: "Installed"
+                }
+                QQC2.Label {
+                    visible: updateAvailableBadge.visible
+                    text: "Update Available"
+                }
+                Kirigami.Icon {
+                    id: installedBadge;
+                    visible: model.status == NewStuff.ItemsModel.InstalledStatus;
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: height
+                    source: "vcs-normal";
+                }
+                Kirigami.Icon {
+                    id: updateAvailableBadge;
+                    visible: model.status == NewStuff.ItemsModel.UpdateableStatus;
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: height
+                    source: "vcs-update-required";
+                }
+            }
+        }
+    }
+    Private.SelectorViewBackground {
+        anchors.fill: parent
+        ListView {
+            id: mainView
+            anchors {
+                fill: parent;
+                margins: Kirigami.Units.largeSpacing
+                rightMargin: proxyView.width + Kirigami.Units.smallSpacing + Kirigami.Units.largeSpacing
+            }
+            model: newStuffModel
+            delegate: newStuffDelegate
+            clip: true
+            currentIndex: component.selector.current_index
+            onCurrentIndexChanged: {
+                positionViewAtIndex(currentIndex, ListView.Contain);
             }
         }
     }
@@ -147,6 +190,7 @@ Zynthian.SelectorPage {
         pixelAligned: true
         clip: true
         model: newStuffModel
+        currentIndex: component.selector.current_index
         onCurrentIndexChanged: {
             positionViewAtIndex(currentIndex, ListView.Beginning);
         }
@@ -165,7 +209,6 @@ Zynthian.SelectorPage {
                 anchors.fill: parent;
                 ColumnLayout {
                     opacity: busyInstallingStuff.running ? 0.3 : 1
-                    Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
                     anchors {
                         fill: parent;
                         margins: Kirigami.Units.largeSpacing;
@@ -174,6 +217,14 @@ Zynthian.SelectorPage {
                         id: previewContainer;
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Kirigami.Icon {
+                            anchors {
+                                fill: parent;
+                                margins: Kirigami.Units.smallSpacing;
+                            }
+                            visible: previewImage.status != Image.Ready;
+                            source: "viewimage";
+                        }
                         Image {
                             id: previewImage;
                             anchors {
@@ -186,8 +237,7 @@ Zynthian.SelectorPage {
                             source: model.previews.length > 0 ? model.previews[0] : "";
                             Kirigami.Icon {
                                 id: updateAvailableBadge;
-                                opacity: (model.status == NewStuff.ItemsModel.UpdateableStatus) ? 1 : 0;
-                                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                                visible: model.status == NewStuff.ItemsModel.UpdateableStatus;
                                 anchors {
                                     top: parent.top;
                                     right: parent.right;
@@ -199,8 +249,7 @@ Zynthian.SelectorPage {
                             }
                             Kirigami.Icon {
                                 id: installedBadge;
-                                opacity: (model.status == NewStuff.ItemsModel.InstalledStatus) ? 1 : 0;
-                                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                                visible: model.status == NewStuff.ItemsModel.InstalledStatus;
                                 anchors {
                                     top: parent.top;
                                     right: parent.right;
@@ -265,9 +314,9 @@ Zynthian.SelectorPage {
                 }
                 height: Kirigami.Units.gridUnit * 3
                 width: height
-                opacity: (model.status == NewStuff.ItemsModel.InstallingStatus || model.status == NewStuff.ItemsModel.UpdatingStatus) ? 1 : 0;
-                Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
-                running: opacity > 0;
+                visible: model.status == NewStuff.ItemsModel.InstallingStatus || model.status == NewStuff.ItemsModel.UpdatingStatus;
+                running: visible;
+                background: Item {} // Quiet some warnings
                 QQC2.Label {
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -286,11 +335,10 @@ Zynthian.SelectorPage {
             bottom: view.bottom
             right: view.right
             left: view.left
-            margins: Kirigami.Units.smallSpacing
+            margins: Kirigami.Units.largeSpacing
         }
         height: Kirigami.Units.gridUnit * 5
-        opacity: newStuffEngine.isLoading ? 1 : 0;
-        Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+        visible: newStuffEngine.isLoading;
         Zynthian.Card {
             anchors {
                 top: parent.top
@@ -311,7 +359,8 @@ Zynthian.SelectorPage {
             }
             height: Kirigami.Units.gridUnit * 3
             width: height
-            running: parent.opacity > 0;
+            running: parent.visible;
+            background: Item {} // Quiet some warnings
         }
         QQC2.Label {
             id: busyWithEngineStuffLabel

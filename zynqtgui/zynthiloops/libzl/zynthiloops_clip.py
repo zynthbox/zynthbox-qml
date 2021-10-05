@@ -591,6 +591,7 @@ class zynthiloops_clip(QObject):
 
             self.sound_data_changed.emit()
             self.metadata_bpm_changed.emit()
+            self.metadata_audio_type_changed.emit()
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None
@@ -664,3 +665,14 @@ class zynthiloops_clip(QObject):
     def stop_audio(self):
         if self.audioSource is not None:
             self.audioSource.stop()
+
+    ### Property metadataAudioType
+    def get_metadata_audio_type(self):
+        try:
+            return self.audio_metadata["ZYNTHBOX_AUDIO_TYPE"][0]
+        except Exception as e:
+            logging.error(f"Error retrieving from metadata : {str(e)}")
+        return None
+    metadata_audio_type_changed = Signal()
+    metadataAudioType = Property(str, get_metadata_audio_type, notify=metadata_audio_type_changed)
+    ### END Property metadataAudioType

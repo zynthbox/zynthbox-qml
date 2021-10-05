@@ -263,6 +263,10 @@ MouseArea {
             visible: zynthian.status_information.midi_recorder.length > 0
         }
         QQC2.Label {
+            text: zynthian.last_note
+            font.pointSize: 9
+        }
+        QQC2.Label {
             id: metronomeLabel
             text: {
                 if (zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0 && zynthian.zynthiloops.currentBar >= 0) {

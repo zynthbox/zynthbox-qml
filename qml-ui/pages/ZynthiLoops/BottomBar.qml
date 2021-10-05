@@ -257,6 +257,13 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
+                    id: metadataSoundsAction
+                    text: qsTr("Sounds")
+                    page: Qt.resolvedUrl("MetadataSoundsBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
                     text: qsTr("Info")
                     page: Qt.resolvedUrl("InfoBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0

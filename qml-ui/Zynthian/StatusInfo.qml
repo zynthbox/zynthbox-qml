@@ -320,17 +320,22 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                /*MultiSwitchController {
-					controller: QtObject {
-						property QtObject ctrl: QtObject {
-							property int value: zynthian.zynthiloops.song.selectedScaleIndex
-							property int value0: 0
-							property int max_value: 11
-							property int step_size: 1
-						}
-					}
-					valueLabel: zynthian.zynthiloops.song.selectedScale
-				}*/
+                contentItem: ColumnLayout {
+                    ZynthiloopsMultiSwitch {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        controlObj: zynthian.zynthiloops.song
+                        controlProperty: "selectedScaleIndex"
+                        from: 0
+                        to: 11
+                        text: zynthian.zynthiloops.song.selectedScale
+                    }
+                    QQC2.Label {
+                        text: qsTr("Scale")
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
             }
             Card {
                 Layout.fillWidth: true

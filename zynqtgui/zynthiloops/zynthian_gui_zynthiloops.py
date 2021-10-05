@@ -98,7 +98,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_capture_port_a = self.jack_client.inports.register(f"capture_port_a")
         self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
-        self.recorder_process_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
+        self.recorder_process_internal_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
 
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -350,7 +350,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             libzl.startTimer(self.__song__.__bpm__)
 
-    def queue_clip_record(self, clip):
+    def queue_clip_record(self, clip, source, channel):
         layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
         self.update_recorder_jack_port()
         self.clip_to_record = clip
@@ -358,20 +358,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_{layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')}_{self.__song__.bpm}-BPM.clip.wav"
 
         #self.countInValue = countInBars * 4
-
-        # self.recorder_process = QProcess()
-        # self.recorder_process.setProgram("/usr/local/bin/jack_capture")
-        # self.recorder_process.setArguments([*self.recorder_process_arguments, self.clip_to_record_path])
-        # self.recorder_process.finished.connect(
-        #     lambda exitCode, exitStatus: self.recording_process_stopped(exitCode, exitStatus))
         logging.error(
-            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_arguments} {self.clip_to_record_path}")
+            f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
         self.is_recording_complete = False
         self.start_clip_recording = True
         self.clip_to_record.isRecording = True
         self.start_metronome_request()
-        self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
+
+        if source == 'internal':
+            self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
+        else:
+            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
+
         self.start_clip_recording = False
 
     def stop_recording(self):

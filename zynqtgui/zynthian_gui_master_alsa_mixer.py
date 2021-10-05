@@ -36,10 +36,12 @@ class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
         try:
-            card = alsaaudio.cards().index("Headphones")
-            self.__mixer = alsaaudio.Mixer("Headphone", 0, card)
-        except:
+            card = alsaaudio.cards().index("CODEC") #TODO: take whtever the real card is
+            mixer_name = alsaaudio.mixers(card)[0]
+            self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
+        except Exception as e:
             self.__mixer = None
+            logging.error(e)
 
     @Signal
     def volume_changed(self):

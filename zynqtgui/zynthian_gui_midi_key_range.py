@@ -86,7 +86,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 	@Slot(int, result=str)
 	def get_midi_note_name(self, num):
 		note_names = ("C","C#","D","D#","E","F","F#","G","G#","A","A#","B")
-		scale = int(num/12)-1
+		scale = int(num/12)-2
 		num = int(num%12)
 		return "{}{}".format(note_names[num],scale)
 

@@ -538,21 +538,21 @@ Zynthian.ScreenPage {
 
             conflictMessageLabel.visible: saveDialog.mode === "soundset" ? zynthian.layer.soundset_file_exists(fileNameToSave) : zynthian.layer.layer_file_exists(fileNameToSave);
             headerText: saveDialog.mode === "soundset" ? qsTr("Save a Soundset file") : qsTr("Save a Sound file")
-            rootFolder: saveDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
+            rootFolder: "/zynthian/zynthian-my-data/"
             noFilesMessage: saveDialog.mode === "soundset" ? qsTr("No Soundsets present") : qsTr("No sounds present")
             folderModel {
                 nameFilters: [saveDialog.mode === "soundset" ? "*.soundset" : "*.*.sound"]
             }
-            onVisibleChanged: folderModel.folder = rootFolder
+            onVisibleChanged: folderModel.folder = rootFolder + (pickerDialog.mode === "soundset" ? "soundsets/" : "sounds/")
 
             filesListView.delegate: Kirigami.BasicListItem {
                 width: ListView.view.width
                 highlighted: ListView.isCurrentItem
 
                 label: model.fileName
-                icon: "emblem-music-symbolic"
+                icon: model.fileIsDir ? "folder" : "emblem-music-symbolic"
                 QQC2.Label {
-                    visible: saveDialog.mode === sound
+                    visible: saveDialog.mode === "sound"
                     text: {
                         let parts = model.fileName.split(".");
                         if (parts.length < 2) {
@@ -576,8 +576,8 @@ Zynthian.ScreenPage {
                             path = path.slice(0, path.length-1)
                         }
 
-                        folderModel.folder = path
-                        filesListView.currentIndex = 0;
+                        saveDialog.folderModel.folder = path
+                        saveDialog.filesListView.currentIndex = 0;
                     } else {
                         saveDialog.fileNameToSave = model.fileName
                         saveDialog.fileSelected(model)
@@ -608,17 +608,17 @@ Zynthian.ScreenPage {
             height: Math.round(parent.height * 0.8)
 
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
-            rootFolder: pickerDialog.mode === "soundset" ? "/zynthian/zynthian-my-data/soundsets/" : "/zynthian/zynthian-my-data/sounds/"
+            rootFolder: "/zynthian/zynthian-my-data/"
             folderModel {
                 nameFilters: ["*.*." + pickerDialog.mode]
             }
-            onVisibleChanged: folderModel.folder = rootFolder
+            onVisibleChanged: folderModel.folder = rootFolder + (pickerDialog.mode === "soundset" ? "soundsets/" : "sounds/")
             filesListView.delegate: Kirigami.BasicListItem {
                 width: ListView.view.width
                 highlighted: ListView.isCurrentItem
 
                 label: model.fileName
-                icon: "emblem-music-symbolic"
+                icon: model.fileIsDir ? "folder" : "emblem-music-symbolic"
                 QQC2.Label {
                     visible: pickerDialog.mode === sound
                     text: {
@@ -644,13 +644,13 @@ Zynthian.ScreenPage {
                             path = path.slice(0, path.length-1)
                         }
 
-                        folderModel.folder = path
+                        pickerDialog.folderModel.folder = path
                     } else {
                         pickerDialog.fileSelected(model)
                         pickerDialog.accept()
                     }
 
-                    filesListView.currentIndex = 0;
+                    pickerDialog.filesListView.currentIndex = 0;
                 }
             }
             onFileSelected: {

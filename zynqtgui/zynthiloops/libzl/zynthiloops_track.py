@@ -27,6 +27,7 @@ import math
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
+from . import libzl
 from .zynthiloops_clips_model import zynthiloops_clips_model
 from .zynthiloops_clip import zynthiloops_clip
 
@@ -39,16 +40,17 @@ class zynthiloops_track(QObject):
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
-        self.__initial_volume__ = 67
+        self.__initial_volume__ = 0
         self.__volume__ = self.__initial_volume__
         self.__audio_level__ = -40
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
-        self.master_volume = (self.__song__.get_metronome_manager().get_master_volume() - 50)/50
+        self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
 
     def master_volume_changed(self):
-        self.master_volume = (self.__song__.get_metronome_manager().get_master_volume() - 50)/50
+        self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
+        logging.error(f"Master Volume : {self.master_volume} dB")
 
     def serialize(self):
         return {"name": self.__name__,
@@ -188,21 +190,7 @@ class zynthiloops_track(QObject):
         return self.__audio_level__
 
     def set_audioLevel(self, leveldB):
-        lower_limit = -40
-        upper_limit = 20
-        new_upper_limit = upper_limit - (1 - self.__volume__/100) * (upper_limit - lower_limit)
-
-        if self.master_volume is not None:
-            new_upper_limit = new_upper_limit - (1-self.master_volume) * (new_upper_limit - lower_limit)
-
-        # Calculate new value wrt volume
-        leveldB = self.map_range(leveldB, lower_limit, upper_limit, lower_limit, new_upper_limit)
-
-        if leveldB < -40:
-            self.__audio_level__ = -40
-        else:
-            self.__audio_level__ = leveldB
-
+        self.__audio_level__ = leveldB + self.__volume__ + self.master_volume
         self.audioLevelChanged.emit()
 
     audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)

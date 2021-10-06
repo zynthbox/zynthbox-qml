@@ -350,11 +350,11 @@ MouseArea {
                     text: qsTr("Volume")
                     controlObj: zynthian.master_alsa_mixer
                     controlProperty: "volume"
-                    valueString: qsTr("%1%").arg(Math.round((dial.value - 50)/50*100)) //FIXME: for some reason the silence point seems to be 50%?
+                    valueString: qsTr("%1%").arg(dial.value)
 
                     dial {
-                        stepSize: 2.5
-                        from: 50
+                        stepSize: 1
+                        from: 0
                         to: 100
                     }
                 }

@@ -44,7 +44,10 @@ def init():
     if not libzl is None:
         try:
             ### Type Definition
-            libzl.stopClips.argTypes = [ctypes.c_int, ]
+            libzl.stopClips.argTypes = [ctypes.c_int]
+
+            libzl.dBFromVolume.argtypes = [ctypes.c_float]
+            libzl.dBFromVolume.restype = ctypes.c_float
 
             libzl.SyncTimer_instance.restype = ctypes.c_void_p
 
@@ -132,6 +135,11 @@ def stopClips(clips: list):
 
         if libzl:
             libzl.stopClips(len(clips), arr)
+
+
+def dbFromVolume(vol: float):
+    if libzl:
+        return libzl.dBFromVolume(vol)
 
 
 class ClipAudioSource(QObject):

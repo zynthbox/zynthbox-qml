@@ -1684,7 +1684,6 @@ class zynthian_gui(QObject):
                     self.status_info["midi_clock"] = True
                 else:
                     self.status_info["midi"] = True
-                logging.error("TYPE {}".format(evtype))
 
                 # logging.info("MIDI_UI MESSAGE: {}".format(hex(ev)))
                 # logging.info("MIDI_UI MESSAGE DETAILS: {}, {}".format(chan,evtype))
@@ -1810,7 +1809,6 @@ class zynthian_gui(QObject):
                 elif evtype == 0x8:
                     self.screens["midi_chan"].midi_chan_activity(chan)
                     note = (ev & 0x7F00) >> 8
-                    logging.error("NOTE OFF {}".format(note))
                     self.__notes_on = list(filter(lambda a: a != note, self.__notes_on))
                     self.last_note_changed.emit()
 
@@ -1829,7 +1827,6 @@ class zynthian_gui(QObject):
                         self.stop_loading()
 
                     note = (ev & 0x7F00) >> 8
-                    logging.error("NOTE ON {}".format(note))
                     if not note in self.__notes_on:
                         self.__notes_on.append(note)
                         self.last_note_changed.emit()

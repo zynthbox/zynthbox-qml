@@ -88,7 +88,7 @@ class zynthiloops_clip(QObject):
         logging.error(f"Track volume changed : {self.track.volume}")
 
         if self.audioSource is not None:
-            self.audioSource.set_volume(self.track.volume/100)
+            self.audioSource.set_volume(self.track.volume)
 
     @Signal
     def current_beat_changed(self):

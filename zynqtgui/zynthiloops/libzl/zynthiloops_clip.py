@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import math
+import shutil
 
 from datetime import datetime
 from pathlib import Path
@@ -428,7 +429,16 @@ class zynthiloops_clip(QObject):
         return self.__path__
 
     def set_path(self, path):
-        self.__path__ = path
+        selected_path = Path(path)
+        wav_path = Path(self.__song__.sketch_folder) / 'wav'
+
+        if selected_path.parent != wav_path:
+            logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({wav_path / selected_path.name})")
+            shutil.copy2(selected_path, wav_path / selected_path.name)
+        else:
+            logging.error(f"Clip({wav_path / selected_path.name}) is from same sketch")
+
+        self.__path__ = str(wav_path / selected_path.name)
         self.stop()
 
         if self.audioSource is not None:

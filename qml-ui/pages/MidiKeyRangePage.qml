@@ -83,7 +83,7 @@ Zynthian.ScreenPage {
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
-                        text: qsTr("Lower Half (L)")
+                        text: qsTr("Lower (L)")
                         checkable: true
                         checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
                         onToggled: {
@@ -93,7 +93,7 @@ Zynthian.ScreenPage {
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
-                        text: qsTr("Higher Half (H)")
+                        text: qsTr("Higher (H)")
                         checkable: true
                         checked: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
                         onToggled: {

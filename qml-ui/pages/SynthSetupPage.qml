@@ -76,7 +76,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Get New Soundsets...")
-                onTriggered: zynthian.show_modal("soundsets_downloader")
+                onTriggered: zynthian.show_modal("soundset_downloader")
             }
             Kirigami.Action {
                 text: qsTr("Clear Sound")

@@ -1,5 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -43,10 +44,11 @@ QQC2.Dialog {
 
     modal: true
 
-    y: saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(parent.height/2 - height/2)
-    x: Math.round(parent.width/2 - width/2)
-    width: Math.round(parent.width * 0.8)
-    height: saveMode && Qt.inputMethod.visible ? Math.round(parent.height / 2) : Math.round(parent.height * 0.8)
+    y: pickerDialog.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
+    x: pickerDialog.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
+
+    width: Math.round(header.Window.width * 0.8)
+    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
     z: 999999999
 
     onAccepted: filesListView.selectedModelData = null

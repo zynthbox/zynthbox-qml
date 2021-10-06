@@ -324,10 +324,6 @@ Zynthian.Card {
         id: pickerDialog
         parent: root.parent
 
-        x: parent.width/2 - width/2
-        y: parent.height/2 - height/2
-        width: Math.round(parent.width * 0.8)
-        height: Math.round(parent.height * 0.8)
 
         headerText: qsTr("Pick an audio file")
         rootFolder: "/zynthian/zynthian-my-data"

@@ -188,7 +188,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
 
         if midi_chan < self.__start_midi_chan or midi_chan >= self.__start_midi_chan + self.__layers_count:
-            self.set_start_midi_chan(math.floor(midi_chan / 5) * 5)
+            return
         for i, item in enumerate(self.list_data):
             if midi_chan == item[1]:
                 self.current_index = i

@@ -12,6 +12,8 @@ Rectangle {
     property alias audioLeveldB: audioGauge.value
     property alias slider: slider
 
+    signal doubleClicked();
+
     id: control
     border.color: Kirigami.Theme.highlightColor
     border.width: highlight ? 1 : 0
@@ -173,6 +175,8 @@ Rectangle {
     MouseArea {
         property real startY
         property real startValue
+
+        id: mouseArea
         anchors.fill: parent
 
         onPressed: {
@@ -185,6 +189,9 @@ Rectangle {
             let floored = Math.floor(value/slider.stepSize) * slider.stepSize;
 
             slider.value = value;
+        }
+        onDoubleClicked: {
+            control.doubleClicked();
         }
     }
 }

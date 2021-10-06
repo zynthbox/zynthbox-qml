@@ -39,7 +39,8 @@ class zynthiloops_track(QObject):
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
-        self.__volume__ = 67
+        self.__initial_volume__ = 67
+        self.__volume__ = self.__initial_volume__
         self.__audio_level__ = -40
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
@@ -156,6 +157,11 @@ class zynthiloops_track(QObject):
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 
+    ### Property initialVolume
+    def get_initial_volume(self):
+        return self.__initial_volume__
+    initialVolume = Property(int, get_initial_volume, constant=True)
+    ### END Property initialVolume
 
     def type(self):
         return self.__type__

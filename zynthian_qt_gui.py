@@ -2513,6 +2513,19 @@ class zynthian_gui(QObject):
     def sketch_copier(self):
         return self.screens["sketch_copier"]
 
+    @Slot(str, result='QVariantMap')
+    def getWavData(self, path):
+        try:
+            f = SoundFile(path)
+            return {
+                "frames": f.frames,
+                "sampleRate": f.samplerate,
+                "channels": f.channels,
+                "duration": f.frames/f.samplerate
+            }
+        except:
+            return None
+
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
     is_loading_changed = Signal()

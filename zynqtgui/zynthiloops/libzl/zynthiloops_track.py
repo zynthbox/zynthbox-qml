@@ -207,6 +207,18 @@ class zynthiloops_track(QObject):
 
     audioLevel = Property(float, get_audioLevel, set_audioLevel, notify=audioLevelChanged)
 
+    @Slot(None, result=bool)
+    def isEmpty(self):
+        is_empty = True
+
+        for clip_index in range(0, self.__clips_model__.count):
+            clip: zynthiloops_clip = self.__clips_model__.getClip(clip_index)
+            if clip.path is not None and len(clip.path) > 0:
+                is_empty = False
+                break
+
+        return is_empty
+
     # Helper method to map value from one range to another
     @staticmethod
     def map_range(sourceNumber, fromA, fromB, toA, toB):

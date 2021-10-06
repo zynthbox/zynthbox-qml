@@ -566,23 +566,7 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-                onClicked: {
-                    console.log(model.fileName, model.filePath)
-
-                    if (model.fileIsDir) {
-                        var path = model.filePath
-
-                        if (path.endsWith("/")) {
-                            path = path.slice(0, path.length-1)
-                        }
-
-                        saveDialog.folderModel.folder = path
-                        saveDialog.filesListView.currentIndex = 0;
-                    } else {
-                        saveDialog.fileNameToSave = model.fileName
-                        saveDialog.fileSelected(model)
-                    }
-                }
+                onClicked: saveDialog.filesListView.selectItem(model)
             }
 
             onFileSelected: {
@@ -634,24 +618,7 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-                onClicked: {
-                    console.log(model.fileName, model.filePath)
-
-                    if (model.fileIsDir) {
-                        var path = model.filePath
-
-                        if (path.endsWith("/")) {
-                            path = path.slice(0, path.length-1)
-                        }
-
-                        pickerDialog.folderModel.folder = path
-                    } else {
-                        pickerDialog.fileSelected(model)
-                        pickerDialog.accept()
-                    }
-
-                    pickerDialog.filesListView.currentIndex = 0;
-                }
+                onClicked: pickerDialog.filesListView.selectItem(model)
             }
             onFileSelected: {
                 console.log(file.filePath);

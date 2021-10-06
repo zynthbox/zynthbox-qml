@@ -62,7 +62,7 @@ Zynthian.ScreenPage {
             text: qsTr("Sketch")
 
             Kirigami.Action {
-                text: qsTr("Save Sketch")
+                text: qsTr("Save")
                 onTriggered: {
                     if (zynthian.zynthiloops.sketchIsTemp()) {
                         fileNameDialog.dialogType = "save";

@@ -399,6 +399,7 @@ MouseArea {
                     zynthian.zynthiloops.stopAllPlayback();
                     zynthian.playgrid.stopMetronomeRequest();
                     zynthian.song_arranger.stop();
+                    zynthian.zynthiloops.resetMetronome();
                 }
             }
         }

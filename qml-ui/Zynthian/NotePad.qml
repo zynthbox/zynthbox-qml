@@ -26,15 +26,16 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import org.zynthian.quick 1.0 as ZynQuick
 
-QQC2.Button {
+Item {
     id: component
     property bool positionalVelocity
     property var note
+    property bool highlightOctaveStart: true
+    signal notePlayed(QtObject note, int velocity);
 
     // Pitch is -8192 to 8191 inclusive
     property int pitchValue: Math.max(-8192, Math.min(slidePoint.slideX * 8192 / width, 8191))
@@ -46,83 +47,81 @@ QQC2.Button {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    property color focusColor: Kirigami.Theme.focusColor
+    property color firstNoteBackground: component.highlightOctaveStart ? Kirigami.Theme.focusColor : backgroundColor
     property color foregroundColor: Kirigami.Theme.backgroundColor
     property color backgroundColor: Kirigami.Theme.textColor
     property color borderColor: foregroundColor
     property color playingBackgroundColor: "#8bc34a"
     property color playingForegroundColor: foregroundColor
 
-    background: Item {
-        RowLayout {
-            visible: component.note.subnotes.length > 0
-            anchors.fill: parent
-            spacing: 0
-            Repeater {
-                model: component.note.subnotes
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    color: modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.focusColor : component.backgroundColor)
-                    QQC2.Label {
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        clip: true
-                        color: component.foregroundColor
-                        text: modelData.name + modelData.octave
-                    }
+    RowLayout {
+        visible: component.note.subnotes.length > 0
+        anchors.fill: parent
+        spacing: 0
+        Repeater {
+            model: component.note.subnotes
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.firstNoteBackground : component.backgroundColor)
+                Text {
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    clip: true
+                    color: component.foregroundColor
+                    text: modelData.name + modelData.octave
                 }
             }
         }
-        Rectangle {
-            visible: component.note.subnotes.length === 0
-            anchors.fill: parent
-            color: {
-                var color = component.backgroundColor;
-                if (component.note) {
-                    if (component.note.isPlaying) {
-                        color = component.playingBackgroundColor;
+    }
+    Rectangle {
+        visible: component.note.subnotes.length === 0
+        anchors.fill: parent
+        color: {
+            var color = component.backgroundColor;
+            if (component.note) {
+                if (component.note.isPlaying) {
+                    color = component.playingBackgroundColor;
+                } else {
+                    if (component.scale !== "chromatic" &&
+                        component.note.midiNote % 12 === 0
+                    ) {
+                        color = component.firstNoteBackground;
                     } else {
-                        if (component.scale !== "chromatic" &&
-                            component.note.midiNote % 12 === 0
-                        ) {
-                            color = component.focusColor;
-                        } else {
-                            color = component.backgroundColor;
-                        }
+                        color = component.backgroundColor;
                     }
                 }
-                return color;
             }
-            QQC2.Label {
-                anchors.fill: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                clip: true
-                color: component.foregroundColor
-                text: {
-                    var text = "";
-                    if (component.note && component.note.name != "") {
-                        if (component.scale == "major") {
-                            text = component.note.name
-                        } else {
-                            text = component.note.name + component.note.octave
-                        }
-                    }
-                    return text;
-                }
-            }
+            return color;
         }
-        Rectangle {
+        Text {
             anchors.fill: parent
-            radius: 2
-            border {
-                width: 1
-                color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            clip: true
+            color: component.foregroundColor
+            text: {
+                var text = "";
+                if (component.note && component.note.name != "") {
+                    if (component.scale == "major") {
+                        text = component.note.name
+                    } else {
+                        text = component.note.name + component.note.octave
+                    }
+                }
+                return text;
             }
-            color: "transparent"
         }
+    }
+    Rectangle {
+        anchors.fill: parent
+        radius: 2
+        border {
+            width: 1
+            color: parent.focus ? Kirigami.Theme.highlightColor : "#e5e5e5"
+        }
+        color: "transparent"
     }
 
     MultiPointTouchArea {
@@ -142,13 +141,10 @@ QQC2.Button {
                             // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
                             velocityValue = slidePoint.pressure > 0.99999 ? 64 : Math.floor(slidePoint.pressure * 127);
                         }
-                        component.down = true;
-                        component.focus = true;
                         playingNote = component.note;
                         ZynQuick.PlayGridManager.setNoteOn(playingNote, velocityValue)
+                        component.notePlayed(playingNote, velocityValue);
                     } else {
-                        component.down = false;
-                        component.focus = false;
                         ZynQuick.PlayGridManager.setNoteOff(playingNote)
                         ZynQuick.PlayGridManager.pitch = 0;
                         ZynQuick.PlayGridManager.modulation = 0;

@@ -83,6 +83,8 @@ class zynthiloops_song(QObject):
 
         self.bpm_changed.emit()
 
+        (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
+
     def serialize(self):
         return {"name": self.__name__,
                 "bpm": self.__bpm__,

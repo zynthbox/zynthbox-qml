@@ -85,7 +85,7 @@ Rectangle {
 
                         slider {
                             value: zynthian.master_alsa_mixer.volume
-                            from: 50
+                            from: 0
                             to: 100
                             stepSize: 1
                             onValueChanged: {

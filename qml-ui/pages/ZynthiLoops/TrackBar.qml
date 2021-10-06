@@ -44,6 +44,7 @@ GridLayout {
     QQC2.Button {
         Layout.alignment: Qt.alignCenter
         text: "Track Editor..."
+        visible: !bottomBar.controlObj.isEmpty()
 		onClicked: {
 			zynthian.current_modal_screen_id = "track"
 		}

@@ -414,6 +414,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.stop_metronome_request()
         self.recording_complete.emit()
 
+    @Slot(None)
+    def startMetronomeRequest(self):
+        self.start_metronome_request()
+
     def start_metronome_request(self):
         self.metronome_running_refcount += 1
 
@@ -440,6 +444,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount == 0:
             self.metronome_schedule_stop = True
 
+    @Slot(None)
+    def resetMetronome(self):
+        if self.metronome_running_refcount > 0:
+            logging.error(f"Resetting metronome")
+            self.metronome_running_refcount = 0
+            self.metronome_schedule_stop = True
+
     def metronome_update(self, beat):
         self.__current_beat__ = beat
 
@@ -459,7 +470,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
-                self.metronome_running_changed.emit()
 
                 self.click_track_click.stop()
                 self.click_track_clack.stop()
@@ -468,6 +478,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.current_beat_changed.emit()
                 self.current_bar_changed.emit()
                 self.metronome_schedule_stop = False
+                self.metronome_running_changed.emit()
             else:
                 self.__current_bar__ += 1
                 self.current_bar_changed.emit()

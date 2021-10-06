@@ -269,18 +269,20 @@ QQC2.Dialog {
             visible: wavData !== null
 
             Layout.preferredWidth: Kirigami.Units.gridUnit*12
-            Layout.fillHeight: true
-
-            QQC2.Label {
-                text: "Duration: " + wavData ? (wavData["frames"]/wavData["samplerRate"]).toFixed(2) : ""
+            Layout.maximumWidth: Kirigami.Units.gridUnit*12
+            Layout.alignment: Qt.AlignTop
+            
+            Kirigami.BasicListItem {
+              label: qsTr("Duration: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["duration"] ? filePropertiesSection.wavData["duration"].toFixed(2) : "")
+              visible: true
             }
-            QQC2.Label {
-                visible: wavData && wavData["channels"]
-                text: "Channels: " + wavData && wavData["channels"] ? wavData["channels"] : ""
+            Kirigami.BasicListItem {
+              label: qsTr("Channels: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["channels"] ? filePropertiesSection.wavData["channels"] : "")
+              visible: filePropertiesSection.wavData && filePropertiesSection.wavData["channels"]
             }
-            QQC2.Label {
-                visible: wavData && wavData["sampleRate"]
-                text: "Sample Rate: " + wavData && wavData["sampleRate"] ? wavData["sampleRate"] : ""
+            Kirigami.BasicListItem {
+              label: qsTr("Sample Rate: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["sampleRate"] ? filePropertiesSection.wavData["sampleRate"] : "")
+              visible: filePropertiesSection.wavData && filePropertiesSection.wavData["sampleRate"]
             }
         }
     }

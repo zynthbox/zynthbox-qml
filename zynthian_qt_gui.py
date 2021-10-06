@@ -2293,8 +2293,9 @@ class zynthian_gui(QObject):
 
     def get_active_midi_channel(self):
         if self.curlayer == None:
-            return -1
-        return self.curlayer.midi_chan
+            return lib_zyncoder.get_midi_active_chan()
+        else:
+            return self.curlayer.midi_chan
 
     def get_current_screen_id(self):
         if self.modal_screen:

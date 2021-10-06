@@ -1252,6 +1252,16 @@ class zynthian_gui(QObject):
             logging.error("KEYBOARD")
             self.miniPlayGridToggle.emit()
 
+        elif cuia == "ZL_PLAY_TOGGLE":
+            zl = self.screens["zynthiloops"]
+            if zl.isMetronomeRunning:
+                zl.stopAllPlayback();
+                self.screens["playgrid"].stop_metronome_request()
+                self.screens["song_arranger"].stop()
+                zl.resetMetronome()
+            else:
+                zl.start_metronome_request()
+
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:

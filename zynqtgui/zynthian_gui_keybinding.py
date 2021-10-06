@@ -133,6 +133,7 @@ class zynthian_gui_keybinding(QObject):
 			"DECREASE" : { "modifier": 0, "keysym": "-" },
 
 			"KEYBOARD" : { "modifier": 0, "keysym": "k" },
+			"ZL_PLAY_TOGGLE" : { "modifier": 0, "keysym": "p" },
 		}
 	}
 

@@ -104,7 +104,7 @@ QtObject {
         "song_arranger": "SongArranger/main.qml",
         "sketch_copier": "SketchCopier/main.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
-        "soundsets_downloader": "SoundsetsDownloaderPage.qml",
+        "soundset_downloader": "SoundsetsDownloaderPage.qml",
     }
 
     readonly property var dashboardScreens: {

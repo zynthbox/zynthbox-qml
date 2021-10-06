@@ -62,8 +62,8 @@ Zynthian.ScreenPage {
         }
         Zynthian.Card {
             Layout.alignment: Qt.AlignCenter
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            Layout.preferredHeight: Layout.preferredWidth
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 10
             Layout.fillWidth: false
             Layout.fillHeight: false
             contentItem: Item {
@@ -83,7 +83,7 @@ Zynthian.ScreenPage {
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
-                        text: qsTr("Low Half")
+                        text: qsTr("Lower Half (L)")
                         checkable: true
                         checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
                         onToggled: {
@@ -93,7 +93,7 @@ Zynthian.ScreenPage {
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
-                        text: qsTr("High Half")
+                        text: qsTr("Higher Half (H)")
                         checkable: true
                         checked: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
                         onToggled: {
@@ -126,6 +126,9 @@ Zynthian.ScreenPage {
                 text: "-"
                 onClicked: zynthian.midi_key_range.note_low_controller.value = Math.max(0, zynthian.midi_key_range.note_low_controller.value - 1)
             }
+            QQC2.Label {
+                text: qsTr("Low note: %1").arg(zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_low_controller.value)))
+            }
             QQC2.Button {
                 text: "+"
                 onClicked: zynthian.midi_key_range.note_low_controller.value = Math.min(126, zynthian.midi_key_range.note_low_controller.value + 1)
@@ -140,6 +143,9 @@ Zynthian.ScreenPage {
             QQC2.Button {
                 text: "-"
                 onClicked: zynthian.midi_key_range.note_high_controller.value = Math.max(0, zynthian.midi_key_range.note_high_controller.value - 1)
+            }
+            QQC2.Label {
+                text: qsTr("High note: %1").arg(zynthian.midi_key_range.get_midi_note_name(Math.round(zynthian.midi_key_range.note_high_controller.value)))
             }
             QQC2.Button {
                 text: "+"

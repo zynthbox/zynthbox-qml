@@ -143,11 +143,6 @@ Zynthian.ScreenPage {
         id: sessionPickerDialog
         parent: root
 
-        x: parent.width/2 - width/2
-        y: parent.height/2 - height/2
-        width: Math.round(parent.width * 0.8)
-        height: Math.round(parent.height * 0.8)
-
         headerText: qsTr("Pick a session")
         rootFolder: "/zynthian/zynthian-my-data/sessions"
         folderModel {
@@ -161,11 +156,6 @@ Zynthian.ScreenPage {
     Zynthian.FilePickerDialog {
         id: sketchPickerDialog
         parent: root
-
-        x: parent.width/2 - width/2
-        y: parent.height/2 - height/2
-        width: Math.round(parent.width * 0.8)
-        height: Math.round(parent.height * 0.8)
 
         headerText: qsTr("Pick a sketch")
         rootFolder: "/zynthian/zynthian-my-data/sketches"

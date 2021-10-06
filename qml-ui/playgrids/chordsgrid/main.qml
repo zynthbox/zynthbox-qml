@@ -178,7 +178,6 @@ Zynthian.BasePlayGrid {
         ChordsGrid {
             model: _private.model
             positionalVelocity: _private.positionalVelocity
-            playgrid: component
         }
     }
 
@@ -187,7 +186,6 @@ Zynthian.BasePlayGrid {
         ChordsGrid {
             model: _private.miniGridModel
             positionalVelocity: _private.positionalVelocity
-            playgrid: component
         }
     }
 

@@ -49,6 +49,10 @@ QQC2.Dialog {
     height: saveMode && Qt.inputMethod.visible ? Math.round(parent.height / 2) : Math.round(parent.height * 0.8)
     z: 999999999
 
+    onAccepted: filesListView.selectedModelData = null
+    onRejected: filesListView.selectedModelData = null
+    onDiscarded: filesListView.selectedModelData = null
+
     header: ColumnLayout{
         spacing: 8
 
@@ -91,7 +95,6 @@ QQC2.Dialog {
     }
     onVisibleChanged: nameFiled.text = ""
     footer: QQC2.Control {
-        visible: pickerDialog.saveMode
         leftPadding: pickerDialog.leftPadding
         topPadding: Kirigami.Units.smallSpacing
         rightPadding: pickerDialog.rightPadding
@@ -106,6 +109,16 @@ QQC2.Dialog {
                     id: nameFiled
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.6
+                    onTextChanged: {
+                        if (filesListView.selectedModelData) {
+                            filesListView.selectedModelData.fileName = text;
+                        } else {
+                            filesListView.selectedModelData = {};
+                            filesListView.selectedModelData.fileName = nameFiled.text;
+                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                            pickerDialog.fileSelected(filesListView.selectedModelData);
+                        }
+                    }
                 }
             }
             QQC2.Label {
@@ -128,15 +141,27 @@ QQC2.Dialog {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
-                    text: conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save")
-                    enabled: nameFiled.text.length > 0
+                    text: {
+                        if (pickerDialog.saveMode) {
+                            return conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save");
+                        } else {
+                            return qsTr("Load")
+                        }
+                    }
+                    enabled: filesListView.selectedModelData !== null
                     onClicked: {
-                        if (nameFiled.text.length > 0) {
-                            let file = {};
-                            file.fileName = nameFiled.text;
-                            file.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
-                            pickerDialog.fileSelected(file);
+                        /*if (pickerDialog.saveMode) {
+                            if (nameFiled.text.length > 0) {
+                                let file = {};
+                                file.fileName = nameFiled.text;
+                                file.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                                pickerDialog.fileSelected(file);
+                                pickerDialog.accept();
+                            }
+                        } else*/ {
+                            fileSelected(filesListView.selectedModelData);
                             pickerDialog.accept();
+                            filesListView.currentIndex = 0;
                         }
                     }
                 }
@@ -152,6 +177,26 @@ QQC2.Dialog {
             contentItem: ListView {
                 id: filesListView
                 focus: true
+                property var selectedModelData: null
+                function selectItem(model) {
+                    console.log(model.fileName, model.filePath, model.index)
+                    if (model.fileIsDir) {
+                        var path = model.filePath;
+
+                        if (path.endsWith("/")) {
+                            path = path.slice(0, path.length - 1);
+                        }
+
+                        folderModel.folder = path;
+                        filesListView.currentIndex = 0;
+                    } else {
+                        filesListView.selectedModelData = model;
+                        if (pickerDialog.saveMode) {
+                            nameFiled.text = model.fileName;
+                        }
+                        pickerDialog.filesListView.currentIndex = model.index;
+                    }
+                }
 
                 QQC2.Label {
                     id: noFilesMessage
@@ -184,26 +229,7 @@ QQC2.Dialog {
                             return "file-catalog-symbolic"
                         }
                     }
-                    onClicked: {
-                        console.log(model.fileName, model.filePath)
-
-                        if (model.fileIsDir) {
-                            var path = model.filePath
-
-                            if (path.endsWith("/")) {
-                                path = path.slice(0, path.length-1)
-                            }
-
-                            folderModel.folder = path
-                            filesListView.currentIndex = 0;
-                        } else if (pickerDialog.saveMode) {
-                            nameFiled.text = model.fileName
-                        } else {
-                            fileSelected(model)
-                            pickerDialog.accept()
-                            filesListView.currentIndex = 0;
-                        }
-                    }
+                    onClicked: filesListView.selectItem(model)
                 }
             }
     }

@@ -52,7 +52,6 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine
-from soundfile import SoundFile
 
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
@@ -336,12 +335,12 @@ class zynthian_gui(QObject):
         "94": "MODAL_ALSA_MIXER",
         "95": "MODAL_STEPSEQ",
         "96": "NAVIGATE_RIGHT",
-        "101": "LAYER_ONE",
-        "102": "LAYER_TWO",
-        "103": "LAYER_THREE",
-        "104": "LAYER_FOUR",
-        "105": "LAYER_FIVE",
-        "106": "LAYER_SIX",
+        "101": "LAYER_1",
+        "102": "LAYER_2",
+        "103": "LAYER_3",
+        "104": "LAYER_4",
+        "105": "LAYER_5",
+        "106": "LAYER_6",
         "107": "INCREASE",
         "108": "DECREASE",
         "109": "KEYBOARD",
@@ -1216,18 +1215,38 @@ class zynthian_gui(QObject):
         ):
             self.toggle_modal("stepseq")
 
-        elif cuia == "LAYER_ONE":
+        elif cuia == "LAYER_1":
             self.screens["layer"].activate_midichan_layer(0)
-        elif cuia == "LAYER_TWO":
+        elif cuia == "LAYER_2":
             self.screens["layer"].activate_midichan_layer(1)
-        elif cuia == "LAYER_THREE":
+        elif cuia == "LAYER_3":
             self.screens["layer"].activate_midichan_layer(2)
-        elif cuia == "LAYER_FOUR":
+        elif cuia == "LAYER_4":
             self.screens["layer"].activate_midichan_layer(3)
-        elif cuia == "LAYER_FIVE":
+        elif cuia == "LAYER_5":
             self.screens["layer"].activate_midichan_layer(4)
-        elif cuia == "LAYER_SIX":
+        elif cuia == "LAYER_6":
             self.screens["layer"].activate_midichan_layer(5)
+        elif cuia == "LAYER_7":
+            self.screens["layer"].activate_midichan_layer(6)
+        elif cuia == "LAYER_8":
+            self.screens["layer"].activate_midichan_layer(7)
+        elif cuia == "LAYER_9":
+            self.screens["layer"].activate_midichan_layer(8)
+        elif cuia == "LAYER_10":
+            self.screens["layer"].activate_midichan_layer(9)
+        elif cuia == "LAYER_11":
+            self.screens["layer"].activate_midichan_layer(10)
+        elif cuia == "LAYER_12":
+            self.screens["layer"].activate_midichan_layer(11)
+        elif cuia == "LAYER_13":
+            self.screens["layer"].activate_midichan_layer(12)
+        elif cuia == "LAYER_14":
+            self.screens["layer"].activate_midichan_layer(13)
+        elif cuia == "LAYER_15":
+            self.screens["layer"].activate_midichan_layer(14)
+        elif cuia == "LAYER_16":
+            self.screens["layer"].activate_midichan_layer(15)
 
         elif cuia == "KEYBOARD":
             logging.error("KEYBOARD")
@@ -2493,18 +2512,6 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sketch_copier(self):
         return self.screens["sketch_copier"]
-
-    @Slot(str, result='QVariantMap')
-    def getWavData(self, path):
-        try:
-            f = SoundFile(path)
-            return {
-                "frames": f.frames,
-                "sampleRate": f.samplerate,
-                "channels": f.channels
-            }
-        except:
-            return None
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

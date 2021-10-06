@@ -70,6 +70,13 @@ Rectangle {
                     Layout.fillHeight: true
                     spacing: 1
 
+                    Connections {
+                        target: zynthian.status_information
+                        onStatus_changed: {
+                            // masterVolume.audioLeveldB = zynthian.status_information.peakB;
+                        }
+                    }
+
                     VolumeControl {
                         id: masterVolume
                         Layout.preferredWidth: privateProps.cellWidth

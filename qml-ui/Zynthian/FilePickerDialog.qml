@@ -172,14 +172,23 @@ QQC2.Dialog {
     }
 
 
-    contentItem: QQC2.ScrollView {
+    contentItem: RowLayout {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        
+        QQC2.ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             contentItem: ListView {
                 id: filesListView
                 focus: true
+                onCurrentIndexChanged: {
+                    filesListView.readWavData();
+                }
+
                 property var selectedModelData: null
+
                 function selectItem(model) {
                     console.log(model.fileName, model.filePath, model.index)
                     if (model.fileIsDir) {
@@ -200,6 +209,20 @@ QQC2.Dialog {
                     }
                 }
 
+                function readWavData() {
+                    var filePath = folderModel.get(filesListView.currentIndex, "filePath");
+                    console.log("Highlighted filePath :", filePath)
+
+                    if (filePath.endsWith(".wav")){
+                        var wavData = zynthian.getWavData(filePath);
+                        filePropertiesSection.wavData = wavData;
+
+                        console.log("Wav Data :", JSON.stringify(wavData));
+                    } else {
+                        filePropertiesSection.wavData = null;
+                    }
+                }
+
                 QQC2.Label {
                     id: noFilesMessage
                     parent: filesListView
@@ -215,6 +238,9 @@ QQC2.Dialog {
                     showDirs: true
                     showDirsFirst: true
                     showDotAndDotDot: false
+                    onFolderChanged: {
+                        filesListView.readWavData();
+                    }
                 }
                 delegate: Kirigami.BasicListItem {
                     width: ListView.view.width
@@ -234,6 +260,29 @@ QQC2.Dialog {
                     onClicked: filesListView.selectItem(model)
                 }
             }
+        }
+
+        ColumnLayout {
+            property var wavData: null
+
+            id: filePropertiesSection
+            visible: wavData !== null
+
+            Layout.preferredWidth: Kirigami.Units.gridUnit*12
+            Layout.fillHeight: true
+
+            QQC2.Label {
+                text: "Duration: " + wavData ? (wavData["frames"]/wavData["samplerRate"]).toFixed(2) : ""
+            }
+            QQC2.Label {
+                visible: wavData && wavData["channels"]
+                text: "Channels: " + wavData && wavData["channels"] ? wavData["channels"] : ""
+            }
+            QQC2.Label {
+                visible: wavData && wavData["sampleRate"]
+                text: "Sample Rate: " + wavData && wavData["sampleRate"] ? wavData["sampleRate"] : ""
+            }
+        }
     }
 
     function cuiaCallback(cuia) {

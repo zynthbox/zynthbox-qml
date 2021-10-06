@@ -2334,7 +2334,7 @@ class zynthian_gui(QObject):
             return ""
         note_names = ("C","C#","D","D#","E","F","F#","G","G#","A","A#","B")
         num = self.__notes_on[len(self.__notes_on) - 1]
-        scale = int(num / 12) - 2
+        scale = int(num / 12) - 1
         num = int(num % 12)
         return "{}{}".format(note_names[num], scale)
 

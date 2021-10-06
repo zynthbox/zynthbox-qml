@@ -1256,7 +1256,7 @@ class zynthian_gui(QObject):
             zl = self.screens["zynthiloops"]
             if zl.isMetronomeRunning:
                 zl.stopAllPlayback();
-                self.screens["playgrid"].stop_metronome_request()
+                self.screens["playgrid"].stopMetronomeRequest()
                 self.screens["song_arranger"].stop()
                 zl.resetMetronome()
             else:
@@ -2522,19 +2522,6 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sketch_copier(self):
         return self.screens["sketch_copier"]
-
-    @Slot(str, result='QVariantMap')
-    def getWavData(self, path):
-        try:
-            f = SoundFile(path)
-            return {
-                "frames": f.frames,
-                "sampleRate": f.samplerate,
-                "channels": f.channels,
-                "duration": f.frames/f.samplerate
-            }
-        except:
-            return None
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

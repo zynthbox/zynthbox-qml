@@ -27,6 +27,7 @@
 import os
 import sys
 import copy
+import math
 import base64
 import logging
 import collections
@@ -225,20 +226,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
 			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
 			self.zyngui.screens['fixed_layers'].current_index_valid_changed.emit()
-			self.zyngui.screens['main_layers_view'].sync_index_from_curlayer()
-			self.zyngui.screens['main_layers_view'].current_index_valid_changed.emit()
-			self.set_select_path()
-		#elif midi_chan < 5: #HACK to not open the engine selection on layers 6-10
-			#self.replace_layer_index = None
-			#self.layer_chain_parallel = False
-			#self.zyngui.screens['engine'].set_engine_type("MIDI Synth")
-			#self.zyngui.screens['engine'].set_midi_channel(midi_chan)
-			#self.layer_index_replace_engine = None
-			#self.zyngui.show_modal('engine')
-		#else: # HACK Channels 6-10
-			#for i in range(5, 10):
-				#if i in self.layer_midi_map:
-					#self.activate_index(self.root_layers.index(self.layer_midi_map[i]))
+
+		if midi_chan < self.zyngui.screens['main_layers_view'].get_start_midi_chan() or midi_chan >= self.zyngui.screens['main_layers_view'].get_start_midi_chan() + self.zyngui.screens['main_layers_view'].get_layers_count():
+			self.zyngui.screens['main_layers_view'].set_start_midi_chan(math.floor(midi_chan / 5) * 5)
+		self.zyngui.screens['main_layers_view'].sync_index_from_curlayer()
+		self.zyngui.screens['main_layers_view'].current_index_valid_changed.emit()
+		self.set_select_path()
+
 
 	def next(self, control=True):
 		self.zyngui.restore_curlayer()

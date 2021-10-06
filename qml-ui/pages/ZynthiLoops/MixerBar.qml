@@ -131,6 +131,10 @@ Rectangle {
                                 slider.onValueChanged: {
                                     model.track.volume = slider.value
                                 }
+
+                                onDoubleClicked: {
+                                    slider.value = model.track.initialVolume;
+                                }
                             }
 
                             Kirigami.Separator {

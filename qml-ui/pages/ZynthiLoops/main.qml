@@ -106,6 +106,17 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
+            text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
+            onTriggered: {
+                if (zynthian.zynthiloops.isMetronomeRunning) {
+                    zynthian.zynthiloops.stopAllPlayback();
+                    zynthian.playgrid.stopMetronomeRequest();
+                    zynthian.song_arranger.stop();
+                    zynthian.zynthiloops.resetMetronome();
+                } else {
+                    zynthian.zynthiloops.startMetronomeRequest();
+                }
+            }
         },
         Kirigami.Action {
             text: qsTr("Mixer")

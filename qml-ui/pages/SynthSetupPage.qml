@@ -75,6 +75,10 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
+                text: qsTr("Get New Soundsets...")
+                onTriggered: zynthian.show_modal("soundsets_downloader")
+            }
+            Kirigami.Action {
                 text: qsTr("Clear Sound")
                 enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()

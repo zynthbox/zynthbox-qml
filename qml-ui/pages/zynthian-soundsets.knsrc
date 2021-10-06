@@ -1,0 +1,6 @@
+[KNewStuff3]
+Name=Sounds
+ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+Categories=Soundsets
+AbsoluteInstallPath=/zynthian/zynthian-my-data/soundsets/
+Uncompress=never

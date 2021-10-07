@@ -354,6 +354,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         sketch_path = self.__sketch_basepath__ / name
         return sketch_path.is_dir()
 
+    @Slot(str, result=bool)
+    def versionExists(self, name):
+        sketch_path = Path(self.__song__.sketch_folder)
+        return (sketch_path / (name+'.json')).exists()
+
     @Slot(None, result=bool)
     def sketchIsTemp(self):
         return self.__song__.sketch_folder == str(self.__sketch_basepath__ / "temp") + "/"

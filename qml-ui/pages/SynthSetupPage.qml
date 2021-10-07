@@ -272,12 +272,21 @@ Zynthian.ScreenPage {
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {
-                                visible: model.metadata.note_high < 60 || model.metadata.note_low >= 60
-                                text: model.metadata.note_high < 60 ? "L" : "H"
-                            }
-                            QQC2.Label {
-                                visible: model.metadata.octave_transpose !== 0
-                                text: model.metadata.octave_transpose > 0 ? "+" + model.metadata.octave_transpose : model.metadata.octave_transpose
+                                text: {
+                                    let text = "";
+                                    if (model.metadata.note_high < 60) {
+                                        text = "L";
+                                    } else if (model.metadata.note_low >= 60) {
+                                        text = "H";
+                                    }
+                                    if (model.metadata.octave_transpose !== 0) {
+                                        if (model.metadata.octave_transpose > 0) {
+                                            text += "+"
+                                        }
+                                        text += model.metadata.octave_transpose;
+                                    }
+                                    return text;
+                                }
                             }
                             QQC2.Button {
                                 icon.name: "configure"

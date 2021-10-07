@@ -102,11 +102,14 @@ Kirigami.AbstractApplicationWindow {
                     y: parent.height
                     modal: true
                     dim: false
-                    Component.onCompleted: zynthian.fixed_layers.layers_count = 10;
+                    Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
                     Repeater {
-                        model: zynthian.active_midi_channel >= 10 ? zynthian.main_layers_view.selector_list : zynthian.fixed_layers.selector_list
+                        model: zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
                             height: visible ? implicitHeight : 0
+                            visible: zynthian.main_layers_view.active_midi_channel < 10
+                                    ? index < 10
+                                    : index >= 10
                             //enabled: index < 5 || model.display.indexOf("- -") === -1
                             text: ""
                             //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
@@ -120,7 +123,7 @@ Kirigami.AbstractApplicationWindow {
                                     Layout.alignment: Qt.AlignLeft
                                     Layout.maximumWidth: implicitWidth
                                     text: qsTr("6 - T-RACK:")
-                                    visible: index >= 5
+                                    visible: model.metadata.midi_channel >= 5 && model.metadata.midi_channel < 10
                                     opacity: index === 5
                                 }
                                 QQC2.Label {

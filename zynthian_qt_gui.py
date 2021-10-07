@@ -28,6 +28,7 @@ import sys
 import copy
 import liblo
 import signal
+import math
 
 # import psutil
 # import alsaseq
@@ -944,7 +945,6 @@ class zynthian_gui(QObject):
         else:
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
-        self.screens["main_layers_view"].sync_index_from_curlayer()
         self.screens["bank"].fill_list()
         self.screens["bank"].show()
         self.screens["preset"].fill_list()
@@ -953,7 +953,12 @@ class zynthian_gui(QObject):
         self.screens["control"].show()
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)
+            midi_chan = self.curlayer.midi_chan
+            if midi_chan < self.screens['main_layers_view'].get_start_midi_chan() or midi_chan >= self.screens['main_layers_view'].get_start_midi_chan() + self.screens['main_layers_view'].get_layers_count():
+                self.screens['main_layers_view'].set_start_midi_chan(math.floor(midi_chan / 5) * 5)
         self.active_midi_channel_changed.emit()
+        self.screens["main_layers_view"].sync_index_from_curlayer()
+
 
     def restore_curlayer(self):
         if self._curlayer:
@@ -989,6 +994,7 @@ class zynthian_gui(QObject):
 
         lib_zyncoder.set_midi_active_chan(active_chan)
         self.zynswitches_midi_setup(curlayer_chan)
+        self.active_midi_channel_changed.emit()
 
     def get_curlayer_wait(self):
         # Try until layer is ready

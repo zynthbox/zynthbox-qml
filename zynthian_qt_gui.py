@@ -1256,7 +1256,7 @@ class zynthian_gui(QObject):
             zl = self.screens["zynthiloops"]
             if zl.isMetronomeRunning:
                 zl.stopAllPlayback();
-                self.screens["playgrid"].stop_metronome_request()
+                self.screens["playgrid"].stopMetronomeRequest()
                 self.screens["song_arranger"].stop()
                 zl.resetMetronome()
             else:

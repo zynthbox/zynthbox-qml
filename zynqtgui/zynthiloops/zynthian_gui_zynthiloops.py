@@ -37,6 +37,7 @@ from subprocess import Popen
 from time import sleep
 import json
 
+import numpy as np
 from PySide2.QtCore import Property, QObject, QProcess, QTimer, Signal, Slot
 
 from .libzl.libzl import ClipAudioSource
@@ -100,6 +101,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process = None
         self.recorder_process_internal_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
         self.__last_recording_type__ = ""
+        self.__capture_audio_level_left__ = -200
+        self.__capture_audio_level_right__ = -200
 
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -115,6 +118,73 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
 
         self.update_timer_bpm()
+
+    @Slot(None)
+    def monitorCaptureAudioLevels(self):
+        client = jack.Client('zynthiloops_monitor')
+        port_l = client.inports.register("l")
+        port_r = client.inports.register("r")
+
+        def convertToDBFS(raw):
+            if raw <= 0:
+                return -200
+            fValue = 20 * math.log10(raw)
+            if fValue < -200:
+                fValue = -200
+            return fValue
+
+        @client.set_process_callback
+        def process(frames):
+            buf_l = np.frombuffer(port_l.get_buffer())
+            buf_r = np.frombuffer(port_r.get_buffer())
+            raw_peak_l = 0
+            raw_peak_r = 0
+
+            for i in range(0, frames):
+                try:
+                    sample_l = abs(buf_l[i])
+                    sample_r = abs(buf_r[i])
+
+                    if sample_l > raw_peak_l:
+                        raw_peak_l = sample_l
+                    if sample_r > raw_peak_r:
+                        raw_peak_r = sample_r
+                except:
+                    pass
+
+            if raw_peak_l < 0.0:
+                raw_peak_l = 0.0
+            if raw_peak_r < 0.0:
+                raw_peak_r = 0.0
+
+            db_left = convertToDBFS(raw_peak_l)
+            db_right = convertToDBFS(raw_peak_r)
+
+            if self.__capture_audio_level_left__ != db_left:
+                self.__capture_audio_level_left__ = db_left
+                self.capture_audio_level_left_changed.emit()
+            if self.__capture_audio_level_right__ != db_right:
+                self.__capture_audio_level_right__ = db_right
+                self.capture_audio_level_right_changed.emit()
+
+        client.activate()
+
+        client.connect("system:capture_1", port_l.name)
+        client.connect("system:capture_2", port_r.name)
+
+    ### Property captureAudioLevelLeft
+    def get_capture_audio_level_left(self):
+        return self.__capture_audio_level_left__
+    capture_audio_level_left_changed = Signal()
+    captureAudioLevelLeft = Property(float, get_capture_audio_level_left, notify=capture_audio_level_left_changed)
+    ### END Property captureAudioLevelLeft
+
+    ### Property captureAudioLevelRight
+    def get_capture_audio_level_right(self):
+        return self.__capture_audio_level_right__
+    capture_audio_level_right_changed = Signal()
+    captureAudioLevelRight = Property(float, get_capture_audio_level_right, notify=capture_audio_level_right_changed)
+    ### END Property captureAudioLevelRight
 
     @Signal
     def master_volume_changed(self):

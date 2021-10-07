@@ -158,17 +158,15 @@ Zynthian.ScreenPage {
                                 id: delegate
                                 property QtObject track: model.track
                                 QQC2.Label {
-                                    text: (index+1) + "." + model.display
-                                }
-                                Repeater {
-                                    model: delegate.track.clipsModel
-                                    QQC2.Label {
-                                        visible: model.clip.path.length > 0
-                                        text: model.clip.name
+                                    text: (index+1) + "." + (visibleChildren.length > 1 ? model.display : "")
+                                    Repeater { //HACK
+                                        model: delegate.track.clipsModel
+                                        Item {
+                                            width: 10
+                                            height: 10
+                                            visible: model.clip.path.length > 0
+                                        }
                                     }
-                                }
-                                Item {
-                                    Layout.fillWidth: true
                                 }
                             }
                         }

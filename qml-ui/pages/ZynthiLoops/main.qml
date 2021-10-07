@@ -62,9 +62,10 @@ Zynthian.ScreenPage {
             text: qsTr("Sketch")
 
             Kirigami.Action {
-                text: qsTr("Save")
+                // Rename Save button as Save as for temp sketch
+                text: root.song.isTemp ? qsTr("Save As") : qsTr("Save")
                 onTriggered: {
-                    if (zynthian.zynthiloops.sketchIsTemp()) {
+                    if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
                         fileNameDialog.fileName = "Sketch-1";
                         fileNameDialog.open();
@@ -74,20 +75,20 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
-                text: qsTr("Save Sketch As")
+                text: qsTr("Save As")
                 visible: !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "saveas";
-                    fileNameDialog.fileName = "";
+                    fileNameDialog.fileName = song.name;
                     fileNameDialog.open();
                 }
             }
             Kirigami.Action {
-                text: qsTr("Save A Copy")
+                text: qsTr("Clone As")
                 visible: !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "savecopy";
-                    fileNameDialog.fileName = "";
+                    fileNameDialog.fileName = song.sketchFolderName;
                     fileNameDialog.open();
                 }
             }
@@ -177,8 +178,22 @@ Zynthian.ScreenPage {
         id: fileNameDialog
         visible: false
 
-        headerText: qsTr("New Sketch")
-        conflictText: qsTr("Sketch Exists")
+        headerText: {
+            if (fileNameDialog.dialogType == "savecopy")
+                return qsTr("Clone Sketch")
+            else if (fileNameDialog.dialogType === "saveas")
+                return qsTr("New version")
+            else
+                return qsTr("New Sketch")
+        }
+        conflictText: {
+            if (dialogType == "savecopy")
+                return qsTr("Sketch Exists")
+            else if (dialogType == "saveas")
+                return qsTr("Version Exists")
+            else
+                return qsTr("Exists")
+        }
         overwriteOnConflict: false
 
         onFileNameChanged: {
@@ -189,7 +204,14 @@ Zynthian.ScreenPage {
             id: fileCheckTimer
             interval: 300
             onTriggered: {
-                if (fileNameDialog.fileName.length > 0 && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                if (fileNameDialog.dialogType == "savecopy"
+                    && fileNameDialog.fileName.length > 0
+                    && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                    // Sketch with name already exists
+                    fileNameDialog.conflict = true;
+                } else if (fileNameDialog.dialogType === "saveas"
+                           && fileNameDialog.fileName.length > 0
+                           && zynthian.zynthiloops.versionExists(fileNameDialog.fileName)) {
                     fileNameDialog.conflict = true;
                 } else {
                     fileNameDialog.conflict = false;

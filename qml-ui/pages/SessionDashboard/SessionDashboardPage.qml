@@ -81,26 +81,139 @@ Zynthian.ScreenPage {
         }
     }
     ColumnLayout {
-        anchors.fill: parent
-        Kirigami.Heading {
-            id: clockLabel
-            Layout.alignment: Qt.AlignCenter
+        anchors {
+            fill: parent
+            topMargin: -Kirigami.Units.smallSpacing
         }
-        Item {
-            Layout.preferredHeight: Kirigami.Units.gridUnit
-        }
-        QQC2.Label {
-            Layout.alignment: Qt.AlignCenter
-            text: "Session time:"
+        spacing: Kirigami.Units.largeSpacing
+        RowLayout {
+            Kirigami.Heading {
+                id: clockLabel
+                Layout.alignment: Qt.AlignCenter
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            QQC2.Label {
+                Layout.alignment: Qt.AlignCenter
+                text: "Session time:"
+            }
+            Kirigami.Heading {
+                id: sessionTimeLabel
+                Layout.alignment: Qt.AlignCenter
+            }
         }
 
-        Kirigami.Heading {
-            id: sessionTimeLabel
-            Layout.alignment: Qt.AlignCenter
-        }
+        RowLayout {
+            ColumnLayout {
+                Kirigami.Heading {
+                    level: 2
+                    text: zynthian.session_dashboard.name
+                }
+                QQC2.ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    ListView {
+                        model: zynthian.session_dashboard.sessionSketchesModel
+                        header: QQC2.ItemDelegate {
+                            width: parent.width
+                            contentItem: RowLayout {
+                                QQC2.Label {
+                                    text: "1. " + zynthian.zynthiloops.song.name
+                                }
+                            }
+                        }
+                        delegate: QQC2.ItemDelegate {
+                            width: parent.width
+                            contentItem: RowLayout {
+                                QQC2.Label {
+                                    text: (model.slot + 2) + ". " + (model.sketch ? model.sketch.name : " - ")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-        Item {
-            Layout.fillHeight: true
+            ColumnLayout {
+                Kirigami.Heading {
+                    level: 2
+                    text: qsTr("Tracks")
+                }
+                QQC2.ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    ListView {
+                        model: zynthian.zynthiloops.song.tracksModel
+                        delegate: QQC2.ItemDelegate {
+                            width: parent.width
+                            contentItem: RowLayout {
+                                id: delegate
+                                property QtObject track: model.track
+                                QQC2.Label {
+                                    text: (index+1) + "." + model.display
+                                }
+                                Repeater {
+                                    model: delegate.track.clipsModel
+                                    QQC2.Label {
+                                        visible: model.clip.path.length > 0
+                                        text: model.clip.name
+                                    }
+                                }
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Kirigami.Heading {
+                    level: 2
+                    text: qsTr("Patterns")
+                }
+                QQC2.ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                }
+            }
+
+            ColumnLayout {
+                Kirigami.Heading {
+                    level: 2
+                    text: qsTr("Sounds")
+                }
+                QQC2.ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    ListView {
+                        id: layersView
+                        model: zynthian.fixed_layers.selector_list
+                        delegate: QQC2.ItemDelegate {
+                            width: layersView.width
+                            highlighted: zynthian.active_midi_channel === index
+                            height: layersView.height / 15
+                            contentItem: RowLayout {
+                                QQC2.Label {
+                                    text: {
+                                        let numPrefix = model.metadata.midi_channel + 1;
+                                        if (numPrefix > 5 && numPrefix <= 10) {
+                                            numPrefix = "6." + (numPrefix - 5);
+                                        }
+                                        return numPrefix + " - " + model.display
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

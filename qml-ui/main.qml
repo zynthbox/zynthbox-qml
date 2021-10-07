@@ -90,7 +90,7 @@ Kirigami.AbstractApplicationWindow {
                     } else if (zynthian.main_layers_view.selector_path_element > 5 && zynthian.main_layers_view.selector_path_element <= 10) {
                         return "6." + (zynthian.main_layers_view.selector_path_element - 5) + "ˬ";
                     } else {
-                        return zynthian.main_layers_view.selector_path_element + "ˬ";
+                        return (zynthian.active_midi_channel + 1) + "ˬ";
                     }
                 }
                 onTextChanged: zynthian.fixed_layers.start_midi_chan = 0;
@@ -103,7 +103,7 @@ Kirigami.AbstractApplicationWindow {
                     dim: false
                     Component.onCompleted: zynthian.fixed_layers.layers_count = 10;
                     Repeater {
-                        model: zynthian.fixed_layers.selector_list
+                        model: zynthian.active_midi_channel >= 10 ? zynthian.main_layers_view.selector_list : zynthian.fixed_layers.selector_list
                         delegate: QQC2.MenuItem {
                             height: visible ? implicitHeight : 0
                             //enabled: index < 5 || model.display.indexOf("- -") === -1

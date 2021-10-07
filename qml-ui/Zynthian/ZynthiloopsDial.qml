@@ -13,6 +13,7 @@ ColumnLayout {
     property QtObject controlObj
     property string controlProperty
     property real buttonStepSize
+    signal doubleClicked()
     onControlObjChanged: dial.value = controlObj[controlProperty]
 
     //visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
@@ -81,6 +82,9 @@ ColumnLayout {
                 let floored = Math.floor(value/dial.stepSize) * dial.stepSize;
                 dial.value = floored+startDiff
                 dial.moved()
+            }
+            onDoubleClicked: {
+                root.doubleClicked();
             }
         }
     }

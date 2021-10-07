@@ -224,6 +224,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['preset'].fill_list()
 			self.zyngui.screens['preset'].set_select_path()
 			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
+			self.zyngui.active_midi_channel_changed.emit()
 			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()
 			self.zyngui.screens['fixed_layers'].current_index_valid_changed.emit()
 

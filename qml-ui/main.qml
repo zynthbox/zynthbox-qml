@@ -134,6 +134,23 @@ Kirigami.AbstractApplicationWindow {
                                         return numPrefix + " - " + model.display
                                     }
                                 }
+                                QQC2.Label {
+                                    text: {
+                                        let text = "";
+                                        if (model.metadata.note_high < 60) {
+                                            text = "L";
+                                        } else if (model.metadata.note_low >= 60) {
+                                            text = "H";
+                                        }
+                                        if (model.metadata.octave_transpose !== 0) {
+                                            if (model.metadata.octave_transpose > 0) {
+                                                text += "+"
+                                            }
+                                            text += model.metadata.octave_transpose;
+                                        }
+                                        return text;
+                                    }
+                                }
                             }
                         }
                     }

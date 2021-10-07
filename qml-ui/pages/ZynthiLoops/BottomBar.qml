@@ -130,6 +130,17 @@ Zynthian.Card {
             }
 
             SidebarButton {
+                icon.name: "document-save-symbolic"
+                visible: root.controlType === BottomBar.ControlType.Clip
+                         && controlObj.hasOwnProperty("path")
+                         && controlObj.path.length > 0
+
+                onClicked: {
+                    controlObj.saveMetadata();
+                }
+            }
+
+            SidebarButton {
                 icon.name: "document-open"
                 visible: root.controlType === BottomBar.ControlType.Clip
                 enabled: !controlObj.isPlaying

@@ -42,14 +42,19 @@ class zynthiloops_clip(QObject):
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__is_playing__ = False
-        self.__length__ = 4
-        self.__start_position__ = 0.0
+        self.__initial_length__ = 4
+        self.__length__ = self.__initial_length__
+        self.__initial_start_position__ = 0.0
+        self.__start_position__ = self.__initial_start_position__
         self.__path__ = None
         self.__song__ = song
-        self.__pitch__ = 0
-        self.__time__ = 1
+        self.__initial_pitch__ = 0
+        self.__pitch__ = self.__initial_pitch__
+        self.__initial_time__ = 1
+        self.__time__ = self.__initial_time__
         self.__bpm__ = 0
-        self.__gain__ = 0
+        self.__initial_gain__ = 0
+        self.__gain__ = self.__initial_gain__
         self.__progress__ = 0.0
         self.__audio_level__ = 0
         self.__current_beat__ = -1
@@ -68,6 +73,36 @@ class zynthiloops_clip(QObject):
         if self.track is not None:
             self.track.volume_changed.connect(lambda: self.track_volume_changed())
             self.track_volume_changed()
+
+    ### Property initialStartPosition
+    def get_initial_start_position(self):
+        return self.__initial_start_position__
+    initialStartPosition = Property(float, get_initial_start_position, constant=True)
+    ### END Property initialStartPosition
+
+    ### Property initialLength
+    def get_initial_length(self):
+        return self.__initial_length__
+    initialLength = Property(int, get_initial_length, constant=True)
+    ### END Property initialLength
+
+    ### Property initialPitch
+    def get_initial_pitch(self):
+        return self.__initial_pitch__
+    initialPitch = Property(int, get_initial_pitch, constant=True)
+    ### END Property initialPitch
+
+    ### Property initialTime
+    def get_initial_time(self):
+        return self.__initial_time__
+    initialTime = Property(float, get_initial_time, constant=True)
+    ### END Property initialTime
+
+    ### Property initialGain
+    def get_initial_gain(self):
+        return self.__initial_gain__
+    initialGain = Property(float, get_initial_gain, constant=True)
+    ### END Property initialGain
 
     def update_current_beat(self):
         if not self.__playing_started__:
@@ -447,16 +482,19 @@ class zynthiloops_clip(QObject):
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         print(path)
 
-        self.__length__ = 4
+        self.__read_metadata__()
+
+        self.__length__ = int(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__is_playing__ = False
         self.__is_recording__ = False
-        self.__start_position__ = 0.0
-        self.__pitch__ = 0
-        self.__time__ = 1
+        self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
+        self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
+        self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
+        self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
         self.__bpm__ = 0
         self.__progress__ = 0.0
         self.__audio_level__ = 0
-        self.__read_metadata__()
+
         self.reset_beat_count()
         self.track_volume_changed()
 
@@ -483,6 +521,7 @@ class zynthiloops_clip(QObject):
         self.set_start_position(self.__start_position__, True)
         self.set_time(self.__time__, True)
         self.set_pitch(self.__pitch__, True)
+        self.set_gain(self.__gain__, True)
 
         # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
@@ -596,8 +635,11 @@ class zynthiloops_clip(QObject):
         try:
             self.audio_metadata = taglib.File(self.__path__).tags
 
-            if self.__bpm__ <= 0:
-                self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
+            try:
+                if self.__bpm__ <= 0:
+                    self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
+            except Exception as e:
+                logging.error(f"Error setting BPM from metadata : {str(e)}")
 
             self.sound_data_changed.emit()
             self.metadata_bpm_changed.emit()
@@ -605,6 +647,14 @@ class zynthiloops_clip(QObject):
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None
+
+    def __get_metadata_prop__(self, name, default):
+        try:
+            value = self.audio_metadata[name][0]
+            logging.error(f"Restoring from metadata : {name}({value})")
+            return value
+        except:
+            return default
 
     def metadata(self):
         return self.audio_metadata
@@ -675,6 +725,14 @@ class zynthiloops_clip(QObject):
     def stop_audio(self):
         if self.audioSource is not None:
             self.audioSource.stop()
+
+    @Slot(None)
+    def saveMetadata(self):
+        self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
+        self.write_metadata("ZYNTHBOX_LENGTH", [str(self.__length__)])
+        self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
+        self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
+        self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
 
     ### Property metadataAudioType
     def get_metadata_audio_type(self):

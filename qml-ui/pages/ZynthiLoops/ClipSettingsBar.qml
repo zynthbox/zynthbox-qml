@@ -54,6 +54,10 @@ GridLayout {
             from: 0
             to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
         }
+
+        onDoubleClicked: {
+            controlObj.startPosition = controlObj.initialStartPosition;
+        }
     }
 
     Zynthian.ZynthiloopsDial {
@@ -67,6 +71,10 @@ GridLayout {
             from: 1
             to: 16
         }
+
+        onDoubleClicked: {
+            controlObj.length = controlObj.initialLength;
+        }
     }
 
     Zynthian.ZynthiloopsDial {
@@ -79,6 +87,10 @@ GridLayout {
             stepSize: 1
             from: -12
             to: 12
+        }
+
+        onDoubleClicked: {
+            controlObj.pitch = controlObj.initialPitch;
         }
     }
 
@@ -95,6 +107,10 @@ GridLayout {
             from: 0.5
             to: 2
         }
+
+        onDoubleClicked: {
+            controlObj.time = controlObj.initialTime;
+        }
     }
 
     Zynthian.ZynthiloopsDial {
@@ -108,6 +124,10 @@ GridLayout {
             stepSize: 1
             from: -24
             to: 8
+        }
+
+        onDoubleClicked: {
+            controlObj.gain = controlObj.initialGain;
         }
     }
 

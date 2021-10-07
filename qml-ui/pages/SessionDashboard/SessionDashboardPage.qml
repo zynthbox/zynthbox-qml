@@ -30,6 +30,8 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
+import org.kde.plasma.core 2.0 as PlasmaCore
+
 Zynthian.ScreenPage {
     id: root
     title: zynthian.control.selector_path_element
@@ -116,16 +118,18 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: 1
                     ListView {
                         model: zynthian.session_dashboard.sessionSketchesModel
-                        header: QQC2.ItemDelegate {
+                        header: QQC2.Control {
                             width: parent.width
+                            height: layersView.height / 15
                             contentItem: RowLayout {
                                 QQC2.Label {
                                     text: "1. " + zynthian.zynthiloops.song.name
                                 }
                             }
                         }
-                        delegate: QQC2.ItemDelegate {
+                        delegate: QQC2.Control {
                             width: parent.width
+                            height: layersView.height / 15
                             contentItem: RowLayout {
                                 QQC2.Label {
                                     text: (model.slot + 2) + ". " + (model.sketch ? model.sketch.name : " - ")
@@ -147,8 +151,9 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: 1
                     ListView {
                         model: zynthian.zynthiloops.song.tracksModel
-                        delegate: QQC2.ItemDelegate {
+                        delegate: QQC2.Control {
                             width: parent.width
+                            height: layersView.height / 15
                             contentItem: RowLayout {
                                 id: delegate
                                 property QtObject track: model.track
@@ -195,18 +200,47 @@ Zynthian.ScreenPage {
                     ListView {
                         id: layersView
                         model: zynthian.fixed_layers.selector_list
-                        delegate: QQC2.ItemDelegate {
+                        delegate: QQC2.Control {
                             width: layersView.width
-                            highlighted: zynthian.active_midi_channel === index
+                            background: Item {
+                                PlasmaCore.FrameSvgItem {
+                                    anchors {
+                                        fill: parent
+                                        margins: -Kirigami.Units.smallSpacing
+                                    }
+                                    imagePath: "widgets/viewitem"
+                                    prefix: "hover"
+                                    visible: zynthian.active_midi_channel === index
+                                }
+                            }
                             height: layersView.height / 15
                             contentItem: RowLayout {
                                 QQC2.Label {
+                                    Layout.fillWidth: true
+                                    elide: Text.ElideRight
                                     text: {
                                         let numPrefix = model.metadata.midi_channel + 1;
                                         if (numPrefix > 5 && numPrefix <= 10) {
                                             numPrefix = "6." + (numPrefix - 5);
                                         }
-                                        return numPrefix + " - " + model.display
+                                        return numPrefix + ". " + model.display
+                                    }
+                                }
+                                QQC2.Label {
+                                    text: {
+                                        let text = "";
+                                        if (model.metadata.note_high < 60) {
+                                            text = "L";
+                                        } else if (model.metadata.note_low >= 60) {
+                                            text = "H";
+                                        }
+                                        if (model.metadata.octave_transpose !== 0) {
+                                            if (model.metadata.octave_transpose > 0) {
+                                                text += "+"
+                                            }
+                                            text += model.metadata.octave_transpose;
+                                        }
+                                        return text;
                                     }
                                 }
                             }

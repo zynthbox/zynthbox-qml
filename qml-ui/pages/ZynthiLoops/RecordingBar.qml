@@ -26,6 +26,8 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Controls.Styles 1.4
+import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -44,7 +46,7 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
@@ -69,7 +71,7 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
         visible: sourceCombo.currentIndex === 1
 
         QQC2.Label {
@@ -96,7 +98,7 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
@@ -137,13 +139,92 @@ GridLayout {
     }
 
     ColumnLayout {
+        property bool isCapturing: false
+
+        id: monitorColumn
+
         Layout.fillHeight: true
         Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 12
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            RowLayout {
+                opacity: monitorColumn.isCapturing ? 1 : 0.3
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                Extras.Gauge {
+                    Layout.fillHeight: true
+
+                    minimumValue: -200
+                    maximumValue: 0
+                    value: zynthian.zynthiloops.captureAudioLevelLeft
+
+                    font.pointSize: 8
+
+                    style: GaugeStyle {
+                        valueBar: Rectangle {
+                            color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                            implicitWidth: 6
+                        }
+                        minorTickmark: null
+                        tickmark: null
+                        tickmarkLabel: null
+                    }
+                }
+
+                Extras.Gauge {
+                    Layout.fillHeight: true
+
+                    minimumValue: -200
+                    maximumValue: 0
+                    value: zynthian.zynthiloops.captureAudioLevelRight
+
+                    font.pointSize: 8
+
+                    style: GaugeStyle {
+                        valueBar: Rectangle {
+                            color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                            implicitWidth: 6
+                        }
+                        minorTickmark: null
+                        tickmark: null
+                        tickmarkLabel: null
+                    }
+                }
+            }
+
+            QQC2.Button {
+                visible: !monitorColumn.isCapturing
+                text: "Monitor"
+                anchors.centerIn: parent
+                onClicked: {
+                    monitorColumn.isCapturing = true;
+                    zynthian.zynthiloops.monitorCaptureAudioLevels();
+                }
+            }
+        }
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Capture"
+        }
+    }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 
         QQC2.Button {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 6
             Layout.alignment: Qt.AlignCenter
 
             icon.name: controlObj.isRecording ? "media-playback-stop" : "media-record-symbolic"

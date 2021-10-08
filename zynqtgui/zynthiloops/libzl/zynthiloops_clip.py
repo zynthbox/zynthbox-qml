@@ -744,3 +744,10 @@ class zynthiloops_clip(QObject):
     metadata_audio_type_changed = Signal()
     metadataAudioType = Property(str, get_metadata_audio_type, notify=metadata_audio_type_changed)
     ### END Property metadataAudioType
+
+    ### Property trackName
+    def get_track_name(self):
+        track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        return track.name
+    trackName = Property(str, get_track_name, constant=True)
+    ### END Property trackName

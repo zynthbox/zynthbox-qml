@@ -333,12 +333,12 @@ Zynthian.Card {
 
     Zynthian.FilePickerDialog {
         id: pickerDialog
+        parent: zlScreen.parent
 
         width: parent.width
         height: parent.height
         x: parent.x
         y: parent.y
-        modal: false
 
         headerText: qsTr("%1 : Pick an audio file").arg(controlObj.trackName)
         rootFolder: "/zynthian/zynthian-my-data"

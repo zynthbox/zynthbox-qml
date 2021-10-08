@@ -178,97 +178,184 @@ QQC2.Dialog {
         Layout.fillWidth: true
         Layout.fillHeight: true
 
+        QtObject {
+            id: filesListViewDimensions
+
+            property var rowHeight: Kirigami.Units.gridUnit*2
+            property var rowMargin: Kirigami.Units.gridUnit
+        }
+
         QQC2.ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            contentItem: ListView {
-                id: filesListView
-                focus: true
-                onCurrentIndexChanged: {
-                    filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
-                }
-                Layout.leftMargin: 8
-                clip: true
+            contentItem: ColumnLayout {
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                property var selectedModelData: null
+                    color: "#11000000"
+                    border.width: 1
+                    border.color: "#22000000"
 
-                function selectItem(model) {
-                    console.log(model.fileName, model.filePath, model.index)
-                    if (model.fileIsDir) {
-                        var path = model.filePath;
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 4
+                        anchors.rightMargin: 4
 
-                        if (path.endsWith("/")) {
-                            path = path.slice(0, path.length - 1);
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            text: qsTr("Filename")
                         }
 
-                        folderModel.folder = path;
-                        filesListView.currentIndex = 0;
-                    } else {
-                        filesListView.selectedModelData = model;
-                        if (pickerDialog.saveMode) {
-                            nameFiled.text = model.fileName;
+                        QQC2.Label {
+                            Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                            Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                            Layout.fillHeight: true
+                            text: qsTr("Duration")
                         }
-                        pickerDialog.filesListView.currentIndex = model.index;
                     }
                 }
 
-                QQC2.Label {
-                    id: noFilesMessage
-                    parent: filesListView
-                    anchors.centerIn: parent
-                    visible: filesListView.count === 0
-                    text: qsTr("There are no files present")
-                }
+                ListView {
+                    id: filesListView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-
-                model: FolderListModel {
-                    id: folderModel
-                    showDirs: true
-                    showDirsFirst: true
-                    showDotAndDotDot: false
-                    onFolderChanged: {
-                        filesListView.currentIndex = 0;
+                    focus: true
+                    onCurrentIndexChanged: {
                         filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                     }
-                }
-                delegate: Kirigami.BasicListItem {
-                    property var fileProperties: Helpers.FilePropertiesHelper {
-                        filePath: model.filePath
-                    }
+                    Layout.leftMargin: 8
+                    clip: true
 
-                    width: ListView.view.width
-                    highlighted: ListView.isCurrentItem
+                    property var selectedModelData: null
 
-                    label: model.fileName
-                    icon: {
+                    function selectItem(model) {
+                        console.log(model.fileName, model.filePath, model.index)
                         if (model.fileIsDir) {
-                            return "folder-symbolic"
-                        }
-                        else if (model.filePath.endsWith(".wav")) {
-                            return "folder-music-symbolic"
+                            var path = model.filePath;
+
+                            if (path.endsWith("/")) {
+                                path = path.slice(0, path.length - 1);
+                            }
+
+                            folderModel.folder = path;
+                            filesListView.currentIndex = 0;
                         } else {
-                            return "file-catalog-symbolic"
+                            filesListView.selectedModelData = model;
+                            if (pickerDialog.saveMode) {
+                                nameFiled.text = model.fileName;
+                            }
+                            pickerDialog.filesListView.currentIndex = model.index;
                         }
                     }
-                    onClicked: filesListView.selectItem(model)
+
+                    QQC2.Label {
+                        id: noFilesMessage
+                        parent: filesListView
+                        anchors.centerIn: parent
+                        visible: filesListView.count === 0
+                        text: qsTr("There are no files present")
+                    }
+
+
+                    model: FolderListModel {
+                        id: folderModel
+                        showDirs: true
+                        showDirsFirst: true
+                        showDotAndDotDot: false
+                        onFolderChanged: {
+                            filesListView.currentIndex = 0;
+                            filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
+                        }
+                    }
+                    delegate: Rectangle {
+                        property var fileProperties: Helpers.FilePropertiesHelper {
+                            filePath: model.filePath
+                        }
+
+                        width: ListView.view.width
+                        height: Kirigami.Units.gridUnit*2
+                        color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
+
+                        ColumnLayout {
+                            spacing: 0
+                            anchors.fill: parent
+
+                            RowLayout {
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: Kirigami.Units.gridUnit
+
+                                Kirigami.Icon {
+                                    Layout.preferredWidth: parent.height
+                                    Layout.maximumWidth: parent.height
+                                    Layout.fillHeight: true
+
+                                    source: {
+                                        if (model.fileIsDir) {
+                                            return "folder-symbolic"
+                                        }
+                                        else if (model.filePath.endsWith(".wav")) {
+                                            return "folder-music-symbolic"
+                                        } else {
+                                            return "file-catalog-symbolic"
+                                        }
+                                    }
+                                }
+
+                                RowLayout {
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        text: model.fileName
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                                        Layout.maximumWidth: Kirigami.Units.gridUnit*8
+                                        Layout.fillHeight: true
+                                        text: fileProperties.fileMetadata.isWav
+                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(2))
+                                                : ""
+                                    }
+                                }
+                            }
+
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: filesListView.selectItem(model)
+                        }
+                    }
                 }
             }
         }
 
-        QQC2.ScrollView {
+        Flickable {
             Layout.preferredWidth: Kirigami.Units.gridUnit*12
             Layout.maximumWidth: Kirigami.Units.gridUnit*12
             Layout.fillHeight: true
+            clip: true
+            flickableDirection: Flickable.VerticalFlick
+            contentHeight: filePropertiesSection.height
 
-            contentItem: ColumnLayout {
+            ColumnLayout {
                 property var filePropertiesHelperObj: null
 
                 id: filePropertiesSection
                 visible: filePropertiesHelperObj !== null && filePropertiesHelperObj.fileMetadata !== null
 
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignTop
+                width: parent.width
 
                 Kirigami.Icon {
                     Layout.preferredWidth: 48

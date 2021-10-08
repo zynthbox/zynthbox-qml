@@ -39,11 +39,24 @@ Kirigami.PageRow {
     separatorVisible: false
 
     data: [
+        Timer {
+            id: delayedRemoveTimer
+            interval: 500
+            onTriggered: {
+                applicationWindow().pageStack.layers.pop();
+                root.clear();
+            }
+        },
         Connections {
             target: zynthian
             onCurrent_modal_screen_idChanged: {
                 print("MODAL SCREEN ID CHANGED: "+zynthian.current_modal_screen_id);
 
+                // Are we in a dashboard page? don't do anything
+                if (applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id).length > 0) {
+                    delayedRemoveTimer.restart();
+                    return;
+                }
                 if (zynthian.current_modal_screen_id === "confirm") {
                     applicationWindow().showConfirmationDialog();
                     return;

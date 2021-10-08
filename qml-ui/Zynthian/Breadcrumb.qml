@@ -100,7 +100,7 @@ QQC2.ToolBar {
                         //enabled: root.layerManager.depth === 1
 
                         onClicked: {
-                            if (root.layerManager.depth > 1) {
+                            if (root.layerManager.depth > 1 && applicationWindow().pageScreenMapping.pageForScreen(model.screenId).length === 0) {
                                 zynthian.current_modal_screen_id = model.screenId;
                             } else {
                                 zynthian.current_screen_id = model.screenId;

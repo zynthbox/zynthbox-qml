@@ -34,9 +34,7 @@ QQC2.ToolBar {
     id: root
     property alias leftHeaderControl: leftHeaderControl.contentItem
     property alias rightHeaderControl: rightHeaderControl.contentItem
-    property QQC2.StackView layerManager
     readonly property Item pageRow: applicationWindow().pageStack //FIXME: is really what we want?
-    //layerManager.depth > 1 ? layerManager.currentItem : applicationWindow().pageStack
 
     leftPadding: 0
     rightPadding: 0
@@ -100,11 +98,10 @@ QQC2.ToolBar {
                         //enabled: root.layerManager.depth === 1
 
                         onClicked: {
-                            if (root.layerManager.depth > 1 && applicationWindow().pageScreenMapping.pageForScreen(model.screenId).length === 0) {
-                                zynthian.current_modal_screen_id = model.screenId;
-                            } else {
-                                zynthian.current_screen_id = model.screenId;
-                            }
+                            //if (root.layerManager.depth > 1 && applicationWindow().pageScreenMapping.pageForScreen(model.screenId).length === 0) {
+                                //zynthian.current_modal_screen_id = model.screenId;
+                            //}
+                            zynthian.current_screen_id = model.screenId;
                         }
                     }
                 }

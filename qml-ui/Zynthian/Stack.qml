@@ -36,59 +36,59 @@ QQC2.StackView {
     z: 99
 
     popEnter: Transition {
-        OpacityAnimator {
-            from: 0
-            to: 1
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutCubic
-        }
+        //OpacityAnimator {
+            //from: 0
+            //to: 1
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InOutCubic
+        //}
     }
     popExit: Transition {
-        OpacityAnimator {
-            from: 1
-            to: 0
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutCubic
-        }
+        //OpacityAnimator {
+            //from: 1
+            //to: 0
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InOutCubic
+        //}
     }
 
     pushEnter: Transition {
-        //NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
-        PropertyAnimation {
-            property: "opacity"
-            from: 0
-            to: 1
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutCubic
-        }
+        ////NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
+        //PropertyAnimation {
+            //property: "opacity"
+            //from: 0
+            //to: 1
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InOutCubic
+        //}
     }
 
 
     pushExit: Transition {
-        OpacityAnimator {
-            from: 1
-            to: 0
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutCubic
-        }
+        //OpacityAnimator {
+            //from: 1
+            //to: 0
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InOutCubic
+        //}
     }
 
     replaceEnter: Transition {
-        NumberAnimation {
-            property: "opacity"
-            from: 0
-            to: 1
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutCubic
-        }
+        //NumberAnimation {
+            //property: "opacity"
+            //from: 0
+            //to: 1
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InOutCubic
+        //}
     }
 
     replaceExit: Transition {
-        OpacityAnimator {
-            from: 1
-            to: 0
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InCubic
-        }
+        //OpacityAnimator {
+            //from: 1
+            //to: 0
+            //duration: Kirigami.Units.longDuration
+            //easing.type: Easing.InCubic
+        //}
     }
 }

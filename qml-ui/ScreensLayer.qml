@@ -32,11 +32,8 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 
-Kirigami.PageRow {
+Zynthian.Stack {
     id: root
-    defaultColumnWidth: width
-    globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
-    separatorVisible: false
 
     Component.onCompleted: {
         zynthian.current_screen_id_changed()
@@ -59,9 +56,9 @@ Kirigami.PageRow {
                 if (screenId === zynthian.current_modal_screen_id) {
                     return;
                 }
-                if (root.layers.depth > 1) {
-                    root.layers.pop(root)
-                }
+                //if (root.layers.depth > 1) {
+                    //root.layers.pop(root)
+                //}
 
                 for (var i = 0; i < root.depth; ++i) {
                     let child = root.get(i);
@@ -72,24 +69,23 @@ Kirigami.PageRow {
                         for (j in child.screenIds) {
                             let id = child.screenIds[j];
                             if (id === screenId) {
-                                root.currentIndex = i;
+                                root.pop(child);
                                 return;
                             }
                         }
                         if (screenId in child.screenIds) {
-                            root.currentIndex = i;
+                            root.pop(child);
                             return;
                         }
                     } else if (child.hasOwnProperty("screenId")) {
                         if (child.screenId === screenId) {
-                            root.currentIndex = i;
+                            root.pop(child);
                             return;
                         }
                     }
                 }
                 let file = applicationWindow().pageScreenMapping.pageForScreen(screenId);
                 if (file.length > 0) {
-                    root.currentIndex = 1 // HACK to replace whatever page after the 3 columns layers page
                     root.push(file);
                 } else {
                     print("Non managed screen " + screenId);

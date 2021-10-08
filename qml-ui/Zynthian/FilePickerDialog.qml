@@ -295,6 +295,7 @@ QQC2.Dialog {
                                     Layout.preferredWidth: parent.height
                                     Layout.maximumWidth: parent.height
                                     Layout.fillHeight: true
+                                    Layout.margins: 8
 
                                     source: {
                                         if (model.fileIsDir) {
@@ -356,6 +357,7 @@ QQC2.Dialog {
                 visible: filePropertiesHelperObj !== null && filePropertiesHelperObj.fileMetadata !== null
 
                 width: parent.width
+                spacing: 0
 
                 Kirigami.Icon {
                     Layout.preferredWidth: 48
@@ -387,6 +389,8 @@ QQC2.Dialog {
                     id: previewButton
                     visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
                     Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: Kirigami.Units.gridUnit
+                    Layout.bottomMargin: Kirigami.Units.gridUnit
                     text: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
                     icon.name: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
                     onClicked: {

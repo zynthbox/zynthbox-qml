@@ -49,11 +49,11 @@ Zynthian.ScreenPage {
         applicationWindow().controlsVisible = true
     }
     onVisibleChanged: {
-		applicationWindow().controlsVisible = !visible
-		if (visible) {
-			height = parent.height;
-		}
-	}
+        applicationWindow().controlsVisible = !visible
+        if (visible) {
+            height = parent.height;
+        }
+    }
 
     ListModel {
         id: scaleModel

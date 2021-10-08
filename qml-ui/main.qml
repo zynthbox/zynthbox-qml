@@ -39,7 +39,7 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item currentPage: {
         if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "session_dashboard") {
             return dashboardLayer.currentItem;
-        } else if (screensLayer.layers.depth > 1) {
+        } else if (modalScreensLayer.depth > 0) {
             return modalScreensLayer.currentItem;
         } else {
             return screensLayer.currentItem
@@ -64,7 +64,6 @@ Kirigami.AbstractApplicationWindow {
 
     header: Zynthian.Breadcrumb {
         visible: root.headerVisible
-        layerManager: screensLayer.layers
         leftHeaderControl: RowLayout {
             spacing: 0
             Zynthian.BreadcrumbButton {
@@ -80,7 +79,7 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 text: {
-                    if (screensLayer.layers.depth > 1 && zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
+                    if (zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
                         if (zynthian.engine.midi_channel > 10) {
                             return "7." + (zynthian.engine.midi_channel - 10) + "ˬ";
                         } else if (zynthian.engine.midi_channel > 5) {
@@ -167,7 +166,7 @@ Kirigami.AbstractApplicationWindow {
         id: screensLayer
         parent: root.contentItem
         anchors.fill: parent
-        initialPage: [root.pageScreenMapping.pageForScreen('main_layers_view')]
+        initialItem: root.pageScreenMapping.pageForScreen('main_layers_view')
     }
 
     ModalScreensLayer {

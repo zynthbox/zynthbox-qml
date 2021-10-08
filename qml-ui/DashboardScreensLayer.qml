@@ -86,11 +86,11 @@ Zynthian.Stack {
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
         opacity: root.depth > 0
-        Behavior on opacity {
-            OpacityAnimator {
-               duration: Kirigami.Units.shortDuration
-               easing.type: Easing.InOutCubic
-            }
-        }
+        //Behavior on opacity {
+            //OpacityAnimator {
+               //duration: Kirigami.Units.shortDuration
+               //easing.type: Easing.InOutCubic
+            //}
+        //}
     }
 }

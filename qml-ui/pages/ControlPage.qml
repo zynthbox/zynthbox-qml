@@ -65,7 +65,7 @@ Zynthian.ScreenPage {
         }
     ]
     Component.onCompleted: {
-        mainView.forceActiveFocus()
+       // mainView.forceActiveFocus()
         //HACK
         if (zynthian.control.custom_control_page.length > 0) {
             stack.push(zynthian.control.custom_control_page);
@@ -88,7 +88,7 @@ Zynthian.ScreenPage {
         id: currentConnection
         target: zynthian
         onCurrent_screen_idChanged: {
-            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.lastItem === root) {
+            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.currentItem === root) {
                 pageRemoveTimer.restart()
             }
         }
@@ -97,7 +97,7 @@ Zynthian.ScreenPage {
         id: pageRemoveTimer
         interval: Kirigami.Units.longDuration
         onTriggered: {
-            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.lastItem === root) {
+            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.currentItem === root) {
                 applicationWindow().pageStack.pop();
             }
         }

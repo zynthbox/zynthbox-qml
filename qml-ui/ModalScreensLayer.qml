@@ -35,9 +35,17 @@ import "pages" as Pages
 Zynthian.Stack {
     id: root
 
+    property var pageCache: {}
     data: [
         Connections {
             target: zynthian
+
+            onCurrent_screen_idChanged: {
+                if (zynthian.current_modal_screen_id.length === 0) {
+                    root.clear();
+                }
+            }
+
             onCurrent_modal_screen_idChanged: {
                 print("MODAL SCREEN ID CHANGED: "+zynthian.current_modal_screen_id);
 
@@ -99,11 +107,11 @@ Zynthian.Stack {
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
         opacity: root.depth > 0
-        Behavior on opacity {
+        /*Behavior on opacity {
             OpacityAnimator {
                duration: Kirigami.Units.shortDuration
                easing.type: Easing.InOutCubic
             }
-        }
+        }*/
     }
 }

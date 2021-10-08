@@ -186,6 +186,10 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Patterns")
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: zynthian.current_modal_screen_id = "playgrid"
+                    }
                 }
                 QQC2.ScrollView {
                     Layout.fillWidth: true

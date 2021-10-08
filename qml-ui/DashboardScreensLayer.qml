@@ -31,6 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
+import "pages/SessionDashboard" as Dash
 
 Zynthian.Stack {
     id: root
@@ -42,7 +43,27 @@ Zynthian.Stack {
         }
     }
 
+    property var pageCache: {
+        "session_dashboard": dashboard
+    }
+    initialItem: Dash.SessionDashboardPage {
+        id: dashboard
+    }
     data: [
+        Timer {
+            id: preloadTimer
+            interval: 2000
+            running: true
+            onTriggered: {
+                let file = ""
+                if (!root.pageCache["main"]) {
+                    file = applicationWindow().pageScreenMapping.pageForDashboardScreen("main");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["main"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["main"].visible = false;
+                }
+            }
+        },
         Connections {
             target: zynthian
             onCurrent_screen_idChanged: {
@@ -70,13 +91,17 @@ Zynthian.Stack {
                 }
 
 
-                let file = applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id);
-                if (file.length > 0) {
-                    root.replace(file, QQC2.StackView.PushTransition);
+                if (root.pageCache && root.pageCache[zynthian.current_screen_id]) {
+                    root.replace(root.pageCache[zynthian.current_screen_id]);
                 } else {
-                    print("Non managed dashboard screen " + zynthian.current_screen_id);
-                    root.clear(QQC2.StackView.PopTransition);
-                    root.depthChanged()
+                    let file = applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id);
+                    if (file.length > 0) {
+                        root.replace(file, QQC2.StackView.PushTransition);
+                    } else {
+                        print("Non managed dashboard screen " + zynthian.current_screen_id);
+                        root.clear(QQC2.StackView.PopTransition);
+                        root.depthChanged()
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ from . import zynthian_gui_config
 
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Signal, Property, QStringListModel
-
+import traceback
 #------------------------------------------------------------------------------
 # Zynthian Keyboard Binding Class
 #------------------------------------------------------------------------------
@@ -111,6 +111,10 @@ class zynthian_gui_keybinding(QObject):
 			"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
 
 			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
+			"SCREEN_ZYNTHILOOPS": { "modifier": 0, "keysym": "F1" },
+			"SCREEN_ARRANGER": { "modifier": 0, "keysym": "F2" },
+			"SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F3" },
+			"SCREEN_LAYER": { "modifier": 0, "keysym": "F4" },
 
 			# Added in QML version
 			"NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },

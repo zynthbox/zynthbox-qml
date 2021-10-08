@@ -44,38 +44,22 @@ QQC2.StackView {
         }
     }
     popExit: Transition {
-        ParallelAnimation {
-            OpacityAnimator {
-                from: 1
-                to: 0
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutCubic
-            }
-            YAnimator {
-                from: 0
-                to: Kirigami.Units.gridUnit * 2
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InCubic
-            }
+        OpacityAnimator {
+            from: 1
+            to: 0
+            duration: Kirigami.Units.longDuration
+            easing.type: Easing.InOutCubic
         }
     }
 
     pushEnter: Transition {
-        ParallelAnimation {
-            //NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
-            PropertyAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutCubic
-            }
-            YAnimator {
-                from: Kirigami.Units.gridUnit * 2
-                to: 0
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.OutCubic
-            }
+        //NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
+        PropertyAnimation {
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: Kirigami.Units.longDuration
+            easing.type: Easing.InOutCubic
         }
     }
 
@@ -90,37 +74,21 @@ QQC2.StackView {
     }
 
     replaceEnter: Transition {
-        ParallelAnimation {
-            NumberAnimation {
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutCubic
-            }
-            YAnimator {
-                from: Kirigami.Units.gridUnit * 2
-                to: 0
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.OutCubic
-            }
+        NumberAnimation {
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: Kirigami.Units.longDuration
+            easing.type: Easing.InOutCubic
         }
     }
 
     replaceExit: Transition {
-        ParallelAnimation {
-            OpacityAnimator {
-                from: 1
-                to: 0
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InCubic
-            }
-            YAnimator {
-                from: 0
-                to: -Kirigami.Units.gridUnit * 2
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutCubic
-            }
+        OpacityAnimator {
+            from: 1
+            to: 0
+            duration: Kirigami.Units.longDuration
+            easing.type: Easing.InCubic
         }
     }
 }

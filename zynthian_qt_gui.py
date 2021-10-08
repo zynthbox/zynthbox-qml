@@ -52,10 +52,12 @@ from PySide2.QtCore import (
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
 
 # from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine
+from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
+from soundfile import SoundFile
 
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
+from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
@@ -2529,19 +2531,6 @@ class zynthian_gui(QObject):
     def sketch_copier(self):
         return self.screens["sketch_copier"]
 
-    @Slot(str, result='QVariantMap')
-    def getWavData(self, path):
-        try:
-            f = SoundFile(path)
-            return {
-                "frames": f.frames,
-                "sampleRate": f.samplerate,
-                "channels": f.channels,
-                "duration": f.frames/f.samplerate
-            }
-        except:
-            return None
-
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
     is_loading_changed = Signal()
@@ -2731,6 +2720,9 @@ if __name__ == "__main__":
     libzl.init()
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
+
+    logging.info("REGISTERING QML TYPES")
+    qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")
 
     logging.info("STARTING ZYNTHIAN-UI ...")
     zynthian_gui_config.zyngui = zyngui = zynthian_gui()

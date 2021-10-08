@@ -89,19 +89,19 @@ Zynthian.ScreenPage {
         }
         spacing: Kirigami.Units.largeSpacing
         RowLayout {
-            Kirigami.Heading {
-                id: clockLabel
-                Layout.alignment: Qt.AlignCenter
-            }
-            Item {
-                Layout.fillWidth: true
-            }
             QQC2.Label {
                 Layout.alignment: Qt.AlignCenter
                 text: "Session time:"
             }
             Kirigami.Heading {
                 id: sessionTimeLabel
+                Layout.alignment: Qt.AlignCenter
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            Kirigami.Heading {
+                id: clockLabel
                 Layout.alignment: Qt.AlignCenter
             }
         }
@@ -111,6 +111,10 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     level: 2
                     text: zynthian.session_dashboard.name
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: zynthian.current_modal_screen_id = "sketch_copier"
+                    }
                 }
                 QQC2.ScrollView {
                     Layout.fillWidth: true
@@ -144,6 +148,10 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Tracks")
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: zynthian.current_modal_screen_id = "zynthiloops"
+                    }
                 }
                 QQC2.ScrollView {
                     Layout.fillWidth: true
@@ -190,6 +198,10 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Sounds")
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: zynthian.current_screen_id = "main_layers_view"
+                    }
                 }
                 QQC2.ScrollView {
                     Layout.fillWidth: true

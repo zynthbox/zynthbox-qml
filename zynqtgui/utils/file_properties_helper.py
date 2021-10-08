@@ -1,11 +1,13 @@
 import logging
 
-from PySide2.QtCore import Property, QMimeDatabase, QObject, Signal
+from PySide2.QtCore import Property, QMimeDatabase, QObject, Signal, Slot
 from pathlib import Path
 
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QStyle
 from soundfile import SoundFile
+
+from zynqtgui.zynthiloops.libzl.libzl import ClipAudioSource
 
 
 class file_properties_helper(QObject):
@@ -13,6 +15,8 @@ class file_properties_helper(QObject):
         super(file_properties_helper, self).__init__(parent)
         self.file_path = None
         self.file_metadata = []
+        self.preview_clip: ClipAudioSource = None
+        self.is_preview_playing = False
 
     ### Property filePath
     def get_file_path(self):
@@ -51,6 +55,13 @@ class file_properties_helper(QObject):
     fileMetadata = Property('QVariantMap', get_file_metadata, notify=file_metadata_changed)
     ### END Property fileMetadata
 
+    ### Property isPreviewPlaying
+    def get_is_preview_playing(self):
+        return self.is_preview_playing
+    is_preview_playing_changed = Signal()
+    isPreviewPlaying = Property(bool, get_is_preview_playing, notify=is_preview_playing_changed)
+    ### END Property isPreviewPlaying
+
     @staticmethod
     def getWavData(path):
         try:
@@ -63,3 +74,23 @@ class file_properties_helper(QObject):
             }
         except:
             return []
+
+    @Slot(None)
+    def playPreview(self):
+        if self.file_metadata is not None and self.file_metadata["isWav"]:
+            if self.preview_clip is not None:
+                self.preview_clip.stop()
+                self.preview_clip.destroy()
+                self.preview_clip.deleteLater()
+            self.preview_clip = ClipAudioSource(None, str(self.file_path).encode('utf-8'))
+
+            self.preview_clip.play()
+            self.is_preview_playing = True
+            self.is_preview_playing_changed.emit()
+
+    @Slot(None)
+    def stopPreview(self):
+        if self.file_metadata is not None and self.file_metadata["isWav"] and self.preview_clip is not None:
+            self.preview_clip.stop()
+            self.is_preview_playing = False
+            self.is_preview_playing_changed.emit()

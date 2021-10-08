@@ -172,7 +172,7 @@ Kirigami.AbstractApplicationWindow {
 
     ModalScreensLayer {
         id: modalScreensLayer
-        visible: false
+        anchors.fill: parent
     }
 
     DashboardScreensLayer {

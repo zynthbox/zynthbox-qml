@@ -136,11 +136,11 @@ Zynthian.Stack {
                 }
 
                 if (root.pageCache && root.pageCache[zynthian.current_modal_screen_id]) {
-                    root.push(root.pageCache[zynthian.current_modal_screen_id]);
+                    root.replace(root.pageCache[zynthian.current_modal_screen_id]);
                 } else {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
                     if (file.length > 0) {
-                        root.push(file);
+                        root.replace(file);
                     } else {
                         print("Non managed modal screen " + zynthian.current_modal_screen_id);
                     }

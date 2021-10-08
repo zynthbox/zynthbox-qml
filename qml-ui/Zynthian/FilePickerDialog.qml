@@ -1,10 +1,13 @@
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
+import QtMultimedia 5.11
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
+
+import Helpers 1.0 as Helpers
 
 import Zynthian 1.0 as Zynthian
 
@@ -184,8 +187,11 @@ QQC2.Dialog {
                 id: filesListView
                 focus: true
                 onCurrentIndexChanged: {
-                    filesListView.readWavData();
+                    filePropertiesSection.metadata = filesListView.currentItem.fileProperties.fileMetadata;
+                    console.log(JSON.stringify(filePropertiesSection.metadata, null, 2));
                 }
+                Layout.leftMargin: 8
+                clip: true
 
                 property var selectedModelData: null
 
@@ -209,20 +215,6 @@ QQC2.Dialog {
                     }
                 }
 
-                function readWavData() {
-                    var filePath = folderModel.get(filesListView.currentIndex, "filePath");
-                    console.log("Highlighted filePath :", filePath)
-
-                    if (filePath.endsWith(".wav")){
-                        var wavData = zynthian.getWavData(filePath);
-                        filePropertiesSection.wavData = wavData;
-
-                        console.log("Wav Data :", JSON.stringify(wavData));
-                    } else {
-                        filePropertiesSection.wavData = null;
-                    }
-                }
-
                 QQC2.Label {
                     id: noFilesMessage
                     parent: filesListView
@@ -230,8 +222,7 @@ QQC2.Dialog {
                     visible: filesListView.count === 0
                     text: qsTr("There are no files present")
                 }
-                Layout.leftMargin: 8
-                clip: true
+
 
                 model: FolderListModel {
                     id: folderModel
@@ -239,10 +230,16 @@ QQC2.Dialog {
                     showDirsFirst: true
                     showDotAndDotDot: false
                     onFolderChanged: {
-                        filesListView.readWavData();
+                        filesListView.currentIndex = 0;
+                        filePropertiesSection.metadata = filesListView.currentItem.fileProperties.fileMetadata;
+                        console.log(JSON.stringify(filePropertiesSection.metadata, null, 2));
                     }
                 }
                 delegate: Kirigami.BasicListItem {
+                    property var fileProperties: Helpers.FilePropertiesHelper {
+                        filePath: model.filePath
+                    }
+
                     width: ListView.view.width
                     highlighted: ListView.isCurrentItem
 
@@ -263,26 +260,91 @@ QQC2.Dialog {
         }
 
         ColumnLayout {
-            property var wavData: null
+            property var metadata: null
 
             id: filePropertiesSection
-            visible: wavData !== null
+            visible: metadata !== null
 
             Layout.preferredWidth: Kirigami.Units.gridUnit*12
             Layout.maximumWidth: Kirigami.Units.gridUnit*12
             Layout.alignment: Qt.AlignTop
-            
-            Kirigami.BasicListItem {
-              label: qsTr("Duration: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["duration"] ? filePropertiesSection.wavData["duration"].toFixed(2) : "")
-              visible: true
+
+            Audio {
+                property bool isPlaying: false
+
+                id: wavPreviewer
+                source: filePropertiesSection.metadata.filepath
+                onPlaying: {
+                    isPlaying = true;
+                }
+                onStopped: {
+                    isPlaying = false;
+                }
             }
-            Kirigami.BasicListItem {
-              label: qsTr("Channels: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["channels"] ? filePropertiesSection.wavData["channels"] : "")
-              visible: filePropertiesSection.wavData && filePropertiesSection.wavData["channels"]
+
+            Kirigami.Icon {
+                Layout.preferredWidth: 48
+                Layout.preferredHeight: 48
+
+                Layout.alignment: Qt.AlignHCenter
+                source: {
+                    if (filePropertiesSection.metadata.isDir) {
+                        return "folder-symbolic"
+                    }
+                    else if (filePropertiesSection.metadata.isWav) {
+                        return "folder-music-symbolic"
+                    } else {
+                        return "file-catalog-symbolic"
+                    }
+                }
             }
+
+            QQC2.Label {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.maximumWidth: Kirigami.Units.gridUnit*10
+                elide: Text.Elide.Middle
+                text: filePropertiesSection.metadata.filename.length > 23
+                        ? filePropertiesSection.metadata.filename.substring(0, 20) + '...'
+                        : filePropertiesSection.metadata.filename
+            }
+
+            QQC2.Button {
+                id: previewButton
+                visible: filePropertiesSection.metadata.isWav
+                Layout.alignment: Qt.AlignHCenter
+                text: wavPreviewer.isPlaying ? qsTr("Stop") : qsTr("Preview")
+                icon.name: wavPreviewer.isPlaying ? "media-playback-stop" : "media-playback-start"
+                onClicked: {
+                    if (wavPreviewer.isPlaying) {
+                        wavPreviewer.stop();
+                    } else {
+                        wavPreviewer.play();
+                    }
+                }
+            }
+
             Kirigami.BasicListItem {
-              label: qsTr("Sample Rate: %1").arg(filePropertiesSection.wavData && filePropertiesSection.wavData["sampleRate"] ? filePropertiesSection.wavData["sampleRate"] : "")
-              visible: filePropertiesSection.wavData && filePropertiesSection.wavData["sampleRate"]
+                Layout.fillWidth: true
+                visible: filePropertiesSection.metadata.isWav
+                label: qsTr("Size: %1 MB").arg((filePropertiesSection.metadata.size/1024/1024).toFixed(2))
+            }
+
+            Kirigami.BasicListItem {
+                Layout.fillWidth: true
+                visible: filePropertiesSection.metadata.isWav
+                label: qsTr("Sample Rate: %1").arg(filePropertiesSection.metadata.properties.sampleRate)
+            }
+
+            Kirigami.BasicListItem {
+                Layout.fillWidth: true
+                visible: filePropertiesSection.metadata.isWav
+                label: qsTr("Channels: %1").arg(filePropertiesSection.metadata.properties.channels)
+            }
+
+            Kirigami.BasicListItem {
+                Layout.fillWidth: true
+                visible: filePropertiesSection.metadata.isWav
+                label: qsTr("Duration: %1 secs").arg(filePropertiesSection.metadata.properties.duration.toFixed(2))
             }
         }
     }

@@ -48,7 +48,12 @@ Zynthian.ScreenPage {
     Component.onDestruction: {
         applicationWindow().controlsVisible = true
     }
-    onVisibleChanged: applicationWindow().controlsVisible = !visible
+    onVisibleChanged: {
+		applicationWindow().controlsVisible = !visible
+		if (visible) {
+			height = parent.height;
+		}
+	}
 
     ListModel {
         id: scaleModel

@@ -1,7 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
-import QtMultimedia 5.11
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -187,8 +186,7 @@ QQC2.Dialog {
                 id: filesListView
                 focus: true
                 onCurrentIndexChanged: {
-                    filePropertiesSection.metadata = filesListView.currentItem.fileProperties.fileMetadata;
-                    console.log(JSON.stringify(filePropertiesSection.metadata, null, 2));
+                    filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                 }
                 Layout.leftMargin: 8
                 clip: true
@@ -231,8 +229,7 @@ QQC2.Dialog {
                     showDotAndDotDot: false
                     onFolderChanged: {
                         filesListView.currentIndex = 0;
-                        filePropertiesSection.metadata = filesListView.currentItem.fileProperties.fileMetadata;
-                        console.log(JSON.stringify(filePropertiesSection.metadata, null, 2));
+                        filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                     }
                 }
                 delegate: Kirigami.BasicListItem {
@@ -260,27 +257,14 @@ QQC2.Dialog {
         }
 
         ColumnLayout {
-            property var metadata: null
+            property var filePropertiesHelperObj: null
 
             id: filePropertiesSection
-            visible: metadata !== null
+            visible: filePropertiesHelperObj !== null && filePropertiesHelperObj.fileMetadata !== null
 
             Layout.preferredWidth: Kirigami.Units.gridUnit*12
             Layout.maximumWidth: Kirigami.Units.gridUnit*12
             Layout.alignment: Qt.AlignTop
-
-            Audio {
-                property bool isPlaying: false
-
-                id: wavPreviewer
-                source: filePropertiesSection.metadata.filepath
-                onPlaying: {
-                    isPlaying = true;
-                }
-                onStopped: {
-                    isPlaying = false;
-                }
-            }
 
             Kirigami.Icon {
                 Layout.preferredWidth: 48
@@ -288,10 +272,10 @@ QQC2.Dialog {
 
                 Layout.alignment: Qt.AlignHCenter
                 source: {
-                    if (filePropertiesSection.metadata.isDir) {
+                    if (filePropertiesSection.filePropertiesHelperObj.fileMetadata.isDir) {
                         return "folder-symbolic"
                     }
-                    else if (filePropertiesSection.metadata.isWav) {
+                    else if (filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav) {
                         return "folder-music-symbolic"
                     } else {
                         return "file-catalog-symbolic"
@@ -303,48 +287,48 @@ QQC2.Dialog {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.maximumWidth: Kirigami.Units.gridUnit*10
                 elide: Text.Elide.Middle
-                text: filePropertiesSection.metadata.filename.length > 23
-                        ? filePropertiesSection.metadata.filename.substring(0, 20) + '...'
-                        : filePropertiesSection.metadata.filename
+                text: filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename.length > 23
+                        ? filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename.substring(0, 20) + '...'
+                        : filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename
             }
 
             QQC2.Button {
                 id: previewButton
-                visible: filePropertiesSection.metadata.isWav
+                visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
                 Layout.alignment: Qt.AlignHCenter
-                text: wavPreviewer.isPlaying ? qsTr("Stop") : qsTr("Preview")
-                icon.name: wavPreviewer.isPlaying ? "media-playback-stop" : "media-playback-start"
+                text: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
+                icon.name: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
                 onClicked: {
-                    if (wavPreviewer.isPlaying) {
-                        wavPreviewer.stop();
+                    if (filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying) {
+                        filePropertiesSection.filePropertiesHelperObj.stopPreview();
                     } else {
-                        wavPreviewer.play();
+                        filePropertiesSection.filePropertiesHelperObj.playPreview();
                     }
                 }
             }
 
             Kirigami.BasicListItem {
                 Layout.fillWidth: true
-                visible: filePropertiesSection.metadata.isWav
-                label: qsTr("Size: %1 MB").arg((filePropertiesSection.metadata.size/1024/1024).toFixed(2))
+                visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
+                label: qsTr("Size: %1 MB").arg((filePropertiesSection.filePropertiesHelperObj.fileMetadata.size/1024/1024).toFixed(2))
             }
 
             Kirigami.BasicListItem {
                 Layout.fillWidth: true
-                visible: filePropertiesSection.metadata.isWav
-                label: qsTr("Sample Rate: %1").arg(filePropertiesSection.metadata.properties.sampleRate)
+                visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
+                label: qsTr("Sample Rate: %1").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.sampleRate)
             }
 
             Kirigami.BasicListItem {
                 Layout.fillWidth: true
-                visible: filePropertiesSection.metadata.isWav
-                label: qsTr("Channels: %1").arg(filePropertiesSection.metadata.properties.channels)
+                visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
+                label: qsTr("Channels: %1").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.channels)
             }
 
             Kirigami.BasicListItem {
                 Layout.fillWidth: true
-                visible: filePropertiesSection.metadata.isWav
-                label: qsTr("Duration: %1 secs").arg(filePropertiesSection.metadata.properties.duration.toFixed(2))
+                visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
+                label: qsTr("Duration: %1 secs").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(2))
             }
         }
     }

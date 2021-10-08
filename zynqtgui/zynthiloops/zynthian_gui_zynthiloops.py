@@ -455,7 +455,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.update_recorder_jack_port()
             self.clip_to_record = clip
             (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
-            self.clip_to_record_path = f"{self.clip_to_record.recording_basepath}/wav/{datetime.now().strftime('%Y%m%d-%H%M')}_{layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')}_{self.__song__.bpm}-BPM.clip.wav"
+
+            if source == 'internal':
+                preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')
+            else:
+                preset_name = "external"
+
+            count=0
+            base_recording_dir = f"{self.clip_to_record.recording_basepath}/wav"
+            base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{self.__song__.bpm}-BPM"
+
+            # Check if file exists otherwise append count
+            while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav").exists():
+                count += 1
+
+            self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
             #self.countInValue = countInBars * 4
             logging.error(

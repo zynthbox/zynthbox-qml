@@ -321,7 +321,7 @@ QQC2.Dialog {
                                         Layout.maximumWidth: Kirigami.Units.gridUnit*8
                                         Layout.fillHeight: true
                                         text: fileProperties.fileMetadata.isWav
-                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(2))
+                                                ? qsTr("%1 secs").arg(fileProperties.fileMetadata.properties.duration.toFixed(1))
                                                 : ""
                                     }
                                 }
@@ -423,7 +423,7 @@ QQC2.Dialog {
                 Kirigami.BasicListItem {
                     Layout.fillWidth: true
                     visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    label: qsTr("Duration: %1 secs").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(2))
+                    label: qsTr("Duration: %1 secs").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1))
                 }
             }
         }

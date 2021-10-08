@@ -32,19 +32,18 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 
-Kirigami.PageRow {
+Zynthian.Stack {
     id: root
-    defaultColumnWidth: width
-    globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
-    separatorVisible: false
 
     data: [
         Timer {
             id: delayedRemoveTimer
             interval: 500
             onTriggered: {
-                applicationWindow().pageStack.layers.pop();
-                root.clear();
+                if (applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_screen_id).length === 0) {
+//                     applicationWindow().pageStack.layers.pop();
+//                     root.clear();
+                }
             }
         },
         Connections {
@@ -82,27 +81,30 @@ Kirigami.PageRow {
                         for (j in child.screenIds) {
                             let id = child.screenIds[j];
                             if (id === zynthian.current_modal_screen_id) {
-                                root.currentIndex = i;
+                                root.pop(child);
                                 return;
                             }
                         }
                         if (zynthian.current_modal_screen_id in child.screenIds) {
-                            root.currentIndex = i;
+                            root.pop(child);
                             return;
                         }
                     } else if (child.hasOwnProperty("screenId")) {
                         if (child.screenId === zynthian.current_modal_screen_id) {
-                            root.currentIndex = i;
+                            root.pop(child);
                             return;
                         }
                     }
                 }
+
                 let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
                 if (file.length > 0) {
                     if (applicationWindow().pageStack.layers.currentItem != root) {
                         applicationWindow().pageStack.layers.push(root)
                     }
+
                     root.push(file);
+
                 } else {
                     print("Non managed modal screen " + zynthian.current_modal_screen_id);
                 }

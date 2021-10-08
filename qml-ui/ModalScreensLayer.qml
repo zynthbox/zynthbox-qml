@@ -35,8 +35,50 @@ import "pages" as Pages
 Zynthian.Stack {
     id: root
 
+    visible: depth > 0 || busy
+    onVisibleChanged: {
+        if (visible) {
+            root.forceActiveFocus()
+        }
+    }
+
     property var pageCache: {}
     data: [
+        Timer {
+            id: preloadTimer
+            interval: 2000
+            running: true
+            onTriggered: {
+                let file = ""
+                if (!root.pageCache) {
+                    root.pageCache = {};
+                }
+                if (!root.pageCache["zynthiloops"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("zynthiloops");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["zynthiloops"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["zynthiloops"].visible = false;
+                }
+                if (!root.pageCache["song_arranger"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["song_arranger"].visible = false;
+                }
+                if (!root.pageCache["playgrid"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["playgrid"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["playgrid"].visible = false;
+                }
+                if (!root.pageCache["sketch_copier"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["sketch_copier"].visible = false;
+                }
+            }
+        },
         Connections {
             target: zynthian
 
@@ -93,11 +135,15 @@ Zynthian.Stack {
                     }
                 }
 
-                let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
-                if (file.length > 0) {
-                    root.push(file);
+                if (root.pageCache && root.pageCache[zynthian.current_modal_screen_id]) {
+                    root.push(root.pageCache[zynthian.current_modal_screen_id]);
                 } else {
-                    print("Non managed modal screen " + zynthian.current_modal_screen_id);
+                    let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
+                    if (file.length > 0) {
+                        root.push(file);
+                    } else {
+                        print("Non managed modal screen " + zynthian.current_modal_screen_id);
+                    }
                 }
             }
         }

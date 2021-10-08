@@ -1203,19 +1203,13 @@ class zynthian_gui(QObject):
             self.show_screen("control")
 
         elif cuia == "SCREEN_ZYNTHILOOPS":
-            self.start_loading()
             self.show_modal("zynthiloops")
-            self.stop_loading()
 
         elif cuia == "SCREEN_ARRANGER":
-            self.start_loading()
             self.show_modal("song_arranger")
-            self.stop_loading()
 
         elif cuia == "SCREEN_PLAYGRID":
-            self.start_loading()
             self.show_modal("playgrid")
-            self.stop_loading()
 
         elif cuia == "MODAL_SNAPSHOT_LOAD":
             self.toggle_modal("snapshot", "LOAD")

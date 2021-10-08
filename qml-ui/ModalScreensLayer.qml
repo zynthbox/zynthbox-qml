@@ -36,16 +36,6 @@ Zynthian.Stack {
     id: root
 
     data: [
-        Timer {
-            id: delayedRemoveTimer
-            interval: 500
-            onTriggered: {
-                if (applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_screen_id).length === 0) {
-//                     applicationWindow().pageStack.layers.pop();
-//                     root.clear();
-                }
-            }
-        },
         Connections {
             target: zynthian
             onCurrent_modal_screen_idChanged: {
@@ -53,7 +43,6 @@ Zynthian.Stack {
 
                 // Are we in a dashboard page? don't do anything
                 if (applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id).length > 0) {
-                    delayedRemoveTimer.restart();
                     return;
                 }
                 if (zynthian.current_modal_screen_id === "confirm") {
@@ -65,7 +54,6 @@ Zynthian.Stack {
 
                 // No modal screen anymore
                 if (zynthian.current_modal_screen_id.length === 0) {
-                    applicationWindow().pageStack.layers.pop();
                     root.clear();
                     return;
                 }
@@ -99,16 +87,23 @@ Zynthian.Stack {
 
                 let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
                 if (file.length > 0) {
-                    if (applicationWindow().pageStack.layers.currentItem != root) {
-                        applicationWindow().pageStack.layers.push(root)
-                    }
-
                     root.push(file);
-
                 } else {
                     print("Non managed modal screen " + zynthian.current_modal_screen_id);
                 }
             }
         }
     ]
+    background: Rectangle {
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        color: Kirigami.Theme.backgroundColor
+        opacity: root.depth > 0
+        Behavior on opacity {
+            OpacityAnimator {
+               duration: Kirigami.Units.shortDuration
+               easing.type: Easing.InOutCubic
+            }
+        }
+    }
 }

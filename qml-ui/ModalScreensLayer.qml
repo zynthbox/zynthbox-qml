@@ -140,7 +140,7 @@ Zynthian.Stack {
                 } else {
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
                     if (file.length > 0) {
-                        root.replace(file);
+                        root.push(file);
                     } else {
                         print("Non managed modal screen " + zynthian.current_modal_screen_id);
                     }

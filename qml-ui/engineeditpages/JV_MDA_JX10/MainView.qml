@@ -45,35 +45,35 @@ GridLayout {
     // Glide
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#1"
+            category: "Ungroup#1"
             index: 3
         }
     }
     // gld rate
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#2"
+            category: "Ungroup#2"
             index: 0
         }
     }
     // gld blend
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#2"
+            category: "Ungroup#2"
             index: 1
         }
     }
     // vibrato
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#6"
+            category: "Ungroup#4"
             index: 0
         }
     }
     // octave
     Zynthian.MultiSwitchController {
         controller {
-            category: "MDA JX10#6"
+            category: "Ungroup#4"
             index: 2
         }
         stepSize: 50
@@ -85,7 +85,7 @@ GridLayout {
     // tuning
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#6"
+            category: "Ungroup#4"
             index: 3
         }
         valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"

@@ -36,7 +36,7 @@ GridLayout {
     // Cutoff
     Zynthian.DialController {
         controller {
-            category: "Obxd#12"
+            category: "Ctrls#12"
             index: 1
         }
     }
@@ -44,7 +44,7 @@ GridLayout {
     // Resonance
     Zynthian.DialController {
         controller {
-            category: "Obxd#12"
+            category: "Ctrls#12"
             index: 2
         }
     }
@@ -53,7 +53,7 @@ GridLayout {
     // KeyFollow
     Zynthian.DialController {
         controller {
-            category: "Obxd#12"
+            category: "Ctrls#12"
             index: 0
         }
     }
@@ -61,7 +61,7 @@ GridLayout {
     // Filter env amount
     Zynthian.DialController {
         controller {
-            category: "Obxd#13"
+            category: "Ctrls#13"
             index: 3
         }
     }
@@ -69,7 +69,7 @@ GridLayout {
     // Warm
     Zynthian.DialController {
         controller {
-            category: "Obxd#13"
+            category: "Ctrls#13"
             index: 0
         }
     }
@@ -92,7 +92,7 @@ GridLayout {
 
         title: qsTr("Filtertype")
         controller {
-            category: "Obxd#13"
+            category: "Ctrls#13"
             index: 1
         }
         valueLabel: controller.ctrl.value < 100 ? qsTr("Notch") : qsTr("Bandpass")
@@ -114,7 +114,7 @@ GridLayout {
             multimodeId.title = qsTr(newTitle)
         }
         controller {
-            category: "Obxd#13"
+            category: "Ctrls#13"
             index: 2
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("24db") : qsTr("12db")
@@ -127,7 +127,7 @@ GridLayout {
         property int filtertypeVal: 0
         property int lowpassVal: 0
         controller {
-            category: "Obxd#12"
+            category: "Ctrls#12"
             index: 3
         }
         Component.onCompleted: {

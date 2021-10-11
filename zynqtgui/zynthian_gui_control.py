@@ -25,7 +25,7 @@
 
 import sys
 import logging
-import tkinter
+import math
 from time import sleep
 from string import Template
 from datetime import datetime
@@ -101,18 +101,24 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		midichain_layers = self.zyngui.screens['layer'].get_midichain_layers()
 		if midichain_layers is not None and len(midichain_layers)>1:
-			midichain_layers.remove(self.zyngui.curlayer)
+			try:
+				midichain_layers.remove(self.zyngui.curlayer)
+			except:
+				pass
 			self.layers += midichain_layers
 
 		i = 0
 		for layer in self.layers:
 			j = 0
+			if len(self.layers)>1:
+				self.list_data.append((None,None,"> {}".format(layer.engine.name.split("/")[-1])))
 			for cscr in layer.get_ctrl_screens():
 				self.list_data.append((cscr,i,cscr,layer,j))
 				i += 1
 				j += 1
 		self.index = self.zyngui.curlayer.get_active_screen_index()
-		self.controllers_changed.emit()
+		if len(self.list_data[self.index]) < 4:
+			self.index = 1
 		super().fill_list()
 
 
@@ -203,11 +209,13 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.index < len(self.list_data):
 			screen_info = self.list_data[self.index]
 			screen_title = screen_info[2]
-			screen_layer = screen_info[3]
+			if len(screen_info) > 3:
+				screen_layer = screen_info[3]
 
 			#Get controllers for the current screen
 			self.zyngui.curlayer.set_active_screen_index(self.index)
-			self.zcontrollers = screen_layer.get_ctrl_screen(screen_title)
+			if len(screen_info) > 3:
+				self.zcontrollers = screen_layer.get_ctrl_screen(screen_title)
 
 		else:
 			self.zcontrollers = None
@@ -293,9 +301,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		#self.listbox.config(selectbackground=zynthian_gui_config.color_ctrl_bg_on,
 		#	selectforeground=zynthian_gui_config.color_ctrl_tx,
 		#	fg=zynthian_gui_config.color_ctrl_tx)
-		self.listbox.config(selectbackground=zynthian_gui_config.color_ctrl_bg_off,
-			selectforeground=zynthian_gui_config.color_ctrl_tx,
-			fg=zynthian_gui_config.color_ctrl_tx_off)
+		#self.listbox.config(selectbackground=zynthian_gui_config.color_ctrl_bg_off,
+			#selectforeground=zynthian_gui_config.color_ctrl_tx,
+			#fg=zynthian_gui_config.color_ctrl_tx_off)
 		self.select(self.index)
 		self.set_select_path()
 
@@ -397,6 +405,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 
 	def select(self, index=None):
+		if index != None and index >= 0 and index < len(self.list_data) and len(self.list_data[index]) < 4:
+			if self.index > index:
+				index = max(0, index - 1)
+			else:
+				index = min(len(self.list_data), index + 1)
+
 		super().select(index)
 		if self.mode=='select':
 			self.set_controller_screen()

@@ -33,19 +33,19 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ADSRControlView {
     attackController {
-        category: "Obxd#15"
+        category: "Ctrls#15"
         index: 0
     }
     decayController {
-        category: "Obxd#15"
+        category: "Ctrls#15"
         index: 1
     }
     sustainController {
-        category: "Obxd#15"
+        category: "Ctrls#15"
         index: 2
     }
     releaseController {
-        category: "Obxd#15"
+        category: "Ctrls#15"
         index: 3
     }
 }

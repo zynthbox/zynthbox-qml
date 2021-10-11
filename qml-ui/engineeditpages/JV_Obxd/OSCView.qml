@@ -39,7 +39,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("OSC1 Tuning")
         controller {
-            category: "Obxd#8"
+            category: "Ctrls#8"
             index: 3
         }
     }
@@ -49,7 +49,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("Step Quantize")
         controller {
-            category: "Obxd#9"
+            category: "Ctrls#9"
             index: 1
         }
     }
@@ -58,7 +58,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("SYNC")
         controller {
-            category: "Obxd#8"
+            category: "Ctrls#8"
             index: 1
         }
     }
@@ -67,7 +67,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("OSC2 Tuning")
         controller {
-            category: "Obxd#9"
+            category: "Ctrls#9"
             index: 0
         }
     }
@@ -79,7 +79,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC1 Saw")
         controller {
-            category: "Obxd#9"
+            category: "Ctrls#9"
             index: 2
         }
     }
@@ -88,7 +88,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("Cross Modulation")
         controller {
-            category: "Obxd#8"
+            category: "Ctrls#8"
             index: 2
         }
     }
@@ -97,7 +97,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("OSC 2 Detune")
         controller {
-            category: "Obxd#5"
+            category: "Ctrls#5"
             index: 1
         }
     }
@@ -106,7 +106,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC2 Saw")
         controller {
-            category: "Obxd#10"
+            category: "Ctrls#10"
             index: 0
         }
     }
@@ -118,7 +118,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC1 Pulse")
         controller {
-            category: "Obxd#9"
+            category: "Ctrls#9"
             index: 3
         }
     }
@@ -127,7 +127,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("Pulse Width")
         controller {
-            category: "Obxd#10"
+            category: "Ctrls#10"
             index: 2
         }
     }
@@ -136,7 +136,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("Pitch Envelope")
         controller {
-            category: "Obxd#11"
+            category: "Ctrls#11"
             index: 0
         }
     }
@@ -145,7 +145,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC2 Pulse")
         controller {
-            category: "Obxd#10"
+            category: "Ctrls#10"
             index: 1
         }
     }

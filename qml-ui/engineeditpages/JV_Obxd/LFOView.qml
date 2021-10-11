@@ -37,7 +37,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("LFO Speed")
         controller {
-            category: "Obxd#5"
+            category: "Ctrls#5"
             index: 2
         }
     }
@@ -45,7 +45,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("Sine")
         controller {
-            category: "Obxd#5"
+            category: "Ctrls#5"
             index: 3
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -54,7 +54,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("Square")
         controller {
-            category: "Obxd#6"
+            category: "Ctrls#6"
             index: 0
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -63,7 +63,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("Sample & Hold")
         controller {
-            category: "Obxd#6"
+            category: "Ctrls#6"
             index: 1
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -74,7 +74,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("Pitch")
         controller {
-            category: "Obxd#6"
+            category: "Ctrls#6"
             index: 2
         }
     }
@@ -82,7 +82,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC1 Pitch")
         controller {
-            category: "Obxd#7"
+            category: "Ctrls#7"
             index: 0
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -91,7 +91,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC2 Pitch")
         controller {
-            category: "Obxd#7"
+            category: "Ctrls#7"
             index: 1
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -100,7 +100,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("Filter")
         controller {
-            category: "Obxd#7"
+            category: "Ctrls#7"
             index: 2
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -111,7 +111,7 @@ GridLayout {
     Zynthian.DialController {
         title: qsTr("Pulse Width")
         controller {
-            category: "Obxd#6"
+            category: "Ctrls#6"
             index: 3
         }
     }
@@ -119,7 +119,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC1 PWM")
         controller {
-            category: "Obxd#7"
+            category: "Ctrls#7"
             index: 3
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")
@@ -128,7 +128,7 @@ GridLayout {
     Zynthian.SwitchController {
         title: qsTr("OSC2 PWM")
         controller {
-            category: "Obxd#8"
+            category: "Ctrls#8"
             index: 0
         }
         valueLabel: controller.ctrl.value > 100 ? qsTr("on") : qsTr("off")

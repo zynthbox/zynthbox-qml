@@ -35,26 +35,26 @@ GridLayout {
 
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#1"
+            category: "Ungroup#1"
             index: 0
         }
     }
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#1"
+            category: "Ungroup#1"
             index: 1
         }
     }
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#1"
+            category: "Ungroup#1"
             index: 2
         }
     }
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#6"
-            index: 1
+            category: "Ungroup#4"
+            index: 0
         }
     }
 

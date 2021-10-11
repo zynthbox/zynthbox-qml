@@ -36,49 +36,49 @@ GridLayout {
 
     Zynthian.DialController {
         controller {
-            category: "Obxd#16"
+            category: "Ctrls#16"
             index: 3
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#17"
+            category: "Ctrls#17"
             index: 0
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#17"
+            category: "Ctrls#17"
             index: 1
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#17"
+            category: "Ctrls#17"
             index: 2
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#17"
+            category: "Ctrls#17"
             index: 3
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#18"
+            category: "Ctrls#18"
             index: 0
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#18"
+            category: "Ctrls#18"
             index: 1
         }
     }
     Zynthian.DialController {
         controller {
-            category: "Obxd#18"
+            category: "Ctrls#18"
             index: 2
         }
     }

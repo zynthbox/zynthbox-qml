@@ -30,8 +30,6 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-import org.kde.plasma.core 2.0 as PlasmaCore
-
 Zynthian.ScreenPage {
     id: root
     title: zynthian.control.selector_path_element
@@ -214,20 +212,15 @@ Zynthian.ScreenPage {
                     ListView {
                         id: layersView
                         model: zynthian.fixed_layers.selector_list
-                        delegate: QQC2.Control {
+                        delegate: Kirigami.AbstractListItem {
                             width: layersView.width
-                            background: Item {
-                                PlasmaCore.FrameSvgItem {
-                                    anchors {
-                                        fill: parent
-                                        margins: -Kirigami.Units.smallSpacing
-                                    }
-                                    imagePath: "widgets/viewitem"
-                                    prefix: "hover"
-                                    visible: zynthian.active_midi_channel === index
-                                }
-                            }
                             height: layersView.height / 15
+                            highlighted: zynthian.active_midi_channel === index
+                            separatorVisible: false
+                            onClicked: {
+                                zynthian.current_screen_id = "main_layers_view";
+                                zynthian.fixed_layers.activate_index(index);
+                            }
                             contentItem: RowLayout {
                                 QQC2.Label {
                                     Layout.fillWidth: true

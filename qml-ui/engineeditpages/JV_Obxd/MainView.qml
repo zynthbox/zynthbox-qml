@@ -38,7 +38,7 @@ GridLayout {
     // VoiceCount
     Zynthian.MultiSwitchController {
         title: qsTr("Voices")
-        controller.category: "Obxd#2"
+        controller.category: "Ctrls#2"
         controller.index: 0
         stepSize: Math.round(multiSwitch.to / 7)
         valueLabel: Math.round(multiSwitch.value / (200 / 7)) + 1
@@ -46,7 +46,7 @@ GridLayout {
     // Octave
     Zynthian.MultiSwitchController {
         title: qsTr("Transpose")
-        controller.category: "Obxd#2"
+        controller.category: "Ctrls#2"
         controller.index: 2
         stepSize: 50
         valueLabel: {
@@ -57,14 +57,14 @@ GridLayout {
     // Tune
     Zynthian.DialController {
         title: qsTr("Tune")
-        controller.category: "Obxd#2"
+        controller.category: "Ctrls#2"
         controller.index: 1
         valueLabel: (value > 100 ? "+" : "") + Math.round(value - 100) + "%"
     }
     // VOLUME
     Zynthian.SliderController {
         title: qsTr("Volume")
-        controller.category: "Obxd#1"
+        controller.category: "Ctrls#1"
         controller.index: 3
         valueLabel: Math.round(value / 2)
     }

@@ -33,20 +33,20 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ADSRControlView {
     attackController {
-        category: "MDA JX10#3"
-        index: 3
-    }
-    decayController {
-        category: "MDA JX10#4"
+        category: "Filter Envelope"
         index: 0
     }
-    sustainController {
-        category: "MDA JX10#4"
+    decayController {
+        category: "Filter Envelope"
         index: 1
     }
-    releaseController {
-        category: "MDA JX10#4"
+    sustainController {
+        category: "Filter Envelope"
         index: 2
+    }
+    releaseController {
+        category: "Filter Envelope"
+        index: 3
     }
 }
 

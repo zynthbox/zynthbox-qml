@@ -37,28 +37,28 @@ GridLayout {
     // vcf freq
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#2"
+            category: "Ungroup#2"
             index: 2
         }
     }
     // vcf reso
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#2"
+            category: "Ungroup#2"
             index: 3
         }
     }
     // vcf env
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#3"
+            category: "Ungroup#3"
             index: 0
         }
     }
     // vcf vel
     Zynthian.DialController {
         controller {
-            category: "MDA JX10#3"
+            category: "Ungroup#3"
             index: 2
         }
     }

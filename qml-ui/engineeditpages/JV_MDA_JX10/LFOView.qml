@@ -36,14 +36,14 @@ GridLayout {
     Zynthian.DialController {
         implicitHeight: 1
         controller {
-            category: "MDA JX10#3"
+            category: "Ungroup#3"
             index: 1
         }
     }
     Zynthian.DialController {
         implicitHeight: 1
         controller {
-            category: "MDA JX10#5"
+            category: "Ungroup#3"
             index: 3
         }
     }

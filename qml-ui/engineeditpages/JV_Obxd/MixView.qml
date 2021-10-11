@@ -36,7 +36,7 @@ GridLayout {
     // o1mix
     Zynthian.SliderController {
         controller {
-            category: "Obxd#11"
+            category: "Ctrls#11"
             index: 1
         }
         valueLabel: Math.round(value / 2)
@@ -44,7 +44,7 @@ GridLayout {
     // o2mix
     Zynthian.SliderController {
         controller {
-            category: "Obxd#11"
+            category: "Ctrls#11"
             index: 2
         }
         valueLabel: Math.round(value / 2)
@@ -54,7 +54,7 @@ GridLayout {
     // noisemix
     Zynthian.SliderController {
         controller {
-            category: "Obxd#11"
+            category: "Ctrls#11"
             index: 3
         }
         valueLabel: Math.round(value / 2)
@@ -62,7 +62,7 @@ GridLayout {
     // brightness
     Zynthian.SliderController {
         controller {
-            category: "Obxd#10"
+            category: "Ctrls#10"
             index: 3
         }
         valueLabel: Math.round(value / 2)

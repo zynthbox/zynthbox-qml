@@ -1494,13 +1494,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if not isinstance(snapshot["layers"], list):
 			return []
 		self.zyngui.start_loading()
-		#for i in range(from_channel, to_channel + 1):
-			#for j in range(from_channel, to_channel + 1):
-				#if i in self.layer_midi_map and j in self.layer_midi_map and zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
-					#self.remove_clone_midi(i, j)
+
 		restored_layers = []
 		restored_channels = []
 		restored_jacknames = []
+
+		for layer_data in snapshot["layers"]:
+			if "midi_chan" in layer_data and "engine_nick" in layer_data:
+				midi_chan = layer_data["midi_chan"]
+				if midi_chan in self.layer_midi_map:
+						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]
@@ -1512,8 +1515,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 						if i in self.layer_midi_map and midi_chan in self.layer_midi_map:
 							self.remove_clone_midi(i, midi_chan)
 							self.remove_clone_midi(midi_chan, i)
-					if midi_chan in self.layer_midi_map:
-						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
 					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
 					new_layer = zynthian_layer(engine, midi_chan, self.zyngui)
 					new_layer.restore_snapshot_1(layer_data)

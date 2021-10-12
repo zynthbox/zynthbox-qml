@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.ScreenPage {
     id: root
@@ -190,9 +191,43 @@ Zynthian.ScreenPage {
                     }
                 }
                 QQC2.ScrollView {
+                    id: patternsView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredWidth: 1
+                    ColumnLayout {
+                        Repeater {
+                            id: patternsViewMainRepeater
+                            model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                            delegate: Repeater {
+                                id: patternsViewPlaygridRepeater
+                                model: ZynQuick.PlayGridManager.dashboardModels[modelData]
+                                property string playgridId: modelData
+                                delegate: QQC2.Control {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: patternsView.height / 15
+                                    contentItem: RowLayout {
+                                        QQC2.Label {
+                                            Layout.fillWidth: true
+                                            // If there's more than one playgrid exposing models to us, let's make it clear which is this one
+                                            /// NOTE: Port this bit of string-mangling ugliness to whatever handy trickery we end up with for keeping instances around in PlayGridManager
+                                            text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
+                                        }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            zynthian.current_modal_screen_id = "playgrid";
+                                            var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
+                                            //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
+                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
+                                            ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

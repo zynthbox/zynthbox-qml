@@ -270,6 +270,9 @@ RowLayout {
             Loader {
                 id:playGridLoader
                 source: modelData + "/main.qml"
+                onLoaded: {
+                    playGridLoader.item.setId(modelData);
+                }
             }
         }
 

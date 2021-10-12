@@ -1957,6 +1957,7 @@ class zynthian_gui(QObject):
                     self.screens[self.active_screen].refresh_loading()
             except Exception as err:
                 logging.error("zynthian_gui.loading_refresh() => %s" % err)
+                self.show_screen("session_dashboard")
             time.sleep(0.1)
 
     def wait_threads_end(self, n=20):

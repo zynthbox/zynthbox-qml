@@ -1458,6 +1458,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				binary_riff_data = base64.decodebytes(b64_bytes)
 				self.zyngui.screens['stepseq'].restore_riff_data(binary_riff_data)
 
+			# Forbid layers without any output
+			for layer in self.layers:
+				if len(layer.get_audio_out()) == 0:
+					layer.reset_audio_out()
+
 			#Post action
 			if not quiet:
 				if self.index<len(self.root_layers):

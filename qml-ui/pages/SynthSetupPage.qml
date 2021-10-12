@@ -710,7 +710,10 @@ Zynthian.ScreenPage {
                         }
                         Connections {
                             target: layerReplaceDialog
-                            onFileToLoadChanged: checked = index === zynthian.main_layers_view.current_index
+                            onFileToLoadChanged: {
+                                checked = false
+                                checked = index === zynthian.main_layers_view.current_index
+                            }
                         }
                         indicator.opacity: enabled
                         indicator.x: 0

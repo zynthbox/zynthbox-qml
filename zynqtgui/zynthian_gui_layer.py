@@ -1620,6 +1620,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.ensure_special_layers_midi_cloned()
 
 		self.fill_list()
+		if len(restored_channels) > 0:
+			self.activate_midichan_layer(restored_channels[0])
 		self.zyngui.stop_loading()
 		return restored_layers
 

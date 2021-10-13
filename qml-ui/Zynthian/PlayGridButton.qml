@@ -55,6 +55,7 @@ QQC2.Button {
                 onPressedChanged: {
                     if (pressed) {
                         component.pressed();
+                        component.focus = true;
                     } else {
                         component.released();
                         if (x > -1 && y > -1 && x < component.width && y < component.height) {

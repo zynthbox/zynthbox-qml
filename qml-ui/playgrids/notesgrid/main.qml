@@ -212,7 +212,17 @@ Zynthian.BasePlayGrid {
                 id: comboScale
                 Kirigami.FormData.label: "Modes"
                 Layout.fillWidth: true
-                model: scaleModel
+                model: ListModel {
+                    id: scaleModel
+                    ListElement { scale: "chromatic"; text: "Chromatic" }
+                    ListElement { scale: "ionian"; text: "Ionian (Major)" }
+                    ListElement { scale: "dorian"; text: "Dorian" }
+                    ListElement { scale: "phrygian"; text: "Phrygian" }
+                    ListElement { scale: "lydian"; text: "Lydian" }
+                    ListElement { scale: "mixolydian"; text: "Mixolydian" }
+                    ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
+                    ListElement { scale: "locrian"; text: "Locrian" }
+                }
                 textRole: "text"
                 displayText: currentText
                 currentIndex: 1
@@ -318,7 +328,13 @@ Zynthian.BasePlayGrid {
                 id: optionGrid
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Grid"
-                model: gridModel
+                model: ListModel {
+                    id: gridModel
+                    ListElement { row: 0; column: 0; text: "Custom" }
+                    ListElement { row: 3; column: 3; text: "3x3" }
+                    ListElement { row: 4; column: 4; text: "4x4" }
+                    ListElement { row: 5; column: 8; text: "5x8" }
+                }
                 textRole: "text"
                 displayText: currentText
                 currentIndex: 3

@@ -48,8 +48,11 @@ QQC2.Button {
             return;
         }
         kirigamiAction.trigger()
-        if (kirigamiAction && kirigamiAction.hasOwnProperty("children") && kirigamiAction.children.length > 0) {
-            mainActionSubMenu.visible = true
+        if (kirigamiAction && kirigamiAction.hasOwnProperty("menuDelegate") && kirigamiAction.menuDelegate) {
+            kirigamiAction.menuDelegate.parent = root;
+            kirigamiAction.menuDelegate.visible = true;
+        } else if (kirigamiAction && kirigamiAction.hasOwnProperty("children") && kirigamiAction.children.length > 0) {
+            mainActionSubMenu.visible = true;
         }
     }
 
@@ -60,7 +63,7 @@ QQC2.Button {
             bottom: parent.bottom
             margins: Kirigami.Units.largeSpacing
         }
-        visible: root.kirigamiAction && root.kirigamiAction.hasOwnProperty("children") && root.kirigamiAction.children.length > 0
+        visible: (root.kirigamiAction && root.kirigamiAction.hasOwnProperty("children") && root.kirigamiAction.children.length > 0) || (kirigamiAction && kirigamiAction.hasOwnProperty("menuDelegate") && kirigamiAction.menuDelegate)
         parent: root.background
         height: Kirigami.Units.smallSpacing
         color: Kirigami.Theme.highlightColor

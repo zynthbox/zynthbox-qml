@@ -31,6 +31,7 @@ from time import sleep
 from string import Template
 from datetime import datetime
 from pathlib import Path
+from json import JSONEncoder, JSONDecoder
 
 # Zynthian specific modules
 from zyngine import zynthian_controller
@@ -142,15 +143,26 @@ class zynthian_gui_control(zynthian_gui_selector):
 		super().show()
 		self.click_listbox()
 		if self.zyngui.curlayer:
-			engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
-			path = "/root/.local/share/zynthian/engineeditpages/" + engine_folder_name
+			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
 			logging.error(path)
 			if Path(path).exists():
 				for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
 					if module_dir.is_dir():
-						entries.append({"display": module_dir.name,
-										"path": module_dir.path})
+						metadatapath = module_dir.path + "/metadata.json";
+						try:
+							fh = open(metadatapath, "r")
+							json = fh.read()
+							metadata = JSONDecoder().decode(json)
+							logging.error(metadata)
+							if metadata["Engine"] == self.zyngui.curlayer.engine.nickname:
+								logging.error("ADDING")
+								entries.append({"display": metadata["Name"],
+												"path": module_dir.path})
+						except:
+							continue
+
+			engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
 			path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 			if Path(path).exists():
 				entries.append({"display": "Default",

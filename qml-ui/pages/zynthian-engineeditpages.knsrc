@@ -1,0 +1,6 @@
+[KNewStuff3]
+Name=Themes
+ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+Categories=Synth Plugin Themes
+XdgTargetDir=zynthian/engineeditpages
+Uncompress=always

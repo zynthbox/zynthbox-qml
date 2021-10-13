@@ -588,6 +588,7 @@ class zynthian_gui(QObject):
         self.screens["bank"] = zynthian_gui_bank(self)
         self.screens["preset"] = zynthian_gui_preset(self)
         self.screens["control"] = zynthian_gui_control(self)
+        self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["track"] = zynthian_gui_track(self)
         # self.screens['control_xy'] = zynthian_gui_control_xy(self)
         # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)

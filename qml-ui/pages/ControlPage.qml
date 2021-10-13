@@ -53,17 +53,36 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
+            id: viewAction
             text: qsTr("Switch View")
             visible: zynthian.control.custom_control_page.length > 0
             onTriggered: {
-                if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
-                    stack.replace(defaultPage);
-                } else if (zynthian.control.custom_control_page.length > 0) {
-                    stack.replace(zynthian.control.custom_control_page);
+                if (zynthian.control.control_pages_model.count == 2) {
+                    if (zynthian.control.custom_control_page === zynthian.control.default_custom_control_page) {
+                        zynthian.control.custom_control_page = "";
+                    } else {
+                        zynthian.control.custom_control_page = zynthian.control.default_custom_control_page;
+                    }
+                }
+            }
+            property QQC2.Menu menuDelegate: zynthian.control.control_pages_model.count > 2 ? customControlsMenu : null
+        }
+    ]
+
+    QQC2.Menu {
+        id: customControlsMenu
+        y: -height
+        Repeater {
+            model: zynthian.control.control_pages_model
+            delegate: QQC2.MenuItem {
+                text: model.display
+                onClicked: {
+                    zynthian.control.custom_control_page = model.path
                 }
             }
         }
-    ]
+    }
+
     Component.onCompleted: {
        // mainView.forceActiveFocus()
         //HACK

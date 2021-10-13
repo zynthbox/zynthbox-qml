@@ -26,6 +26,7 @@
 import sys
 import logging
 import math
+import os
 from time import sleep
 from string import Template
 from datetime import datetime
@@ -38,11 +39,74 @@ from . import zynthian_gui_controller
 from . import zynthian_gui_selector
 
 # Qt modules
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, QByteArray
 
 #------------------------------------------------------------------------------
 # Zynthian Instrument Controller GUI Class
 #------------------------------------------------------------------------------
+
+class control_pages_list_model(QAbstractListModel):
+	DISPLAY = Qt.DisplayRole
+	PATH = Qt.UserRole + 1
+
+	def __init__(self, parent=None):
+		super(control_pages_list_model, self).__init__(parent)
+		self.entries = []
+
+	def set_entries(self, entries):
+		was_empty = len(self.entries) == 0
+
+		if len(entries) > len(self.entries):
+			self.beginInsertRows(QModelIndex(), len(self.entries), len(entries)-1)
+			self.entries = entries
+			self.endInsertRows()
+		elif len(entries) < len(self.entries):
+			self.beginRemoveRows(QModelIndex(), len(entries), len(self.entries)-1)
+			self.entries = entries
+			self.endRemoveRows()
+		else:
+			self.entries = entries
+
+		if not was_empty:
+			self.dataChanged.emit(self.index(0,0), self.index(min(len(entries), len(self.entries)) - 1, 0))
+
+		self.count_changed.emit()
+
+
+	def roleNames(self):
+		keys = {
+			control_pages_list_model.DISPLAY : QByteArray(b'display'),
+			control_pages_list_model.PATH : QByteArray(b'path'),
+			}
+		return keys
+
+	def rowCount(self, index):
+		return len(self.entries)
+
+	def get_count(self):
+		return len(self.entries)
+
+
+	def data(self, index, role):
+		if not index.isValid():
+			return None
+
+		if index.row() > len(self.entries):
+			return None
+
+		entry = self.entries[index.row()]
+		if role == control_pages_list_model.DISPLAY:
+			return entry["display"]
+		elif role == control_pages_list_model.PATH:
+			return entry["path"]
+		else:
+			return None
+
+	count_changed = Signal()
+
+	count = Property(int, get_count, notify = count_changed)
+
+
 
 class zynthian_gui_control(zynthian_gui_selector):
 
@@ -63,7 +127,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.zgui_custom_controllers_map={}
 		self.custom_controller_id_start = 100
 
-		self.last_custom_control_page = None
+		self.__last_custom_control_page = None
+		self.__control_pages_model = control_pages_list_model(self)
+		self.__custom_control_page = None
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -75,6 +141,25 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def show(self):
 		super().show()
 		self.click_listbox()
+		if self.zyngui.curlayer:
+			engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
+			path = "/root/.local/share/zynthian/engineeditpages/" + engine_folder_name
+			entries = []
+			logging.error(path)
+			if Path(path).exists():
+				for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
+					if module_dir.is_dir():
+						entries.append({"display": module_dir.name,
+										"path": module_dir.path})
+			path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
+			if Path(path).exists():
+				entries.append({"display": "Default",
+								"path": "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name})
+			entries.append({"display": "Basic",
+							"path": ""})
+			self.__control_pages_model.set_entries(entries)
+		else:
+			self.__control_pages_model.set_entries([])
 
 
 	def hide(self):
@@ -174,18 +259,45 @@ class zynthian_gui_control(zynthian_gui_selector):
 		else:
 			return None
 
-	def get_custom_control_page(self):
+	def get_control_pages_model(self):
+		return self.__control_pages_model
+
+	def set_custom_control_page(self, path):
+		final_path = path
+		if not final_path.endswith("/contents/main.qml"):
+			final_path += "/contents/main.qml"
+		if path == "":
+			if self.__custom_control_page != path:
+				self.__custom_control_page = path
+				self.custom_control_page_changed.emit()
+		elif Path(final_path).exists():
+			if self.__custom_control_page != final_path:
+				self.__custom_control_page = final_path
+				self.custom_control_page_changed.emit()
+
+
+	def get_default_custom_control_page(self):
 		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
 			return None
 		engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
 		# TODO: also search for stuff installed in ~/.local
-		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/main.qml"
+		path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 		if Path(path).exists():
-			self.last_custom_control_page = path
+			self.__last_custom_control_page = path
 			return path
 		else:
-			self.last_custom_control_page = None
+			self.__last_custom_control_page = None
 			return None
+
+
+
+	def get_custom_control_page(self):
+		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+			return None
+		if self.__custom_control_page == None:
+			return self.get_default_custom_control_page()
+		else:
+			return self.__custom_control_page
 
 	def lock_controllers(self):
 		self.controllers_lock = True
@@ -251,8 +363,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		self.controllers_count_changed.emit()
 
-		if self.last_custom_control_page != self.get_custom_control_page():
+		if self.__last_custom_control_page != self.get_custom_control_page():
 			self.custom_control_page_changed.emit()
+			self.default_custom_control_page_changed.emit()
 		#Release Mutex Lock
 		#self.zyngui.lock.release()
 
@@ -591,8 +704,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 	controllers_changed = Signal()
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()
+	default_custom_control_page_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
-	custom_control_page = Property(str, get_custom_control_page, notify = custom_control_page_changed)
+	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)
+	default_custom_control_page = Property(str, get_default_custom_control_page, notify = default_custom_control_page_changed)
+	control_pages_model = Property(QObject, get_control_pages_model, constant = True)
 
 #------------------------------------------------------------------------------

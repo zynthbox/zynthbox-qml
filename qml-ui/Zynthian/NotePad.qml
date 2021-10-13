@@ -26,6 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import org.zynthian.quick 1.0 as ZynQuick
@@ -64,11 +65,10 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 color: modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.firstNoteBackground : component.backgroundColor)
-                Text {
+                QQC2.Label {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    clip: true
                     color: component.foregroundColor
                     text: modelData.name + modelData.octave
                 }
@@ -95,11 +95,10 @@ Item {
             }
             return color;
         }
-        Text {
+        QQC2.Label {
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            clip: true
             color: component.foregroundColor
             text: {
                 var text = "";

@@ -1462,6 +1462,15 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			for layer in self.layers:
 				if len(layer.get_audio_out()) == 0:
 					layer.reset_audio_out()
+			# Forbid channels with empty midi routing
+			for layer in self.root_layers:
+				for l2 in self.get_midichain_layers(layer):
+					if len(l2.get_midi_out()) == 0:
+						if l2 == layer:
+							l2.set_midi_out(["MIDI-OUT", "NET-OUT"])
+						else:
+							l2.set_midi_out([layer.get_jackname()])
+
 
 			#Post action
 			if not quiet:
@@ -1472,6 +1481,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.show_screen('layer')
 
 			self.ensure_special_layers_midi_cloned()
+
 
 
 		except Exception as e:

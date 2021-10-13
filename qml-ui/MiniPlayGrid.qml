@@ -43,66 +43,11 @@ RowLayout {
         Layout.maximumWidth: Layout.preferredWidth
         Layout.fillHeight: true
         Layout.margins: 8
-        QQC2.Button {
-            Layout.fillWidth: true
-            Layout.preferredHeight: width
-            Layout.maximumHeight: width
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-            background: Rectangle {
-                radius: 2
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                border {
-                    width: 1
-                    color: Kirigami.Theme.textColor
-                }
-                color: Kirigami.Theme.backgroundColor
-
-                Text {
-                    anchors.fill: parent
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: Kirigami.Theme.textColor
-                    text: "Hide"
-                }
-            }
-            MultiPointTouchArea {
-                anchors.fill: parent
-                onPressed: {
-                    parent.down = true;
-                    focus = true;
-                }
-                onReleased: {
-                    parent.down = false;
-                    focus = false;
-                    zynthian.callable_ui_action("KEYBOARD")
-                }
-            }
-        }
-
-        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
-
-        QQC2.Button {
+        Zynthian.PlayGridButton {
             id: settingsButton
-            Layout.fillWidth: true
             Layout.preferredHeight: width
             Layout.maximumHeight: width
             icon.name: "configure"
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-            background: Rectangle {
-                radius: 2
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                border {
-                    width: 1
-                    color: Kirigami.Theme.textColor
-                }
-                color: Kirigami.Theme.backgroundColor
-            }
             Rectangle {
                 id: slideDelegateIconMask
                 anchors {
@@ -242,6 +187,17 @@ RowLayout {
                         }
                     }
                 }
+            }
+        }
+
+        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+        Zynthian.PlayGridButton {
+            text: "Hide"
+            Layout.preferredHeight: width
+            Layout.maximumHeight: width
+            onClicked: {
+                zynthian.callable_ui_action("KEYBOARD")
             }
         }
     }

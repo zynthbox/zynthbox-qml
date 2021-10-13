@@ -235,6 +235,31 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     component.setProperty("startingNote", keyModel.get(currentIndex).note);
                 }
+                ListModel {
+                    id: keyModel
+                    function getName(note) {
+                        for(var i = 0; i < keyModel.rowCount(); ++i) {
+                            var le = keyModel.get(i);
+                            if (le.note = note) {
+                                return le.text;
+                            }
+                        }
+                        return "C";
+                    }
+
+                    ListElement { note: 36; text: "C" }
+                    ListElement { note: 37; text: "C#" }
+                    ListElement { note: 38; text: "D" }
+                    ListElement { note: 39; text: "D#" }
+                    ListElement { note: 40; text: "E" }
+                    ListElement { note: 41; text: "F" }
+                    ListElement { note: 42; text: "F#" }
+                    ListElement { note: 43; text: "G" }
+                    ListElement { note: 44; text: "G#" }
+                    ListElement { note: 45; text: "A" }
+                    ListElement { note: 46; text: "A#" }
+                    ListElement { note: 47; text: "B" }
+                }
             }
 
             QQC2.Button {

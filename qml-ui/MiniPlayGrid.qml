@@ -254,11 +254,13 @@ RowLayout {
         initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item.miniGrid
         Connections {
             target: ZynQuick.PlayGridManager
+            property string currentPlaygrid
             onCurrentPlaygridsChanged: {
-                if (playGridsRepeater.count > 0) {
+                if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]) {
                     var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
                     playGridStack.replace(playgrid.miniGrid);
                     //settingsStack.replace(playgrid.settings);
+                    currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["minigrid"];
                 }
             }
         }

@@ -214,7 +214,17 @@ Zynthian.BasePlayGrid {
                     Layout.fillWidth: true
                     Kirigami.FormData.label: "Scale for row " + (index + 1)
                     property int repeaterIndex: index
-                    model: scaleModel
+                    model: ListModel {
+                        id: scaleModel
+                        ListElement { scale: "chromatic"; text: "Chromatic" }
+                        ListElement { scale: "ionian"; text: "Ionian (Major)" }
+                        ListElement { scale: "dorian"; text: "Dorian" }
+                        ListElement { scale: "phrygian"; text: "Phrygian" }
+                        ListElement { scale: "lydian"; text: "Lydian" }
+                        ListElement { scale: "mixolydian"; text: "Mixolydian" }
+                        ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
+                        ListElement { scale: "locrian"; text: "Locrian" }
+                    }
                     textRole: "text"
                     displayText: currentText
                     currentIndex: {

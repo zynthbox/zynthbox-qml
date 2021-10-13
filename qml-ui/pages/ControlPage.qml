@@ -55,7 +55,7 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             id: viewAction
             text: qsTr("Switch View")
-            visible: zynthian.control.custom_control_page.length > 0
+            visible: zynthian.control.control_pages_model.count > 0
             onTriggered: {
                 if (zynthian.control.control_pages_model.count == 2) {
                     if (zynthian.control.custom_control_page === zynthian.control.default_custom_control_page) {
@@ -66,6 +66,10 @@ Zynthian.ScreenPage {
                 }
             }
             property QQC2.Menu menuDelegate: zynthian.control.control_pages_model.count > 2 ? customControlsMenu : null
+        },
+        Kirigami.Action {
+            text: qsTr("Get New Views...")
+            onTriggered: zynthian.show_modal("control_downloader")
         }
     ]
 
@@ -76,6 +80,7 @@ Zynthian.ScreenPage {
             model: zynthian.control.control_pages_model
             delegate: QQC2.MenuItem {
                 text: model.display
+                highlighted: zynthian.control.custom_control_page === model.path
                 onClicked: {
                     zynthian.control.custom_control_page = model.path
                 }

@@ -14,6 +14,7 @@ MultiSelectorPage 1.0 MultiSelectorPage.qml
 MultiSwitchController 1.0 MultiSwitchController.qml
 NewStuffPage 1.0 NewStuffPage.qml
 NotePad 1.0 NotePad.qml
+PlayGridButton 1.0 PlayGridButton.qml
 Rating 1.0 Rating.qml
 ScreenPage 1.0 ScreenPage.qml
 ScrollableScreenPage 1.0 ScrollableScreenPage.qml

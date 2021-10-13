@@ -57,11 +57,13 @@ Zynthian.ScreenPage {
 
     Connections {
         target: ZynQuick.PlayGridManager
+        property string currentPlaygrid
         onCurrentPlaygridsChanged: {
-            if (playGridsRepeater.count > 0){
+            if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
                 var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
                 playGridStack.replace(playgrid.grid);
                 settingsStack.replace(playgrid.settings);
+                currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
             }
         }
     }

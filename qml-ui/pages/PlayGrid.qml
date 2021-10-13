@@ -55,53 +55,6 @@ Zynthian.ScreenPage {
         }
     }
 
-    ListModel {
-        id: scaleModel
-        ListElement { scale: "chromatic"; text: "Chromatic" }
-        ListElement { scale: "ionian"; text: "Ionian (Major)" }
-        ListElement { scale: "dorian"; text: "Dorian" }
-        ListElement { scale: "phrygian"; text: "Phrygian" }
-        ListElement { scale: "lydian"; text: "Lydian" }
-        ListElement { scale: "mixolydian"; text: "Mixolydian" }
-        ListElement { scale: "aeolian"; text: "Aeolian (Natural Minor)" }
-        ListElement { scale: "locrian"; text: "Locrian" }
-    }
-
-    ListModel {
-        id: keyModel
-        function getName(note) {
-            for(var i = 0; i < keyModel.rowCount(); ++i) {
-                var le = keyModel.get(i);
-                if (le.note = note) {
-                    return le.text;
-                }
-            }
-            return "C";
-        }
-
-        ListElement { note: 36; text: "C" }
-        ListElement { note: 37; text: "C#" }
-        ListElement { note: 38; text: "D" }
-        ListElement { note: 39; text: "D#" }
-        ListElement { note: 40; text: "E" }
-        ListElement { note: 41; text: "F" }
-        ListElement { note: 42; text: "F#" }
-        ListElement { note: 43; text: "G" }
-        ListElement { note: 44; text: "G#" }
-        ListElement { note: 45; text: "A" }
-        ListElement { note: 46; text: "A#" }
-        ListElement { note: 47; text: "B" }
-    }
-
-    ListModel {
-        id: gridModel
-
-        ListElement { row: 0; column: 0; text: "Custom" }
-        ListElement { row: 3; column: 3; text: "3x3" }
-        ListElement { row: 4; column: 4; text: "4x4" }
-        ListElement { row: 5; column: 8; text: "5x8" }
-    }
-
     Connections {
         target: ZynQuick.PlayGridManager
         onCurrentPlaygridsChanged: {
@@ -214,24 +167,11 @@ Zynthian.ScreenPage {
                 Layout.margins: 8
                 z: 999
 
-                QQC2.Button {
+                Zynthian.PlayGridButton {
                     id: settingsButton
-                    Layout.fillWidth: true
                     Layout.minimumHeight: width
                     Layout.maximumHeight: width
                     icon.name: "application-menu"
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    background: Rectangle {
-                        radius: 2
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        border {
-                            width: 1
-                            color: Kirigami.Theme.textColor
-                        }
-                        color: Kirigami.Theme.backgroundColor
-                    }
                     Rectangle {
                         id: slideDelegateIconMask
                         anchors {
@@ -407,7 +347,12 @@ Zynthian.ScreenPage {
                             if (settingsSlidePoint.pressed) {
                                 xChoice = settingsButton.getXChoice();
                                 yChoice = settingsButton.getYChoice();
+                                parent.focus = true;
                                 parent.down = true;
+                                if (sidebarLoader.item) {
+                                    // This looks odd - it steals focus from anything /inside/ the bar that has focus (such as a popup menu that might want hiding)
+                                    sidebarLoader.item.focus = true;
+                                }
                             }
                         }
                         onUpdated: {
@@ -444,6 +389,7 @@ Zynthian.ScreenPage {
                 }
 
                 Loader {
+                    id: sidebarLoader
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
@@ -466,23 +412,9 @@ Zynthian.ScreenPage {
         ColumnLayout {
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            Zynthian.PlayGridButton {
                 icon.name: "arrow-up"
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
-                background: Rectangle {
-                    radius: 2
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    border {
-                        width: 1
-                        color: Kirigami.Theme.textColor
-                    }
-                    color: Kirigami.Theme.backgroundColor
-                }
                 onClicked: {
                     if (playGridsRepeater.currentItem.octave + 1 < 11){
                         playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
@@ -497,23 +429,9 @@ Zynthian.ScreenPage {
                 Layout.alignment: Qt.AlignHCenter
             }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            Zynthian.PlayGridButton {
                 icon.name: "arrow-down"
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
-                background: Rectangle {
-                    radius: 2
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    border {
-                        width: 1
-                        color: Kirigami.Theme.textColor
-                    }
-                    color: Kirigami.Theme.backgroundColor
-                }
                 onClicked: {
                     if (playGridsRepeater.currentItem.octave - 1 > 0) {
                         playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
@@ -525,31 +443,8 @@ Zynthian.ScreenPage {
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                background: Rectangle {
-                    radius: 2
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    border {
-                        width: 1
-                        color: Kirigami.Theme.textColor
-                    }
-                    color: Kirigami.Theme.backgroundColor
-
-                    Text {
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        color: Kirigami.Theme.textColor
-                        text: "Mod\nulate"
-                    }
-                }
+            Zynthian.PlayGridButton {
+                text: "Mod\nulate"
                 MultiPointTouchArea {
                     anchors.fill: parent
                     property int modulationValue: Math.max(-127, Math.min(modulationPoint.y * 127 / width, 127))
@@ -571,68 +466,26 @@ Zynthian.ScreenPage {
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            Zynthian.PlayGridButton {
                 icon.name: "arrow-up"
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                background: Rectangle {
-                    radius: 2
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    border {
-                        width: 1
-                        color: Kirigami.Theme.textColor
-                    }
-                    color: Kirigami.Theme.backgroundColor
+                onPressed: {
+                    ZynQuick.PlayGridManager.pitch = 8191;
                 }
-                MultiPointTouchArea {
-                    anchors.fill: parent
-                    onPressed: {
-                        parent.down = true;
-                        focus = true;
-                        ZynQuick.PlayGridManager.pitch = 8191;
-                    }
-                    onReleased: {
-                        parent.down = false;
-                        focus = false;
-                        ZynQuick.PlayGridManager.pitch = 0;
-                    }
+                onReleased: {
+                    ZynQuick.PlayGridManager.pitch = 0;
                 }
             }
             QQC2.Label {
                 text: "Pitch"
                 Layout.alignment: Qt.AlignHCenter
             }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            Zynthian.PlayGridButton {
                 icon.name: "arrow-down"
-                Kirigami.Theme.inherit: false
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                background: Rectangle {
-                    radius: 2
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    border {
-                        width: 1
-                        color: Kirigami.Theme.textColor
-                    }
-                    color: Kirigami.Theme.backgroundColor
+                onPressed: {
+                    ZynQuick.PlayGridManager.pitch = -8192;
                 }
-                MultiPointTouchArea {
-                    anchors.fill: parent
-                    onPressed: {
-                        parent.down = true;
-                        focus = true;
-                        ZynQuick.PlayGridManager.pitch = -8192;
-                    }
-                    onReleased: {
-                        parent.down = false;
-                        focus = false;
-                        ZynQuick.PlayGridManager.pitch = 0;
-                    }
+                onReleased: {
+                    ZynQuick.PlayGridManager.pitch = 0;
                 }
             }
         }

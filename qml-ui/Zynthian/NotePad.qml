@@ -144,6 +144,7 @@ Item {
                         playingNote = component.note;
                         ZynQuick.PlayGridManager.setNoteOn(playingNote, velocityValue)
                         component.notePlayed(playingNote, velocityValue);
+                        component.focus = true;
                     } else {
                         ZynQuick.PlayGridManager.setNoteOff(playingNote)
                         ZynQuick.PlayGridManager.pitch = 0;

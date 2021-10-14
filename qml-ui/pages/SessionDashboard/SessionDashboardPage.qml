@@ -129,6 +129,9 @@ Zynthian.ScreenPage {
                                     text: "1. " + zynthian.zynthiloops.song.name
                                 }
                             }
+                            background: Rectangle {
+                                color: Kirigami.Theme.highlightColor
+                            }
                         }
                         delegate: QQC2.Control {
                             width: parent.width
@@ -207,15 +210,15 @@ Zynthian.ScreenPage {
                                 property QtObject track: model.track
                                 QQC2.Label {
                                     text: (index+1) + "." + (visibleChildren.length > 1 ? model.display : "")
-                                    Repeater { //HACK
-                                        model: delegate.track.clipsModel
-                                        Item {
-                                            width: 10
-                                            height: 10
-                                            visible: model.clip.path.length > 0
-                                        }
+                                }
+                                Repeater { //HACK
+                                    model: delegate.track.clipsModel
+                                    QQC2.Label {
+                                        text: model.display
+                                        visible: model.clip.path.length > 0
                                     }
                                 }
+
                             }
                         }
                     }
@@ -251,7 +254,7 @@ Zynthian.ScreenPage {
                                     print("Pattern layer: "+ model.layer)
                                 }
                                 property int chan: model.layer
-                                onChanChanged: print("Updated PAttern Layer: "+chan)
+                                onChanChanged: print("Updated Pattern Layer: "+chan)
                                 contentItem: RowLayout {
                                     QQC2.Label {
                                         Layout.fillWidth: true

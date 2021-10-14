@@ -263,14 +263,19 @@ Zynthian.ScreenPage {
                                         text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
                                     }
                                 }
-                                MouseArea {
+                                ConnectionsDragManager {
                                     anchors.fill: parent
+                                    patternConnections: patternConnectionsItem
+                                    secondColumn: layersView.contentItem
                                     onClicked: {
                                         zynthian.current_modal_screen_id = "playgrid";
                                         var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
                                         //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
                                         ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
                                         ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
+                                    }
+                                    onRequestConnect: {
+                                        patternsViewPlaygridRepeater.model.setProperty(index, "layer", child.channel)
                                     }
                                 }
                             }
@@ -282,6 +287,7 @@ Zynthian.ScreenPage {
                 }
             }
             PatternConnections {
+                id: patternConnectionsItem
                 Layout.preferredWidth: parent.width / 10
                 Layout.maximumWidth: parent.width / 10
                 Layout.fillHeight: true
@@ -313,6 +319,7 @@ Zynthian.ScreenPage {
                             height: layersView.height / 15
                             highlighted: zynthian.active_midi_channel === index
                             separatorVisible: false
+                            readonly property int channel: model.metadata.midi_channel
                             onClicked: {
                                 zynthian.current_screen_id = "main_layers_view";
                                 zynthian.fixed_layers.activate_index(index);

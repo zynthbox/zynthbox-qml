@@ -146,6 +146,47 @@ Zynthian.ScreenPage {
             ColumnLayout {
                 Kirigami.Heading {
                     level: 2
+                    text: qsTr("Scenes")
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: zynthian.current_modal_screen_id = "sketch_copier"
+                    }
+                }
+                QQC2.ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    ListView {
+                        id: scenesView
+                        model: ListModel {
+                            ListElement {
+                                display: "A.-L"
+                            }
+                            ListElement {
+                                display: " - "
+                            }
+                            ListElement {
+                                display: "B.-L"
+                            }
+                            ListElement {
+                                display: "A.-L"
+                            }
+                        }
+                        delegate: Kirigami.AbstractListItem {
+                            separatorVisible: false
+                            width: scenesView.width
+                            height: scenesView.height / 15
+                            contentItem: QQC2.Label {
+                                text: (index + 1) + ". " + model.display
+                            }
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Kirigami.Heading {
+                    level: 2
                     text: qsTr("Tracks")
                     MouseArea {
                         anchors.fill: parent

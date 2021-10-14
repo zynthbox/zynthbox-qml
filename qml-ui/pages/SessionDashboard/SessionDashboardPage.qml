@@ -223,7 +223,10 @@ Zynthian.ScreenPage {
             }
 
             ColumnLayout {
+                Layout.preferredWidth: parent.width / 10
+                Layout.maximumWidth: parent.width / 10
                 Kirigami.Heading {
+                    Layout.fillWidth: true
                     level: 2
                     text: qsTr("Patterns")
                     MouseArea {
@@ -231,45 +234,59 @@ Zynthian.ScreenPage {
                         onClicked: zynthian.current_modal_screen_id = "playgrid"
                     }
                 }
-                QQC2.ScrollView {
-                    id: patternsView
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-                    ColumnLayout {
-                        Repeater {
-                            id: patternsViewMainRepeater
-                            model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
-                            delegate: Repeater {
-                                id: patternsViewPlaygridRepeater
-                                model: ZynQuick.PlayGridManager.dashboardModels[modelData]
-                                property string playgridId: modelData
-                                delegate: QQC2.Control {
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: patternsView.height / 15
-                                    contentItem: RowLayout {
-                                        QQC2.Label {
-                                            Layout.fillWidth: true
-                                            // If there's more than one playgrid exposing models to us, let's make it clear which is this one
-                                            /// NOTE: Port this bit of string-mangling ugliness to whatever handy trickery we end up with for keeping instances around in PlayGridManager
-                                            text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
-                                        }
+
+                ColumnLayout {
+                    id: patternsLayout
+                    Repeater {
+                        id: patternsViewMainRepeater
+                        model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                        delegate: Repeater {
+                            id: patternsViewPlaygridRepeater
+                            model: ZynQuick.PlayGridManager.dashboardModels[modelData]
+                            property string playgridId: modelData
+                            delegate: QQC2.Control {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: patternsLayout.height / 15
+                                Component.onCompleted: {
+                                    print("Pattern layer: "+ model.layer)
+                                }
+                                property int chan: model.layer
+                                onChanChanged: print("Updated PAttern Layer: "+chan)
+                                contentItem: RowLayout {
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        // If there's more than one playgrid exposing models to us, let's make it clear which is this one
+                                        /// NOTE: Port this bit of string-mangling ugliness to whatever handy trickery we end up with for keeping instances around in PlayGridManager
+                                        text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
                                     }
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            zynthian.current_modal_screen_id = "playgrid";
-                                            var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
-                                            //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
-                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
-                                            ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
-                                        }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        zynthian.current_modal_screen_id = "playgrid";
+                                        var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
+                                        //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
+                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
+                                        ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
                                     }
                                 }
                             }
                         }
                     }
+                    Item {
+                        Layout.fillHeight: true
+                    }
                 }
+            }
+            PatternConnections {
+                Layout.preferredWidth: parent.width / 10
+                Layout.maximumWidth: parent.width / 10
+                Layout.fillHeight: true
+//                 connections:[
+//                     [patternsLayout.children[0], layersView.contentItem.children[11]],
+//                     [patternsLayout.children[2], layersView.contentItem.children[13]],
+//                     [patternsLayout.children[3], layersView.contentItem.children[12]],
+//                 ]
             }
 
             ColumnLayout {

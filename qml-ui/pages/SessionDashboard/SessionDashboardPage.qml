@@ -240,6 +240,7 @@ Zynthian.ScreenPage {
 
                 ColumnLayout {
                     id: patternsLayout
+                    spacing: 0
                     Repeater {
                         id: patternsViewMainRepeater
                         model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)

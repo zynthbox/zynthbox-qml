@@ -136,6 +136,23 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.xyselect_mode=False
 		self.x_zctrl=None
 		self.y_zctrl=None
+
+		json = None
+		try:
+			fpath = "/zynthian/config/control_page.conf"
+			with open(fpath, "r") as fh:
+				json = fh.read()
+				logging.info("Loading control config %s => \n%s" % (fpath, json))
+
+		except Exception as e:
+			logging.error("Can't load control config '%s': %s" % (fpath, e))
+
+		try:
+			conf = JSONDecoder().decode(json)
+			self.__custom_control_page = conf["custom_control_page"]
+		except Exception as e:
+			logging.error("Can't parse control config '%s': %s" % (fpath, e))
+
 		self.show()
 
 
@@ -286,6 +303,15 @@ class zynthian_gui_control(zynthian_gui_selector):
 			if self.__custom_control_page != final_path:
 				self.__custom_control_page = final_path
 				self.custom_control_page_changed.emit()
+		try:
+			conf = {"custom_control_page": self.__custom_control_page}
+			json = JSONEncoder().encode(conf)
+			with open("/zynthian/config/control_page.conf","w") as fh:
+				fh.write(json)
+				fh.flush()
+				os.fsync(fh.fileno())
+		except Exception as e:
+			logging.error("Can't save config '%s': %s" % (fpath,e))
 
 
 	def get_default_custom_control_page(self):

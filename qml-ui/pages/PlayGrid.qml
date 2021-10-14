@@ -171,6 +171,8 @@ Zynthian.ScreenPage {
 
                 Zynthian.PlayGridButton {
                     id: settingsButton
+                    // Let's put our friend here on top of the things underneath (which would usually be stacked above)
+                    z: 1000
                     Layout.minimumHeight: width
                     Layout.maximumHeight: width
                     icon.name: "application-menu"
@@ -182,6 +184,14 @@ Zynthian.ScreenPage {
                         }
                         radius: width / 2
                         visible: false
+                    }
+                    MouseArea {
+                        // A touch hacky, but we can't really depend on everybody telling us that we've lost focus, so... block out everything instead and demand taps
+                        x: 0; y: 0; height: component.height; width: component.width;
+                        visible: settingsPopup.visible
+                        onClicked: {
+                            settingsPopup.visible = false;
+                        }
                     }
                     Item {
                         id: settingsPopup

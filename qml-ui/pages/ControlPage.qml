@@ -79,8 +79,14 @@ Zynthian.ScreenPage {
         Repeater {
             model: zynthian.control.control_pages_model
             delegate: QQC2.MenuItem {
+                id: menuItem
                 text: model.display
-                highlighted: zynthian.control.custom_control_page === model.path
+                checkable: true
+                autoExclusive: true
+                checked: model.path == ""
+                    ? (zynthian.control.custom_control_page == "")
+                    : (zynthian.control.custom_control_page.indexOf(model.path) == 0)
+
                 onClicked: {
                     zynthian.control.custom_control_page = model.path
                 }

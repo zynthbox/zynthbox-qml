@@ -43,7 +43,7 @@ Canvas {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);
         ctx.beginPath();
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.strokeStyle = Kirigami.Theme.highlightColor;
         for (var i in connections) {
             var conn = connections [i];

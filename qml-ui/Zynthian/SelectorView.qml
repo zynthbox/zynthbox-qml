@@ -69,13 +69,12 @@ QQC2.ScrollView {
     QQC2.ScrollBar.vertical.x: view.x + view.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
 
 
-    ListView {
+    contentItem: ListView {
         id: view
         keyNavigationEnabled: true
         keyNavigationWraps: false
         clip: true
         currentIndex: root.selector.current_index
-        cacheBuffer: height
 
         onActiveFocusChanged: {
             if (activeFocus) {
@@ -84,28 +83,10 @@ QQC2.ScrollView {
         }
 
         onCountChanged: syncPosTimer.restart()
-        Timer {
-            id: syncPosTimer
-            interval: 100
-            onTriggered: {
-                view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
-                view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
-                view.forceLayout()
-            }
-        }
+
         //highlightRangeMode: ListView.ApplyRange
         preferredHighlightBegin: Kirigami.Units.gridUnit * 2
         preferredHighlightEnd: Kirigami.Units.gridUnit * 4
-
-        Connections {
-            id: focusConnection
-            target: zynthian
-            onCurrent_screen_idChanged: {
-                if (zynthian.current_screen_id === root.screenId) {
-                    view.forceActiveFocus();
-                }
-            }
-        }
 
         model: root.selector.selector_list
 
@@ -117,30 +98,51 @@ QQC2.ScrollView {
             onItemActivated: root.itemActivated(screenId, index)
             onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
         }
+    }
 
-        Kirigami.Separator {
-            parent: view
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
+    Connections {
+        id: focusConnection
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            if (zynthian.current_screen_id === root.screenId) {
+                view.forceActiveFocus();
             }
-            color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
-            opacity: 1
-            visible: !view.atYBeginning
-        }
-        Kirigami.Separator {
-            parent: view
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
-            opacity: 1
-            visible: !view.atYEnd
         }
     }
+
+    Timer {
+        id: syncPosTimer
+        interval: 100
+        onTriggered: {
+            view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
+            view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
+            view.forceLayout()
+        }
+    }
+
+    Kirigami.Separator {
+        parent: view
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+        }
+        color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
+        opacity: 1
+        visible: !view.atYBeginning
+    }
+    Kirigami.Separator {
+        parent: view
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        color: Qt.tint(Kirigami.Theme.backgroundColor, Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.2))
+        opacity: 1
+        visible: !view.atYEnd
+    }
+
 
     background: SelectorViewBackground {
         id: background

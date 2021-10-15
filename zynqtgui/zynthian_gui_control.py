@@ -131,15 +131,22 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__last_custom_control_page = None
 		self.__control_pages_model = control_pages_list_model(self)
 		self.__custom_control_page = None
+		self.__conf = {}
 
 		# xyselect mode vars
 		self.xyselect_mode=False
 		self.x_zctrl=None
 		self.y_zctrl=None
 
+		self.load_config()
+
+		self.show()
+
+
+	def load_config(self):
 		json = None
+		fpath = "/zynthian/config/control_page.conf"
 		try:
-			fpath = "/zynthian/config/control_page.conf"
 			with open(fpath, "r") as fh:
 				json = fh.read()
 				logging.info("Loading control config %s => \n%s" % (fpath, json))
@@ -148,12 +155,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 			logging.error("Can't load control config '%s': %s" % (fpath, e))
 
 		try:
-			conf = JSONDecoder().decode(json)
-			self.__custom_control_page = conf["custom_control_page"]
+			self.__conf = JSONDecoder().decode(json)
+			self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
 		except Exception as e:
 			logging.error("Can't parse control config '%s': %s" % (fpath, e))
-
-		self.show()
 
 
 	def show(self):
@@ -292,6 +297,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return self.__control_pages_model
 
 	def set_custom_control_page(self, path):
+		if self.zyngui.curlayer is None or self.zyngui.curlayer.engine is None:
+			return
 		final_path = path
 		if not final_path.endswith("/contents/main.qml"):
 			final_path += "/contents/main.qml"
@@ -304,14 +311,14 @@ class zynthian_gui_control(zynthian_gui_selector):
 				self.__custom_control_page = final_path
 				self.custom_control_page_changed.emit()
 		try:
-			conf = {"custom_control_page": self.__custom_control_page}
-			json = JSONEncoder().encode(conf)
+			self.__conf[self.zyngui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
+			json = JSONEncoder().encode(self.__conf)
 			with open("/zynthian/config/control_page.conf","w") as fh:
 				fh.write(json)
 				fh.flush()
 				os.fsync(fh.fileno())
 		except Exception as e:
-			logging.error("Can't save config '%s': %s" % (fpath,e))
+			logging.error("Can't save config '/zynthian/config/control_page.conf': %s" % (e))
 
 
 	def get_default_custom_control_page(self):
@@ -400,6 +407,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.lock_controllers()
 
 		self.controllers_count_changed.emit()
+
+		self.load_config()
 
 		if self.__last_custom_control_page != self.get_custom_control_page():
 			self.custom_control_page_changed.emit()

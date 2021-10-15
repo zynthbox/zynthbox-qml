@@ -132,6 +132,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__control_pages_model = control_pages_list_model(self)
 		self.__custom_control_page = None
 		self.__conf = {}
+		self.__single_effect_engine = None
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -156,12 +157,32 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		try:
 			self.__conf = JSONDecoder().decode(json)
-			if self.zyngui.curlayer.engine.nickname in self.__conf:
-				self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
+			if self.__single_effect_engine == None:
+				if self.zyngui.curlayer.engine.nickname in self.__conf:
+					self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
+				else:
+					self.set_custom_control_page("")
 			else:
-				self.set_custom_control_page("")
+				if self.__single_effect_engine in self.__conf:
+					self.set_custom_control_page(self.__conf[self.__single_effect_engine]["custom_control_page"])
+				else:
+					self.set_custom_control_page("")
 		except Exception as e:
 			logging.error("Can't parse control config '%s': %s" % (fpath, e))
+
+
+	def set_single_effect_engine(self, eng : str):
+		if self.__single_effect_engine == eng:
+			return
+		if eng == "":
+			self.__single_effect_engine = None
+		else:
+			self.__single_effect_engine = eng
+		self.fill_list()
+		self.single_effect_engine_changed.emit()
+
+	def get_single_effect_engine(self):
+		return self.__single_effect_engine
 
 
 	def show(self):
@@ -170,6 +191,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.zyngui.curlayer:
 			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
+			engine = self.zyngui.curlayer.engine.nickname
+			if self.__single_effect_engine != None:
+				engine = self.__single_effect_engine
 			if Path(path).exists():
 				for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
 					if module_dir.is_dir():
@@ -178,13 +202,13 @@ class zynthian_gui_control(zynthian_gui_selector):
 							fh = open(metadatapath, "r")
 							json = fh.read()
 							metadata = JSONDecoder().decode(json)
-							if metadata["Engine"] == self.zyngui.curlayer.engine.nickname:
+							if metadata["Engine"] == engine:
 								entries.append({"display": metadata["Name"],
 												"path": module_dir.path})
 						except:
 							continue
 
-			engine_folder_name = self.zyngui.curlayer.engine.nickname.replace("/", "_").replace(" ", "_")
+			engine_folder_name = engine.replace("/", "_").replace(" ", "_")
 			path = "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name + "/contents/main.qml"
 			if Path(path).exists():
 				entries.append({"display": "Default",
@@ -228,15 +252,21 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		i = 0
 		for layer in self.layers:
+			if self.__single_effect_engine != None and layer.engine.nickname != self.__single_effect_engine:
+				continue
 			j = 0
-			if len(self.layers)>1:
+			if self.__single_effect_engine == None and len(self.layers) > 1:
 				self.list_data.append((None,None,"> {}".format(layer.engine.name.split("/")[-1])))
 			for cscr in layer.get_ctrl_screens():
 				self.list_data.append((cscr,i,cscr,layer,j))
 				i += 1
 				j += 1
-		self.index = self.zyngui.curlayer.get_active_screen_index()
-		if len(self.list_data[self.index]) < 4:
+		if self.__single_effect_engine == None:
+			self.index = self.zyngui.curlayer.get_active_screen_index()
+		else:
+			self.index = 0
+		logging.error("KK {} {}".format(len(self.list_data), self.index))
+		if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
 			self.index = 1
 		super().fill_list()
 
@@ -309,7 +339,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 				self.__custom_control_page = final_path
 				self.custom_control_page_changed.emit()
 		try:
-			self.__conf[self.zyngui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
+			if self.__single_effect_engine == None:
+				self.__conf[self.zyngui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
+			else:
+				self.__conf[self.__single_effect_engine] = {"custom_control_page": self.__custom_control_page}
 			json = JSONEncoder().encode(self.__conf)
 			with open("/zynthian/config/control_page.conf","w") as fh:
 				fh.write(json)
@@ -750,10 +783,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 	controllers_count_changed = Signal()
 	custom_control_page_changed = Signal()
 	default_custom_control_page_changed = Signal()
+	single_effect_engine_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
 	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)
 	default_custom_control_page = Property(str, get_default_custom_control_page, notify = default_custom_control_page_changed)
 	control_pages_model = Property(QObject, get_control_pages_model, constant = True)
+	single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
 
 #------------------------------------------------------------------------------

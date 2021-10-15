@@ -126,7 +126,10 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Edit")
-            onTriggered: zynthian.current_screen_id = "control"
+            onTriggered: {
+                zynthian.control.single_effect_engine = null;
+                zynthian.current_screen_id = "control";
+            }
         }
     ]
 

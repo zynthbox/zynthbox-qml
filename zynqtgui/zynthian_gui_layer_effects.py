@@ -29,6 +29,9 @@ import logging
 # Zynthian specific modules
 from . import zynthian_gui_selector
 
+# Qt modules
+from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, QByteArray
+
 #------------------------------------------------------------------------------
 # Zynthian Listing effects for active layer GUI Class
 #------------------------------------------------------------------------------
@@ -54,6 +57,10 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.zyngui.screens[self.types_screen].show()
 		self.zyngui.screens[self.effect_chooser_screen].show()
 		super().show()
+
+	def select(self, index=None):
+		self.current_effect_engine_changed.emit()
+		super().select(index)
 
 	def fill_list(self):
 		self.list_data=[]
@@ -139,6 +146,12 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.set_select_path()
 
 
+	def get_current_effect_engine(self):
+		if self.index < 0 or len(self.fx_layers) <= self.index:
+			return None
+		return self.fx_layers[self.index].engine.nickname
+
+
 	def index_supports_immediate_activation(self, index=None):
 		return index >= 0 and index < len(self.fx_layers)
 
@@ -197,5 +210,10 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			else:
 				self.select_path_element = "Audio-FX"
 		super().set_select_path()
+
+
+	current_effect_engine_changed = Signal()
+
+	current_effect_engine = Property(str, get_current_effect_engine, notify = current_effect_engine_changed)
 
 #------------------------------------------------------------------------------

@@ -33,7 +33,6 @@ import Zynthian 1.0 as Zynthian
 Zynthian.MultiSelectorPage {
     id: root
 
-
     screenIds: ["layer_midi_effects", "midi_effect_types", "layer_midi_effect_chooser"]
     screenTitles: [qsTr("Active FX (%1)").arg(zynthian.layer_midi_effects.effective_count || qsTr("None")), qsTr("FX Type (%1)").arg(zynthian.midi_effect_types.selector_list.count), qsTr("FX (%1)").arg(zynthian.layer_midi_effect_chooser.selector_list.count)]
 
@@ -52,9 +51,9 @@ Zynthian.MultiSelectorPage {
         },
         Kirigami.Action {
             text: qsTr("Edit")
-            enabled: zynthian.layer_effects.current_effect_engine.length > 0
+            enabled: zynthian.layer_midi_effects.current_effect_engine.length > 0
             onTriggered: {
-                zynthian.control.single_effect_engine = zynthian.layer_effects.current_effect_engine;
+                zynthian.control.single_effect_engine = zynthian.layer_midi_effects.current_effect_engine;
                 zynthian.current_screen_id = "control";
             }
         }

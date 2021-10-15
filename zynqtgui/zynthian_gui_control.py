@@ -156,7 +156,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 		try:
 			self.__conf = JSONDecoder().decode(json)
-			self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
+			if self.zyngui.curlayer.engine.nickname in self.__conf:
+				self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
+			else:
+				self.set_custom_control_page("")
 		except Exception as e:
 			logging.error("Can't parse control config '%s': %s" % (fpath, e))
 
@@ -167,7 +170,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 		if self.zyngui.curlayer:
 			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
-			logging.error(path)
 			if Path(path).exists():
 				for module_dir in [f for f in os.scandir(path) if f.is_dir()]:
 					if module_dir.is_dir():
@@ -176,9 +178,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 							fh = open(metadatapath, "r")
 							json = fh.read()
 							metadata = JSONDecoder().decode(json)
-							logging.error(metadata)
 							if metadata["Engine"] == self.zyngui.curlayer.engine.nickname:
-								logging.error("ADDING")
 								entries.append({"display": metadata["Name"],
 												"path": module_dir.path})
 						except:
@@ -283,8 +283,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 				return None
 
 			zctrl = controllers[cat][index]
-			logging.error(zctrl)
-			logging.error(zctrl in self.zgui_custom_controllers_map)
 			if zctrl in self.zgui_custom_controllers_map:
 				return self.zgui_custom_controllers_map[zctrl]
 			else:

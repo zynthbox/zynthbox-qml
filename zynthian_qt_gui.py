@@ -2438,6 +2438,9 @@ class zynthian_gui(QObject):
     def get_module_downloader(self):
         return self.screens["module_downloader"]
 
+    def get_control_downloader(self):
+        return self.screens["control_downloader"]
+
     def get_admin(self):
         return self.screens["admin"]
 
@@ -2610,6 +2613,7 @@ class zynthian_gui(QObject):
         QObject, get_layer_midi_effect_chooser, constant=True
     )
     module_downloader = Property(QObject, get_module_downloader, constant=True)
+    control_downloader = Property(QObject, get_control_downloader, constant=True)
     admin = Property(QObject, get_admin, constant=True)
     snapshot = Property(QObject, get_snapshot, constant=True)
     midi_chan = Property(QObject, get_midi_chan, constant=True)

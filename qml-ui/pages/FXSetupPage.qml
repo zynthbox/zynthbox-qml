@@ -43,6 +43,27 @@ Zynthian.MultiSelectorPage {
         text: qsTr("Back")
         onTriggered: zynthian.current_screen_id = "preset"
     }
+    contextualActions: [
+        Kirigami.Action {
+            visible: false
+        },
+        Kirigami.Action {
+            visible: false
+        },
+        Kirigami.Action {
+            text: qsTr("Edit")
+            enabled: zynthian.layer_effects.current_effect_engine.length > 0
+            onTriggered: {
+                zynthian.control.single_effect_engine = zynthian.layer_effects.current_effect_engine;
+                zynthian.current_screen_id = "control";
+            }
+        }
+    ]
+    onVisibleChanged: {
+        if (visible) {
+            zynthian.control.single_effect_engine = ""
+        }
+    }
     Connections {
         id: currentConnection
         target: zynthian

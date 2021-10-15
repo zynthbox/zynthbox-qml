@@ -54,8 +54,8 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             id: viewAction
-            text: qsTr("Switch View")
-            visible: zynthian.control.control_pages_model.count > 0
+            text: qsTr("Switch View")+zynthian.control.control_pages_model.count
+            enabled: zynthian.control.control_pages_model.count > 1
             onTriggered: {
                 if (zynthian.control.control_pages_model.count == 2) {
                     if (zynthian.control.custom_control_page === zynthian.control.default_custom_control_page) {

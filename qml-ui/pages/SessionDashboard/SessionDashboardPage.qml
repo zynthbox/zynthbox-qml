@@ -210,10 +210,11 @@ Zynthian.ScreenPage {
 
                 Repeater {
                     model: zynthian.zynthiloops.song.tracksModel
-                    delegate: Kirigami.AbstractListItem {
+                    delegate: DashboardListItem {
                         width: parent.width
+                        patternConnections: index < 7 ? trackSoundConnections : trackPatternConnections
+                        secondColumn: index < 7 ? layersView.contentItem : patternsLayout
                         Layout.preferredHeight: root.itemHeight
-                        separatorVisible: false
                         contentItem: RowLayout {
                             id: delegate
                             property QtObject track: model.track
@@ -249,11 +250,11 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 2
                     connections:[
-                        [tracksLayout.children[8], patternsLayout.children[0]],
-                        [tracksLayout.children[9], patternsLayout.children[1]],
-                        [tracksLayout.children[10], patternsLayout.children[2]],
-                        [tracksLayout.children[11], patternsLayout.children[3]],
-                        [tracksLayout.children[12], patternsLayout.children[6]],
+                        [tracksLayout.children[8].dragManager, patternsLayout.children[0]],
+                        [tracksLayout.children[9].dragManager, patternsLayout.children[1]],
+                        [tracksLayout.children[10].dragManager, patternsLayout.children[2]],
+                        [tracksLayout.children[11].dragManager, patternsLayout.children[3]],
+                        [tracksLayout.children[12].dragManager, patternsLayout.children[6]],
                     ]
                 }
             }
@@ -279,7 +280,7 @@ Zynthian.ScreenPage {
                 ColumnLayout {
                     id: patternsLayout
                     Layout.alignment: Qt.AlignBottom
-                    Layout.bottomMargin: 4 //FIXME: why is this needed?
+                    Layout.bottomMargin: 8 //FIXME: why is this needed?
                     spacing: 0
                     Repeater {
                         id: patternsViewMainRepeater
@@ -288,7 +289,7 @@ Zynthian.ScreenPage {
                             id: patternsViewPlaygridRepeater
                             model: ZynQuick.PlayGridManager.dashboardModels[modelData]
                             property string playgridId: modelData
-                            delegate: QQC2.Control {
+                            delegate: DashboardListItem {
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: root.itemHeight
                                 Layout.maximumHeight: root.itemHeight
@@ -297,28 +298,19 @@ Zynthian.ScreenPage {
                                 }
                                 property int chan: model.layer
                                 onChanChanged: print("Updated Pattern Layer: "+chan)
-                                contentItem: ConnectionsDragManager {
-                                    QQC2.Label {
-                                        anchors {
-                                            fill: parent
-                                            leftMargin: Kirigami.Units.largeSpacing
-                                        }
-                                        // If there's more than one playgrid exposing models to us, let's make it clear which is this one
-                                        /// NOTE: Port this bit of string-mangling ugliness to whatever handy trickery we end up with for keeping instances around in PlayGridManager
-                                        text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
-                                    }
-                                    patternConnections: patternSoundsConnections
-                                    secondColumn: layersView.contentItem
-                                    onClicked: {
-                                        zynthian.current_modal_screen_id = "playgrid";
-                                        var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
-                                        //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
-                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
-                                        ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
-                                    }
-                                    onRequestConnect: {
-                                        patternsViewPlaygridRepeater.model.setProperty(index, "layer", child.channel)
-                                    }
+                                text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
+
+                                patternConnections: patternSoundsConnections
+                                secondColumn: layersView.contentItem
+                                onClicked: {
+                                    zynthian.current_modal_screen_id = "playgrid";
+                                    var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
+                                    //console.log("Attempting to switch to playgrid index " + playgridIndex + " for the playgrid named " + playgridId);
+                                    ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", playgridIndex);
+                                    ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
+                                }
+                                onRequestConnect: {
+                                    patternsViewPlaygridRepeater.model.setProperty(index, "layer", child.channel)
                                 }
                             }
                         }
@@ -333,18 +325,18 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     PatternConnections {
-                        id: tracksSoundsConnections
+                        id: trackSoundConnections
                         anchors {
                             fill: parent
                             leftMargin: -parent.width * 2
                         }
                     //    Layout.leftMargin: -width
                         connections:[
-                            [tracksLayout.children[1], layersView.contentItem.children[0]],
-                            [tracksLayout.children[2], layersView.contentItem.children[1]],
-                            [tracksLayout.children[3], layersView.contentItem.children[2]],
-                            [tracksLayout.children[4], layersView.contentItem.children[3]],
-                            [tracksLayout.children[5], layersView.contentItem.children[4]],
+                            [tracksLayout.children[1].dragManager, layersView.contentItem.children[0]],
+                            [tracksLayout.children[2].dragManager, layersView.contentItem.children[1]],
+                            [tracksLayout.children[3].dragManager, layersView.contentItem.children[2]],
+                            [tracksLayout.children[4].dragManager, layersView.contentItem.children[3]],
+                            [tracksLayout.children[5].dragManager, layersView.contentItem.children[4]],
                         ]
                     }
                 }
@@ -353,16 +345,17 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     connections:[
-                        [patternsLayout.children[0].contentItem, layersView.contentItem.children[11]],
-                        [patternsLayout.children[1].contentItem, layersView.contentItem.children[12]],
-                        [patternsLayout.children[2].contentItem, layersView.contentItem.children[13]],
-                        [patternsLayout.children[3].contentItem, layersView.contentItem.children[14]],
-                        [patternsLayout.children[6].contentItem, layersView.contentItem.children[15]],
+                        [patternsLayout.children[0].dragManager, layersView.contentItem.children[11]],
+                        [patternsLayout.children[1].dragManager, layersView.contentItem.children[12]],
+                        [patternsLayout.children[2].dragManager, layersView.contentItem.children[13]],
+                        [patternsLayout.children[3].dragManager, layersView.contentItem.children[14]],
+                        [patternsLayout.children[6].dragManager, layersView.contentItem.children[15]],
                     ]
                 }
             }
 
             ColumnLayout {
+                spacing: 0
                 Kirigami.Heading {
                     level: 2
                     text: qsTr("Sounds")

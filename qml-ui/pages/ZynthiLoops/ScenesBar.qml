@@ -49,10 +49,15 @@ Rectangle {
             }
         }
 
+        QQC2.ButtonGroup {
+            id: scenesButtonGroup
+            buttons: scenesGrid.children
+        }
+
         GridLayout {
             readonly property QtObject song: zynthian.zynthiloops.song
 
-            id: root
+            id: scenesGrid
             Layout.fillWidth: true
             Layout.fillHeight: true
             rows: 2
@@ -65,8 +70,10 @@ Rectangle {
                     Layout.fillHeight: true
 
                     text: model.name
+                    checkable: true
                     onClicked: {
-                        heading.updateSceneName(model.name)
+                        heading.updateSceneName(model.name);
+                        checked = true;
                     }
                 }
             }

@@ -43,10 +43,16 @@ Zynthian.Stack {
     }
 
     property var pageCache: {}
+    onWidthChanged: {
+		for (var i in pageCache) {
+			root.pageCache[i].width = width;
+			root.pageCache[i].height = height;
+		}
+	}
     data: [
         Timer {
             id: preloadTimer
-            interval: 2000
+            interval: 0
             running: true
             onTriggered: {
                 let file = ""

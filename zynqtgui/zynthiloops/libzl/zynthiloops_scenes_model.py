@@ -33,18 +33,18 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.__scenes__ = {
-            0: [],
-            1: [],
-            2: [],
-            3: [],
-            4: [],
-            5: [],
-            6: [],
-            7: [],
-            8: [],
-            9: [],
-            10: [],
-            11: [],
+            0: {"clips": []},
+            1: {"clips": []},
+            2: {"clips": []},
+            3: {"clips": []},
+            4: {"clips": []},
+            5: {"clips": []},
+            6: {"clips": []},
+            7: {"clips": []},
+            8: {"clips": []},
+            9: {"clips": []},
+            10: {"clips": []},
+            11: {"clips": []},
         }
 
     def serialize(self):

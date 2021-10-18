@@ -28,23 +28,23 @@ from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt, Property, Signal
 
 class zynthiloops_scenes_model(QAbstractListModel):
     SceneRole = Qt.UserRole + 1
-    NameRole = SceneRole + 1
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.__selected_scene_index__ = 0
         self.__scenes__ = {
-            0: {"clips": []},
-            1: {"clips": []},
-            2: {"clips": []},
-            3: {"clips": []},
-            4: {"clips": []},
-            5: {"clips": []},
-            6: {"clips": []},
-            7: {"clips": []},
-            8: {"clips": []},
-            9: {"clips": []},
-            10: {"clips": []},
-            11: {"clips": []},
+            0: {"name": "A", "clips": []},
+            1: {"name": "B", "clips": []},
+            2: {"name": "C", "clips": []},
+            3: {"name": "D", "clips": []},
+            4: {"name": "E", "clips": []},
+            5: {"name": "F", "clips": []},
+            6: {"name": "G", "clips": []},
+            7: {"name": "H", "clips": []},
+            8: {"name": "I", "clips": []},
+            9: {"name": "J", "clips": []},
+            10: {"name": "K", "clips": []},
+            11: {"name": "L", "clips": []},
         }
 
     def serialize(self):
@@ -62,8 +62,6 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
         if role == self.SceneRole:
             return self.__scenes__[index.row()]
-        elif role == Qt.DisplayRole or role == self.NameRole:
-            return chr(index.row() + 65)
         else:
             return None
 
@@ -71,7 +69,6 @@ class zynthiloops_scenes_model(QAbstractListModel):
         role_names = {
             Qt.DisplayRole: b'display',
             self.SceneRole: b"scene",
-            self.NameRole: b"name",
         }
 
         return role_names
@@ -85,3 +82,17 @@ class zynthiloops_scenes_model(QAbstractListModel):
     countChanged = Signal()
     count = Property(int, count, notify=countChanged)
     ### END Property count
+
+    ### Property selectedSceneIndex
+    def get_selected_scene_index(self):
+        return self.__selected_scene_index__
+    def set_selected_scene_index(self, index):
+        self.__selected_scene_index__ = index
+        self.selected_scene_index_changed.emit()
+    selected_scene_index_changed = Signal()
+    selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
+    ### END Property selectedSceneIndex
+
+    @Slot(int, result='QVariantMap')
+    def getScene(self, index):
+        return self.__scenes__[index]

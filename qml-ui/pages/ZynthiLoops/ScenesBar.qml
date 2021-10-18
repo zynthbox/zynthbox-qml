@@ -32,6 +32,9 @@ import org.kde.kirigami 2.4 as Kirigami
 //import Zynthian 1.0 as Zynthian
 
 Rectangle {
+    readonly property QtObject song: zynthian.zynthiloops.song
+    readonly property QtObject scenesModel: song.scenesModel
+
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
@@ -42,11 +45,7 @@ Rectangle {
 
         Kirigami.Heading {
             id: heading
-            text: updateSceneName("A")
-
-            function updateSceneName(name) {
-                heading.text = qsTr("Scenes : Scene %1").arg(name)
-            }
+            text: qsTr("Scenes : Scene %1").arg(scenesModel.getScene(scenesModel.selectedSceneIndex).name)
         }
 
         QQC2.ButtonGroup {
@@ -55,25 +54,23 @@ Rectangle {
         }
 
         GridLayout {
-            readonly property QtObject song: zynthian.zynthiloops.song
-
             id: scenesGrid
             Layout.fillWidth: true
             Layout.fillHeight: true
             rows: 2
-            columns: Math.ceil(song.scenesModel.count/2)
+            columns: Math.ceil(scenesModel.count/2)
 
             Repeater {
-                model: song.scenesModel
+                model: scenesModel
                 delegate: QQC2.Button {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    text: model.name
+                    text: model.scene.name
                     checkable: true
+                    checked: index === scenesModel.selectedSceneIndex
                     onClicked: {
-                        heading.updateSceneName(model.name);
-                        checked = true;
+                        scenesModel.selectedSceneIndex = index;
                     }
                 }
             }

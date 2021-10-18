@@ -131,7 +131,7 @@ Zynthian.ScreenPage {
                     zynthian.song_arranger.stop();
                     zynthian.zynthiloops.resetMetronome();
                 } else {
-                    zynthian.zynthiloops.startMetronomeRequest();
+                    zynthian.zynthiloops.startPlayback();
                 }
             }
         },
@@ -424,8 +424,8 @@ Zynthian.ScreenPage {
                                 delegate: ClipCell {
                                     id: clipCell
                                     isPlaying: model.clip.isPlaying
-                                    highlighted: bottomBar.controlObj === model.clip
-
+                                    highlighted: bottomBar.controlObj === model.clip ||
+                                                 root.song.scenesModel.isClipInScene(model.clip, root.song.scenesModel.selectedSceneIndex)
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
@@ -436,11 +436,12 @@ Zynthian.ScreenPage {
                                         bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
                                         if (dblTimer.running) {
-                                            if (model.clip.isPlaying) {
+                                            /*if (model.clip.isPlaying) {
                                                 model.clip.stop();
                                             } else {
                                                 model.clip.play();
-                                            }
+                                            }*/
+                                            root.song.scenesModel.toggleClipInCurrentScene(model.clip);
                                         }
                                         dblTimer.restart()
                                     }

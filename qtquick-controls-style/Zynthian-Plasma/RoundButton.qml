@@ -55,10 +55,10 @@ T.RoundButton {
     }
 
     background: Rectangle {
-        color: PlasmaCore.Theme.buttonBackgroundColor
+        color: theme.buttonBackgroundColor
         radius: control.radius
         border {
-            color: Qt.rgba(PlasmaCore.Theme.buttonTextColor.r, PlasmaCore.Theme.buttonTextColor.g, PlasmaCore.Theme.buttonTextColor.b, 0.4)
+            color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
         }
 
         Rectangle {

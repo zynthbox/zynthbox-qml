@@ -72,7 +72,7 @@ Rectangle {
                         height: parent.height
                         anchors.centerIn: parent
 
-                        radius: 8
+                        radius: 12
                         font.pointSize: 28
                         checkable: true
                         checked: index === scenesModel.selectedSceneIndex
@@ -80,7 +80,6 @@ Rectangle {
                             scenesModel.stopScene(scenesModel.selectedSceneIndex);
                             scenesModel.selectedSceneIndex = index;
                         }
-
                         QQC2.Label {
                             anchors.centerIn: parent
                             text: model.scene.name

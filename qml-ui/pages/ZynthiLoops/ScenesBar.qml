@@ -41,7 +41,12 @@ Rectangle {
         anchors.margins: Kirigami.Units.gridUnit*0.3
 
         Kirigami.Heading {
-            text: qsTr("Mixer : %1").arg(song.name)
+            id: heading
+            text: updateSceneName("A")
+
+            function updateSceneName(name) {
+                heading.text = qsTr("Scenes : Scene %1").arg(name)
+            }
         }
 
         GridLayout {
@@ -60,6 +65,9 @@ Rectangle {
                     Layout.fillHeight: true
 
                     text: model.name
+                    onClicked: {
+                        heading.updateSceneName(model.name)
+                    }
                 }
             }
         }

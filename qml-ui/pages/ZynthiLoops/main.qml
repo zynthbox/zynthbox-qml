@@ -48,6 +48,7 @@ Zynthian.ScreenPage {
     rightPadding: 8
     topPadding: 8
     bottomPadding: 8
+    backAction.visible: false
     onSongChanged: {
         console.log("Song Changed :", song)
 
@@ -106,6 +107,21 @@ Zynthian.ScreenPage {
                 }
             }
         },
+
+        Kirigami.Action {
+            id: sceneActionBtn
+            text: qsTr("Scenes")
+            checkable: true
+            onTriggered: {
+                mixerActionBtn.checked = false;
+
+                if (!checked) {
+                    bottomStack.currentIndex = 2;
+                } else {
+                    bottomStack.currentIndex = 0;
+                }
+            }
+        },
         Kirigami.Action {
             text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
             onTriggered: {
@@ -120,10 +136,13 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
+            id: mixerActionBtn
             text: qsTr("Mixer")
             checkable: true
-            onCheckedChanged: {
-                if (checked) {
+            onTriggered: {
+                sceneActionBtn.checked = false;
+
+                if (!checked) {
                     bottomStack.currentIndex = 1;
                 } else {
                     bottomStack.currentIndex = 0;
@@ -451,6 +470,12 @@ Zynthian.ScreenPage {
 
             MixerBar {
                 id: mixerBar
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            ScenesBar {
+                id: scenesBar
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }

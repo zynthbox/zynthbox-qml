@@ -292,12 +292,13 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
 
                     text: root.song.name
-                    subText: "BPM: " + root.song.bpm
-                    subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
+                    subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
+                    // subText: "BPM: " + root.song.bpm
+                    // subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
 
-                    textSize: 10
+                    textSize: 11
                     subTextSize: 9
-                    subSubTextSize: 9
+                    subSubTextSize: 0
 
                     onPressed: {
                         bottomBar.controlType = BottomBar.ControlType.Song;

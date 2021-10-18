@@ -39,6 +39,7 @@ Canvas {
     property var temporaryEndPos
     property var temporaryEndPos2
     property var connections: []
+    Component.onCompleted: requestPaint();
     onPaint: {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);

@@ -42,7 +42,8 @@ T.RoundButton {
             text: control.text
             font: control.font
             opacity: enabled || control.highlighted || control.checked ? 1 : 0.4
-            color: PlasmaCore.Theme.buttonTextColor
+            color: Kirigami.Theme.textColor
+            Layout.alignment: Qt.AlignCenter
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight

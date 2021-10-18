@@ -301,7 +301,7 @@ Zynthian.ScreenPage {
                                     QQC2.Label {
                                         anchors {
                                             fill: parent
-                                            margins: Kirigami.Units.smallSpacing
+                                            leftMargin: Kirigami.Units.largeSpacing
                                         }
                                         // If there's more than one playgrid exposing models to us, let's make it clear which is this one
                                         /// NOTE: Port this bit of string-mangling ugliness to whatever handy trickery we end up with for keeping instances around in PlayGridManager

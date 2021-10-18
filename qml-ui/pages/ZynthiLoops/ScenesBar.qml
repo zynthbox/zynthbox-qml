@@ -62,15 +62,23 @@ Rectangle {
 
             Repeater {
                 model: scenesModel
-                delegate: QQC2.Button {
+                delegate: Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    text: model.scene.name
-                    checkable: true
-                    checked: index === scenesModel.selectedSceneIndex
-                    onClicked: {
-                        scenesModel.selectedSceneIndex = index;
+                    QQC2.RoundButton {
+                        width: parent.height
+                        height: parent.height
+                        anchors.centerIn: parent
+
+                        radius: 16
+                        text: model.scene.name
+                        font.pointSize: 28
+                        checkable: true
+                        checked: index === scenesModel.selectedSceneIndex
+                        onClicked: {
+                            scenesModel.selectedSceneIndex = index;
+                        }
                     }
                 }
             }

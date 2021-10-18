@@ -105,7 +105,8 @@ QtObject {
         "sketch_copier": "SketchCopier/main.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
         "soundset_downloader": "SoundsetsDownloaderPage.qml",
-        "control_downloader": "ControlDownloaderPage.qml"
+        "control_downloader": "ControlDownloaderPage.qml",
+        "fx_control_downloader": "FXControlDownloaderPage.qml"
     }
 
     readonly property var dashboardScreens: {

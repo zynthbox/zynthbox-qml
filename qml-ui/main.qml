@@ -70,10 +70,12 @@ Kirigami.AbstractApplicationWindow {
                 id: homeButton
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.zynthiloops.song.name
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 7
+                text: zynthian.zynthiloops.song.name + " Scene " + zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: zynthian.current_screen_id = 'session_dashboard'
+                onClicked: {zynthian.current_screen_id = 'session_dashboard'
+                    print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                }
                 onPressAndHold: zynthian.current_screen_id = 'main'
                 highlighted: zynthian.current_screen_id === 'session_dashboard'
             }

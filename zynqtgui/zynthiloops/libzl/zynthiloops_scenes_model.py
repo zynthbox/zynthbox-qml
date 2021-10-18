@@ -22,15 +22,17 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-import logging
-from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt, Property, Signal, Slot, QObject
+from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
+
+from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
 
 
 class zynthiloops_scenes_model(QAbstractListModel):
     SceneRole = Qt.UserRole + 1
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, song=None):
+        super().__init__(song)
+        self.__song__ = song
         self.__selected_scene_index__ = 0
         self.__scenes__ = {
             0: {"name": "A", "clips": []},
@@ -96,3 +98,32 @@ class zynthiloops_scenes_model(QAbstractListModel):
     @Slot(int, result='QVariantMap')
     def getScene(self, index):
         return self.__scenes__[index]
+
+    @Slot(QObject)
+    def toggleClipInCurrentScene(self, clip: zynthiloops_clip):
+        if clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
+            self.__scenes__[self.__selected_scene_index__]["clips"].remove(clip)
+        else:
+            clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
+
+            # Remove other clips in same track from scene before adding clip to scene
+            for clip_index in range(0, clips_model.count):
+                m_clip: zynthiloops_clip = clips_model.getClip(clip_index)
+
+                if m_clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
+                    self.__scenes__[self.__selected_scene_index__]["clips"].remove(m_clip)
+
+            self.selected_scene_index_changed.emit()
+            self.__scenes__[self.__selected_scene_index__]["clips"].append(clip)
+
+            if self.__song__.get_metronome_manager().isMetronomeRunning:
+                clip.play()
+
+    @Slot(None)
+    def stopAllClipsInCurrentScene(self):
+        for clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
+            clip.stop()
+
+    @Slot(QObject, int, result=bool)
+    def isClipInScene(self, clip, sceneIndex):
+        return clip in self.__scenes__[sceneIndex]["clips"]

@@ -39,7 +39,14 @@ Canvas {
     property var temporaryEndPos
     property var temporaryEndPos2
     property var connections: []
-    Component.onCompleted: requestPaint();
+
+    onWidthChanged: requestPaint()
+	onHeightChanged: requestPaint()
+    Timer {
+		running: true
+		interval: 500
+		onTriggered: canvas.requestPaint();
+	}
     onPaint: {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);

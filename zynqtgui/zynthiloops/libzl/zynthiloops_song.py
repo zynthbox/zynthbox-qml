@@ -29,6 +29,7 @@ import uuid
 from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
 from . import libzl
+from .zynthiloops_scenes_model import zynthiloops_scenes_model
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
 from .zynthiloops_clip import zynthiloops_clip
@@ -52,6 +53,7 @@ class zynthiloops_song(QObject):
         self.sketch_folder = sketch_folder
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
+        self.__scenes_model__ = zynthiloops_scenes_model(self)
         self.__bpm__ = 120
         self.__volume__ = 100
         self.__index__ = 0
@@ -329,15 +331,21 @@ class zynthiloops_song(QObject):
     def __parts_model_changed__(self):
         pass
 
+    @Signal
+    def __scenes_model_changed__(self):
+        pass
+
     def tracksModel(self):
         return self.__tracks_model__
     tracksModel = Property(QObject, tracksModel, notify=tracks_model_changed)
-
 
     def partsModel(self):
         return self.__parts_model__
     partsModel = Property(QObject, partsModel, notify=__parts_model_changed__)
 
+    def scenesModel(self):
+        return self.__scenes_model__
+    scenesModel = Property(QObject, scenesModel, notify=__scenes_model_changed__)
 
     def isPlaying(self):
         return self.__is_playing__

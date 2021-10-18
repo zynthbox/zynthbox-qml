@@ -84,7 +84,7 @@ Rectangle {
                         QQC2.Label {
                             anchors.centerIn: parent
                             text: model.scene.name
-                            color: checked ? "#ff444444" : Kirigami.Theme.textColor
+                            color: parent.checked ? "#ff000000" : Kirigami.Theme.textColor
                         }
                     }
                 }

@@ -66,21 +66,25 @@ Rectangle {
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: height
-                    // height: (scenesGrid.height/scenesGrid.rows) - scenesGrid.rowSpacing*(scenesGrid.rows-1)
 
                     QQC2.RoundButton {
                         width: parent.height
                         height: parent.height
                         anchors.centerIn: parent
 
-                        radius: 16
-                        text: model.scene.name
+                        radius: 8
                         font.pointSize: 28
                         checkable: true
                         checked: index === scenesModel.selectedSceneIndex
                         onClicked: {
-                            scenesModel.stopAllClipsInCurrentScene();
+                            scenesModel.stopScene(scenesModel.selectedSceneIndex);
                             scenesModel.selectedSceneIndex = index;
+                        }
+
+                        QQC2.Label {
+                            anchors.centerIn: parent
+                            text: model.scene.name
+                            color: checked ? "#ff444444" : Kirigami.Theme.textColor
                         }
                     }
                 }

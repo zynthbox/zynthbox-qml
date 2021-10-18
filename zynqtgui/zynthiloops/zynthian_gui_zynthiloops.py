@@ -505,13 +505,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startPlayback(self):
-        scene = self.__song__.scenesModel.getScene(self.__song__.scenesModel.selectedSceneIndex)
-        for i in range(0, len(scene["clips"])):
-            clip = scene["clips"][i]
-            clip.play()
-
+        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex)
         self.start_metronome_request()
-
 
     def start_metronome_request(self):
         self.metronome_running_refcount += 1

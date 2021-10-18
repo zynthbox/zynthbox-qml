@@ -91,9 +91,28 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def set_selected_scene_index(self, index):
         self.__selected_scene_index__ = index
         self.selected_scene_index_changed.emit()
+        if self.__song__.get_metronome_manager().isMetronomeRunning:
+            self.playScene(index)
+
     selected_scene_index_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex
+
+    @Slot(int)
+    def playScene(self, sceneIndex):
+        scene = self.getScene(sceneIndex)
+
+        for i in range(0, len(scene["clips"])):
+            clip = scene["clips"][i]
+            clip.play()
+
+    @Slot(int)
+    def stopScene(self, sceneIndex):
+        scene = self.getScene(sceneIndex)
+
+        for i in range(0, len(scene["clips"])):
+            clip = scene["clips"][i]
+            clip.stop()
 
     @Slot(int, result='QVariantMap')
     def getScene(self, index):
@@ -118,11 +137,6 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
             if self.__song__.get_metronome_manager().isMetronomeRunning:
                 clip.play()
-
-    @Slot(None)
-    def stopAllClipsInCurrentScene(self):
-        for clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
-            clip.stop()
 
     @Slot(QObject, int, result=bool)
     def isClipInScene(self, clip, sceneIndex):

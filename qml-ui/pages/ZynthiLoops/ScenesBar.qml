@@ -55,16 +55,18 @@ Rectangle {
 
         GridLayout {
             id: scenesGrid
-            Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignHCenter
             rows: 2
             columns: Math.ceil(scenesModel.count/2)
 
             Repeater {
                 model: scenesModel
                 delegate: Item {
-                    Layout.fillWidth: true
+                    Layout.fillWidth: false
                     Layout.fillHeight: true
+                    Layout.preferredWidth: height
+                    // height: (scenesGrid.height/scenesGrid.rows) - scenesGrid.rowSpacing*(scenesGrid.rows-1)
 
                     QQC2.RoundButton {
                         width: parent.height
@@ -77,6 +79,7 @@ Rectangle {
                         checkable: true
                         checked: index === scenesModel.selectedSceneIndex
                         onClicked: {
+                            scenesModel.stopAllClipsInCurrentScene();
                             scenesModel.selectedSceneIndex = index;
                         }
                     }

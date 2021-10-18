@@ -35,25 +35,35 @@ class zynthiloops_scenes_model(QAbstractListModel):
         self.__song__ = song
         self.__selected_scene_index__ = 0
         self.__scenes__ = {
-            0: {"name": "A", "clips": []},
-            1: {"name": "B", "clips": []},
-            2: {"name": "C", "clips": []},
-            3: {"name": "D", "clips": []},
-            4: {"name": "E", "clips": []},
-            5: {"name": "F", "clips": []},
-            6: {"name": "G", "clips": []},
-            7: {"name": "H", "clips": []},
-            8: {"name": "I", "clips": []},
-            9: {"name": "J", "clips": []},
-            10: {"name": "K", "clips": []},
-            11: {"name": "L", "clips": []},
+            "0": {"name": "A", "clips": []},
+            "1": {"name": "B", "clips": []},
+            "2": {"name": "C", "clips": []},
+            "3": {"name": "D", "clips": []},
+            "4": {"name": "E", "clips": []},
+            "5": {"name": "F", "clips": []},
+            "6": {"name": "G", "clips": []},
+            "7": {"name": "H", "clips": []},
+            "8": {"name": "I", "clips": []},
+            "9": {"name": "J", "clips": []},
+            "10": {"name": "K", "clips": []},
+            "11": {"name": "L", "clips": []},
         }
 
     def serialize(self):
-        pass
+        return {
+            # "scenesData": self.__scenes__,
+            "selectedIndex": self.__selected_scene_index__
+        }
 
-    def deserialize(self, arr):
-        pass
+    def deserialize(self, obj):
+        if "scenesData" in obj:
+            self.beginResetModel()
+            self.__scenes__ = obj["scenesData"]
+            self.endResetModel()
+
+        if "selectedIndex" in obj:
+            self.__selected_scene_index__ = obj["selectedIndex"]
+            self.selected_scene_index_changed.emit()
 
     def data(self, index, role=None):
         if not index.isValid():
@@ -63,7 +73,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
             return None
 
         if role == self.SceneRole:
-            return self.__scenes__[index.row()]
+            return self.getScene(index.row())
         else:
             return None
 
@@ -91,9 +101,11 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def set_selected_scene_index(self, index):
         self.__selected_scene_index__ = index
         self.selected_scene_index_changed.emit()
+
         if self.__song__.get_metronome_manager().isMetronomeRunning:
             self.playScene(index)
 
+        self.__song__.schedule_save()
     selected_scene_index_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex
@@ -116,12 +128,12 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     @Slot(int, result='QVariantMap')
     def getScene(self, index):
-        return self.__scenes__[index]
+        return self.__scenes__[str(index)]
 
     @Slot(QObject)
     def toggleClipInCurrentScene(self, clip: zynthiloops_clip):
-        if clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
-            self.__scenes__[self.__selected_scene_index__]["clips"].remove(clip)
+        if clip in self.getScene(self.__selected_scene_index__)["clips"]:
+            self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
         else:
             clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
 
@@ -129,15 +141,17 @@ class zynthiloops_scenes_model(QAbstractListModel):
             for clip_index in range(0, clips_model.count):
                 m_clip: zynthiloops_clip = clips_model.getClip(clip_index)
 
-                if m_clip in self.__scenes__[self.__selected_scene_index__]["clips"]:
-                    self.__scenes__[self.__selected_scene_index__]["clips"].remove(m_clip)
+                if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
+                    self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
 
             self.selected_scene_index_changed.emit()
-            self.__scenes__[self.__selected_scene_index__]["clips"].append(clip)
+            self.getScene(self.__selected_scene_index__)["clips"].append(clip)
 
             if self.__song__.get_metronome_manager().isMetronomeRunning:
                 clip.play()
 
+        self.__song__.schedule_save()
+
     @Slot(QObject, int, result=bool)
     def isClipInScene(self, clip, sceneIndex):
-        return clip in self.__scenes__[sceneIndex]["clips"]
+        return clip in self.getScene(sceneIndex)["clips"]

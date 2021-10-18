@@ -589,6 +589,7 @@ class zynthian_gui(QObject):
         self.screens["preset"] = zynthian_gui_preset(self)
         self.screens["control"] = zynthian_gui_control(self)
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["fx_control_downloader"] = self.screens["control_downloader"]
         self.screens["track"] = zynthian_gui_track(self)
         # self.screens['control_xy'] = zynthian_gui_control_xy(self)
         # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
@@ -2441,6 +2442,9 @@ class zynthian_gui(QObject):
     def get_control_downloader(self):
         return self.screens["control_downloader"]
 
+    def get_fx_control_downloader(self):
+        return self.screens["fx_control_downloader"]
+
     def get_admin(self):
         return self.screens["admin"]
 
@@ -2614,6 +2618,7 @@ class zynthian_gui(QObject):
     )
     module_downloader = Property(QObject, get_module_downloader, constant=True)
     control_downloader = Property(QObject, get_control_downloader, constant=True)
+    fx_control_downloader = Property(QObject, get_fx_control_downloader, constant=True)
     admin = Property(QObject, get_admin, constant=True)
     snapshot = Property(QObject, get_snapshot, constant=True)
     midi_chan = Property(QObject, get_midi_chan, constant=True)

@@ -54,7 +54,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             id: viewAction
-            text: qsTr("Switch View")
+            text: qsTr("Select Mod")
             enabled: zynthian.control.control_pages_model.count > 1
             onTriggered: {
                 if (zynthian.control.control_pages_model.count == 2) {
@@ -68,8 +68,11 @@ Zynthian.ScreenPage {
             property QQC2.Menu menuDelegate: zynthian.control.control_pages_model.count > 2 ? customControlsMenu : null
         },
         Kirigami.Action {
-            text: qsTr("Get New Views...")
-            onTriggered: zynthian.show_modal("control_downloader")
+            visible: false
+        },
+        Kirigami.Action {
+            text: qsTr("Get New Mods...")
+            onTriggered: zynthian.control.single_effect_engine === "" ? zynthian.show_modal("control_downloader") : zynthian.show_modal("fx_control_downloader")
         }
     ]
 
@@ -118,7 +121,7 @@ Zynthian.ScreenPage {
         id: currentConnection
         target: zynthian
         onCurrent_screen_idChanged: {
-            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.currentItem === root) {
+            if (zynthian.current_screen_id !== "control" && zynthian.current_screen_id.indexOf("control_downloader") === -1 && applicationWindow().pageStack.currentItem === root) {
                 pageRemoveTimer.restart()
             }
         }
@@ -127,7 +130,7 @@ Zynthian.ScreenPage {
         id: pageRemoveTimer
         interval: Kirigami.Units.longDuration
         onTriggered: {
-            if (zynthian.current_screen_id !== "control" && applicationWindow().pageStack.currentItem === root) {
+            if (zynthian.current_screen_id !== "control" && zynthian.current_screen_id.indexOf("control_downloader") === -1 && applicationWindow().pageStack.currentItem === root) {
                 applicationWindow().pageStack.pop();
             }
         }

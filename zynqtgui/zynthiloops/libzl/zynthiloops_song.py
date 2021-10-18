@@ -93,7 +93,8 @@ class zynthiloops_song(QObject):
                 "volume": self.__volume__,
                 "selectedScaleIndex": self.__selected_scale_index__,
                 "tracks": self.__tracks_model__.serialize(),
-                "parts": self.__parts_model__.serialize()}
+                "parts": self.__parts_model__.serialize(),
+                "scenes": self.__scenes_model__.serialize()}
 
     def save(self, cache=True):
         cache_dir = Path(self.sketch_folder) / ".cache"
@@ -204,6 +205,8 @@ class zynthiloops_song(QObject):
                     self.__parts_model__.deserialize(sketch["parts"])
                 if "tracks" in sketch:
                     self.__tracks_model__.deserialize(sketch["tracks"])
+                if "scenes" in sketch:
+                    self.__scenes_model__.deserialize(sketch["scenes"])
                 if "bpm" in sketch:
                     self.__bpm__ = sketch["bpm"]
                     self.set_bpm(self.__bpm__, True)

@@ -364,12 +364,18 @@ class zynthiloops_clip(QObject):
 
 
     def name(self):
-        return f"{self.__song__.tracksModel.getTrack(self.__row_index__).name}-{chr(self.__col_index__+65)}"
+        return f"{self.get_track_name()}-{self.get_part_name()}"
     name = Property(str, name, constant=True)
 
 
     def get_part_name(self):
-        return chr(self.__col_index__+65)
+        # return chr(self.__col_index__+65)
+        if self.__col_index__ == 0:
+            return "I"
+        elif self.__col_index__ == 1:
+            return "II"
+        else:
+            return ""
     partName = Property(str, get_part_name, constant=True)
 
 

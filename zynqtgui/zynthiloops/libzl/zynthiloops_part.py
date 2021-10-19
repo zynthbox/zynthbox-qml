@@ -37,7 +37,14 @@ class zynthiloops_part(QObject):
         self.__is_playing__ = False
         self.__length__ = 1
         self.__song__ = song
-        self.__name__ = chr(self.__part_index__+65) # A B C ...
+        # self.__name__ = chr(self.__part_index__+65) # A B C ...
+
+        if self.__part_index__ == 0:
+            self.__name__ = "I"
+        elif self.__part_index__ == 1:
+            self.__name__ = "II"
+        else:
+            self.__name__ = ""
 
     def serialize(self):
         return {"name": self.__name__,

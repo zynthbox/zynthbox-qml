@@ -307,6 +307,10 @@ Zynthian.ScreenPage {
                     onPressed: {
                         bottomBar.controlType = BottomBar.ControlType.Song;
                         bottomBar.controlObj = root.song;
+
+                        bottomStack.currentIndex = 0
+                        mixerActionBtn.checked = false
+                        sceneActionBtn.checked = false
                     }
 
                 }
@@ -335,6 +339,10 @@ Zynthian.ScreenPage {
                         onPressed: {
                             bottomBar.controlType = BottomBar.ControlType.Track;
                             bottomBar.controlObj = model.track;
+
+                            bottomStack.currentIndex = 0
+                            mixerActionBtn.checked = false
+                            sceneActionBtn.checked = false
                         }
 
                         onPressAndHold: {
@@ -376,6 +384,10 @@ Zynthian.ScreenPage {
                         onPressed: {
                             bottomBar.controlType = BottomBar.ControlType.Part;
                             bottomBar.controlObj = model.part;
+
+                            bottomStack.currentIndex = 0
+                            mixerActionBtn.checked = false
+                            sceneActionBtn.checked = false
                         }
 
                         Kirigami.Icon {
@@ -449,6 +461,10 @@ Zynthian.ScreenPage {
                                             root.song.scenesModel.toggleClipInCurrentScene(model.clip);
                                         }
                                         dblTimer.restart()
+
+                                        bottomStack.currentIndex = 0
+                                        mixerActionBtn.checked = false
+                                        sceneActionBtn.checked = false
                                     }
                                     Timer { //FIXME: why onDoubleClicked doesn't work
                                         id: dblTimer

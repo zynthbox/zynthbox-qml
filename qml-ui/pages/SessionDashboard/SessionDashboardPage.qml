@@ -226,6 +226,15 @@ Zynthian.ScreenPage {
                                 QQC2.Label {
                                     text: model.display
                                     visible: model.clip.path.length > 0
+                                    Rectangle {
+                                        anchors {
+                                            fill: parent
+                                            margins: -Kirigami.Units.smallSpacing
+                                        }
+                                        z: -1
+                                        color: Kirigami.Theme.highlightColor
+                                        visible: zynthian.zynthiloops.song.scenesModel.isClipInScene(model.clip, zynthian.zynthiloops.song.scenesModel.selectedSceneIndex)
+                                    }
                                 }
                             }
                         }

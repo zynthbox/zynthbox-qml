@@ -104,6 +104,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_left__ = -200
         self.__capture_audio_level_right__ = -200
 
+        self.__master_audio_level__ = -200
+        self.master_audio_level_timer = QTimer()
+        self.master_audio_level_timer.setInterval(50)
+        self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
+
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
@@ -185,6 +190,32 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     capture_audio_level_right_changed = Signal()
     captureAudioLevelRight = Property(float, get_capture_audio_level_right, notify=capture_audio_level_right_changed)
     ### END Property captureAudioLevelRight
+
+    @Slot(None)
+    def startMonitorMasterAudioLevels(self):
+        self.master_audio_level_timer.start()
+
+    @Slot(None)
+    def stopMonitorMasterAudioLevels(self):
+        self.master_audio_level_timer.stop()
+
+    def master_volume_level_timer_timeout(self):
+        added_db = 0
+        for i in range(0, self.__song__.tracksModel.count):
+            track = self.__song__.tracksModel.getTrack(i)
+            added_db += pow(10, track.get_audioLevel()/10)
+
+        self.set_master_audio_level(10*math.log10(added_db))
+
+    ### Property masterAudioLevel
+    def get_master_audio_level(self):
+        return self.__master_audio_level__
+    def set_master_audio_level(self, level):
+        self.__master_audio_level__ = level
+        self.master_audio_level_changed.emit()
+    master_audio_level_changed = Signal()
+    masterAudioLevel = Property(float, get_master_audio_level, notify=master_audio_level_changed)
+    ### END Property masterAudioLevelLeft
 
     @Signal
     def master_volume_changed(self):

@@ -82,7 +82,11 @@ Rectangle {
                         Layout.preferredWidth: privateProps.cellWidth
                         Layout.maximumWidth: privateProps.cellWidth
                         Layout.fillHeight: true
+                        headerText: zynthian.zynthiloops.masterAudioLevel <= -40
+                                        ? ""
+                                        : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
                         footerText: "Master"
+                        audioLeveldB: zynthian.zynthiloops.masterAudioLevel
 
                         Binding {
                             target: masterVolume.slider
@@ -130,7 +134,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                headerText: audioLevelText === "-40.00" ? "" : (audioLevelText + " (dB)")
+                                headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
                                 footerText: model.track.name
                                 audioLeveldB: model.track.audioLevel
 

@@ -115,12 +115,26 @@ Zynthian.ScreenPage {
                     zynthian.current_screen_id = "layer_effects";
                 }
             }
-             Kirigami.Action {
+            Kirigami.Action {
+                text: qsTr("Remove All Audio-FX")
+                enabled: zynthian.main_layers_view.current_index_valid
+                onTriggered: {
+                    zynthian.layer_effects.fx_reset()
+                }
+            }
+            Kirigami.Action {
                 text: qsTr("MIDI-FX")
                 enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show() //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_midi_effects";
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Remove All MIDI-FX")
+                enabled: zynthian.main_layers_view.current_index_valid
+                onTriggered: {
+                    zynthian.layer_midi_effects.fx_reset()
                 }
             }
         },

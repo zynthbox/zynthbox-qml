@@ -207,6 +207,11 @@ class zynthiloops_track(QObject):
 
         return is_empty
 
+    @Slot(QObject)
+    def copyFrom(self, source):
+        for clip_index in range(0, self.__clips_model__.count):
+            self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
+
     # Helper method to map value from one range to another
     @staticmethod
     def map_range(sourceNumber, fromA, fromB, toA, toB):

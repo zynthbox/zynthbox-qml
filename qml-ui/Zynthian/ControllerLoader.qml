@@ -37,7 +37,7 @@ Loader {
 
     Layout.fillWidth: true
     Layout.fillHeight: true
-    visible: controller !== null
+    active: controller.ctrl !== null && controller.ctrl.visible
 
     readonly property string valueType: {
         //FIXME: Ugly heuristics

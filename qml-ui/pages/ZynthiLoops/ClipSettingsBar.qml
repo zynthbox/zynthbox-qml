@@ -190,6 +190,34 @@ GridLayout {
         }
     }
 
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        QQC2.Button {
+            Layout.alignment: Qt.AlignCenter
+
+            text: qsTr("Copy Clip")
+            visible: bottomBar.clipCopySource == null
+            onClicked: {
+                bottomBar.clipCopySource = bottomBar.controlObj;
+            }
+        }
+
+        QQC2.Button {
+            Layout.alignment: Qt.AlignCenter
+
+            text: qsTr("Paste Clip")
+            visible: bottomBar.clipCopySource != null
+            enabled: bottomBar.clipCopySource != bottomBar.controlObj
+            onClicked: {
+                bottomBar.controlObj.copyFrom(bottomBar.clipCopySource);
+                bottomBar.clipCopySource = null;
+            }
+        }
+    }
+
     Item {
         Layout.fillWidth: true
     }

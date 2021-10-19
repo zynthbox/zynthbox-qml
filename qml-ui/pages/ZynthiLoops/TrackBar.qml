@@ -80,13 +80,41 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+        visible: !bottomBar.controlObj.isEmpty()
 
         QQC2.Button {
             Layout.alignment: Qt.AlignCenter
             text: "Track Editor..."
-            visible: !bottomBar.controlObj.isEmpty()
             onClicked: {
                 zynthian.current_modal_screen_id = "track"
+            }
+        }
+    }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        QQC2.Button {
+            Layout.alignment: Qt.AlignCenter
+
+            text: qsTr("Copy Track")
+            visible: bottomBar.trackCopySource == null
+            onClicked: {
+                bottomBar.trackCopySource = bottomBar.controlObj;
+            }
+        }
+
+        QQC2.Button {
+            Layout.alignment: Qt.AlignCenter
+
+            text: qsTr("Paste Track")
+            visible: bottomBar.trackCopySource != null
+            enabled: bottomBar.trackCopySource != bottomBar.controlObj
+            onClicked: {
+                bottomBar.controlObj.copyFrom(bottomBar.trackCopySource);
+                bottomBar.trackCopySource = null;
             }
         }
     }

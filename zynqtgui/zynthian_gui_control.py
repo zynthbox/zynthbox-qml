@@ -265,7 +265,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.index = self.zyngui.curlayer.get_active_screen_index()
 		else:
 			self.index = 0
-		logging.error("KK {} {}".format(len(self.list_data), self.index))
 		if len(self.list_data) > self.index and len(self.list_data[self.index]) < 4:
 			self.index = 1
 		super().fill_list()
@@ -285,7 +284,20 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	@Slot(str, int, result=QObject)
 	def controller_by_category(self, cat, index):
-		controllers = self.zyngui.curlayer.get_ctrl_screens()
+		controllers = []
+		if self.__single_effect_engine != None:
+			fxchain_layers = self.zyngui.screens['layer'].get_fxchain_layers()
+			if fxchain_layers != None:
+				for layer in fxchain_layers:
+					if layer.engine.nickname == self.__single_effect_engine:
+						controllers = layer.get_ctrl_screens()
+			midichain_layers = self.zyngui.screens['layer'].get_midichain_layers()
+			if midichain_layers != None:
+				for layer in midichain_layers:
+					if layer.engine.nickname == self.__single_effect_engine:
+						controllers = layer.get_ctrl_screens()
+		else:
+			controllers = self.zyngui.curlayer.get_ctrl_screens()
 		if cat in controllers:
 			controllers_cat = controllers[cat]
 			if index < 0 or index >= len(controllers_cat):
@@ -302,7 +314,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	@Slot(str, int, result=QObject)
 	def amixer_controller_by_category(self, cat, index):
-		logging.error(self.zyngui.screens["layer"].amixer_layer)
 		if not self.zyngui.screens["layer"].amixer_layer:
 			return None
 

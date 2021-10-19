@@ -232,6 +232,7 @@ Item {
         FocusScope {
             id: primaryTabsScope
             opacity: tabsLayout.visibleChildren.length > 3 ? 1 : 0
+            visible: root.tabActions.length > 1
             Layout.minimumWidth: root.orientation === Qt.Horizontal ? Layout.maximumWidth : -1
             Layout.maximumWidth: root.orientation === Qt.Horizontal ? Kirigami.Units.gridUnit * 6 : -1
             Layout.minimumHeight: root.orientation === Qt.Horizontal ? -1 : Layout.maximumHeight

@@ -56,16 +56,7 @@ Zynthian.ScreenPage {
             id: viewAction
             text: qsTr("Select Mod")
             enabled: zynthian.control.control_pages_model.count > 1
-            onTriggered: {
-                if (zynthian.control.control_pages_model.count == 2) {
-                    if (zynthian.control.custom_control_page === zynthian.control.default_custom_control_page) {
-                        zynthian.control.custom_control_page = "";
-                    } else {
-                        zynthian.control.custom_control_page = zynthian.control.default_custom_control_page;
-                    }
-                }
-            }
-            property QQC2.Menu menuDelegate: zynthian.control.control_pages_model.count > 2 ? customControlsMenu : null
+            property QQC2.Menu menuDelegate: customControlsMenu
         },
         Kirigami.Action {
             visible: false

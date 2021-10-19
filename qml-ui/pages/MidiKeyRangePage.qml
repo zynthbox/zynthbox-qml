@@ -71,35 +71,54 @@ Zynthian.ScreenPage {
                     anchors.centerIn: parent
                     columns: 2
                     QQC2.Button {
+                        id: fullButton
                         Layout.fillWidth: true
                         Layout.columnSpan: 2
                         text: qsTr("Full Keyboard")
                         checkable: true
                         checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126
+                        Binding {
+                            target: fullButton
+                            property: "checked"
+                            value: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126
+                        }
                         onToggled: {
                             zynthian.midi_key_range.note_low_controller.value = 0;
                             zynthian.midi_key_range.note_high_controller.value = 126;
+                            checked = zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 126;
                         }
                     }
                     QQC2.Button {
+                        id: lowerButton
                         Layout.fillWidth: true
                         text: qsTr("Lower (L)")
                         checkable: true
-                        checked: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
-                        onToggled: {
+                        Binding {
+                            target: lowerButton
+                            property: "checked"
+                            value: zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59
+                        }
+                        onClicked: {
                             zynthian.midi_key_range.note_low_controller.value = 0;
                             zynthian.midi_key_range.note_high_controller.value = 59;
+                            checked = zynthian.midi_key_range.note_low_controller.value === 0 && zynthian.midi_key_range.note_high_controller.value === 59;
                         }
                     }
                     QQC2.Button {
+                        id: higherButton
                         Layout.fillWidth: true
                         text: qsTr("Higher (H)")
                         checkable: true
-                        checked: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
-                        onToggled: {
+                        Binding {
+                            target: higherButton
+                            property: "checked"
+                            value: zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126
+                        }
+                        onClicked: {
                             zynthian.midi_key_range.note_high_controller.value = 126;
                             zynthian.midi_key_range.note_low_controller.value = 60;
                             zynthian.midi_key_range.note_low_controller.value = 60;
+                            checked = zynthian.midi_key_range.note_low_controller.value === 60 && zynthian.midi_key_range.note_high_controller.value === 126;
                         }
                     }
                 }

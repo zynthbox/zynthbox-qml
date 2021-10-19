@@ -1273,7 +1273,7 @@ class zynthian_gui(QObject):
 
         elif cuia == "ZL_PLAY":
             zl = self.screens["zynthiloops"]
-            zl.start_metronome_request()
+            zl.startPlayback()
 
         elif cuia == "ZL_STOP":
             zl = self.screens["zynthiloops"]

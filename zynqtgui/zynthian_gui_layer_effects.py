@@ -160,6 +160,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.fx_layer_index = self.zyngui.screens['layer'].layers.index(layer)
 		self.show()
 
+	@Slot(None)
 	def fx_reset(self):
 		if self.midi_mode:
 			self.zyngui.show_confirm("Do you really want to remove all Midi-FXs for this layer?", self.fx_reset_confirmed)

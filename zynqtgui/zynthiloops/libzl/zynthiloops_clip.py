@@ -56,7 +56,7 @@ class zynthiloops_clip(QObject):
         self.__initial_gain__ = 0
         self.__gain__ = self.__initial_gain__
         self.__progress__ = 0.0
-        self.__audio_level__ = 0
+        self.__audio_level__ = -200
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
@@ -499,7 +499,7 @@ class zynthiloops_clip(QObject):
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
         self.__bpm__ = 0
         self.__progress__ = 0.0
-        self.__audio_level__ = 0
+        self.__audio_level__ = -200
 
         self.reset_beat_count()
         self.track_volume_changed()
@@ -553,7 +553,7 @@ class zynthiloops_clip(QObject):
         if self.__is_playing__:
             return self.__audio_level__
         else:
-            return -40
+            return -200
 
     audioLevel = Property(float, get_audioLevel, notify=audioLevelChanged)
 

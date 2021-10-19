@@ -42,7 +42,7 @@ class zynthiloops_track(QObject):
         self.__song__ = song
         self.__initial_volume__ = 0
         self.__volume__ = self.__initial_volume__
-        self.__audio_level__ = -40
+        self.__audio_level__ = -200
         self.__clips_model__ = zynthiloops_clips_model(song, self)
         self.__layers_snapshot = []
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)

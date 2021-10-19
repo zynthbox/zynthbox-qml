@@ -83,9 +83,9 @@ class zynthian_gui_keybinding(QObject):
 			"SWITCH_LAYER_SHORT": { "modifier": 0, "keysym": "l" },
 			"SWITCH_LAYER_BOLD": { "modifier": 1, "keysym": "l" },
 			"SWITCH_LAYER_LONG": { "modifier": 4, "keysym": "l" },
-			"SWITCH_SNAPSHOT_SHORT": { "modifier": 0, "keysym": "s" },
-			"SWITCH_SNAPSHOT_BOLD": { "modifier": 1, "keysym": "s" },
-			"SWITCH_SNAPSHOT_LONG": { "modifier": 4, "keysym": "s" },
+			#"SWITCH_SNAPSHOT_SHORT": { "modifier": 0, "keysym": "s" },
+			#"SWITCH_SNAPSHOT_BOLD": { "modifier": 1, "keysym": "s" },
+			#"SWITCH_SNAPSHOT_LONG": { "modifier": 4, "keysym": "s" },
 
 			"SELECT_UP": { "modifier": 0, "keysym": "Up" },
 			"SELECT_DOWN": { "modifier": 0, "keysym": "Down" },
@@ -96,19 +96,19 @@ class zynthian_gui_keybinding(QObject):
 			"SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
 			"SNAPSHOT_DOWN": { "modifier": 4, "keysym": "Down" },
 
-			"START_AUDIO_RECORD": { "modifier": 0, "keysym": "a" },
-			"STOP_AUDIO_RECORD": { "modifier": 1, "keysym": "a" },
-			"TOGGLE_AUDIO_RECORD": { "modifier": 8, "keysym": "a" },
-			"START_AUDIO_PLAY": { "modifier": 4, "keysym": "a" },
-			"STOP_AUDIO_PLAY": { "modifier": 5, "keysym": "a" },
-			"TOGGLE_AUDIO_PLAY": { "modifier": 12, "keysym": "a" },
+			"START_AUDIO_RECORD": { "modifier": 0, "keysym": "r" },
+			"STOP_AUDIO_RECORD": { "modifier": 1, "keysym": "r" },
+			"TOGGLE_AUDIO_RECORD": { "modifier": 8, "keysym": "r" },
+			"START_AUDIO_PLAY": { "modifier": 4, "keysym": "r" },
+			"STOP_AUDIO_PLAY": { "modifier": 5, "keysym": "r" },
+			"TOGGLE_AUDIO_PLAY": { "modifier": 12, "keysym": "r" },
 
-			"START_MIDI_RECORD": { "modifier": 0, "keysym": "r" },
-			"STOP_MIDI_RECORD": { "modifier": 1, "keysym": "r" },
-			"TOGGLE_MIDI_RECORD": { "modifier": 8, "keysym": "r" },
-			"START_MIDI_PLAY": { "modifier": 4, "keysym": "r" },
-			"STOP_MIDI_PLAY": { "modifier": 5, "keysym": "r" },
-			"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
+			#"START_MIDI_RECORD": { "modifier": 0, "keysym": "r" },
+			#"STOP_MIDI_RECORD": { "modifier": 1, "keysym": "r" },
+			#"TOGGLE_MIDI_RECORD": { "modifier": 8, "keysym": "r" },
+			#"START_MIDI_PLAY": { "modifier": 4, "keysym": "r" },
+			#"STOP_MIDI_PLAY": { "modifier": 5, "keysym": "r" },
+			#"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
 
 			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 			"SCREEN_ZYNTHILOOPS": { "modifier": 0, "keysym": "F1" },
@@ -137,8 +137,8 @@ class zynthian_gui_keybinding(QObject):
 			"DECREASE" : { "modifier": 0, "keysym": "-" },
 
 			"KEYBOARD" : { "modifier": 0, "keysym": "k" },
-			"ZL_PLAY" : { "modifier": 0, "keysym": "p" },
-			"ZL_STOP" : { "modifier": 0, "keysym": "o" },
+			"ZL_PLAY" : { "modifier": 0, "keysym": "a" },
+			"ZL_STOP" : { "modifier": 0, "keysym": "s" },
 		}
 	}
 

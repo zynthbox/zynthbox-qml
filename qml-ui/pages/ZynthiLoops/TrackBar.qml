@@ -41,13 +41,59 @@ GridLayout {
 
     property QtObject bottomBar: null
 
-    QQC2.Button {
-        Layout.alignment: Qt.alignCenter
-        text: "Track Editor..."
-        visible: !bottomBar.controlObj.isEmpty()
-		onClicked: {
-			zynthian.current_modal_screen_id = "track"
-		}
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        Binding {
+            target: volumeControl.slider
+            property: "value"
+            value: bottomBar.controlObj.volume
+        }
+
+        VolumeControl {
+            id: volumeControl
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit*2
+
+            headerText: bottomBar.controlObj.audioLevel <= -40
+                            ? ""
+                            : (bottomBar.controlObj.audioLevel.toFixed(2) + " (dB)")
+            footerText: bottomBar.controlObj.name
+            audioLeveldB: bottomBar.controlObj.audioLevel
+
+            slider.value: bottomBar.controlObj.volume
+            slider.onValueChanged: {
+                bottomBar.controlObj.volume = slider.value
+            }
+
+            onDoubleClicked: {
+                slider.value = bottomBar.controlObj.initialVolume;
+            }
+        }
+    }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        QQC2.Button {
+            Layout.alignment: Qt.AlignCenter
+            text: "Track Editor..."
+            visible: !bottomBar.controlObj.isEmpty()
+            onClicked: {
+                zynthian.current_modal_screen_id = "track"
+            }
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
     }
 }
 

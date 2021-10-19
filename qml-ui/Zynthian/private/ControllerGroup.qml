@@ -43,7 +43,6 @@ QtObject {
         id: internal
         function syncCtrl() {
             if (index < 0) {
-                root.ctrl = null;
                 return;
             }
             if (category.length > 0 && category.indexOf("amixer_") === 0) {

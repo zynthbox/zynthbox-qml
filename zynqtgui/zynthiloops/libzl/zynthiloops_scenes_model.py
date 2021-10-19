@@ -22,6 +22,8 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import logging
+
 from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
 
 from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
@@ -50,15 +52,33 @@ class zynthiloops_scenes_model(QAbstractListModel):
         }
 
     def serialize(self):
+        logging.error("### Serializing Scenes")
+        scene_data = {}
+
+        for key, val in self.__scenes__.items():
+            scene_data[key] = {
+                "name": val["name"],
+                "clips": val["clips"].copy()
+            }
+            for index, clip in enumerate(scene_data[key]["clips"]):
+                scene_data[key]["clips"][index] = {
+                    "row": clip.row,
+                    "col": clip.col
+                }
+        logging.error(f"{self.__scenes__}")
         return {
-            # "scenesData": self.__scenes__,
+            "scenesData": scene_data,
             "selectedIndex": self.__selected_scene_index__
         }
 
     def deserialize(self, obj):
+        logging.error("### Deserializing Scenes")
         if "scenesData" in obj:
             self.beginResetModel()
-            self.__scenes__ = obj["scenesData"]
+            for key, val in obj["scenesData"].items():
+                self.__scenes__[key] = val.copy()
+                for index, clip in enumerate(self.__scenes__[key]["clips"]):
+                    self.__scenes__[key]["clips"][index] = self.__song__.getClip(clip["row"], clip["col"])
             self.endResetModel()
 
         if "selectedIndex" in obj:

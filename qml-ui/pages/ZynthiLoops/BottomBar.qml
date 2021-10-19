@@ -35,6 +35,8 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.Card {
     property alias filePickerDialog: pickerDialog
+    property var trackCopySource: null
+    property var clipCopySource: null
 
     leftPadding: 0
     rightPadding: 0

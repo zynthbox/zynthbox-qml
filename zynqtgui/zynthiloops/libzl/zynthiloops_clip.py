@@ -740,6 +740,18 @@ class zynthiloops_clip(QObject):
         self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
         self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
 
+    @Slot(QObject)
+    def copyFrom(self, clip):
+        self.clear()
+
+        if clip.path is not None:
+            self.path = clip.path
+            self.length = clip.length
+            self.startPosition = clip.startPosition
+            self.time = clip.time
+            self.pitch = clip.pitch
+            self.gain = clip.gain
+
     ### Property metadataAudioType
     def get_metadata_audio_type(self):
         try:

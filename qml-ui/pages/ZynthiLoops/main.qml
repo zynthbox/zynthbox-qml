@@ -143,8 +143,12 @@ Zynthian.ScreenPage {
                 sceneActionBtn.checked = false;
 
                 if (!checked) {
+                    // Open Mixer
+                     zynthian.zynthiloops.startMonitorMasterAudioLevels();
                     bottomStack.currentIndex = 1;
                 } else {
+                    // Close Mixer
+                     zynthian.zynthiloops.stopMonitorMasterAudioLevels();
                     bottomStack.currentIndex = 0;
                 }
             }

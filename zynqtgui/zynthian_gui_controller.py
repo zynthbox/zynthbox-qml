@@ -67,6 +67,7 @@ class zynthian_gui_controller(QObject):
 		self.scale_value=1
 		self.ctrl_value_plot=0
 		self.ctrl_value_print=None
+		self.__visible = True
 
 
 		self.ctrl_midi_bind=None
@@ -84,10 +85,15 @@ class zynthian_gui_controller(QObject):
 	def show(self):
 		#logging.error("SHOWING")
 		#self.calculate_plot_values()
-		return
+		self.__visible = True
+		self.visible_changed.emit()
 
 	def hide(self):
-		return
+		self.__visible = False
+		self.visible_changed.emit()
+
+	def get_visible(self):
+		return self.__visible
 
 
 	def calculate_plot_values(self):
@@ -199,7 +205,7 @@ class zynthian_gui_controller(QObject):
 
 	def set_title(self, title):
 		self.ctrl_title = str(title)
-		self.title_canged.emit()
+		self.title_changed.emit()
 
 	def get_title(self):
 		return self.ctrl_title
@@ -459,7 +465,7 @@ class zynthian_gui_controller(QObject):
 			self.set_value(self.ctrl_value + 1, True)
 
 
-	title_canged = Signal()
+	title_changed = Signal()
 	midi_bind_changed = Signal()
 	value_changed = Signal()
 	value_print_changed = Signal()
@@ -467,8 +473,10 @@ class zynthian_gui_controller(QObject):
 	value0_changed = Signal()
 	value_type_changed = Signal()
 	step_size_changed = Signal()
+	visible_changed = Signal()
 
-	title = Property(str, get_title, notify = title_canged)
+	title = Property(str, get_title, notify = title_changed)
+	visible = Property(bool, get_visible, notify = visible_changed)
 	midi_bind = Property(str, get_midi_bind, notify = midi_bind_changed)
 	value = Property(float, get_value, write_value, notify = value_changed)
 	value_print = Property(str, get_value_print, notify = value_print_changed)

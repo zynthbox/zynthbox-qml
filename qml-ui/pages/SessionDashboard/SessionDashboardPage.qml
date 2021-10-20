@@ -299,14 +299,37 @@ Zynthian.ScreenPage {
                             model: ZynQuick.PlayGridManager.dashboardModels[modelData]
                             property string playgridId: modelData
                             delegate: DashboardListItem {
+                                id: delegate
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: root.itemHeight
                                 Layout.maximumHeight: root.itemHeight
+                                dragManager.targetMinY: patternsLayout.y
                                 Component.onCompleted: {
                                     print("Pattern layer: "+ model.layer)
+                                    var channel = chan
+                                    if (channel === 0) {
+                                        channel = zynthian.active_midi_channel
+                                    }
+                                    patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[channel])
                                 }
                                 property int chan: model.layer
-                                onChanChanged: print("Updated Pattern Layer: "+chan)
+                                onChanChanged: {
+                                    print("Updated Pattern Layer: " + chan)
+                                    var channel = chan
+                                    if (channel === 0) {
+                                        channel = zynthian.active_midi_channel
+                                    }
+                                    patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[channel])
+                                }
+                                data: [Connections {
+                                    target: zynthian
+                                    onActive_midi_channelChanged: {
+                                        print("AAAAAA"+zynthian.active_midi_channel)
+                                        if (delegate.chan === 0) {
+                                            patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[zynthian.active_midi_channel]);
+                                        }
+                                    }
+                                }]
                                 text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
 
                                 patternConnections: patternSoundsConnections
@@ -319,6 +342,9 @@ Zynthian.ScreenPage {
                                     ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
                                 }
                                 onRequestConnect: {
+                                    if (child.channel < 10) {
+                                        return;
+                                    }
                                     patternsViewPlaygridRepeater.model.setPatternProperty(index, "layer", child.channel)
                                 }
                             }
@@ -326,40 +352,29 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            ColumnLayout {
+            Item {
                 Layout.preferredWidth: parent.width / 10
                 Layout.maximumWidth: parent.width / 10
                 Layout.fillHeight: true
-                Item {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    PatternConnections {
-                        id: trackSoundConnections
-                        anchors {
-                            fill: parent
-                            leftMargin: -parent.width * 2
-                        }
-                    //    Layout.leftMargin: -width
-                        connections:[
-                            [tracksLayout.children[1].dragManager, layersView.contentItem.children[0]],
-                            [tracksLayout.children[2].dragManager, layersView.contentItem.children[1]],
-                            [tracksLayout.children[3].dragManager, layersView.contentItem.children[2]],
-                            [tracksLayout.children[4].dragManager, layersView.contentItem.children[3]],
-                            [tracksLayout.children[5].dragManager, layersView.contentItem.children[4]],
-                        ]
+
+                PatternConnections {
+                    id: trackSoundConnections
+                    anchors {
+                        fill: parent
+                        leftMargin: -parent.width * 2
                     }
+                    connections:[
+                        [tracksLayout.children[1].dragManager, layersView.contentItem.children[0]],
+                        [tracksLayout.children[2].dragManager, layersView.contentItem.children[1]],
+                        [tracksLayout.children[3].dragManager, layersView.contentItem.children[2]],
+                        [tracksLayout.children[4].dragManager, layersView.contentItem.children[3]],
+                        [tracksLayout.children[5].dragManager, layersView.contentItem.children[4]],
+                    ]
                 }
+
                 PatternConnections {
                     id: patternSoundsConnections
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    connections:[
-                        [patternsLayout.children[0].dragManager, layersView.contentItem.children[11]],
-                        [patternsLayout.children[1].dragManager, layersView.contentItem.children[12]],
-                        [patternsLayout.children[2].dragManager, layersView.contentItem.children[13]],
-                        [patternsLayout.children[3].dragManager, layersView.contentItem.children[14]],
-                        [patternsLayout.children[6].dragManager, layersView.contentItem.children[15]],
-                    ]
+                    anchors.fill: parent
                 }
             }
 

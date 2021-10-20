@@ -40,6 +40,28 @@ Canvas {
     property var temporaryEndPos2
     property var connections: []
 
+    function removeConnection(fromItem) {
+        if (canvas.connections === undefined) {
+            canvas.connections = [];
+        }
+        for (var i in canvas.connections) {
+            if (canvas.connections[i][0] == fromItem) {
+                canvas.connections.splice(i, 1);
+                return;
+            }
+        }
+        canvas.requestPaint();
+    }
+
+    function addConnection(fromItem, toItem) {
+        if (canvas.connections === undefined) {
+            canvas.connections = [];
+        }
+        removeConnection(fromItem);
+        canvas.connections.push([fromItem, toItem]);
+        canvas.requestPaint();
+    }
+
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Timer {

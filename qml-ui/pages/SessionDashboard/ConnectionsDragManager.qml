@@ -39,11 +39,26 @@ MouseArea {
     property int targetMaxY: patternConnections.height
     signal requestConnect(Item child)
 
+    Rectangle {
+        anchors {
+            horizontalCenter: parent.right
+            verticalCenter: parent.verticalCenter
+        }
+        visible: root.pressed
+        width: Kirigami.Units.gridUnit
+        height: width
+        radius: width
+        color: Kirigami.Theme.highlightColor
+    }
     onPressed: {
         print(mouse.y)
     }
     onPositionChanged: {
         let column2Pos = secondColumn.mapFromItem(this, mouse.x, mouse.y);
+        let minYSecondColumn = secondColumn.mapFromItem(patternConnections, 0, root.targetMinY).y;
+        let maxYSecondColumn = secondColumn.mapFromItem(patternConnections, 0, root.targetMaxY).y;
+        column2Pos.y = Math.max(minYSecondColumn, Math.min(maxYSecondColumn, column2Pos.y));
+
         patternConnections.temporaryEndPos = patternConnections.mapFromItem(this, mouse.x, mouse.y);
         patternConnections.temporaryEndPos.x = Math.min(patternConnections.width, patternConnections.temporaryEndPos.x);
         patternConnections.temporaryEndPos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos.y));
@@ -77,8 +92,13 @@ MouseArea {
     onReleased: {
         patternConnections.temporaryStartPos = null;
         patternConnections.temporaryEndPos = null;
+
         let column2Pos = secondColumn.mapFromItem(this, mouse.x, mouse.y);
-        column2Pos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, column2Pos.y));
+
+        let minYSecondColumn = secondColumn.mapFromItem(patternConnections, 0, root.targetMinY).y;
+        let maxYSecondColumn = secondColumn.mapFromItem(patternConnections, 0, root.targetMaxY).y;
+        column2Pos.y = Math.max(minYSecondColumn, Math.min(maxYSecondColumn, column2Pos.y));
+
         let child = secondColumn.childAt(0, column2Pos.y);
         if (!child) {
             patternConnections.temporaryEndPos2 = null;

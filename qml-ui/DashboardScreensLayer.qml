@@ -46,7 +46,7 @@ Zynthian.Stack {
     property var pageCache: {
         "session_dashboard": dashboard
     }
-    initialItem: Dash.SessionDashboardPage {
+    initialItem: Dash.Main {
         id: dashboard
     }
     data: [

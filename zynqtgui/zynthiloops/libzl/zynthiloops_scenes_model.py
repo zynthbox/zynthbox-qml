@@ -154,6 +154,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def toggleClipInCurrentScene(self, clip: zynthiloops_clip):
         if clip in self.getScene(self.__selected_scene_index__)["clips"]:
             self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
+
+            if self.__song__.get_metronome_manager().isMetronomeRunning:
+                clip.stop()
         else:
             clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
 

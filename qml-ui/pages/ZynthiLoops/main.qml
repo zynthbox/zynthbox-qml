@@ -308,9 +308,10 @@ Zynthian.ScreenPage {
                         bottomBar.controlType = BottomBar.ControlType.Song;
                         bottomBar.controlObj = root.song;
 
-                        bottomStack.currentIndex = 0
-                        mixerActionBtn.checked = false
-                        sceneActionBtn.checked = false
+                        if (mixerActionBtn.checked) {
+                            bottomStack.currentIndex = 0
+                            mixerActionBtn.checked = false
+                        }
                     }
 
                 }
@@ -340,9 +341,10 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Track;
                             bottomBar.controlObj = model.track;
 
-                            bottomStack.currentIndex = 0
-                            mixerActionBtn.checked = false
-                            sceneActionBtn.checked = false
+                            if (mixerActionBtn.checked) {
+                                bottomStack.currentIndex = 0
+                                mixerActionBtn.checked = false
+                            }
                         }
 
                         onPressAndHold: {
@@ -385,9 +387,10 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Part;
                             bottomBar.controlObj = model.part;
 
-                            bottomStack.currentIndex = 0
-                            mixerActionBtn.checked = false
-                            sceneActionBtn.checked = false
+                            if (mixerActionBtn.checked) {
+                                bottomStack.currentIndex = 0
+                                mixerActionBtn.checked = false
+                            }
                         }
 
                         Kirigami.Icon {
@@ -462,9 +465,10 @@ Zynthian.ScreenPage {
                                         }
                                         dblTimer.restart()
 
-                                        bottomStack.currentIndex = 0
-                                        mixerActionBtn.checked = false
-                                        sceneActionBtn.checked = false
+                                        if (mixerActionBtn.checked) {
+                                            bottomStack.currentIndex = 0
+                                            mixerActionBtn.checked = false
+                                        }
                                     }
                                     Timer { //FIXME: why onDoubleClicked doesn't work
                                         id: dblTimer

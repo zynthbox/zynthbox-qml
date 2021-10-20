@@ -319,7 +319,7 @@ Zynthian.ScreenPage {
                                     ZynQuick.PlayGridManager.pickDashboardModelItem(patternsViewPlaygridRepeater.model, index);
                                 }
                                 onRequestConnect: {
-                                    patternsViewPlaygridRepeater.model.setProperty(index, "layer", child.channel)
+                                    patternsViewPlaygridRepeater.model.setPatternProperty(index, "layer", child.channel)
                                 }
                             }
                         }

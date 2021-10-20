@@ -464,7 +464,7 @@ Zynthian.ScreenPage {
                                     onPressed: {
                                         bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
-                                        if (dblTimer.running) {
+                                        if (dblTimer.running || sceneActionBtn.checked) {
                                             /*if (model.clip.isPlaying) {
                                                 model.clip.stop();
                                             } else {

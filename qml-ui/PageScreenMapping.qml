@@ -111,6 +111,6 @@ QtObject {
 
     readonly property var dashboardScreens: {
         "main": "MainPage.qml",
-        "session_dashboard": "SessionDashboard/SessionDashboardPage.qml",
+        "session_dashboard": "SessionDashboard/main.qml",
     }
 }

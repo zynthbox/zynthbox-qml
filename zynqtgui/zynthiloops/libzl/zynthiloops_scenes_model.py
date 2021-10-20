@@ -166,6 +166,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
                 if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
                     self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
+                    if self.__song__.get_metronome_manager().isMetronomeRunning:
+                        m_clip.stop()
+                    m_clip.in_current_scene_changed.emit()
 
             self.getScene(self.__selected_scene_index__)["clips"].append(clip)
 

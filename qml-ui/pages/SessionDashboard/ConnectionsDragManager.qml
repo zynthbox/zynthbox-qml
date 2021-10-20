@@ -35,6 +35,8 @@ MouseArea {
     id: root
     property Item patternConnections
     property Item secondColumn
+    property int targetMinY: 0
+    property int targetMaxY: patternConnections.height
     signal requestConnect(Item child)
 
     onPressed: {
@@ -43,14 +45,18 @@ MouseArea {
     onPositionChanged: {
         let column2Pos = secondColumn.mapFromItem(this, mouse.x, mouse.y);
         patternConnections.temporaryEndPos = patternConnections.mapFromItem(this, mouse.x, mouse.y);
+        patternConnections.temporaryEndPos.x = Math.min(patternConnections.width, patternConnections.temporaryEndPos.x);
+        patternConnections.temporaryEndPos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos.y));
         let child = secondColumn.childAt(0, column2Pos.y);
         if (!child) {
             return;
         }
 
         patternConnections.temporaryStartPos = patternConnections.mapFromItem(this, 0, height / 2);
+
         if (patternConnections.temporaryEndPos.x > patternConnections.width / 2) {
             patternConnections.temporaryEndPos2 = patternConnections.mapFromItem(child, 0, child.height / 2);
+            patternConnections.temporaryEndPos2.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos2.y));
         } else {
             patternConnections.temporaryEndPos2 = null;
         }
@@ -72,6 +78,7 @@ MouseArea {
         patternConnections.temporaryStartPos = null;
         patternConnections.temporaryEndPos = null;
         let column2Pos = secondColumn.mapFromItem(this, mouse.x, mouse.y);
+        column2Pos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, column2Pos.y));
         let child = secondColumn.childAt(0, column2Pos.y);
         if (!child) {
             patternConnections.temporaryEndPos2 = null;

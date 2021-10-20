@@ -41,12 +41,12 @@ Canvas {
     property var connections: []
 
     onWidthChanged: requestPaint()
-	onHeightChanged: requestPaint()
+    onHeightChanged: requestPaint()
     Timer {
-		running: true
-		interval: 500
-		onTriggered: canvas.requestPaint();
-	}
+        running: true
+        interval: 500
+        onTriggered: canvas.requestPaint();
+    }
     onPaint: {
         var ctx = getContext("2d");
         ctx.clearRect(0, 0, width, height);

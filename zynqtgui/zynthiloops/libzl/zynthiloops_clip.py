@@ -74,6 +74,8 @@ class zynthiloops_clip(QObject):
             self.track.volume_changed.connect(lambda: self.track_volume_changed())
             self.track_volume_changed()
 
+        self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.in_current_scene_changed.emit())
+
     ### Property initialStartPosition
     def get_initial_start_position(self):
         return self.__initial_start_position__
@@ -769,3 +771,10 @@ class zynthiloops_clip(QObject):
         return track.name
     trackName = Property(str, get_track_name, constant=True)
     ### END Property trackName
+
+    ### Property inCurrentScene
+    def get_in_current_scene(self):
+        return self.__song__.scenesModel.isClipInCurrentScene(self)
+    in_current_scene_changed = Signal()
+    inCurrentScene = Property(bool, get_in_current_scene, notify=in_current_scene_changed)
+    ### END Property inCurrentScene

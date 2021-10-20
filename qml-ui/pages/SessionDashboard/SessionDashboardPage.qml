@@ -233,7 +233,7 @@ Zynthian.ScreenPage {
                                         }
                                         z: -1
                                         color: Kirigami.Theme.highlightColor
-                                        visible: zynthian.zynthiloops.song.scenesModel.isClipInScene(model.clip, zynthian.zynthiloops.song.scenesModel.selectedSceneIndex)
+                                        visible: model.clip.inCurrentScene
                                     }
                                 }
                             }

@@ -164,14 +164,18 @@ class zynthiloops_scenes_model(QAbstractListModel):
                 if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
                     self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
 
-            self.selected_scene_index_changed.emit()
             self.getScene(self.__selected_scene_index__)["clips"].append(clip)
 
             if self.__song__.get_metronome_manager().isMetronomeRunning:
                 clip.play()
 
+        clip.in_current_scene_changed.emit()
         self.__song__.schedule_save()
 
     @Slot(QObject, int, result=bool)
     def isClipInScene(self, clip, sceneIndex):
         return clip in self.getScene(sceneIndex)["clips"]
+
+    @Slot(QObject, result=bool)
+    def isClipInCurrentScene(self, clip):
+        return self.isClipInScene(clip, self.__selected_scene_index__)

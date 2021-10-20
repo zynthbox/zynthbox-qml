@@ -442,10 +442,19 @@ Zynthian.ScreenPage {
                                 model: track.clipsModel
 
                                 delegate: ClipCell {
+                                    // Hack to disable property binding
+                                    readonly property color baseHighlightColor: { baseHighlightColor = Kirigami.Theme.highlightColor }
+
                                     id: clipCell
                                     isPlaying: model.clip.isPlaying
                                     highlighted: bottomBar.controlObj === model.clip ||
-                                                 root.song.scenesModel.isClipInScene(model.clip, root.song.scenesModel.selectedSceneIndex)
+                                                 model.clip.inCurrentScene
+
+                                    Kirigami.Theme.highlightColor: bottomBar.controlObj !== model.clip &&
+                                                                   model.clip.inCurrentScene
+                                                                     ? "#f44336"
+                                                                     : baseHighlightColor
+                                    backgroundOpacity: model.clip.inCurrentScene ? 0.1 : 0.05
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth

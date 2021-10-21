@@ -58,7 +58,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_playgrid, self).__init__(parent)
         zynthian_gui_playgrid.__playgrid_instances__.append(self)
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
-        self.__play_grid_index__ = 0
         zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.screens["zynthiloops"]
         self.listen_to_everything()
 
@@ -94,24 +93,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def __get_play_grids__(self):
-        return self.__play_grids__
-
-    @Signal
-    def __play_grids_changed__(self):
-        pass
-
-    def __get_play_grid_index__(self):
-        return self.__play_grid_index__
-
-    def __set_play_grid_index__(self, play_grid_index):
-        self.__play_grid_index__ = play_grid_index
-        self.__play_grid_index_changed__.emit()
-
-    @Signal
-    def __play_grid_index_changed__(self):
-        pass
-
     def __set_pitch__(self):
         midi_pitch_message = mido.Message(
             "pitchwheel", channel=0, pitch=zynthian_gui_playgrid.__zynquick_pgmanager__.property("pitch")
@@ -124,12 +105,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         )
         self.__midi_port__.send(modulation_message)
 
-    @Slot(int, int, int, bool)
-    def doAMidiNoteThing(self, midiNote:int, velocity:int, channel:int, setOn:bool):
-        command = "note_on" if setOn else "note_off"
-        midi_message = mido.Message(command, note=midiNote, channel=channel, velocity=velocity)
-        self.__midi_port__.send(midi_message)
-
     def __get_zynquick_pgmanager__(self):
         return zynthian_gui_playgrid.__zynquick_pgmanager__
 
@@ -138,7 +113,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         # This thing is a singleton, don't set it more than once
         if zynthian_gui_playgrid.__zynquick_pgmanager__ is None:
             zynthian_gui_playgrid.__zynquick_pgmanager__ = thing
-            zynthian_gui_playgrid.__zynquick_pgmanager__.sendAMidiNoteMessage.connect(self.doAMidiNoteThing)
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStart.connect(self.startMetronomeRequest)
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStop.connect(self.stopMetronomeRequest)
             zynthian_gui_playgrid.__zynquick_pgmanager__.pitchChanged.connect(self.__set_pitch__)
@@ -165,5 +139,3 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         zynthian_gui_playgrid.__metronome_manager__.stop_metronome_request()
 
     zynquickPgmanager = Property(QObject, __get_zynquick_pgmanager__, __set_zynquick_pgmanager__, notify=__zynquick_pgmanager_changed__)
-    playgrids = Property('QVariantList', __get_play_grids__, notify=__play_grids_changed__)
-    playGridIndex = Property(int, __get_play_grid_index__, __set_play_grid_index__, notify=__play_grid_index_changed__)

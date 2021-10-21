@@ -620,10 +620,36 @@ Zynthian.ScreenPage {
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
             rootFolder: "/zynthian/zynthian-my-data/"
             folderModel {
-                nameFilters: ["*.*." + pickerDialog.mode]
+                nameFilters: [(pickerDialog.mode === "soundset" ? "*.soundset" : "*.*." + pickerDialog.mode)]
             }
 
-
+            filePropertiesComponent: Flow {
+                Repeater {
+                    id: infoRepeater
+                    model: pickerDialog.currentFileInfo
+                        ? (pickerDialog.mode === "soundset"
+                            ? zynthian.layer.soundset_metadata_from_file(pickerDialog.currentFileInfo.fileName)
+                            : zynthian.layer.sound_metadata_from_file(pickerDialog.currentFileInfo.fileName))
+                        : []
+                    delegate: QQC2.Label {
+                        width: modelData.preset_name ? parent.width - 10 : implicitWidth
+                        elide: Text.ElideRight
+                        font.pointSize: modelData.preset_name ? Kirigami.Theme.font.pointSize : 9
+                        text: {
+                            var name = modelData.name;
+                            if (modelData.preset_name) {
+                                name += ">" + modelData.preset_name;
+                            } else {
+                                name = "    " + name;
+                            }
+                            return name;
+                        }
+                    }
+                }
+                Item {
+                    Layout.fillHeight: true
+                }
+            }
 
             onVisibleChanged: folderModel.folder = rootFolder + (pickerDialog.mode === "soundset" ? "soundsets/" : "sounds/")
             filesListView.delegate: Kirigami.BasicListItem {

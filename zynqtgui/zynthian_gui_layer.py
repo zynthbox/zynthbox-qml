@@ -1637,6 +1637,45 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 
+	@Slot(str, result="QVariantList")
+	def soundset_metadata_from_file(self, file_name):
+		try:
+			f = open(self.__soundsets_basepath__ + file_name, "r")
+			snapshot = JSONDecoder().decode(f.read())
+			data = []
+			for layer_data in snapshot["layers"]:
+				#if not layer_data["midi_chan"] in data:
+					#data[layer_data["midi_chan"]] = []
+				item = {"name": layer_data["engine_name"].split("/")[-1]}
+				if "bank_name" in layer_data:
+					item["bank_name"] = layer_data["bank_name"]
+				if "preset_name" in layer_data:
+					item["preset_name"] = layer_data["preset_name"]
+				data.append(item)
+			return data
+		except Exception as e:
+			logging.error(e)
+			return []
+
+	@Slot(str, result="QVariantList")
+	def sound_metadata_from_file(self, file_name):
+		try:
+			f = open(self.__sounds_basepath__ + file_name, "r")
+			snapshot = JSONDecoder().decode(f.read())
+			data = []
+			for layer_data in snapshot["layers"]:
+				#if not layer_data["midi_chan"] in data:
+					#data[layer_data["midi_chan"]] = []
+				item = {"name": layer_data["engine_name"].split("/")[-1]}
+				if "bank_name" in layer_data:
+					item["bank_name"] = layer_data["bank_name"]
+				if "preset_name" in layer_data:
+					item["preset_name"] = layer_data["preset_name"]
+				data.append(item)
+			return data
+		except Exception as e:
+			logging.error(e)
+			return []
 
 	@Slot(str)
 	def load_soundset_from_file(self, file_name):

@@ -36,8 +36,8 @@ QQC2.AbstractButton {
     readonly property int colIndex: index
     property bool isPlaying
     property bool highlighted: false
+    property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-
 
     onPressed: forceActiveFocus()
 
@@ -80,7 +80,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
+        color: root.backgroundColor
 
         border.width: root.highlighted ? 1 : 0
         border.color: Kirigami.Theme.highlightColor

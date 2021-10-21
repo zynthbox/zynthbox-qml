@@ -35,6 +35,9 @@ Canvas {
     id: canvas
     Layout.fillWidth: true
     Layout.fillHeight: true
+    property int leftYOffset: 0
+    property int rightYOffset: 0
+    property int slotHeight: 20
     property var temporaryStartPos
     property var temporaryEndPos
     property var temporaryEndPos2
@@ -78,9 +81,9 @@ Canvas {
         for (var i in connections) {
             var conn = connections [i];
             var x1 = 0;
-            var y1 = conn[0].mapToItem(this, 0, conn[0].height/2).y;
+            var y1 = canvas.leftYOffset + conn[0] * canvas.slotHeight + canvas.slotHeight/2;
             var x2 = width;
-            var y2 = conn[1].mapToItem(this, 0, conn[1].height/2).y;
+            var y2 = canvas.rightYOffset + conn[1] * canvas.slotHeight + canvas.slotHeight/2;
             var cp1x = width / 2;
             var cp1y = y1;
             var cp2x = width / 2

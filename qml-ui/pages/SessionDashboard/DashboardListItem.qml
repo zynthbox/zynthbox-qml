@@ -40,6 +40,7 @@ Kirigami.AbstractListItem {
     signal requestConnect(Item child)
     topPadding: 0
     bottomPadding: 0
+    property int row: index
 
     contentItem: QQC2.Label {
         id: label

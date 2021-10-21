@@ -101,7 +101,7 @@ ColumnLayout {
                     patternConnections: index < 6 ? trackSoundConnections : trackPatternConnections
                     secondColumn: index < 6 ? layersView.contentItem : patternsLayout
                     Layout.preferredHeight: root.itemHeight
-                    dragManager.targetMaxY: index < 6 ? patternsLayout.y : layersView.contentItem.height
+                    dragManager.targetMaxY: index < 6 ? patternsLayout.y : layersView.contentItem.height + soundsHeading.height
                     contentItem: RowLayout {
                         id: delegate
                         property QtObject track: model.track
@@ -132,26 +132,26 @@ ColumnLayout {
             }
         }
 
-        ColumnLayout {
+        Item {
             Layout.fillWidth: true
             Layout.preferredWidth: 1
             Layout.fillHeight: true
-            spacing: 0
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
             PatternConnections {
                 id: trackPatternConnections
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                Layout.preferredHeight: 2
+                anchors {
+					fill: parent
+					//topMargin: soundsHeading.height
+				}
+				leftYOffset: soundsHeading.height
+                rightYOffset: patternsLayout.y
+                slotHeight: root.itemHeight
+
                 connections:[
-                    [tracksLayout.children[7].dragManager, patternsLayout.children[0]],
-                    [tracksLayout.children[8].dragManager, patternsLayout.children[1]],
-                    [tracksLayout.children[9].dragManager, patternsLayout.children[2]],
-                    [tracksLayout.children[10].dragManager, patternsLayout.children[3]],
-                    [tracksLayout.children[11].dragManager, patternsLayout.children[6]],
+                    [6, 0],
+                    [7, 1],
+                    [8, 2],
+                    [9, 3],
+                    [10, 4],
                 ]
             }
         }
@@ -204,7 +204,7 @@ ColumnLayout {
                                 if (channel === 0) {
                                     channel = zynthian.active_midi_channel
                                 }
-                                patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[channel])
+                                patternSoundsConnections.addConnection(index, channel)
                             }
                             property int chan: model.layer
                             onChanChanged: {
@@ -213,13 +213,13 @@ ColumnLayout {
                                 if (channel === 0) {
                                     channel = zynthian.active_midi_channel
                                 }
-                                patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[channel])
+                                patternSoundsConnections.addConnection(index, channel)
                             }
                             data: [Connections {
                                 target: zynthian
                                 onActive_midi_channelChanged: {
                                     if (delegate.chan === 0) {
-                                        patternSoundsConnections.addConnection(dragManager, layersView.contentItem.children[zynthian.active_midi_channel]);
+                                        patternSoundsConnections.addConnection(index, zynthian.active_midi_channel);
                                     }
                                 }
                             }]
@@ -282,20 +282,28 @@ ColumnLayout {
                 id: trackSoundConnections
                 anchors {
                     fill: parent
+                    topMargin: soundsHeading.height
                     leftMargin: -parent.width * 2
                 }
+                slotHeight: root.itemHeight
                 connections:[
-                    [tracksLayout.children[1].dragManager, layersView.contentItem.children[0]],
-                    [tracksLayout.children[2].dragManager, layersView.contentItem.children[1]],
-                    [tracksLayout.children[3].dragManager, layersView.contentItem.children[2]],
-                    [tracksLayout.children[4].dragManager, layersView.contentItem.children[3]],
-                    [tracksLayout.children[5].dragManager, layersView.contentItem.children[4]],
+                    [0, 0],
+                    [1, 1],
+                    [2, 2],
+                    [3, 3],
+                    [4, 4],
                 ]
             }
 
             PatternConnections {
                 id: patternSoundsConnections
-                anchors.fill: parent
+                leftYOffset: patternsLayout.y
+                rightYOffset: soundsHeading.height
+                slotHeight: root.itemHeight
+                anchors {
+					fill: parent
+					//topMargin: soundsHeading.height
+				}
             }
         }
 
@@ -304,6 +312,7 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.preferredWidth: 2
             Kirigami.Heading {
+				id: soundsHeading
                 level: 2
                 text: qsTr("Sounds")
                 MouseArea {
@@ -327,6 +336,7 @@ ColumnLayout {
                         separatorVisible: false
                         topPadding: 0
                         bottomPadding: 0
+                        property int row: index
                         readonly property int channel: model.metadata.midi_channel
                         onClicked: {
                             zynthian.current_screen_id = "main_layers_view";

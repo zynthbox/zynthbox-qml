@@ -237,7 +237,6 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("REBOOT")
         self.last_state_action()
         #self.zyngui.exit(100)
-        self.start_command(["reboot"])
         self.zyngui.screens["admin"].reboot_confirmed()
 
     @Slot('void')

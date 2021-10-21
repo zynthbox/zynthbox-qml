@@ -410,7 +410,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 
 	def disable_show_fav_presets(self):
-		if self.zyngui.curlayer.show_fav_presets:
+		if self.zyngui.curlayer and self.zyngui.curlayer.show_fav_presets:
 			self.zyngui.curlayer.show_fav_presets = False
 			self.set_select_path()
 			self.update_list()

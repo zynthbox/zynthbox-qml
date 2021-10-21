@@ -569,7 +569,32 @@ Zynthian.ScreenPage {
             folderModel {
                 nameFilters: [saveDialog.mode === "soundset" ? "*.soundset" : "*.*.sound"]
             }
-            onVisibleChanged: folderModel.folder = rootFolder + (pickerDialog.mode === "soundset" ? "soundsets/" : "sounds/")
+            onVisibleChanged: folderModel.folder = rootFolder + (saveDialog.mode === "soundset" ? "soundsets/" : "sounds/")
+
+            filePropertiesComponent: Flow {
+                Repeater {
+                    id: infoRepeater
+                    model: saveDialog.currentFileInfo
+                        ? (saveDialog.mode === "soundset"
+                            ? zynthian.layer.soundset_metadata_from_file(saveDialog.currentFileInfo.fileName)
+                            : zynthian.layer.sound_metadata_from_file(saveDialog.currentFileInfo.fileName))
+                        : []
+                    delegate: QQC2.Label {
+                        width: modelData.preset_name ? parent.width - 10 : implicitWidth
+                        elide: Text.ElideRight
+                        font.pointSize: modelData.preset_name ? Kirigami.Theme.font.pointSize : 9
+                        text: {
+                            var name = modelData.name;
+                            if (modelData.preset_name) {
+                                name += ">" + modelData.preset_name;
+                            } else {
+                                name = "    " + name;
+                            }
+                            return name;
+                        }
+                    }
+                }
+            }
 
             filesListView.delegate: Kirigami.BasicListItem {
                 width: ListView.view.width
@@ -645,9 +670,6 @@ Zynthian.ScreenPage {
                             return name;
                         }
                     }
-                }
-                Item {
-                    Layout.fillHeight: true
                 }
             }
 

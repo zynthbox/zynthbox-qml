@@ -46,7 +46,7 @@ class zynthiloops_clip(QObject):
         self.__length__ = self.__initial_length__
         self.__initial_start_position__ = 0.0
         self.__start_position__ = self.__initial_start_position__
-        self.__start_position_before_sync__ = self.__start_position__
+        # self.__start_position_before_sync__ = None
         self.__path__ = None
         self.__song__ = song
         self.__initial_pitch__ = 0
@@ -146,7 +146,9 @@ class zynthiloops_clip(QObject):
             new_ratio = self.__song__.bpm / self.__bpm__
             logging.error(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
-            self.startPosition = new_ratio * self.__start_position__
+
+            # if self.__start_position_before_sync__ is not None:
+            #     self.startPosition = new_ratio * self.__start_position__
 
         # Set length to recalculate loop time
         self.set_length(self.__length__, True)
@@ -457,8 +459,8 @@ class zynthiloops_clip(QObject):
 
     def set_shouldSync(self, shouldSync: bool, force_set=False):
         if self.__should_sync__ != shouldSync or force_set is True:
-            if shouldSync:
-                self.__start_position_before_sync__ = self.__start_position__
+            # if shouldSync:
+            #     self.__start_position_before_sync__ = self.__start_position__
 
             self.__should_sync__ = shouldSync
             self.should_sync_changed.emit()
@@ -469,7 +471,10 @@ class zynthiloops_clip(QObject):
                 self.set_time(1.0)
                 # Set length to recalculate loop time
                 self.set_length(self.__length__)
-                self.startPosition = self.__start_position_before_sync__
+
+                # if self.__start_position_before_sync__ is not None:
+                #     self.startPosition = self.__start_position_before_sync__
+                #     self.__start_position_before_sync__ = None
 
     shouldSync = Property(bool, shouldSync, set_shouldSync, notify=should_sync_changed)
 

@@ -622,6 +622,9 @@ Zynthian.ScreenPage {
             folderModel {
                 nameFilters: ["*.*." + pickerDialog.mode]
             }
+
+
+
             onVisibleChanged: folderModel.folder = rootFolder + (pickerDialog.mode === "soundset" ? "soundsets/" : "sounds/")
             filesListView.delegate: Kirigami.BasicListItem {
                 width: ListView.view.width

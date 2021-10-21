@@ -104,6 +104,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
             visibleFocusRects: false
+            minimumTabsCount: 5
 
             property QQC2.StackView stack
 

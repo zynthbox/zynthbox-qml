@@ -43,6 +43,7 @@ QQC2.Dialog {
     property alias fileNameToSave: nameFiled.text
     property alias noFilesMessage: noFilesMessage.text
     property alias conflictMessageLabel: conflictLabel
+    property alias filePropertiesComponent: filePropertiesColumn.sourceComponent
 
     modal: true
 
@@ -226,7 +227,7 @@ QQC2.Dialog {
 
                     focus: true
                     onCurrentIndexChanged: {
-                        filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
+                        filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                     }
                     Layout.leftMargin: 8
                     clip: true
@@ -269,7 +270,7 @@ QQC2.Dialog {
                         showDotAndDotDot: false
                         onFolderChanged: {
                             filesListView.currentIndex = 0;
-                            filePropertiesSection.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
+                            filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                         }
                     }
                     delegate: Rectangle {
@@ -342,88 +343,93 @@ QQC2.Dialog {
             }
         }
 
-        Flickable {
+        Loader {
+            id: filePropertiesColumn
+            property var filePropertiesHelperObj: null
             Layout.preferredWidth: Kirigami.Units.gridUnit*12
             Layout.maximumWidth: Kirigami.Units.gridUnit*12
             Layout.fillHeight: true
-            clip: true
-            flickableDirection: Flickable.VerticalFlick
-            contentHeight: filePropertiesSection.height
+            sourceComponent: Component {
+                Flickable {
+                    clip: true
+                    flickableDirection: Flickable.VerticalFlick
+                    contentHeight: filePropertiesSection.height
 
-            ColumnLayout {
-                property var filePropertiesHelperObj: null
+                    ColumnLayout {
+                        id: filePropertiesSection
 
-                id: filePropertiesSection
-                visible: filePropertiesHelperObj !== null && filePropertiesHelperObj.fileMetadata !== null
+                        visible: filePropertiesColumn.filePropertiesHelperObj !== null && filePropertiesColumn.filePropertiesHelperObj.fileMetadata !== null
 
-                width: parent.width
-                spacing: 0
+                        width: parent.width
+                        spacing: 0
 
-                Kirigami.Icon {
-                    Layout.preferredWidth: 48
-                    Layout.preferredHeight: 48
+                        Kirigami.Icon {
+                            Layout.preferredWidth: 48
+                            Layout.preferredHeight: 48
 
-                    Layout.alignment: Qt.AlignHCenter
-                    source: {
-                        if (filePropertiesSection.filePropertiesHelperObj.fileMetadata.isDir) {
-                            return "folder-symbolic"
+                            Layout.alignment: Qt.AlignHCenter
+                            source: {
+                                if (filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isDir) {
+                                    return "folder-symbolic"
+                                }
+                                else if (filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav) {
+                                    return "folder-music-symbolic"
+                                } else {
+                                    return "file-catalog-symbolic"
+                                }
+                            }
                         }
-                        else if (filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav) {
-                            return "folder-music-symbolic"
-                        } else {
-                            return "file-catalog-symbolic"
+
+                        QQC2.Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.maximumWidth: Kirigami.Units.gridUnit*10
+                            elide: Text.Elide.Middle
+                            text: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.length > 23
+                                    ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.substring(0, 20) + '...'
+                                    : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename
+                        }
+
+                        QQC2.Button {
+                            id: previewButton
+                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.topMargin: Kirigami.Units.gridUnit
+                            Layout.bottomMargin: Kirigami.Units.gridUnit
+                            text: filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
+                            icon.name: filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
+                            onClicked: {
+                                if (filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying) {
+                                    filePropertiesColumn.filePropertiesHelperObj.stopPreview();
+                                } else {
+                                    filePropertiesColumn.filePropertiesHelperObj.playPreview();
+                                }
+                            }
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Size: %1 MB").arg((filePropertiesColumn.filePropertiesHelperObj.fileMetadata.size/1024/1024).toFixed(2))
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Sample Rate: %1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.sampleRate)
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Channels: %1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels)
+                        }
+
+                        Kirigami.BasicListItem {
+                            Layout.fillWidth: true
+                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Duration: %1 secs").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1))
                         }
                     }
-                }
-
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.maximumWidth: Kirigami.Units.gridUnit*10
-                    elide: Text.Elide.Middle
-                    text: filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename.length > 23
-                            ? filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename.substring(0, 20) + '...'
-                            : filePropertiesSection.filePropertiesHelperObj.fileMetadata.filename
-                }
-
-                QQC2.Button {
-                    id: previewButton
-                    visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.topMargin: Kirigami.Units.gridUnit
-                    Layout.bottomMargin: Kirigami.Units.gridUnit
-                    text: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
-                    icon.name: filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
-                    onClicked: {
-                        if (filePropertiesSection.filePropertiesHelperObj.isPreviewPlaying) {
-                            filePropertiesSection.filePropertiesHelperObj.stopPreview();
-                        } else {
-                            filePropertiesSection.filePropertiesHelperObj.playPreview();
-                        }
-                    }
-                }
-
-                Kirigami.BasicListItem {
-                    Layout.fillWidth: true
-                    visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    label: qsTr("Size: %1 MB").arg((filePropertiesSection.filePropertiesHelperObj.fileMetadata.size/1024/1024).toFixed(2))
-                }
-
-                Kirigami.BasicListItem {
-                    Layout.fillWidth: true
-                    visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    label: qsTr("Sample Rate: %1").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.sampleRate)
-                }
-
-                Kirigami.BasicListItem {
-                    Layout.fillWidth: true
-                    visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    label: qsTr("Channels: %1").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.channels)
-                }
-
-                Kirigami.BasicListItem {
-                    Layout.fillWidth: true
-                    visible: filePropertiesSection.filePropertiesHelperObj.fileMetadata.isWav
-                    label: qsTr("Duration: %1 secs").arg(filePropertiesSection.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1))
                 }
             }
         }

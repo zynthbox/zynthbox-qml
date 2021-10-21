@@ -38,6 +38,8 @@ Kirigami.AbstractListItem {
     separatorVisible: false
     property alias dragManager: dragManager
     signal requestConnect(Item child)
+    topPadding: 0
+    bottomPadding: 0
 
     contentItem: QQC2.Label {
         id: label

@@ -65,6 +65,7 @@ Canvas {
         canvas.requestPaint();
     }
 
+    onYChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Timer {

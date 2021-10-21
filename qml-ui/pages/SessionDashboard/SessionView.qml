@@ -101,7 +101,7 @@ ColumnLayout {
                     patternConnections: index < 6 ? trackSoundConnections : trackPatternConnections
                     secondColumn: index < 6 ? layersView.contentItem : patternsLayout
                     Layout.preferredHeight: root.itemHeight
-                    dragManager.targetMaxY: index < 6 ? patternsLayout.y : layersView.contentItem.height + soundsHeading.height
+                    dragManager.targetMaxY: index < 6 ? patternsLayout.y - soundsHeading.height - 10 : layersView.contentItem.height + soundsHeading.height //FIXME: random magic numbers
                     contentItem: RowLayout {
                         id: delegate
                         property QtObject track: model.track

@@ -63,7 +63,7 @@ MouseArea {
         patternConnections.temporaryEndPos.x = Math.min(patternConnections.width, patternConnections.temporaryEndPos.x);
         patternConnections.temporaryEndPos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos.y));
         let child = secondColumn.childAt(0, column2Pos.y);
-        if (!child) {
+        if (!child || !child.visible || child.height === 0) {
             return;
         }
 
@@ -76,7 +76,7 @@ MouseArea {
             patternConnections.temporaryEndPos2 = null;
         }
         for (var i in patternConnections.connections) {
-            if (patternConnections.connections[i][0] == this) {
+            if (patternConnections.connections[i][0] == index) {
                 patternConnections.connections.splice(i, 1);
                 break;
             }
@@ -106,9 +106,9 @@ MouseArea {
             root.requestConnect(null);
             return;
         }
-        print(patternConnections.connections.indexOf([this, child]))
-        if (patternConnections.temporaryEndPos2 && patternConnections.connections.indexOf([this, child]) === -1) {
-            patternConnections.connections.push([this, child]);
+        print(patternConnections.connections.indexOf([index, child.row]))
+        if (patternConnections.temporaryEndPos2 && patternConnections.connections.indexOf([index, child.row]) === -1) {
+            patternConnections.connections.push([index, child.row]);
         }
         patternConnections.temporaryEndPos2 = null;
         patternConnections.requestPaint();

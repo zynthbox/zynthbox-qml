@@ -81,22 +81,6 @@ Rectangle {
                             scenesModel.stopScene(scenesModel.selectedSceneIndex);
                             scenesModel.selectedSceneIndex = index;
                         }
-                        background: Rectangle {
-                            color: control.checked ? "#f44336" : theme.buttonBackgroundColor
-                            radius: control.radius
-                            border {
-                                color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                gradient: Gradient {
-                                    GradientStop { position: 0; color: control.pressed ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(1, 1, 1, 0.05)}
-                                    GradientStop { position: 1; color: control.pressed ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.05)}
-                                }
-                            }
-                        }
 
                         QQC2.Label {
                             anchors.centerIn: parent

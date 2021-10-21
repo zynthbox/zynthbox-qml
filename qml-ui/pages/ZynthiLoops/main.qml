@@ -446,11 +446,11 @@ Zynthian.ScreenPage {
                                     isPlaying: model.clip.isPlaying
                                     highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundOpacity: model.clip.inCurrentScene
-                                                        ? 0.2
-                                                        : model.clip.path.length > 0
-                                                           ? 0.07
-                                                           : 0.02
+                                    backgroundColor: model.clip.inCurrentScene
+                                                       ? "#3381d4fa"
+                                                       : model.clip.path.length > 0
+                                                         ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
+                                                         : Qt.rgba(0, 0, 0, 0.03)
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth

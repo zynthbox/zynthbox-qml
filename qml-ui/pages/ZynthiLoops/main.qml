@@ -446,7 +446,11 @@ Zynthian.ScreenPage {
                                     isPlaying: model.clip.isPlaying
                                     highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundOpacity: model.clip.inCurrentScene ? 0.1 : 0.05
+                                    backgroundOpacity: model.clip.inCurrentScene
+                                                        ? 0.2
+                                                        : model.clip.path.length > 0
+                                                           ? 0.07
+                                                           : 0.02
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth

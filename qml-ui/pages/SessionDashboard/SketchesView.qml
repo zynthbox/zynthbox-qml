@@ -45,10 +45,10 @@ RowLayout {
         spacing: 0
         Layout.fillHeight: true
         Layout.fillWidth: true
-        
+
         Kirigami.Heading {
             level: 2
-            text: zynthian.session_dashboard.name
+            text: qsTr("Sketches")
             MouseArea {
                 anchors.fill: parent
                 onClicked: zynthian.current_modal_screen_id = "sketch_copier"

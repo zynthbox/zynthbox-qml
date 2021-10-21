@@ -25,6 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -42,6 +43,63 @@ ColumnLayout {
 
     property int itemHeight: layersView.height / 15
     spacing: Kirigami.Units.largeSpacing
+
+    RowLayout {
+		visible: false
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: "Session time:"
+        }
+        Kirigami.Heading {
+            id: sessionTimeLabel
+            Layout.alignment: Qt.AlignCenter
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Kirigami.Heading {
+				id: sketchHeader
+				anchors.verticalCenter: parent.verticalCenter
+				/*anchors {
+					verticalCenter: parent
+					horizontalCenterOffset: -root.x
+				}*/
+				x: {
+					print(parent.width)
+					return root.Window.width/2 - parent.x - root.x - width/2
+					//return mapFromGlobal(Window.width/2 - width/2, 0).x;
+				}
+				text: zynthian.session_dashboard.name+" "+parent.x+" "+root.x
+				MouseArea {
+					anchors.fill: parent
+					onClicked: print("KKKKKK " + root.Window.width+" "+parent.x+" "+root.x)
+				}
+			}
+			onWidthChanged: print("LLLLLL " + sketchHeader.mapFromGlobal(root.Window.width/2 - sketchHeader.width/2, 0).x)
+        }
+        Kirigami.Heading {
+            id: clockLabel
+            Layout.alignment: Qt.AlignCenter
+        }
+    }
+    Timer {
+        interval: 10 * 1000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        function pad(d) {
+            return (d < 10) ? '0' + d.toString() : d.toString();
+        }
+        onTriggered: {
+            let d = new Date();
+            clockLabel.text = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            let sessionSecs = zynthian.session_dashboard.get_session_time()
+            let sessionMins = Math.floor(sessionSecs / 60);
+            let sessionHours = Math.floor(sessionMins / 60);
+            sessionMins = sessionMins % 60;
+            sessionTimeLabel.text = pad(sessionHours) + ":" + pad(sessionMins);
+        }
+    }
 
     RowLayout {
         spacing: 0

@@ -97,10 +97,10 @@ ColumnLayout {
                 model: zynthian.zynthiloops.song.tracksModel
                 delegate: DashboardListItem {
                     width: parent.width
-                    patternConnections: index < 7 ? trackSoundConnections : trackPatternConnections
-                    secondColumn: index < 7 ? layersView.contentItem : patternsLayout
+                    patternConnections: index < 6 ? trackSoundConnections : trackPatternConnections
+                    secondColumn: index < 6 ? layersView.contentItem : patternsLayout
                     Layout.preferredHeight: root.itemHeight
-                    dragManager.targetMaxY: index < 7 ? patternsLayout.y : layersView.contentItem.height
+                    dragManager.targetMaxY: index < 6 ? patternsLayout.y : layersView.contentItem.height
                     contentItem: RowLayout {
                         id: delegate
                         property QtObject track: model.track
@@ -146,11 +146,11 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 2
                 connections:[
-                    [tracksLayout.children[8].dragManager, patternsLayout.children[0]],
-                    [tracksLayout.children[9].dragManager, patternsLayout.children[1]],
-                    [tracksLayout.children[10].dragManager, patternsLayout.children[2]],
-                    [tracksLayout.children[11].dragManager, patternsLayout.children[3]],
-                    [tracksLayout.children[12].dragManager, patternsLayout.children[6]],
+                    [tracksLayout.children[7].dragManager, patternsLayout.children[0]],
+                    [tracksLayout.children[8].dragManager, patternsLayout.children[1]],
+                    [tracksLayout.children[9].dragManager, patternsLayout.children[2]],
+                    [tracksLayout.children[10].dragManager, patternsLayout.children[3]],
+                    [tracksLayout.children[11].dragManager, patternsLayout.children[6]],
                 ]
             }
         }

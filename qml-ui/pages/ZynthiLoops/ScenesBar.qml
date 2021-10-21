@@ -67,6 +67,15 @@ Rectangle {
                     Layout.fillHeight: true
                     Layout.preferredWidth: height
 
+                    Connections {
+                        target: scenesModel
+                        onClipCountChanged: {
+                            control.opacity = scenesModel.clipCountInScene(index) > 0
+                                                ? 1
+                                                : 0.3
+                        }
+                    }
+
                     QQC2.RoundButton {
                         id: control
                         width: parent.height
@@ -80,6 +89,26 @@ Rectangle {
                         onClicked: {
                             scenesModel.stopScene(scenesModel.selectedSceneIndex);
                             scenesModel.selectedSceneIndex = index;
+                        }
+                        background: Rectangle {
+                            color: control.checked
+                                     ? Kirigami.Theme.highlightColor
+                                     : scenesModel.clipCountInScene(index) > 0
+                                         ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
+                                         : theme.buttonBackgroundColor
+                            radius: control.radius
+                            border {
+                                color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: parent.radius
+                                gradient: Gradient {
+                                    GradientStop { position: 0; color: control.pressed ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(1, 1, 1, 0.05)}
+                                    GradientStop { position: 1; color: control.pressed ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.05)}
+                                }
+                            }
                         }
 
                         QQC2.Label {

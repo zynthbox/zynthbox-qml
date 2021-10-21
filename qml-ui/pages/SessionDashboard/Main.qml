@@ -25,6 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -92,6 +93,12 @@ Zynthian.ScreenPage {
             }
             Item {
                 Layout.fillWidth: true
+                Kirigami.Heading {
+                    id: sketchHeader
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: root.Window.width/2 - parent.x - width/2
+                    text: zynthian.session_dashboard.name
+                }
             }
             Kirigami.Heading {
                 id: clockLabel

@@ -113,12 +113,20 @@ Zynthian.ScreenPage {
                     page: Qt.resolvedUrl("SessionView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Project")
-                    page: Qt.resolvedUrl("ProjectView.qml")
+                    text: qsTr("Sketches")
+                    page: Qt.resolvedUrl("SketchesView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Sketches")
-                    enabled: false
+                    text: qsTr("Recording")
+                    page: Qt.resolvedUrl("RecordingView.qml")
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Templates")
+                    page: Qt.resolvedUrl("TemplatesView.qml")
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Discover")
+                    page: Qt.resolvedUrl("DiscoverView.qml")
                 }
             ]
         }

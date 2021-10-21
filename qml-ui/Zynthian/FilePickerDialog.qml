@@ -13,8 +13,8 @@ import Zynthian 1.0 as Zynthian
 /**
   * EXAMPLE :
   *
-  * Zynthian.FilePickerDialog {
-  *      id: pickerDialog
+  * Zynthian.Fileroot {
+  *      id: root
   *
   *      x: parent.width/2 - width/2
   *      y: parent.height/2 - height/2
@@ -32,7 +32,7 @@ import Zynthian 1.0 as Zynthian
   * }
   */
 QQC2.Dialog {
-    id: pickerDialog
+    id: root
     property alias headerText: heading.text
     property string rootFolder: "/"
     property alias folderModel: folderModel
@@ -44,11 +44,12 @@ QQC2.Dialog {
     property alias noFilesMessage: noFilesMessage.text
     property alias conflictMessageLabel: conflictLabel
     property alias filePropertiesComponent: filePropertiesColumn.sourceComponent
+    property var currentFileInfo: null
 
     modal: true
 
-    y: pickerDialog.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
-    x: pickerDialog.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
+    y: root.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
+    x: root.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
 
     width: Math.round(header.Window.width * 0.8)
     height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
@@ -71,7 +72,7 @@ QQC2.Dialog {
         }
 
         RowLayout {
-            property var folderSplitArray: String(folderModel.folder).replace("file://"+pickerDialog.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
+            property var folderSplitArray: String(folderModel.folder).replace("file://"+root.rootFolder, "").split("/").filter(function(e) { return e.length > 0 })
 
             id: folderBreadcrumbs
             Layout.leftMargin: 12
@@ -81,7 +82,7 @@ QQC2.Dialog {
                 id: homeButton
                 icon.name: "user-home-symbolic"
                 onClicked: {
-                    folderModel.folder = pickerDialog.rootFolder + "/"
+                    folderModel.folder = root.rootFolder + "/"
                 }
             }
 
@@ -91,7 +92,7 @@ QQC2.Dialog {
                 delegate: Zynthian.BreadcrumbButton {
                     text: modelData
                     onClicked: {
-                        folderModel.folder = pickerDialog.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
+                        folderModel.folder = root.rootFolder + "/" + folderBreadcrumbs.folderSplitArray.slice(0, index+1).join("/")
                         filesListView.currentIndex = 0;
                     }
                 }
@@ -100,13 +101,13 @@ QQC2.Dialog {
     }
     onVisibleChanged: nameFiled.text = ""
     footer: QQC2.Control {
-        leftPadding: pickerDialog.leftPadding
+        leftPadding: root.leftPadding
         topPadding: Kirigami.Units.smallSpacing
-        rightPadding: pickerDialog.rightPadding
-        bottomPadding: pickerDialog.bottomPadding
+        rightPadding: root.rightPadding
+        bottomPadding: root.bottomPadding
         contentItem: ColumnLayout {
             RowLayout {
-                visible: pickerDialog.saveMode
+                visible: root.saveMode
                 QQC2.Label {
                     text: qsTr("File Name:")
                 }
@@ -121,7 +122,7 @@ QQC2.Dialog {
                             filesListView.selectedModelData = {};
                             filesListView.selectedModelData.fileName = nameFiled.text;
                             filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
-                            pickerDialog.fileSelected(filesListView.selectedModelData);
+                            root.fileSelected(filesListView.selectedModelData);
                         }
                     }
                 }
@@ -141,13 +142,13 @@ QQC2.Dialog {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     text: qsTr("Cancel")
-                    onClicked: pickerDialog.close();
+                    onClicked: root.close();
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     text: {
-                        if (pickerDialog.saveMode) {
+                        if (root.saveMode) {
                             return conflictLabel.visible ? qsTr("Overwrite") : qsTr("Save");
                         } else {
                             return qsTr("Load")
@@ -155,17 +156,17 @@ QQC2.Dialog {
                     }
                     enabled: filesListView.selectedModelData !== null
                     onClicked: {
-                        /*if (pickerDialog.saveMode) {
+                        /*if (root.saveMode) {
                             if (nameFiled.text.length > 0) {
                                 let file = {};
                                 file.fileName = nameFiled.text;
                                 file.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
-                                pickerDialog.fileSelected(file);
-                                pickerDialog.accept();
+                                root.fileSelected(file);
+                                root.accept();
                             }
                         } else*/ {
                             fileSelected(filesListView.selectedModelData);
-                            pickerDialog.accept();
+                            root.accept();
                             filesListView.currentIndex = 0;
                         }
                     }
@@ -236,6 +237,7 @@ QQC2.Dialog {
 
                     function selectItem(model) {
                         console.log(model.fileName, model.filePath, model.index)
+                        root.currentFileInfo = model;
                         if (model.fileIsDir) {
                             var path = model.filePath;
 
@@ -247,10 +249,10 @@ QQC2.Dialog {
                             filesListView.currentIndex = 0;
                         } else {
                             filesListView.selectedModelData = model;
-                            if (pickerDialog.saveMode) {
+                            if (root.saveMode) {
                                 nameFiled.text = model.fileName;
                             }
-                            pickerDialog.filesListView.currentIndex = model.index;
+                            root.filesListView.currentIndex = model.index;
                         }
                     }
 
@@ -438,23 +440,23 @@ QQC2.Dialog {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SELECT_UP":
-                pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex > 0
-                                                            ? pickerDialog.filesListView.currentIndex - 1
+                root.filesListView.currentIndex = root.filesListView.currentIndex > 0
+                                                            ? root.filesListView.currentIndex - 1
                                                             : 0
                 return true;
 
             case "SELECT_DOWN":
-                pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count-1
-                                                            ? pickerDialog.filesListView.currentIndex + 1
-                                                            : pickerDialog.filesListView.count-1
+                root.filesListView.currentIndex = root.filesListView.currentIndex < root.filesListView.count-1
+                                                            ? root.filesListView.currentIndex + 1
+                                                            : root.filesListView.count-1
                 return true;
 
             case "SWITCH_SELECT_SHORT":
             case "SWITCH_SELECT_BOLD":
             case "SWITCH_SELECT_LONG":
-                if (pickerDialog.filesListView.currentIndex >= 0 &&
-                    pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count) {
-                    pickerDialog.filesListView.currentItem.clicked();
+                if (root.filesListView.currentIndex >= 0 &&
+                    root.filesListView.currentIndex < root.filesListView.count) {
+                    root.filesListView.currentItem.clicked();
                 }
 
                 return true;
@@ -462,7 +464,7 @@ QQC2.Dialog {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                pickerDialog.goBack();
+                root.goBack();
 
                 return true;
 

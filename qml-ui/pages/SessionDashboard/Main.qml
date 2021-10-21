@@ -103,6 +103,7 @@ Zynthian.ScreenPage {
             id: tabbedView
             Layout.fillWidth: true
             Layout.fillHeight: true
+            visibleFocusRects: false
 
             property QQC2.StackView stack
 

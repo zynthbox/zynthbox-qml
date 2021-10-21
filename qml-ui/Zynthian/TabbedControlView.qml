@@ -38,6 +38,7 @@ Item {
     property list<Zynthian.TabbedControlViewAction> tabActions
     property int minimumTabsCount: 6
     property int orientation: Qt.Horizontal
+    property bool visibleFocusRects: true
     property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
     readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
 
@@ -246,7 +247,7 @@ Item {
                 }
                 color: "transparent"
                 border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
-                visible: primaryTabsScope.focus
+                visible: primaryTabsScope.focus && root.visibleFocusRects
                 radius: 3
             }
             GridLayout {
@@ -334,7 +335,7 @@ Item {
                     }
                     color: "transparent"
                     border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
-                    visible: secondaryTabsScope.focus
+                    visible: secondaryTabsScope.focus && root.visibleFocusRects
                     radius: 3
                 }
                 RowLayout {

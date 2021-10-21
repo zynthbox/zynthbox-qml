@@ -100,7 +100,7 @@ ColumnLayout {
                     patternConnections: index < 7 ? trackSoundConnections : trackPatternConnections
                     secondColumn: index < 7 ? layersView.contentItem : patternsLayout
                     Layout.preferredHeight: root.itemHeight
-                    dragManager.targetMaxY: index < 7 ? patternsLayout.y -10: layersView.contentItem.height
+                    dragManager.targetMaxY: index < 7 ? patternsLayout.y : layersView.contentItem.height
                     contentItem: RowLayout {
                         id: delegate
                         property QtObject track: model.track

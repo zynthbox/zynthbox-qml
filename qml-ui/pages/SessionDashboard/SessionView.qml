@@ -45,63 +45,6 @@ ColumnLayout {
     spacing: Kirigami.Units.largeSpacing
 
     RowLayout {
-		visible: false
-        QQC2.Label {
-            Layout.alignment: Qt.AlignCenter
-            text: "Session time:"
-        }
-        Kirigami.Heading {
-            id: sessionTimeLabel
-            Layout.alignment: Qt.AlignCenter
-        }
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Kirigami.Heading {
-				id: sketchHeader
-				anchors.verticalCenter: parent.verticalCenter
-				/*anchors {
-					verticalCenter: parent
-					horizontalCenterOffset: -root.x
-				}*/
-				x: {
-					print(parent.width)
-					return root.Window.width/2 - parent.x - root.x - width/2
-					//return mapFromGlobal(Window.width/2 - width/2, 0).x;
-				}
-				text: zynthian.session_dashboard.name+" "+parent.x+" "+root.x
-				MouseArea {
-					anchors.fill: parent
-					onClicked: print("KKKKKK " + root.Window.width+" "+parent.x+" "+root.x)
-				}
-			}
-			onWidthChanged: print("LLLLLL " + sketchHeader.mapFromGlobal(root.Window.width/2 - sketchHeader.width/2, 0).x)
-        }
-        Kirigami.Heading {
-            id: clockLabel
-            Layout.alignment: Qt.AlignCenter
-        }
-    }
-    Timer {
-        interval: 10 * 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        function pad(d) {
-            return (d < 10) ? '0' + d.toString() : d.toString();
-        }
-        onTriggered: {
-            let d = new Date();
-            clockLabel.text = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-            let sessionSecs = zynthian.session_dashboard.get_session_time()
-            let sessionMins = Math.floor(sessionSecs / 60);
-            let sessionHours = Math.floor(sessionMins / 60);
-            sessionMins = sessionMins % 60;
-            sessionTimeLabel.text = pad(sessionHours) + ":" + pad(sessionMins);
-        }
-    }
-
-    RowLayout {
         spacing: 0
 
         ColumnLayout {
@@ -382,6 +325,8 @@ ColumnLayout {
                         height: root.itemHeight
                         highlighted: zynthian.active_midi_channel === index
                         separatorVisible: false
+                        topPadding: 0
+                        bottomPadding: 0
                         readonly property int channel: model.metadata.midi_channel
                         onClicked: {
                             zynthian.current_screen_id = "main_layers_view";

@@ -175,6 +175,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
             if self.__song__.get_metronome_manager().isMetronomeRunning:
                 clip.play()
 
+        self.clipCountChanged.emit()
         clip.in_current_scene_changed.emit()
         self.__song__.schedule_save()
 
@@ -185,3 +186,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
     @Slot(QObject, result=bool)
     def isClipInCurrentScene(self, clip):
         return self.isClipInScene(clip, self.__selected_scene_index__)
+
+    @Slot(int, result=int)
+    def clipCountInScene(self, scene_index):
+        return len(self.getScene(scene_index)["clips"])
+
+    clipCountChanged = Signal()

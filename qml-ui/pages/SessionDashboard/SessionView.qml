@@ -193,6 +193,12 @@ ColumnLayout {
                             dragManager.targetMinY: patternsLayout.y
                             Component.onCompleted: {
                                 print("Pattern layer: "+ model.layer)
+                                for (var i in model) {
+                                    print(i+ " _ " + model[i])
+                                }
+                                for (var i in model.pattern) {
+                                    print(i+ " => " + model.pattern[i])
+                                }
                                 var channel = chan
                                 if (channel === 0) {
                                     channel = zynthian.active_midi_channel
@@ -216,7 +222,35 @@ ColumnLayout {
                                     }
                                 }
                             }]
-                            text: patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")"
+                            contentItem: RowLayout {
+                                QQC2.Label {
+                                    text: (patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")")
+                                }
+                                QQC2.Label {
+                                    text: "A"
+                                    Rectangle {
+                                        anchors {
+                                            fill: parent
+                                            margins: -Kirigami.Units.smallSpacing
+                                        }
+                                        z: -1
+                                        color: Kirigami.Theme.highlightColor
+                                        visible: model.pattern.bankOffset == 0 //TODO: use model.bank
+                                    }
+                                }
+                                QQC2.Label {
+                                    text: "B"
+                                    Rectangle {
+                                        anchors {
+                                            fill: parent
+                                            margins: -Kirigami.Units.smallSpacing
+                                        }
+                                        z: -1
+                                        color: Kirigami.Theme.highlightColor
+                                        visible: model.pattern.bankOffset > 0
+                                    }
+                                }
+                            }
 
                             patternConnections: patternSoundsConnections
                             secondColumn: layersView.contentItem

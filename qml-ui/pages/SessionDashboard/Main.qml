@@ -97,7 +97,7 @@ Zynthian.ScreenPage {
                     id: sketchHeader
                     anchors.verticalCenter: parent.verticalCenter
                     x: root.Window.width/2 - parent.x - width/2
-                    text: zynthian.session_dashboard.name
+                    text: zynthian.zynthiloops.song.name
                 }
             }
             Kirigami.Heading {

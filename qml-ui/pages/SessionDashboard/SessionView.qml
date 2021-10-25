@@ -139,10 +139,10 @@ ColumnLayout {
             PatternConnections {
                 id: trackPatternConnections
                 anchors {
-					fill: parent
-					//topMargin: soundsHeading.height
-				}
-				leftYOffset: soundsHeading.height
+                    fill: parent
+                    //topMargin: soundsHeading.height
+                }
+                leftYOffset: soundsHeading.height
                 rightYOffset: patternsLayout.y
                 slotHeight: root.itemHeight
 
@@ -225,7 +225,7 @@ ColumnLayout {
                             }]
                             contentItem: RowLayout {
                                 QQC2.Label {
-                                    text: (patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")")
+                                    text: ((index + 1) + ". ") + (patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")")
                                 }
                                 QQC2.Label {
                                     text: "A"
@@ -301,9 +301,9 @@ ColumnLayout {
                 rightYOffset: soundsHeading.height
                 slotHeight: root.itemHeight
                 anchors {
-					fill: parent
-					//topMargin: soundsHeading.height
-				}
+                    fill: parent
+                    //topMargin: soundsHeading.height
+                }
             }
         }
 
@@ -312,7 +312,7 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.preferredWidth: 2
             Kirigami.Heading {
-				id: soundsHeading
+                id: soundsHeading
                 level: 2
                 text: qsTr("Sounds")
                 MouseArea {

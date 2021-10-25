@@ -70,7 +70,16 @@ AbstractController {
         Kirigami.Heading {
             id: valueLabel
             anchors.centerIn: parent
-            text: root.controller.ctrl ? root.controller.ctrl.value_print :  ""
+            text: {
+                if (!root.controller.ctrl) {
+                    return "";
+                }
+                // Heuristic: convert the values from 0-127 to 0-100
+                if (root.controller.ctrl.value0 === 0 && root.controller.ctrl.max_value === 127) {
+                    return Math.round(100 * (value / 127));
+                }
+                return root.controller.ctrl.value_print;
+            }
         }
 
         //TODO: with Qt >= 5.12 replace this with inputMode: Dial.Vertical

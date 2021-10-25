@@ -385,8 +385,9 @@ class zynthian_layer:
 	# Build array of zynthian_controllers from list of keys
 	def build_ctrl_screen(self, ctrl_keys):
 		zctrls=[]
-		for k in ctrl_keys:
+		for i, k in enumerate(ctrl_keys):
 			try:
+				self.controllers_dict[k].index = i
 				zctrls.append(self.controllers_dict[k])
 			except:
 				logging.error("Controller %s is not defined" % k)

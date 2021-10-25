@@ -349,6 +349,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if (self.__sketch_basepath__ / 'temp').exists():
             shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
+        self.stopAllPlayback()
+        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["song_arranger"].stop()
+        self.resetMetronome()
+
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
@@ -359,6 +364,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def createSketch(self, name):
+        self.stopAllPlayback()
+        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["song_arranger"].stop()
+        self.resetMetronome()
+
         # Rename temp sketch folder to the user defined name
         Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
 
@@ -435,6 +445,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         sketch_path = Path(sketch)
 
+        self.stopAllPlayback()
+        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["song_arranger"].stop()
+        self.resetMetronome()
+
         logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
         self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
 
@@ -449,6 +464,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__song__.bpm_changed.disconnect()
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
+
+        self.stopAllPlayback()
+        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["song_arranger"].stop()
+        self.resetMetronome()
 
         self.__song__ = zynthiloops_song.zynthiloops_song(sketch_folder, version, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)

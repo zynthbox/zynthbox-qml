@@ -462,3 +462,8 @@ class zynthiloops_song(QObject):
         return Path(self.sketch_folder).stem
     sketchFolderName = Property(str, get_sketch_folder_name, constant=True)
     ### END Property sketchFolderName
+
+    def stop(self):
+        for i in range(0, self.__parts_model__.count):
+            part = self.__parts_model__.getPart(i)
+            part.stop()

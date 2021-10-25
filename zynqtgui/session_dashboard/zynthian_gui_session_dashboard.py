@@ -111,6 +111,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         try:
             with open(self.__cache_json_path__, "w") as f:
                 json.dump(self.serialize(), f)
+                f.flush()
+                os.fsync(f.fileno())
         except Exception as e:
             logging.error(f"Error saving cache : {str(e)}")
 
@@ -124,6 +126,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         try:
             with open(session_json_path, "w") as f:
                 json.dump(self.serialize(), f)
+                f.flush()
+                os.fsync(f.fileno())
         except Exception as e:
             logging.error(f"Error saving session : {str(e)}")
 

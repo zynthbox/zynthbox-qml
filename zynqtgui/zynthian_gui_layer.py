@@ -1792,6 +1792,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			Path(self.__sounds_basepath__).mkdir(parents=True, exist_ok=True)
 			f = open(self.__sounds_basepath__ + final_name, "w")
 			f.write(JSONEncoder().encode(self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan))) #TODO: get cloned midi channels
+			f.flush()
+			os.fsync(f.fileno())
 			f.close()
 		except Exception as e:
 			logging.error(e)
@@ -1805,6 +1807,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			Path(self.__soundsets_basepath__).mkdir(parents=True, exist_ok=True)
 			f = open(self.__soundsets_basepath__ + final_name, "w")
 			f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))
+			f.flush()
+			os.fsync(f.fileno())
 			f.close()
 		except Exception as e:
 			logging.error(e)

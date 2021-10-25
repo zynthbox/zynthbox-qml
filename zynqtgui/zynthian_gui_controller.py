@@ -431,7 +431,7 @@ class zynthian_gui_controller(QObject):
 			#logging.debug("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
 			if set_zyncoder and zyncoder.lib_zyncoder:
 				if self.mult>1: v = self.mult*v
-				zyncoder.lib_zyncoder.set_value_zyncoder(self.index,ctypes.c_uint(int(v)),int(send_zyncoder))
+				zyncoder.lib_zyncoder.set_value_zyncoder(self.zctrl.index,ctypes.c_uint(int(v)),int(send_zyncoder))
 				#logging.debug("set_value_zyncoder {} ({}, {}) => {}".format(self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
 			self.calculate_plot_values()
 			self.value_changed.emit()

@@ -387,6 +387,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                             obj["tracks"][i]["clips"][j]["path"] = path
 
                 f.write(json.dumps(obj))
+                f.flush()
+                os.fsync(f.fileno())
         except Exception as e:
             logging.error(e)
 
@@ -417,6 +419,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                     json.dump(obj, f)
                     f.truncate()
+                    f.flush()
+                    os.fsync(f.fileno())
             except Exception as e:
                 logging.error(e)
 

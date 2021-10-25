@@ -120,6 +120,8 @@ class zynthiloops_song(QObject):
 
                     json.dump(obj, f)
                     f.truncate()
+                    f.flush()
+                    os.fsync(f.fileno())
 
             filename = self.__name__ + ".json"
             self.__initial_name__ = self.name
@@ -131,6 +133,8 @@ class zynthiloops_song(QObject):
 
                 with open(self.sketch_folder + filename, "w") as f:
                     f.write(json.dumps(self.serialize()))
+                    f.flush()
+                    os.fsync(f.fileno())
             except Exception as e:
                 logging.error(e)
 
@@ -164,6 +168,8 @@ class zynthiloops_song(QObject):
                     if self.serialize() != comparing_obj:
                         with open(cache_dir / (cache_id + ".json"), "w") as f_cache:
                             f_cache.write(json.dumps(self.serialize()))
+                            f_cache.flush()
+                            os.fsync(f_cache.fileno())
 
                         if "history" not in obj:
                             obj["history"] = []
@@ -175,6 +181,8 @@ class zynthiloops_song(QObject):
 
                         json.dump(obj, f)
                         f.truncate()
+                        f.flush()
+                        os.fsync(f.fileno())
             except Exception as e:
                 logging.error(e)
 
@@ -417,6 +425,8 @@ class zynthiloops_song(QObject):
 
                 json.dump(obj, f)
                 f.truncate()
+                f.flush()
+                os.fsync(f.fileno())
         except Exception as e:
             logging.error(e)
             return False

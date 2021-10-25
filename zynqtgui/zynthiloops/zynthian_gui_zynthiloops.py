@@ -350,7 +350,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
         self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["playgrid"].stopMetronomeRequest()
         self.zyngui.screens["song_arranger"].stop()
         self.resetMetronome()
 
@@ -365,7 +365,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(str)
     def createSketch(self, name):
         self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["playgrid"].stopMetronomeRequest()
         self.zyngui.screens["song_arranger"].stop()
         self.resetMetronome()
 
@@ -446,7 +446,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         sketch_path = Path(sketch)
 
         self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["playgrid"].stopMetronomeRequest()
         self.zyngui.screens["song_arranger"].stop()
         self.resetMetronome()
 
@@ -466,7 +466,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Already disconnected : {str(e)}")
 
         self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest();
+        self.zyngui.screens["playgrid"].stopMetronomeRequest()
         self.zyngui.screens["song_arranger"].stop()
         self.resetMetronome()
 

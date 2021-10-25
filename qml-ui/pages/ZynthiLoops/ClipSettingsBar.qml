@@ -141,6 +141,13 @@ GridLayout {
             text: qsTr("BPM")
         }
 
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            visible: controlObj.metadataBPM ? true : false
+            text: controlObj.metadataBPM
+            font.pointSize: 9
+        }
+
         QQC2.TextField {
             id: objBpmEdit
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
@@ -228,10 +235,6 @@ GridLayout {
         QQC2.Label {
             visible: controlObj.soundData.length <= 0
             text: "<No Metadata>"
-        }
-        QQC2.Label {
-            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
-            text: qsTr("BPM: %1").arg(controlObj.metadataBPM ? controlObj.metadataBPM : "--")
         }
         QQC2.Label {
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0 && controlObj.metadataAudioType

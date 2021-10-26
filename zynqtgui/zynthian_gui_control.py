@@ -619,6 +619,12 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.set_selector_screen()
 		
 
+	@Slot(None)
+	# This is to make sure that the visual controller are synced between custom and basic views
+	def refresh_values(self):
+		for gctrl in self.zgui_custom_controllers:
+			gctrl.ctrl_value = gctrl.zctrl.value
+
 	def zyncoder_read(self, zcnums=None):
 		#Read Controller
 		if self.controllers_lock and self.mode=='control' and self.zcontrollers:

@@ -27,8 +27,8 @@ T.Dialog {
 
     T.Overlay.modal: Rectangle {
         color: Qt.rgba(0, 0, 0, 0.8)
-		opacity: control.visible
-		Behavior on opacity {
+        opacity: control.visible
+        Behavior on opacity {
             OpacityAnimator {
                 duration: Kirigami.Units.longDuration
                 easing.type: Easing.OutQuad
@@ -42,14 +42,14 @@ T.Dialog {
             from: 0
             to: 1
             easing.type: Easing.OutCubic
-            duration: Kirigami.Units.shortDuration
+            duration: 10//Kirigami.Units.shortDuration
         }
         NumberAnimation {
             property: "scale"
             from: 0.8
             to: 1
             easing.type: Easing.OutQuad
-            duration: Kirigami.Units.shortDuration
+            duration: 10//Kirigami.Units.shortDuration
         }
     }
 
@@ -59,14 +59,14 @@ T.Dialog {
             from: 1
             to: 0
             easing.type: Easing.InCubic
-            duration: Kirigami.Units.shortDuration
+            duration: 10//Kirigami.Units.shortDuration
         }
         NumberAnimation {
             property: "scale"
             from: 1
             to: 0.8
             easing.type: Easing.InQuad
-            duration: Kirigami.Units.shortDuration
+            duration: 10//Kirigami.Units.shortDuration
         }
     }
 

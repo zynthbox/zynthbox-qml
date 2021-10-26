@@ -296,8 +296,10 @@ class zynthian_gui_control(zynthian_gui_selector):
 				for layer in midichain_layers:
 					if layer.engine.nickname == self.__single_effect_engine:
 						controllers = layer.get_ctrl_screens()
-		else:
+		elif self.zyngui.curlayer:
 			controllers = self.zyngui.curlayer.get_ctrl_screens()
+		else:
+			return None
 		if cat in controllers:
 			controllers_cat = controllers[cat]
 			if index < 0 or index >= len(controllers_cat):

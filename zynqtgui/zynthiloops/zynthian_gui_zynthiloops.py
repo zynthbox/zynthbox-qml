@@ -582,12 +582,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
+        if self.metronome_running_refcount == 1:
+            self.metronome_schedule_stop = True
+
         self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
 
         logging.error(f"Stop Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
-
-        if self.metronome_running_refcount == 0:
-            self.metronome_schedule_stop = True
 
     @Slot(None)
     def resetMetronome(self):

@@ -179,6 +179,7 @@ Kirigami.AbstractApplicationWindow {
     DashboardScreensLayer {
         id: dashboardLayer
         anchors.fill: parent
+        visible: root.footer.height > 0 //HACK
     }
 
 

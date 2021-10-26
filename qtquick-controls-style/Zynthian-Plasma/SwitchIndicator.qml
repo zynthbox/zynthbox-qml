@@ -43,12 +43,12 @@ Item {
             z: -1
             state: control.activeFocus ? "focus" : (control.hovered ? "hover" : "shadow")
         }
-        Behavior on x {
-            XAnimator {
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
-        }
+        //Behavior on x {
+            //XAnimator {
+                //duration: Kirigami.Units.longDuration
+                //easing.type: Easing.InOutQuad
+            //}
+        //}
     }
 }
 

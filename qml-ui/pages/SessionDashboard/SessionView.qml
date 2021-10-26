@@ -162,7 +162,7 @@ ColumnLayout {
             spacing: 0
             Item {
                 Layout.fillHeight: true
-                Layout.preferredHeight: 1
+                Layout.preferredHeight: parent.height / 2
             }
             Kirigami.Heading {
                 Layout.fillWidth: true

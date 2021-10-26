@@ -435,6 +435,8 @@ class zynthian_gui_controller(QObject):
 				#logging.debug("set_value_zyncoder {} ({}, {}) => {}".format(self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
 			self.calculate_plot_values()
 			self.value_changed.emit()
+			if "snapshot" in self.zyngui.screens:
+				self.zyngui.screens["snapshot"].schedule_save_last_state_snapshot()
 			return True
 
 

@@ -962,7 +962,7 @@ class zynthian_gui(QObject):
                 self.screens['main_layers_view'].set_start_midi_chan(math.floor(midi_chan / 5) * 5)
         self.active_midi_channel_changed.emit()
         self.screens["main_layers_view"].sync_index_from_curlayer()
-        self.screens["snapshot"].save_last_state_snapshot()
+        self.screens["snapshot"].schedule_save_last_state_snapshot()
 
 
     def restore_curlayer(self):

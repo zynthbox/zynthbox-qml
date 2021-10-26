@@ -32,6 +32,8 @@ from os.path import isfile, isdir, join, basename
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
 
+from PySide2.QtCore import Qt, QObject, Slot, Signal, QTimer
+
 #------------------------------------------------------------------------------
 # Zynthian Load/Save Snapshot GUI Class
 #------------------------------------------------------------------------------
@@ -49,6 +51,12 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 		self.index_offset = 0
 		self.midi_banks = {}
 		self.midi_programs = {}
+
+		self.save_last_state_timer = QTimer(self)
+		self.save_last_state_timer.setInterval(1000)
+		self.save_last_state_timer.setSingleShot(True)
+		self.save_last_state_timer.timeout.connect(self.save_last_state_snapshot)
+		self.save_last_state_timer_requested.connect(self.save_last_state_timer.start)
 
 
 	def get_snapshot_fpath(self,f):
@@ -251,6 +259,13 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 		if isfile(self.default_snapshot_fpath):
 			return self.zyngui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
 
+	@Signal
+	def save_last_state_timer_requested(self):
+		pass
+
+	def schedule_save_last_state_snapshot(self):
+		# HACK to use a timer from another thread
+		self.save_last_state_timer_requested.emit()
 
 	def save_last_state_snapshot(self):
 		self.zyngui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)

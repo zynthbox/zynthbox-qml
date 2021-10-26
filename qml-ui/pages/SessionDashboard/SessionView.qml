@@ -179,6 +179,10 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignBottom
                 Layout.bottomMargin: 8 //FIXME: why is this needed?
                 spacing: 0
+                onHeightChanged: {
+                    patternSoundsConnections.requestPaint();
+                    trackPatternConnections.requestPaint();
+                }
                 Repeater {
                     id: patternsViewMainRepeater
                     model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)

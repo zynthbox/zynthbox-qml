@@ -44,6 +44,10 @@ ColumnLayout {
     property int itemHeight: layersView.height / 15
     spacing: Kirigami.Units.largeSpacing
 
+    Component.onCompleted: {
+        zynthian.zynthiloops.song.tracksModel.getTrack(7).connectedPattern = 2
+    }
+
     RowLayout {
         spacing: 0
 
@@ -126,6 +130,24 @@ ColumnLayout {
                             }
                         }
                     }
+                    Component.onCompleted: {
+                        for (var i in model) {
+                            print(i+ " _ " + model[i])
+                        }
+                        for (var i in model.track) {
+                            print(i+ " => " + model.track[i])
+                        }
+                        if (index >= 6 && model.track.connectedPattern >= 0) {
+                            trackPatternConnections.addConnection(index, model.track.connectedPattern);
+                        }
+                    }
+                    onRequestConnect: {
+                        if (child) {
+                            model.track.connectedPattern = child.row;
+                        } else {
+                            model.track.connectedPattern = -1;
+                        }
+                    }
                 }
             }
             Item {
@@ -148,11 +170,11 @@ ColumnLayout {
                 slotHeight: root.itemHeight
 
                 connections:[
-                    [6, 0],
+                    /*[6, 0],
                     [7, 1],
                     [8, 2],
                     [9, 3],
-                    [10, 4],
+                    [10, 4],*/
                 ]
             }
         }

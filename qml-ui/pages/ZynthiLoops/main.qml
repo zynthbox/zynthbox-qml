@@ -340,7 +340,9 @@ Zynthian.ScreenPage {
                     model: root.song.tracksModel
 
                     delegate: TableHeader {
-                        text: model.track.name
+                        text: model.track.connectedPattern >= 0
+                                ? "P" + (model.track.connectedPattern+1)
+                                : model.track.name
                         // subText: model.track.type === "audio" ? "Audio" : "Midi"
 
                         width: privateProps.headerWidth

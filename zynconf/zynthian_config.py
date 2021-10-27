@@ -89,6 +89,8 @@ CustomUiAction = [
 	"SELECT",
 	"SELECT_UP",
 	"SELECT_DOWN",
+	"SCENE_UP",
+	"SCENE_DOWN",
 
 	"SWITCH_LAYER_SHORT",
 	"SWITCH_LAYER_BOLD",

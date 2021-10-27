@@ -1145,6 +1145,18 @@ class zynthian_gui(QObject):
             except:
                 pass
 
+        elif cuia == "SCENE_UP":
+            try:
+                self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex - 1)
+            except:
+                pass
+
+        elif cuia == "SCENE_DOWN":
+            try:
+                self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex + 1)
+            except:
+                pass
+
         elif cuia == "SWITCH_LAYER_SHORT":
             self.zynswitch_short(0)
 

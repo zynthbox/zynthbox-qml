@@ -95,6 +95,8 @@ class zynthian_gui_keybinding(QObject):
 			"LAYER_DOWN": { "modifier": 1, "keysym": "Down" },
 			"SNAPSHOT_UP": { "modifier": 4, "keysym": "Up" },
 			"SNAPSHOT_DOWN": { "modifier": 4, "keysym": "Down" },
+			"SCENE_UP": { "modifier": 8, "keysym": "Up" },
+			"SCENE_DOWN": { "modifier": 8, "keysym": "Down" },
 
 			"START_AUDIO_RECORD": { "modifier": 0, "keysym": "r" },
 			"STOP_AUDIO_RECORD": { "modifier": 1, "keysym": "r" },

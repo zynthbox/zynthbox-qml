@@ -37,6 +37,7 @@ MouseArea {
     property Item secondColumn
     property int targetMinY: 0
     property int targetMaxY: patternConnections.height
+    property Item temporarySecondColumnChild
     signal requestConnect(Item child)
 
     Rectangle {
@@ -51,6 +52,7 @@ MouseArea {
         color: Kirigami.Theme.highlightColor
     }
     onPressed: {
+        root.temporarySecondColumnChild = null;
         print(mouse.y)
     }
     onPositionChanged: {
@@ -62,8 +64,9 @@ MouseArea {
         patternConnections.temporaryEndPos = patternConnections.mapFromItem(this, mouse.x, mouse.y);
         patternConnections.temporaryEndPos.x = Math.min(patternConnections.width, patternConnections.temporaryEndPos.x);
         patternConnections.temporaryEndPos.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos.y));
-        let child = secondColumn.childAt(0, column2Pos.y);
-        if (!child || !child.visible || child.height === 0) {
+        let child = secondColumn.childAt(10, column2Pos.y);
+
+        if (!child || !child.visible || child.height === 0 || !child.hasOwnProperty("row")) {
             return;
         }
 
@@ -72,8 +75,10 @@ MouseArea {
         if (patternConnections.temporaryEndPos.x > patternConnections.width / 2) {
             patternConnections.temporaryEndPos2 = patternConnections.mapFromItem(child, 0, child.height / 2);
             patternConnections.temporaryEndPos2.y = Math.max(root.targetMinY, Math.min(root.targetMaxY, patternConnections.temporaryEndPos2.y));
+            root.temporarySecondColumnChild = child;
         } else {
             patternConnections.temporaryEndPos2 = null;
+            root.temporarySecondColumnChild = null;
         }
         for (var i in patternConnections.connections) {
             if (patternConnections.connections[i][0] == index) {
@@ -99,7 +104,10 @@ MouseArea {
         let maxYSecondColumn = secondColumn.mapFromItem(patternConnections, 0, root.targetMaxY).y;
         column2Pos.y = Math.max(minYSecondColumn, Math.min(maxYSecondColumn, column2Pos.y));
 
-        let child = secondColumn.childAt(0, column2Pos.y);
+        let child = root.temporarySecondColumnChild;
+        if (!child) {
+            child = secondColumn.childAt(0, column2Pos.y);
+        }
         if (!child) {
             patternConnections.temporaryEndPos2 = null;
             patternConnections.requestPaint();

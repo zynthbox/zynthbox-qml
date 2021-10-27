@@ -52,7 +52,7 @@ QQC2.Dialog {
     x: root.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
 
     width: header.Window.width
-    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : header.Window.height
+    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
     z: 999999999
 
     onAccepted: filesListView.selectedModelData = null
@@ -99,7 +99,10 @@ QQC2.Dialog {
             }
         }
     }
-    onVisibleChanged: nameFiled.text = ""
+    onVisibleChanged: {
+        nameFiled.text = "";
+        filesListView.currentIndex = -1;
+    }
     footer: QQC2.Control {
         leftPadding: root.leftPadding
         topPadding: Kirigami.Units.smallSpacing
@@ -129,7 +132,8 @@ QQC2.Dialog {
             }
             QQC2.Label {
                 id: conflictLabel
-                visible: zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text)
+                opacity: nameFiled.text !== "" && zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text)
+                Layout.preferredHeight: opacity > 0 ? implicitHeight : 0
                 Layout.fillWidth: true
                 text: qsTr("File Exists: overwrite?")
                 horizontalAlignment: Text.AlignHCenter
@@ -271,7 +275,11 @@ QQC2.Dialog {
                         showDirsFirst: true
                         showDotAndDotDot: false
                         onFolderChanged: {
-                            filesListView.currentIndex = 0;
+                            if (root.saveMode) {
+                                filesListView.currentIndex = -1;
+                            } else {
+                                filesListView.currentIndex = 0;
+                            }
                             filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
                         }
                     }

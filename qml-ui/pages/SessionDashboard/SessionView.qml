@@ -99,9 +99,10 @@ ColumnLayout {
                 delegate: DashboardListItem {
                     width: parent.width
                     patternConnections: index < 6 ? trackSoundConnections : trackPatternConnections
-                    secondColumn: index < 6 ? layersView.contentItem : patternsLayout
+                    secondColumn: index < 6 ? layersLayout : patternsLayout
                     Layout.preferredHeight: root.itemHeight
-                    dragManager.targetMaxY: index < 6 ? patternsLayout.y - soundsHeading.height - 10 : layersView.contentItem.height + soundsHeading.height //FIXME: random magic numbers
+                    //dragManager.targetMinY: -550
+                    dragManager.targetMaxY: index < 6 ? patternsLayout.y - soundsHeading.height  : layersLayout.height + soundsHeading.height //FIXME: random magic numbers
                     contentItem: RowLayout {
                         id: delegate
                         property QtObject track: model.track
@@ -258,7 +259,7 @@ ColumnLayout {
                             }
 
                             patternConnections: patternSoundsConnections
-                            secondColumn: layersView.contentItem
+                            secondColumn: layersLayout
                             onClicked: {
                                 zynthian.current_modal_screen_id = "playgrid";
                                 var playgridIndex = ZynQuick.PlayGridManager.playgrids.indexOf(playgridId);
@@ -286,9 +287,11 @@ ColumnLayout {
                 id: trackSoundConnections
                 anchors {
                     fill: parent
-                    topMargin: soundsHeading.height
+                    //topMargin: soundsHeading.height
                     leftMargin: -parent.width * 2
                 }
+                leftYOffset: soundsHeading.height
+                rightYOffset: soundsHeading.height
                 slotHeight: root.itemHeight
                 connections:[
                     [0, 0],
@@ -330,49 +333,59 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 topPadding: 0
                 bottomPadding: 0
-                ListView {
+                Flickable {
                     id: layersView
-                    model: zynthian.fixed_layers.selector_list
-                    delegate: Kirigami.AbstractListItem {
-                        width: layersView.width
-                        height: root.itemHeight
-                        highlighted: zynthian.active_midi_channel === index
-                        separatorVisible: false
-                        topPadding: 0
-                        bottomPadding: 0
-                        property int row: index
-                        readonly property int channel: model.metadata.midi_channel
-                        onClicked: {
-                            zynthian.current_screen_id = "main_layers_view";
-                            zynthian.fixed_layers.activate_index(index);
-                        }
-                        contentItem: RowLayout {
-                            QQC2.Label {
-                                Layout.fillWidth: true
-                                elide: Text.ElideRight
-                                text: {
-                                    let numPrefix = model.metadata.midi_channel + 1;
-                                    if (numPrefix > 5 && numPrefix <= 10) {
-                                        numPrefix = "6." + (numPrefix - 5);
-                                    }
-                                    return numPrefix + ". " + model.display
+                    contentWidth: width
+                    contentHeight: layersLayout.height
+                    clip: true
+                    ColumnLayout {
+                        id: layersLayout
+                        width: parent.width
+                        spacing: 0
+                        Repeater {
+                            model: zynthian.fixed_layers.selector_list
+                            delegate: Kirigami.AbstractListItem {
+                                width: layersLayout.width
+                                implicitHeight: root.itemHeight
+                                highlighted: zynthian.active_midi_channel === index
+                                separatorVisible: false
+                                topPadding: 0
+                                bottomPadding: 0
+                                property int row: index
+                                readonly property int channel: model.metadata.midi_channel
+                                onClicked: {
+                                    zynthian.current_screen_id = "main_layers_view";
+                                    zynthian.fixed_layers.activate_index(index);
                                 }
-                            }
-                            QQC2.Label {
-                                text: {
-                                    let text = "";
-                                    if (model.metadata.note_high < 60) {
-                                        text = "L";
-                                    } else if (model.metadata.note_low >= 60) {
-                                        text = "H";
-                                    }
-                                    if (model.metadata.octave_transpose !== 0) {
-                                        if (model.metadata.octave_transpose > 0) {
-                                            text += "+"
+                                contentItem: RowLayout {
+                                    QQC2.Label {
+                                        Layout.fillWidth: true
+                                        elide: Text.ElideRight
+                                        text: {
+                                            let numPrefix = model.metadata.midi_channel + 1;
+                                            if (numPrefix > 5 && numPrefix <= 10) {
+                                                numPrefix = "6." + (numPrefix - 5);
+                                            }
+                                            return numPrefix + ". " + model.display
                                         }
-                                        text += model.metadata.octave_transpose;
                                     }
-                                    return text;
+                                    QQC2.Label {
+                                        text: {
+                                            let text = "";
+                                            if (model.metadata.note_high < 60) {
+                                                text = "L";
+                                            } else if (model.metadata.note_low >= 60) {
+                                                text = "H";
+                                            }
+                                            if (model.metadata.octave_transpose !== 0) {
+                                                if (model.metadata.octave_transpose > 0) {
+                                                    text += "+"
+                                                }
+                                                text += model.metadata.octave_transpose;
+                                            }
+                                            return text;
+                                        }
+                                    }
                                 }
                             }
                         }

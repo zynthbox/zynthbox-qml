@@ -105,9 +105,7 @@ MouseArea {
         column2Pos.y = Math.max(minYSecondColumn, Math.min(maxYSecondColumn, column2Pos.y));
 
         let child = root.temporarySecondColumnChild;
-        if (!child) {
-            child = secondColumn.childAt(0, column2Pos.y);
-        }
+
         if (!child) {
             patternConnections.temporaryEndPos2 = null;
             patternConnections.requestPaint();

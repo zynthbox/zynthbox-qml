@@ -47,6 +47,9 @@ class zynthiloops_track(QObject):
         self.__layers_snapshot = []
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
+        self.__connected_pattern__ = -1
+        if self.__id__ > 5 and self.__id__ < 11:
+            self.__connected_pattern__ = self.__id__ - 6
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
@@ -55,6 +58,7 @@ class zynthiloops_track(QObject):
     def serialize(self):
         return {"name": self.__name__,
                 "volume": self.__volume__,
+                "connectedPattern": self.__connected_pattern__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -64,6 +68,9 @@ class zynthiloops_track(QObject):
         if "volume" in obj:
             self.__volume__ = obj["volume"]
             self.set_volume(self.__volume__, True)
+        if "connectedPattern" in obj:
+            self.__connected_pattern__ = obj["connectedPattern"]
+            self.set_connected_pattern(self.__connected_pattern__)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -212,14 +219,25 @@ class zynthiloops_track(QObject):
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
 
-    # Helper method to map value from one range to another
-    @staticmethod
-    def map_range(sourceNumber, fromA, fromB, toA, toB):
-        deltaA = fromB - fromA
-        deltaB = toB - toA
-        scale  = deltaB / deltaA
-        negA   = -1 * fromA
-        offset = (negA * scale) + toA
-        finalNumber = (sourceNumber * scale) + offset
+    ### Property connectedPattern
+    def get_connected_pattern(self):
+        return self.__connected_pattern__
+    def set_connected_pattern(self, pattern):
+        self.__connected_pattern__ = pattern
+        self.__song__.schedule_save()
+        self.connected_pattern_changed.emit()
+    connected_pattern_changed = Signal()
+    connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)
+    ### END Property connectedPattern
 
-        return finalNumber
+    # Helper method to map value from one range to another
+    # @staticmethod
+    # def map_range(sourceNumber, fromA, fromB, toA, toB):
+    #     deltaA = fromB - fromA
+    #     deltaB = toB - toA
+    #     scale  = deltaB / deltaA
+    #     negA   = -1 * fromA
+    #     offset = (negA * scale) + toA
+    #     finalNumber = (sourceNumber * scale) + offset
+    #
+    #     return finalNumber

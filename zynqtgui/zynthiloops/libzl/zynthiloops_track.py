@@ -48,6 +48,8 @@ class zynthiloops_track(QObject):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
+        if self.__id__ > 5 and self.__id__ < 11:
+            self.__connected_pattern__ = self.__id__ - 6
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
@@ -222,6 +224,7 @@ class zynthiloops_track(QObject):
         return self.__connected_pattern__
     def set_connected_pattern(self, pattern):
         self.__connected_pattern__ = pattern
+        self.__song__.schedule_save()
         self.connected_pattern_changed.emit()
     connected_pattern_changed = Signal()
     connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)

@@ -129,6 +129,24 @@ ColumnLayout {
                             }
                         }
                     }
+                    Component.onCompleted: {
+                        for (var i in model) {
+                            print(i+ " _ " + model[i])
+                        }
+                        for (var i in model.track) {
+                            print(i+ " => " + model.track[i])
+                        }
+                        if (index >= 6 && model.track.connectedPattern >= 0) {
+                            trackPatternConnections.addConnection(index, model.track.connectedPattern);
+                        }
+                    }
+                    onRequestConnect: {
+                        if (child) {
+                            model.track.connectedPattern = child.row;
+                        } else {
+                            model.track.connectedPattern = -1;
+                        }
+                    }
                 }
             }
             Item {

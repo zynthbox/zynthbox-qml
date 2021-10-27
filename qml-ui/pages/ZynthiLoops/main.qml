@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
+import org.zynthian.quick 1.0 as ZynQuick
 
 import '../../Zynthian' 1.0 as Zynthian
 
@@ -130,8 +131,16 @@ Zynthian.ScreenPage {
                     zynthian.playgrid.stopMetronomeRequest();
                     zynthian.song_arranger.stop();
                     zynthian.zynthiloops.resetMetronome();
+
+                    /*ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
+                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(0);
+                    seq.enabled = false;*/
                 } else {
                     zynthian.zynthiloops.startPlayback();
+                    /*var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(0);
+                    seq.bankOffset = seq.bankLength*1;
+                    seq.enabled = true;
+                    ZynQuick.PlayGridManager.getSequenceModel("Global").startSequencePlayback();*/
                 }
             }
         },

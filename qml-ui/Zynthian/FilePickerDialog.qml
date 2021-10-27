@@ -51,8 +51,8 @@ QQC2.Dialog {
     y: root.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
     x: root.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x
 
-    width: Math.round(header.Window.width * 0.8)
-    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : Math.round(header.Window.height * 0.8)
+    width: header.Window.width
+    height: saveMode && Qt.inputMethod.visible ? Math.round(header.Window.height / 2) : header.Window.height
     z: 999999999
 
     onAccepted: filesListView.selectedModelData = null

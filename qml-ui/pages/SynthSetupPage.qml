@@ -637,11 +637,6 @@ Zynthian.ScreenPage {
             parent: root
             property string mode: "sound"
 
-            x: Math.round(parent.width/2 - width/2)
-            y: Math.round(parent.height/2 - height/2)
-            width: Math.round(parent.width * 0.8)
-            height: Math.round(parent.height * 0.8)
-
             headerText: pickerDialog.mode === "soundset" ? qsTr("Pick a Soundset file") : qsTr("Pick a Sound file")
             rootFolder: "/zynthian/zynthian-my-data/"
             folderModel {

@@ -291,7 +291,7 @@ ColumnLayout {
                     leftMargin: -parent.width * 2
                 }
                 leftYOffset: soundsHeading.height
-                rightYOffset: soundsHeading.height
+                rightYOffset: soundsHeading.height - layersView.contentY
                 slotHeight: root.itemHeight
                 connections:[
                     [0, 0],
@@ -305,7 +305,7 @@ ColumnLayout {
             PatternConnections {
                 id: patternSoundsConnections
                 leftYOffset: patternsLayout.y
-                rightYOffset: soundsHeading.height
+                rightYOffset: soundsHeading.height - layersView.contentY
                 slotHeight: root.itemHeight
                 anchors {
                     fill: parent

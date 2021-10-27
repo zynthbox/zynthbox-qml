@@ -65,6 +65,9 @@ Canvas {
         canvas.requestPaint();
     }
 
+    onLeftYOffsetChanged: requestPaint()
+    onRightYOffsetChanged: requestPaint()
+    onSlotHeightChanged: requestPaint()
     onYChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()

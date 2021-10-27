@@ -1647,6 +1647,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				#if not layer_data["midi_chan"] in data:
 					#data[layer_data["midi_chan"]] = []
 				item = {"name": layer_data["engine_name"].split("/")[-1]}
+				if "midi_chan" in layer_data:
+					item["midi_chan"] = layer_data["midi_chan"]
+				else:
+					item["midi_chan"] = -1
 				if "bank_name" in layer_data:
 					item["bank_name"] = layer_data["bank_name"]
 				if "preset_name" in layer_data:
@@ -1667,6 +1671,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				#if not layer_data["midi_chan"] in data:
 					#data[layer_data["midi_chan"]] = []
 				item = {"name": layer_data["engine_name"].split("/")[-1]}
+				if "midi_chan" in layer_data:
+					item["midi_chan"] = layer_data["midi_chan"]
+				else:
+					item["midi_chan"] = -1
 				if "bank_name" in layer_data:
 					item["bank_name"] = layer_data["bank_name"]
 				if "preset_name" in layer_data:

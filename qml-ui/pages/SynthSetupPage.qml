@@ -586,7 +586,7 @@ Zynthian.ScreenPage {
                         text: {
                             var name = modelData.name;
                             if (modelData.preset_name) {
-                                name += ">" + modelData.preset_name;
+                                name = "• " + name + ">" + modelData.preset_name;
                             } else {
                                 name = "    " + name;
                             }
@@ -663,7 +663,7 @@ Zynthian.ScreenPage {
                         text: {
                             var name = modelData.name;
                             if (modelData.preset_name) {
-                                name += ">" + modelData.preset_name;
+                                name = "• " + name + ">" + modelData.preset_name;
                             } else {
                                 name = "    " + name;
                             }

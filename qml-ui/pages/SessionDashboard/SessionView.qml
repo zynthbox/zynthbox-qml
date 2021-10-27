@@ -354,7 +354,7 @@ ColumnLayout {
                                 property int row: index
                                 readonly property int channel: model.metadata.midi_channel
                                 onClicked: {
-                                    zynthian.current_screen_id = "main_layers_view";
+                                    //zynthian.current_screen_id = "main_layers_view";
                                     zynthian.fixed_layers.activate_index(index);
                                 }
                                 contentItem: RowLayout {

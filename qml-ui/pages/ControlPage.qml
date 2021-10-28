@@ -82,7 +82,7 @@ Zynthian.ScreenPage {
                     : (zynthian.control.custom_control_page.indexOf(model.path) == 0)
 
                 onClicked: {
-					zynthian.control.refresh_values()
+                    zynthian.control.refresh_values()
                     zynthian.control.custom_control_page = model.path
                 }
             }

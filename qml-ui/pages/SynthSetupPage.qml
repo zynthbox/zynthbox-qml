@@ -151,6 +151,13 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
         layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
+
+        if (pickerDialog.visible) {
+            return pickerDialog.cuiaCallback(cuia);
+        } else if (saveDialog.visible) {
+            return saveDialog.cuiaCallback(cuia);
+        }
+
         switch (cuia) {
         case "NAVIGATE_LEFT":
             var newIndex = Math.max(0, currentScreenIndex - 1);
@@ -600,6 +607,12 @@ Zynthian.ScreenPage {
                 width: ListView.view.width
                 highlighted: ListView.isCurrentItem
 
+                property bool isCurrentItem: ListView.isCurrentItem
+                onIsCurrentItemChanged: {
+                    if (isCurrentItem) {
+                        saveDialog.currentFileInfo = model;
+                    }
+                }
                 label: model.fileName
                 icon: model.fileIsDir ? "folder" : "emblem-music-symbolic"
                 QQC2.Label {
@@ -673,10 +686,16 @@ Zynthian.ScreenPage {
                 width: ListView.view.width
                 highlighted: ListView.isCurrentItem
 
+                property bool isCurrentItem: ListView.isCurrentItem
+                onIsCurrentItemChanged: {
+                    if (isCurrentItem) {
+                        pickerDialog.currentFileInfo = model;
+                    }
+                }
                 label: model.fileName
                 icon: model.fileIsDir ? "folder" : "emblem-music-symbolic"
                 QQC2.Label {
-                    visible: pickerDialog.mode === sound
+                    visible: pickerDialog.mode === "sound"
                     text: {
                         let parts = model.fileName.split(".");
                         if (parts.length < 2) {

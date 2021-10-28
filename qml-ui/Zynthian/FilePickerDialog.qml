@@ -291,6 +291,12 @@ QQC2.Dialog {
                         width: ListView.view.width
                         height: Kirigami.Units.gridUnit*2
                         color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
+                        property bool isCurrentItem: ListView.isCurrentItem
+                        onIsCurrentItemChanged: {
+                            if (isCurrentItem) {
+                                root.currentFileInfo = model;
+                            }
+                        }
 
                         ColumnLayout {
                             spacing: 0

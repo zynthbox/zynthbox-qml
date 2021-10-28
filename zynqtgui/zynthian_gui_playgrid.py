@@ -42,10 +42,6 @@ from .zynthiloops import zynthian_gui_zynthiloops
 sys.path.insert(1, "./zynthiloops/libzl")
 from .zynthiloops.libzl import libzl
 
-@ctypes.CFUNCTYPE(None, ctypes.c_int)
-def playgrid_cb(beat):
-    zynthian_gui_playgrid.__zynquick_pgmanager__.metronomeTick(beat)
-
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     __zynquick_pgmanager__ = None

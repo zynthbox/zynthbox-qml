@@ -47,42 +47,14 @@ def playgrid_cb(beat):
     zynthian_gui_playgrid.__zynquick_pgmanager__.metronomeTick(beat)
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
-    # Use this when something needs to be signalled to /all/ the instances (such as note states)
-    __playgrid_instances__ = []
 
-    __input_ports__ = []
     __zynquick_pgmanager__ = None
     __metronome_manager__ = None
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
-        zynthian_gui_playgrid.__playgrid_instances__.append(self)
         self.__midi_port__ = mido.open_output("Midi Through Port-0")
         zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.screens["zynthiloops"]
-        self.listen_to_everything()
-
-    @staticmethod
-    def listen_to_everything():
-        for port in zynthian_gui_playgrid.__input_ports__:
-            try:
-                port.close()
-            except:
-                logging("Attempted to close a port that apparently is broken. It seems we can safely ignore this, so let's do that.")
-        zynthian_gui_playgrid.__input_ports__.clear()
-        # It's entirely possible we'll need to nab this out of zyngine or somesuch, but for now...
-        #for input_name in mido.get_input_names():
-        try:
-            #input_port = mido.open_input(input_name)
-            input_port = mido.open_input()
-            input_port.callback = zynthian_gui_playgrid.handle_input_message
-            zynthian_gui_playgrid.__input_ports__.append(input_port)
-            logging.error("Successfully opened midi input for reading: " + str(input_port))
-        except:
-            logging.error("Failed to open midi input port for reading")
-
-    @staticmethod
-    def handle_input_message(message):
-        zynthian_gui_playgrid.__zynquick_pgmanager__.updateNoteState(message.dict())
 
     def show(self):
         pass
@@ -123,8 +95,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             #zynthian_gui_playgrid.__zynquick_pgmanager__.syncTimer = libzl.getSyncTimerInstance()
 
             self.__zynquick_pgmanager_changed__.emit()
-            #logging.error("Really, we should be registering this function, but we need to get at it properly. Maybe pass the libzl instance into the qtquick module instead, though (which needs libzl to be installed and findable, with headers). " + str(getattr(zynthian_gui_playgrid.__zynquick_pgmanager__, "metronomeTick")))
-            #libzl.registerTimerCallback(playgrid_cb)
 
     @Signal
     def __zynquick_pgmanager_changed__(self):

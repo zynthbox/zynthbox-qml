@@ -42,12 +42,6 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: qsTr("Sounds")
             Kirigami.Action {
-                text: qsTr("Mixer")
-                onTriggered: {
-                    middleColumnStack.currentIndex = middleColumnStack.currentIndex === 0 ? 1 : 0;
-                }
-            }
-            Kirigami.Action {
                 text: qsTr("Load Sound...")
                 onTriggered: {
                     pickerDialog.mode = "sound";
@@ -405,103 +399,46 @@ Zynthian.ScreenPage {
                 }
             }
         }
-        StackLayout {
-            id: middleColumnStack
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             implicitWidth: 1
             Layout.preferredWidth: 1
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                RowLayout {
-                    Kirigami.Heading {
-                        Layout.fillWidth: true
-                        level: 2
-                        text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                    QQC2.Button {
-                        id: favModeButton
-                        text: qsTr("Fav-Mode")
-                        checkable: true
-                        checked: zynthian.bank.show_top_sounds
-                        onToggled: {
-                            zynthian.bank.show_top_sounds = checked;
-                            zynthian.current_screen_id = "bank";
-                        }
-                    }
-                }
-                Zynthian.SelectorView {
-                    id: bankView
+            RowLayout {
+                Kirigami.Heading {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    screenId: "bank"
-                    onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
-                    onItemActivated: root.itemActivated(screenId, index)
-                    onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
-                    delegate: Zynthian.SelectorDelegate {
-                        text: model.display === "None" ? qsTr("Single") : model.display
-                        screenId: bankView.screenId
-                        selector: bankView.selector
-                        highlighted: zynthian.current_screen_id === bankView.screenId
-                        onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
-                        onItemActivated: bankView.itemActivated(screenId, index)
-                        onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
+                    level: 2
+                    text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                }
+                QQC2.Button {
+                    id: favModeButton
+                    text: qsTr("Fav-Mode")
+                    checkable: true
+                    checked: zynthian.bank.show_top_sounds
+                    onToggled: {
+                        zynthian.bank.show_top_sounds = checked;
+                        zynthian.current_screen_id = "bank";
                     }
                 }
             }
-            ColumnLayout {
+            Zynthian.SelectorView {
+                id: bankView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                RowLayout {
-                    Layout.fillWidth: true
-                    Kirigami.Heading {
-                        Layout.fillWidth: true
-                        level: 2
-                        text: qsTr("Mixer")
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    }
-                    QQC2.Button {
-                        text: qsTr("Close")
-                        onClicked: middleColumnStack.currentIndex = 0
-                    }
-                }
-                Zynthian.Card {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    contentItem: ColumnLayout {
-                        spacing: 0
-                        Repeater {
-                            model: zynthian.main_layers_view.volume_controls
-                            delegate: Zynthian.SliderController {
-                                title: ""
-                                controller.ctrl: modelData
-                                slider.orientation: Qt.Horizontal
-                                visible: true
-                                enabled: modelData !== null
-                                slider.enabled: modelData !== null
-                                background.visible: false
-                                valueLabel: {
-                                    if (!controller.ctrl) {
-                                        return "";
-                                    }
-                                    // Heuristic: convert the values from 0-127 to 0-100
-                                    if (controller.ctrl.value0 === 0 && controller.ctrl.max_value === 127) {
-                                        return Math.round(100 * (value / 127));
-                                    } else if (controller.ctrl.value0 === 0 && controller.ctrl.max_value === 1) {
-                                        return Math.round(100 * value);
-                                    } else if (controller.ctrl.value0 === 0 && controller.ctrl.max_value === 200) {
-                                        return Math.round(100 * (value / 200));
-                                    } else {
-                                        return controller.ctrl.value_print;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                screenId: "bank"
+                onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
+                onItemActivated: root.itemActivated(screenId, index)
+                onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
+                delegate: Zynthian.SelectorDelegate {
+                    text: model.display === "None" ? qsTr("Single") : model.display
+                    screenId: bankView.screenId
+                    selector: bankView.selector
+                    highlighted: zynthian.current_screen_id === bankView.screenId
+                    onCurrentScreenIdRequested: bankView.currentScreenIdRequested(screenId)
+                    onItemActivated: bankView.itemActivated(screenId, index)
+                    onItemActivatedSecondary: bankView.itemActivatedSecondary(screenId, index)
                 }
             }
         }

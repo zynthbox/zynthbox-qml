@@ -30,7 +30,6 @@ import math
 # Zynthian specific modules
 from . import zynthian_gui_layer
 from . import zynthian_gui_selector
-from . import zynthian_gui_controller
 
 from zyncoder import *
 
@@ -47,7 +46,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.__layers_count = 5
         self.__start_midi_chan = 0
-        self.__volume_ctrls = []
         self.show()
 
 
@@ -90,38 +88,14 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     sl0 = sl
                 metadata["effects_label"] = effects_label
 
-                ctrl = None
-                for name in layer.controllers_dict:
-                    if name == "volume" or name == "Volume":
-                        ctrl = layer.controllers_dict[name]
-                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    if ctrl:
-                        self.__volume_ctrls.append(zynthian_gui_controller(ctrl.index, ctrl, self))
-                    else:
-                        self.__volume_ctrls.append(None)
-                elif ctrl and self.__volume_ctrls[i - self.__start_midi_chan]:
-                    self.__volume_ctrls[i - self.__start_midi_chan].config(ctrl)
-                    self.__volume_ctrls[i - self.__start_midi_chan].index = ctrl.index
-                elif ctrl:
-                    self.__volume_ctrls[i - self.__start_midi_chan] = zynthian_gui_controller(ctrl.index, ctrl, self)
-                else:
-                    self.__volume_ctrls[i - self.__start_midi_chan].deleteLater()
-                    self.__volume_ctrls[i - self.__start_midi_chan] = None
-
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""
-                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    self.__volume_ctrls.append(None)
-                elif self.__volume_ctrls[i - self.__start_midi_chan]:
-                    self.__volume_ctrls[i - self.__start_midi_chan].deleteLater()
-                    self.__volume_ctrls[i - self.__start_midi_chan] = None
 
             if i < 15:
                 metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
             else:
                 metadata["midi_cloned"] = False
-
             metadata["midi_channel"] = i
             metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
             metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
@@ -131,7 +105,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()
-        self.volume_controls_changed.emit()
         super().fill_list()
 
 
@@ -288,14 +261,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         else:
             return -1
     active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
-
-
-    def get_volume_controls(self):
-        return self.__volume_ctrls
-    @Signal
-    def volume_controls_changed(self):
-        pass
-    volume_controls = Property('QVariantList', get_volume_controls, notify = volume_controls_changed)
 
     def set_select_path(self):
         self.select_path = "Layers"

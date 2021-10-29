@@ -54,7 +54,7 @@ class zynthian_controller:
 		self.is_toggle=False
 		self.is_integer=True
 		self.is_logarithmic=False
-		self.index = 0
+		self.index = -1
 
 		self.midi_chan=None
 		self.midi_cc=None

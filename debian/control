@@ -2,7 +2,7 @@ Source: zynthian-qml
 Section: misc
 Priority: optional
 Maintainer: Leszek Lesner <leszek@zevenos.com>
-Build-Depends: debhelper (>= 11)
+Build-Depends: debhelper (>= 11), cmake (>= 3.13), extra-cmake-modules (>= 5.54.0), qtbase5-dev (>= 5.11.3), kirigami2-dev, libzl, qtdeclarative5-dev, pkg-config, librtmidi-dev
 Standards-Version: 4.1.3
 Homepage: https://github.com/zynthbox/zynthian-qml
 

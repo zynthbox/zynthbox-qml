@@ -36,7 +36,14 @@ install-zynsmf: build-zynsmf
 install-zynthian-qml:
 	echo "  > Installing zynthian-qml"
 	mkdir -p $(BASEINSTALLDIR)/
-	find ./ -maxdepth 1 -not -name zynlibs -not -name . -not -name '.git*' -exec cp -pr $(shell realpath {}) $(BASEINSTALLDIR)/ \;
+	find ./ \
+		-maxdepth 1 \
+		-not -name zynlibs \
+		-not -name . \
+		-not -name '.git*' \
+		-not -name '*.deb' \
+		-not -name 'debian' \
+		-exec cp -pr $(shell realpath {}) $(BASEINSTALLDIR)/ \;
 
 
 build: build-jackpeak build-zynseq build-zynsmf

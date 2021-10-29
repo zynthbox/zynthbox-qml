@@ -51,10 +51,10 @@ class MixerControl(QObject):
 
     @Slot(None)
     def refresh(self):
-        self.value_changed.emit()
         self.value_min_changed.emit()
         self.value_max_changed.emit()
         self.name_changed.emit()
+        self.value_changed.emit()
 
     @Signal
     def value_changed(self):
@@ -180,6 +180,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                 metadata["effects_label"] = ""
                 if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
                     self.__volume_ctrls.append(MixerControl(self))
+                else:
+                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(None)
 
             if i < 15:
                 metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)

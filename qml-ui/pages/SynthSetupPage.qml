@@ -477,6 +477,7 @@ Zynthian.ScreenPage {
                         Repeater {
                             model: zynthian.main_layers_view.volume_controls
                             delegate: ColumnLayout {
+                                spacing: Kirigami.Units.largeSpacing
                                 enabled: modelData.value_max > 0
                                 QQC2.Slider {
                                     Layout.fillWidth: true

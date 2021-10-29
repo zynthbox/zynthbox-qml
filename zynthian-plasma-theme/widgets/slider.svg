@@ -30,9 +30,9 @@
      objecttolerance="10"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="23.363987"
-     inkscape:cx="67.289838"
-     inkscape:cy="98.411657"
+     inkscape:zoom="5.8409968"
+     inkscape:cx="71.393854"
+     inkscape:cy="129.0412"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      width="128px"
@@ -128,19 +128,6 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <path
-       class="ColorScheme-Text"
-       inkscape:connector-curvature="0"
-       style="opacity:0.3;fill:currentColor"
-       d="m 13,7 v 3 h 3 V 7 Z"
-       id="groove-top" />
-    <path
-       class="ColorScheme-Text"
-       style="opacity:0.3;fill:currentColor"
-       d="M 12,7 C 10.31784,7 9,8.31784 9,10 h 3 z"
-       id="groove-topleft"
-       sodipodi:nodetypes="cccc"
-       inkscape:connector-curvature="0" />
     <rect
        ry="2.077126"
        rx="0"
@@ -150,109 +137,6 @@
        width="2.0329318"
        id="hint-tile-center"
        style="fill:#4e9a06;fill-opacity:1;fill-rule:nonzero;stroke:none" />
-    <path
-       class="ColorScheme-Text"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccc"
-       id="groove-topright"
-       d="M 20,10 C 20,8.31784 18.68216,7 17,7 v 3 z"
-       style="opacity:0.3;fill:currentColor" />
-    <path
-       class="ColorScheme-Text"
-       id="groove-bottom"
-       d="m 13,18 v -3 h 3 v 3 z"
-       style="opacity:0.3;fill:currentColor"
-       inkscape:connector-curvature="0" />
-    <path
-       class="ColorScheme-Text"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccc"
-       id="groove-bottomleft"
-       d="M 12,18 C 10.31784,18 9,16.68216 9,15 h 3 z"
-       style="opacity:0.3;fill:currentColor" />
-    <path
-       class="ColorScheme-Text"
-       style="opacity:0.3;fill:currentColor"
-       d="m 20,15 c 0,1.68216 -1.31784,3 -3,3 v -3 z"
-       id="groove-bottomright"
-       sodipodi:nodetypes="cccc"
-       inkscape:connector-curvature="0" />
-    <path
-       class="ColorScheme-Text"
-       id="groove-center"
-       d="m 13,11 v 3 h 3 v -3 z"
-       style="opacity:0.3;fill:currentColor"
-       inkscape:connector-curvature="0" />
-    <path
-       class="ColorScheme-Text"
-       inkscape:connector-curvature="0"
-       style="opacity:0.3;fill:currentColor"
-       d="m 9,11 v 3 h 3 v -3 z"
-       id="groove-left" />
-    <path
-       class="ColorScheme-Text"
-       inkscape:connector-curvature="0"
-       style="opacity:0.3;fill:currentColor"
-       d="m 17,11 v 3 h 3 v -3 z"
-       id="groove-right" />
-    <path
-       id="groove-highlight-top"
-       d="m 31,7 v 3 h 3 V 7 Z"
-       style="fill:currentColor;fill-opacity:1"
-       inkscape:connector-curvature="0"
-       class="ColorScheme-Highlight" />
-    <path
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccc"
-       id="groove-highlight-topleft"
-       d="m 30,7 c -1.68216,0 -3,1.31784 -3,3 h 3 z"
-       style="fill:currentColor;fill-opacity:1"
-       class="ColorScheme-Highlight" />
-    <path
-       style="fill:currentColor;fill-opacity:1"
-       d="M 38,10 C 38,8.31784 36.68216,7 35,7 v 3 z"
-       id="groove-highlight-topright"
-       sodipodi:nodetypes="cccc"
-       inkscape:connector-curvature="0"
-       class="ColorScheme-Highlight" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:currentColor;fill-opacity:1"
-       d="m 31,18 v -3 h 3 v 3 z"
-       id="groove-highlight-bottom"
-       class="ColorScheme-Highlight" />
-    <path
-       style="fill:currentColor;fill-opacity:1"
-       d="m 30,18 c -1.68216,0 -3,-1.31784 -3,-3 h 3 z"
-       id="groove-highlight-bottomleft"
-       sodipodi:nodetypes="cccc"
-       inkscape:connector-curvature="0"
-       class="ColorScheme-Highlight" />
-    <path
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccc"
-       id="groove-highlight-bottomright"
-       d="m 38,15 c 0,1.68216 -1.31784,3 -3,3 v -3 z"
-       style="fill:currentColor;fill-opacity:1"
-       class="ColorScheme-Highlight" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:currentColor;fill-opacity:1"
-       d="m 31,11 v 3 h 3 v -3 z"
-       id="groove-highlight-center"
-       class="ColorScheme-Highlight" />
-    <path
-       id="groove-highlight-left"
-       d="m 27,11 v 3 h 3 v -3 z"
-       style="fill:currentColor;fill-opacity:1"
-       inkscape:connector-curvature="0"
-       class="ColorScheme-Highlight" />
-    <path
-       id="groove-highlight-right"
-       d="m 35,11 v 3 h 3 v -3 z"
-       style="fill:currentColor;fill-opacity:1"
-       inkscape:connector-curvature="0"
-       class="ColorScheme-Highlight" />
     <g
        id="horizontal-slider-hover"
        transform="translate(24,2)"
@@ -359,7 +243,7 @@
          inkscape:connector-curvature="0" />
     </g>
     <g
-       transform="translate(52,-34)"
+       transform="translate(64,-22)"
        id="vertical-slider-focus"
        style="opacity:0">
       <rect
@@ -640,6 +524,189 @@
          width="1"
          id="rect1189"
          style="opacity:0;fill:#31363b;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <path
+       class="ColorScheme-Text"
+       inkscape:connector-curvature="0"
+       style="opacity:0.3;fill:currentColor"
+       d="m 82,19 h -3 v 3 h 3 z"
+       id="groove-right" />
+    <path
+       class="ColorScheme-Text"
+       style="opacity:0.3;fill:currentColor;stroke-width:2.16024685"
+       d="M 82,18 V 4 h -3 v 14 z"
+       id="groove-topright"
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0" />
+    <path
+       class="ColorScheme-Text"
+       id="groove-left"
+       d="m 71,19 h 3 v 3 h -3 z"
+       style="opacity:0.3;fill:currentColor"
+       inkscape:connector-curvature="0" />
+    <path
+       class="ColorScheme-Text"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       id="groove-topleft"
+       d="M 71,18 V 4 h 3 v 14 z"
+       style="opacity:0.3;fill:currentColor;stroke-width:2.16024685" />
+    <path
+       class="ColorScheme-Text"
+       id="groove-center"
+       d="m 78,19 h -3 v 3 h 3 z"
+       style="opacity:0.3;fill:currentColor"
+       inkscape:connector-curvature="0" />
+    <path
+       class="ColorScheme-Text"
+       inkscape:connector-curvature="0"
+       style="opacity:0.3;fill:currentColor;stroke-width:2.16024685"
+       d="m 78,4 h -3 v 14 h 3 z"
+       id="groove-top" />
+    <path
+       id="groove-highlight-right"
+       d="m 98,8 h -3 v 3 h 3 z"
+       style="fill:currentColor;fill-opacity:1"
+       inkscape:connector-curvature="0"
+       class="ColorScheme-Highlight" />
+    <path
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       id="groove-highlight-topright"
+       d="M 98,7 V 4 h -3 v 3 z"
+       style="fill:currentColor;fill-opacity:1"
+       class="ColorScheme-Highlight" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:currentColor;fill-opacity:1"
+       d="m 87,8 h 3 v 3 h -3 z"
+       id="groove-highlight-left"
+       class="ColorScheme-Highlight" />
+    <path
+       style="fill:currentColor;fill-opacity:1"
+       d="M 87,7 V 4 h 3 v 3 z"
+       id="groove-highlight-topleft"
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       class="ColorScheme-Highlight" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:currentColor;fill-opacity:1"
+       d="m 94,8 h -3 v 3 h 3 z"
+       id="groove-highlight-center"
+       class="ColorScheme-Highlight" />
+    <path
+       id="groove-highlight-top"
+       d="m 94,4 h -3 v 3 h 3 z"
+       style="fill:currentColor;fill-opacity:1"
+       inkscape:connector-curvature="0"
+       class="ColorScheme-Highlight" />
+    <g
+       id="groove-highlight-bottomright"
+       transform="rotate(90,85,42)">
+      <path
+         class="ColorScheme-Highlight"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc"
+         id="path921"
+         d="m 58,32 v -3 h -3 v 3 z"
+         style="fill:currentColor;fill-opacity:1" />
+      <path
+         style="fill:currentColor"
+         d="m 58,29 v 1 h 5 v 2 h 1 v -2 -1 z"
+         id="path923"
+         class="ColorScheme-Text"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="groove-highlight-bottom"
+       transform="rotate(90,85,42)">
+      <path
+         class="ColorScheme-Highlight"
+         inkscape:connector-curvature="0"
+         style="fill:currentColor;fill-opacity:1"
+         d="m 55,33 v 3 h 3 v -3 z"
+         id="path927" />
+      <rect
+         style="fill:currentColor"
+         id="rect929"
+         width="1"
+         height="3"
+         x="63"
+         y="33"
+         class="ColorScheme-Text" />
+    </g>
+    <g
+       id="groove-highlight-bottomleft"
+       transform="rotate(90,85,42)">
+      <path
+         class="ColorScheme-Highlight"
+         style="fill:currentColor;fill-opacity:1"
+         d="m 58,37 v 3 h -3 v -3 z"
+         id="path933"
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0" />
+      <rect
+         style="fill:currentColor"
+         id="rect935"
+         width="1"
+         height="3"
+         x="63"
+         y="37"
+         class="ColorScheme-Text" />
+    </g>
+    <g
+       id="groove-bottomright"
+       transform="rotate(90,55.5,55.5)">
+      <path
+         style="opacity:0.3;fill:currentColor;stroke-width:2.16024685"
+         d="M 37,32 V 29 H 23 v 3 z"
+         id="path939"
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         class="ColorScheme-Text" />
+      <rect
+         style="opacity:0;fill:#31363b;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect941"
+         width="1"
+         height="3"
+         x="42"
+         y="29" />
+    </g>
+    <g
+       id="groove-bottom"
+       transform="rotate(90,55.5,55.5)">
+      <path
+         id="path945"
+         d="m 23,33 v 3 h 14 v -3 z"
+         style="opacity:0.3;fill:currentColor;stroke-width:2.16024685"
+         inkscape:connector-curvature="0"
+         class="ColorScheme-Text" />
+      <rect
+         style="opacity:0;fill:#31363b;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect947"
+         width="1"
+         height="3"
+         x="42"
+         y="33" />
+    </g>
+    <g
+       id="groove-bottomleft"
+       transform="rotate(90,55.5,55.5)">
+      <path
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc"
+         id="path951"
+         d="m 37,37 v 3 H 23 v -3 z"
+         style="opacity:0.3;fill:currentColor;stroke-width:2.16024685"
+         class="ColorScheme-Text" />
+      <rect
+         style="opacity:0;fill:#31363b;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect953"
+         width="1"
+         height="3"
+         x="42"
+         y="37" />
     </g>
   </g>
 </svg>

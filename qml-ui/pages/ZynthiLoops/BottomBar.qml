@@ -272,6 +272,7 @@ Zynthian.Card {
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
+                    preload: true
                 },
                 Zynthian.TabbedControlViewAction {
                     id: editorAction

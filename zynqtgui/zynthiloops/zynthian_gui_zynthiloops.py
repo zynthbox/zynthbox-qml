@@ -512,7 +512,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
             if source == 'internal':
-                preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-')
+                preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
             else:
                 preset_name = "external"
 

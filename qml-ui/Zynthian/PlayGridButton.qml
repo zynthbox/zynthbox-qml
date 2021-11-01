@@ -34,6 +34,8 @@ QQC2.Button {
     id: component
     // Because otherwise we can't emit the signal, because the pressed property takes over...
     signal pressed();
+    // Because we no longer have a pressed property... (yeah, this is kind of a mess, but there's not a whole lot we can do about it)
+    property bool isPressed: false;
     Layout.fillWidth: true
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
@@ -44,7 +46,7 @@ QQC2.Button {
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
         border {
             width: 1
-            color: Kirigami.Theme.textColor
+            color: component.isPressed ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
         }
         color: component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor
     }
@@ -55,9 +57,11 @@ QQC2.Button {
                 onPressedChanged: {
                     if (pressed) {
                         component.pressed();
+                        component.isPressed = true;
                         component.focus = true;
                     } else {
                         component.released();
+                        component.isPressed = false;
                         if (x > -1 && y > -1 && x < component.width && y < component.height) {
                             component.clicked();
                         }

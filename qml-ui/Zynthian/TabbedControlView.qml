@@ -225,7 +225,15 @@ Item {
         return null;
     }
 
-    Component.onCompleted: Qt.callLater(primaryTabsScope.forceActiveFocus)
+    Component.onCompleted: {
+        Qt.callLater(primaryTabsScope.forceActiveFocus)
+        for (var i in root.tabActions) {
+            var action = root.tabActions[i];
+            if (action.hasOwnProperty("preload") && action.preload) {
+                mainLayout.loadAndCachePage(action.page, action.initialProperties)
+            }
+        }
+    }
 
     GridLayout {
         id: mainLayout

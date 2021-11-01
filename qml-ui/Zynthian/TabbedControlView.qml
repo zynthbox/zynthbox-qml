@@ -228,8 +228,43 @@ Item {
     Component.onCompleted: Qt.callLater(primaryTabsScope.forceActiveFocus)
 
     GridLayout {
+        id: mainLayout
         columns: root.orientation === Qt.Horizontal ? 2 : 1
         anchors.fill: parent
+        property var pageCache: {}
+        function loadAndCachePage(pageUrl, initialProperties) {
+            if (!pageCache) {
+                pageCache = {};
+            }
+            if (pageCache.hasOwnProperty(pageUrl)) {
+                return;
+            } else {
+                var component = Qt.createComponent(pageUrl);
+                if (typeof initialProperties !== "undefined") {
+                    pageCache[pageUrl] = component.createObject(root, initialProperties);
+                } else {
+                    pageCache[pageUrl] = component.createObject(root);
+                }
+                pageCache[pageUrl].visible = false;
+            }
+        }
+        function pushAndCachePage(pageUrl, initialProperties) {
+            if (!pageCache) {
+                pageCache = {};
+            }
+            if (pageCache.hasOwnProperty(pageUrl)) {
+                internalStack.replace(mainLayout.pageCache[pageUrl]);
+            } else {
+                loadAndCachePage(pageUrl, initialProperties);
+                internalStack.replace(pageCache[pageUrl]);
+            }
+        }
+        onWidthChanged: {
+            for (var i in pageCache) {
+                root.pageCache[i].width = width;
+                root.pageCache[i].height = height;
+            }
+        }
         FocusScope {
             id: primaryTabsScope
             opacity: tabsLayout.visibleChildren.length > 3 ? 1 : 0
@@ -281,7 +316,7 @@ Item {
                                 if (internalStack.activeAction === modelData) {
                                     return;
                                 }
-                                internalStack.replace(modelData.page, modelData.initialProperties);
+                                mainLayout.pushAndCachePage(modelData.page, modelData.initialProperties);
                                 internalStack.activeAction = modelData;
                                 if (modelData.children.length > 0) {
                                     internalStack.activeSubAction = modelData.children[0]
@@ -319,8 +354,7 @@ Item {
                     }
                 }
                 Component.onCompleted: {
-                    internalStack.push(Qt.resolvedUrl(root.initialAction.page), root.initialAction.initialProperties);
-
+                    mainLayout.pushAndCachePage(Qt.resolvedUrl(root.initialAction.page), root.initialAction.initialProperties);
                 }
             }
             FocusScope {
@@ -364,7 +398,7 @@ Item {
                                     if (internalStack.activeSubAction === modelData) {
                                         return;
                                     }
-                                    internalStack.replace(modelData.page, modelData.initialProperties);
+                                    mainLayout.pushAndCachePage(modelData.page, modelData.initialProperties);
                                     internalStack.activeSubAction = modelData;
                                 }
                             }

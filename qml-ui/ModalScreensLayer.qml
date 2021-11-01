@@ -44,11 +44,11 @@ Zynthian.Stack {
 
     property var pageCache: {}
     onWidthChanged: {
-		for (var i in pageCache) {
-			root.pageCache[i].width = width;
-			root.pageCache[i].height = height;
-		}
-	}
+        for (var i in pageCache) {
+            root.pageCache[i].width = width;
+            root.pageCache[i].height = height;
+        }
+    }
     data: [
         Timer {
             id: preloadTimer

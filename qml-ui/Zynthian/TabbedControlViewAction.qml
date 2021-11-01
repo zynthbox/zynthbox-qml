@@ -41,5 +41,6 @@ Kirigami.Action {
      */
     property string page
     property var initialProperties
+    property bool preload: false
 
 }

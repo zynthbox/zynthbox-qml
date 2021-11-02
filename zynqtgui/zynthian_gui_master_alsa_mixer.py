@@ -28,6 +28,8 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 
 import alsaaudio
 import logging
+import re
+
 #------------------------------------------------------------------------------
 # Base QObject wrapper for alsaaudio import
 #------------------------------------------------------------------------------
@@ -35,8 +37,16 @@ import logging
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
+
+        # Read jack2.service file to find selected card name
+        with open("/etc/systemd/system/jack2.service", "r") as f:
+            data = f.read()
+            dev = re.search("hw:([^ ]*)", data).group(1)
+
+        logging.error(f"### ALSA Mixer card : {dev}")
+
         try:
-            card = alsaaudio.cards().index("CODEC") #TODO: take whtever the real card is
+            card = alsaaudio.cards().index(dev)
             mixer_name = alsaaudio.mixers(card)[0]
             self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
         except Exception as e:

@@ -23,7 +23,6 @@
 #
 # ******************************************************************************
 
-import mido
 import typing
 import logging
 import sys
@@ -49,7 +48,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
-        self.__midi_port__ = mido.open_output("Midi Through Port-0")
         zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.screens["zynthiloops"]
 
     def show(self):
@@ -61,18 +59,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def __set_pitch__(self):
-        midi_pitch_message = mido.Message(
-            "pitchwheel", channel=0, pitch=zynthian_gui_playgrid.__zynquick_pgmanager__.property("pitch")
-        )
-        self.__midi_port__.send(midi_pitch_message)
-
-    def __set_modulation__(self):
-        modulation_message = mido.Message(
-            "control_change", channel=0, control=1, value=zynthian_gui_playgrid.__zynquick_pgmanager__.property("modulation")
-        )
-        self.__midi_port__.send(modulation_message)
-
     def __get_zynquick_pgmanager__(self):
         return zynthian_gui_playgrid.__zynquick_pgmanager__
 
@@ -83,8 +69,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             zynthian_gui_playgrid.__zynquick_pgmanager__ = thing
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStart.connect(self.startMetronomeRequest)
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStop.connect(self.stopMetronomeRequest)
-            zynthian_gui_playgrid.__zynquick_pgmanager__.pitchChanged.connect(self.__set_pitch__)
-            zynthian_gui_playgrid.__zynquick_pgmanager__.modulationChanged.connect(self.__set_modulation__)
 
             # These two should only be the second option... Please, someone fix this, i have no idea what is wrong.
             zynthian_gui_playgrid.__zynquick_pgmanager__.setSyncTimerObj(libzl.getSyncTimerInstance())

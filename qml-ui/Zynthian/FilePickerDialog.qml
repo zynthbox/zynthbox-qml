@@ -280,7 +280,7 @@ QQC2.Dialog {
                             } else {
                                 filesListView.currentIndex = 0;
                             }
-                            filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
+                            filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
                         }
                     }
                     delegate: Rectangle {

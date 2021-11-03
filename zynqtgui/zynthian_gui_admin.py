@@ -895,7 +895,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 quick_components_update_available = "zynthian-quick-components" in process_list.stdout
                 qml_update_available = "zynthian-qml" in process_list.stdout
 
-                if libzl_update_available or quick_components_update_available:# or qml_update_available:
+                if libzl_update_available or quick_components_update_available or qml_update_available:
                     logging.error(
                         f"Updates Available : libzl({libzl_update_available}), zynthian-quick-components({quick_components_update_available}), zynthian-qml({qml_update_available})")
                     self.checkForUpdatesCompleted.emit()
@@ -926,7 +926,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
                 cache["libzl"].mark_install()
                 cache["zynthian-quick-components"].mark_install()
-                # cache["zynthian-qml"].mark_install()
+                cache["zynthian-qml"].mark_install()
                 cache.commit()
 
                 self.updateCompleted.emit()

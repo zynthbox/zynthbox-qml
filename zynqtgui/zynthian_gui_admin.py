@@ -28,9 +28,12 @@ import re
 import sys
 import signal
 import logging
+import apt
+import apt_pkg
 from time import sleep
 from threading import Thread
-from subprocess import check_output, Popen, PIPE, STDOUT
+from subprocess import run, check_output, Popen, PIPE, STDOUT
+from PySide2.QtCore import Signal
 
 # Zynthian specific modules
 import zynconf
@@ -880,11 +883,61 @@ class zynthian_gui_admin(zynthian_gui_selector):
             )
         return update_available
 
-    # TODO enable again update of everything
     def check_for_updates(self):
-        self.zyngui.show_info("CHECK FOR UPDATES")
-        # self.start_command(["git -C /zynthian/zyncoder remote update; git -C /zynthian/zynthian-ui remote update; git -C /zynthian/zynthian-sys remote update; git -C /zynthian/zynthian-webconf remote update; git -C /zynthian/zynthian-data remote update"])
-        self.start_command(["git -C /zynthian/zynthian-ui remote update;"])
+        def run_cmd():
+            self.checkForUpdatesStarted.emit()
+
+            try:
+                process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=True)
+                process_list = run(["apt", "list", "--upgradeable"], capture_output=True, text=True, check=True)
+
+                libzl_update_available = "libzl" in process_list.stdout
+                quick_components_update_available = "zynthian-quick-components" in process_list.stdout
+                qml_update_available = "zynthian-qml" in process_list.stdout
+
+                if libzl_update_available or quick_components_update_available:# or qml_update_available:
+                    logging.error(
+                        f"Updates Available : libzl({libzl_update_available}), zynthian-quick-components({quick_components_update_available}), zynthian-qml({qml_update_available})")
+                    self.checkForUpdatesCompleted.emit()
+
+                    self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.", self.run_update)
+                else:
+                    self.checkForUpdatesUnavailable.emit()
+            except Exception as e:
+                logging.error(f"Error while checking for updates : {str(e)}")
+                self.checkForUpdatesErrored.emit()
+
+        thread = Thread(target=run_cmd, args=())
+        thread.daemon = True  # thread dies with the program
+        thread.start()
+
+    def run_update(self, params=None):
+        def run_cmd():
+            self.updateStarted.emit()
+
+            try:
+                apt_pkg.init_config()
+                apt_pkg.config.set("DPkg::Options::", "--force-confdef")
+                apt_pkg.config.set("DPkg::Options::", "--force-confold")
+                apt_pkg.config.set("DPkg::Options::", "--force-overwrite")
+
+                cache = apt.cache.Cache()
+                cache.open()
+
+                cache["libzl"].mark_install()
+                cache["zynthian-quick-components"].mark_install()
+                # cache["zynthian-qml"].mark_install()
+                cache.commit()
+
+                self.updateCompleted.emit()
+                self.reboot_confirmed()
+            except Exception as e:
+                logging.error(f"Error while updating : {str(e)}")
+                self.updateErrored.emit()
+
+        thread = Thread(target=run_cmd, args=())
+        thread.daemon = True  # thread dies with the program
+        thread.start()
 
     def update_system(self):
         logging.info("UPDATE SYSTEM")
@@ -938,5 +991,13 @@ class zynthian_gui_admin(zynthian_gui_selector):
     # 	self.zyngui.show_screen("main")
     # 	return ''
 
+    checkForUpdatesStarted = Signal()
+    checkForUpdatesErrored = Signal()
+    checkForUpdatesCompleted = Signal()
+    checkForUpdatesUnavailable = Signal()
+
+    updateStarted = Signal()
+    updateErrored = Signal()
+    updateCompleted = Signal()
 
 # ------------------------------------------------------------------------------

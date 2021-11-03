@@ -39,5 +39,89 @@ Zynthian.SelectorPage {
         }
     ]
 
+    QQC2.Dialog {
+        property string label
 
+        id: progressDialog
+
+        modal: true
+        closePolicy: QQC2.Popup.NoAutoClose
+
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit * 15
+
+        contentItem: ColumnLayout {
+            Layout.alignment: Qt.AlignCenter
+
+            QQC2.Label {
+                text: progressDialog.label
+                Layout.alignment: Qt.AlignHCenter
+            }
+            QQC2.ProgressBar {
+                indeterminate: true
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
+    }
+
+    QQC2.Dialog {
+        property string label
+
+        id: errorDialog
+
+        modal: true
+
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit * 15
+        height: Kirigami.Units.gridUnit * 8
+
+        contentItem: ColumnLayout {
+            Layout.alignment: Qt.AlignCenter
+
+            QQC2.Label {
+                text: errorDialog.label
+                Layout.alignment: Qt.AlignHCenter
+            }
+        }
+    }
+
+    Connections {
+        target: zynthian.admin
+
+        onCheckForUpdatesStarted: {
+            progressDialog.label = qsTr("Checking for updates");
+            progressDialog.visible = true;
+        }
+        onCheckForUpdatesErrored: {
+            progressDialog.visible = false;
+            errorDialog.label = qsTr("Error while checking for updates. Retry again later.")
+            errorDialog.visible = true;
+        }
+        onCheckForUpdatesCompleted: {
+            progressDialog.visible = false;
+        }
+        onCheckForUpdatesUnavailable: {
+            progressDialog.visible = false;
+            errorDialog.label = qsTr("No Updates Available")
+            errorDialog.visible = true;
+        }
+
+        onUpdateStarted: {
+            progressDialog.label = qsTr("Updating system");
+            progressDialog.visible = true;
+        }
+        onUpdateErrored: {
+            progressDialog.visible = false;
+            errorDialog.label = qsTr("Error while updating system")
+            errorDialog.visible = true;
+        }
+        onUpdateCompleted: {
+            progressDialog.visible = false;
+            errorDialog.label = qsTr("Update Complete")
+            errorDialog.visible = true;
+        }
+    }
 }

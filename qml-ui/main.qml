@@ -319,7 +319,15 @@ Kirigami.AbstractApplicationWindow {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitWidth: 1
-                    enabled: false
+                    enabled: true
+                    text: zynthian.main.isRecording ? qsTr("STOP RECORDING") : qsTr("START RECORDING")
+                    onClicked: {
+                        if (zynthian.main.isRecording) {
+                            zynthian.main.stop_recording();
+                        } else {
+                            zynthian.main.start_recording();
+                        }
+                    }
                 }
             }
         }

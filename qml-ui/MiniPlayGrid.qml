@@ -207,6 +207,13 @@ RowLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         clip: true
+        replaceEnter: Transition {}
+        replaceExit: Transition {}
+        popEnter: Transition {}
+        popExit: Transition {}
+        pushEnter: Transition {}
+        pushExit: Transition {}
+        replaceExit: Transition {}
         initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item.miniGrid
         Connections {
             target: ZynQuick.PlayGridManager

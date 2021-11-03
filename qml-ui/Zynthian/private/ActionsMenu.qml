@@ -42,7 +42,7 @@ QQC2.Menu
         checkable: kirigamiAction.checkable !== undefined && kirigamiAction.checkable
         checked: kirigamiAction.checked !== undefined && kirigamiAction.checked
         height: visible ? implicitHeight : 0
-        width: parent.width
+        width: parent ? parent.width : 10 // Just to not spam out during instantiation
 
         text: kirigamiAction.text
         icon.name: kirigamiAction.icon.name

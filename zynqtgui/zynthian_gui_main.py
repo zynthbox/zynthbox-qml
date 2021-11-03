@@ -31,7 +31,7 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 from . import zynthian_gui_selector
 from zyngui import zynthian_gui_config
 from zynlibs.zynseq import zynseq
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Property, Signal, Slot
 
 from json import JSONDecoder
 
@@ -48,6 +48,8 @@ from subprocess import Popen
 class zynthian_gui_main(zynthian_gui_selector):
     def __init__(self, parent=None):
         super(zynthian_gui_main, self).__init__("Main", parent)
+        self.__is_recording__ = False
+        self.recorder_process = None
         self.show()
 
     def show(self):
@@ -105,6 +107,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata.append({"icon":"../../img/settings.svg"})
 
         apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+        self.global_recordings_dir = "/zynthian/zynthian-my-data/sounds/capture"
         if Path(apps_folder).exists():
             for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
                 try:
@@ -113,7 +116,9 @@ class zynthian_gui_main(zynthian_gui_selector):
                     if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
                         continue
                     self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
-                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"]})
+                    # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
+                    # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
+                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : self.global_recordings_dir + "/" + metadata["Name"]})
                 except Exception as e:
                     logging.error(e)
 
@@ -121,11 +126,45 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
+            self.__current_recordings_file_base__ = self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             Popen([self.list_data[i][1]])
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()
+
+    @Slot(None)
+    def start_recording(self):
+        if (self.__is_recording__ == False):
+            Path(self.global_recordings_dir).mkdir(parents=True, exist_ok=True)
+            # Check if file exists otherwise append count
+            count = 1;
+            while Path(f"{self.__current_recordings_file_base__}{'-'+str(count).zfill(6)}.clip.wav").exists():
+                count += 1
+            self.recording_file = f"{self.__current_recordings_file_base__}{'-'+str(count).zfill(6)}.clip.wav"
+
+            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.recording_file))
+            logging.error("Started recording into the file " + self.recording_file)
+            self.__is_recording__ = True
+            self.is_recording_changed.emit()
+
+    @Slot(None)
+    def stop_recording(self):
+        if (self.recorder_process is not None):
+            self.recorder_process.terminate()
+            self.recorder_process = None
+            logging.error("Finished recording, and your shiny new recording should be at " + self.recording_file)
+            self.__is_recording__ = False
+            self.is_recording_changed.emit()
+        pass
+
+    @Signal
+    def is_recording_changed(self):
+        pass
+
+    @Property(bool, notify=is_recording_changed)
+    def isRecording(self):
+        return self.__is_recording__;
 
     def next_action(self):
         return "main"

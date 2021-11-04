@@ -42,6 +42,7 @@ from ctypes import c_float, c_double, CDLL
 
 # Qt modules
 from PySide2.QtCore import (
+    Qt,
     QObject,
     Slot,
     Signal,
@@ -49,7 +50,7 @@ from PySide2.QtCore import (
     QTimer,
     QEventLoop,
 )
-from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow
+from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap
 
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
@@ -2754,6 +2755,10 @@ if __name__ == "__main__":
     libzl.init()
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
+
+    nullCursor = QPixmap(16, 16);
+    nullCursor.fill(Qt.transparent);
+    app.setOverrideCursor(QCursor(nullCursor));
 
     logging.info("REGISTERING QML TYPES")
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")

@@ -46,7 +46,7 @@ ColumnLayout {
                 fill: parent
                 margins: Kirigami.Units.largeSpacing
             }
-            wrap: Text.Wrap
+            wrapMode: Text.Wrap
             text: qsTr("(not a thing yet - WIP) Recordings from this module will be stored as the contents of a clip selected by you here. Each time you hit record, the existing contents of the clip will be replaced by the new recording.")
         }
     }

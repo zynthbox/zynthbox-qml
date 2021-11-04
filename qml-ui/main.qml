@@ -356,7 +356,6 @@ Kirigami.AbstractApplicationWindow {
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         color: Kirigami.Theme.backgroundColor
         Zynthian.TabbedControlView {
-            id: tabbedView
             anchors {
                 fill: parent;
                 margins: Kirigami.Units.smallSpacing;
@@ -379,4 +378,3 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 }
-

@@ -313,7 +313,10 @@ Kirigami.AbstractApplicationWindow {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitWidth: 1
-                    enabled: false
+                    text: qsTr("RECORDING DESTINATION")
+                    onClicked: {
+                        clipPickerMenu.visible = !clipPickerMenu.visible;
+                    }
                 }
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -339,6 +342,40 @@ Kirigami.AbstractApplicationWindow {
                 //TODO: necessary?
                 //panel.y = panel.screen.height - height
             }
+        }
+    }
+    Window {
+        id: clipPickerMenu
+        visible: false;
+        width: screen.width / 2
+        height: screen.height / 2
+        x: screen.width - width
+        y: screen.height - height
+        flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        color: Kirigami.Theme.backgroundColor
+        Zynthian.TabbedControlView {
+            id: tabbedView
+            anchors {
+                fill: parent;
+                margins: Kirigami.Units.smallSpacing;
+            }
+            visibleFocusRects: false
+            minimumTabsCount: 2
+
+            property QQC2.StackView stack
+
+            tabActions: [
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("File")
+                    page: Qt.resolvedUrl("ExternalRecordingDestinationFile.qml")
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Clip")
+                    page: Qt.resolvedUrl("ExternalRecordingDestinationClip.qml")
+                }
+            ]
         }
     }
 }

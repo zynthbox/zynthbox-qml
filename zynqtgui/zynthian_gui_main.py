@@ -25,6 +25,7 @@
 
 import logging
 import re
+from datetime import datetime
 from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
@@ -137,11 +138,8 @@ class zynthian_gui_main(zynthian_gui_selector):
     def start_recording(self):
         if (self.__is_recording__ == False):
             Path(self.global_recordings_dir).mkdir(parents=True, exist_ok=True)
-            # Check if file exists otherwise append count
-            count = 1;
-            while Path(f"{self.__current_recordings_file_base__}{'-'+str(count).zfill(6)}.clip.wav").exists():
-                count += 1
-            self.recording_file = f"{self.__current_recordings_file_base__}{'-'+str(count).zfill(6)}.clip.wav"
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
+            self.recording_file = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
 
             self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.recording_file))
             logging.error("Started recording into the file " + self.recording_file)

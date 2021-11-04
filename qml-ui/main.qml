@@ -317,6 +317,17 @@ Kirigami.AbstractApplicationWindow {
                     onClicked: {
                         clipPickerMenu.visible = !clipPickerMenu.visible;
                     }
+                    Rectangle {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
+                            margins: Kirigami.Units.largeSpacing
+                        }
+                        parent: parent.background
+                        height: Kirigami.Units.smallSpacing
+                        color: Kirigami.Theme.highlightColor
+                    }
                 }
                 QQC2.Button {
                     Layout.fillWidth: true

@@ -46,7 +46,7 @@ ColumnLayout {
                 fill: parent
                 margins: Kirigami.Units.largeSpacing
             }
-            wrap: Text.Wrap
+            wrapMode: Text.Wrap
             text: qsTr("Recordings from this module will be stored in the sounds/capture section of your data store. They will be given the name of the module, with a timestamp so you can tell your recordings apart by when you made them.")
         }
     }

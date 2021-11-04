@@ -40,7 +40,6 @@ install-zynthian-qml:
 		-maxdepth 1 \
 		-not -name zynlibs \
 		-not -name . \
-		-not -name '.git*' \
 		-not -name '*.deb' \
 		-not -name 'debian' \
 		-exec cp -pr $(shell realpath {}) $(BASEINSTALLDIR)/ \;

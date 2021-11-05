@@ -25,6 +25,8 @@
 
 import logging
 import re
+import threading
+from time import sleep
 from datetime import datetime
 from subprocess import check_output, Popen, PIPE, STDOUT
 
@@ -47,9 +49,14 @@ from subprocess import Popen
 
 
 class zynthian_gui_main(zynthian_gui_selector):
+    mplayer_ctrl_fifo_path = "/tmp/mplayer-control"
     def __init__(self, parent=None):
         super(zynthian_gui_main, self).__init__("Main", parent)
         self.__is_recording__ = False
+        self.__is_playing__ = False
+        self.playback_process = None
+        self.__most_recent_recording_file__ = ""
+        self.__recording_file__ = ""
         self.recorder_process = None
         self.show()
 
@@ -139,10 +146,10 @@ class zynthian_gui_main(zynthian_gui_selector):
         if (self.__is_recording__ == False):
             Path(self.global_recordings_dir).mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
-            self.recording_file = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
+            self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
 
-            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.recording_file))
-            logging.error("Started recording into the file " + self.recording_file)
+            self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:playback_*", self.__recording_file__))
+            logging.error("Started recording into the file " + self.__recording_file__)
             self.__is_recording__ = True
             self.is_recording_changed.emit()
 
@@ -151,9 +158,12 @@ class zynthian_gui_main(zynthian_gui_selector):
         if (self.recorder_process is not None):
             self.recorder_process.terminate()
             self.recorder_process = None
-            logging.error("Finished recording, and your shiny new recording should be at " + self.recording_file)
             self.__is_recording__ = False
             self.is_recording_changed.emit()
+            self.__most_recent_recording_file__ = self.__recording_file__
+            self.most_recent_recording_file_changed.emit()
+            self.__recording_file__ = ""
+            self.recording_file_changed.emit();
         pass
 
     @Signal
@@ -163,6 +173,88 @@ class zynthian_gui_main(zynthian_gui_selector):
     @Property(bool, notify=is_recording_changed)
     def isRecording(self):
         return self.__is_recording__;
+
+    @Signal
+    def recording_file_changed(self):
+        pass
+
+    @Property(str, notify=recording_file_changed)
+    def recordingFile(self):
+        return self.__recording_file__
+
+    @Signal
+    def most_recent_recording_file_changed(self):
+        pass
+
+    @Property(str, notify=most_recent_recording_file_changed)
+    def mostRecentRecordingFile(self):
+        return self.__most_recent_recording_file__
+
+    @Slot(None)
+    def discardMostRecentRecording(self):
+        if (self.__most_recent_recording_file__ != ""):
+            if (os.path.exists(self.__most_recent_recording_file__)):
+                os.remove(self.__most_recent_recording_file__)
+                if (not os.path.exists(self.__most_recent_recording_file__)):
+                    self.__most_recent_recording_file__ = ""
+                    self.most_recent_recording_file_changed.emit()
+
+    @Slot(None)
+    def playMostRecentRecording(self):
+        if (self.__most_recent_recording_file__ != ""):
+            if (os.path.exists(self.__most_recent_recording_file__)):
+                self.stopMostRecentRecordingPlayback()
+
+                # Create control fifo is needed ...
+                try:
+                    os.mkfifo(self.mplayer_ctrl_fifo_path)
+                except:
+                    pass
+
+                try:
+                    cmd="/usr/bin/mplayer -nogui -noconsolecontrols -nolirc -nojoystick -really-quiet -slave -ao jack -input file=\"{}\" \"{}\"".format(self.mplayer_ctrl_fifo_path, self.__most_recent_recording_file__)
+                    logging.info("COMMAND: %s" % cmd)
+
+                    def runInThread(onExit, cmd):
+                        self.playback_process = Popen(cmd, shell=True, universal_newlines=True)
+                        self.playback_process.wait()
+                        self.playback_ended()
+                        return
+
+                    thread = threading.Thread(target=runInThread, args=(self.playback_ended, cmd), daemon=True)
+                    thread.start()
+
+                    self.__is_playing__ = True
+                    self.is_playing_changed.emit()
+
+                except Exception as e:
+                    logging.error("ERROR STARTING AUDIO PLAY: %s" % e)
+
+    def send_mplayer_command(self, cmd):
+        with open(self.mplayer_ctrl_fifo_path, "w") as f:
+            f.write(cmd + "\n")
+            f.close()
+
+    def playback_ended(self):
+        self.playback_process = None
+        self.__is_playing__ = False
+        self.is_playing_changed.emit()
+
+    @Slot(None)
+    def stopMostRecentRecordingPlayback(self):
+        if (self.playback_process is not None):
+            try:
+                self.send_mplayer_command("quit")
+            except Exception as e:
+                logging.error("ERROR STOPPING AUDIO PLAY: %s" % e)
+
+    @Signal
+    def is_playing_changed(self):
+        pass
+
+    @Property(bool, notify=is_playing_changed)
+    def isPlaying(self):
+        return self.__is_playing__
 
     def next_action(self):
         return "main"

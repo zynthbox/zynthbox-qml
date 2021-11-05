@@ -301,7 +301,10 @@ Kirigami.AbstractApplicationWindow {
                     Layout.fillHeight: true
                     implicitWidth: 1
                     text: qsTr("CLOSE")
-                    onClicked: zynthian.close_current_window()
+                    onClicked: {
+                        clipPickerMenu.visible = false;
+                        zynthian.close_current_window();
+                    }
                 }
                 QQC2.Button {
                     Layout.fillWidth: true

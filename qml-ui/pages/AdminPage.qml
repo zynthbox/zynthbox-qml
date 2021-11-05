@@ -53,16 +53,23 @@ Zynthian.SelectorPage {
         height: Kirigami.Units.gridUnit * 4
 
         contentItem: ColumnLayout {
-            Layout.alignment: Qt.AlignCenter
+            anchors.fill: parent
+            
+            ColumnLayout {
+                Layout.alignment: Qt.AlignCenter
 
-            QQC2.Label {
-                text: progressDialog.label
-                Layout.alignment: Qt.AlignHCenter
-            }
-            QQC2.ProgressBar {
-                indeterminate: true
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
+                QQC2.Label {
+                    text: progressDialog.label
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                QQC2.ProgressBar {
+                    indeterminate: true
+                    Layout.fillWidth: true
+                    Layout.leftMargin: Kirigami.Units.gridUnit * 2
+                    Layout.rightMargin: Kirigami.Units.gridUnit * 2
+                    Layout.topMargin: Kirigami.Units.gridUnit * 1
+                    Layout.alignment: Qt.AlignHCenter
+                }
             }
         }
     }
@@ -80,11 +87,15 @@ Zynthian.SelectorPage {
         height: Kirigami.Units.gridUnit * 4
 
         contentItem: ColumnLayout {
-            Layout.alignment: Qt.AlignCenter
+            anchors.fill: parent
 
-            QQC2.Label {
-                text: errorDialog.label
-                Layout.alignment: Qt.AlignHCenter
+            ColumnLayout {
+                Layout.alignment: Qt.AlignCenter
+
+                QQC2.Label {
+                    text: errorDialog.label
+                    Layout.alignment: Qt.AlignHCenter
+                }
             }
         }
     }

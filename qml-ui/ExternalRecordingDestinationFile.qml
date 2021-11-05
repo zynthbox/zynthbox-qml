@@ -38,16 +38,43 @@ ColumnLayout {
         Layout.fillWidth: true
         text: qsTr("Save Recordings To A File");
     }
+    QQC2.Label {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        wrapMode: Text.Wrap
+        text: qsTr("Recordings from this module will be stored in the sounds/capture section of your data store. They will be given the name of the module, with a timestamp so you can tell your recordings apart by when you made them.")
+    }
+    QQC2.Label {
+        Layout.fillWidth: true
+        visible: zynthian.main.mostRecentRecordingFile != ""
+        wrapMode: Text.Wrap
+        text: qsTr("Your most recent recording is:\n%1").arg(zynthian.main.mostRecentRecordingFile)
+    }
+    RowLayout {
+        Layout.fillWidth: true
+        QQC2.Button {
+            Layout.fillWidth: true
+            visible: zynthian.main.mostRecentRecordingFile != ""
+            text: qsTr("Discard Recording")
+            onClicked: {
+                zynthian.main.discardMostRecentRecording();
+            }
+        }
+        QQC2.Button {
+            Layout.fillWidth: true
+            visible: zynthian.main.mostRecentRecordingFile != ""
+            text: zynthian.main.isPlaying ? qsTr("Stop Playback") : qsTr("Play Recording")
+            onClicked: {
+                if (zynthian.main.isPlaying) {
+                    zynthian.main.stopMostRecentRecordingPlayback();
+                } else {
+                    zynthian.main.playMostRecentRecording();
+                }
+            }
+        }
+    }
     Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        QQC2.Label {
-            anchors {
-                fill: parent
-                margins: Kirigami.Units.largeSpacing
-            }
-            wrapMode: Text.Wrap
-            text: qsTr("Recordings from this module will be stored in the sounds/capture section of your data store. They will be given the name of the module, with a timestamp so you can tell your recordings apart by when you made them.")
-        }
     }
 }

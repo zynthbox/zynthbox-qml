@@ -63,6 +63,7 @@ Window {
 
     Image {
         anchors.centerIn: parent
+        asynchronous: true
         source: Qt.resolvedUrl("../img/zynthian_gui_loading.gif")
         Component.onCompleted: {
             startupTimer.start();

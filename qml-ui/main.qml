@@ -33,17 +33,22 @@ Window {
     id: splashWindow
     visible: true
     color: "#000000"
+    flags: Qt.SplashScreen
+    x: 0
+    y: 0
+    width: Screen.width
+    height: Screen.height
 
     Timer {
         id: startupTimer
-        interval: 5000
+        interval: 1000
         repeat: false
         onTriggered: {
             var mainPageComponent = Qt.createComponent("MainPage.qml");
 
             if (mainPageComponent.status === Component.Ready) {
-                sprite = mainPageComponent.createObject(splashWindow, {visible: true});
-                if (sprite == null) {
+                var obj = mainPageComponent.createObject(splashWindow, {visible: true});
+                if (obj == null) {
                     // Error Handling
                     console.log("Error creating object");
                 } else {

@@ -44,10 +44,6 @@ ColumnLayout {
     property int itemHeight: layersView.height / 15
     spacing: Kirigami.Units.largeSpacing
 
-    Component.onCompleted: {
-        zynthian.zynthiloops.song.tracksModel.getTrack(7).connectedPattern = 2
-    }
-
     RowLayout {
         spacing: 0
 

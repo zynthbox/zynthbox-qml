@@ -41,7 +41,7 @@ Window {
 
     Timer {
         id: startupTimer
-        interval: 1
+        interval: 1000
         repeat: false
         onTriggered: {
             var mainPageComponent = Qt.createComponent("MainPage.qml");

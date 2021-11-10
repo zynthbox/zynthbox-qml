@@ -117,8 +117,8 @@ Zynthian.ScreenPage {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Session")
-                    page: Qt.resolvedUrl("SessionView.qml")
+                    text: qsTr("Tracks")
+                    page: Qt.resolvedUrl("TracksView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Sketches")
@@ -129,8 +129,8 @@ Zynthian.ScreenPage {
                     page: Qt.resolvedUrl("TemplatesView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Recording")
-                    page: Qt.resolvedUrl("RecordingView.qml")
+                    text: qsTr("Session")
+                    page: Qt.resolvedUrl("SessionView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Discover")

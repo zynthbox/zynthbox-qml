@@ -121,10 +121,12 @@ Zynthian.ScreenPage {
                     page: Qt.resolvedUrl("TracksView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
+                    // Sketches tab renamed to sessions
                     text: qsTr("Sessions")
                     page: Qt.resolvedUrl("SketchesView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
+                    // Sessions tab renamed to Wiring
                     text: qsTr("Wiring")
                     page: Qt.resolvedUrl("SessionView.qml")
                 },

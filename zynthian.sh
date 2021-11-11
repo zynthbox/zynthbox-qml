@@ -111,6 +111,9 @@ while true; do
 	#Load Config Environment
 	load_config_env
 
+	# Show a basic splash on the root
+	xloadimage -border black -onroot -center $ZYNTHIAN_UI_DIR/img/zynthian_gui_loading.gif
+
 	# Start Zynthian GUI & Synth Engine
 	export QT_QUICK_CONTROLS_MOBILE=1
 	export QT_QUICK_CONTROLS_STYLE=Zynthian-Plasma

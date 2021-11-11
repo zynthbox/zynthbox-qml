@@ -39,63 +39,55 @@ from . import zynthian_gui_selector
 
 class zynthian_gui_newstuff(zynthian_gui_selector):
 
-	def __init__(self, parent = None):
-		super(zynthian_gui_newstuff, self).__init__('Download', parent)
+    def __init__(self, parent = None):
+        super(zynthian_gui_newstuff, self).__init__('Download', parent)
 
-		self.audiofx_layer = None
-		self.audiofx_layers = None
-		self.newstuff_model_changed.connect(self.fill_list)
-		self.newstuff_model_data = None
+        self.audiofx_layer = None
+        self.audiofx_layers = None
+        self.newstuff_model_changed.connect(self.fill_list)
+        self.newstuff_model_data = None
 
+    def fill_list(self):
+        self.list_data=[]
+        if self.newstuff_model_data:
+            if self.newstuff_model_data.rowCount() > 0:
+                for index in range(self.newstuff_model_data.rowCount()):
+                    entry_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
+                    # 285 is StatusRole in NewStuff's model
+                    entry_status = 0 #int(self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285))
+                    # element 0 is action_id
+                    # element 1 is entry_index
+                    # element 2 is the display role
+                    self.list_data.append((entry_status,index,entry_name))
 
-	def fill_list(self):
-		self.list_data=[]
-		if self.newstuff_model_data:
-			if self.newstuff_model_data.rowCount() > 0:
-				for index in range(self.newstuff_model_data.rowCount()):
-					entry_name = self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0))
-					# 285 is StatusRole in NewStuff's model
-					entry_status = 0 #int(self.newstuff_model_data.data(self.newstuff_model_data.index(index, 0), 285))
-					# element 0 is action_id
-					# element 1 is entry_index
-					# element 2 is the display role
-					self.list_data.append((entry_status,index,entry_name))
+        super().fill_list()
 
-		super().fill_list()
+    def select_action(self, i, t='S'):
+        if i < 0 or i >= len(self.list_data):
+            return
 
+    def set_select_path(self):
+        self.select_path = "Download"
+        super().set_select_path()
 
-	def select_action(self, i, t='S'):
-		if i < 0 or i >= len(self.list_data):
-			return
+    def get_newstuff_model(self):
+        return self.newstuff_model_data
 
+    def background_model_deleted(self):
+        self.newstuff_model_data = None
+        self.newstuff_model_changed.emit()
 
-	def set_select_path(self):
-		self.select_path = "Download"
-		super().set_select_path()
+    def set_newstuff_model(self,new_model):
+        self.newstuff_model_data = new_model
+        self.newstuff_model_data.rowsInserted.connect(self.fill_list)
+        self.newstuff_model_data.rowsRemoved.connect(self.fill_list)
+        self.newstuff_model_data.dataChanged.connect(self.fill_list)
+        self.newstuff_model_data.modelReset.connect(self.fill_list)
+        self.newstuff_model_data.destroyed.connect(self.background_model_deleted)
+        self.newstuff_model_changed.emit()
 
+    newstuff_model_changed = Signal()
 
-	def get_newstuff_model(self):
-		return self.newstuff_model_data
-
-
-	def background_model_deleted(self):
-		self.newstuff_model_data = None
-		self.newstuff_model_changed.emit()
-		self.fill_list()
-
-	def set_newstuff_model(self,new_model):
-		self.newstuff_model_data = new_model
-		self.newstuff_model_data.rowsInserted.connect(self.fill_list)
-		self.newstuff_model_data.rowsRemoved.connect(self.fill_list)
-		self.newstuff_model_data.dataChanged.connect(self.fill_list)
-		self.newstuff_model_data.modelReset.connect(self.fill_list)
-		self.newstuff_model_data.destroyed.connect(self.background_model_deleted)
-		self.newstuff_model_changed.emit()
-		self.fill_list()
-
-
-	newstuff_model_changed = Signal()
-
-	newstuff_model = Property(QObject, get_newstuff_model, set_newstuff_model, notify = newstuff_model_changed)
+    newstuff_model = Property(QObject, get_newstuff_model, set_newstuff_model, notify = newstuff_model_changed)
 
 #------------------------------------------------------------------------------

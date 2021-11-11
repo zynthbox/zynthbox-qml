@@ -47,51 +47,6 @@ ColumnLayout {
     RowLayout {
         spacing: Kirigami.Units.gridUnit * 2
 
-//        ColumnLayout {
-//            id: tracksLayout
-//            Layout.fillWidth: true
-//            Layout.preferredWidth: 1
-//            spacing: 0
-//            Kirigami.Heading {
-//                level: 2
-//                text: qsTr("Tracks")
-//                MouseArea {
-//                    anchors.fill: parent
-//                    onClicked: zynthian.current_modal_screen_id = "zynthiloops"
-//                }
-//            }
-
-//            Repeater {
-//                model: zynthian.zynthiloops.song.tracksModel
-//                delegate: RowLayout {
-//                    id: delegate
-//                    property QtObject track: model.track
-//                    QQC2.Label {
-//                        text: (index+1) + "." + (visibleChildren.length > 1 ? model.display : "")
-//                    }
-//                    Repeater { //HACK
-//                        model: delegate.track.clipsModel
-//                        QQC2.Label {
-//                            text: model.display
-//                            visible: model.clip.path.length > 0
-//                            Rectangle {
-//                                anchors {
-//                                    fill: parent
-//                                    margins: -Kirigami.Units.smallSpacing
-//                                }
-//                                z: -1
-//                                color: Kirigami.Theme.highlightColor
-//                                visible: model.clip.inCurrentScene
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            Item {
-//                Layout.fillHeight: true
-//            }
-//        }
-
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -123,98 +78,22 @@ ColumnLayout {
                             Layout.preferredWidth: Kirigami.Units.gridUnit*4
                             Layout.alignment: Qt.AlignVCenter
                             text: model.display
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
-                            Layout.alignment: Qt.AlignVCenter
-                            color: Kirigami.Theme.buttonBackgroundColor
-                            radius: 4
+                        }                        
+                        Repeater {
+                            model: zynthian.zynthiloops.song.partsModel
+                            delegate: Rectangle {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
+                                Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                Layout.alignment: Qt.AlignVCenter
+                                color: Kirigami.Theme.buttonBackgroundColor
+                                radius: 4
 
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                text: "I"
-                            }
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
-                            Layout.alignment: Qt.AlignVCenter
-                            color: Kirigami.Theme.buttonBackgroundColor
-                            radius: 4
-
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                text: "II"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            radius: 4
-            color: Kirigami.Theme.backgroundColor
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Kirigami.Units.gridUnit*0.5
-
-                Repeater {
-                    model: zynthian.zynthiloops.song.tracksModel
-                    delegate: RowLayout {
-                        property QtObject track: model.track
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        spacing: 0
-                        visible: index >= 6
-
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                            Layout.alignment: Qt.AlignVCenter
-                            text: (index+1) + "."
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                            Layout.alignment: Qt.AlignVCenter
-                            text: model.display
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
-                            Layout.alignment: Qt.AlignVCenter
-                            color: Kirigami.Theme.buttonBackgroundColor
-                            radius: 4
-
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                text: "I"
-                            }
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
-                            Layout.alignment: Qt.AlignVCenter
-                            color: Kirigami.Theme.buttonBackgroundColor
-                            radius: 4
-
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                text: "II"
+                                QQC2.Label {
+                                    anchors.centerIn: parent
+                                    text: model.display
+                                }
                             }
                         }
                     }

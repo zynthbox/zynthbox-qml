@@ -121,16 +121,16 @@ Zynthian.ScreenPage {
                     page: Qt.resolvedUrl("TracksView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Sketches")
+                    text: qsTr("Sessions")
                     page: Qt.resolvedUrl("SketchesView.qml")
+                },
+                Zynthian.TabbedControlViewAction {
+                    text: qsTr("Wiring")
+                    page: Qt.resolvedUrl("SessionView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Templates")
                     page: Qt.resolvedUrl("TemplatesView.qml")
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Session")
-                    page: Qt.resolvedUrl("SessionView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Discover")

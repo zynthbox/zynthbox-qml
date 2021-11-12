@@ -2801,14 +2801,19 @@ if __name__ == "__main__":
     engine.addImportPath(os.fspath(Path(__file__).resolve().parent / "qml-ui"))
     engine.rootContext().setContextProperty("zynthian", zyngui)
 
-    engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
+    def load_qml():
+        engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 
-    if not engine.rootObjects() or not app.topLevelWindows():
-        sys.exit(-1)
+        if not engine.rootObjects() or not app.topLevelWindows():
+            sys.exit(-1)
 
-    # assuming there is one and only one window for now
-    zynthian_gui_config.top = app.topLevelWindows()[0]
-    zynthian_gui_config.app = app
+        # assuming there is one and only one window for now
+        zynthian_gui_config.top = app.topLevelWindows()[0]
+        zynthian_gui_config.app = app
+    
+    # Delay loading qml to let zyngui complete it's init sequence
+    # Without the delay, UI sometimes doest start when `systemctl restart zynthian` is ran
+    QTimer.singleShot(1000, load_qml)
 
     sys.exit(app.exec_())
 

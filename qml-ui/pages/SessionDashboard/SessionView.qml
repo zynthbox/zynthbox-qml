@@ -161,7 +161,7 @@ ColumnLayout {
                             if (model.track.connectedSound >= 0) {
                                 trackSoundConnections.addConnection(index, model.track.connectedSound);
                             } else {
-//                                trackSoundConnections.removeConnection()
+                                trackSoundConnections.removeConnection(index)
                             }
                         }
                     }]

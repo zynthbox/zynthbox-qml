@@ -105,6 +105,17 @@ Zynthian.ScreenPage {
             }
             Item {
                 Layout.fillWidth: true
+
+                RowLayout {
+                    anchors.centerIn: parent
+
+                    QQC2.Button {
+                        icon.name: "media-playback-start"
+                    }
+                    QQC2.Button {
+                        icon.name: "media-playback-stop"
+                    }
+                }
             }
             Kirigami.Heading {
                 id: clockLabel

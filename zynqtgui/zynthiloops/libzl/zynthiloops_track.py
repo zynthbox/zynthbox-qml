@@ -48,6 +48,11 @@ class zynthiloops_track(QObject):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
+        self.__connected_sound__ = -1
+
+        if self.__id__ < 5:
+            self.__connected_sound__ = self.__id__
+
         if self.__id__ > 5 and self.__id__ < 11:
             self.__connected_pattern__ = self.__id__ - 6
 
@@ -59,6 +64,7 @@ class zynthiloops_track(QObject):
         return {"name": self.__name__,
                 "volume": self.__volume__,
                 "connectedPattern": self.__connected_pattern__,
+                "connectedSound": self.__connected_sound__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -71,6 +77,9 @@ class zynthiloops_track(QObject):
         if "connectedPattern" in obj:
             self.__connected_pattern__ = obj["connectedPattern"]
             self.set_connected_pattern(self.__connected_pattern__)
+        if "connectedSound" in obj:
+            self.__connected_sound__ = obj["connectedSound"]
+            self.set_connected_sound(self.__connected_sound__)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -229,6 +238,17 @@ class zynthiloops_track(QObject):
     connected_pattern_changed = Signal()
     connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)
     ### END Property connectedPattern
+
+    ### Property connectedSound
+    def get_connected_sound(self):
+        return self.__connected_sound__
+    def set_connected_sound(self, sound):
+        self.__connected_sound__ = sound
+        self.__song__.schedule_save()
+        self.connected_sound_changed.emit()
+    connected_sound_changed = Signal()
+    connectedSound = Property(int, get_connected_sound, set_connected_sound, notify=connected_sound_changed)
+    ### END Property connectedSound
 
     # Helper method to map value from one range to another
     # @staticmethod

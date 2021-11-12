@@ -133,17 +133,38 @@ ColumnLayout {
                         for (var i in model.track) {
                             print(i+ " => " + model.track[i])
                         }
+                        if (index < 6 && model.track.connectedSound >= 0) {
+                            trackSoundConnections.addConnection(index, model.track.connectedSound);
+                        }
                         if (index >= 6 && model.track.connectedPattern >= 0) {
                             trackPatternConnections.addConnection(index, model.track.connectedPattern);
                         }
                     }
                     onRequestConnect: {
-                        if (child) {
-                            model.track.connectedPattern = child.row;
+                        if (index < 6) {
+                            if (child) {
+                                model.track.connectedSound = child.row;
+                            } else {
+                                model.track.connectedSound = -1;
+                            }
                         } else {
-                            model.track.connectedPattern = -1;
+                            if (child) {
+                                model.track.connectedPattern = child.row;
+                            } else {
+                                model.track.connectedPattern = -1;
+                            }
                         }
                     }
+                    data: [Connections {
+                        target: model.track
+                        onConnectedSoundChanged: {
+                            if (model.track.connectedSound >= 0) {
+                                trackSoundConnections.addConnection(index, model.track.connectedSound);
+                            } else {
+//                                trackSoundConnections.removeConnection()
+                            }
+                        }
+                    }]
                 }
             }
             Item {
@@ -311,13 +332,6 @@ ColumnLayout {
                 leftYOffset: soundsHeading.height
                 rightYOffset: soundsHeading.height - layersView.contentY
                 slotHeight: root.itemHeight
-                connections:[
-                    [0, 0],
-                    [1, 1],
-                    [2, 2],
-                    [3, 3],
-                    [4, 4],
-                ]
             }
 
             PatternConnections {

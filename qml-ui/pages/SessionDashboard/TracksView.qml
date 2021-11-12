@@ -73,12 +73,49 @@ ColumnLayout {
                             Layout.alignment: Qt.AlignVCenter
                             text: (index+1) + "."
                         }
-                        QQC2.Label {
+                        Rectangle {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                            Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                            Layout.rightMargin: Kirigami.Units.gridUnit
+                            Layout.alignment: Qt.AlignVCenter
+
+                            color: Kirigami.Theme.buttonBackgroundColor
+
+                            border.color: "#ff999999"
+                            border.width: 1
+                            radius: 4
+
+                            QQC2.Label {
+                                width: parent.width
+                                anchors.centerIn: parent
+                                anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+                                anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                                horizontalAlignment: Text.AlignHCenter
+                                text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : "-"
+                                elide: "ElideRight"
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    soundsDialog.track = track
+                                    soundsDialog.open()
+                                }
+                            }
+                        }
+                        Item {
                             Layout.fillWidth: false
                             Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                            Layout.alignment: Qt.AlignVCenter
-                            text: model.display
-                        }                        
+                            Layout.alignment: Qt.AlignHCenter
+
+                            QQC2.Label {
+                                anchors.centerIn: parent
+                                elide: "ElideRight"
+                                text: model.display
+                            }
+                        }
                         Repeater {
                             model: zynthian.zynthiloops.song.partsModel
                             delegate: Rectangle {
@@ -95,6 +132,69 @@ ColumnLayout {
                                     text: model.display
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    QQC2.Dialog {
+        property QtObject track;
+
+        id: soundsDialog
+        modal: true
+
+        x: root.parent.mapFromGlobal(0, 0).x
+        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
+        width: Screen.width - Kirigami.Units.gridUnit*2
+        height: Screen.height - Kirigami.Units.gridUnit*2
+
+        header: Kirigami.Heading {
+            text: qsTr("Pick a sound for %1").arg(soundsDialog.track.name)
+            font.pointSize: 16
+            padding: Kirigami.Units.gridUnit
+        }
+
+        footer: RowLayout {
+            QQC2.Button {
+                Layout.fillWidth: true
+                text: qsTr("Clear Selection")
+                onClicked: {
+                    soundsDialog.track.connectedSound = -1;
+                    soundsDialog.close();
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                text: qsTr("Close")
+                onClicked: soundsDialog.close();
+            }
+        }
+
+        contentItem: Item {
+            GridLayout {
+                rows: 3
+                columns: 5
+                rowSpacing: Kirigami.Units.gridUnit*0.5
+                columnSpacing: rowSpacing
+
+                anchors.fill: parent
+                anchors.leftMargin: Kirigami.Units.gridUnit
+                anchors.rightMargin: Kirigami.Units.gridUnit
+                anchors.bottomMargin: Kirigami.Units.gridUnit
+
+                Repeater {
+                    model: zynthian.fixed_layers.selector_list
+                    delegate: QQC2.Button {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
+                        Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
+                        text: model.display
+                        onClicked: {
+                            soundsDialog.track.connectedSound = index;
+                            soundsDialog.close();
                         }
                     }
                 }

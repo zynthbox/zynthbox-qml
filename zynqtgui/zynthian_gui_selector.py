@@ -139,6 +139,15 @@ class selector_list_model(QAbstractListModel):
 		else:
 			return None
 
+	@Slot(int, result=str)
+	def getDisplayValue(self, index):
+		try:
+			entry = self.entries[index]
+			return entry[2]
+		except Exception as e:
+			logging.error(f"Error while fetching display value : {str(e)}")
+			return "-"
+
 	count_changed = Signal()
 
 	count = Property(int, get_count, notify = count_changed)

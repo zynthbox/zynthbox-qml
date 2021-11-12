@@ -72,17 +72,23 @@ Zynthian.ScreenPage {
         onTriggered: {
             let d = new Date();
             clockLabel.text = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+            /* Remove session time as per #272
+               TODO : Remove below snippet
             let sessionSecs = zynthian.session_dashboard.get_session_time()
             let sessionMins = Math.floor(sessionSecs / 60);
             let sessionHours = Math.floor(sessionMins / 60);
             sessionMins = sessionMins % 60;
             sessionTimeLabel.text = pad(sessionHours) + ":" + pad(sessionMins);
+            */
         }
     }
 
     ColumnLayout {
         anchors.fill: parent
         RowLayout {
+            /* Remove session time as per #272
+               TODO : Remove below snippet
             QQC2.Label {
                 Layout.alignment: Qt.AlignCenter
                 text: "Session time:"
@@ -91,14 +97,14 @@ Zynthian.ScreenPage {
                 id: sessionTimeLabel
                 Layout.alignment: Qt.AlignCenter
             }
+            */
+            Kirigami.Heading {
+                id: sketchHeader
+                Layout.alignment: Qt.AlignCenter
+                text: zynthian.zynthiloops.song.name
+            }
             Item {
                 Layout.fillWidth: true
-                Kirigami.Heading {
-                    id: sketchHeader
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: root.Window.width/2 - parent.x - width/2
-                    text: zynthian.zynthiloops.song.name
-                }
             }
             Kirigami.Heading {
                 id: clockLabel

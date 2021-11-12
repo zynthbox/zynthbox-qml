@@ -73,6 +73,18 @@ ColumnLayout {
                             Layout.alignment: Qt.AlignVCenter
                             text: (index+1) + "."
                         }
+                        Item {
+                            Layout.fillWidth: false
+                            Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.rightMargin: Kirigami.Units.gridUnit
+
+                            QQC2.Label {
+                                anchors.centerIn: parent
+                                elide: "ElideRight"
+                                text: model.display
+                            }
+                        }
                         Rectangle {
                             Layout.fillWidth: false
                             Layout.fillHeight: false
@@ -103,17 +115,6 @@ ColumnLayout {
                                     soundsDialog.track = track
                                     soundsDialog.open()
                                 }
-                            }
-                        }
-                        Item {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                            Layout.alignment: Qt.AlignHCenter
-
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                elide: "ElideRight"
-                                text: model.display
                             }
                         }
                         Repeater {

@@ -159,6 +159,7 @@ ColumnLayout {
         footer: RowLayout {
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.preferredWidth: 1
                 text: qsTr("Clear Selection")
                 onClicked: {
                     soundsDialog.track.connectedSound = -1;
@@ -167,6 +168,7 @@ ColumnLayout {
             }
             QQC2.Button {
                 Layout.fillWidth: true
+                Layout.preferredWidth: 1
                 text: qsTr("Close")
                 onClicked: soundsDialog.close();
             }

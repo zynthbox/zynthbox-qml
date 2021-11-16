@@ -42,6 +42,7 @@ ColumnLayout {
     }
 
     property int itemHeight: layersView.height / 15
+    property QtObject selectedTrack
     spacing: Kirigami.Units.largeSpacing
 
     RowLayout {
@@ -56,82 +57,181 @@ ColumnLayout {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: Kirigami.Units.gridUnit*0.5
+                spacing: 0
 
                 Repeater {
                     model: zynthian.zynthiloops.song.tracksModel
-                    delegate: RowLayout {
+                    delegate: Rectangle {
                         property QtObject track: model.track
+                        property QtObject selectedClip: track.clipsModel.getClip(0)
+
+                        id: trackDelegate
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        spacing: 0
+
                         visible: index < 6
+                        border.width: root.selectedTrack === track ? 1 : 0
+                        border.color: Kirigami.Theme.highlightColor
+                        color: "transparent"
+                        radius: 4
 
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                            Layout.alignment: Qt.AlignVCenter
-                            text: (index+1) + "."
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.selectedTrack = track;
+                                zynthian.fixed_layers.activate_index(track.connectedSound);
+                            }
                         }
-                        Item {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.rightMargin: Kirigami.Units.gridUnit
+
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 0
 
                             QQC2.Label {
-                                anchors.centerIn: parent
-                                elide: "ElideRight"
-                                text: model.display
-                            }
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                            Layout.rightMargin: Kirigami.Units.gridUnit
-                            Layout.alignment: Qt.AlignVCenter
-
-                            color: Kirigami.Theme.buttonBackgroundColor
-
-                            border.color: "#ff999999"
-                            border.width: 1
-                            radius: 4
-
-                            QQC2.Label {
-                                width: parent.width
-                                anchors.centerIn: parent
-                                anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-                                anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                                horizontalAlignment: Text.AlignHCenter
-                                text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : "-"
-                                elide: "ElideRight"
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    soundsDialog.track = track
-                                    soundsDialog.open()
-                                }
-                            }
-                        }
-                        Repeater {
-                            model: zynthian.zynthiloops.song.partsModel
-                            delegate: Rectangle {
                                 Layout.fillWidth: false
-                                Layout.fillHeight: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                                Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                Layout.leftMargin: Kirigami.Units.gridUnit*0.5
                                 Layout.alignment: Qt.AlignVCenter
-                                color: Kirigami.Theme.buttonBackgroundColor
-                                radius: 4
+                                text: (index+1) + "."
+                            }
+                            Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 QQC2.Label {
                                     anchors.centerIn: parent
+                                    elide: "ElideRight"
                                     text: model.display
                                 }
+                            }
+                            Rectangle {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                                Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+                                Layout.alignment: Qt.AlignVCenter
+
+                                color: Kirigami.Theme.buttonBackgroundColor
+
+                                border.color: "#ff999999"
+                                border.width: 1
+                                radius: 4
+
+                                QQC2.Label {
+                                    width: parent.width
+                                    anchors.centerIn: parent
+                                    anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+                                    anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                                    horizontalAlignment: Text.AlignLeft
+                                    text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    elide: "ElideRight"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.selectedTrack = track;
+                                        soundsDialog.open();
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.alignment: Qt.AlignVCenter
+
+                                Repeater {
+                                    model: track.clipsModel
+                                    delegate: QQC2.RoundButton {
+                                        Layout.fillWidth: false
+                                        Layout.fillHeight: false
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                        Layout.alignment: Qt.AlignVCenter
+                                        radius: 4
+                                        highlighted: trackDelegate.selectedClip == model.clip
+
+                                        onClicked: {
+                                            root.selectedTrack = track;
+                                            trackDelegate.selectedClip = model.clip;
+                                        }
+
+                                        QQC2.Label {
+                                            anchors.centerIn: parent
+                                            text: model.clip.partName
+                                        }
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+
+                                QQC2.RoundButton {
+                                    width: Kirigami.Units.gridUnit*2
+                                    height: Kirigami.Units.gridUnit*2
+
+                                    anchors.centerIn: parent
+                                    enabled: root.selectedTrack === track
+                                    radius: 2
+
+                                    onClicked: {
+                                        if (!trackDelegate.selectedClip.isRecording) {
+                                            trackDelegate.selectedClip.queueRecording("internal", "");
+                                        } else {
+                                            trackDelegate.selectedClip.stopRecording();
+                                        }
+                                    }
+
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : "white"
+                                        opacity: root.selectedTrack === track ? 1 : 0.6
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+                                visible: false
+
+                                QQC2.RoundButton {
+                                    width: Kirigami.Units.gridUnit*2
+                                    height: Kirigami.Units.gridUnit*2
+
+                                    anchors.centerIn: parent
+                                    radius: 2
+
+                                    onClicked: {
+                                        clipFilePickerDialog.clip = trackDelegate.selectedClip;
+                                        clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clip.recordingDir;
+                                        clipFilePickerDialog.open();
+                                    }
+
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: "document-open"
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                             }
                         }
                     }
@@ -141,8 +241,6 @@ ColumnLayout {
     }
 
     QQC2.Dialog {
-        property QtObject track;
-
         id: soundsDialog
         modal: true
 
@@ -152,7 +250,7 @@ ColumnLayout {
         height: Screen.height - Kirigami.Units.gridUnit*2
 
         header: Kirigami.Heading {
-            text: qsTr("Pick a sound for %1").arg(soundsDialog.track.name)
+            text: qsTr("Pick a sound for %1").arg(root.selectedTrack.name)
             font.pointSize: 16
             padding: Kirigami.Units.gridUnit
         }
@@ -163,7 +261,7 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 text: qsTr("Clear Selection")
                 onClicked: {
-                    soundsDialog.track.connectedSound = -1;
+                    root.selectedTrack.connectedSound = -1;
                     soundsDialog.close();
                 }
             }
@@ -189,14 +287,17 @@ ColumnLayout {
 
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
-                    delegate: QQC2.Button {
+                    delegate: QQC2.RoundButton {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                         Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                         text: model.display
+                        highlighted: root.selectedTrack.connectedSound === index ? 1 : 0
+                        radius: 2
                         onClicked: {
-                            soundsDialog.track.connectedSound = index;
+                            root.selectedTrack.connectedSound = index;
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                             soundsDialog.close();
                         }
                     }
@@ -204,4 +305,26 @@ ColumnLayout {
             }
         }
     }
+
+//    Zynthian.FilePickerDialog {
+//        property QtObject clip
+
+//        id: clipFilePickerDialog
+
+//        x: root.parent.mapFromGlobal(0, 0).x
+//        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
+//        width: Screen.width - Kirigami.Units.gridUnit*2
+//        height: Screen.height - Kirigami.Units.gridUnit*2
+
+//        headerText: qsTr("%1 : Pick an audio file").arg(clip ? clip.trackName : "")
+//        rootFolder: "/zynthian/zynthian-my-data"
+//        folderModel {
+//            nameFilters: ["*.wav"]
+//        }
+//        onFileSelected: {
+//            if (clip) {
+//                clip.path = file.filePath
+//            }
+//        }
+//    }
 }

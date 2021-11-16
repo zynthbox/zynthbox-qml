@@ -63,7 +63,7 @@ def init():
             #
             # libzl.SyncTimer_stopPart.argtypes = [ctypes.c_int]
 
-            libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p]
+            libzl.ClipAudioSource_new.argtypes = [ctypes.c_char_p, ctypes.c_bool]
             libzl.ClipAudioSource_new.restype = ctypes.c_void_p
 
             libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
@@ -146,11 +146,11 @@ class ClipAudioSource(QObject):
     audioLevelChanged = Signal(float)
     progressChanged = Signal(float)
 
-    def __init__(self, zl_clip, filepath: bytes):
+    def __init__(self, zl_clip, filepath: bytes, muted=False):
         super(ClipAudioSource, self).__init__()
 
         if libzl:
-            self.obj = libzl.ClipAudioSource_new(filepath)
+            self.obj = libzl.ClipAudioSource_new(filepath, muted)
 
             if zl_clip is not None:
                 self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)

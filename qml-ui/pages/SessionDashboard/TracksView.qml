@@ -287,14 +287,17 @@ ColumnLayout {
 
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
-                    delegate: QQC2.Button {
+                    delegate: QQC2.RoundButton {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                         Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                         text: model.display
+                        highlighted: root.selectedTrack.connectedSound === index ? 1 : 0
+                        radius: 2
                         onClicked: {
                             root.selectedTrack.connectedSound = index;
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                             soundsDialog.close();
                         }
                     }

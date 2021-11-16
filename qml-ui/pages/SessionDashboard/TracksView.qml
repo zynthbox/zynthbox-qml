@@ -104,8 +104,8 @@ ColumnLayout {
                                 anchors.centerIn: parent
                                 anchors.leftMargin: Kirigami.Units.gridUnit*0.5
                                 anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                                horizontalAlignment: Text.AlignHCenter
-                                text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : "-"
+                                horizontalAlignment: track.connectedSound >= 0 ? Text.AlignLeft : Text.AlignHCenter
+                                text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : "-"
                                 elide: "ElideRight"
                             }
 

@@ -42,6 +42,7 @@ ColumnLayout {
     }
 
     property int itemHeight: layersView.height / 15
+    property QtObject selectedTrack
     spacing: Kirigami.Units.largeSpacing
 
     RowLayout {
@@ -56,82 +57,121 @@ ColumnLayout {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: Kirigami.Units.gridUnit*0.5
+                spacing: 0
 
                 Repeater {
                     model: zynthian.zynthiloops.song.tracksModel
-                    delegate: RowLayout {
+                    delegate: Rectangle {
                         property QtObject track: model.track
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        spacing: 0
+
                         visible: index < 6
+                        border.width: root.selectedTrack === track ? 1 : 0
+                        border.color: Kirigami.Theme.highlightColor
+                        color: "transparent"
+                        radius: 4
 
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                            Layout.alignment: Qt.AlignVCenter
-                            text: (index+1) + "."
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.selectedTrack = track;
+                            }
                         }
-                        Item {
-                            Layout.fillWidth: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.rightMargin: Kirigami.Units.gridUnit
+
+                        RowLayout {
+                            anchors.fill: parent
+                            spacing: 0
 
                             QQC2.Label {
-                                anchors.centerIn: parent
-                                elide: "ElideRight"
-                                text: model.display
-                            }
-                        }
-                        Rectangle {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                            Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                            Layout.rightMargin: Kirigami.Units.gridUnit
-                            Layout.alignment: Qt.AlignVCenter
-
-                            color: Kirigami.Theme.buttonBackgroundColor
-
-                            border.color: "#ff999999"
-                            border.width: 1
-                            radius: 4
-
-                            QQC2.Label {
-                                width: parent.width
-                                anchors.centerIn: parent
-                                anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-                                anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                                horizontalAlignment: track.connectedSound >= 0 ? Text.AlignLeft : Text.AlignHCenter
-                                text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : "-"
-                                elide: "ElideRight"
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    soundsDialog.track = track
-                                    soundsDialog.open()
-                                }
-                            }
-                        }
-                        Repeater {
-                            model: zynthian.zynthiloops.song.partsModel
-                            delegate: Rectangle {
                                 Layout.fillWidth: false
-                                Layout.fillHeight: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                                Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                Layout.leftMargin: Kirigami.Units.gridUnit*0.5
                                 Layout.alignment: Qt.AlignVCenter
-                                color: Kirigami.Theme.buttonBackgroundColor
-                                radius: 4
+                                text: (index+1) + "."
+                            }
+                            Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 QQC2.Label {
                                     anchors.centerIn: parent
+                                    elide: "ElideRight"
                                     text: model.display
                                 }
+                            }
+                            Rectangle {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                                Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+                                Layout.alignment: Qt.AlignVCenter
+
+                                color: Kirigami.Theme.buttonBackgroundColor
+
+                                border.color: "#ff999999"
+                                border.width: 1
+                                radius: 4
+
+                                QQC2.Label {
+                                    width: parent.width
+                                    anchors.centerIn: parent
+                                    anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+                                    anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                                    horizontalAlignment: Text.AlignLeft
+                                    text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    elide: "ElideRight"
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.selectedTrack = track;
+                                        soundsDialog.open();
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.alignment: Qt.AlignVCenter
+
+                                QQC2.ButtonGroup {
+                                    id: clipsGroup
+                                }
+
+                                Repeater {
+                                    model: zynthian.zynthiloops.song.partsModel
+                                    delegate: QQC2.RoundButton {
+                                        Layout.fillWidth: false
+                                        Layout.fillHeight: false
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                        Layout.alignment: Qt.AlignVCenter
+                                        radius: 4
+                                        checkable: true
+
+                                        QQC2.ButtonGroup.group: clipsGroup
+
+                                        onClicked: {
+                                            root.selectedTrack = track;
+                                            // TODO : Select Clip for recording and display additional info
+                                        }
+
+                                        QQC2.Label {
+                                            anchors.centerIn: parent
+                                            text: model.display
+                                        }
+                                    }
+                                }
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                             }
                         }
                     }
@@ -141,8 +181,6 @@ ColumnLayout {
     }
 
     QQC2.Dialog {
-        property QtObject track;
-
         id: soundsDialog
         modal: true
 
@@ -152,7 +190,7 @@ ColumnLayout {
         height: Screen.height - Kirigami.Units.gridUnit*2
 
         header: Kirigami.Heading {
-            text: qsTr("Pick a sound for %1").arg(soundsDialog.track.name)
+            text: qsTr("Pick a sound for %1").arg(root.selectedTrack.name)
             font.pointSize: 16
             padding: Kirigami.Units.gridUnit
         }
@@ -163,7 +201,7 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 text: qsTr("Clear Selection")
                 onClicked: {
-                    soundsDialog.track.connectedSound = -1;
+                    root.selectedTrack.connectedSound = -1;
                     soundsDialog.close();
                 }
             }
@@ -196,7 +234,7 @@ ColumnLayout {
                         Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                         text: model.display
                         onClicked: {
-                            soundsDialog.track.connectedSound = index;
+                            root.selectedTrack.connectedSound = index;
                             soundsDialog.close();
                         }
                     }

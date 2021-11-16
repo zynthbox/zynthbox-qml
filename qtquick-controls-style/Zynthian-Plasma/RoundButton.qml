@@ -55,7 +55,7 @@ T.RoundButton {
     }
 
     background: Rectangle {
-        color: control.checked ? Kirigami.Theme.highlightColor : theme.buttonBackgroundColor
+        color: control.checked || control.highlighted ? Kirigami.Theme.highlightColor : theme.buttonBackgroundColor
         radius: control.radius
         border {
             color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)

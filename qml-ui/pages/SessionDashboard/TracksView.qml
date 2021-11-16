@@ -201,6 +201,35 @@ ColumnLayout {
                                 }
                             }
                             Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+                                visible: false
+
+                                QQC2.RoundButton {
+                                    width: Kirigami.Units.gridUnit*2
+                                    height: Kirigami.Units.gridUnit*2
+
+                                    anchors.centerIn: parent
+                                    radius: 2
+
+                                    onClicked: {
+                                        clipFilePickerDialog.clip = trackDelegate.selectedClip;
+                                        clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clip.recordingDir;
+                                        clipFilePickerDialog.open();
+                                    }
+
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: "document-open"
+                                    }
+                                }
+                            }
+                            Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
@@ -273,4 +302,26 @@ ColumnLayout {
             }
         }
     }
+
+//    Zynthian.FilePickerDialog {
+//        property QtObject clip
+
+//        id: clipFilePickerDialog
+
+//        x: root.parent.mapFromGlobal(0, 0).x
+//        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
+//        width: Screen.width - Kirigami.Units.gridUnit*2
+//        height: Screen.height - Kirigami.Units.gridUnit*2
+
+//        headerText: qsTr("%1 : Pick an audio file").arg(clip ? clip.trackName : "")
+//        rootFolder: "/zynthian/zynthian-my-data"
+//        folderModel {
+//            nameFilters: ["*.wav"]
+//        }
+//        onFileSelected: {
+//            if (clip) {
+//                clip.path = file.filePath
+//            }
+//        }
+//    }
 }

@@ -80,6 +80,7 @@ ColumnLayout {
                             anchors.fill: parent
                             onClicked: {
                                 root.selectedTrack = track;
+                                zynthian.fixed_layers.activate_index(track.connectedSound);
                             }
                         }
 

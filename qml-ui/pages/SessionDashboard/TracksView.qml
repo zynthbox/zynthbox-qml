@@ -167,6 +167,39 @@ ColumnLayout {
                                 }
                             }
                             Item {
+                                Layout.fillWidth: false
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+
+                                QQC2.RoundButton {
+                                    width: Kirigami.Units.gridUnit*2
+                                    height: Kirigami.Units.gridUnit*2
+
+                                    anchors.centerIn: parent
+                                    enabled: root.selectedTrack === track
+                                    radius: 2
+
+                                    onClicked: {
+                                        if (!trackDelegate.selectedClip.isRecording) {
+                                            trackDelegate.selectedClip.queueRecording("internal", "");
+                                        } else {
+                                            trackDelegate.selectedClip.stopRecording();
+                                        }
+                                    }
+
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : "white"
+                                        opacity: root.selectedTrack === track ? 1 : 0.6
+                                    }
+                                }
+                            }
+                            Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }

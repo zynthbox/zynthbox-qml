@@ -63,6 +63,9 @@ ColumnLayout {
                     model: zynthian.zynthiloops.song.tracksModel
                     delegate: Rectangle {
                         property QtObject track: model.track
+                        property QtObject selectedClip: track.clipsModel.getClip(0)
+
+                        id: trackDelegate
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -140,12 +143,8 @@ ColumnLayout {
                                 Layout.fillHeight: false
                                 Layout.alignment: Qt.AlignVCenter
 
-                                QQC2.ButtonGroup {
-                                    id: clipsGroup
-                                }
-
                                 Repeater {
-                                    model: zynthian.zynthiloops.song.partsModel
+                                    model: track.clipsModel
                                     delegate: QQC2.RoundButton {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
@@ -153,18 +152,16 @@ ColumnLayout {
                                         Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
                                         Layout.alignment: Qt.AlignVCenter
                                         radius: 4
-                                        checkable: true
-
-                                        QQC2.ButtonGroup.group: clipsGroup
+                                        highlighted: trackDelegate.selectedClip == model.clip
 
                                         onClicked: {
                                             root.selectedTrack = track;
-                                            // TODO : Select Clip for recording and display additional info
+                                            trackDelegate.selectedClip = model.clip;
                                         }
 
                                         QQC2.Label {
                                             anchors.centerIn: parent
-                                            text: model.display
+                                            text: model.clip.partName
                                         }
                                     }
                                 }

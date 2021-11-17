@@ -29,6 +29,8 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import JuceGraphics 1.0
+
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
@@ -64,6 +66,7 @@ ColumnLayout {
                     delegate: Rectangle {
                         property QtObject track: model.track
                         property QtObject selectedClip: track.clipsModel.getClip(0)
+                        property bool hasWavLoaded: trackDelegate.selectedClip.path.length > 0
 
                         id: trackDelegate
 
@@ -167,20 +170,22 @@ ColumnLayout {
                                     }
                                 }
                             }
-                            Item {
+                            RowLayout {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*7
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.leftMargin: Kirigami.Units.gridUnit
                                 Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 QQC2.RoundButton {
-                                    width: Kirigami.Units.gridUnit*2
-                                    height: Kirigami.Units.gridUnit*2
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                                    anchors.centerIn: parent
                                     enabled: root.selectedTrack === track
                                     radius: 2
+                                    visible: !trackDelegate.hasWavLoaded
 
                                     onClicked: {
                                         if (!trackDelegate.selectedClip.isRecording) {
@@ -199,25 +204,18 @@ ColumnLayout {
                                         opacity: root.selectedTrack === track ? 1 : 0.6
                                     }
                                 }
-                            }
-                            Item {
-                                Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                                Layout.alignment: Qt.AlignHCenter
-                                Layout.leftMargin: Kirigami.Units.gridUnit
-                                Layout.rightMargin: Kirigami.Units.gridUnit
-                                visible: false
-
                                 QQC2.RoundButton {
-                                    width: Kirigami.Units.gridUnit*2
-                                    height: Kirigami.Units.gridUnit*2
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                                    anchors.centerIn: parent
                                     radius: 2
+                                    visible: !trackDelegate.hasWavLoaded
 
                                     onClicked: {
-                                        clipFilePickerDialog.clip = trackDelegate.selectedClip;
-                                        clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clip.recordingDir;
+                                        clipFilePickerDialog.clipObj = trackDelegate.selectedClip;
+                                        clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clipObj.recordingDir;
                                         clipFilePickerDialog.open();
                                     }
 
@@ -226,12 +224,68 @@ ColumnLayout {
                                         height: Kirigami.Units.gridUnit
                                         anchors.centerIn: parent
                                         source: "document-open"
+                                        color: "white"
+                                    }
+                                }
+                                QQC2.RoundButton {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+
+                                    radius: 2
+                                    visible: trackDelegate.hasWavLoaded
+
+                                    onClicked: {
+                                        trackDelegate.selectedClip.clear();
+                                    }
+
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: "edit-clear-all"
+                                        color: "white"
+                                    }
+                                }
+                                QQC2.RoundButton {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*3
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+
+                                    text: qsTr("Midi")
+                                    radius: 2
+                                    visible: !trackDelegate.hasWavLoaded
+
+                                    onClicked: {
+
                                     }
                                 }
                             }
-                            Item {
+                            Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
+                                Layout.topMargin: Kirigami.Units.gridUnit*0.3
+                                Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
+
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.backgroundColor : "transparent"
+                                border.color: "#99999999"
+                                border.width: trackDelegate.hasWavLoaded ? 1 : 0
+                                radius: 4
+
+                                WaveFormItem {
+                                    id: wav
+
+                                    anchors.fill: parent
+
+                                    color: Kirigami.Theme.textColor
+                                    source: trackDelegate.selectedClip.path
+                                    visible: trackDelegate.hasWavLoaded
+                                }
                             }
                         }
                     }
@@ -306,25 +360,25 @@ ColumnLayout {
         }
     }
 
-//    Zynthian.FilePickerDialog {
-//        property QtObject clip
+    Zynthian.FilePickerDialog {
+        property QtObject clipObj
 
-//        id: clipFilePickerDialog
+        id: clipFilePickerDialog
 
 //        x: root.parent.mapFromGlobal(0, 0).x
 //        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
 //        width: Screen.width - Kirigami.Units.gridUnit*2
 //        height: Screen.height - Kirigami.Units.gridUnit*2
 
-//        headerText: qsTr("%1 : Pick an audio file").arg(clip ? clip.trackName : "")
-//        rootFolder: "/zynthian/zynthian-my-data"
-//        folderModel {
-//            nameFilters: ["*.wav"]
-//        }
-//        onFileSelected: {
-//            if (clip) {
-//                clip.path = file.filePath
-//            }
-//        }
-//    }
+        headerText: qsTr("%1 : Pick an audio file").arg(clipObj ? clipObj.trackName : "")
+        rootFolder: "/zynthian/zynthian-my-data"
+        folderModel {
+            nameFilters: ["*.wav"]
+        }
+        onFileSelected: {
+            if (clipObj) {
+                clipObj.path = file.filePath
+            }
+        }
+    }
 }

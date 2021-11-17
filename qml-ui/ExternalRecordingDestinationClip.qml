@@ -34,20 +34,48 @@ ColumnLayout {
     anchors {
         fill: parent
     }
+    property QtObject selectedClip: tracksList.currentItem && tracksList.currentItem.selectedClip ? tracksList.currentItem.selectedClip : null
     Kirigami.Heading {
         Layout.fillWidth: true
         text: qsTr("Record Into A Clip");
     }
-    Item {
+    QQC2.Label {
+        Layout.fillWidth: true
+        wrapMode: Text.Wrap
+        text: qsTr("(not a thing yet - WIP) Recordings from this module will be stored as the contents of a clip selected by you here. Each time you hit record, the existing contents of the clip will be replaced by the new recording.")
+    }
+    ListView {
+        id: tracksList
         Layout.fillWidth: true
         Layout.fillHeight: true
-        QQC2.Label {
-            anchors {
-                fill: parent
-                margins: Kirigami.Units.largeSpacing
+        clip: true
+        model: zynthian.zynthiloops.song.tracksModel
+        delegate: QQC2.ItemDelegate {
+            width: ListView.view.width
+            property QtObject selectedClip: contentItem.selectedClip
+            contentItem: RowLayout {
+                id: delegate
+                property QtObject track: model.track
+                property QtObject selectedClip: null
+                property int thisIndex: index
+                QQC2.Label {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    text: "Track " + (index+1)
+                }
+                Repeater {
+                    model: delegate.track.clipsModel
+                    QQC2.Button {
+                        Layout.fillHeight: true
+                        text: model.display
+                        checked: ListView.isCurrentItem && delegate.selectedClip === model.clip
+                        onClicked: {
+                            delegate.selectedClip = model.clip;
+                            tracksList.currentIndex = delegate.thisIndex;
+                        }
+                    }
+                }
             }
-            wrapMode: Text.Wrap
-            text: qsTr("(not a thing yet - WIP) Recordings from this module will be stored as the contents of a clip selected by you here. Each time you hit record, the existing contents of the clip will be replaced by the new recording.")
         }
     }
 }

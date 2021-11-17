@@ -561,6 +561,7 @@ Zynthian.BasePlayGrid {
                                 id:patternsMenuItem
                                 property QtObject thisPattern: model.pattern
                                 property int thisPatternIndex: model.index
+                                property int bankIndex: thisPattern.bankOffset / 8;
                                 property int selectedLayer: model.layer
                                 property int activePattern: _private.activePattern
                                 Layout.fillHeight: true
@@ -599,12 +600,20 @@ Zynthian.BasePlayGrid {
                                                         }
                                                     }
                                                 }
-                                                Kirigami.Heading {
+                                                Image {
                                                     Layout.fillHeight: true
                                                     Layout.fillWidth: true
-                                                    text: model.name + (model.unsavedChanges === true ? " *" : "")
-                                                    level: 3
-                                                    horizontalAlignment: Text.AlignHCenter
+                                                    source: "image://pattern/Global/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified
+                                                    Kirigami.Heading {
+                                                        anchors {
+                                                            fill: parent
+                                                            margins: Kirigami.Units.smallSpacing
+                                                        }
+                                                        horizontalAlignment: Text.AlignRight
+                                                        verticalAlignment: Text.AlignBottom
+                                                        level: 3
+                                                        text: model.name + (model.unsavedChanges === true ? " *" : "")
+                                                    }
                                                 }
                                             }
 

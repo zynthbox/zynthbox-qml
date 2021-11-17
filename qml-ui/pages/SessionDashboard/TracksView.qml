@@ -105,9 +105,10 @@ ColumnLayout {
                                 Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 QQC2.Label {
+                                    width: parent.width
                                     anchors.centerIn: parent
                                     elide: "ElideRight"
-                                    text: model.display
+                                    text: track.name
                                 }
                             }
                             Rectangle {
@@ -220,8 +221,8 @@ ColumnLayout {
                                     }
 
                                     Kirigami.Icon {
-                                        width: Kirigami.Units.gridUnit
-                                        height: Kirigami.Units.gridUnit
+                                        width: Math.round(Kirigami.Units.gridUnit)
+                                        height: width
                                         anchors.centerIn: parent
                                         source: "document-open"
                                         color: "white"
@@ -241,8 +242,8 @@ ColumnLayout {
                                     }
 
                                     Kirigami.Icon {
-                                        width: Kirigami.Units.gridUnit
-                                        height: Kirigami.Units.gridUnit
+                                        width: Math.round(Kirigami.Units.gridUnit)
+                                        height: width
                                         anchors.centerIn: parent
                                         source: "edit-clear-all"
                                         color: "white"

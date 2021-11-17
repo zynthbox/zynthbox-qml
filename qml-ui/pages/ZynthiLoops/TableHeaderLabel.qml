@@ -16,6 +16,8 @@ ColumnLayout {
         id: label1
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
+        Layout.maximumWidth: parent.width
+        elide: "ElideRight"
         color: Kirigami.Theme.textColor
         font.pointSize: 12
     }
@@ -24,6 +26,8 @@ ColumnLayout {
         id: label2
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
+        Layout.maximumWidth: parent.width
+        elide: "ElideRight"
         color: Kirigami.Theme.textColor
         font.pointSize: 10
     }
@@ -32,6 +36,8 @@ ColumnLayout {
         id: label3
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
+        Layout.maximumWidth: parent.width
+        elide: "ElideRight"
         color: Kirigami.Theme.textColor
         font.pointSize: 10
     }

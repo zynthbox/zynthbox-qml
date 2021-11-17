@@ -269,6 +269,7 @@ ColumnLayout {
                                             trackDelegate.selectedClip.queueRecording("internal", "");
                                         } else {
                                             trackDelegate.selectedClip.stopRecording();
+                                            zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(trackDelegate.selectedClip);
                                         }
                                     }
 
@@ -360,11 +361,6 @@ ColumnLayout {
 
         id: clipFilePickerDialog
 
-//        x: root.parent.mapFromGlobal(0, 0).x
-//        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
-//        width: Screen.width - Kirigami.Units.gridUnit*2
-//        height: Screen.height - Kirigami.Units.gridUnit*2
-
         headerText: qsTr("%1 : Pick an audio file").arg(clipObj ? clipObj.trackName : "")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
@@ -373,6 +369,7 @@ ColumnLayout {
         onFileSelected: {
             if (clipObj) {
                 clipObj.path = file.filePath
+                zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(clipObj);
             }
         }
     }

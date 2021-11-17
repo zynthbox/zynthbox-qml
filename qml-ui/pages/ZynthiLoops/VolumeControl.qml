@@ -169,6 +169,8 @@ Rectangle {
         QQC2.Label {
             id: footerLabel
             Layout.alignment: Qt.AlignCenter
+            Layout.maximumWidth: parent.width
+            elide: "ElideRight"
         }
     }
 

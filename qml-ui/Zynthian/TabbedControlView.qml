@@ -269,8 +269,8 @@ Item {
         }
         onWidthChanged: {
             for (var i in pageCache) {
-                mainLayout.pageCache[i].width = width;
-                mainLayout.pageCache[i].height = height;
+                root.pageCache[i].width = width;
+                root.pageCache[i].height = height;
             }
         }
         FocusScope {

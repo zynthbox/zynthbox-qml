@@ -89,12 +89,13 @@ ColumnLayout {
 
                         RowLayout {
                             anchors.fill: parent
-                            spacing: 0
+                            anchors.leftMargin: Kirigami.Units.gridUnit
+                            anchors.rightMargin: Kirigami.Units.gridUnit
+                            spacing: Kirigami.Units.gridUnit
 
                             QQC2.Label {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                                Layout.leftMargin: Kirigami.Units.gridUnit*0.5
                                 Layout.alignment: Qt.AlignVCenter
                                 text: (index+1) + "."
                             }
@@ -102,7 +103,6 @@ ColumnLayout {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit*4
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 QQC2.Label {
                                     width: parent.width
@@ -116,7 +116,6 @@ ColumnLayout {
                                 Layout.fillHeight: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit*12
                                 Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                                Layout.rightMargin: Kirigami.Units.gridUnit
                                 Layout.alignment: Qt.AlignVCenter
 
                                 color: Kirigami.Theme.buttonBackgroundColor
@@ -171,40 +170,32 @@ ColumnLayout {
                                     }
                                 }
                             }
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                Layout.topMargin: Kirigami.Units.gridUnit*0.3
+                                Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
+
+                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.buttonBackgroundColor : "transparent"
+                                border.color: "#99999999"
+                                border.width: trackDelegate.hasWavLoaded ? 1 : 0
+                                radius: 4
+
+                                WaveFormItem {
+                                    id: wav
+
+                                    anchors.fill: parent
+
+                                    color: Kirigami.Theme.textColor
+                                    source: trackDelegate.selectedClip.path
+                                    visible: trackDelegate.hasWavLoaded
+                                }
+                            }
                             RowLayout {
                                 Layout.fillWidth: false
                                 Layout.preferredWidth: Kirigami.Units.gridUnit*7
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.leftMargin: Kirigami.Units.gridUnit
-                                Layout.rightMargin: Kirigami.Units.gridUnit
 
-                                QQC2.RoundButton {
-                                    Layout.fillWidth: false
-                                    Layout.fillHeight: false
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-
-                                    enabled: root.selectedTrack === track
-                                    radius: 2
-                                    visible: !trackDelegate.hasWavLoaded
-
-                                    onClicked: {
-                                        if (!trackDelegate.selectedClip.isRecording) {
-                                            trackDelegate.selectedClip.queueRecording("internal", "");
-                                        } else {
-                                            trackDelegate.selectedClip.stopRecording();
-                                        }
-                                    }
-
-                                    Kirigami.Icon {
-                                        width: Kirigami.Units.gridUnit
-                                        height: Kirigami.Units.gridUnit
-                                        anchors.centerIn: parent
-                                        source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : "white"
-                                        opacity: root.selectedTrack === track ? 1 : 0.6
-                                    }
-                                }
                                 QQC2.RoundButton {
                                     Layout.fillWidth: false
                                     Layout.fillHeight: false
@@ -262,29 +253,33 @@ ColumnLayout {
                                     onClicked: {
 
                                     }
-                                }
-                            }
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                Layout.leftMargin: Kirigami.Units.gridUnit
-                                Layout.rightMargin: Kirigami.Units.gridUnit
-                                Layout.topMargin: Kirigami.Units.gridUnit*0.3
-                                Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
+                                }                                
+                                QQC2.RoundButton {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.buttonBackgroundColor : "transparent"
-                                border.color: "#99999999"
-                                border.width: trackDelegate.hasWavLoaded ? 1 : 0
-                                radius: 4
+                                    enabled: root.selectedTrack === track
+                                    radius: 2
+                                    visible: !trackDelegate.hasWavLoaded
 
-                                WaveFormItem {
-                                    id: wav
+                                    onClicked: {
+                                        if (!trackDelegate.selectedClip.isRecording) {
+                                            trackDelegate.selectedClip.queueRecording("internal", "");
+                                        } else {
+                                            trackDelegate.selectedClip.stopRecording();
+                                        }
+                                    }
 
-                                    anchors.fill: parent
-
-                                    color: Kirigami.Theme.textColor
-                                    source: trackDelegate.selectedClip.path
-                                    visible: trackDelegate.hasWavLoaded
+                                    Kirigami.Icon {
+                                        width: Kirigami.Units.gridUnit
+                                        height: Kirigami.Units.gridUnit
+                                        anchors.centerIn: parent
+                                        source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : "white"
+                                        opacity: root.selectedTrack === track ? 1 : 0.6
+                                    }
                                 }
                             }
                         }

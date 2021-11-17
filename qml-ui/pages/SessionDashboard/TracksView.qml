@@ -189,6 +189,17 @@ ColumnLayout {
                                     color: Kirigami.Theme.textColor
                                     source: trackDelegate.selectedClip.path
                                     visible: trackDelegate.hasWavLoaded
+
+                                    Rectangle { // Progress
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        visible: trackDelegate.selectedClip.isPlaying
+                                        color: Kirigami.Theme.highlightColor
+                                        width: Kirigami.Units.smallSpacing
+                                        x: trackDelegate.selectedClip.progress/trackDelegate.selectedClip.duration * parent.width
+                                    }
                                 }
                             }
                             RowLayout {

@@ -67,6 +67,7 @@ ColumnLayout {
                         property QtObject track: model.track
                         property QtObject selectedClip: track.clipsModel.getClip(0)
                         property bool hasWavLoaded: trackDelegate.selectedClip.path.length > 0
+                        property bool trackHasConnectedPattern: track.connectedPattern >= 0
 
                         id: trackDelegate
 
@@ -95,13 +96,13 @@ ColumnLayout {
 
                             QQC2.Label {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*1
                                 Layout.alignment: Qt.AlignVCenter
                                 text: (index+1) + "."
                             }
                             Item {
                                 Layout.fillWidth: false
-                                Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                                Layout.preferredWidth: Kirigami.Units.gridUnit*3
                                 Layout.alignment: Qt.AlignHCenter
 
                                 QQC2.Label {
@@ -161,6 +162,9 @@ ColumnLayout {
                                         onClicked: {
                                             root.selectedTrack = track;
                                             trackDelegate.selectedClip = model.clip;
+
+                                            // TODO : Find a way to select/deselect clip to/from scene
+                                            zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
                                         }
 
                                         QQC2.Label {
@@ -176,9 +180,9 @@ ColumnLayout {
                                 Layout.topMargin: Kirigami.Units.gridUnit*0.3
                                 Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
 
-                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.buttonBackgroundColor : "transparent"
+                                color: Kirigami.Theme.buttonBackgroundColor
                                 border.color: "#99999999"
-                                border.width: trackDelegate.hasWavLoaded ? 1 : 0
+                                border.width: 1
                                 radius: 4
 
                                 WaveFormItem {
@@ -188,7 +192,15 @@ ColumnLayout {
 
                                     color: Kirigami.Theme.textColor
                                     source: trackDelegate.selectedClip.path
-                                    visible: trackDelegate.hasWavLoaded
+                                    visible: !trackDelegate.trackHasConnectedPattern && trackDelegate.hasWavLoaded
+
+                                    Rectangle {
+                                        x: 0
+                                        y: parent.height/2 - height/2
+                                        width: parent.width
+                                        height: 1
+                                        color: Kirigami.Theme.textColor
+                                    }
 
                                     Rectangle { // Progress
                                         anchors {
@@ -200,6 +212,21 @@ ColumnLayout {
                                         width: Kirigami.Units.smallSpacing
                                         x: trackDelegate.selectedClip.progress/trackDelegate.selectedClip.duration * parent.width
                                     }
+                                }
+
+                                QQC2.Label {
+                                    anchors.centerIn: parent
+                                    visible: trackDelegate.trackHasConnectedPattern
+                                    text: qsTr("Pattern %1").arg(track.connectedPattern+1)
+                                }
+
+                                QQC2.Label {
+                                    anchors.centerIn: parent
+                                    visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+                                    text: qsTr("Select a wav or pattern")
+                                    font.italic: true
+                                    font.pointSize: 9
+                                    color: "#88ffffff"
                                 }
                             }
                             RowLayout {
@@ -214,7 +241,7 @@ ColumnLayout {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
                                     radius: 2
-                                    visible: !trackDelegate.hasWavLoaded
+                                    visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
                                         clipFilePickerDialog.clipObj = trackDelegate.selectedClip;
@@ -227,7 +254,7 @@ ColumnLayout {
                                         height: width
                                         anchors.centerIn: parent
                                         source: "document-open"
-                                        color: "white"
+                                        color: Kirigami.Theme.textColor
                                     }
                                 }
                                 QQC2.RoundButton {
@@ -237,10 +264,14 @@ ColumnLayout {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
                                     radius: 2
-                                    visible: trackDelegate.hasWavLoaded
+                                    visible: trackDelegate.hasWavLoaded || trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
-                                        trackDelegate.selectedClip.clear();
+                                        if (trackDelegate.trackHasConnectedPattern) {
+                                            track.connectedPattern = -1;
+                                        } else {
+                                            trackDelegate.selectedClip.clear();
+                                        }
                                     }
 
                                     Kirigami.Icon {
@@ -248,7 +279,7 @@ ColumnLayout {
                                         height: width
                                         anchors.centerIn: parent
                                         source: "edit-clear-all"
-                                        color: "white"
+                                        color: Kirigami.Theme.textColor
                                     }
                                 }
                                 QQC2.RoundButton {
@@ -259,12 +290,14 @@ ColumnLayout {
 
                                     text: qsTr("Midi")
                                     radius: 2
-                                    visible: !trackDelegate.hasWavLoaded
+                                    visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
-
+                                        playgridPickerPopup.trackObj = track;
+                                        playgridPickerPopup.clipObj = trackDelegate.selectedClip;
+                                        playgridPickerPopup.open();
                                     }
-                                }                                
+                                }
                                 QQC2.RoundButton {
                                     Layout.fillWidth: false
                                     Layout.fillHeight: false
@@ -273,7 +306,7 @@ ColumnLayout {
 
                                     enabled: root.selectedTrack === track
                                     radius: 2
-                                    visible: !trackDelegate.hasWavLoaded
+                                    visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
                                         if (!trackDelegate.selectedClip.isRecording) {
@@ -289,7 +322,7 @@ ColumnLayout {
                                         height: Kirigami.Units.gridUnit
                                         anchors.centerIn: parent
                                         source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : "white"
+                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : Kirigami.Theme.textColor
                                         opacity: root.selectedTrack === track ? 1 : 0.6
                                     }
                                 }
@@ -381,6 +414,57 @@ ColumnLayout {
             if (clipObj) {
                 clipObj.path = file.filePath
                 zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(clipObj);
+            }
+        }
+    }
+
+    QQC2.Popup {
+        property QtObject trackObj
+        property QtObject clipObj
+
+        id: playgridPickerPopup
+        x: root.parent.mapFromGlobal(Math.round(Screen.width/2 - width/2), 0).x
+        y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
+        width: Kirigami.Units.gridUnit*12
+        height: Kirigami.Units.gridUnit*12
+        modal: true
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            Repeater {
+                id: patternsViewMainRepeater
+                model: Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                delegate: Repeater {
+                    id: patternsViewPlaygridRepeater
+                    model: ZynQuick.PlayGridManager.dashboardModels[modelData]
+                    property string playgridId: modelData
+
+                    QQC2.Button {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*5
+                        Layout.alignment: Qt.AlignCenter
+                        text: model.text
+
+                        onClicked: {
+                            if (playgridPickerPopup.trackObj) {
+                                playgridPickerPopup.trackObj.clipsModel.getClip(0).clear();
+                                playgridPickerPopup.trackObj.clipsModel.getClip(1).clear();
+                                playgridPickerPopup.trackObj.connectedPattern = index;
+                                playgridPickerPopup.close();
+
+                                if (playgridPickerPopup.clipObj) {
+                                    zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(playgridPickerPopup.clipObj);
+                                } else {
+                                    console.log("Error setting clip to scene")
+                                }
+                            } else {
+                                console.log("Error connecting pattern to track")
+                            }
+                        }
+                    }
+                }
             }
         }
     }

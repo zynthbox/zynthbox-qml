@@ -110,10 +110,35 @@ Zynthian.ScreenPage {
                     anchors.centerIn: parent
 
                     QQC2.Button {
-                        icon.name: "media-playback-start"
+                        enabled: !zynthian.zynthiloops.isMetronomeRunning
+                        onClicked: {
+                            zynthian.zynthiloops.startPlayback();
+                        }
+
+                        Kirigami.Icon {
+                            width: Kirigami.Units.gridUnit
+                            height: width
+                            anchors.centerIn: parent
+                            source: "media-playback-start"
+                            color: parent.enabled ? "white" : "#99999999"
+                        }
                     }
                     QQC2.Button {
-                        icon.name: "media-playback-stop"
+                        enabled: zynthian.zynthiloops.isMetronomeRunning
+                        onClicked: {
+                            zynthian.zynthiloops.stopAllPlayback();
+                            zynthian.playgrid.stopMetronomeRequest();
+                            zynthian.song_arranger.stop();
+                            zynthian.zynthiloops.resetMetronome();
+                        }
+
+                        Kirigami.Icon {
+                            width: Kirigami.Units.gridUnit
+                            height: width
+                            anchors.centerIn: parent
+                            source: "media-playback-stop"
+                            color: parent.enabled ? "white" : "#99999999"
+                        }
                     }
                 }
             }

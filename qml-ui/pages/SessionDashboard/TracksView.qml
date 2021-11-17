@@ -271,8 +271,7 @@ ColumnLayout {
                                 Layout.topMargin: Kirigami.Units.gridUnit*0.3
                                 Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
 
-                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.backgroundColor : "transparent"
+                                color: trackDelegate.hasWavLoaded ? Kirigami.Theme.buttonBackgroundColor : "transparent"
                                 border.color: "#99999999"
                                 border.width: trackDelegate.hasWavLoaded ? 1 : 0
                                 radius: 4

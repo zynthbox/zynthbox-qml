@@ -38,9 +38,6 @@ from PySide2.QtCore import (
 from . import zynthian_qt_gui_base
 from .zynthiloops import zynthian_gui_zynthiloops
 
-sys.path.insert(1, "./zynthiloops/libzl")
-from .zynthiloops.libzl import libzl
-
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     __zynquick_pgmanager__ = None
@@ -69,10 +66,6 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
             zynthian_gui_playgrid.__zynquick_pgmanager__ = thing
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStart.connect(self.startMetronomeRequest)
             zynthian_gui_playgrid.__zynquick_pgmanager__.requestMetronomeStop.connect(self.stopMetronomeRequest)
-
-            # These two should only be the second option... Please, someone fix this, i have no idea what is wrong.
-            zynthian_gui_playgrid.__zynquick_pgmanager__.setSyncTimerObj(libzl.getSyncTimerInstance())
-            #zynthian_gui_playgrid.__zynquick_pgmanager__.syncTimer = libzl.getSyncTimerInstance()
 
             self.__zynquick_pgmanager_changed__.emit()
 

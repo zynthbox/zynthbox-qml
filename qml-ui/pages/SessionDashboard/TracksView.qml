@@ -373,6 +373,10 @@ ColumnLayout {
                 text: qsTr("Clear Selection")
                 onClicked: {
                     root.selectedTrack.connectedSound = -1;
+                    if (root.selectedTrack.connectedPattern >= 0) {
+                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                        seq.midiChannel = root.selectedTrack.connectedSound;
+                    }
                     soundsDialog.close();
                 }
             }

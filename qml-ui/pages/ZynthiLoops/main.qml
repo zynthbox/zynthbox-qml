@@ -127,20 +127,9 @@ Zynthian.ScreenPage {
             text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
             onTriggered: {
                 if (zynthian.zynthiloops.isMetronomeRunning) {
-                    zynthian.zynthiloops.stopAllPlayback();
-                    zynthian.playgrid.stopMetronomeRequest();
-                    zynthian.song_arranger.stop();
-                    zynthian.zynthiloops.resetMetronome();
-
-                    /*ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
-                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(0);
-                    seq.enabled = false;*/
+                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
                 } else {
-                    zynthian.zynthiloops.startPlayback();
-                    /*var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(0);
-                    seq.bankOffset = seq.bankLength*1;
-                    seq.enabled = true;
-                    ZynQuick.PlayGridManager.getSequenceModel("Global").startSequencePlayback();*/
+                    Zynthian.CommonUtils.startMetronomeAndPlayback();
                 }
             }
         },

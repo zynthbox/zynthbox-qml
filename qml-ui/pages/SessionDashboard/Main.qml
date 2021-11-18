@@ -113,8 +113,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         enabled: !zynthian.zynthiloops.isMetronomeRunning
                         onClicked: {
-                            zynthian.zynthiloops.startPlayback();
-                            ZynQuick.PlayGridManager.getSequenceModel("Global").startSequencePlayback();
+                            Zynthian.CommonUtils.startMetronomeAndPlayback();
                         }
 
                         Kirigami.Icon {
@@ -128,11 +127,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         enabled: zynthian.zynthiloops.isMetronomeRunning
                         onClicked: {
-                            zynthian.zynthiloops.stopAllPlayback();
-                            zynthian.playgrid.stopMetronomeRequest();
-                            zynthian.song_arranger.stop();
-                            zynthian.zynthiloops.resetMetronome();
-                            ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
+                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
                         }
 
                         Kirigami.Icon {

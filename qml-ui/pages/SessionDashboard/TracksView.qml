@@ -388,7 +388,7 @@ ColumnLayout {
             GridLayout {
                 rows: 3
                 columns: 5
-                rowSpacing: Kirigami.Units.gridUnit*0.5
+                rowSpacing: Kirigami.Units.gridUnit*2.5
                 columnSpacing: rowSpacing
 
                 anchors.fill: parent
@@ -399,6 +399,10 @@ ColumnLayout {
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RoundButton {
+                        id: delegateBtn
+
+                        property bool layerMidiCloned: model.metadata.midi_cloned
+
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
@@ -416,6 +420,28 @@ ColumnLayout {
 
                             zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                             soundsDialog.close();
+                        }
+
+                        Kirigami.Icon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.right
+                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                            width: Kirigami.Units.gridUnit*1.5
+                            height: width
+
+                            source: "link"
+                            color: Kirigami.Theme.textColor
+                            visible: (index+1)%5 !== 0
+                            opacity: delegateBtn.layerMidiCloned ? 1 : 0.4
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    console.log("Toggle layer chaining")
+                                    Zynthian.CommonUtils.toggleLayerChaining(model);
+                                }
+                            }
                         }
                     }
                 }

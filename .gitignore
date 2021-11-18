@@ -5,6 +5,7 @@ jackpeak/build
 zynseq/build
 zynlibs/*/build
 *.qmlc
+*.jsc
 *.pyproject.user
 *.pyproject.user*
 .idea

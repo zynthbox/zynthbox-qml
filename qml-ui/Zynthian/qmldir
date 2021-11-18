@@ -33,3 +33,4 @@ FilePickerDialog 1.0 FilePickerDialog.qml
 SaveFileDialog 1.0 SaveFileDialog.qml
 TableHeader 1.0 TableHeader.qml
 TableHeaderLabel 1.0 TableHeaderLabel.qml
+CommonUtils 1.0 CommonUtils.js

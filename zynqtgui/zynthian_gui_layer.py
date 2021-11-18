@@ -1853,6 +1853,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
 		self.zyngui.screens['main_layers_view'].fill_list()
+		self.zyngui.screens['fixed_layers'].fill_list()
 
 	@Slot(int, int)
 	def remove_clone_midi(self, from_chan: int, to_chan: int):
@@ -1860,6 +1861,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
 		self.zyngui.screens['main_layers_view'].fill_list()
+		self.zyngui.screens['fixed_layers'].fill_list()
 
 	@Slot(None)
 	def ensure_contiguous_cloned_layers(self):

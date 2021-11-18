@@ -408,6 +408,12 @@ ColumnLayout {
                         radius: 2
                         onClicked: {
                             root.selectedTrack.connectedSound = index;
+
+                            if (root.selectedTrack.connectedPattern >= 0) {
+                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                                seq.midiChannel = root.selectedTrack.connectedSound;
+                            }
+
                             zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                             soundsDialog.close();
                         }
@@ -469,6 +475,10 @@ ColumnLayout {
                                 playgridPickerPopup.trackObj.clipsModel.getClip(0).clear();
                                 playgridPickerPopup.trackObj.clipsModel.getClip(1).clear();
                                 playgridPickerPopup.trackObj.connectedPattern = index;
+
+                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                                seq.midiChannel = playgridPickerPopup.trackObj.connectedSound;
+
                                 playgridPickerPopup.close();
 
                                 if (playgridPickerPopup.clipObj) {

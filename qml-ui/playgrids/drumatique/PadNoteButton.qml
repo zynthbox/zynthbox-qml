@@ -149,7 +149,7 @@ QQC2.Button {
                 margins: 1
             }
             height:9
-            color: ZynQuick.PlayGridManager.metronomeActive && component.patternModel.playingRow === component.activeBar && component.patternModel.playingColumn === component.padNoteIndex
+            color: component.patternModel.sequence.isPlaying && component.patternModel.playingRow === component.activeBar && component.patternModel.playingColumn === component.padNoteIndex
                 ? "yellow"
                 : component.backgroundColor
         }

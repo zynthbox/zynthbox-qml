@@ -29,6 +29,7 @@ import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import org.zynthian.quick 1.0 as ZynQuick
 import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
@@ -113,6 +114,7 @@ Zynthian.ScreenPage {
                         enabled: !zynthian.zynthiloops.isMetronomeRunning
                         onClicked: {
                             zynthian.zynthiloops.startPlayback();
+                            ZynQuick.PlayGridManager.getSequenceModel("Global").startSequencePlayback();
                         }
 
                         Kirigami.Icon {
@@ -130,6 +132,7 @@ Zynthian.ScreenPage {
                             zynthian.playgrid.stopMetronomeRequest();
                             zynthian.song_arranger.stop();
                             zynthian.zynthiloops.resetMetronome();
+                            ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
                         }
 
                         Kirigami.Icon {

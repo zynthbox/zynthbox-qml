@@ -175,6 +175,13 @@ ColumnLayout {
 
                                             // TODO : Find a way to select/deselect clip to/from scene
                                             zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
+                                            if (track.connectedPattern >= 0) {
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                                seq.bankOffset = seq.bankLength*model.clip.col;
+                                                seq.enabled = true;
+
+                                                console.log("Clip Row :", model.clip.col, ", Enabled :", seq.enabled);
+                                            }
                                         }
 
                                         QQC2.Label {
@@ -466,6 +473,7 @@ ColumnLayout {
 
                                 if (playgridPickerPopup.clipObj) {
                                     zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(playgridPickerPopup.clipObj);
+                                    // TODO enable/disble pattern
                                 } else {
                                     console.log("Error setting clip to scene")
                                 }

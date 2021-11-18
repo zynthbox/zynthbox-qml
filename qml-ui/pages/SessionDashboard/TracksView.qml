@@ -399,10 +399,6 @@ ColumnLayout {
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RoundButton {
-                        id: delegateBtn
-
-                        property bool layerMidiCloned: model.metadata.midi_cloned
-
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
@@ -433,7 +429,7 @@ ColumnLayout {
                             source: "link"
                             color: Kirigami.Theme.textColor
                             visible: (index+1)%5 !== 0
-                            opacity: delegateBtn.layerMidiCloned ? 1 : 0.4
+                            opacity: model.metadata.midi_cloned ? 1 : 0.4
 
                             MouseArea {
                                 anchors.fill: parent

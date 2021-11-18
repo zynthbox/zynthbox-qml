@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import Zynthian 1.0 as Zynthian
 
 MouseArea {
     id: root
@@ -396,10 +397,7 @@ MouseArea {
                 Layout.preferredWidth: 1
                 text: qsTr("Stop Playback")
                 onClicked: {
-                    zynthian.zynthiloops.stopAllPlayback();
-                    zynthian.playgrid.stopMetronomeRequest();
-                    zynthian.song_arranger.stop();
-                    zynthian.zynthiloops.resetMetronome();
+                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
                 }
             }
         }

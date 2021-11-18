@@ -127,6 +127,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def fill_list(self):
+        logging.error("Fixed Layers : Filling list")
+
         self.list_data=[]
         self.list_metadata=[]
 
@@ -193,6 +195,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
             metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
             self.list_metadata.append(metadata)
+
+            logging.error(f"Channel : {i}, Cloned: {metadata['midi_cloned']}")
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()

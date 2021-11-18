@@ -80,11 +80,21 @@ ColumnLayout {
                         color: "transparent"
                         radius: 4
 
+                        // Switch the sound layer after a short interval to allow UI to populate first
+                        Timer {
+                            id: switchLayerTimer
+                            interval: 10
+                            repeat: false
+                            onTriggered: {
+                                zynthian.fixed_layers.activate_index(track.connectedSound);
+                            }
+                        }
+
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
                                 root.selectedTrack = track;
-                                zynthian.fixed_layers.activate_index(track.connectedSound);
+                                switchLayerTimer.start();
                             }
                         }
 

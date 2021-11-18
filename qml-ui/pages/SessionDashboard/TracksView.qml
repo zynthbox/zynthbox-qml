@@ -411,16 +411,6 @@ ColumnLayout {
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RoundButton {
-                        property var myMetadata: model.metadata
-                        property bool layerIsCloned: myMetadata.midi_cloned
-
-                        onMyMetadataChanged: {
-                            console.log("My metadata changed");
-                        }
-                        onLayerIsClonedChanged: {
-                            console.log("Layer is cloned changed to :", layerIsCloned);
-                        }
-
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
@@ -451,13 +441,14 @@ ColumnLayout {
                             source: "link"
                             color: Kirigami.Theme.textColor
                             visible: (index+1)%5 !== 0
-                            opacity: layerIsCloned ? 1 : 0.4
+                            opacity: model.metadata.midi_cloned ? 1 : 0.4
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
                                     console.log("Toggle layer chaining")
                                     Zynthian.CommonUtils.toggleLayerChaining(model);
+                                    zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                                 }
                             }
                         }

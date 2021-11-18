@@ -200,6 +200,18 @@ ColumnLayout {
                                 border.width: 1
                                 radius: 4
 
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (trackDelegate.trackHasConnectedPattern) {
+                                            zynthian.current_modal_screen_id = "playgrid";
+                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                                            sequence.activePattern = track.connectedPattern;
+                                        }
+                                    }
+                                }
+
                                 WaveFormItem {
                                     anchors.fill: parent
 

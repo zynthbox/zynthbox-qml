@@ -440,7 +440,7 @@ ColumnLayout {
 
                             source: "link"
                             color: Kirigami.Theme.textColor
-                            visible: (index+1)%5 !== 0
+                            visible: (index+1)%5 !== 0 && (index < 5 || index > 9)
                             opacity: model.metadata.midi_cloned ? 1 : 0.4
 
                             MouseArea {

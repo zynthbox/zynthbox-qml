@@ -472,12 +472,14 @@ Zynthian.ScreenPage {
                                         bottomBar.controlType = BottomBar.ControlType.Clip;
                                         bottomBar.controlObj = model.clip;
                                         if (dblTimer.running || sceneActionBtn.checked) {
-                                            /*if (model.clip.isPlaying) {
-                                                model.clip.stop();
-                                            } else {
-                                                model.clip.play();
-                                            }*/
                                             root.song.scenesModel.toggleClipInCurrentScene(model.clip);
+
+                                            if (track.connectedPattern >= 0) {
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                                seq.enabled = model.clip.inCurrentScene;
+
+                                                console.log("Clip Row :", model.clip.row, ", Enabled :", seq.enabled);
+                                            }
                                         }
                                         dblTimer.restart()
 

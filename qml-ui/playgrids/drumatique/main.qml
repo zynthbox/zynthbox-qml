@@ -604,6 +604,17 @@ Zynthian.BasePlayGrid {
                                                     Layout.fillHeight: true
                                                     Layout.fillWidth: true
                                                     source: "image://pattern/Global/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified
+                                                    Rectangle {
+                                                        anchors {
+                                                            top: parent.top
+                                                            bottom: parent.bottom
+                                                        }
+                                                        visible: _private.sequence.isPlaying && patternsMenuItem.thisPattern.enabled
+                                                        color: Kirigami.Theme.highlightColor
+                                                        width: widthFactor
+                                                        property double widthFactor: parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength)
+                                                        x: patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor
+                                                    }
                                                     Kirigami.Heading {
                                                         anchors {
                                                             fill: parent
@@ -611,7 +622,7 @@ Zynthian.BasePlayGrid {
                                                         }
                                                         horizontalAlignment: Text.AlignRight
                                                         verticalAlignment: Text.AlignBottom
-                                                        level: 3
+                                                        level: 4
                                                         text: model.name + (model.unsavedChanges === true ? " *" : "")
                                                     }
                                                 }
@@ -755,14 +766,14 @@ Zynthian.BasePlayGrid {
             Zynthian.PlayGridButton {
                 id:playPauseBtn
                 property var timeOnPressed
-                text: ZynQuick.PlayGridManager.metronomeActive ? "Pause" : "Play"
+                text: _private.sequence.isPlaying ? "Pause" : "Play"
                 onPressed: {
                     hideAllMenus();
                     playPauseBtn.timeOnPressed = new Date();
                 }
                 onReleased: {
                     // pause
-                    if (ZynQuick.PlayGridManager.metronomeActive === true){
+                    if (_private.sequence.isPlaying) {
                         _private.sequence.stopSequencePlayback();
                     }
                     // play

@@ -547,8 +547,15 @@ ColumnLayout {
         x: root.parent.mapFromGlobal(Math.round(Screen.width/2 - width/2), 0).x
         y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
         width: Kirigami.Units.gridUnit*12
-        height: Kirigami.Units.gridUnit*12
         modal: true
+
+        onVisibleChanged: {
+            if (visible) {
+                patternsViewMainRepeater.model = Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+            } else {
+                patternsViewMainRepeater.model = []
+            }
+        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -563,10 +570,12 @@ ColumnLayout {
 
                     QQC2.Button {
                         Layout.fillWidth: false
-                        Layout.fillHeight: true
+                        Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*5
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*3
                         Layout.alignment: Qt.AlignCenter
                         text: model.text
+                        visible: !zynthian.zynthiloops.song.tracksModel.checkIfPatternAlreadyConnected(index)
 
                         onClicked: {
                             if (playgridPickerPopup.trackObj) {

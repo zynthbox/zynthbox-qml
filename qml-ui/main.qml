@@ -70,7 +70,10 @@ Kirigami.AbstractApplicationWindow {
                 id: homeButton
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.zynthiloops.song.name + " Scene " + zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name
+                text: qsTr("%1 Scene %2 Track %3")
+                        .arg(zynthian.zynthiloops.song.name)
+                        .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                        .arg(zynthian.session_dashboard.selectedTrack+1)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {zynthian.current_screen_id = 'session_dashboard'

@@ -97,14 +97,20 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     ### Property selectedTrack
     def get_selected_track(self):
         return self.__selected_track__
-    def set_selected_track(self, track):
+    def set_selected_track(self, track, force_set=False):
         def change_to_track_sound():
-            self.zyngui.screens["fixed_layers"].activate_index(self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound)
+            connectedSound = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound
 
-        self.__selected_track__ = track
-        self.selected_track_changed.emit()
-        self.schedule_save()
-        QTimer.singleShot(10, change_to_track_sound)
+            if connectedSound >= 0:
+                self.zyngui.screens["fixed_layers"].activate_index(connectedSound)
+            else:
+                self.zyngui.screens["fixed_layers"].activate_index(track)
+
+        if self.__selected_track__ != track or force_set is True:
+            self.__selected_track__ = track
+            self.selected_track_changed.emit()
+            self.schedule_save()
+            QTimer.singleShot(10, change_to_track_sound)
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack
@@ -178,7 +184,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.__id__ = session["id"]
                 self.id_changed.emit()
             if "selectedTrack" in session:
-                self.__selected_track__ = session["selectedTrack"]
+                self.set_selected_track(session["selectedTrack"], True)
                 self.selected_track_changed.emit()
             if "sketches" in session:
                 self.__session_sketches_model__.deserialize(session["sketches"])

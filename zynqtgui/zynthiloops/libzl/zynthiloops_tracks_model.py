@@ -125,3 +125,18 @@ class zynthiloops_tracks_model(QAbstractListModel):
                 clip.set_row_index(index)
 
         self.__song__.schedule_save()
+
+    @Slot(int, result=bool)
+    def checkIfPatternAlreadyConnected(self, patternIndex):
+        already_connected = False
+
+        for i in range(0, self.count):
+            track = self.getTrack(i)
+
+            if track.connectedPattern == patternIndex:
+                already_connected = True
+                break
+
+        logging.error(f"Pattern {patternIndex} already connected: {already_connected}")
+
+        return already_connected

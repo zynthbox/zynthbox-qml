@@ -98,15 +98,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def get_selected_track(self):
         return self.__selected_track__
     def set_selected_track(self, track):
-        parent = self
-
         def change_to_track_sound():
-            parent.zyngui.screens["fixed_layers"].activate_index(parent.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound)
+            self.zyngui.screens["fixed_layers"].activate_index(self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound)
 
         self.__selected_track__ = track
         self.selected_track_changed.emit()
         self.schedule_save()
-        QTimer.singleShot(100, change_to_track_sound)
+        QTimer.singleShot(10, change_to_track_sound)
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack

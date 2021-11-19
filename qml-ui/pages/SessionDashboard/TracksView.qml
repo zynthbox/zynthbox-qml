@@ -443,11 +443,11 @@ ColumnLayout {
                                 )
                             } else if (model.metadata.isChainedToConnectedSound) {
                                 return Qt.rgba(
-                                            Kirigami.Theme.highlightColor.r,
-                                            Kirigami.Theme.highlightColor.g,
-                                            Kirigami.Theme.highlightColor.b,
-                                            0.3
-                                       )
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    0.3
+                               )
                             } else {
                                 return Qt.rgba(
                                     Kirigami.Theme.highlightColor.r,

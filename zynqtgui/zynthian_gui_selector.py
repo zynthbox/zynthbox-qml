@@ -148,6 +148,10 @@ class selector_list_model(QAbstractListModel):
 			logging.error(f"Error while fetching display value : {str(e)}")
 			return "-"
 
+	@Slot(int, result='QVariantMap')
+	def getMetadataByIndex(self, index):
+		return self.get_metadata(self.index(index, 0), None)
+
 	count_changed = Signal()
 
 	count = Property(int, get_count, notify = count_changed)

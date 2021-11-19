@@ -265,6 +265,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         if t=='B' and chan in self.zyngui.screens['layer'].layer_midi_map:
             self.zyngui.screens['layer'].layer_options()
 
+        self.fill_list()
+
 
     @Signal
     def start_midi_chan_changed(self):

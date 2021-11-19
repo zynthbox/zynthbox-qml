@@ -250,7 +250,10 @@ ColumnLayout {
                                         anchors.fill: parent
                                         horizontalAlignment: Text.AlignRight
                                         verticalAlignment: Text.AlignBottom
-                                        text: patternVisualiser.pattern ? patternVisualiser.pattern.objectName : ""
+                                        text: qsTr("Pattern %1%2 (%3)")
+                                                .arg(track.connectedPattern+1)
+                                                .arg(ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern).bank)
+                                                .arg(ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern).availableBars)
                                     }
                                 }
 

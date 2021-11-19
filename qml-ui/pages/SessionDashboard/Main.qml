@@ -34,10 +34,58 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
+
+    readonly property QtObject song: zynthian.zynthiloops.song
+
     backAction: null
     contextualActions: [
         Kirigami.Action {
-            enabled: false
+            text: qsTr("Sketch")
+
+            Kirigami.Action {
+                // Rename Save button as Save as for temp sketch
+                text: root.song.isTemp ? qsTr("Save As") : qsTr("Save")
+                onTriggered: {
+                    if (root.song.isTemp) {
+                        fileNameDialog.dialogType = "save";
+                        fileNameDialog.fileName = "Sketch-1";
+                        fileNameDialog.open();
+                    } else {
+                        zynthian.zynthiloops.saveSketch();
+                    }
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Save As")
+                visible: !root.song.isTemp
+                onTriggered: {
+                    fileNameDialog.dialogType = "saveas";
+                    fileNameDialog.fileName = song.name;
+                    fileNameDialog.open();
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Clone As")
+                visible: !root.song.isTemp
+                onTriggered: {
+                    fileNameDialog.dialogType = "savecopy";
+                    fileNameDialog.fileName = song.sketchFolderName;
+                    fileNameDialog.open();
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("Load Sketch")
+                onTriggered: {
+                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
+                    sketchPickerDialog.open();
+                }
+            }
+            Kirigami.Action {
+                text: qsTr("New Sketch")
+                onTriggered: {
+                    zynthian.zynthiloops.newSketch()
+                }
+            }
         },
         Kirigami.Action {
             enabled: false
@@ -62,6 +110,86 @@ Zynthian.ScreenPage {
         }
     ]
     screenId: "session_dashboard"
+
+    Zynthian.SaveFileDialog {
+        property string dialogType: "save"
+
+        id: fileNameDialog
+        visible: false
+
+        headerText: {
+            if (fileNameDialog.dialogType == "savecopy")
+                return qsTr("Clone Sketch")
+            else if (fileNameDialog.dialogType === "saveas")
+                return qsTr("New version")
+            else
+                return qsTr("New Sketch")
+        }
+        conflictText: {
+            if (dialogType == "savecopy")
+                return qsTr("Sketch Exists")
+            else if (dialogType == "saveas")
+                return qsTr("Version Exists")
+            else
+                return qsTr("Exists")
+        }
+        overwriteOnConflict: false
+
+        onFileNameChanged: {
+            console.log("File Name : " + fileName)
+            fileCheckTimer.restart()
+        }
+        Timer {
+            id: fileCheckTimer
+            interval: 300
+            onTriggered: {
+                if (fileNameDialog.dialogType == "savecopy"
+                    && fileNameDialog.fileName.length > 0
+                    && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                    // Sketch with name already exists
+                    fileNameDialog.conflict = true;
+                } else if (fileNameDialog.dialogType === "saveas"
+                           && fileNameDialog.fileName.length > 0
+                           && zynthian.zynthiloops.versionExists(fileNameDialog.fileName)) {
+                    fileNameDialog.conflict = true;
+                } else {
+                    fileNameDialog.conflict = false;
+                }
+            }
+        }
+
+        onAccepted: {
+            console.log("Accepted")
+
+            if (dialogType === "save") {
+                zynthian.zynthiloops.createSketch(fileNameDialog.fileName)
+            } else if (dialogType === "saveas") {
+                root.song.name = fileNameDialog.fileName;
+                zynthian.zynthiloops.saveSketch();
+            } else if (dialogType === "savecopy") {
+                zynthian.zynthiloops.saveCopy(fileNameDialog.fileName);
+            }
+        }
+        onRejected: {
+            console.log("Rejected")
+        }
+    }
+
+    Zynthian.FilePickerDialog {
+        id: sketchPickerDialog
+        parent: root
+
+        headerText: qsTr("Pick a sketch")
+        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        folderModel {
+            nameFilters: ["*.json"]
+        }
+        onFileSelected: {
+            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
+            zynthian.zynthiloops.loadSketch(file.filePath)
+        }
+    }
+
     Timer {
         interval: 10 * 1000
         running: true

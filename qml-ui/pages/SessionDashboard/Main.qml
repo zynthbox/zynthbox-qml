@@ -111,6 +111,8 @@ Zynthian.ScreenPage {
                     anchors.centerIn: parent
 
                     QQC2.Button {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         enabled: !zynthian.zynthiloops.isMetronomeRunning
                         onClicked: {
                             Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -125,6 +127,8 @@ Zynthian.ScreenPage {
                         }
                     }
                     QQC2.Button {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         enabled: zynthian.zynthiloops.isMetronomeRunning
                         onClicked: {
                             Zynthian.CommonUtils.stopMetronomeAndPlayback();

@@ -228,10 +228,30 @@ ColumnLayout {
                                     }
                                 }
 
-                                QQC2.Label {
-                                    anchors.centerIn: parent
+                                Image {
+                                    id: patternVisualiser
+                                    anchors.fill: parent
                                     visible: trackDelegate.trackHasConnectedPattern
-                                    text: qsTr("Pattern %1").arg(track.connectedPattern+1)
+                                    property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                    source: pattern ? "image://pattern/Global/" + track.connectedPattern + "/" + (pattern.bankOffset / 8) + "?" + pattern.lastModified : ""
+                                    Rectangle { // Progress
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        visible: patternVisualiser.sequence.isPlaying && patternVisualiser.pattern.enabled
+                                        color: Kirigami.Theme.highlightColor
+                                        width: widthFactor // this way the progress rect is the same width as a step
+                                        property double widthFactor: parent.width / (patternVisualiser.pattern.width * patternVisualiser.pattern.bankLength)
+                                        x: patternVisualiser.pattern.bankPlaybackPosition * widthFactor
+                                    }
+                                    QQC2.Label {
+                                        anchors.fill: parent
+                                        horizontalAlignment: Text.AlignRight
+                                        verticalAlignment: Text.AlignBottom
+                                        text: patternVisualiser.pattern ? patternVisualiser.pattern.objectName : ""
+                                    }
                                 }
 
                                 QQC2.Label {

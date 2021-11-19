@@ -420,38 +420,7 @@ ColumnLayout {
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RoundButton {
-//                        property bool isChained: {
-//                            // TODO : Bind to midi_cloned property
-
-//                            if (index >= 5 && index <= 9 &&
-//                                root.selectedTrack.connectedSound >=5 && root.selectedTrack.connectedSound <= 9) {
-//                                // Highlight set to true for all 6.X slots if any one is selected as all are chained by default
-//                                return true;
-//                            } else {
-//                                // Highlight only if current slot is chained to connected sound
-//                                var connected = false;
-
-//                                for (var i=index; i<root.selectedTrack.connectedSound; i++) {
-//                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
-//                                        connected = true;
-//                                    } else {
-//                                        connected = false;
-//                                        break;
-//                                    }
-//                                }
-
-//                                for (var i=root.selectedTrack.connectedSound; i<index; i++) {
-//                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
-//                                        connected = true;
-//                                    } else {
-//                                        connected = false;
-//                                        break;
-//                                    }
-//                                }
-
-//                                return connected;
-//                            }
-//                        }
+                        property int layerIndex: index
 
                         Kirigami.Theme.highlightColor: {
                             if (root.selectedTrack.connectedSound === index) {
@@ -495,6 +464,29 @@ ColumnLayout {
 
                             zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                             soundsDialog.close();
+                        }
+
+                        QQC2.Label {
+                            anchors.left: parent.left
+                            anchors.top: parent.top
+                            anchors.margins: Kirigami.Units.gridUnit*0.5
+                            font.pointSize: 10
+                            text: index >= 5 && index <= 9 ? ("6." + (index%5 + 1)) : (index + 1)
+                        }
+
+                        RowLayout {
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.margins: Kirigami.Units.gridUnit*0.5
+
+                            Repeater {
+                                model: zynthian.zynthiloops.song.tracksModel
+                                delegate: QQC2.Label {
+                                    font.pointSize: 10
+                                    text: model.track.name
+                                    visible: model.track.connectedSound === layerIndex
+                                }
+                            }
                         }
 
                         Kirigami.Icon {

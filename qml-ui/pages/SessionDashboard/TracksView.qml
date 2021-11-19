@@ -416,8 +416,42 @@ ColumnLayout {
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                         Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                         text: model.display
-                        highlighted: root.selectedTrack.connectedSound === index ? 1 : 0
-                        radius: 2
+                        radius: 4
+                        highlighted: {
+                            // TODO : Bind to midi_cloned property
+
+                            if (root.selectedTrack.connectedSound === index) {
+                                // Highlight set to true if current slot is connected sound
+                                return true
+                            } else if (index >= 5 && index <= 9 &&
+                                       root.selectedTrack.connectedSound >=5 && root.selectedTrack.connectedSound <= 9) {
+                                // Highlight set to true for all 6.X slots if any one is selected as all are chained by default
+                                return true;
+                            } else {
+                                // Highlight only if current slot is chained to connected sound
+                                var connected = false;
+
+                                for (var i=index; i<root.selectedTrack.connectedSound; i++) {
+                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
+                                        connected = true;
+                                    } else {
+                                        connected = false;
+                                        break;
+                                    }
+                                }
+
+                                for (var i=root.selectedTrack.connectedSound; i<index; i++) {
+                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
+                                        connected = true;
+                                    } else {
+                                        connected = false;
+                                        break;
+                                    }
+                                }
+
+                                return connected;
+                            }
+                        }
                         onClicked: {
                             root.selectedTrack.connectedSound = index;
 
@@ -449,7 +483,6 @@ ColumnLayout {
                                     if (!(index >= 5 && index <= 9)) {
                                         console.log("Toggle layer chaining")
                                         Zynthian.CommonUtils.toggleLayerChaining(model);
-                                        zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
                                     }
                                 }
                             }

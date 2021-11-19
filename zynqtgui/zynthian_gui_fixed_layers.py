@@ -127,8 +127,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
 
     def fill_list(self):
-        logging.error("Fixed Layers : Filling list")
-
         self.list_data=[]
         self.list_metadata=[]
 
@@ -194,9 +192,44 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
             metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
             metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
+            metadata["isChainedToConnectedSound"] = False
+
+            selectedTrackIndex = self.zyngui.screens["session_dashboard"].selectedTrack
+            selectedTrack = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(selectedTrackIndex)
+
+            logging.error(f"Evaluating isChainedToConnectedSound for index {i}")
+            logging.error(f"Test 1 : 5 <= `{i}` <= 9 and 5 <= `{selectedTrack.connectedSound}` <= 9")
+
+            if 5 <= i <= 9 and 5 <= selectedTrack.connectedSound <= 9:
+                metadata["isChainedToConnectedSound"] = True
+            else:
+                # Highlight only if current slot is chained to connected sound var
+                connected = False
+
+                logging.error(f"Loop 1 : range({i}, {selectedTrack.connectedSound})")
+                for j in range(i, selectedTrack.connectedSound):
+                    logging.error(
+                        f"is_midi_cloned({j}, {j + 1}): {self.zyngui.screens['layer'].is_midi_cloned(j, j + 1)}")
+                    if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
+                        connected = True
+                    else:
+                        connected = False
+                        break
+
+                logging.error(f"Loop 2 : range({selectedTrack.connectedSound}, {i})")
+                for j in range(selectedTrack.connectedSound, i):
+                    logging.error(
+                        f"is_midi_cloned({j}, {j + 1}): {self.zyngui.screens['layer'].is_midi_cloned(j, j + 1)}")
+                    if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
+                        connected = True
+                    else:
+                        connected = False
+                        break
+
+                metadata["isChainedToConnectedSound"] = connected
+
             self.list_metadata.append(metadata)
 
-            logging.error(f"Channel : {i}, Cloned: {metadata['midi_cloned']}")
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()

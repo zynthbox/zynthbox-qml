@@ -440,15 +440,17 @@ ColumnLayout {
 
                             source: "link"
                             color: Kirigami.Theme.textColor
-                            visible: (index+1)%5 !== 0 && (index < 5 || index > 9)
-                            opacity: model.metadata.midi_cloned ? 1 : 0.4
+                            visible: (index+1)%5 !== 0
+                            opacity: model.metadata.midi_cloned || (index >= 5 && index <= 9)? 1 : 0.4
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    console.log("Toggle layer chaining")
-                                    Zynthian.CommonUtils.toggleLayerChaining(model);
-                                    zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
+                                    if (!(index >= 5 && index <= 9)) {
+                                        console.log("Toggle layer chaining")
+                                        Zynthian.CommonUtils.toggleLayerChaining(model);
+                                        zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
+                                    }
                                 }
                             }
                         }

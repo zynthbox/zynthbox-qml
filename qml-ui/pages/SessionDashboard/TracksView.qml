@@ -400,47 +400,71 @@ ColumnLayout {
                 Repeater {
                     model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RoundButton {
+//                        property bool isChained: {
+//                            // TODO : Bind to midi_cloned property
+
+//                            if (index >= 5 && index <= 9 &&
+//                                root.selectedTrack.connectedSound >=5 && root.selectedTrack.connectedSound <= 9) {
+//                                // Highlight set to true for all 6.X slots if any one is selected as all are chained by default
+//                                return true;
+//                            } else {
+//                                // Highlight only if current slot is chained to connected sound
+//                                var connected = false;
+
+//                                for (var i=index; i<root.selectedTrack.connectedSound; i++) {
+//                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
+//                                        connected = true;
+//                                    } else {
+//                                        connected = false;
+//                                        break;
+//                                    }
+//                                }
+
+//                                for (var i=root.selectedTrack.connectedSound; i<index; i++) {
+//                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
+//                                        connected = true;
+//                                    } else {
+//                                        connected = false;
+//                                        break;
+//                                    }
+//                                }
+
+//                                return connected;
+//                            }
+//                        }
+
+                        Kirigami.Theme.highlightColor: {
+                            if (root.selectedTrack.connectedSound === index) {
+                                return Qt.rgba(
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    1
+                                )
+                            } else if (model.metadata.isChainedToConnectedSound) {
+                                return Qt.rgba(
+                                            Kirigami.Theme.highlightColor.r,
+                                            Kirigami.Theme.highlightColor.g,
+                                            Kirigami.Theme.highlightColor.b,
+                                            0.3
+                                       )
+                            } else {
+                                return Qt.rgba(
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    1
+                                )
+                            }
+                        }
+
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                         Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                         text: model.display
                         radius: 4
-                        highlighted: {
-                            // TODO : Bind to midi_cloned property
-
-                            if (root.selectedTrack.connectedSound === index) {
-                                // Highlight set to true if current slot is connected sound
-                                return true
-                            } else if (index >= 5 && index <= 9 &&
-                                       root.selectedTrack.connectedSound >=5 && root.selectedTrack.connectedSound <= 9) {
-                                // Highlight set to true for all 6.X slots if any one is selected as all are chained by default
-                                return true;
-                            } else {
-                                // Highlight only if current slot is chained to connected sound
-                                var connected = false;
-
-                                for (var i=index; i<root.selectedTrack.connectedSound; i++) {
-                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
-                                        connected = true;
-                                    } else {
-                                        connected = false;
-                                        break;
-                                    }
-                                }
-
-                                for (var i=root.selectedTrack.connectedSound; i<index; i++) {
-                                    if (zynthian.fixed_layers.selector_list.getMetadataByIndex(i)["midi_cloned"]) {
-                                        connected = true;
-                                    } else {
-                                        connected = false;
-                                        break;
-                                    }
-                                }
-
-                                return connected;
-                            }
-                        }
+                        highlighted: root.selectedTrack.connectedSound === index || model.metadata.isChainedToConnectedSound
                         onClicked: {
                             root.selectedTrack.connectedSound = index;
 

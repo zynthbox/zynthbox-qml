@@ -278,14 +278,7 @@ Zynthian.ScreenPage {
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
                     function toggleCloned() {
-                        if (model.metadata.midi_cloned) {
-                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
-                            zynthian.layer.remove_clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
-                        } else {
-                            zynthian.layer.clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
-                            zynthian.layer.clone_midi(model.metadata.midi_channel + 1, model.metadata.midi_channel);
-                        }
-                        zynthian.layer.ensure_contiguous_cloned_layers();
+                        Zynthian.CommonUtils.toggleLayerChaining(model);
                     }
                     contentItem: ColumnLayout {
                         RowLayout {

@@ -43,8 +43,8 @@ ColumnLayout {
         leftMargin: Kirigami.Units.gridUnit
     }
 
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property int itemHeight: layersView.height / 15
-    property QtObject selectedTrack
     spacing: Kirigami.Units.largeSpacing
 
     RowLayout {
@@ -65,6 +65,7 @@ ColumnLayout {
                     model: zynthian.zynthiloops.song.tracksModel
                     delegate: Rectangle {
                         property QtObject track: model.track
+                        property int trackIndex: index
                         property QtObject selectedClip: track.clipsModel.getClip(0)
                         property bool hasWavLoaded: trackDelegate.selectedClip.path.length > 0
                         property bool trackHasConnectedPattern: track.connectedPattern >= 0
@@ -75,26 +76,15 @@ ColumnLayout {
                         Layout.fillHeight: true
 
                         visible: index < 6
-                        border.width: root.selectedTrack === track ? 1 : 0
+                        border.width: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0
                         border.color: Kirigami.Theme.highlightColor
                         color: "transparent"
                         radius: 4
 
-                        // Switch the sound layer after a short interval to allow UI to populate first
-                        Timer {
-                            id: switchLayerTimer
-                            interval: 10
-                            repeat: false
-                            onTriggered: {
-                                zynthian.fixed_layers.activate_index(track.connectedSound);
-                            }
-                        }
-
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                root.selectedTrack = track;
-                                switchLayerTimer.start();
+                                zynthian.session_dashboard.selectedTrack = trackIndex;
                             }
                         }
 
@@ -148,7 +138,7 @@ ColumnLayout {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        root.selectedTrack = track;
+                                        zynthian.session_dashboard.selectedTrack = index;
                                         soundsDialog.open();
                                     }
                                 }
@@ -170,7 +160,6 @@ ColumnLayout {
                                         highlighted: trackDelegate.selectedClip == model.clip
 
                                         onClicked: {
-                                            root.selectedTrack = track;
                                             trackDelegate.selectedClip = model.clip;
 
                                             // TODO : Find a way to select/deselect clip to/from scene
@@ -329,7 +318,7 @@ ColumnLayout {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit*2
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
-                                    enabled: root.selectedTrack === track
+                                    enabled: zynthian.session_dashboard.selectedTrack === trackIndex
                                     radius: 2
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
@@ -347,8 +336,8 @@ ColumnLayout {
                                         height: Kirigami.Units.gridUnit
                                         anchors.centerIn: parent
                                         source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                                        color: root.selectedTrack === track && !trackDelegate.selectedClip.isRecording ? "#f44336" : Kirigami.Theme.textColor
-                                        opacity: root.selectedTrack === track ? 1 : 0.6
+                                        color: zynthian.session_dashboard.selectedTrack === trackIndex && !trackDelegate.selectedClip.isRecording ? "#f44336" : Kirigami.Theme.textColor
+                                        opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.6
                                     }
                                 }
                             }

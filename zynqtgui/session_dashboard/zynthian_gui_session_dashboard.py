@@ -26,6 +26,7 @@
 import json
 import sys
 import logging
+import os
 
 from datetime import datetime
 
@@ -57,6 +58,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         if not self.restore():
             self.__name__ = None
             self.__id__ = 0
+            self.__selected_track__ = 0
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -92,10 +94,26 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     sessionSketchesModel = Property(QObject, get_session_sketches_model, notify=session_sketches_model_changed)
     ### END Property sessionSketchesModel
 
+    ### Property selectedTrack
+    def get_selected_track(self):
+        return self.__selected_track__
+    def set_selected_track(self, track):
+        def change_to_track_sound():
+            # zynthian.fixed_layers.activate_index(track.connectedSound);
+            pass
+        self.__selected_track__ = track
+        self.selected_track_changed.emit()
+        self.schedule_save()
+        QTimer.singleShot(100, change_to_track_sound)
+    selected_track_changed = Signal()
+    selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
+    ### END Property selectedTrack
+
     def serialize(self):
         return {
             "name": self.__name__,
             "id": self.__id__,
+            "selectedTrack": self.__selected_track__,
             "sketches": self.__session_sketches_model__.serialize()
         }
 
@@ -159,6 +177,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             if "id" in session:
                 self.__id__ = session["id"]
                 self.id_changed.emit()
+            if "selectedTrack" in session:
+                self.__selected_track__ = session["selectedTrack"]
+                self.selected_track_changed.emit()
             if "sketches" in session:
                 self.__session_sketches_model__.deserialize(session["sketches"])
                 self.session_sketches_model_changed.emit()

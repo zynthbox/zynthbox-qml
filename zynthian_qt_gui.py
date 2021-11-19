@@ -1253,38 +1253,30 @@ class zynthian_gui(QObject):
         ):
             self.toggle_modal("stepseq")
 
-        elif cuia == "LAYER_1":
-            self.screens["layer"].activate_midichan_layer(0)
-        elif cuia == "LAYER_2":
-            self.screens["layer"].activate_midichan_layer(1)
-        elif cuia == "LAYER_3":
-            self.screens["layer"].activate_midichan_layer(2)
-        elif cuia == "LAYER_4":
-            self.screens["layer"].activate_midichan_layer(3)
-        elif cuia == "LAYER_5":
-            self.screens["layer"].activate_midichan_layer(4)
-        elif cuia == "LAYER_6":
-            self.screens["layer"].activate_midichan_layer(5)
-        elif cuia == "LAYER_7":
-            self.screens["layer"].activate_midichan_layer(6)
-        elif cuia == "LAYER_8":
-            self.screens["layer"].activate_midichan_layer(7)
-        elif cuia == "LAYER_9":
-            self.screens["layer"].activate_midichan_layer(8)
-        elif cuia == "LAYER_10":
-            self.screens["layer"].activate_midichan_layer(9)
-        elif cuia == "LAYER_11":
-            self.screens["layer"].activate_midichan_layer(10)
-        elif cuia == "LAYER_12":
-            self.screens["layer"].activate_midichan_layer(11)
-        elif cuia == "LAYER_13":
-            self.screens["layer"].activate_midichan_layer(12)
-        elif cuia == "LAYER_14":
-            self.screens["layer"].activate_midichan_layer(13)
-        elif cuia == "LAYER_15":
-            self.screens["layer"].activate_midichan_layer(14)
-        elif cuia == "LAYER_16":
-            self.screens["layer"].activate_midichan_layer(15)
+        elif cuia == "TRACK_1":
+            self.screens["session_dashboard"].selectedTrack = 0
+        elif cuia == "TRACK_2":
+            self.screens["session_dashboard"].selectedTrack = 1
+        elif cuia == "TRACK_3":
+            self.screens["session_dashboard"].selectedTrack = 2
+        elif cuia == "TRACK_4":
+            self.screens["session_dashboard"].selectedTrack = 3
+        elif cuia == "TRACK_5":
+            self.screens["session_dashboard"].selectedTrack = 4
+        elif cuia == "TRACK_6":
+            self.screens["session_dashboard"].selectedTrack = 5
+        elif cuia == "TRACK_7":
+            self.screens["session_dashboard"].selectedTrack = 6
+        elif cuia == "TRACK_8":
+            self.screens["session_dashboard"].selectedTrack = 7
+        elif cuia == "TRACK_9":
+            self.screens["session_dashboard"].selectedTrack = 8
+        elif cuia == "TRACK_10":
+            self.screens["session_dashboard"].selectedTrack = 9
+        elif cuia == "TRACK_11":
+            self.screens["session_dashboard"].selectedTrack = 10
+        elif cuia == "TRACK_12":
+            self.screens["session_dashboard"].selectedTrack = 11
 
         elif cuia == "KEYBOARD":
             logging.error("KEYBOARD")

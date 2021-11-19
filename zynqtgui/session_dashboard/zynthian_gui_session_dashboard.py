@@ -98,9 +98,11 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def get_selected_track(self):
         return self.__selected_track__
     def set_selected_track(self, track):
+        parent = self
+
         def change_to_track_sound():
-            # zynthian.fixed_layers.activate_index(track.connectedSound);
-            pass
+            parent.zyngui.screens["fixed_layers"].activate_index(parent.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound)
+
         self.__selected_track__ = track
         self.selected_track_changed.emit()
         self.schedule_save()

@@ -567,8 +567,6 @@ class zynthian_gui(QObject):
         self.screens["option"] = zynthian_gui_option(self)
         self.screens["engine"] = zynthian_gui_engine(self)
         self.screens["layer"] = zynthian_gui_layer(self)
-        self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
-        self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
         self.screens["layer_options"] = zynthian_gui_layer_options(self)
         self.screens["layer_effects"] = zynthian_gui_layer_effects(self)
         self.screens["layer_midi_effects"] = zynthian_gui_layer_effects(self)
@@ -624,6 +622,13 @@ class zynthian_gui(QObject):
         # Session Dashboard depends on ZL to load sketches and hence needs to be initialized after ZL page
         ###
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
+
+        ###
+        # Fixed layers depends on zynthiloops and session_dashboard screens and hence needs to be initialized
+        # after those 2 pages
+        ###
+        self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
+        self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         # self.screens['autoeq'] = zynthian_gui_autoeq(self)

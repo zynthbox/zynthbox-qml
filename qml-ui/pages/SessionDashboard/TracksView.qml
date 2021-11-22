@@ -151,6 +151,7 @@ ColumnLayout {
                                 Repeater {
                                     model: track.clipsModel
                                     delegate: QQC2.RoundButton {
+                                        id: control
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
                                         Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
@@ -158,6 +159,27 @@ ColumnLayout {
                                         Layout.alignment: Qt.AlignVCenter
                                         radius: 4
                                         highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
+                                        background: Rectangle { // Derived from znthian qtquick-controls-style
+                                            color: model.clip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.buttonBackgroundColor
+                                            border.color: trackDelegate.selectedClip === model.clip
+                                                            ? Kirigami.Theme.highlightColor
+                                                            : Qt.rgba(
+                                                                  Kirigami.Theme.textColor.r,
+                                                                  Kirigami.Theme.textColor.g,
+                                                                  Kirigami.Theme.textColor.b,
+                                                                  0.4
+                                                              )
+                                            radius: control.radius
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                radius: parent.radius
+                                                gradient: Gradient {
+                                                    GradientStop { position: 0; color: control.pressed ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(1, 1, 1, 0.05)}
+                                                    GradientStop { position: 1; color: control.pressed ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.05)}
+                                                }
+                                            }
+                                        }
 
                                         onClicked: {
                                             trackDelegate.selectedClip = model.clip;

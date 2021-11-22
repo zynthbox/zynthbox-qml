@@ -537,10 +537,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.clip_to_record.isRecording = True
             
-            # Do not start metronome request. Instead start playback of scene while recording is started
-            if not self.isMetronomeRunning:
-                self.startPlayback()
-
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))

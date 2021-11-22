@@ -335,6 +335,7 @@ Zynthian.ScreenPage {
                                     sourceComboModel.get(sourceCombo.currentIndex).value,
                                     channelComboModel.get(channelCombo.currentIndex).value
                                 );
+                                Zynthian.CommonUtils.startMetronomeAndPlayback();
                             } else {
                                 root.clip.stopRecording();
                             }

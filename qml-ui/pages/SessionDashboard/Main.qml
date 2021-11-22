@@ -111,6 +111,10 @@ Zynthian.ScreenPage {
     ]
     screenId: "session_dashboard"
 
+    cuiaCallback: function(cuia) {
+        return tabbedView.cuiaCallback(cuia);
+    }
+
     Zynthian.SaveFileDialog {
         property string dialogType: "save"
 
@@ -289,6 +293,7 @@ Zynthian.ScreenPage {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
+                    id: tracksViewTab
                     text: qsTr("Tracks")
                     page: Qt.resolvedUrl("TracksView.qml")
                 },

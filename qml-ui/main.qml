@@ -71,8 +71,8 @@ Kirigami.AbstractApplicationWindow {
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
-                padding: Kirigami.Units.largeSpacing*2
-                rightPadding: Kirigami.Units.largeSpacing*2
+                padding: Kirigami.Units.largeSpacing*1.5
+                rightPadding: Kirigami.Units.largeSpacing*1.5
                 onClicked: {
                     zynthian.current_screen_id = 'session_dashboard'
                     // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)

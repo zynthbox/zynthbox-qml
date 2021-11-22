@@ -70,17 +70,42 @@ Kirigami.AbstractApplicationWindow {
                 id: homeButton
                 icon.name: "go-home"
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("%1 Scene %2 Track %3")
-                        .arg(zynthian.zynthiloops.song.name)
-                        .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
-                        .arg(zynthian.session_dashboard.selectedTrack+1)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                padding: Kirigami.Units.largeSpacing*2
                 rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: {zynthian.current_screen_id = 'session_dashboard'
-                    print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                onClicked: {
+                    zynthian.current_screen_id = 'session_dashboard'
+                    // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
                 }
                 onPressAndHold: zynthian.current_screen_id = 'main'
                 highlighted: zynthian.current_screen_id === 'session_dashboard'
+            }
+            Zynthian.BreadcrumbButton {
+                id: sketchButton
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: zynthian.zynthiloops.song.name
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: {
+                    zynthian.current_modal_screen_id = 'zynthiloops'
+                }
+                highlighted: zynthian.current_modal_screen_id === 'zynthiloops'
+            }
+            Zynthian.BreadcrumbButton {
+                id: sceneButton
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("Scene %2")
+                        .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+            }
+            Zynthian.BreadcrumbButton {
+                id: trackButton
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("Track %3")
+                        .arg(zynthian.session_dashboard.selectedTrack+1)
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
             }
             Zynthian.BreadcrumbButton {
                 text: {

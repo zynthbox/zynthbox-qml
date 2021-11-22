@@ -48,6 +48,12 @@ Item {
             focusedScope.forceActiveFocus()
         }
 
+        if (internalStack.currentItem.cuiaCallback != null) {
+            if (internalStack.currentItem.cuiaCallback(cuia)) {
+                return true;
+            }
+        }
+
         switch (cuia) { //TODO: figure out rows and columns
         // Eat select actions
         case "SWITCH_SELECT_SHORT":

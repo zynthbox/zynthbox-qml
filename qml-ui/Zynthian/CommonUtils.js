@@ -7,6 +7,7 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     zynthian.zynthiloops.stopAllPlayback();
+    zynthian.zynthiloops.stopRecording();
     ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
     zynthian.playgrid.stopMetronomeRequest();
     zynthian.song_arranger.stop();

@@ -327,6 +327,8 @@ ColumnLayout {
 
                                     onClicked: {
                                         if (trackDelegate.trackHasConnectedPattern) {
+                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                                            seq.enabled = false;
                                             track.connectedPattern = -1;
                                         } else {
                                             trackDelegate.selectedClip.clear();

@@ -244,6 +244,28 @@ ColumnLayout {
                                         color: Kirigami.Theme.textColor
                                     }
 
+                                    Rectangle {  //Start loop
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        color: Kirigami.Theme.positiveTextColor
+                                        opacity: 0.6
+                                        width: Kirigami.Units.smallSpacing
+                                        x: (trackDelegate.selectedClip.startPosition / trackDelegate.selectedClip.duration) * parent.width
+                                    }
+
+                                    Rectangle {  // End loop
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        color: Kirigami.Theme.neutralTextColor
+                                        opacity: 0.6
+                                        width: Kirigami.Units.smallSpacing
+                                        x: ((((60/zynthian.zynthiloops.song.bpm) * trackDelegate.selectedClip.length) / trackDelegate.selectedClip.duration) * parent.width) + ((trackDelegate.selectedClip.startPosition / trackDelegate.selectedClip.duration) * parent.width)
+                                    }
+
                                     Rectangle { // Progress
                                         anchors {
                                             top: parent.top

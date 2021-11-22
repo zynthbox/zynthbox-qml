@@ -197,29 +197,20 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             selectedTrackIndex = self.zyngui.screens["session_dashboard"].selectedTrack
             selectedTrack = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(selectedTrackIndex)
 
-            logging.error(f"Evaluating isChainedToConnectedSound for index {i}")
-            logging.error(f"Test 1 : 5 <= `{i}` <= 9 and 5 <= `{selectedTrack.connectedSound}` <= 9")
-
             if 5 <= i <= 9 and 5 <= selectedTrack.connectedSound <= 9:
                 metadata["isChainedToConnectedSound"] = True
             else:
                 # Highlight only if current slot is chained to connected sound var
                 connected = False
 
-                logging.error(f"Loop 1 : range({i}, {selectedTrack.connectedSound})")
                 for j in range(i, selectedTrack.connectedSound):
-                    logging.error(
-                        f"is_midi_cloned({j}, {j + 1}): {self.zyngui.screens['layer'].is_midi_cloned(j, j + 1)}")
                     if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
                         connected = True
                     else:
                         connected = False
                         break
 
-                logging.error(f"Loop 2 : range({selectedTrack.connectedSound}, {i})")
                 for j in range(selectedTrack.connectedSound, i):
-                    logging.error(
-                        f"is_midi_cloned({j}, {j + 1}): {self.zyngui.screens['layer'].is_midi_cloned(j, j + 1)}")
                     if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
                         connected = True
                     else:

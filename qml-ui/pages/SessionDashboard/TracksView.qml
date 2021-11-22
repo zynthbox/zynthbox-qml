@@ -48,6 +48,29 @@ ColumnLayout {
     property int itemHeight: layersView.height / 15
     spacing: Kirigami.Units.largeSpacing
 
+    function cuiaCallback(cuia) {
+        switch (cuia) {
+            case "SELECT_UP":
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack -= 1
+                    return true;
+                } else {
+                    return false;
+                }
+
+            case "SELECT_DOWN":
+                if (zynthian.session_dashboard.selectedTrack < 5) {
+                    zynthian.session_dashboard.selectedTrack += 1
+                    return true;
+                } else {
+                    return false;
+                }
+
+            default:
+                return false;
+        }
+    }
+
     RowLayout {
         spacing: Kirigami.Units.gridUnit * 2
 

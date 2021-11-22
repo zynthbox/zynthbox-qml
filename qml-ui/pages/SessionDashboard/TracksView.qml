@@ -157,7 +157,7 @@ ColumnLayout {
                                         Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
                                         Layout.alignment: Qt.AlignVCenter
                                         radius: 4
-                                        highlighted: trackDelegate.selectedClip == model.clip
+                                        highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
 
                                         onClicked: {
                                             trackDelegate.selectedClip = model.clip;

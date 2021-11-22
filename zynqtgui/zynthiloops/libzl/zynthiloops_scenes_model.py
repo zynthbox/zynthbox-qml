@@ -153,31 +153,42 @@ class zynthiloops_scenes_model(QAbstractListModel):
     @Slot(QObject)
     def toggleClipInCurrentScene(self, clip: zynthiloops_clip):
         if clip in self.getScene(self.__selected_scene_index__)["clips"]:
-            self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
-
-            if self.__song__.get_metronome_manager().isMetronomeRunning:
-                clip.stop()
+            self.removeClipFromCurrentScene(clip)
         else:
-            clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
-
-            # Remove other clips in same track from scene before adding clip to scene
-            for clip_index in range(0, clips_model.count):
-                m_clip: zynthiloops_clip = clips_model.getClip(clip_index)
-
-                if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
-                    self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
-                    if self.__song__.get_metronome_manager().isMetronomeRunning:
-                        m_clip.stop()
-                    m_clip.in_current_scene_changed.emit()
-
-            self.getScene(self.__selected_scene_index__)["clips"].append(clip)
-
-            if self.__song__.get_metronome_manager().isMetronomeRunning:
-                clip.play()
+            self.addClipToCurrentScene(clip)
 
         self.clipCountChanged.emit()
         clip.in_current_scene_changed.emit()
         self.__song__.schedule_save()
+
+    @Slot(QObject)
+    def addClipToCurrentScene(self, clip):
+        if clip in self.getScene(self.__selected_scene_index__)["clips"]:
+            self.removeClipFromCurrentScene(clip)
+
+        clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
+
+        # Remove other clips in same track from scene before adding clip to scene
+        for clip_index in range(0, clips_model.count):
+            m_clip: zynthiloops_clip = clips_model.getClip(clip_index)
+
+            if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
+                self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
+                if self.__song__.get_metronome_manager().isMetronomeRunning:
+                    m_clip.stop()
+                m_clip.in_current_scene_changed.emit()
+
+        self.getScene(self.__selected_scene_index__)["clips"].append(clip)
+
+        if self.__song__.get_metronome_manager().isMetronomeRunning:
+            clip.play()
+
+    @Slot(QObject)
+    def removeClipFromCurrentScene(self, clip):
+        self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
+
+        if self.__song__.get_metronome_manager().isMetronomeRunning:
+            clip.stop()
 
     @Slot(QObject, int, result=bool)
     def isClipInScene(self, clip, sceneIndex):

@@ -324,12 +324,13 @@ ColumnLayout {
 
                                     radius: 2
                                     visible: trackDelegate.hasWavLoaded || trackDelegate.trackHasConnectedPattern
+                                    enabled: !zynthian.zynthiloops.isMetronomeRunning
 
                                     onClicked: {
                                         if (trackDelegate.trackHasConnectedPattern) {
-                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(trackDelegate.track.connectedPattern);
                                             seq.enabled = false;
-                                            track.connectedPattern = -1;
+                                            trackDelegate.track.connectedPattern = -1;
                                         } else {
                                             trackDelegate.selectedClip.clear();
                                         }
@@ -374,9 +375,7 @@ ColumnLayout {
                                             trackDelegate.selectedClip.queueRecording("internal", "");
                                         } else {
                                             trackDelegate.selectedClip.stopRecording();
-                                            if (!trackDelegate.selectedClip.inCurrentScene) {
-                                                zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(trackDelegate.selectedClip);
-                                            }
+                                            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(trackDelegate.selectedClip);
                                         }
                                     }
 
@@ -560,9 +559,7 @@ ColumnLayout {
         onFileSelected: {
             if (clipObj) {
                 clipObj.path = file.filePath
-                if (!clipObj.inCurrentScene) {
-                    zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(clipObj);
-                }
+                zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clipObj);
             }
         }
     }
@@ -619,9 +616,7 @@ ColumnLayout {
                                 playgridPickerPopup.close();
 
                                 if (playgridPickerPopup.clipObj) {
-                                    if (!playgridPickerPopup.clipObj.inCurrentScene) {
-                                        zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(playgridPickerPopup.clipObj);
-                                    }
+                                    zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(playgridPickerPopup.clipObj);
                                 } else {
                                     console.log("Error setting clip to scene")
                                 }

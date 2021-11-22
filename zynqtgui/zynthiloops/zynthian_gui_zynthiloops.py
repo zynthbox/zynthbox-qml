@@ -530,7 +530,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
             self.clip_to_record.isRecording = True
-            self.start_metronome_request()
+            
+            # Do not start metronome request. Instead start playback of scene while recording is started
+            if not self.isMetronomeRunning:
+                self.startPlayback()
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
@@ -548,12 +551,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def stopRecording(self):
-        if self.clip_to_record.isRecording:
+        if self.clip_to_record is not None and self.clip_to_record.isRecording:
             self.clip_to_record.isRecording = False
 
         if self.recorder_process is not None:
             self.recorder_process.terminate()
-            self.stop_metronome_request()
             self.recording_complete.emit()
 
     @Slot(None)

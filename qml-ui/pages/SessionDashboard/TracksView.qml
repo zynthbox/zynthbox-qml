@@ -373,6 +373,7 @@ ColumnLayout {
                                     onClicked: {
                                         if (!trackDelegate.selectedClip.isRecording) {
                                             trackDelegate.selectedClip.queueRecording("internal", "");
+                                            Zynthian.CommonUtils.startMetronomeAndPlayback();
                                         } else {
                                             trackDelegate.selectedClip.stopRecording();
                                             zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(trackDelegate.selectedClip);

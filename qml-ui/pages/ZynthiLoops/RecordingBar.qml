@@ -236,6 +236,7 @@ GridLayout {
                         sourceComboModel.get(sourceCombo.currentIndex).value,
                         channelComboModel.get(channelCombo.currentIndex).value
                     );
+                    Zynthian.CommonUtils.startMetronomeAndPlayback();
                 } else {
                     controlObj.stopRecording();
                 }

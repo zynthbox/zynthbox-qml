@@ -644,7 +644,7 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def stopRecording(self):
-        self.__song__.get_metronome_manager().stop_recording()
+        self.__song__.get_metronome_manager().stopRecording()
 
     @Signal
     def sound_data_changed(self):

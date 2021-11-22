@@ -82,7 +82,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.clip_to_record_path = None
-        self.start_clip_recording = False
         self.__current_beat__ = -1
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
@@ -530,8 +529,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
-            self.is_recording_complete = False
-            self.start_clip_recording = True
             self.clip_to_record.isRecording = True
             self.start_metronome_request()
 
@@ -546,17 +543,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
-
-            self.start_clip_recording = False
         else:
             logging.error("Empty layer selected. Cannot record.")
 
-    def stop_recording(self):
-        self.recorder_process.terminate()
-        self.clip_to_record.isRecording = False
-        self.is_recording_complete = True
-        self.stop_metronome_request()
-        self.recording_complete.emit()
+    @Slot(None)
+    def stopRecording(self):
+        if self.clip_to_record.isRecording:
+            self.clip_to_record.isRecording = False
+
+        if self.recorder_process is not None:
+            self.recorder_process.terminate()
+            self.stop_metronome_request()
+            self.recording_complete.emit()
 
     @Slot(None)
     def startPlayback(self):
@@ -603,16 +601,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         #     self.countInValue -= 1
 
         if self.__current_beat__ == 0:
-            # if self.clip_to_record is not None and self.is_recording_complete is False: # and self.countInValue <= 0:
-            #     if self.start_clip_recording:
-            #         # self.recorder_process.start()
-            #         try:
-            #             logging.error(f'Staring Recorder process : {("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path)}')
-            #             self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_arguments, self.clip_to_record_path))
-            #         except Exception as e:
-            #             logging.error(f"Error starting audio recording : {str(e)}")
-            #         self.start_clip_recording = False
-
             if self.metronome_schedule_stop:
                 libzl.stopTimer()
 
@@ -627,9 +615,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             else:
                 self.__current_bar__ += 1
                 self.current_bar_changed.emit()
-
-        #if self.__song__.isPlaying:
-            #self.__song__.metronome_update
 
         self.current_beat_changed.emit()
 

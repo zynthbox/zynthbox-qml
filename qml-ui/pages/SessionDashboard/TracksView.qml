@@ -33,6 +33,7 @@ import JuceGraphics 1.0
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
+import "../ZynthiLoops" as ZynthiLoops
 
 ColumnLayout {
     id: root
@@ -219,6 +220,11 @@ ColumnLayout {
                                             ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                                             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
                                             sequence.activePattern = track.connectedPattern;
+                                        } else if (trackDelegate.hasWavLoaded) {
+                                            console.log("Opening bottom drawer");
+                                            bottomBar.controlType = ZynthiLoops.BottomBar.ControlType.Clip;
+                                            bottomBar.controlObj = trackDelegate.selectedClip;
+                                            bottomDrawer.open();
                                         }
                                     }
                                 }
@@ -628,6 +634,21 @@ ColumnLayout {
                     }
                 }
             }
+        }
+    }
+
+    QQC2.Drawer {
+        id: bottomDrawer
+
+        edge: Qt.BottomEdge
+        modal: true
+
+        width: parent.width
+        height: Kirigami.Units.gridUnit * 15
+
+        ZynthiLoops.BottomBar {
+            id: bottomBar
+            anchors.fill: parent
         }
     }
 }

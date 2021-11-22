@@ -300,7 +300,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def process_jack_port(self, port, target):
         try:
-            if not (port.name.startswith("JUCE") or port.name.startswith("system")):
+            layer_index = self.zyngui.screens['layer'].get_layer_selected()
+            jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname.split(":")[0]
+        except:
+            jack_basename = ""
+
+        try:
+            if not (port.name.startswith("JUCE") or port.name.startswith("system")) and port.name.startswith(jack_basename):
                 logging.error("ACCEPTED {}".format(port.name))
                 self.jack_client.connect(port.name, target.name)
             else:

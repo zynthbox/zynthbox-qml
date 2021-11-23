@@ -148,12 +148,17 @@ ColumnLayout {
                                 border.color: "#ff999999"
                                 border.width: 1
                                 radius: 4
+                                opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.5
+
 
                                 QQC2.Label {
-                                    width: parent.width
-                                    anchors.centerIn: parent
-                                    anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-                                    anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                                    anchors {
+                                        verticalCenter: parent.verticalCenter
+                                        left: parent.left
+                                        right: parent.right
+                                        leftMargin: Kirigami.Units.gridUnit*0.5
+                                        rightMargin: Kirigami.Units.gridUnit*0.5
+                                    }
                                     horizontalAlignment: Text.AlignLeft
                                     text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
                                     elide: "ElideRight"
@@ -181,10 +186,10 @@ ColumnLayout {
                                         id: control
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
                                         Layout.alignment: Qt.AlignVCenter
-                                        radius: 4
+                                        radius: 2
                                         highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
                                         background: Rectangle { // Derived from znthian qtquick-controls-style
                                             color: model.clip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.buttonBackgroundColor
@@ -241,6 +246,7 @@ ColumnLayout {
                                 border.color: "#99999999"
                                 border.width: 1
                                 radius: 4
+                                opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.5
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -276,6 +282,7 @@ ColumnLayout {
                                         width: parent.width
                                         height: 1
                                         color: Kirigami.Theme.textColor
+                                        opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.1
                                     }
 
                                     Rectangle {  //Start loop
@@ -362,6 +369,7 @@ ColumnLayout {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
 
                                     radius: 2
+                                    enabled: zynthian.session_dashboard.selectedTrack === trackIndex
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
@@ -390,7 +398,7 @@ ColumnLayout {
 
                                     radius: 2
                                     visible: trackDelegate.hasWavLoaded || trackDelegate.trackHasConnectedPattern
-                                    enabled: !zynthian.zynthiloops.isMetronomeRunning
+                                    enabled: zynthian.session_dashboard.selectedTrack === trackIndex && !zynthian.zynthiloops.isMetronomeRunning
 
                                     onClicked: {
                                         if (zynthian.session_dashboard.selectedTrack !== index) {
@@ -422,6 +430,7 @@ ColumnLayout {
 
                                     text: qsTr("Midi")
                                     radius: 2
+                                    enabled: zynthian.session_dashboard.selectedTrack === trackIndex
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {

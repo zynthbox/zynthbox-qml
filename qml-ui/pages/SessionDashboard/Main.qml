@@ -276,9 +276,19 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-            Kirigami.Heading {
-                id: clockLabel
+            RowLayout {
                 Layout.alignment: Qt.AlignCenter
+                QQC2.Label {
+                    Layout.rightMargin: Kirigami.Units.gridUnit
+                    Layout.alignment: Qt.AlignCenter
+                    text: qsTr("%1 x Sounds | %2 x Midi")
+                            .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
+                            .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
+                }
+                Kirigami.Heading {
+                    id: clockLabel
+                    Layout.alignment: Qt.AlignCenter
+                }
             }
         }
 

@@ -39,6 +39,7 @@ T.RoundButton {
             Layout.fillHeight: true
             visible: source.length > 0
             source: control.icon ? (control.icon.name || control.icon.source) : ""
+            opacity: control.enabled ? 1 : 0.5
         }
         QQC2.Label {
             Layout.fillWidth: !iconItem.visible
@@ -55,11 +56,14 @@ T.RoundButton {
     }
 
     background: Rectangle {
-        color: control.checked || control.highlighted ? Kirigami.Theme.highlightColor : theme.buttonBackgroundColor
+        color: control.checked || control.highlighted
+                ? Kirigami.Theme.highlightColor
+                : theme.buttonBackgroundColor
         radius: control.radius
         border {
             color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
         }
+        opacity: control.enabled ? 1 : 0.5
 
         Rectangle {
             anchors.fill: parent

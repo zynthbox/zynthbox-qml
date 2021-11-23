@@ -24,6 +24,7 @@
 # ******************************************************************************
 import logging
 
+import numpy as np
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 from .zynthiloops_track import zynthiloops_track
 
@@ -140,3 +141,22 @@ class zynthiloops_tracks_model(QAbstractListModel):
         logging.error(f"Pattern {patternIndex} already connected: {already_connected}")
 
         return already_connected
+
+    ### Property connectedSoundsCount
+    def get_connected_sounds_count(self):
+        connected_sounds = []
+        for index, track in enumerate(self.__tracks__):
+            if track.connectedSound >= 0:
+                connected_sounds.append(track.connectedSound)
+        values = np.unique(connected_sounds)
+        return len(values)
+    connected_sounds_count_changed = Signal()
+    connectedSoundsCount = Property(int, get_connected_sounds_count, notify=connected_sounds_count_changed)
+    ### END Property connectedSoundsCount
+
+    ### Property connectedPatternsCount
+    def get_connected_patterns_count(self):
+        return 5
+    connected_patterns_count_changed = Signal()
+    connectedPatternsCount = Property(int, get_connected_patterns_count, notify=connected_patterns_count_changed)
+    ### END Property connectedPatternsCount

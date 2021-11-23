@@ -208,12 +208,16 @@ ColumnLayout {
                                         onClicked: {
                                             trackDelegate.selectedClip = model.clip;
 
-                                            // TODO : Find a way to select/deselect clip to/from scene
                                             zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
                                             if (track.connectedPattern >= 0) {
                                                 var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
                                                 seq.bank = model.clip.col === 0 ? "A" : "B";
-                                                seq.enabled = true;
+
+                                                if (model.clip.inCurrentScene) {
+                                                    seq.enabled = true;
+                                                } else {
+                                                    seq.enabled = false;
+                                                }
                                             }
                                         }
 

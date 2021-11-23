@@ -698,6 +698,7 @@ ColumnLayout {
     QQC2.Popup {
         property QtObject trackObj
         property QtObject clipObj
+        property bool hasPatternsToConnect: false
 
         id: playgridPickerPopup
         x: root.parent.mapFromGlobal(Math.round(Screen.width/2 - width/2), 0).x
@@ -707,9 +708,10 @@ ColumnLayout {
 
         onVisibleChanged: {
             if (visible) {
-                patternsViewMainRepeater.model = Object.keys(ZynQuick.PlayGridManager.dashboardModels)
+                patternsViewMainRepeater.model = Object.keys(ZynQuick.PlayGridManager.dashboardModels);
             } else {
-                patternsViewMainRepeater.model = []
+                patternsViewMainRepeater.model = [];
+                playgridPickerPopup.hasPatternsToConnect = false;
             }
         }
 
@@ -731,7 +733,14 @@ ColumnLayout {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*3
                         Layout.alignment: Qt.AlignCenter
                         text: model.text
-                        visible: !zynthian.zynthiloops.song.tracksModel.checkIfPatternAlreadyConnected(index)
+
+                        Component.onCompleted: {
+                            visible = !zynthian.zynthiloops.song.tracksModel.checkIfPatternAlreadyConnected(index)
+
+                            if (visible) {
+                                playgridPickerPopup.hasPatternsToConnect = true;
+                            }
+                        }
 
                         onClicked: {
                             if (playgridPickerPopup.trackObj) {
@@ -757,6 +766,22 @@ ColumnLayout {
                         }
                     }
                 }
+            }
+
+            QQC2.Label {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.preferredHeight: Kirigami.Units.gridUnit*3
+                Layout.margins: Kirigami.Units.gridUnit
+                Layout.alignment: Qt.AlignVCenter
+                horizontalAlignment: "AlignHCenter"
+                verticalAlignment: "AlignVCenter"
+                text: qsTr("All patterns are already assigned to tracks")
+                wrapMode: "WordWrap"
+                font.italic: true
+                font.pointSize: 11
+                visible: !playgridPickerPopup.hasPatternsToConnect
+                opacity: 0.7
             }
         }
     }

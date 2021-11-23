@@ -2807,7 +2807,15 @@ if __name__ == "__main__":
         # assuming there is one and only one window for now
         zynthian_gui_config.top = app.topLevelWindows()[0]
         zynthian_gui_config.app = app
-    
+
+        # Since the UI takes a little while to show up, let's just let this spin for a bit
+        # We could probably make this cleaner by putting it in qml somewhere, but it works
+        def stop_splash():
+            with open("/tmp/mplayer-splash-control", "w") as f:
+                f.write("quit\n")
+                f.close()
+        QTimer.singleShot(5000, stop_splash)
+
     # Delay loading qml to let zyngui complete it's init sequence
     # Without the delay, UI sometimes doest start when `systemctl restart zynthian` is ran
     QTimer.singleShot(1000, load_qml)

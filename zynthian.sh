@@ -111,8 +111,9 @@ while true; do
 	#Load Config Environment
 	load_config_env
 
-	# Show a basic splash on the root
-	xloadimage -border black -onroot -center $ZYNTHIAN_UI_DIR/img/zynthian_gui_loading.gif
+	# Throw up a splash screen while we load up the UI proper
+	mkfifo /tmp/mplayer-splash-control
+	mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mkv -loop 0 &> /dev/null &
 
 	# Start Zynthian GUI & Synth Engine
 	export QT_QUICK_CONTROLS_MOBILE=1

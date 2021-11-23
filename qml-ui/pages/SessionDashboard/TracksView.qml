@@ -162,8 +162,11 @@ ColumnLayout {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        zynthian.session_dashboard.selectedTrack = index;
-                                        soundsDialog.open();
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
+                                        } else {
+                                            soundsDialog.open();
+                                        }
                                     }
                                 }
                             }
@@ -242,16 +245,20 @@ ColumnLayout {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        if (trackDelegate.trackHasConnectedPattern) {
-                                            zynthian.current_modal_screen_id = "playgrid";
-                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
-                                            sequence.activePattern = track.connectedPattern;
-                                        } else if (trackDelegate.hasWavLoaded) {
-                                            console.log("Opening bottom drawer");
-                                            bottomBar.controlType = ZynthiLoops.BottomBar.ControlType.Clip;
-                                            bottomBar.controlObj = trackDelegate.selectedClip;
-                                            bottomDrawer.open();
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
+                                        } else {
+                                            if (trackDelegate.trackHasConnectedPattern) {
+                                                zynthian.current_modal_screen_id = "playgrid";
+                                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                                                sequence.activePattern = track.connectedPattern;
+                                            } else if (trackDelegate.hasWavLoaded) {
+                                                console.log("Opening bottom drawer");
+                                                bottomBar.controlType = ZynthiLoops.BottomBar.ControlType.Clip;
+                                                bottomBar.controlObj = trackDelegate.selectedClip;
+                                                bottomDrawer.open();
+                                            }
                                         }
                                     }
                                 }
@@ -358,9 +365,13 @@ ColumnLayout {
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
-                                        clipFilePickerDialog.clipObj = trackDelegate.selectedClip;
-                                        clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clipObj.recordingDir;
-                                        clipFilePickerDialog.open();
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
+                                        } else {
+                                            clipFilePickerDialog.clipObj = trackDelegate.selectedClip;
+                                            clipFilePickerDialog.folderModel.folder = clipFilePickerDialog.clipObj.recordingDir;
+                                            clipFilePickerDialog.open();
+                                        }
                                     }
 
                                     Kirigami.Icon {
@@ -382,12 +393,16 @@ ColumnLayout {
                                     enabled: !zynthian.zynthiloops.isMetronomeRunning
 
                                     onClicked: {
-                                        if (trackDelegate.trackHasConnectedPattern) {
-                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(trackDelegate.track.connectedPattern);
-                                            seq.enabled = false;
-                                            trackDelegate.track.connectedPattern = -1;
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
                                         } else {
-                                            trackDelegate.selectedClip.clear();
+                                            if (trackDelegate.trackHasConnectedPattern) {
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(trackDelegate.track.connectedPattern);
+                                                seq.enabled = false;
+                                                trackDelegate.track.connectedPattern = -1;
+                                            } else {
+                                                trackDelegate.selectedClip.clear();
+                                            }
                                         }
                                     }
 
@@ -410,9 +425,13 @@ ColumnLayout {
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
-                                        playgridPickerPopup.trackObj = track;
-                                        playgridPickerPopup.clipObj = trackDelegate.selectedClip;
-                                        playgridPickerPopup.open();
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
+                                        } else {
+                                            playgridPickerPopup.trackObj = track;
+                                            playgridPickerPopup.clipObj = trackDelegate.selectedClip;
+                                            playgridPickerPopup.open();
+                                        }
                                     }
                                 }
                                 QQC2.RoundButton {
@@ -426,12 +445,16 @@ ColumnLayout {
                                     visible: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                                     onClicked: {
-                                        if (!trackDelegate.selectedClip.isRecording) {
-                                            trackDelegate.selectedClip.queueRecording("internal", "");
-                                            Zynthian.CommonUtils.startMetronomeAndPlayback();
+                                        if (zynthian.session_dashboard.selectedTrack !== index) {
+                                            zynthian.session_dashboard.selectedTrack = index;
                                         } else {
-                                            trackDelegate.selectedClip.stopRecording();
-                                            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(trackDelegate.selectedClip);
+                                            if (!trackDelegate.selectedClip.isRecording) {
+                                                trackDelegate.selectedClip.queueRecording("internal", "");
+                                                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                                            } else {
+                                                trackDelegate.selectedClip.stopRecording();
+                                                zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(trackDelegate.selectedClip);
+                                            }
                                         }
                                     }
 

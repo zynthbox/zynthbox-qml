@@ -150,7 +150,6 @@ ColumnLayout {
                                 radius: 4
                                 opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.5
 
-
                                 QQC2.Label {
                                     anchors {
                                         verticalCenter: parent.verticalCenter
@@ -160,7 +159,8 @@ ColumnLayout {
                                         rightMargin: Kirigami.Units.gridUnit*0.5
                                     }
                                     horizontalAlignment: Text.AlignLeft
-                                    text: track.connectedSound >= 0 ? (track.connectedSound+1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    text: track.connectedSound >= 0 ? (track.connectedSound >= 5 && track.connectedSound <= 9 ? ("6." + (track.connectedSound%5 + 1)) : (track.connectedSound + 1)) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+
                                     elide: "ElideRight"
                                 }
 

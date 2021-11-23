@@ -9,3 +9,4 @@ zynlibs/*/build
 *.pyproject.user
 *.pyproject.user*
 .idea
+*.autosave

@@ -609,7 +609,7 @@ ColumnLayout {
                             soundsDialog.close();
                         }
 
-                        // Reset hasConnectedTracks on dialog open
+                        // Reset hasConnectedTracks on dialog close
                         Connections {
                             target: soundsDialog
                             onVisibleChanged: {

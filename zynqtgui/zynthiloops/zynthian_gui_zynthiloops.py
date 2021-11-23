@@ -116,9 +116,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.metronomeBeatUpdate4th.connect(self.metronome_update)
 
-        # self.update_recorder_jack_port()
-        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
-
         self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
 
         self.update_timer_bpm()

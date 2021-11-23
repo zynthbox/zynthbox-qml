@@ -698,7 +698,6 @@ ColumnLayout {
     QQC2.Popup {
         property QtObject trackObj
         property QtObject clipObj
-        property bool hasPatternsToConnect: false
 
         id: playgridPickerPopup
         x: root.parent.mapFromGlobal(Math.round(Screen.width/2 - width/2), 0).x
@@ -711,7 +710,6 @@ ColumnLayout {
                 patternsViewMainRepeater.model = Object.keys(ZynQuick.PlayGridManager.dashboardModels);
             } else {
                 patternsViewMainRepeater.model = [];
-                playgridPickerPopup.hasPatternsToConnect = false;
             }
         }
 
@@ -733,14 +731,7 @@ ColumnLayout {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*3
                         Layout.alignment: Qt.AlignCenter
                         text: model.text
-
-                        Component.onCompleted: {
-                            visible = !zynthian.zynthiloops.song.tracksModel.checkIfPatternAlreadyConnected(index)
-
-                            if (visible) {
-                                playgridPickerPopup.hasPatternsToConnect = true;
-                            }
-                        }
+                        visible: !zynthian.zynthiloops.song.tracksModel.checkIfPatternAlreadyConnected(index)
 
                         onClicked: {
                             if (playgridPickerPopup.trackObj) {
@@ -780,7 +771,7 @@ ColumnLayout {
                 wrapMode: "WordWrap"
                 font.italic: true
                 font.pointSize: 11
-                visible: !playgridPickerPopup.hasPatternsToConnect
+                visible: zynthian.zynthiloops.song.tracksModel.connectedPatternsCount >= 5
                 opacity: 0.7
             }
         }

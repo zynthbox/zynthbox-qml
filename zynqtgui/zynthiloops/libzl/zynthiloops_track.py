@@ -236,6 +236,7 @@ class zynthiloops_track(QObject):
         self.__connected_pattern__ = pattern
         self.__song__.schedule_save()
         self.connected_pattern_changed.emit()
+        self.__song__.tracksModel.connected_patterns_count_changed.emit()
     connected_pattern_changed = Signal()
     connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)
     ### END Property connectedPattern
@@ -247,6 +248,7 @@ class zynthiloops_track(QObject):
         self.__connected_sound__ = sound
         self.__song__.schedule_save()
         self.connected_sound_changed.emit()
+        self.__song__.tracksModel.connected_sounds_count_changed.emit()
     connected_sound_changed = Signal()
     connectedSound = Property(int, get_connected_sound, set_connected_sound, notify=connected_sound_changed)
     ### END Property connectedSound

@@ -110,7 +110,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.__selected_track__ = track
             self.selected_track_changed.emit()
             self.schedule_save()
-            QTimer.singleShot(10, change_to_track_sound)
+            QTimer.singleShot(1, change_to_track_sound)
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack

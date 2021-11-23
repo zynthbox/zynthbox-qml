@@ -156,7 +156,12 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
     ### Property connectedPatternsCount
     def get_connected_patterns_count(self):
-        return 5
+        connected_patterns = []
+        for index, track in enumerate(self.__tracks__):
+            if track.connectedPattern >= 0:
+                connected_patterns.append(track.connectedPattern)
+        values = np.unique(connected_patterns)
+        return len(values)
     connected_patterns_count_changed = Signal()
     connectedPatternsCount = Property(int, get_connected_patterns_count, notify=connected_patterns_count_changed)
     ### END Property connectedPatternsCount

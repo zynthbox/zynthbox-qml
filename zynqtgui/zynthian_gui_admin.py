@@ -889,15 +889,18 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
             try:
                 process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=True)
-                process_list = run(["apt", "list", "--upgradeable"], capture_output=True, text=True, check=True)
 
-                libzl_update_available = "libzl" in process_list.stdout
-                quick_components_update_available = "zynthian-quick-components" in process_list.stdout
-                qml_update_available = "zynthian-qml" in process_list.stdout
+                cache = apt.cache.Cache()
+                cache.open()
 
-                if libzl_update_available or quick_components_update_available or qml_update_available:
+                libzl_update_available = cache["libzl"].is_upgradable
+                quick_components_update_available = cache["zynthian-quick-components"].is_upgradable
+                qml_update_available = cache["zynthian-qml"].is_upgradable
+                metapackage_update_available = cache["zynthbox-meta"].is_upgradable or (not cache["zynthbox-meta"].is_installed)
+
+                if libzl_update_available or quick_components_update_available or qml_update_available or metapackage_update_available:
                     logging.error(
-                        f"Updates Available : libzl({libzl_update_available}), zynthian-quick-components({quick_components_update_available}), zynthian-qml({qml_update_available})")
+                        f"Updates Available : libzl({libzl_update_available}), zynthian-quick-components({quick_components_update_available}), zynthian-qml({qml_update_available}), zynthbox-meta({metapackage_update_available})")
                     self.checkForUpdatesCompleted.emit()
 
                     self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.", self.run_update)
@@ -927,6 +930,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 cache["libzl"].mark_install()
                 cache["zynthian-quick-components"].mark_install()
                 cache["zynthian-qml"].mark_install()
+                cache["zynthbox-meta"].mark_install()
+
                 cache.commit()
 
                 self.updateCompleted.emit()

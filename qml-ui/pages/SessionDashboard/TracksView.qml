@@ -598,6 +598,8 @@ ColumnLayout {
                             }
                         }
                         onClicked: {
+                            soundsDialog.close();
+
                             root.selectedTrack.connectedSound = index;
 
                             if (root.selectedTrack.connectedPattern >= 0) {
@@ -606,10 +608,9 @@ ColumnLayout {
                             }
 
                             zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
-                            soundsDialog.close();
                         }
 
-                        // Reset hasConnectedTracks on dialog open
+                        // Reset hasConnectedTracks on dialog close
                         Connections {
                             target: soundsDialog
                             onVisibleChanged: {

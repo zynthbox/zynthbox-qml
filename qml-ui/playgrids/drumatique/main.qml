@@ -533,7 +533,7 @@ Zynthian.BasePlayGrid {
                         top: parent.top
                         topMargin: - parent.width - Kirigami.Units.largeSpacing
                     }
-                    width:600
+                    width:900
                     height:450
                     Zynthian.Card {
                         anchors.fill: parent
@@ -564,6 +564,7 @@ Zynthian.BasePlayGrid {
                                 property int bankIndex: thisPattern.bankOffset / 8;
                                 property int selectedLayer: model.layer
                                 property int activePattern: _private.activePattern
+                                property QtObject associatedTrack: null
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
                                 color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
@@ -573,6 +574,24 @@ Zynthian.BasePlayGrid {
                                     _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
                                     component.saveDraft();
                                 }
+                                function updateTrack() {
+                                    var foundTrack = null;
+                                    for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                                        var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                        if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
+                                            foundTrack = track;
+                                            break;
+                                        }
+                                    }
+                                    patternsMenuItem.associatedTrack = foundTrack;
+                                }
+                                Connections {
+                                    target: zynthian.zynthiloops.song.tracksModel
+                                    onConnectedPatternsCountChanged: updateTrack()
+                                }
+                                Component.onCompleted: {
+                                    updateTrack();
+                                }
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: patternsMenuItem.pickThisPattern();
@@ -581,25 +600,25 @@ Zynthian.BasePlayGrid {
                                         anchors.margins: 5
                                         spacing: 5
 
+                                        QQC2.CheckBox {
+                                            Layout.fillHeight: true
+                                            Layout.preferredWidth: height
+                                            checked: patternsMenuItem.thisPattern.enabled
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                    patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                }
+                                            }
+                                        }
                                         ColumnLayout {
                                             Layout.fillHeight: true
-                                            Layout.minimumWidth: (parent.width / 5) * 3;
-                                            Layout.maximumWidth: (parent.width / 5) * 3;
+                                            Layout.minimumWidth: (parent.width / 7) * 3;
+                                            Layout.maximumWidth: (parent.width / 7) * 3;
 
                                             RowLayout {
-                                                Layout.fillHeight: true
                                                 Layout.fillWidth: true
-                                                QQC2.CheckBox {
-                                                    Layout.fillHeight: true
-                                                    Layout.preferredWidth: height
-                                                    checked: patternsMenuItem.thisPattern.enabled
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        onClicked: {
-                                                            patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
-                                                        }
-                                                    }
-                                                }
+                                                Layout.preferredHeight: parent.height / 2
                                                 Image {
                                                     Layout.fillHeight: true
                                                     Layout.fillWidth: true
@@ -628,48 +647,20 @@ Zynthian.BasePlayGrid {
                                                 }
                                             }
 
-                                            RowLayout {
+                                            Zynthian.PlayGridButton {
                                                 Layout.fillWidth: true
-                                                Layout.minimumHeight: parent.height / 2;
-                                                Layout.maximumHeight: parent.height / 2;
-                                                spacing:5
-
-                                                QQC2.Label {
-                                                    Layout.fillHeight: true
-                                                    Layout.fillWidth: true
-                                                    text: "Sound:"
-                                                    font.pixelSize: 15
-                                                    Kirigami.Theme.inherit: false
-                                                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                    color: Kirigami.Theme.textColor
-                                                }
-                                                QQC2.ComboBox {
-                                                    id: layerCombo
-                                                    Layout.fillHeight: true
-                                                    Layout.fillWidth: true
-                                                    model: zynthian.fixed_layers.selector_list
-                                                    textRole: "display"
-                                                    delegate: QQC2.ItemDelegate {
-                                                        width: layerCombo.popup.width
-                                                        highlighted: layerCombo.highlightedIndex === index
-                                                        text: (model.metadata.midi_channel + 1) + ". " + model.display
-                                                        height: visible ? Kirigami.Units.fontMetrics.height * 2 : 0
-                                                        visible: index === 0 || index > 9
-                                                    }
-                                                    currentIndex: patternsMenuItem.selectedLayer;
-                                                    Connections {
-                                                        target: patternsMenuItem.thisPattern
-                                                        onLayerChanged: {
-                                                            var layerIndex = patternsMenuItem.thisPattern.layer;
-                                                            if (layerCombo.currentIndex !== layerIndex) {
-                                                                layerCombo.currentIndex = layerIndex;
-                                                            }
-                                                        }
-                                                    }
-                                                    onActivated: {
-                                                        console.log(patternsMenuItem.thisPatternIndex, index, "on select layer")
-                                                        component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
-                                                    }
+                                                Layout.preferredHeight: parent.height / 2
+                                                text: "Sound: " + zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+//                                                     delegate: QQC2.ItemDelegate {
+//                                                         width: layerCombo.popup.width
+//                                                         highlighted: layerCombo.highlightedIndex === index
+//                                                         text: (model.metadata.midi_channel + 1) + ". " + model.display
+//                                                         height: visible ? Kirigami.Units.fontMetrics.height * 2 : 0
+//                                                         visible: index === 0 || index > 9
+//                                                     }
+                                                function setLayer() {
+                                                    console.log(patternsMenuItem.thisPatternIndex, index, "on select layer")
+                                                    component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
                                                 }
                                             }
                                         }
@@ -720,6 +711,33 @@ Zynthian.BasePlayGrid {
                                                 if (_private.activePatternModel == patternsMenuItem.thisPattern) {
                                                     component.refreshSteps();
                                                 }
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: (parent.width / 7);
+                                            Layout.maximumWidth: (parent.width / 7);
+
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: "Track:"
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                                elide: Text.ElideRight
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
                                             }
                                         }
                                     }
@@ -789,17 +807,11 @@ Zynthian.BasePlayGrid {
 
             Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
-            QQC2.Label {
-                Layout.fillWidth: true
-                horizontalAlignment: Text.AlignHCenter
-                text: "Note"
-            }
             Zynthian.PlayGridButton {
-                Layout.fillHeight: false
                 icon.name: component.mostRecentlyPlayedNote == undefined ? "" : "edit-clear-locationbar-ltr"
-                text: component.mostRecentlyPlayedNote == undefined
+                text: "Note:\n" + (component.mostRecentlyPlayedNote == undefined
                     ? "(all)"
-                    : component.mostRecentlyPlayedNote.name + component.mostRecentlyPlayedNote.octave
+                    : component.mostRecentlyPlayedNote.name + component.mostRecentlyPlayedNote.octave)
                 onClicked: {
                     hideAllMenus();
                     component.mostRecentlyPlayedNote = undefined;

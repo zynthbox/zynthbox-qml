@@ -41,20 +41,6 @@ Zynthian.ScreenPage {
     topPadding: 5
     bottomPadding: 5
 
-    Component.onCompleted: {
-        applicationWindow().controlsVisible = false
-    }
-
-    Component.onDestruction: {
-        applicationWindow().controlsVisible = true
-    }
-    onVisibleChanged: {
-        applicationWindow().controlsVisible = !visible
-        if (visible) {
-            height = parent.height;
-        }
-    }
-
     Connections {
         target: ZynQuick.PlayGridManager
         property string currentPlaygrid
@@ -106,7 +92,6 @@ Zynthian.ScreenPage {
                                 onTriggered: {
                                     settingsDialog.visible = false;
                                     zynthian.show_modal("playgrid_downloader");
-                                    applicationWindow().controlsVisible = true;
                                 }
                             }
                         ]

@@ -17,6 +17,17 @@ import "mobiletextselection" as MobileTextSelection
 T.TextField {
     id: control
 
+    // FIXME Outdated Plasma theme type stuff
+    // This surely is supposed to be something more useful... but without defining them, things get errorsy, and that's just ugly
+    // More to be done to make them properly go away, but for now...
+    property bool __hasBackgroundAndMargins: false
+    property int implicitBackgroundWidth: 0
+    property int implicitBackgroundHeight: 0
+    property int topInset: 0
+    property int bottomInset: 0
+    property int leftInset: 0
+    property int rightInset: 0
+
     /* It might be preferrable to do background width OR content width if we
      * want content to stay within the background rather than expanding the
      * control, but this is maintaining compatibility with the pre-existing
@@ -37,7 +48,8 @@ T.TextField {
     bottomPadding: __hasBackgroundAndMargins ? background.margins.bottom : 0
 
     PlasmaCore.ColorScope.inherit: !background || !background.visible
-    PlasmaCore.ColorScope.colorGroup: theme.ViewColorGroup
+    // FIXME Outdated Plasma theme type stuff
+    // PlasmaCore.ColorScope.colorGroup: theme.ViewColorGroup - If there's a newer Plasma eventually, this'll want commenting back in
 
     color: theme.textColor
     selectionColor: theme.highlightColor
@@ -97,7 +109,9 @@ T.TextField {
 
         text: control.placeholderText
         font: control.font
-        color: control.placeholderTextColor
+        // FIXME Outdated Qt type thing
+        // This colour is a 5.12 addition
+        // color: control.placeholderTextColor
         horizontalAlignment: control.horizontalAlignment
         verticalAlignment: control.verticalAlignment
         visible: !control.length && !control.preeditText && (!control.activeFocus || control.horizontalAlignment !== Qt.AlignHCenter)

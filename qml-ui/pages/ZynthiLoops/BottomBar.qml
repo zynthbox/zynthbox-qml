@@ -145,7 +145,7 @@ Zynthian.Card {
             SidebarButton {
                 icon.name: "document-open"
                 visible: root.controlType === BottomBar.ControlType.Clip
-                enabled: !controlObj.isPlaying
+                enabled: controlObj ? !controlObj.isPlaying : false
 
                 onClicked: {
                     pickerDialog.folderModel.folder = root.controlObj.recordingDir;
@@ -165,13 +165,13 @@ Zynthian.Card {
             SidebarButton {
                 icon.name: "edit-clear-all"
                 visible: (controlObj != null) && controlObj.clearable
-                enabled: !controlObj.isPlaying
+                enabled: controlObj ? !controlObj.isPlaying : false
 
                 onClicked: controlObj.clear()
             }
 
             SidebarButton {
-                icon.name: controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
                 visible: root.controlType !== BottomBar.ControlType.Part &&
                          (controlObj != null) && controlObj.playable && controlObj.path
 
@@ -343,7 +343,7 @@ Zynthian.Card {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1 : Pick an audio file").arg(controlObj.trackName)
+        headerText: qsTr("%1 : Pick an audio file").arg(root.controlObj ? root.controlObj.trackName : "")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]

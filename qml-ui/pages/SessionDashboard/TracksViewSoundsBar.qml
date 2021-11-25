@@ -74,7 +74,9 @@ Zynthian.Card {
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
 
                         border.color: "#ff999999"
                         border.width: 1
@@ -173,7 +175,9 @@ Zynthian.Card {
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        color: Kirigami.Theme.buttonBackgroundColor
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
 
                         border.color: "#ff999999"
                         border.width: 1

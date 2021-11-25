@@ -787,7 +787,7 @@ Zynthian.BasePlayGrid {
             Zynthian.PlayGridButton {
                 id:playPauseBtn
                 property var timeOnPressed
-                text: _private.sequence.isPlaying ? "Pause" : "Play"
+                text: _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
                 onPressed: {
                     hideAllMenus();
                     playPauseBtn.timeOnPressed = new Date();

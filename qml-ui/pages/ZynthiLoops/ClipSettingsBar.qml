@@ -50,7 +50,7 @@ GridLayout {
         buttonStepSize: 0.01
 
         dial {
-            stepSize: controlObj.hasOwnProperty("secPerBeat") ? controlObj.secPerBeat : 0.01
+            stepSize: controlObj && controlObj.hasOwnProperty("secPerBeat") ? controlObj.secPerBeat : 0.01
             from: 0
             to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
         }
@@ -100,7 +100,7 @@ GridLayout {
         controlObj: root.bottomBar.controlObj
         controlProperty: "time"
         valueString: dial.value.toFixed(2)
-        enabled: !root.bottomBar.controlObj.shouldSync
+        enabled: root.bottomBar.controlObj ? !root.bottomBar.controlObj.shouldSync : false
 
         dial {
             stepSize: 0.1
@@ -143,8 +143,8 @@ GridLayout {
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
-            visible: controlObj.metadataBPM ? true : false
-            text: controlObj.metadataBPM
+            visible: controlObj && controlObj.metadataBPM ? true : false
+            text: controlObj && controlObj.hasOwnProperty("metadataBPM") ? controlObj.metadataBPM : ""
             font.pointSize: 9
         }
 
@@ -155,7 +155,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)
+            text: root.bottomBar.controlObj ? (root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)) : ""
             // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
             /** Float Matching : Matches exactly one '0' after decimal point
@@ -163,7 +163,7 @@ GridLayout {
               */
             validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
-            enabled: !root.bottomBar.controlObj.shouldSync
+            enabled: root.bottomBar.controlObj ? !root.bottomBar.controlObj.shouldSync : false
             onAccepted: {
                 root.bottomBar.controlObj.bpm = parseFloat(text);
             }
@@ -185,7 +185,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-            checked: root.bottomBar.controlObj.shouldSync
+            checked: root.bottomBar.controlObj && root.bottomBar.controlObj.hasOwnProperty("shouldSync") ? root.bottomBar.controlObj.shouldSync : false
             onToggled: {
                 root.bottomBar.controlObj.shouldSync = checked
             }
@@ -233,12 +233,12 @@ GridLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
 
         QQC2.Label {
-            visible: controlObj.soundData.length <= 0
+            visible: controlObj && controlObj.soundData ? controlObj.soundData.length <= 0 : false
             text: "<No Metadata>"
         }
         QQC2.Label {
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0 && controlObj.metadataAudioType
-            text: qsTr("Audio Type: %1").arg(controlObj.metadataAudioType ? controlObj.metadataAudioType : "")
+            text: qsTr("Audio Type: %1").arg(controlObj && controlObj.metadataAudioType ? controlObj.metadataAudioType : "")
         }
         QQC2.Label {
             visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0

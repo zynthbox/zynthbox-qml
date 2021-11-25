@@ -54,6 +54,11 @@ ColumnLayout {
     spacing: Kirigami.Units.largeSpacing
 
     function cuiaCallback(cuia) {
+        if (bottomDrawer.opened &&
+            bottomStack.children[bottomStack.currentIndex].cuiaCallback != null) {
+            return bottomStack.children[bottomStack.currentIndex].cuiaCallback(cuia);
+        }
+
         switch (cuia) {
             case "SELECT_UP":
                 if (zynthian.session_dashboard.selectedTrack > 0) {
@@ -805,16 +810,9 @@ ColumnLayout {
                 Layout.fillHeight: true
             }
 
-            Zynthian.Card {
-                leftPadding: 0
-                rightPadding: 0
+            TracksViewSoundsBar {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-
-                id: soundsBar
-                contentItem: ColumnLayout {
-
-                }
             }
         }
     }

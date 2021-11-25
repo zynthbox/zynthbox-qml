@@ -531,7 +531,7 @@ Zynthian.BasePlayGrid {
                         left: parent.right
                         leftMargin: Kirigami.Units.largeSpacing
                         top: parent.top
-                        topMargin: - parent.width - Kirigami.Units.largeSpacing
+                        topMargin: - parent.width - Kirigami.Units.largeSpacing * 2
                     }
                     width:900
                     height:450
@@ -600,12 +600,42 @@ Zynthian.BasePlayGrid {
                                         anchors.margins: 5
                                         spacing: 5
 
-                                        QQC2.CheckBox {
+                                        ColumnLayout {
                                             Layout.fillHeight: true
-                                            Layout.preferredWidth: height
-                                            checked: patternsMenuItem.thisPattern.enabled
-                                            MouseArea {
-                                                anchors.fill: parent
+                                            Layout.minimumWidth: (parent.width / 7);
+                                            Layout.maximumWidth: (parent.width / 7);
+
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: "Track:"
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                                elide: Text.ElideRight
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: height
+                                            Layout.maximumWidth: height
+                                            Zynthian.PlayGridButton {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                Layout.margins: Kirigami.Units.largeSpacing
+                                                icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : "player-volume-muted"
                                                 onClicked: {
                                                     patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
                                                 }
@@ -711,33 +741,6 @@ Zynthian.BasePlayGrid {
                                                 if (_private.activePatternModel == patternsMenuItem.thisPattern) {
                                                     component.refreshSteps();
                                                 }
-                                            }
-                                        }
-                                        ColumnLayout {
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: (parent.width / 7);
-                                            Layout.maximumWidth: (parent.width / 7);
-
-                                            QQC2.Label {
-                                                Layout.fillHeight: true
-                                                Layout.fillWidth: true
-                                                text: "Track:"
-                                                font.pixelSize: 15
-                                                Kirigami.Theme.inherit: false
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                color: Kirigami.Theme.textColor
-                                                horizontalAlignment: Text.AlignHCenter
-                                            }
-                                            QQC2.Label {
-                                                Layout.fillHeight: true
-                                                Layout.fillWidth: true
-                                                text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
-                                                elide: Text.ElideRight
-                                                font.pixelSize: 15
-                                                Kirigami.Theme.inherit: false
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                color: Kirigami.Theme.textColor
-                                                horizontalAlignment: Text.AlignHCenter
                                             }
                                         }
                                     }

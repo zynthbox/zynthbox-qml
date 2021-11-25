@@ -38,6 +38,11 @@ import "../ZynthiLoops" as ZynthiLoops
 ColumnLayout {
     id: root
 
+    enum BottomStackControlType {
+        Wave = 0,
+        Sound = 1
+    }
+
     anchors {
         fill: parent
         topMargin: -Kirigami.Units.smallSpacing
@@ -170,7 +175,10 @@ ColumnLayout {
                                         if (zynthian.session_dashboard.selectedTrack !== index) {
                                             zynthian.session_dashboard.selectedTrack = index;
                                         } else {
-                                            soundsDialog.open();
+                                            // soundsDialog.open();
+                                            console.log("Opening bottom drawer");
+                                            bottomStack.currentIndex = TracksView.BottomStackControlType.Sound;
+                                            bottomDrawer.open();
                                         }
                                     }
                                 }
@@ -261,6 +269,7 @@ ColumnLayout {
                                                 sequence.activePattern = track.connectedPattern;
                                             } else if (trackDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
+                                                bottomStack.currentIndex = TracksView.BottomStackControlType.Wave;
                                                 bottomBar.controlType = ZynthiLoops.BottomBar.ControlType.Clip;
                                                 bottomBar.controlObj = trackDelegate.selectedClip;
                                                 bottomDrawer.open();
@@ -786,9 +795,27 @@ ColumnLayout {
         width: parent.width
         height: Kirigami.Units.gridUnit * 15
 
-        ZynthiLoops.BottomBar {
-            id: bottomBar
+        StackLayout {
+            id: bottomStack
             anchors.fill: parent
+
+            ZynthiLoops.BottomBar {
+                id: bottomBar
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            Zynthian.Card {
+                leftPadding: 0
+                rightPadding: 0
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                id: soundsBar
+                contentItem: ColumnLayout {
+
+                }
+            }
         }
     }
 }

@@ -112,7 +112,9 @@ while true; do
 	load_config_env
 
 	# Throw up a splash screen while we load up the UI proper
-	mkfifo /tmp/mplayer-splash-control
+	if [ ! -f /tmp/mplayer-splash-control ]; then
+            mkfifo /tmp/mplayer-splash-control
+        fi
 	mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mkv -loop 0 &> /dev/null &
 
 	# Start Zynthian GUI & Synth Engine

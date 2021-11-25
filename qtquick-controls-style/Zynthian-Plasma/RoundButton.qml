@@ -21,10 +21,11 @@ T.RoundButton {
                             + topPadding + bottomPadding
 
     radius: Math.min(width, height) / 2
-    leftPadding: text.length > 0 ? surfaceNormal.margins.left : contentItem.extraSpace
-    topPadding: text.length > 0 ? surfaceNormal.margins.top : contentItem.extraSpace
-    rightPadding: text.length > 0 ? surfaceNormal.margins.right : contentItem.extraSpace
-    bottomPadding: text.length > 0 ? surfaceNormal.margins.bottom : contentItem.extraSpace
+    // The 0 padding when text exists used to be surfaceNormal.margins.left, but that element no longer exists
+    leftPadding: text.length > 0 ? 0 : contentItem.extraSpace
+    topPadding: text.length > 0 ? 0 : contentItem.extraSpace
+    rightPadding: text.length > 0 ? 0 : contentItem.extraSpace
+    bottomPadding: text.length > 0 ? 0 : contentItem.extraSpace
 
     hoverEnabled: !Kirigami.Settings.tabletMode
 
@@ -56,12 +57,14 @@ T.RoundButton {
     }
 
     background: Rectangle {
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.Button
         color: control.checked || control.highlighted
                 ? Kirigami.Theme.highlightColor
-                : theme.buttonBackgroundColor
+                : Kirigami.Theme.backgroundColor
         radius: control.radius
         border {
-            color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
+            color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.4)
         }
         opacity: control.enabled ? 1 : 0.5
 

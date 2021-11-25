@@ -680,7 +680,9 @@ Zynthian.BasePlayGrid {
                                             Zynthian.PlayGridButton {
                                                 Layout.fillWidth: true
                                                 Layout.preferredHeight: parent.height / 2
-                                                text: "Sound: " + zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                                text: patternsMenuItem.thisPattern.layer > 0
+                                                    ? "Sound: " + zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                                    : "Sound unassigned (using " + zynthian.fixed_layers.selector_list.getDisplayValue(0) + ")"
 //                                                     delegate: QQC2.ItemDelegate {
 //                                                         width: layerCombo.popup.width
 //                                                         highlighted: layerCombo.highlightedIndex === index

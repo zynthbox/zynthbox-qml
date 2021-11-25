@@ -385,10 +385,10 @@ QQC2.Dialog {
 
                             Layout.alignment: Qt.AlignHCenter
                             source: {
-                                if (filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isDir) {
+                                if (filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isDir) {
                                     return "folder-symbolic"
                                 }
-                                else if (filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav) {
+                                else if (filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav) {
                                     return "folder-music-symbolic"
                                 } else {
                                     return "file-catalog-symbolic"
@@ -399,20 +399,22 @@ QQC2.Dialog {
                         QQC2.Label {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.maximumWidth: Kirigami.Units.gridUnit*10
-                            elide: Text.Elide.Middle
-                            text: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.length > 23
-                                    ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.substring(0, 20) + '...'
-                                    : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename
+                            elide: Text.ElideMiddle
+                            text: filePropertiesColumn.filePropertiesHelperObj
+                                    ? (filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.length > 23
+                                        ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename.substring(0, 20) + '...'
+                                        : filePropertiesColumn.filePropertiesHelperObj.fileMetadata.filename)
+                                    : ""
                         }
 
                         QQC2.Button {
                             id: previewButton
-                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
                             Layout.alignment: Qt.AlignHCenter
                             Layout.topMargin: Kirigami.Units.gridUnit
                             Layout.bottomMargin: Kirigami.Units.gridUnit
-                            text: filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
-                            icon.name: filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
+                            text: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? qsTr("Stop") : qsTr("Preview")
+                            icon.name: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying ? "media-playback-stop" : "media-playback-start"
                             onClicked: {
                                 if (filePropertiesColumn.filePropertiesHelperObj.isPreviewPlaying) {
                                     filePropertiesColumn.filePropertiesHelperObj.stopPreview();
@@ -424,26 +426,26 @@ QQC2.Dialog {
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
-                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Size: %1 MB").arg((filePropertiesColumn.filePropertiesHelperObj.fileMetadata.size/1024/1024).toFixed(2))
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Size: %1 MB").arg((filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.size : 0/1024/1024).toFixed(2))
                         }
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
-                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Sample Rate: %1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.sampleRate)
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Sample Rate: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.sampleRate : 0)
                         }
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
-                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Channels: %1").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels)
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Channels: %1").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.channels : 0)
                         }
 
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
-                            visible: filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Duration: %1 secs").arg(filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1))
+                            visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
+                            label: qsTr("Duration: %1 secs").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1) : 0)
                         }
                     }
                 }

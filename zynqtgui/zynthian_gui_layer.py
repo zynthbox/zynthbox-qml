@@ -459,6 +459,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.add_to_fxchain(layer, self.layer_chain_parallel)
 					if layer not in self.layers:
 						self.layers.append(layer)
+						self.layer_created.emit(midich)
 			# Try to connect MIDI tools ...
 			elif len(self.layers)>0 and layer.engine.type=="MIDI Tool":
 				if self.replace_layer_index is not None:
@@ -467,10 +468,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.add_to_midichain(layer, self.layer_chain_parallel)
 					if layer not in self.layers:
 						self.layers.append(layer)
+						self.layer_created.emit(midich)
 			# New root layer
 			else:
 				if layer not in self.layers:
 					self.layers.append(layer)
+					self.layer_created.emit(midich)
 
 			self.zyngui.zynautoconnect()
 
@@ -1910,6 +1913,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.zynautoconnect_midi()
 			new_layer.reset_audio_out()
 			self.layers.append(new_layer)
+			self.layer_created.emit(to_midichan)
 			self.ensure_special_layers_midi_cloned()
 
 			self.fill_list()
@@ -1963,6 +1967,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	engine_nick_changed = Signal()
 
 	engine_nick = Property(str, get_engine_nick, notify = engine_nick_changed)
+
+	layer_created = Signal(int)
 
 
 #------------------------------------------------------------------------------

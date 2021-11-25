@@ -64,7 +64,19 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
 
+        self.zyngui.screens["layer"].layer_created.connect(self.layer_created)
+
         self.show()
+
+    def layer_created(self, index):
+        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+        logging.error(f"Layer created : {index}, Selected Track Chained Sounds : {selected_track.chainedSounds}")
+
+        if index in selected_track.chainedSounds:
+            logging.error(f"Chaining layers {selected_track.connectedSound, index}")
+            self.zyngui.screens['layer'].clone_midi(selected_track.connectedSound, index)
+            self.zyngui.screens['layer'].clone_midi(index, selected_track.connectedSound)
+            selected_track.chained_sounds_changed.emit()
 
     ### Property name
     def get_name(self):

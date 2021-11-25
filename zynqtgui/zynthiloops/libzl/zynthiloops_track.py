@@ -243,7 +243,7 @@ class zynthiloops_track(QObject):
         logging.error(f"Already Assigned layers : {assigned_layers}")
 
         for i in range(0, 15):
-            if i not in assigned_layers:
+            if i not in assigned_layers and (i < 5 or i > 9):
                 next_free_layer = i
                 break
 
@@ -258,10 +258,6 @@ class zynthiloops_track(QObject):
     @Slot(int, result=str)
     def getLayerNameByMidiChannel(self, channel):
         layer = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_data[channel]
-        # layer_metadata = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_metadata[channel]
-
-        # logging.error(f"Layer Data : {layer}")
-        # logging.error(f"Layer Metadata : {layer_metadata}")
 
         return layer[2]
 

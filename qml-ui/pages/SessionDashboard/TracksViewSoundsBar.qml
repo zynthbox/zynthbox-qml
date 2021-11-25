@@ -57,11 +57,8 @@ Zynthian.Card {
                 }
 
                 RowLayout {
-                    anchors.verticalCenter: parent.verticalCenter
                     opacity: root.selectedRowIndex === index ? 1 : 0.5
-
-                    Layout.leftMargin: Kirigami.Units.gridUnit
-                    Layout.rightMargin: Kirigami.Units.gridUnit
+                    anchors.verticalCenter: parent.verticalCenter
 
                     Rectangle {
                         Layout.fillWidth: false
@@ -69,6 +66,7 @@ Zynthian.Card {
                         Layout.preferredWidth: Kirigami.Units.gridUnit*16
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
+                        Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
                         color: Kirigami.Theme.buttonBackgroundColor

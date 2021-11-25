@@ -207,23 +207,64 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: 1
             RowLayout {
                 Layout.fillWidth: true
-                Kirigami.Heading {
+                QQC2.Button {
                     Layout.fillWidth: true
-                    level: 2
-                    text: qsTr("Track %1 Sounds").arg(zynthian.session_dashboard.selectedTrack+1)
-                    Kirigami.Theme.inherit: false
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    Layout.preferredHeight: favModeButton.height
+                    implicitWidth: 1
+                    text: qsTr("1 - 5")
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 0
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 0;
+                            zynthian.main_layers_view.activate_index(0);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("6.x")
+                    implicitWidth: 1
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 5
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 5;
+                            zynthian.main_layers_view.activate_index(0);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    text: qsTr("11-15")
+                    implicitWidth: 1
+                    checkable: true
+                    checked: zynthian.main_layers_view.start_midi_chan === 10
+                    autoExclusive: true
+                    onToggled: {
+                        if (checked) {
+                            zynthian.main_layers_view.start_midi_chan = 10;
+                            zynthian.main_layers_view.activate_index(0);
+                        }
+                    }
+                }
+                QQC2.Button {
+                    implicitWidth: Math.round(parent.width/3.2)
+                    text: "|"
+                    enabled: zynthian.main_layers_view.start_midi_chan !== 5 && layersView.view.currentIndex < layersView.view.count - 1
+                    onClicked: {
+                        if (layersView.view.currentItem) {
+                            layersView.view.currentItem.toggleCloned();
+                        }
+                    }
                 }
             }
             Zynthian.SelectorView {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: "fixed_layers"
-
-                property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-
+                screenId: "main_layers_view"
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
                 onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -236,8 +277,6 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
-                    visible: layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1
-                    height: visible ? implicitHeight : 0
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
@@ -350,10 +389,10 @@ Zynthian.ScreenPage {
                             RowLayout {
                                 id: fxLayout
                                 anchors.fill: parent
-                               /* QQC2.Label {
+                                QQC2.Label {
                                     text: "|"
                                     opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
-                                }*/
+                                }
                                 QQC2.Label {
                                     Layout.fillWidth: true
                                     font.pointSize: mainLabel.font.pointSize * 0.9

@@ -185,8 +185,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
             if i < 15:
                 metadata["midi_cloned"] = self.zyngui.screens['layer'].is_midi_cloned(i, i+1)
+                metadata["midi_cloned_to"] = []
+                for j in range(15):
+                    if i != j and self.zyngui.screens['layer'].is_midi_cloned(i, j):
+                        metadata["midi_cloned_to"].append(j)
             else:
                 metadata["midi_cloned"] = False
+                metadata["midi_cloned_to"] = []
             metadata["midi_channel"] = i
             metadata["octave_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_octave_trans(i)
             metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)

@@ -602,6 +602,20 @@ Zynthian.BasePlayGrid {
 
                                         ColumnLayout {
                                             Layout.fillHeight: true
+                                            Layout.minimumWidth: height
+                                            Layout.maximumWidth: height
+                                            Zynthian.PlayGridButton {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                Layout.margins: Kirigami.Units.largeSpacing
+                                                icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : "player-volume-muted"
+                                                onClicked: {
+                                                    patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                }
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
                                             Layout.minimumWidth: (parent.width / 7);
                                             Layout.maximumWidth: (parent.width / 7);
 
@@ -625,20 +639,6 @@ Zynthian.BasePlayGrid {
                                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                                 color: Kirigami.Theme.textColor
                                                 horizontalAlignment: Text.AlignHCenter
-                                            }
-                                        }
-                                        ColumnLayout {
-                                            Layout.fillHeight: true
-                                            Layout.minimumWidth: height
-                                            Layout.maximumWidth: height
-                                            Zynthian.PlayGridButton {
-                                                Layout.fillHeight: true
-                                                Layout.fillWidth: true
-                                                Layout.margins: Kirigami.Units.largeSpacing
-                                                icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : "player-volume-muted"
-                                                onClicked: {
-                                                    patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
-                                                }
                                             }
                                         }
                                         ColumnLayout {

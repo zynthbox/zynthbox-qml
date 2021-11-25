@@ -636,6 +636,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__last_recording_type__ = ""
         # self.__song__.save()
 
+    def get_next_free_layer(self):
+        logging.error(self.zyngui.screens["layers"].layers)
+
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):
         return self.__current_beat__

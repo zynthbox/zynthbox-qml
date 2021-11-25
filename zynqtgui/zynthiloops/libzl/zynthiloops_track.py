@@ -49,6 +49,7 @@ class zynthiloops_track(QObject):
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
         self.__connected_sound__ = -1
+        self.__chained_sounds__ = [-1, -1, -1, -1, -1]
 
         if self.__id__ < 5:
             self.__connected_sound__ = self.__id__
@@ -66,6 +67,7 @@ class zynthiloops_track(QObject):
                 "volume": self.__volume__,
                 "connectedPattern": self.__connected_pattern__,
                 "connectedSound": self.__connected_sound__,
+                "chainedSounds": self.__chained_sounds__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -81,6 +83,9 @@ class zynthiloops_track(QObject):
         if "connectedSound" in obj:
             self.__connected_sound__ = obj["connectedSound"]
             self.set_connected_sound(self.__connected_sound__)
+        if "chainedSounds" in obj:
+            self.__chained_sounds__ = obj["chainedSounds"]
+            self.set_chained_sounds(self.__chained_sounds__)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -229,6 +234,37 @@ class zynthiloops_track(QObject):
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
 
+    @Slot(int)
+    def createChainedSoundInNextFreeLayer(self, index):
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
+        next_free_layer = -1
+
+        logging.error(f"Already Assigned layers : {assigned_layers}")
+
+        for i in range(0, 15):
+            if i not in assigned_layers:
+                next_free_layer = i
+                break
+
+        logging.error(f"Next free layer : {next_free_layer}")
+        zyngui.screens["fixed_layers"].activate_index(next_free_layer)
+
+        self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
+        self.__chained_sounds__[index] = next_free_layer
+        self.__song__.schedule_save()
+        self.chained_sounds_changed.emit()
+
+    @Slot(int, result=str)
+    def getLayerNameByMidiChannel(self, channel):
+        layer = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_data[channel]
+        # layer_metadata = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_metadata[channel]
+
+        # logging.error(f"Layer Data : {layer}")
+        # logging.error(f"Layer Metadata : {layer_metadata}")
+
+        return layer[2]
+
     ### Property connectedPattern
     def get_connected_pattern(self):
         return self.__connected_pattern__
@@ -253,14 +289,15 @@ class zynthiloops_track(QObject):
     connectedSound = Property(int, get_connected_sound, set_connected_sound, notify=connected_sound_changed)
     ### END Property connectedSound
 
-    # Helper method to map value from one range to another
-    # @staticmethod
-    # def map_range(sourceNumber, fromA, fromB, toA, toB):
-    #     deltaA = fromB - fromA
-    #     deltaB = toB - toA
-    #     scale  = deltaB / deltaA
-    #     negA   = -1 * fromA
-    #     offset = (negA * scale) + toA
-    #     finalNumber = (sourceNumber * scale) + offset
-    #
-    #     return finalNumber
+    ### Property chainedSounds
+    def get_chained_sounds(self):
+        return self.__chained_sounds__
+
+    def set_chained_sounds(self, sounds):
+        self.__chained_sounds__ = sounds
+        self.__song__.schedule_save()
+        self.chained_sounds_changed.emit()
+
+    chained_sounds_changed = Signal()
+    chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
+    ### END Property chainedSounds

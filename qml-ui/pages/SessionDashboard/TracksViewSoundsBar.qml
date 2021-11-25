@@ -10,6 +10,7 @@ Zynthian.Card {
     id: root
 
     property int selectedRowIndex: 0
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -39,8 +40,12 @@ Zynthian.Card {
         anchors.margins: Kirigami.Units.gridUnit
 
         Repeater {
-            model: 5
+            model: root.selectedTrack.chainedSounds
             delegate: Rectangle {
+                id: soundDelegate
+
+                property int chainedSound: modelData
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -58,12 +63,12 @@ Zynthian.Card {
 
                 RowLayout {
                     opacity: root.selectedRowIndex === index ? 1 : 0.5
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.fill: parent
 
                     Rectangle {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*16
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
@@ -84,7 +89,106 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: ""
+                            text: root.selectedTrack.getLayerNameByMidiChannel(modelData)
+
+                            elide: "ElideRight"
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (root.selectedRowIndex !== index) {
+                                    root.selectedRowIndex = index;
+                                } else {
+                                    if (soundDelegate.chainedSound >= 0) {
+                                        // Open library page
+                                    } else {
+                                        root.selectedTrack.createChainedSoundInNextFreeLayer(index);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    QQC2.RoundButton {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
+                        radius: 4
+                        enabled: root.selectedRowIndex === index
+
+                        Kirigami.Icon {
+                            width: Math.round(Kirigami.Units.gridUnit)
+                            height: width
+                            anchors.centerIn: parent
+                            source: "edit-clear-all"
+                            color: Kirigami.Theme.textColor
+                        }
+                    }
+
+                    QQC2.RoundButton {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
+                        radius: 4
+                        enabled: root.selectedRowIndex === index
+
+                        Kirigami.Icon {
+                            width: Math.round(Kirigami.Units.gridUnit)
+                            height: width
+                            anchors.centerIn: parent
+                            source: "document-edit"
+                            color: Kirigami.Theme.textColor
+                        }
+                    }
+
+                    QQC2.RoundButton {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
+                        radius: 4
+                        enabled: root.selectedRowIndex === index
+
+                        Kirigami.Icon {
+                            width: Math.round(Kirigami.Units.gridUnit)
+                            height: width
+                            anchors.centerIn: parent
+                            source: "documentinfo"
+                            color: Kirigami.Theme.textColor
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.leftMargin: Kirigami.Units.gridUnit
+                        Layout.rightMargin: Kirigami.Units.gridUnit
+
+                        color: Kirigami.Theme.buttonBackgroundColor
+
+                        border.color: "#ff999999"
+                        border.width: 1
+                        radius: 4
+
+                        QQC2.Label {
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                right: parent.right
+                                leftMargin: Kirigami.Units.gridUnit*0.5
+                                rightMargin: Kirigami.Units.gridUnit*0.5
+                            }
+                            horizontalAlignment: Text.AlignLeft
+                            text: "FX"
 
                             elide: "ElideRight"
                         }
@@ -102,6 +206,8 @@ Zynthian.Card {
                     }
 
                     QQC2.RoundButton {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*2
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
@@ -117,20 +223,20 @@ Zynthian.Card {
                         }
                     }
 
-                    QQC2.RoundButton {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                    QQC2.Slider {
+                        orientation: Qt.Horizontal
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
-                        radius: 4
-                        enabled: root.selectedRowIndex === index
+                        Layout.leftMargin: Kirigami.Units.gridUnit
+                        Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        Kirigami.Icon {
-                            width: Math.round(Kirigami.Units.gridUnit)
-                            height: width
-                            anchors.centerIn: parent
-                            source: "document-edit"
-                            color: Kirigami.Theme.textColor
-                        }
+                        from: 0
+                        to: 100
+                        stepSize: 1
+                        value: 100
                     }
                 }
             }

@@ -153,7 +153,9 @@ ColumnLayout {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit*2
                                 Layout.alignment: Qt.AlignVCenter
 
-                                color: Kirigami.Theme.buttonBackgroundColor
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: Kirigami.Theme.backgroundColor
 
                                 border.color: "#ff999999"
                                 border.width: 1
@@ -205,7 +207,9 @@ ColumnLayout {
                                         radius: 2
                                         highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
                                         background: Rectangle { // Derived from znthian qtquick-controls-style
-                                            color: model.clip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.buttonBackgroundColor
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: model.clip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
                                             border.color: trackDelegate.selectedClip === model.clip
                                                             ? Kirigami.Theme.highlightColor
                                                             : Qt.rgba(
@@ -255,7 +259,9 @@ ColumnLayout {
                                 Layout.topMargin: Kirigami.Units.gridUnit*0.3
                                 Layout.bottomMargin: Kirigami.Units.gridUnit*0.3
 
-                                color: Kirigami.Theme.buttonBackgroundColor
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: Kirigami.Theme.backgroundColor
                                 border.color: "#99999999"
                                 border.width: 1
                                 radius: 4
@@ -345,11 +351,11 @@ ColumnLayout {
                                             top: parent.top
                                             bottom: parent.bottom
                                         }
-                                        visible: patternVisualiser.sequence.isPlaying && patternVisualiser.pattern.enabled
+                                        visible: patternVisualiser.sequence && patternVisualiser.sequence.isPlaying && patternVisualiser.pattern && patternVisualiser.pattern.enabled
                                         color: Kirigami.Theme.highlightColor
                                         width: widthFactor // this way the progress rect is the same width as a step
-                                        property double widthFactor: parent.width / (patternVisualiser.pattern.width * patternVisualiser.pattern.bankLength)
-                                        x: patternVisualiser.pattern.bankPlaybackPosition * widthFactor
+                                        property double widthFactor: patternVisualiser.pattern ? parent.width / (patternVisualiser.pattern.width * patternVisualiser.pattern.bankLength) : 1
+                                        x: patternVisualiser.pattern ? patternVisualiser.pattern.bankPlaybackPosition * widthFactor : 0
                                     }
                                     QQC2.Label {
                                         anchors.fill: parent
@@ -357,8 +363,8 @@ ColumnLayout {
                                         verticalAlignment: Text.AlignBottom
                                         text: qsTr("Pattern %1%2 (%3)")
                                                 .arg(track.connectedPattern+1)
-                                                .arg(ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern).bank)
-                                                .arg(ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern).availableBars)
+                                                .arg(patternVisualiser.pattern ? patternVisualiser.pattern.bank : "")
+                                                .arg(patternVisualiser.pattern ? patternVisualiser.pattern.availableBars : "")
                                     }
                                 }
 
@@ -589,9 +595,11 @@ ColumnLayout {
                         highlighted: root.selectedTrack.connectedSound === index || model.metadata.isChainedToConnectedSound
 
                         background: Rectangle { // Derived from znthian qtquick-controls-style
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
                             color: soundBtnDelegate.highlighted
                                     ? Kirigami.Theme.highlightColor
-                                    : Kirigami.Theme.buttonBackgroundColor
+                                    : Kirigami.Theme.backgroundColor
                             border.color: soundBtnDelegate.hasConnectedTracks
                                             ? Kirigami.Theme.highlightColor
                                             : Qt.rgba(

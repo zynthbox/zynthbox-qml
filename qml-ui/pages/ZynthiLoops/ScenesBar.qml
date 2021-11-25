@@ -91,14 +91,16 @@ Rectangle {
                             scenesModel.selectedSceneIndex = index;
                         }
                         background: Rectangle {
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
                             color: control.checked
                                      ? Kirigami.Theme.highlightColor
                                      : scenesModel.clipCountInScene(index) > 0
                                          ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
-                                         : theme.buttonBackgroundColor
+                                         : Kirigami.Theme.backgroundColor
                             radius: control.radius
                             border {
-                                color: Qt.rgba(theme.buttonTextColor.r, theme.buttonTextColor.g, theme.buttonTextColor.b, 0.4)
+                                color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.4)
                             }
 
                             Rectangle {

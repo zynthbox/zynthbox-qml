@@ -75,7 +75,7 @@ T.MenuItem {
         y: controlRoot.topPadding + (controlRoot.availableHeight - height) / 2
         source: controlRoot.mirrored ? "go-next-symbolic-rtl" : "go-next-symbolic"
         status: controlRoot.highlighted ? PlasmaCore.Svg.Selected : PlasmaCore.Svg.Normal
-        width: Math.max(label.height, Kirigami.Units.iconSizes.small)
+        width: Math.max((label ? label.height : 0), Kirigami.Units.iconSizes.small)
         height: width
         visible: controlRoot.subMenu
     }

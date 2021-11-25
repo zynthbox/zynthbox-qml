@@ -13,7 +13,7 @@ PlasmaCore.FrameSvgItem {
     property Item control
     imagePath: "widgets/button"
     prefix: "normal"
-    implicitWidth: PlasmaCore.Units.iconSizes.small
+    implicitWidth: units.iconSizes.small
     implicitHeight: implicitWidth
     opacity: control.enabled ? 1 : 0.6
 

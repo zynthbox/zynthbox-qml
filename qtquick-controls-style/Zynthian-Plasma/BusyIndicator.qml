@@ -13,9 +13,9 @@ import org.kde.kirigami 2.5 as Kirigami
 T.BusyIndicator {
     id: control
 
-    implicitWidth: Math.max(background.implicitWidth,
+    implicitWidth: Math.max((background ? background.implicitWidth : 0),
                             contentItem.implicitWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(background.implicitHeight,
+    implicitHeight: Math.max((background ? background.implicitHeight : 0),
                              contentItem.implicitHeight + topPadding + bottomPadding)
 
     /* PC2 BusyIndicator didn't have padding or margins and

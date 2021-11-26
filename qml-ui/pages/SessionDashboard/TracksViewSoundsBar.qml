@@ -113,16 +113,15 @@ Zynthian.Card {
 
                         MouseArea {
                             anchors.fill: parent
+
                             onClicked: {
                                 if (root.selectedRowIndex !== index) {
                                     root.selectedRowIndex = index;
                                 } else {
                                     if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                         // Open library page
+                                        zynthian.current_screen_id = 'fixed_layers';
                                         bottomDrawer.close();
-
-                                        zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
-                                        zynthian.current_screen_id = 'layer';
                                     } else {
                                         if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                             noFreeSlotsPopup.open();

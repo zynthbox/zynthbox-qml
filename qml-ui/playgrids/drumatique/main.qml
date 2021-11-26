@@ -608,7 +608,7 @@ Zynthian.BasePlayGrid {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
                                                 Layout.margins: Kirigami.Units.largeSpacing
-                                                icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : "player-volume-muted"
+                                                icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : ""
                                                 onClicked: {
                                                     patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
                                                 }

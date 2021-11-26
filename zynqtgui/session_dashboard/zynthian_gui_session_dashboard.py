@@ -36,7 +36,7 @@ from pathlib import Path
 from zynqtgui import zynthian_gui_selector
 
 # Qt modules
-from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property, QMetaObject
 
 
 #------------------------------------------------------------------------------
@@ -59,6 +59,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.__name__ = None
             self.__id__ = 0
             self.__selected_track__ = 0
+            self.set_selected_track(self.__selected_track__, True)
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -76,7 +77,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             logging.error(f"Chaining layers {selected_track.connectedSound, index}")
             self.zyngui.screens['layer'].clone_midi(selected_track.connectedSound, index)
             self.zyngui.screens['layer'].clone_midi(index, selected_track.connectedSound)
-            selected_track.chained_sounds_changed.emit()
+            QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+
+    @Slot(None)
+    def emit_chained_sounds_changed(self):
+        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+        selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+        self.set_selected_track(self.selectedTrack, True)
 
     ### Property name
     def get_name(self):

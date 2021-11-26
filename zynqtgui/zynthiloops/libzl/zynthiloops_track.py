@@ -54,9 +54,10 @@ class zynthiloops_track(QObject):
         if self.__id__ < 5:
             self.__connected_sound__ = self.__id__
 
-        # Do not connect pattern by default
-        # if self.__id__ > 5 and self.__id__ < 11:
-        #     self.__connected_pattern__ = self.__id__ - 6
+        # Connect to default patterns on init
+        # This will be overwritten by deserialize if user changed the value, so it is safe to always set the value
+        if self.__id__ > 5 and self.__id__ < 11:
+             self.__connected_pattern__ = self.__id__ - 6
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)

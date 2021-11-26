@@ -132,7 +132,7 @@ Zynthian.ScreenPage {
                                 settingsDialog.visible = false;
                             }
                         }
-                        // property list<QtObject> contextualActions: []
+                        property list<QtObject> contextualActions
                     }
                 }
 

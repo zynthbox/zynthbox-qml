@@ -120,7 +120,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
     def __init__(self, parent = None):
         super(zynthian_gui_fixed_layers, self).__init__('Layer', parent)
 
-        self.__layers_count = 5
+        self.__layers_count = 15
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
         self.show()

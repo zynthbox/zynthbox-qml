@@ -93,7 +93,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def emit_chained_sounds_changed(self):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
         selected_track.set_chained_sounds(selected_track.get_chained_sounds())
-        self.set_selected_track(self.selectedTrack, True)
+        # self.set_selected_track(self.selectedTrack, True)
 
     ### Property name
     def get_name(self):

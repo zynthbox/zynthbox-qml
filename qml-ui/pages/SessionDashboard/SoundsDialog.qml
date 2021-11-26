@@ -66,8 +66,8 @@ QQC2.Dialog {
             Layout.preferredWidth: 1
             text: qsTr("Un-select all slots")
             onClicked: {
-                soundsDialog.selectedTrack.connectedSound = -1;
-                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1]
+              //  soundsDialog.selectedTrack.connectedSound = -1;
+                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
                 /*if (soundsDialog.selectedTrack.connectedPattern >= 0) {
                     var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
                     seq.midiChannel = soundsDialog.selectedTrack.connectedSound;

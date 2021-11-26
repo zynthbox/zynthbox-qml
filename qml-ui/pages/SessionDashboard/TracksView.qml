@@ -207,6 +207,16 @@ ColumnLayout {
                                         Layout.alignment: Qt.AlignVCenter
                                         radius: 2
                                         highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
+                                        property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+                                        property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                        Connections {
+                                            target: pattern
+                                            onEnabledChanged: {
+                                                if (model.clip.col === pattern.bankOffset / pattern.bankLength && ((pattern.enabled && !model.clip.inCurrentScene) || (!pattern.enabled && model.clip.inCurrentScene))) {
+                                                    zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
+                                                }
+                                            }
+                                        }
                                         background: Rectangle { // Derived from znthian qtquick-controls-style
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -235,14 +245,13 @@ ColumnLayout {
                                             trackDelegate.selectedClip = model.clip;
 
                                             zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
-                                            if (track.connectedPattern >= 0) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
-                                                seq.bank = model.clip.col === 0 ? "A" : "B";
+                                            if (control.pattern) {
+                                                pattern.bank = model.clip.col === 0 ? "A" : "B";
 
                                                 if (model.clip.inCurrentScene) {
-                                                    seq.enabled = true;
+                                                    pattern.enabled = true;
                                                 } else {
-                                                    seq.enabled = false;
+                                                    pattern.enabled = false;
                                                 }
                                             }
                                         }

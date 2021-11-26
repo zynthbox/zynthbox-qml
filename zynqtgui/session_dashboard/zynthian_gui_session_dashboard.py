@@ -137,6 +137,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         return self.__selected_track__
     def set_selected_track(self, track, force_set=False):
         def change_to_track_sound():
+            # logging.error(f"### Remove previous clones")
+            # current_layers = [x for x in self.zyngui.screens['layer'].layer_midi_map.keys()]
+            # for i in range(0, 16):
+            #     for j in range(0, 16):
+            #         # logging.error(f"Removing clone {i, j}")
+            #         self.zyngui.screens['layer'].remove_clone_midi(i, j)
+
             connectedSound = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound
 
             if connectedSound >= 0:

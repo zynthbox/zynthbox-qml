@@ -288,6 +288,29 @@ class zynthiloops_track(QObject):
     def checkIfLayerExists(self, channel):
         return channel in self.__song__.get_metronome_manager().zyngui.screens["layer"].layer_midi_map.keys()
 
+    @Slot(int)
+    def selectSound(self, index):
+        zyngui = self.__song__.get_metronome_manager().zyngui
+
+        if index in self.__chained_sounds__:
+            zyngui.screens["fixed_layers"].activate_index(index)
+        else:
+            sounds_to_clone = []
+            for m_sound in self.__chained_sounds__:
+                if m_sound > -1:
+                    sounds_to_clone.append(m_sound)
+
+            for _index in range(0, len(sounds_to_clone) - 1):
+                logging.error(f"Removing cloned layers {sounds_to_clone[_index], sounds_to_clone[_index + 1]}")
+                zyngui.screens['layer'].remove_clone_midi(sounds_to_clone[_index], sounds_to_clone[_index + 1])
+                zyngui.screens['layer'].remove_clone_midi(sounds_to_clone[_index + 1], sounds_to_clone[_index])
+
+            self.set_chained_sounds([index, -1, -1, -1, -1])
+            zyngui.screens["fixed_layers"].activate_index(index)
+
+        self.connected_sound_changed.emit()
+        self.chained_sounds_changed.emit()
+
     ### Property connectedPattern
     def get_connected_pattern(self):
         return self.__connected_pattern__

@@ -167,12 +167,12 @@ QQC2.Dialog {
                     onClicked: {
                         soundsDialog.close();
 
-                        // soundsDialog.selectedTrack.replaceChainedSound(zynthian.active_midi_channel, index);
+                        soundsDialog.selectedTrack.selectSound(index);
 
-//                        if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-//                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
-//                            seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
-//                        }
+                        if (soundsDialog.selectedTrack.connectedPattern >= 0) {
+                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
+                            seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
+                        }
 
                         zynthian.fixed_layers.activate_index(index);
                     }

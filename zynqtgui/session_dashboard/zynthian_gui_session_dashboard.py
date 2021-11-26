@@ -61,6 +61,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.__selected_track__ = 0
             self.set_selected_track(self.__selected_track__, True)
 
+            selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+            selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
         self.__save_timer__.timeout.connect(self.save)
@@ -205,6 +208,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             if "selectedTrack" in session:
                 self.set_selected_track(session["selectedTrack"], True)
                 self.selected_track_changed.emit()
+                QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
             if "sketches" in session:
                 self.__session_sketches_model__.deserialize(session["sketches"])
                 self.session_sketches_model_changed.emit()

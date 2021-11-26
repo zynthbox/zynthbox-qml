@@ -264,7 +264,7 @@ Kirigami.AbstractApplicationWindow {
         id: screensLayer
         parent: root.contentItem
         anchors.fill: parent
-        initialItem: root.pageScreenMapping.pageForScreen('main_layers_view')
+        initialItem: root.pageScreenMapping.pageForScreen('fixed_layers')
     }
 
     ModalScreensLayer {

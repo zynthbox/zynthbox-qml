@@ -44,9 +44,9 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            id: playgridActions
-            text: " "
-            onTriggered: {}
+            id: placeholderAction
+            text: children.length > 0 ? qsTr("%1 Actions").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ") : "       "
+            enabled: children.length > 0
         },
         Kirigami.Action {
             id: playgridSwitchAction
@@ -79,7 +79,6 @@ Zynthian.ScreenPage {
             if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
                 var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
                 playGridStack.replace(playgrid.grid);
-                settingsStack.replace(playgrid.settings);
                 currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
             }
         }

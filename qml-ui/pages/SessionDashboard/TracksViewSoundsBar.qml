@@ -14,8 +14,6 @@ Zynthian.Card {
     property var chainedSounds: selectedTrack.chainedSounds
 
     onChainedSoundsChanged: {
-        console.log("### Chained Sounds Changed");
-
         // Hack to always update UI
         chainedSoundsRepeater.model = [];
         chainedSoundsRepeater.model = chainedSounds;
@@ -63,10 +61,6 @@ Zynthian.Card {
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
-
-                Component.onCompleted: {
-                    console.log("### Chained Sound delegate : ", chainedSound, root.selectedTrack.getLayerNameByMidiChannel(chainedSound))
-                }
 
                 MouseArea {
                     anchors.fill: parent

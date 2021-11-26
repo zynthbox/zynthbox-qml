@@ -164,6 +164,7 @@ ColumnLayout {
                                 opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.5
 
                                 QQC2.Label {
+                                    id: soundLabel
                                     anchors {
                                         verticalCenter: parent.verticalCenter
                                         left: parent.left
@@ -173,6 +174,10 @@ ColumnLayout {
                                     }
                                     horizontalAlignment: Text.AlignLeft
                                     text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    Connections {
+                                        target: zynthian.fixed_layers
+                                        onList_updated: soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    }
 
                                     elide: "ElideRight"
                                 }

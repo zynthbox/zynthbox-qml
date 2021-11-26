@@ -234,7 +234,7 @@ class zynthiloops_track(QObject):
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
 
-    @Slot(int)
+    @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
         zyngui = self.__song__.get_metronome_manager().zyngui
         assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
@@ -247,19 +247,33 @@ class zynthiloops_track(QObject):
                 next_free_layer = i
                 break
 
-        logging.error(f"Next free layer : {next_free_layer}")
-        zyngui.screens["fixed_layers"].activate_index(next_free_layer)
+        if next_free_layer == -1:
+            return False
+        else:
+            logging.error(f"Next free layer : {next_free_layer}")
+            zyngui.screens["fixed_layers"].activate_index(next_free_layer)
 
-        self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
-        self.__chained_sounds__[index] = next_free_layer
-        self.__song__.schedule_save()
-        self.chained_sounds_changed.emit()
+            self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
+            self.__chained_sounds__[index] = next_free_layer
+            self.__song__.schedule_save()
+            self.chained_sounds_changed.emit()
+            
+            return True
 
     @Slot(int, result=str)
     def getLayerNameByMidiChannel(self, channel):
-        layer = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_data[channel]
+        if self.checkIfLayerExists(channel):
+            try:
+                layer = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_data[channel]
+                return layer[2]
+            except:
+                return ""
+        else:
+            return ""
 
-        return layer[2]
+    @Slot(int, result=bool)
+    def checkIfLayerExists(self, channel):
+        return channel in self.__song__.get_metronome_manager().zyngui.screens["layer"].layer_midi_map.keys()
 
     ### Property connectedPattern
     def get_connected_pattern(self):

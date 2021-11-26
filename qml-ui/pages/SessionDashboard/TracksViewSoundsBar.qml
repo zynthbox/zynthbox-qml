@@ -48,7 +48,6 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
-            model: root.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 
@@ -110,10 +109,12 @@ Zynthian.Card {
                                 if (root.selectedRowIndex !== index) {
                                     root.selectedRowIndex = index;
                                 } else {
-                                    if (soundDelegate.chainedSound >= 0) {
+                                    if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                         // Open library page
                                     } else {
-                                        root.selectedTrack.createChainedSoundInNextFreeLayer(index);
+                                        if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
+                                            noFreeSlotsPopup.open();
+                                        }
                                     }
                                 }
                             }
@@ -252,6 +253,24 @@ Zynthian.Card {
                     }
                 }
             }
+        }
+    }
+
+    QQC2.Popup {
+        id: noFreeSlotsPopup
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit*12
+        height: Kirigami.Units.gridUnit*4
+        modal: true
+
+        QQC2.Label {
+            width: parent.width
+            height: parent.height
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            text: qsTr("No free slots remaining")
+            font.italic: true
         }
     }
 } 

@@ -111,7 +111,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: trackButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Track %3")
+                text: qsTr("Track %1 ˬ")
                         .arg(zynthian.session_dashboard.selectedTrack+1)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
@@ -125,7 +125,7 @@ Kirigami.AbstractApplicationWindow {
                     Repeater {
                         model: zynthian.zynthiloops.song.tracksModel
                         delegate: QQC2.MenuItem {
-                            text: qsTr("Track %3").arg(index + 1)
+                            text: qsTr("Track %1").arg(index + 1)
                             width: parent.width
                             //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
                             //height: visible ? implicitHeight : 0
@@ -141,7 +141,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: synthButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.bank.selector_path_element
+                text: zynthian.bank.selector_path_element + "ˬ"
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: soundsDialog.visible = true

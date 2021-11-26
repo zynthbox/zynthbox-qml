@@ -41,13 +41,13 @@ QQC2.Dialog {
     id: soundsDialog
     modal: true
 
-    x: root.parent.mapFromGlobal(0, 0).x
-    y: root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y
+    x: root.parent ? root.parent.mapFromGlobal(0, 0).x : 0
+    y: root.parent ? root.parent.mapFromGlobal(0, Math.round(Screen.height/2 - height/2)).y : 0
     width: Screen.width - Kirigami.Units.gridUnit*2
     height: Screen.height - Kirigami.Units.gridUnit*2
 
     header: Kirigami.Heading {
-        text: qsTr("Pick a sound for %1").arg(root.selectedTrack.name)
+        text: qsTr("Pick a sound for %1").arg(root.selectedTrack ? root.selectedTrack.name : "(no selected track)")
         font.pointSize: 16
         padding: Kirigami.Units.gridUnit
     }
@@ -100,14 +100,14 @@ QQC2.Dialog {
                     property bool hasConnectedTracks: false
 
                     Kirigami.Theme.highlightColor: {
-                        if (root.selectedTrack.connectedSound === index) {
+                        if (root.selectedTrack && root.selectedTrack.connectedSound === index) {
                             return Qt.rgba(
                                 Kirigami.Theme.highlightColor.r,
                                 Kirigami.Theme.highlightColor.g,
                                 Kirigami.Theme.highlightColor.b,
                                 1
                             )
-                        } else if (model.metadata.isChainedToConnectedSound) {
+                        } else if (model.metadata && model.metadata.isChainedToConnectedSound) {
                             return Qt.rgba(
                                 Kirigami.Theme.highlightColor.r,
                                 Kirigami.Theme.highlightColor.g,
@@ -130,7 +130,7 @@ QQC2.Dialog {
                     Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                     text: model.display
                     radius: 4
-                    highlighted: root.selectedTrack.connectedSound === index || model.metadata.isChainedToConnectedSound
+                    highlighted: (root.selectedTrack && root.selectedTrack.connectedSound === index) || (model.metadata && model.metadata.isChainedToConnectedSound)
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
                         Kirigami.Theme.inherit: false

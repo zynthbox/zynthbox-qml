@@ -253,13 +253,7 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 id: mainLabel
                                 Layout.fillWidth: true
-                                text: {
-                                    let numPrefix = model.metadata.midi_channel + 1;
-                                    if (numPrefix > 5 && numPrefix <= 10) {
-                                        numPrefix = "6." + (numPrefix - 5);
-                                    }
-                                    return numPrefix + " - " + model.display;
-                                }
+                                text: model.metadata.midi_channel + 1 + " - " + model.display;
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {

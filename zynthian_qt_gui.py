@@ -261,8 +261,7 @@ class zynthian_gui(QObject):
 
     screens_sequence = (
         "session_dashboard",  #FIXME or main? make this more configurable?
-        "layer",
-        "main_layers_view",
+        "fixed_layers",
         "bank",
         "preset",
         "control",
@@ -272,6 +271,8 @@ class zynthian_gui(QObject):
     non_modal_screens = (
         "session_dashboard",  #FIXME or main? make this more configurable?
         "main",
+        "layer",
+        "fixed_layers",
         "main_layers_view",
         "bank",
         "preset",

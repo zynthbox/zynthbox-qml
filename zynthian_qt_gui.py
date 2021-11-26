@@ -711,8 +711,8 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
-        elif screen is "layer" or screen is "fixed_layers":  #HACK replace completely layer with fixed_layers
-            screen = "main_layers_view"
+        elif screen is "layer" or screen is "main_layers_view":  #HACK replace completely layer with fixed_layers
+            screen = "fixed_layers"
 
         if (
             screen == "layer"
@@ -1213,7 +1213,7 @@ class zynthian_gui(QObject):
             self.show_screen("admin")
 
         elif cuia == "SCREEN_LAYER":
-            self.show_screen("layer")
+            self.show_screen("fixed_layers")
 
         elif cuia == "SCREEN_BANK":
             self.show_screen("bank")

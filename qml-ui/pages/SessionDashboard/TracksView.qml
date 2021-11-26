@@ -172,7 +172,7 @@ ColumnLayout {
                                         rightMargin: Kirigami.Units.gridUnit*0.5
                                     }
                                     horizontalAlignment: Text.AlignLeft
-                                    text: track.connectedSound >= 0 ? (track.connectedSound + 1) + ". "+ zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
 
                                     elide: "ElideRight"
                                 }

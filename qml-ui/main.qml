@@ -31,6 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
+import "pages/SessionDashboard" as SessionDashboard
 
 Kirigami.AbstractApplicationWindow {
     id: root
@@ -118,6 +119,7 @@ Kirigami.AbstractApplicationWindow {
                 rightPadding: Kirigami.Units.largeSpacing*2
             }
             Zynthian.BreadcrumbButton {
+                id: layersButton
                 text: {
                     if (zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
                         if (zynthian.engine.midi_channel > 10) {
@@ -134,9 +136,18 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
                 onTextChanged: zynthian.fixed_layers.start_midi_chan = 0;
-                onClicked: layersMenu.visible = true
+                onClicked: soundsDialog.visible = true
                 highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers' || zynthian.current_screen_id === 'main_layers_view'
-                QQC2.Menu {
+                SessionDashboard.SoundsDialog {
+                    id: soundsDialog
+                    width: Screen.width
+                    height: Screen.height - layersButton.height - Kirigami.Units.gridUnit
+                    onVisibleChanged: {
+                        x = layersButton.mapFromGlobal(0, 0).x
+                        y = layersButton.height + Kirigami.Units.smallSpacing
+                    }
+                }
+                /*QQC2.Menu {
                     id: layersMenu
                     y: parent.height
                     modal: true
@@ -199,7 +210,7 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                }
+                }*/
             }
         }
         rightHeaderControl: Zynthian.StatusInfo {}

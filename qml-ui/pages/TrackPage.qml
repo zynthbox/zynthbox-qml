@@ -142,7 +142,6 @@ Zynthian.ScreenPage {
                             text: qsTr("Load Voices")
                             onClicked: {
                                 zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
-                                zynthian.layer.ensure_special_layers_midi_cloned()
                                 //zynthian.fixed_layers.activate_index(6)
                             }
                         }
@@ -226,13 +225,11 @@ Zynthian.ScreenPage {
                                         if (index === 0) {
                                             zynthian.layer.remove_clone_midi(5, channelDelegate.targetMidiChan);
                                             zynthian.layer.remove_midichan_layer(channelDelegate.targetMidiChan);
-                                            zynthian.layer.ensure_special_layers_midi_cloned()
                                             voiceCombo.updateText()
                                         } else {
                                             print("COPYING "+(index-1)+" "+ channelDelegate.targetMidiChan)
                                             zynthian.layer.copy_midichan_layer(index-1, channelDelegate.targetMidiChan);
                                             print("COPIED")
-                                            zynthian.layer.ensure_special_layers_midi_cloned()
 
                                             voiceCombo.updateText()
                                         }

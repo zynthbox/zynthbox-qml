@@ -493,7 +493,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['layer'].select_action(self.zyngui.screens['layer'].index)
 			if not self.zyngui.screens['bank'].get_show_top_sounds():
 				self.zyngui.screens['bank'].select_action(0)
-		self.ensure_special_layers_midi_cloned()
 
 
 	def remove_layer(self, i, stop_unused_engines=True):
@@ -1483,8 +1482,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.index = 0
 					self.zyngui.show_screen('layer')
 
-			self.ensure_special_layers_midi_cloned()
-
 
 
 		except Exception as e:
@@ -1630,7 +1627,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		self.zyngui.zynautoconnect_midi()
 		self.zyngui.zynautoconnect_audio()
-		self.ensure_special_layers_midi_cloned()
 
 		self.fill_list()
 		if len(restored_channels) > 0:
@@ -1914,7 +1910,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			new_layer.reset_audio_out()
 			self.layers.append(new_layer)
 			self.layer_created.emit(to_midichan)
-			self.ensure_special_layers_midi_cloned()
 
 			self.fill_list()
 			self.zyngui.stop_loading()

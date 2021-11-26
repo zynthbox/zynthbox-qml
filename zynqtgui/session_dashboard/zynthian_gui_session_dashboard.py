@@ -54,6 +54,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__ = QTimer(self)
         self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
         self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
+        self.__visible_tracks_start__ = 0
+        self.__visible_tracks_end__ = 5
 
         if not self.restore():
             self.__name__ = None
@@ -136,6 +138,25 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack
+
+    ### Property visibleTracksStart
+    def get_visible_tracks_start(self):
+        return self.__visible_tracks_start__
+    def set_visible_tracks_start(self, index):
+        self.__visible_tracks_start__ = index
+        self.visible_tracks_changed.emit()
+    visible_tracks_changed = Signal()
+    visibleTracksStart = Property(int, get_visible_tracks_start, set_visible_tracks_start, notify=visible_tracks_changed)
+    ### END Property visibleTracksStart
+
+    ### Property visibleTracksEnd
+    def get_visible_tracks_end(self):
+        return self.__visible_tracks_end__
+    def set_visible_tracks_end(self, index):
+        self.__visible_tracks_end__ = index
+        self.visible_tracks_changed.emit()
+    visibleTracksEnd = Property(int, get_visible_tracks_end, set_visible_tracks_end, notify=visible_tracks_changed)
+    ### END Property visibleTracksEnd
 
     def serialize(self):
         return {

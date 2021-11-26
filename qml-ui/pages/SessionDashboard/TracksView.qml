@@ -109,7 +109,7 @@ ColumnLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        visible: index < 6
+                        visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
                         border.width: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0
                         border.color: Kirigami.Theme.highlightColor
                         color: "transparent"

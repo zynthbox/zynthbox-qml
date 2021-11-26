@@ -82,6 +82,26 @@ Kirigami.AbstractApplicationWindow {
                 highlighted: zynthian.current_screen_id === 'session_dashboard'
             }
             Zynthian.BreadcrumbButton {
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("1-6")
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: {
+                    zynthian.session_dashboard.visibleTracksStart = 0;
+                    zynthian.session_dashboard.visibleTracksEnd = 5;
+                }
+            }
+            Zynthian.BreadcrumbButton {
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("7-12")
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: {
+                    zynthian.session_dashboard.visibleTracksStart = 6;
+                    zynthian.session_dashboard.visibleTracksEnd = 11;
+                }
+            }
+            Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("Scene %2")

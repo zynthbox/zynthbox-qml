@@ -79,11 +79,19 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
         logging.error(f"Layer created : {index}, Selected Track Chained Sounds : {selected_track.chainedSounds}")
 
-        if index in selected_track.chainedSounds:
-            logging.error(f"Chaining layers {selected_track.connectedSound, index}")
-            self.zyngui.screens['layer'].clone_midi(selected_track.connectedSound, index)
-            self.zyngui.screens['layer'].clone_midi(index, selected_track.connectedSound)
-            QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+        sounds_to_clone = []
+        for sound in selected_track.chainedSounds:
+            if sound > -1:
+                sounds_to_clone.append(sound)
+
+        logging.error(f"Sounds to clone : {sounds_to_clone}")
+
+        for index in range(0, len(sounds_to_clone)-1):
+            logging.error(f"Cloning layers {sounds_to_clone[index], sounds_to_clone[index+1]}")
+            self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index], sounds_to_clone[index+1])
+            self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index+1], sounds_to_clone[index])
+
+        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     def fx_layers_changed(self):
         logging.error(f"FX Layer Changed")
@@ -93,6 +101,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def emit_chained_sounds_changed(self):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
         selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+        self.zyngui.screens['zynthiloops'].song.tracksModel.connected_sounds_count_changed.emit()
         # self.set_selected_track(self.selectedTrack, True)
 
     ### Property name
@@ -132,8 +141,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
             if connectedSound >= 0:
                 self.zyngui.screens["fixed_layers"].activate_index(connectedSound)
-            else:
-                self.zyngui.screens["fixed_layers"].activate_index(track)
+            # else:
+            #     self.zyngui.screens["fixed_layers"].activate_index(track)
 
         if self.__selected_track__ != track or force_set is True:
             self.__selected_track__ = track

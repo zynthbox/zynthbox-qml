@@ -181,7 +181,7 @@ Zynthian.ScreenPage {
                             top: parent.top
                             topMargin: -8
                         }
-                        height: controlsPanel.height
+                        height: controlsPanel.height / 3
                         width: component.width / 3
                         Zynthian.Card {
                             anchors.fill: parent
@@ -189,23 +189,16 @@ Zynthian.ScreenPage {
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: 0
-                            ListView {
+                            QQC2.Button {
                                 Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                model: playGridsRepeater.count
-                                interactive: playGridsRepeater.count >= (height / settingsButton.height)
-                                delegate: QQC2.Button {
-                                    width: ListView.view.width
-                                    height: settingsButton.height
-                                    property var playGrid: playGridsRepeater.itemAt(index).item
-                                    icon.name: playGrid.icon
-                                    text: playGrid.name
-                                    display: QQC2.AbstractButton.TextBesideIcon
-                                    enabled: index !== ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]
-                                    onClicked: {
-                                        settingsPopup.visible = false;
-                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
-                                    }
+                                Layout.minimumHeight: settingsButton.height
+                                Layout.maximumHeight: settingsButton.height
+                                icon.name: "view-fullscreen"
+                                text: "Toggle Full Screen"
+                                display: QQC2.AbstractButton.TextBesideIcon
+                                onClicked: {
+                                    settingsPopup.visible = false;
+                                    applicationWindow().controlsVisible = !applicationWindow().controlsVisible;
                                 }
                             }
                             QQC2.Button {

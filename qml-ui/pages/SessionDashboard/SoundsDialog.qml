@@ -64,13 +64,14 @@ QQC2.Dialog {
         QQC2.Button {
             Layout.fillWidth: true
             Layout.preferredWidth: 1
-            text: qsTr("Clear Selection")
+            text: qsTr("Un-select all slots")
             onClicked: {
                 soundsDialog.selectedTrack.connectedSound = -1;
-                if (soundsDialog.selectedTrack.connectedPattern >= 0) {
+                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1]
+                /*if (soundsDialog.selectedTrack.connectedPattern >= 0) {
                     var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
                     seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
-                }
+                }*/
                 soundsDialog.close();
             }
         }

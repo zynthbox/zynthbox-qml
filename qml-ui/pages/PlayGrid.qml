@@ -54,7 +54,6 @@ Zynthian.ScreenPage {
         Kirigami.Action {
             text: "Get New Playgrids"
             onTriggered: {
-                settingsDialog.visible = false;
                 zynthian.show_modal("playgrid_downloader");
             }
         }
@@ -101,13 +100,28 @@ Zynthian.ScreenPage {
             QQC2.Dialog {
                 id: settingsDialog
                 visible: false
-                title: "Settings"
+                title: qsTr("%1 Settings").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ")
                 modal: true
                 width: component.width - Kirigami.Units.largeSpacing * 4
                 height: component.height - Kirigami.Units.largeSpacing * 4
                 x: Kirigami.Units.largeSpacing
                 y: Kirigami.Units.largeSpacing
 
+                header: ColumnLayout {
+                    Kirigami.Heading {
+                        Layout.fillWidth: true
+                        Layout.margins: Kirigami.Units.smallSpacing
+                        level: 2
+                        text: settingsDialog.title
+                    }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.minimumHeight: 1
+                        Layout.maximumHeight: 1
+                        opacity: 0.3
+                        color: Kirigami.Theme.textColor
+                    }
+                }
                 footer: Zynthian.ActionBar {
                     Layout.fillWidth: true
                     currentPage: Item {
@@ -121,58 +135,10 @@ Zynthian.ScreenPage {
                     }
                 }
 
-                contentItem: RowLayout {
-                    ListView {
-                        Layout.preferredWidth: settingsDialog.width / 4
-                        Layout.maximumWidth: Layout.preferredWidth
-                        Layout.fillHeight: true
-                        Layout.margins: 8
-                        model: playGridsRepeater.count
-                        currentIndex: ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] != undefined ? ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] : -1
-                        delegate: QQC2.ItemDelegate {
-                            id: settingsSelectorDelegate
-                            property Item gridComponent: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(model.index).item
-                            width: ListView.view.width
-                            topPadding: Kirigami.Units.largeSpacing
-                            leftPadding: Kirigami.Units.largeSpacing
-                            bottomPadding: Kirigami.Units.largeSpacing
-                            rightPadding: Kirigami.Units.largeSpacing
-                            highlighted: ListView.isCurrentItem
-                            background: Rectangle {
-                                color: !settingsSelectorDelegate.ListView.isCurrentItem && !settingsSelectorDelegate.pressed
-                                    ? "transparent"
-                                    : ((settingsSelectorDelegate.ListView.view.activeFocus && !settingsSelectorDelegate.pressed || !settingsSelectorDelegate.ListView.view.activeFocus && settingsSelectorDelegate.pressed)
-                                            ? Kirigami.Theme.highlightColor
-                                            : Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.4))
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Kirigami.Units.shortDuration
-                                        easing.type: Easing.InOutQuad
-                                    }
-                                }
-                            }
-                            contentItem: QQC2.Label {
-                                text: settingsSelectorDelegate.gridComponent.name
-                                elide: Text.ElideRight
-                            }
-                            onClicked: {
-                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", model.index);
-                            }
-                        }
-                    }
-                    QQC2.StackView {
-                        id: settingsStack
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        clip: true
-                        replaceEnter: Transition {}
-                        replaceExit: Transition {}
-                        popEnter: Transition {}
-                        popExit: Transition {}
-                        pushEnter: Transition {}
-                        pushExit: Transition {}
-                        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.settings
-                    }
+                contentItem: Loader {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.settings ? playGridsRepeater.currentItem.settings : null
                 }
             }
 
@@ -247,7 +213,7 @@ Zynthian.ScreenPage {
                                 Layout.minimumHeight: settingsButton.height
                                 Layout.maximumHeight: settingsButton.height
                                 icon.name: "configure"
-                                text: "Settings..."
+                                text: "More Settings..."
                                 display: QQC2.AbstractButton.TextBesideIcon
                                 onClicked: {
                                     settingsPopup.visible = false;

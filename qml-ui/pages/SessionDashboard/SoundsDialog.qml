@@ -39,6 +39,10 @@ import "../ZynthiLoops" as ZynthiLoops
 
 QQC2.Dialog {
     id: soundsDialog
+
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property var chainedSoundsArr: selectedTrack.chainedSounds.slice()
+
     modal: true
 
     x: root.parent ? root.parent.mapFromGlobal(0, 0).x : 0
@@ -47,7 +51,7 @@ QQC2.Dialog {
     height: Screen.height - Kirigami.Units.gridUnit*2
 
     header: Kirigami.Heading {
-        text: qsTr("Pick a sound for %1").arg(root.selectedTrack ? root.selectedTrack.name : "(no selected track)")
+        text: qsTr("Pick a sound for %1").arg(soundsDialog.selectedTrack ? soundsDialog.selectedTrack.name : "(no selected track)")
         font.pointSize: 16
         padding: Kirigami.Units.gridUnit
     }
@@ -62,10 +66,10 @@ QQC2.Dialog {
             Layout.preferredWidth: 1
             text: qsTr("Clear Selection")
             onClicked: {
-                root.selectedTrack.connectedSound = -1;
-                if (root.selectedTrack.connectedPattern >= 0) {
-                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
-                    seq.midiChannel = root.selectedTrack.connectedSound;
+                soundsDialog.selectedTrack.connectedSound = -1;
+                if (soundsDialog.selectedTrack.connectedPattern >= 0) {
+                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
+                    seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
                 }
                 soundsDialog.close();
             }
@@ -100,14 +104,15 @@ QQC2.Dialog {
                     property bool hasConnectedTracks: false
 
                     Kirigami.Theme.highlightColor: {
-                        if (root.selectedTrack && root.selectedTrack.connectedSound === index) {
+                        if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
                             return Qt.rgba(
                                 Kirigami.Theme.highlightColor.r,
                                 Kirigami.Theme.highlightColor.g,
                                 Kirigami.Theme.highlightColor.b,
                                 1
                             )
-                        } else if (model.metadata && model.metadata.isChainedToConnectedSound) {
+                        } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
+                                   soundsDialog.selectedTrack.checkIfLayerExists(index)) {
                             return Qt.rgba(
                                 Kirigami.Theme.highlightColor.r,
                                 Kirigami.Theme.highlightColor.g,
@@ -130,10 +135,12 @@ QQC2.Dialog {
                     Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                     text: model.display
                     radius: 4
-                    highlighted: (root.selectedTrack && root.selectedTrack.connectedSound === index) || (model.metadata && model.metadata.isChainedToConnectedSound)
+                    highlighted: soundsDialog.selectedTrack &&
+                                 soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
+                                 soundsDialog.selectedTrack.checkIfLayerExists(index)
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
-                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.inherit: true
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor
@@ -158,16 +165,16 @@ QQC2.Dialog {
                         }
                     }
                     onClicked: {
-                        soundsDialog.close();
+//                        soundsDialog.close();
 
-                        root.selectedTrack.connectedSound = index;
+//                        soundsDialog.selectedTrack.connectedSound = index;
 
-                        if (root.selectedTrack.connectedPattern >= 0) {
-                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
-                            seq.midiChannel = root.selectedTrack.connectedSound;
-                        }
+//                        if (soundsDialog.selectedTrack.connectedPattern >= 0) {
+//                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
+//                            seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
+//                        }
 
-                        zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound);
+//                        zynthian.fixed_layers.activate_index(soundsDialog.selectedTrack.connectedSound);
                     }
 
                     // Reset hasConnectedTracks on dialog close
@@ -185,7 +192,7 @@ QQC2.Dialog {
                         anchors.top: parent.top
                         anchors.margins: Kirigami.Units.gridUnit*0.5
                         font.pointSize: 10
-                        text: index >= 5 && index <= 9 ? ("6." + (index%5 + 1)) : (index + 1)
+                        text: (index + 1)
                     }
 
                     RowLayout {

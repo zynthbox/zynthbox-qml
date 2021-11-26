@@ -119,6 +119,8 @@ Zynthian.Card {
                                 } else {
                                     if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                         // Open library page
+                                        bottomDrawer.close();
+                                        zynthian.current_screen_id = 'layer';
                                     } else {
                                         if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                             noFreeSlotsPopup.open();

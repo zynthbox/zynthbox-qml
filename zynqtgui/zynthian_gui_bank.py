@@ -182,7 +182,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			else:
 				self.select_path_element = self.zyngui.curlayer.engine.name
 		else:
-			self.select_path_element = "Banks"
+			self.select_path_element = "Sounds"
 			self.select_path = "Banks"
 		super().set_select_path()
 

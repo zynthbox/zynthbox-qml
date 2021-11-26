@@ -245,7 +245,7 @@ class zynthiloops_track(QObject):
         logging.error(f"Already Assigned layers : {assigned_layers}")
 
         for i in range(0, 15):
-            if i not in assigned_layers and (i < 5 or i > 9):
+            if i not in assigned_layers:
                 next_free_layer = i
                 break
 

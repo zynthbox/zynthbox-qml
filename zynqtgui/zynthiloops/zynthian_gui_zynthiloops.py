@@ -269,7 +269,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
         self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.tracksModel.getTrack(tid).get_layers_snapshot(), 5, 9)
-        self.zyngui.screens['layer'].ensure_special_layers_midi_cloned()
 
 
     # @Signal

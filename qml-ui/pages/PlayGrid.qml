@@ -40,7 +40,6 @@ Zynthian.ScreenPage {
     rightPadding: 0
     topPadding: 5
     bottomPadding: 5
-    anchors.fill: parent
 
     contextualActions: [
         Kirigami.Action {

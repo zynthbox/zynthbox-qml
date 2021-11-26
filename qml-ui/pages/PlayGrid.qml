@@ -41,6 +41,37 @@ Zynthian.ScreenPage {
     topPadding: 5
     bottomPadding: 5
 
+    contextualActions: [
+        Kirigami.Action {
+            id: playgridActions
+            text: " "
+            onTriggered: {}
+        },
+        Kirigami.Action {
+            id: playgridSwitchAction
+            text: "Switch Playgrid"
+        },
+        Kirigami.Action {
+            text: "Get New Playgrids"
+            onTriggered: {
+                settingsDialog.visible = false;
+                zynthian.show_modal("playgrid_downloader");
+            }
+        }
+    ]
+    Instantiator {
+        id: playGridActionInstantiator
+        model: playGridsRepeater.count
+        Kirigami.Action {
+            property Item relevantPlaygrid: playGridsRepeater.itemAt(index).item
+            text: relevantPlaygrid.name
+            onTriggered: {
+                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
+            }
+        }
+        onObjectAdded: { playgridSwitchAction.children.push(object); }
+    }
+
     Connections {
         target: ZynQuick.PlayGridManager
         property string currentPlaygrid
@@ -86,15 +117,7 @@ Zynthian.ScreenPage {
                                 settingsDialog.visible = false;
                             }
                         }
-                        property list<QtObject> contextualActions: [
-                            Kirigami.Action {
-                                text: "Get New Playgrids"
-                                onTriggered: {
-                                    settingsDialog.visible = false;
-                                    zynthian.show_modal("playgrid_downloader");
-                                }
-                            }
-                        ]
+                        // property list<QtObject> contextualActions: []
                     }
                 }
 
@@ -109,7 +132,6 @@ Zynthian.ScreenPage {
                         delegate: QQC2.ItemDelegate {
                             id: settingsSelectorDelegate
                             property Item gridComponent: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(model.index).item
-                            
                             width: ListView.view.width
                             topPadding: Kirigami.Units.largeSpacing
                             leftPadding: Kirigami.Units.largeSpacing

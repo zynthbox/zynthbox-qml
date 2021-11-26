@@ -126,6 +126,8 @@ Zynthian.Card {
                                     } else {
                                         if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                             noFreeSlotsPopup.open();
+                                        } else {
+                                            bottomDrawer.close();
                                         }
                                     }
                                 }

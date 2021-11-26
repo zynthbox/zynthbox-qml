@@ -56,7 +56,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Save Sound...")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     saveDialog.mode = "sound";
                     saveDialog.open();
@@ -86,13 +86,13 @@ Zynthian.ScreenPage {
             }*/
             Kirigami.Action {
                 text: qsTr("Clear Sound")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
                 text: qsTr("Clear Sounds")
-                enabled: zynthian.main_layers_view.current_index_valid
-                onTriggered: zynthian.main_layers_view.ask_clear_visible_range()
+                enabled: zynthian.fixed_layers.current_index_valid
+                onTriggered: zynthian.fixed_layers.ask_clear_visible_range()
             }
             /*Kirigami.Action {
                 text: qsTr("Clear All")
@@ -104,18 +104,18 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: {
-                    zynthian.layer.select_engine(zynthian.main_layers_view.active_midi_channel)
+                    zynthian.layer.select_engine(zynthian.fixed_layers.active_midi_channel)
                 }
             }
             Kirigami.Action {
                 text: qsTr("Effect Layer")
                 onTriggered: {
-                    zynthian.layer.new_effect_layer(zynthian.main_layers_view.active_midi_channel)
+                    zynthian.layer.new_effect_layer(zynthian.fixed_layers.active_midi_channel)
                 }
             }
             Kirigami.Action {
                 text: qsTr("Audio-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show(); //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_effects";
@@ -123,14 +123,14 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Remove All Audio-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     zynthian.layer_effects.fx_reset()
                 }
             }
             Kirigami.Action {
                 text: qsTr("MIDI-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     zynthian.layer_options.show() //FIXME: that show() method should change name
                     zynthian.current_screen_id = "layer_midi_effects";
@@ -138,7 +138,7 @@ Zynthian.ScreenPage {
             }
             Kirigami.Action {
                 text: qsTr("Remove All MIDI-FX")
-                enabled: zynthian.main_layers_view.current_index_valid
+                enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: {
                     zynthian.layer_midi_effects.fx_reset()
                 }
@@ -176,7 +176,7 @@ Zynthian.ScreenPage {
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            zynthian.current_screen_id = "main_layers_view";
+            zynthian.current_screen_id = "fixed_layers";
             zynthian.go_back();
             return true;
         default:
@@ -185,7 +185,7 @@ Zynthian.ScreenPage {
     }
 
 
-    property var screenIds: ["main_layers_view", "bank", "preset"]
+    property var screenIds: ["fixed_layers", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
@@ -277,7 +277,7 @@ Zynthian.ScreenPage {
                                 icon.name: "configure"
                                 visible: model.display != "-"
                                 onClicked: {
-                                    delegate.clicked();
+                                    //delegate.clicked();
                                     optionsMenu.open();
                                 }
                                 QQC2.Menu {
@@ -288,12 +288,18 @@ Zynthian.ScreenPage {
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Range && Transpose...")
-                                        onClicked: zynthian.current_modal_screen_id = "midi_key_range";
+                                        onClicked: {
+                                            optionsMenu.close();
+                                            delegate.clicked();
+                                            zynthian.current_modal_screen_id = "midi_key_range";
+                                        }
                                     }
                                     QQC2.MenuItem {
                                         width: parent.width
                                         text: qsTr("Add Audio FX...")
                                         onClicked: {
+                                            optionsMenu.close();
+                                            delegate.clicked();
                                             zynthian.layer_options.show();
                                             zynthian.current_screen_id = "layer_effects";
                                         }
@@ -302,6 +308,8 @@ Zynthian.ScreenPage {
                                         width: parent.width
                                         text: qsTr("Add Midi FX...")
                                         onClicked: {
+                                            optionsMenu.close();
+                                            delegate.clicked();
                                             zynthian.layer_options.show();
                                             zynthian.current_screen_id = "layer_midi_effects";
                                         }
@@ -310,6 +318,8 @@ Zynthian.ScreenPage {
                                         width: parent.width
                                         text: qsTr("Layer Options...")
                                         onClicked: {
+                                            optionsMenu.close();
+                                            delegate.clicked();
                                             let oldCurrent_screen_id = zynthian.current_screen_id;
                                             delegate.selector.current_index = delegate.ownIndex;
                                             delegate.selector.activate_index_secondary(delegate.ownIndex);
@@ -430,7 +440,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.main_layers_view.volume_controls
+                            model: zynthian.fixed_layers.volume_controls
                             delegate: ColumnLayout {
                                 spacing: Kirigami.Units.largeSpacing
                                 enabled: modelData.value_max > 0
@@ -532,12 +542,12 @@ Zynthian.ScreenPage {
             }
         }
         Connections {
-            target: zynthian.main_layers_view
+            target: zynthian.fixed_layers
             onCurrent_index_validChanged: {
-                if (!zynthian.main_layers_view.current_index_valid) {
+                if (!zynthian.fixed_layers.current_index_valid) {
                     if (zynthian.current_screen_id !== "layer" &&
                         zynthian.current_screen_id !== "fixed_layers" &&
-                        zynthian.current_screen_id !== "main_layers_view" &&
+                        zynthian.current_screen_id !== "fixed_layers" &&
                         zynthian.current_screen_id !== "bank" &&
                         zynthian.current_screen_id !== "confirm" &&
                         zynthian.current_screen_id !== "preset") {
@@ -585,7 +595,7 @@ Zynthian.ScreenPage {
                     Timer { //HACK why is this necessary?
                         id: newSynthWorkaroundTimer
                         interval: 200
-                        onTriggered: zynthian.layer.select_engine(zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index))
+                        onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
 
                     }
                 }
@@ -750,7 +760,7 @@ Zynthian.ScreenPage {
                         layerReplaceDialog.open();
                     } else {
                         let map = {}
-                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
+                        map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index);
                         zynthian.layer.load_layer_from_file(file.fileName, map);
                     }
                 }
@@ -801,7 +811,7 @@ Zynthian.ScreenPage {
                 }
                 Repeater {
                     id: channelReplaceRepeater
-                    model: zynthian.main_layers_view.selector_list
+                    model: zynthian.fixed_layers.selector_list
                     delegate: QQC2.RadioButton {
                         id: delegate
                         enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
@@ -821,7 +831,7 @@ Zynthian.ScreenPage {
                             target: layerReplaceDialog
                             onFileToLoadChanged: {
                                 checked = false
-                                checked = index === zynthian.main_layers_view.current_index
+                                checked = index === zynthian.fixed_layers.current_index
                             }
                         }
                         indicator.opacity: enabled

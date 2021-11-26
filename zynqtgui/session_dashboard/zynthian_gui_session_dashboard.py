@@ -71,6 +71,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__.timeout.connect(self.save)
 
         self.zyngui.screens["layer"].layer_created.connect(self.layer_created)
+        self.zyngui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
 
         self.show()
 
@@ -83,6 +84,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.zyngui.screens['layer'].clone_midi(selected_track.connectedSound, index)
             self.zyngui.screens['layer'].clone_midi(index, selected_track.connectedSound)
             QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+
+    def fx_layers_changed(self):
+        logging.error(f"FX Layer Changed")
+        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     @Slot(None)
     def emit_chained_sounds_changed(self):

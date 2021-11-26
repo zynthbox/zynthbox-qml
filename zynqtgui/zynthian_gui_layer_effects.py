@@ -173,6 +173,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			return
 		i = self.zyngui.screens['layer'].layers.index(self.fx_layer)
 		self.zyngui.screens['layer'].remove_layer(i)
+		self.fx_layers_changed.emit()
 
 		self.fx_layer = None
 		self.fill_list()
@@ -185,6 +186,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 			i = self.zyngui.screens['layer'].layers.index(sl)
 			self.zyngui.screens['layer'].remove_layer(i)
 
+		self.fx_layers_changed.emit()
 		self.fx_layer = None
 		self.fill_list()
 		self.zyngui.screens['main_layers_view'].fill_list()
@@ -216,5 +218,6 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 	current_effect_engine_changed = Signal()
 
 	current_effect_engine = Property(str, get_current_effect_engine, notify = current_effect_engine_changed)
+	fx_layers_changed = Signal()
 
 #------------------------------------------------------------------------------

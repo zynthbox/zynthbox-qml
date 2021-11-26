@@ -127,8 +127,8 @@ Kirigami.AbstractApplicationWindow {
                         delegate: QQC2.MenuItem {
                             text: qsTr("Track %3").arg(index + 1)
                             width: parent.width
-                            visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
-                            height: visible ? implicitHeight : 0
+                            //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
+                            //height: visible ? implicitHeight : 0
                             onClicked: {
                                 zynthian.session_dashboard.selectedTrack = index;
                             }

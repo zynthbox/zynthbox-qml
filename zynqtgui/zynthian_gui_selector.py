@@ -239,6 +239,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.select()
 		self.last_index_change_ts = datetime.min
 		self.effective_count_changed.emit()
+		self.list_updated.emit()
 
 
 	def update_list(self):
@@ -402,6 +403,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	selector_path_changed = Signal()
 	selector_path_element_changed = Signal()
 	effective_count_changed = Signal()
+	list_updated = Signal()
 
 	selector_list = Property(QObject, get_selector_list, constant = True)
 	current_index = Property(int, get_current_index, set_current_index, notify = current_index_changed)

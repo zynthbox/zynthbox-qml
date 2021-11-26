@@ -100,14 +100,14 @@ Kirigami.AbstractApplicationWindow {
                     zynthian.session_dashboard.visibleTracksEnd = 11;
                 }
             }
-            Zynthian.BreadcrumbButton {
+            /*Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("Scene %2")
                         .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
-            }
+            }*/
             Zynthian.BreadcrumbButton {
                 id: trackButton
                 icon.color: customTheme.Kirigami.Theme.textColor

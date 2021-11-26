@@ -200,7 +200,7 @@ Zynthian.Card {
                                 // Open library edit page
                                 bottomDrawer.close();
 
-                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
                                 zynthian.current_modal_screen_id = "midi_key_range";
                             }
                         }
@@ -232,6 +232,7 @@ Zynthian.Card {
                         radius: 4
 
                         QQC2.Label {
+                            id: fxLabel
                             anchors {
                                 verticalCenter: parent.verticalCenter
                                 left: parent.left
@@ -251,7 +252,10 @@ Zynthian.Card {
                                 if (root.selectedRowIndex !== index) {
                                     root.selectedRowIndex = index;
                                 } else {
-
+                                    bottomDrawer.close();
+                                    zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                    zynthian.layer_options.show();
+                                    zynthian.current_screen_id = "layer_effects";
                                 }
                             }
                         }
@@ -264,7 +268,7 @@ Zynthian.Card {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
-                        enabled: root.selectedRowIndex === index
+                        enabled: root.selectedRowIndex === index && fxLabel.text.length > 0
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 bottomDrawer.close();

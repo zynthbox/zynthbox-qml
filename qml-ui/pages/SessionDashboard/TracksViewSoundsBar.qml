@@ -120,6 +120,8 @@ Zynthian.Card {
                                     if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                         // Open library page
                                         bottomDrawer.close();
+
+                                        zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                         zynthian.current_screen_id = 'layer';
                                     } else {
                                         if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {

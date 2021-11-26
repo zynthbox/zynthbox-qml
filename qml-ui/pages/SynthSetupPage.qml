@@ -236,8 +236,8 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
-                    visible: layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1
-                    height: visible ? implicitHeight : 0
+                    visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) || layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1
+                    height: visible ? layersView.view.height/5 : 0
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);

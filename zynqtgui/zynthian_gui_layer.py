@@ -428,6 +428,28 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		else:
 			self.add_layer_midich(midi_chan, select)
 
+	def add_midichannel_to_track(self, midich):
+		try:
+			selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
+			chain = selected_track.get_chained_sounds()
+			if midich not in chain:
+				for i, el in enumerate(chain):
+					if el == -1:
+						chain[i] = midich
+			selected_track.set_chained_sounds(chain)
+		except:
+			pass
+
+	def remove_midichannel_from_track(self, midich):
+		try:
+			selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
+			chain = selected_track.get_chained_sounds()
+			for i, el in enumerate(chain):
+				if el == midich:
+					chain[i] = -1
+			selected_track.set_chained_sounds(chain)
+		except:
+			pass
 
 	def add_layer_midich(self, midich, select=True):
 		traceback.print_stack(None, 8)
@@ -450,6 +472,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.screens['bank'].select_action(0)
 			else:
 				layer = zynthian_layer(zyngine, midich, self.zyngui)
+
+			self.add_midichannel_to_track(midich)
 
 			# Try to connect Audio Effects ...
 			if len(self.layers)>0 and layer.engine.type=="Audio Effect":
@@ -546,6 +570,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			layers_to_delete = []
 			midi_chans_to_delete = []
 			for root_layer in root_layers_to_delete:
+				self.remove_midichannel_from_track(root_layer.midi_chan)
 				# Midichain layers
 				midichain_layers = self.get_midichain_layers(root_layer)
 				if len(midichain_layers)>0:
@@ -1621,9 +1646,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		#TODO: always clone?
 		for i in restored_channels:
+			self.add_midichannel_to_track(i)
 			for j in restored_channels:
 				if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
+
 
 		self.zyngui.zynautoconnect_midi()
 		self.zyngui.zynautoconnect_audio()
@@ -1909,6 +1936,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.zynautoconnect_midi()
 			new_layer.reset_audio_out()
 			self.layers.append(new_layer)
+			self.add_midichannel_to_track(to_midichan)
 			self.layer_created.emit(to_midichan)
 
 			self.fill_list()

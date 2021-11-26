@@ -164,6 +164,50 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
+                text: {
+                    switch (effectScreen) {
+                    case "layer_midi_effects":
+                    case "midi_effect_types":
+                    case "layer_midi_effect_chooser":
+                        return "MIDI FX";
+                    default:
+                        "Audio FX";
+                    }
+                }
+                visible: {
+                    switch (zynthian.current_screen_id) {
+                    case "layer_effects":
+                    case "effect_types":
+                    case "layer_effect_chooser":
+                    case "layer_midi_effects":
+                    case "midi_effect_types":
+                    case "layer_midi_effect_chooser":
+                        return true;
+                    default:
+                        return screensLayer.depth > 2
+                    }
+                }
+                property string effectScreen: ""
+                readonly property string screenId: zynthian.current_screen_id
+                onScreenIdChanged: {
+                    switch (zynthian.current_screen_id) {
+                    case "layer_effects":
+                    case "effect_types":
+                    case "layer_effect_chooser":
+                    case "layer_midi_effects":
+                    case "midi_effect_types":
+                    case "layer_midi_effect_chooser":
+                        effectScreen = zynthian.current_screen_id;
+                    default:
+                        break;
+                    }
+                }
+                onClicked: zynthian.current_screen_id = effectScreen
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+            }
+            Zynthian.BreadcrumbButton {
+                icon.color: customTheme.Kirigami.Theme.textColor
                 text: "EDIT"
                 visible: zynthian.current_screen_id === "control"
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14

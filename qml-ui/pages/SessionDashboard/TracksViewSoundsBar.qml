@@ -240,7 +240,7 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: "FX"
+                            text: root.selectedTrack.getEffectsNameByMidiChannel(chainedSound)
 
                             elide: "ElideRight"
                         }

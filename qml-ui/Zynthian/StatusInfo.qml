@@ -33,6 +33,8 @@ import Zynthian 1.0 as Zynthian
 MouseArea {
     id: root
     implicitWidth: Kirigami.Units.gridUnit * 10
+    Layout.minimumWidth: Kirigami.Units.gridUnit * 10
+    Layout.fillHeight: true
 
     onClicked: popup.visible = true
 

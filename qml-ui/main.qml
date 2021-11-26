@@ -63,9 +63,7 @@ Kirigami.AbstractApplicationWindow {
     width: screen.width
     height: screen.height
 
-    header: Zynthian.Breadcrumb {
-        visible: root.headerVisible
-        leftHeaderControl: RowLayout {
+    header: RowLayout {
             spacing: 0
             Zynthian.BreadcrumbButton {
                 id: homeButton
@@ -117,8 +115,61 @@ Kirigami.AbstractApplicationWindow {
                         .arg(zynthian.session_dashboard.selectedTrack+1)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: tracksMenu.visible = true
+                QQC2.Menu {
+                    id: tracksMenu
+                    y: parent.height
+                    modal: true
+                    dim: false
+                    Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
+                    Repeater {
+                        model: zynthian.zynthiloops.song.tracksModel
+                        delegate: QQC2.MenuItem {
+                            text: qsTr("Track %3").arg(index + 1)
+                            width: parent.width
+                            visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
+                            height: visible ? implicitHeight : 0
+                            onClicked: {
+                                zynthian.session_dashboard.selectedTrack = index;
+                            }
+                            highlighted: zynthian.session_dashboard.selectedTrack === index
+                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+                        }
+                    }
+                }
             }
             Zynthian.BreadcrumbButton {
+                id: synthButton
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: zynthian.bank.selector_path_element
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: soundsDialog.visible = true
+                SessionDashboard.SoundsDialog {
+                    id: soundsDialog
+                    width: Screen.width
+                    height: Screen.height - synthButton.height - Kirigami.Units.gridUnit
+                    onVisibleChanged: {
+                        x = synthButton.mapFromGlobal(0, 0).x
+                        y = synthButton.height + Kirigami.Units.smallSpacing
+                    }
+                }
+            }
+            Zynthian.BreadcrumbButton {
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: zynthian.preset.selector_path_element
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: zynthian.current_screen_id = "preset"
+            }
+            Zynthian.BreadcrumbButton {
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: "EDIT"
+                visible: zynthian.current_screen_id === "control"
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+            }
+            /*Zynthian.BreadcrumbButton {
                 id: layersButton
                 text: {
                     if (zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
@@ -136,18 +187,9 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
                 onTextChanged: zynthian.fixed_layers.start_midi_chan = 0;
-                onClicked: soundsDialog.visible = true
+                onClicked: layersMenu.visible = true
                 highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers' || zynthian.current_screen_id === 'main_layers_view'
-                SessionDashboard.SoundsDialog {
-                    id: soundsDialog
-                    width: Screen.width
-                    height: Screen.height - layersButton.height - Kirigami.Units.gridUnit
-                    onVisibleChanged: {
-                        x = layersButton.mapFromGlobal(0, 0).x
-                        y = layersButton.height + Kirigami.Units.smallSpacing
-                    }
-                }
-                /*QQC2.Menu {
+                QQC2.Menu {
                     id: layersMenu
                     y: parent.height
                     modal: true
@@ -210,10 +252,12 @@ Kirigami.AbstractApplicationWindow {
                             }
                         }
                     }
-                }*/
-            }
+                }
+            }*/
+        Item {
+            Layout.fillWidth: true
         }
-        rightHeaderControl: Zynthian.StatusInfo {}
+        Zynthian.StatusInfo {}
     }
     pageStack: screensLayer
     ScreensLayer {

@@ -11,6 +11,15 @@ Zynthian.Card {
 
     property int selectedRowIndex: 0
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property var chainedSounds: selectedTrack.chainedSounds
+
+    onChainedSoundsChanged: {
+        console.log("### Chained Sounds Changed");
+
+        // Hack to always update UI
+        chainedSoundsRepeater.model = [];
+        chainedSoundsRepeater.model = chainedSounds;
+    }
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -40,7 +49,8 @@ Zynthian.Card {
         anchors.margins: Kirigami.Units.gridUnit
 
         Repeater {
-            model: root.selectedTrack.chainedSounds
+            id: chainedSoundsRepeater
+            model: root.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 
@@ -53,6 +63,10 @@ Zynthian.Card {
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
+
+                Component.onCompleted: {
+                    console.log("### Chained Sound delegate : ", chainedSound, root.selectedTrack.getLayerNameByMidiChannel(chainedSound))
+                }
 
                 MouseArea {
                     anchors.fill: parent
@@ -91,7 +105,7 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: root.selectedTrack.getLayerNameByMidiChannel(modelData)
+                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound)
 
                             elide: "ElideRight"
                         }

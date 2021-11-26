@@ -48,20 +48,20 @@ QQC2.ToolBar {
         }
         ActionButton {
             Layout.fillHeight: true
-            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
         }
         ActionButton {
             Layout.fillHeight: true
-            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 1 ? root.currentPage.contextualActions[1] : null
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 1 ? root.currentPage.contextualActions[1] : null
         }
         ActionButton {
             Layout.fillHeight: true
-            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
         }
         ActionButton {
             visible: !backButton.visible
             Layout.fillHeight: true
-            kirigamiAction: root.currentPage && root.currentPage.contextualActions.length > 3 ? root.currentPage.contextualActions[3] : null
+            kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 3 ? root.currentPage.contextualActions[3] : null
         }
     }
 }

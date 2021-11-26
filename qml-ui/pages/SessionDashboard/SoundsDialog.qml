@@ -165,16 +165,16 @@ QQC2.Dialog {
                         }
                     }
                     onClicked: {
-//                        soundsDialog.close();
+                        soundsDialog.close();
 
-//                        soundsDialog.selectedTrack.connectedSound = index;
+                        // soundsDialog.selectedTrack.replaceChainedSound(zynthian.active_midi_channel, index);
 
 //                        if (soundsDialog.selectedTrack.connectedPattern >= 0) {
 //                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
 //                            seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
 //                        }
 
-//                        zynthian.fixed_layers.activate_index(soundsDialog.selectedTrack.connectedSound);
+                        zynthian.fixed_layers.activate_index(index);
                     }
 
                     // Reset hasConnectedTracks on dialog close

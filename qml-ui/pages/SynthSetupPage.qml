@@ -66,7 +66,7 @@ Zynthian.ScreenPage {
                 text: qsTr("Get New Sounds...")
                 onTriggered: zynthian.show_modal("sound_downloader")
             }
-            Kirigami.Action {
+            /*Kirigami.Action {
                 text: qsTr("Load Soundset...")
                 onTriggered: {
                     pickerDialog.mode = "soundset";
@@ -83,21 +83,21 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Get New Soundsets...")
                 onTriggered: zynthian.show_modal("soundset_downloader")
-            }
+            }*/
             Kirigami.Action {
                 text: qsTr("Clear Sound")
                 enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
-                text: qsTr("Clear Block")
+                text: qsTr("Clear Sounds")
                 enabled: zynthian.main_layers_view.current_index_valid
                 onTriggered: zynthian.main_layers_view.ask_clear_visible_range()
             }
-            Kirigami.Action {
+            /*Kirigami.Action {
                 text: qsTr("Clear All")
                 onTriggered: zynthian.layer.ask_reset()
-            }
+            }*/
         },
         Kirigami.Action {
             text: qsTr("Slot")

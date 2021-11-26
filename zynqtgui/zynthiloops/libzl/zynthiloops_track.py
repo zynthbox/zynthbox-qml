@@ -271,6 +271,17 @@ class zynthiloops_track(QObject):
         else:
             return ""
 
+    @Slot(int, result=str)
+    def getEffectsNameByMidiChannel(self, channel):
+        if self.checkIfLayerExists(channel):
+            try:
+                fx = self.__song__.get_metronome_manager().zyngui.screens["fixed_layers"].list_metadata[channel]
+                return fx["effects_label"]
+            except:
+                return ""
+        else:
+            return ""
+
     @Slot(int, result=bool)
     def checkIfLayerExists(self, channel):
         return channel in self.__song__.get_metronome_manager().zyngui.screens["layer"].layer_midi_map.keys()

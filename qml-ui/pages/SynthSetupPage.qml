@@ -547,14 +547,13 @@ Zynthian.ScreenPage {
             target: zynthian.fixed_layers
             onCurrent_index_validChanged: {
                 if (!zynthian.fixed_layers.current_index_valid) {
-                    if (zynthian.current_screen_id !== "layer" &&
-                        zynthian.current_screen_id !== "fixed_layers" &&
-                        zynthian.current_screen_id !== "fixed_layers" &&
-                        zynthian.current_screen_id !== "bank" &&
-                        zynthian.current_screen_id !== "confirm" &&
-                        zynthian.current_screen_id !== "preset") {
-                        layerSetupDialog.open();
-                    }
+                    //if (zynthian.current_screen_id !== "layer" &&
+                        //zynthian.current_screen_id !== "fixed_layers" &&
+                        //zynthian.current_screen_id !== "fixed_layers" &&
+                        //zynthian.current_screen_id !== "bank" &&
+                        //zynthian.current_screen_id !== "confirm" &&
+                        //zynthian.current_screen_id !== "preset") {
+                    layerSetupDialog.open();
                 } else {
                     layerSetupDialog.close();
                 }

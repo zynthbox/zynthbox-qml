@@ -403,7 +403,7 @@ Zynthian.ScreenPage {
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
                     delegate: Zynthian.SelectorDelegate {
-                        text: model.display === "None" ? qsTr("Single") : model.display
+                        text: model.display === "None" ? qsTr("Single Presets") : model.display
                         screenId: bankView.screenId
                         selector: bankView.selector
                         highlighted: zynthian.current_screen_id === bankView.screenId

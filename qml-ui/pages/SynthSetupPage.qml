@@ -236,7 +236,9 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
-                    visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) || layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1
+                    visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) ||
+                        layersView.selectedTrack.chainedSounds.indexOf(index) !== -1
+                    /*layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1*/
                     height: visible ? layersView.view.height/5 : 0
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {

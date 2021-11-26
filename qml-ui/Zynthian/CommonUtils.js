@@ -23,4 +23,5 @@ function toggleLayerChaining(layer) {
         zynthian.layer.clone_midi(layer.metadata.midi_channel + 1, layer.metadata.midi_channel);
     }
     zynthian.layer.ensure_contiguous_cloned_layers();
+    zynthian.fixed_layers.show();
 }

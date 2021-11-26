@@ -665,15 +665,36 @@ Zynthian.BasePlayGrid {
                                         }
 
                                         Zynthian.PlayGridButton {
+                                            id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
-                                            text: patternsMenuItem.thisPattern.layer > 0
-                                                ? "Sound: " + zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                            property string soundName: zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                            text: patternsMenuItem.thisPattern.layer > 0 && soundName.length > 2
+                                                ? "Sound: " + soundName
                                                 : "No sound assigned"
 
-                                            function setLayer() {
-                                                console.log(patternsMenuItem.thisPatternIndex, index, "on select layer")
-                                                component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
+                                            onClicked: {
+                                                console.log("Pop up the sound assignery picker thing")
+                                                // Picking a sound goes here - how to do that in a not-terrible way?
+                                            }
+                                            //function setLayer() {
+                                                //console.log(patternsMenuItem.thisPatternIndex, index, "on select layer", patternsMenuItem.thisPattern.layer, soundName)
+                                                //component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
+                                            //}
+                                            Connections {
+                                                target: patternsMenuItem.thisPattern
+                                                onLayerChanged: {
+                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                                }
+                                            }
+                                            Connections {
+                                                target: zynthian.zynthiloops.song.tracksModel
+                                                onConnectedSoundsCountChanged: {
+                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                                }
+                                                onConnectedPatternsCountChanged: {
+                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
+                                                }
                                             }
                                         }
                                     }

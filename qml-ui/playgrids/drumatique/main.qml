@@ -682,14 +682,8 @@ Zynthian.BasePlayGrid {
                                                 Layout.preferredHeight: parent.height / 2
                                                 text: patternsMenuItem.thisPattern.layer > 0
                                                     ? "Sound: " + zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
-                                                    : "Sound unassigned (using " + zynthian.fixed_layers.selector_list.getDisplayValue(0) + ")"
-//                                                     delegate: QQC2.ItemDelegate {
-//                                                         width: layerCombo.popup.width
-//                                                         highlighted: layerCombo.highlightedIndex === index
-//                                                         text: (model.metadata.midi_channel + 1) + ". " + model.display
-//                                                         height: visible ? Kirigami.Units.fontMetrics.height * 2 : 0
-//                                                         visible: index === 0 || index > 9
-//                                                     }
+                                                    : "No sound assigned"
+
                                                 function setLayer() {
                                                     console.log(patternsMenuItem.thisPatternIndex, index, "on select layer")
                                                     component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)

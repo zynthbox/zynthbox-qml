@@ -139,6 +139,14 @@ Zynthian.Card {
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index
+                        onClicked: {
+                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                                bottomDrawer.close();
+
+                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                zynthian.layer.ask_remove_current_layer()
+                            }
+                        }
 
                         Kirigami.Icon {
                             width: Math.round(Kirigami.Units.gridUnit)

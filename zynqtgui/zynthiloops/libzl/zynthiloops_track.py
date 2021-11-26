@@ -48,11 +48,12 @@ class zynthiloops_track(QObject):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
         self.__connected_pattern__ = -1
-        self.__connected_sound__ = -1
+        # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
 
         if self.__id__ < 5:
-            self.__connected_sound__ = self.__id__
+            # self.__connected_sound__ = self.__id__
+            self.__chained_sounds__[0] = self.__id__
 
         # Connect to default patterns on init
         # This will be overwritten by deserialize if user changed the value, so it is safe to always set the value
@@ -67,7 +68,7 @@ class zynthiloops_track(QObject):
         return {"name": self.__name__,
                 "volume": self.__volume__,
                 "connectedPattern": self.__connected_pattern__,
-                "connectedSound": self.__connected_sound__,
+                # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
@@ -81,9 +82,9 @@ class zynthiloops_track(QObject):
         if "connectedPattern" in obj:
             self.__connected_pattern__ = obj["connectedPattern"]
             self.set_connected_pattern(self.__connected_pattern__)
-        if "connectedSound" in obj:
-            self.__connected_sound__ = obj["connectedSound"]
-            self.set_connected_sound(self.__connected_sound__)
+        # if "connectedSound" in obj:
+        #     self.__connected_sound__ = obj["connectedSound"]
+        #     self.set_connected_sound(self.__connected_sound__)
         if "chainedSounds" in obj:
             self.__chained_sounds__ = obj["chainedSounds"]
             self.set_chained_sounds(self.__chained_sounds__)
@@ -301,14 +302,19 @@ class zynthiloops_track(QObject):
 
     ### Property connectedSound
     def get_connected_sound(self):
-        return self.__connected_sound__
-    def set_connected_sound(self, sound):
-        self.__connected_sound__ = sound
-        self.__song__.schedule_save()
-        self.connected_sound_changed.emit()
-        self.__song__.tracksModel.connected_sounds_count_changed.emit()
+        # return self.__connected_sound__
+        for sound in self.__chained_sounds__:
+            if sound >= 0:
+                return sound
+
+        return -1
+    # def set_connected_sound(self, sound):
+    #     self.__connected_sound__ = sound
+    #     self.__song__.schedule_save()
+    #     self.connected_sound_changed.emit()
+    #     self.__song__.tracksModel.connected_sounds_count_changed.emit()
     connected_sound_changed = Signal()
-    connectedSound = Property(int, get_connected_sound, set_connected_sound, notify=connected_sound_changed)
+    connectedSound = Property(int, get_connected_sound, notify=connected_sound_changed)
     ### END Property connectedSound
 
     ### Property chainedSounds
@@ -319,6 +325,7 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = sounds
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
+        self.connected_sound_changed.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

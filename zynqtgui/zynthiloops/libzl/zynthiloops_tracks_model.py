@@ -144,12 +144,9 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
     ### Property connectedSoundsCount
     def get_connected_sounds_count(self):
-        connected_sounds = []
-        for index, track in enumerate(self.__tracks__):
-            if track.connectedSound >= 0:
-                connected_sounds.append(track.connectedSound)
-        values = np.unique(connected_sounds)
-        return len(values)
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
+        return len(assigned_layers)
     connected_sounds_count_changed = Signal()
     connectedSoundsCount = Property(int, get_connected_sounds_count, notify=connected_sounds_count_changed)
     ### END Property connectedSoundsCount

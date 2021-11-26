@@ -208,7 +208,8 @@ QQC2.Dialog {
                         }
                     }
 
-                    Kirigami.Icon {
+                    // Disable Chaining
+                    /*Kirigami.Icon {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.right
                         anchors.leftMargin: Kirigami.Units.gridUnit*0.5
@@ -230,7 +231,7 @@ QQC2.Dialog {
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }

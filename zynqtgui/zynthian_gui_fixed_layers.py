@@ -197,32 +197,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             metadata["halftone_transpose"] = zyncoder.lib_zyncoder.get_midi_filter_halftone_trans(i)
             metadata["note_low"] = zyncoder.lib_zyncoder.get_midi_filter_note_low(i)
             metadata["note_high"] = zyncoder.lib_zyncoder.get_midi_filter_note_high(i)
-            metadata["isChainedToConnectedSound"] = False
-
-            selectedTrackIndex = self.zyngui.screens["session_dashboard"].selectedTrack
-            selectedTrack = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(selectedTrackIndex)
-
-            if 5 <= i <= 9 and 5 <= selectedTrack.connectedSound <= 9:
-                metadata["isChainedToConnectedSound"] = True
-            else:
-                # Highlight only if current slot is chained to connected sound var
-                connected = False
-
-                for j in range(i, selectedTrack.connectedSound):
-                    if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
-                        connected = True
-                    else:
-                        connected = False
-                        break
-
-                for j in range(selectedTrack.connectedSound, i):
-                    if self.zyngui.screens['layer'].is_midi_cloned(j, j+1):
-                        connected = True
-                    else:
-                        connected = False
-                        break
-
-                metadata["isChainedToConnectedSound"] = connected
 
             self.list_metadata.append(metadata)
 

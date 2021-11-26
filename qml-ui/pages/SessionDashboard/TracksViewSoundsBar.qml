@@ -193,6 +193,15 @@ Zynthian.Card {
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index
+                        onClicked: {
+                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                                // Open library edit page
+                                bottomDrawer.close();
+
+                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+                                zynthian.current_modal_screen_id = "midi_key_range";
+                            }
+                        }
 
                         Kirigami.Icon {
                             width: Math.round(Kirigami.Units.gridUnit)

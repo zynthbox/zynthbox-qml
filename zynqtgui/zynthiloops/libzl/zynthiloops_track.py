@@ -312,12 +312,12 @@ class zynthiloops_track(QObject):
             if not found:
                 chained[0] = index
 
-            #for i in range (16):
-                #for j in range(16):
-                    #if i != j and i in chained and j in chained:
-                        #zyngui.screens['layer'].clone_midi(i, j)
-                    #else:
-                        #zyngui.screens['layer'].remove_clone_midi(i, j)
+            for i in range (16):
+                for j in range(16):
+                    if i != j and i in chained and j in chained:
+                        zyngui.screens['layer'].clone_midi(i, j)
+                    elif zyngui.screens['layer'].is_midi_cloned(i, j):
+                        zyngui.screens['layer'].remove_clone_midi(i, j)
 
             self.set_chained_sounds(chained)
             #sounds_to_clone = []

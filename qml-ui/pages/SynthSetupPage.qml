@@ -545,6 +545,8 @@ Zynthian.ScreenPage {
         }
         Connections {
             target: zynthian.fixed_layers
+            property int lastCurrentIndex
+            property bool currentIndexWasValid
             onCurrent_index_validChanged: {
                 if (!zynthian.fixed_layers.current_index_valid) {
                     //if (zynthian.current_screen_id !== "layer" &&
@@ -553,10 +555,13 @@ Zynthian.ScreenPage {
                         //zynthian.current_screen_id !== "bank" &&
                         //zynthian.current_screen_id !== "confirm" &&
                         //zynthian.current_screen_id !== "preset") {
-                    layerSetupDialog.open();
+                    if (zynthian.fixed_layers.current_index != lastCurrentIndex) {
+                        layerSetupDialog.open();
+                    }
                 } else {
                     layerSetupDialog.close();
                 }
+                lastCurrentIndex = zynthian.fixed_layers.current_index;
             }
         }
 
@@ -579,9 +584,9 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: 1
                         text: qsTr("Load A Sound...")
                         onClicked: {
-                            layerSetupDialog.close();
                             pickerDialog.mode = "sound";
                             pickerDialog.open();
+                            layerSetupDialog.close();
                         }
                     }
                     QQC2.Button {
@@ -593,11 +598,22 @@ Zynthian.ScreenPage {
                             newSynthWorkaroundTimer.restart()
                         }
                     }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        text: qsTr("Pick Existing Sound...")
+                        onClicked: {
+                            applicationWindow().openSoundsDialog();
+                            layerSetupDialog.close();
+                        }
+                    }
                     Timer { //HACK why is this necessary?
                         id: newSynthWorkaroundTimer
                         interval: 200
-                        onTriggered: zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
-
+                        onTriggered: {
+                            zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
+                            layerSetupDialog.close();
+                        }
                     }
                 }
             }

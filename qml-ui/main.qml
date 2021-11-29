@@ -56,6 +56,9 @@ Kirigami.AbstractApplicationWindow {
     function hideConfirmationDialog() {
         confirmDialog.close()
     }
+    function openSoundsDialog() {
+        soundsDialog.open();
+    }
     Component.onCompleted: {
         root.showFullScreen()
     }

@@ -848,9 +848,9 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 text: {
                                     let numPrefix = model.metadata.midi_channel + 1;
-                                    if (numPrefix > 5 && numPrefix <= 10) {
-                                        numPrefix = "6." + (numPrefix - 5);
-                                    }
+                                    //if (numPrefix > 5 && numPrefix <= 10) {
+                                        //numPrefix = "6." + (numPrefix - 5);
+                                    //}
                                     return numPrefix + " - " + model.display;
                                 }
                             }

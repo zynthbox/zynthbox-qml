@@ -647,4 +647,32 @@ ColumnLayout {
             }
         }
     }
+
+    QQC2.Popup {
+        id: cannotRecordEmptyLayerPopup
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit*12
+        height: Kirigami.Units.gridUnit*4
+        modal: true
+
+        QQC2.Label {
+            anchors.margins: Kirigami.Units.gridUnit
+            width: parent.width
+            height: parent.height
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            text: qsTr("Cannot record empty sound layer")
+            font.italic: true
+            font.pointSize: 11
+            wrapMode: "WordWrap"
+        }
+    }
+
+    Connections {
+        target: zynthian.zynthiloops
+        onCannotRecordEmptyLayer: {
+            cannotRecordEmptyLayerPopup.open();
+        }
+    }
 }

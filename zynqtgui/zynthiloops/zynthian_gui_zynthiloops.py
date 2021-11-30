@@ -513,7 +513,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
             if source == 'internal':
-                preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
+                try:
+                    preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
+                except:
+                    preset_name = ""
             else:
                 preset_name = "external"
 
@@ -546,6 +549,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
         else:
             logging.error("Empty layer selected. Cannot record.")
+            self.cannotRecordEmptyLayer.emit()
 
     @Slot(None)
     def stopRecording(self):
@@ -661,3 +665,5 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     metronomeBeatUpdate32th = Signal(int)
     metronomeBeatUpdate64th = Signal(int)
     metronomeBeatUpdate128th = Signal(int)
+
+    cannotRecordEmptyLayer = Signal()

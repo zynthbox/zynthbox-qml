@@ -552,6 +552,7 @@ Zynthian.BasePlayGrid {
                             property int selectedLayer: model.layer
                             property int activePattern: _private.activePattern
                             property QtObject associatedTrack: null
+                            property int associatedTrackIndex: -1
                             Layout.fillHeight: true
                             Layout.fillWidth: true
                             color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
@@ -559,18 +560,28 @@ Zynthian.BasePlayGrid {
                             function pickThisPattern() {
                                 console.log(patternsMenuItem.thisPatternIndex, "index");
                                 _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
+                                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                    if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
+                                        zynthian.session_dashboard.selectedTrack = i;
+                                        break;
+                                    }
+                                }
                                 component.saveDraft();
                             }
                             function updateTrack() {
                                 var foundTrack = null;
+                                var foundIndex = -1;
                                 for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
                                     var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
                                     if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
                                         foundTrack = track;
+                                        foundIndex = i;
                                         break;
                                     }
                                 }
                                 patternsMenuItem.associatedTrack = foundTrack;
+                                patternsMenuItem.associatedTrackIndex = foundIndex;
                             }
                             Connections {
                                 target: zynthian.zynthiloops.song.tracksModel
@@ -671,11 +682,22 @@ Zynthian.BasePlayGrid {
                                             property string soundName: zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
                                             text: patternsMenuItem.thisPattern.layer > 0 && soundName.length > 2
                                                 ? "Sound: " + soundName
-                                                : "No sound assigned"
+                                                : "No sound assigned - tap to select one"
 
+                                            property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(patternsMenuItem.associatedTrackIndex)
                                             onClicked: {
                                                 console.log("Pop up the sound assignery picker thing")
-                                                // Picking a sound goes here - how to do that in a not-terrible way?
+                                                // In case the user changed track while editing a pattern, let's just make sure we have the right one selected
+                                                zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
+                                                if (soundButton.selectedTrack.checkIfLayerExists(patternsMenuItem.associatedTrackIndex)) {
+                                                    // Open library page
+                                                    zynthian.current_screen_id = 'fixed_layers';
+                                                } else {
+                                                    if (soundButton.selectedTrack.createChainedSoundInNextFreeLayer(patternsMenuItem.associatedTrackIndex)) {
+                                                    } else {
+                                                        //noFreeSlotsPopup.open();
+                                                    }
+                                                }
                                             }
                                             //function setLayer() {
                                                 //console.log(patternsMenuItem.thisPatternIndex, index, "on select layer", patternsMenuItem.thisPattern.layer, soundName)

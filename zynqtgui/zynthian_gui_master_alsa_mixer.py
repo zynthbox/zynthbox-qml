@@ -37,11 +37,26 @@ import re
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
+        dev = ""
 
         # Read jack2.service file to find selected card name
         with open("/etc/systemd/system/jack2.service", "r") as f:
             data = f.read()
-            dev = re.search("hw:([^ ]*)", data).group(1)
+
+            # Get jackd command line args
+            args = re.search("ExecStart=(.*)", data).group(1).split(" ")
+
+            # Discard everything before first occurrence of -d
+            while args.pop(0) != "-d":
+                continue
+
+            # Find next -d or -P
+            while True:
+                option = args.pop(0)
+                if option == "-d" or option == "-P":
+                    raw_dev = args.pop(0)
+                    dev = re.search("hw:([^ ]*)", raw_dev).group(1)
+                    break
 
         logging.error(f"### ALSA Mixer card : {dev}")
 

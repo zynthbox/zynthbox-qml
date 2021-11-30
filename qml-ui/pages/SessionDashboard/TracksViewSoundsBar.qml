@@ -127,6 +127,11 @@ Zynthian.Card {
                                             noFreeSlotsPopup.open();
                                         } else {
                                             bottomDrawer.close();
+
+                                            if (root.selectedTrack.connectedPattern >= 0) {
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                                                seq.midiChannel = root.selectedTrack.connectedSound;
+                                            }
                                         }
                                     }
                                 }

@@ -173,11 +173,21 @@ ColumnLayout {
                                         rightMargin: Kirigami.Units.gridUnit*0.5
                                     }
                                     horizontalAlignment: Text.AlignLeft
-                                    text: track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
-                                    Connections {
-                                        target: zynthian.fixed_layers
-                                        onList_updated: soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                    text:  {
+//                                        track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                        for (var id in track.chainedSounds) {
+                                            if (track.chainedSounds[id] >= 0) {
+                                                return zynthian.fixed_layers.selector_list.getDisplayValue(track.chainedSounds[id])
+                                            }
+                                        }
+
+                                        return ""
                                     }
+
+//                                    Connections {
+//                                        target: zynthian.fixed_layers
+//                                        onList_updated: soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+//                                    }
 
                                     elide: "ElideRight"
                                 }

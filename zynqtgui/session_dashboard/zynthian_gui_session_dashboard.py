@@ -150,6 +150,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.zyngui.screens["fixed_layers"].activate_index(connectedSound)
             # else:
             #     self.zyngui.screens["fixed_layers"].activate_index(track)
+            self.zyngui.screens['layers_for_track'].fill_list()
 
         if self.__selected_track__ != track or force_set is True:
             self.__selected_track__ = track

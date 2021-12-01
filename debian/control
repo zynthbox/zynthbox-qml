@@ -1,13 +1,14 @@
-Source: zynthian-qml
+Source: zynthbox-qml
 Section: misc
 Priority: optional
 Maintainer: Leszek Lesner <leszek@zevenos.com>
 Build-Depends: debhelper (>= 11), cmake (>= 3.13), extra-cmake-modules (>= 5.54.0), qtbase5-dev (>= 5.11.3), kirigami2-dev, libzl, qtdeclarative5-dev, pkg-config, librtmidi-dev
 Standards-Version: 4.1.3
-Homepage: https://github.com/zynthbox/zynthian-qml
+Homepage: https://github.com/zynthbox/zynthbox-qml
 
-Package: zynthian-qml
+Package: zynthbox-qml
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Zynthian QML
- A frontend for Zynthian
+Replaces: zynthian-qml (<= 1.1)
+Description: Zynthbox QML frontend
+ A frontend for Zynthian written in QML

@@ -103,7 +103,7 @@ QQC2.Dialog {
 
                     property int layerIndex: index
                     property bool hasConnectedTracks: false
-/*
+
                     Kirigami.Theme.highlightColor: {
                         if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
                             return Qt.rgba(
@@ -128,7 +128,7 @@ QQC2.Dialog {
                                 1
                             )
                         }
-                    }*/
+                    }
 
                     Layout.fillWidth: false
                     Layout.fillHeight: false

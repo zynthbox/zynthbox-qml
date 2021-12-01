@@ -181,7 +181,7 @@ Zynthian.Card {
                         controlObj.stop();
                     } else {
                         console.log("Playing Sound Loop")
-                        controlObj.play();
+                        controlObj.playSolo();
                     }
                 }
             }

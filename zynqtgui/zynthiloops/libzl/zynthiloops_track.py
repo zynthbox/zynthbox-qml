@@ -30,6 +30,7 @@ from PySide2.QtCore import Property, QObject, Signal, Slot
 from . import libzl
 from .zynthiloops_clips_model import zynthiloops_clips_model
 from .zynthiloops_clip import zynthiloops_clip
+from ... import zynthian_gui_config
 
 class zynthiloops_track(QObject):
     # Possible Values : "audio", "video"
@@ -37,6 +38,7 @@ class zynthiloops_track(QObject):
 
     def __init__(self, id: int, song: QObject, parent: QObject = None):
         super(zynthiloops_track, self).__init__(parent)
+        self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
         self.__name__ = None
         self.__song__ = song
@@ -374,6 +376,11 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
+        try: #can be called before creation
+            self.zyngui.screens['layers_for_track'].fill_list()
+            self.zyngui.screens['layers_for_track'].select_action(self.zyngui.screens['layers_for_track'].current_index)
+        except:
+            pass
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

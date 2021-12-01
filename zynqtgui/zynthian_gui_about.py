@@ -25,6 +25,7 @@
 
 import sys
 import logging
+import apt
 from ctypes import c_ubyte, c_byte
 
 # Zynthian specific modules
@@ -42,28 +43,17 @@ from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
 #------------------------------------------------------------------------------
 
 class zynthian_gui_about(zynthian_qt_gui_base.ZynGui):
-
-
     def __init__(self, parent=None):
         super(zynthian_gui_about, self).__init__(parent)
-
+        self.cache = apt.cache.Cache()
+        self.cache.open()
 
     def get_version_from_apt(self, package):
         try:
-            cmd = "apt show " + package
-            proc = Popen(
-                cmd,
-                shell=True,
-                stdout=PIPE,
-                stderr=STDOUT,
-                universal_newlines=True,
-            )
-
-            for line in proc.stdout:
-                if line.startswith("Version:"):
-                    return line[len("Version:"):len(line)-1]
+            return self.cache[package].installed.version
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Error getting version from apt : {e}")
+            return ""
 
     def get_zynthbox_version(self):
         return self.get_version_from_apt("zynthbox-qml")

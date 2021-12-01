@@ -201,6 +201,22 @@ ColumnLayout {
                                         }
                                     }
 
+                                    Connections {
+                                        target: track
+                                        onChainedSoundsChanged: {
+                                            var text = "";
+
+                                            for (var id in trackDelegate.track.chainedSounds) {
+                                                if (trackDelegate.track.chainedSounds[id] >= 0) {
+                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(trackDelegate.track.chainedSounds[id]);
+                                                    break;
+                                                }
+                                            }
+
+                                            soundLabel.text = text;
+                                        }
+                                    }
+
                                     elide: "ElideRight"
                                 }
 

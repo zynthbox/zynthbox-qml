@@ -184,10 +184,22 @@ ColumnLayout {
                                         return ""
                                     }
 
-//                                    Connections {
-//                                        target: zynthian.fixed_layers
-//                                        onList_updated: soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
-//                                    }
+                                    Connections {
+                                        target: zynthian.fixed_layers
+                                        onList_updated: {
+                                            var text = "";
+
+                                            // soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
+                                            for (var id in track.chainedSounds) {
+                                                if (track.chainedSounds[id] >= 0) {
+                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(track.chainedSounds[id]);
+                                                    break;
+                                                }
+                                            }
+
+                                            soundLabel.text = text;
+                                        }
+                                    }
 
                                     elide: "ElideRight"
                                 }

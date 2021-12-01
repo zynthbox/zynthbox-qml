@@ -82,6 +82,7 @@ from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
+from zynqtgui.zynthian_gui_layers_for_track import zynthian_gui_layers_for_track
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
@@ -261,7 +262,7 @@ class zynthian_gui(QObject):
 
     screens_sequence = (
         "session_dashboard",  #FIXME or main? make this more configurable?
-        "fixed_layers",
+        "layers_for_track",
         "bank",
         "preset",
         "control",
@@ -273,6 +274,7 @@ class zynthian_gui(QObject):
         "main",
         "layer",
         "fixed_layers",
+        "layers_for_track",
         "main_layers_view",
         "bank",
         "preset",
@@ -628,6 +630,7 @@ class zynthian_gui(QObject):
         # Fixed layers depends on zynthiloops and session_dashboard screens and hence needs to be initialized
         # after those 2 pages
         ###
+        self.screens["layers_for_track"] = zynthian_gui_layers_for_track(self)
         self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
         self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
 
@@ -711,13 +714,14 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
-        elif screen is "layer" or screen is "main_layers_view":  #HACK replace completely layer with fixed_layers
-            screen = "fixed_layers"
+        elif screen is "layer" or screen is "main_layers_view" or screen is "fixed_layers":  #HACK replace completely layer with layers_for_track
+            screen = "layers_for_track"
 
         if (
             screen == "layer"
             or screen == "fixed_layers"
             or screen == "main_layers_view"
+            or screen ==  "layers_for_track"
             or screen == "bank"
             or screen == "preset"
             or screen == "control"
@@ -956,6 +960,7 @@ class zynthian_gui(QObject):
         else:
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
+        self.screens["layers_for_track"].sync_index_from_curlayer()
         self.screens["bank"].fill_list()
         self.screens["bank"].show()
         self.screens["preset"].fill_list()
@@ -1213,7 +1218,7 @@ class zynthian_gui(QObject):
             self.show_screen("admin")
 
         elif cuia == "SCREEN_LAYER":
-            self.show_screen("fixed_layers")
+            self.show_screen("layers_for_track")
 
         elif cuia == "SCREEN_BANK":
             self.show_screen("bank")
@@ -2425,6 +2430,9 @@ class zynthian_gui(QObject):
     def get_fixed_layers(self):
         return self.screens["fixed_layers"]
 
+    def get_layers_for_track(self):
+        return self.screens["layers_for_track"]
+
     def get_main_layers_view(self):
         return self.screens["main_layers_view"]
 
@@ -2617,6 +2625,7 @@ class zynthian_gui(QObject):
     engine = Property(QObject, get_engine, constant=True)
     layer = Property(QObject, get_layer, constant=True)
     fixed_layers = Property(QObject, get_fixed_layers, constant=True)
+    layers_for_track = Property(QObject, get_layers_for_track, constant=True)
     main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)
     layer_effects = Property(QObject, get_layer_effects, constant=True)

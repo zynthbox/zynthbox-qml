@@ -203,6 +203,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()
+        self.zyngui.screens['layers_for_track'].fill_list()
         super().fill_list()
 
 
@@ -311,19 +312,23 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
             self.zyngui.screens['layer'].remove_midichan_layer(chan)
         self.zyngui.screens['layer'].reset_channel_status_range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1)
 
-    @Signal
-    def current_index_valid_changed(self):
-        pass
-
-    def get_current_index_valid(self):
-        logging.error("index {} list_data {}".format(self.index, len(self.list_data)))
-        logging.error("midichan: {}".format(self.list_data[self.index][1]))
-        midi_chan = self.list_data[self.index][1]
+    @Slot(int, result=bool)
+    def index_is_valid(self, index):
+        logging.error("index {} list_data {}".format(index, len(self.list_data)))
+        logging.error("midichan: {}".format(self.list_data[index][1]))
+        midi_chan = self.list_data[index][1]
 
         if midi_chan < 0:
             return False
 
         return midi_chan in self.zyngui.screens['layer'].layer_midi_map
+
+    @Signal
+    def current_index_valid_changed(self):
+        pass
+
+    def get_current_index_valid(self):
+        return self.index_is_valid(self.current_index)
 
     current_index_valid = Property(bool, get_current_index_valid, notify = current_index_valid_changed)
 

@@ -65,6 +65,7 @@ QtObject {
         "layer": "SynthSetupPage.qml",
         "fixed_layers": "SynthSetupPage.qml",
         "main_layers_view": "SynthSetupPage.qml",
+        "layers_for_track": "SynthSetupPage.qml",
         "bank": "SynthSetupPage.qml",
         "preset": "SynthSetupPage.qml",
         "control": "ControlPage.qml",

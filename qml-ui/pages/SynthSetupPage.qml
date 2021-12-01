@@ -176,7 +176,7 @@ Zynthian.ScreenPage {
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            zynthian.current_screen_id = "fixed_layers";
+            zynthian.current_screen_id = "layers_for_track";
             zynthian.go_back();
             return true;
         default:
@@ -185,7 +185,7 @@ Zynthian.ScreenPage {
     }
 
 
-    property var screenIds: ["fixed_layers", "bank", "preset"]
+    property var screenIds: ["layers_for_track", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
@@ -220,7 +220,7 @@ Zynthian.ScreenPage {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: "fixed_layers"
+                screenId: "layers_for_track"
 
                 property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
@@ -236,10 +236,10 @@ Zynthian.ScreenPage {
                     onCurrentScreenIdRequested: layersView.currentScreenIdRequested(screenId)
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
-                    visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) ||
-                        layersView.selectedTrack.chainedSounds.indexOf(index) !== -1
+                    //visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) ||
+                     //   layersView.selectedTrack.chainedSounds.indexOf(index) !== -1
                     /*layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1*/
-                    height: visible ? layersView.view.height/5 : 0
+                    height: layersView.view.height/5
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
@@ -447,8 +447,9 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.fixed_layers.volume_controls
+                            model: zynthian.layers_for_track.volume_controls
                             delegate: ColumnLayout {
+                                Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing
                                 enabled: modelData.value_max > 0
                                 QQC2.Slider {
@@ -481,6 +482,9 @@ Zynthian.ScreenPage {
                                     }
                                 }
                             }
+                        }
+                        Item {
+                            Layout.fillHeight: true
                         }
                     }
                 }

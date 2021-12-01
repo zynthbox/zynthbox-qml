@@ -288,25 +288,30 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.jack_client.deactivate()
         self.jack_client.activate()
 
+        jack_basenames = []
+        selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
+
+        for channel in selected_track.chainedSounds:
+            if channel >= 0:
+                try:
+                    jack_basenames.append(self.zyngui.screens['layer'].layer_midi_map[channel].jackname.split(":")[0]).split(":")[0]
+                except:
+                    pass
+
         for port in self.jack_client.get_all_connections('system:playback_1'):
-            self.process_jack_port(port, self.jack_capture_port_a)
+            self.process_jack_port(port, self.jack_capture_port_a, jack_basenames)
 
         for port in self.jack_client.get_all_connections('system:playback_2'):
-            self.process_jack_port(port, self.jack_capture_port_b)
+            self.process_jack_port(port, self.jack_capture_port_b, jack_basenames)
 
-    def process_jack_port(self, port, target):
+    def process_jack_port(self, port, target, active_jack_basenames):
         try:
-            layer_index = self.zyngui.screens['layer'].get_layer_selected()
-            jack_basename = self.zyngui.screens['layer'].root_layers[layer_index].jackname.split(":")[0]
-        except:
-            jack_basename = ""
-
-        try:
-            if not (port.name.startswith("JUCE") or port.name.startswith("system")) and port.name.startswith(jack_basename):
-                logging.error("ACCEPTED {}".format(port.name))
-                self.jack_client.connect(port.name, target.name)
-            else:
-                logging.error("REJECTED {}".format(port.name))
+            for jack_basename in active_jack_basenames:
+                if not (port.name.startswith("JUCE") or port.name.startswith("system")) and port.name.startswith(jack_basename):
+                    logging.error("ACCEPTED {}".format(port.name))
+                    self.jack_client.connect(port.name, target.name)
+                else:
+                    logging.error("REJECTED {}".format(port.name))
         except Exception as e:
             logging.error(f"Error processing jack port : {port}({str(e)})")
 

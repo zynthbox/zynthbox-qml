@@ -893,14 +893,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 cache = apt.cache.Cache()
                 cache.open()
 
-                libzl_update_available = cache["libzl"].is_upgradable
-                quick_components_update_available = cache["zynthian-quick-components"].is_upgradable
-                qml_update_available = cache["zynthian-qml"].is_upgradable
-                metapackage_update_available = cache["zynthbox-meta"].is_upgradable or (not cache["zynthbox-meta"].is_installed)
+                updaterpackage_update_available = cache["zynthbox-update-script"].is_upgradable or (not cache["zynthbox-update-script"].is_installed)
 
-                if libzl_update_available or quick_components_update_available or qml_update_available or metapackage_update_available:
-                    logging.error(
-                        f"Updates Available : libzl({libzl_update_available}), zynthian-quick-components({quick_components_update_available}), zynthian-qml({qml_update_available}), zynthbox-meta({metapackage_update_available})")
+                if updaterpackage_update_available:
+                    logging.error("zynthbox-update-script Update Available")
                     self.checkForUpdatesCompleted.emit()
 
                     self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.", self.run_update)
@@ -926,13 +922,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
 
                 cache = apt.cache.Cache()
                 cache.open()
-
-                cache["libzl"].mark_install()
-                cache["zynthian-quick-components"].mark_install()
-                cache["zynthian-qml"].mark_install()
-                cache["zynthbox-meta"].mark_install()
-
+                cache["zynthbox-update-script"].mark_install()
                 cache.commit()
+
+                process_upgrade = run(["/usr/bin/zynthbox-update-script"], capture_output=False, text=True, check=True)
 
                 self.updateCompleted.emit()
                 self.reboot_confirmed()

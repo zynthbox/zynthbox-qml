@@ -358,7 +358,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
-        self.zyngui.screens["session_dashboard"].selectedTrack = 0
+        self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
 
     @Slot(None)
     def saveSketch(self):

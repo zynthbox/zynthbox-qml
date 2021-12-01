@@ -77,6 +77,7 @@ from zyngine import zynthian_midi_filter
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
+from zynqtgui.zynthian_gui_about import zynthian_gui_about
 from zynqtgui.zynthian_gui_option import zynthian_gui_option
 from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
@@ -565,6 +566,7 @@ class zynthian_gui(QObject):
 
         # Create Core UI Screens
         self.screens["info"] = zynthian_gui_info(self)
+        self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
         # self.screens['keyboard'] = zynthian_gui_keyboard(self)
         self.screens["option"] = zynthian_gui_option(self)
@@ -2420,6 +2422,10 @@ class zynthian_gui(QObject):
 
     def get_main(self):
         return self.screens["main"]
+
+    @Property(QObject, constant=True)
+    def about(self):
+        return self.screens["about"]
 
     def get_engine(self):
         return self.screens["engine"]

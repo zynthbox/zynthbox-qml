@@ -87,6 +87,7 @@ QtObject {
         "audio_recorder": "AudioRecorderPage.qml",
         "midi_recorder": "MidiRecorderPage.qml",
         "admin": "AdminPage.qml",
+        "about": "AboutPage.qml",
         "info": "InfoPage.qml",
         "option": "OptionPage.qml",
         "theme_chooser": "ThemePage.qml",

@@ -549,7 +549,6 @@ Zynthian.BasePlayGrid {
                             property QtObject thisPattern: model.pattern
                             property int thisPatternIndex: model.index
                             property int bankIndex: thisPattern.bankOffset / 8;
-                            property int selectedLayer: model.layer
                             property int activePattern: _private.activePattern
                             property QtObject associatedTrack: null
                             property int associatedTrackIndex: -1
@@ -583,12 +582,28 @@ Zynthian.BasePlayGrid {
                                 patternsMenuItem.associatedTrack = foundTrack;
                                 patternsMenuItem.associatedTrackIndex = foundIndex;
                             }
-                            Connections {
-                                target: zynthian.zynthiloops.song.tracksModel
-                                onConnectedPatternsCountChanged: updateTrack()
-                            }
                             Component.onCompleted: {
                                 updateTrack();
+                            }
+                            Connections {
+                                target: patternsMenuItem.thisPattern
+                                onLayerChanged: patternsMenuItem.updateTrack()
+                            }
+                            Connections {
+                                target: zynthian.zynthiloops.song.tracksModel
+                                onConnectedSoundsCountChanged: patternsMenuItem.updateTrack()
+                                onConnectedPatternsCountChanged: patternsMenuItem.updateTrack()
+                            }
+                            function adoptTrackLayer() {
+                                var connectedSound = patternsMenuItem.associatedTrack.connectedSound;
+                                if (connectedSound !== patternsMenuItem.thisPattern.layer) {
+                                    patternsMenuItem.thisPattern.layer = connectedSound;
+                                }
+                            }
+                            Connections {
+                                target: patternsMenuItem.associatedTrack
+                                onConnectedPatternChanged: patternsMenuItem.adoptTrackLayer()
+                                onConnectedSoundChanged: patternsMenuItem.adoptTrackLayer()
                             }
                             MouseArea {
                                 anchors.fill: parent
@@ -679,23 +694,29 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
-                                            property string soundName: zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
-                                            text: patternsMenuItem.thisPattern.layer > 0 && soundName.length > 2
+                                            property string soundName: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.getLayerNameByMidiChannel(patternsMenuItem.associatedTrack.connectedSound) : "";
+                                            text: (patternsMenuItem.associatedTrack && patternsMenuItem.associatedTrack.connectedSound > -1) && soundName.length > 2
                                                 ? "Sound: " + soundName
                                                 : "No sound assigned - tap to select one"
-
-                                            property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(patternsMenuItem.associatedTrackIndex)
                                             onClicked: {
-                                                console.log("Pop up the sound assignery picker thing")
-                                                // In case the user changed track while editing a pattern, let's just make sure we have the right one selected
-                                                zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
-                                                if (soundButton.selectedTrack.checkIfLayerExists(patternsMenuItem.associatedTrackIndex)) {
+                                                if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
+                                                    zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
+                                                }
+                                                if (patternsMenuItem.associatedTrack.checkIfLayerExists(patternsMenuItem.thisPattern.layer)) {
                                                     // Open library page
                                                     zynthian.current_screen_id = 'fixed_layers';
                                                 } else {
-                                                    if (soundButton.selectedTrack.createChainedSoundInNextFreeLayer(patternsMenuItem.associatedTrackIndex)) {
+                                                    var availableSlot = -1;
+                                                    for (var i = 0; i < patternsMenuItem.associatedTrack.chainedSounds.length; ++i) {
+                                                        if (patternsMenuItem.associatedTrack.chainedSounds[i] == -1) {
+                                                            availableSlot = i;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (availableSlot > -1 && patternsMenuItem.associatedTrack.createChainedSoundInNextFreeLayer(availableSlot)) {
+                                                        // We're asking for a new thing now
                                                     } else {
-                                                        //noFreeSlotsPopup.open();
+                                                        noFreeSlotsPopup.open();
                                                     }
                                                 }
                                             }
@@ -703,21 +724,6 @@ Zynthian.BasePlayGrid {
                                                 //console.log(patternsMenuItem.thisPatternIndex, index, "on select layer", patternsMenuItem.thisPattern.layer, soundName)
                                                 //component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
                                             //}
-                                            Connections {
-                                                target: patternsMenuItem.thisPattern
-                                                onLayerChanged: {
-                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
-                                                }
-                                            }
-                                            Connections {
-                                                target: zynthian.zynthiloops.song.tracksModel
-                                                onConnectedSoundsCountChanged: {
-                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
-                                                }
-                                                onConnectedPatternsCountChanged: {
-                                                    soundButton.soundName = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.thisPattern.layer)
-                                                }
-                                            }
                                         }
                                     }
                                     ColumnLayout {
@@ -773,6 +779,22 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                }
+            }
+            QQC2.Popup {
+                id: noFreeSlotsPopup
+                x: Math.round(parent.width/2 - width/2)
+                y: Math.round(parent.height/2 - height/2)
+                width: Kirigami.Units.gridUnit*12
+                height: Kirigami.Units.gridUnit*4
+                modal: true
+
+                QQC2.Label {
+                    anchors.fill: parent
+                    horizontalAlignment: "AlignHCenter"
+                    verticalAlignment: "AlignVCenter"
+                    text: qsTr("No free slots remaining")
+                    font.italic: true
                 }
             }
         }

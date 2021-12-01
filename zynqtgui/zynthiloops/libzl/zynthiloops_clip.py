@@ -602,10 +602,10 @@ class zynthiloops_clip(QObject):
 
             self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
 
+            # self.__song__.get_metronome_manager().start_metronome_request()
             self.__is_playing__ = True
             self.__is_playing_changed__.emit()
             self.audioSource.queueClipToStart()
-            self.__song__.get_metronome_manager().start_metronome_request()
 
     @Slot(None)
     def stop(self):
@@ -621,7 +621,7 @@ class zynthiloops_clip(QObject):
 
             if self.audioSource is None:
                 return
-            self.__song__.get_metronome_manager().stop_metronome_request()
+            # self.__song__.get_metronome_manager().stop_metronome_request()
             self.__is_playing__ = False
             self.__is_playing_changed__.emit()
 

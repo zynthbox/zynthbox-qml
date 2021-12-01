@@ -10,5 +10,6 @@ Package: zynthbox-qml
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Replaces: zynthian-qml (<= 1.1)
+Conflicts: zynthian-qml (<= 1.1)
 Description: Zynthbox QML frontend
  A frontend for Zynthian written in QML

@@ -66,6 +66,7 @@ class zynthiloops_clip(QObject):
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
         self.recording_basepath = song.sketch_folder
+        self.__started_solo__ = False
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
@@ -602,7 +603,6 @@ class zynthiloops_clip(QObject):
 
             self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
 
-            # self.__song__.get_metronome_manager().start_metronome_request()
             self.__is_playing__ = True
             self.__is_playing_changed__.emit()
             self.audioSource.queueClipToStart()
@@ -621,14 +621,24 @@ class zynthiloops_clip(QObject):
 
             if self.audioSource is None:
                 return
-            # self.__song__.get_metronome_manager().stop_metronome_request()
+
+            if self.__started_solo__:
+                self.__song__.get_metronome_manager().stop_metronome_request()
+
             self.__is_playing__ = False
+            self.__started_solo__ = False
             self.__is_playing_changed__.emit()
 
             # self.audioSource.stop()
             self.audioSource.queueClipToStop()
 
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
+
+    @Slot(None)
+    def playSolo(self):
+        self.__started_solo__ = True
+        self.play()
+        self.__song__.get_metronome_manager().start_metronome_request()
 
     def reset_beat_count(self):
         self.__current_beat__ = -1

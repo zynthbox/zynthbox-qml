@@ -203,6 +203,8 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.list_data.append(
                 (self.check_for_updates, 0, "Check for software updates")
             )
+        self.list_data.append((None, 0, "-----------------------------"))
+        self.list_data.append((self.about_page,0,"About"))
         # self.list_data.append((self.update_system,0,"Update Operating System"))
         # self.list_data.append((self.restart_gui, 0, "Restart UI"))
         # self.list_data.append((self.exit_to_console,0,"Exit to Console"))
@@ -704,6 +706,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
     def midi_profile(self):
         logging.info("MIDI Profile")
         self.zyngui.show_modal("midi_profile")
+
+    def about_page(self):
+        logging.info("About")
+        self.zyngui.show_modal("about")
 
     # ------------------------------------------------------------------------------
     # NETWORK FEATURES

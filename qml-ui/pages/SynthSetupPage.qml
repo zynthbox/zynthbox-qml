@@ -352,7 +352,12 @@ Zynthian.ScreenPage {
                                 delegate.toggleCloned();
                                 delegate.clicked();
                             }
-                            onClicked: delegate.clicked();
+                            onClicked: {
+                                delegate.clicked();
+                                if (!zynthian.fixed_layers.current_index_valid) {
+                                    layerSetupDialog.open();
+                                }
+                            }
                             RowLayout {
                                 id: fxLayout
                                 anchors.fill: parent

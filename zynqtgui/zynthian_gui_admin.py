@@ -894,20 +894,28 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.checkForUpdatesStarted.emit()
 
             try:
+                apt_pkg.init_config()
+                apt_pkg.config.set("DPkg::Options::", "--force-confdef")
+                apt_pkg.config.set("DPkg::Options::", "--force-confold")
+                apt_pkg.config.set("DPkg::Options::", "--force-overwrite")
+
                 process_update = run(["apt-get", "update", "-y"], capture_output=False, text=True, check=True)
 
                 cache = apt.cache.Cache()
                 cache.open()
+                cache["zynthbox-update-script"].mark_install()
+                cache.commit()
 
-                updaterpackage_update_available = cache["zynthbox-update-script"].is_upgradable or (not cache["zynthbox-update-script"].is_installed)
+                process_check_for_updates = run(["/usr/bin/zynthbox-update-script", "check_for_updates"], capture_output=False, text=True, check=False)
 
-                if updaterpackage_update_available:
+                if process_check_for_updates.returncode > 0:
+                    self.checkForUpdatesUnavailable.emit()
+                else:
                     logging.error("zynthbox-update-script Update Available")
                     self.checkForUpdatesCompleted.emit()
 
-                    self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.", self.run_update)
-                else:
-                    self.checkForUpdatesUnavailable.emit()
+                    self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.",
+                                             self.run_update)
             except Exception as e:
                 logging.error(f"Error while checking for updates : {str(e)}")
                 self.checkForUpdatesErrored.emit()
@@ -921,17 +929,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
             self.updateStarted.emit()
 
             try:
-                apt_pkg.init_config()
-                apt_pkg.config.set("DPkg::Options::", "--force-confdef")
-                apt_pkg.config.set("DPkg::Options::", "--force-confold")
-                apt_pkg.config.set("DPkg::Options::", "--force-overwrite")
-
-                cache = apt.cache.Cache()
-                cache.open()
-                cache["zynthbox-update-script"].mark_install()
-                cache.commit()
-
-                process_upgrade = run(["/usr/bin/zynthbox-update-script"], capture_output=False, text=True, check=True)
+                process_check_for_updates = run(["/usr/bin/zynthbox-update-script", "do_upgrade"], capture_output=False, text=True, check=True)
 
                 self.updateCompleted.emit()
                 self.reboot_confirmed()

@@ -127,17 +127,17 @@ Zynthian.Card {
                                         // Open library page
                                         zynthian.current_screen_id = 'fixed_layers';
                                         bottomDrawer.close();
+                                    } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
+                                        noFreeSlotsPopup.open();
                                     } else {
-                                        if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
-                                            noFreeSlotsPopup.open();
-                                        } else {
-                                            bottomDrawer.close();
+                                        applicationWindow().requestOpenLayerSetupDialog();
 
-                                            if (root.selectedTrack.connectedPattern >= 0) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
-                                                seq.midiChannel = root.selectedTrack.connectedSound;
-                                            }
+                                        if (root.selectedTrack.connectedPattern >= 0) {
+                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                                            seq.midiChannel = root.selectedTrack.connectedSound;
                                         }
+
+                                        bottomDrawer.close();
                                     }
                                 }
                             }
@@ -186,11 +186,11 @@ Zynthian.Card {
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 // Open library edit page
-                                bottomDrawer.close();
-
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                 zynthian.control.single_effect_engine = null;
                                 zynthian.current_screen_id = "control";
+
+                                bottomDrawer.close();
                             }
                         }
 
@@ -214,10 +214,10 @@ Zynthian.Card {
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 // Open library edit page
-                                bottomDrawer.close();
-
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
                                 zynthian.current_modal_screen_id = "midi_key_range";
+
+                                bottomDrawer.close();
                             }
                         }
 
@@ -268,10 +268,11 @@ Zynthian.Card {
                                 if (root.selectedRowIndex !== index) {
                                     root.selectedRowIndex = index;
                                 } else {
-                                    bottomDrawer.close();
                                     zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                     zynthian.layer_options.show();
                                     zynthian.current_screen_id = "layer_effects";
+
+                                    bottomDrawer.close();
                                 }
                             }
                         }
@@ -287,10 +288,10 @@ Zynthian.Card {
                         enabled: root.selectedRowIndex === index && fxLabel.text.length > 0
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                bottomDrawer.close();
-
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                 zynthian.layer_effects.fx_reset()
+
+                                bottomDrawer.close();
                             }
                         }
 

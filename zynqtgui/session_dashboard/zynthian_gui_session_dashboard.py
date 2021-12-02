@@ -251,6 +251,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.__id__ = session["id"]
                 self.id_changed.emit()
             if "selectedTrack" in session:
+                self.__selected_track__ = session["selectedTrack"]
                 self.set_selected_track(session["selectedTrack"], True)
                 self.selected_track_changed.emit()
                 QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)

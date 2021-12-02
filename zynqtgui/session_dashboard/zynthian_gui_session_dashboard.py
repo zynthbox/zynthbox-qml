@@ -146,6 +146,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
             connectedSound = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track).connectedSound
 
+            logging.error(f"Set selected Sound : {connectedSound}")
+
             if connectedSound >= 0:
                 self.zyngui.screens["fixed_layers"].activate_index(connectedSound)
             # else:

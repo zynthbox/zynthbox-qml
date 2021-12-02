@@ -176,6 +176,10 @@ QQC2.Dialog {
                         }
 
                         zynthian.fixed_layers.activate_index(index);
+
+                        if (!soundsDialog.selectedTrack.checkIfLayerExists(index)) {
+                            applicationWindow().requestOpenLayerSetupDialog();
+                        }
                     }
 
                     // Reset hasConnectedTracks on dialog close

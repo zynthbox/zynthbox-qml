@@ -147,8 +147,29 @@ Zynthian.BasePlayGrid {
             //filterRowEnd: activeBar
         //}
 
+        function updateCurrentGrid() {
+            if (gridModel) {
+                if (gridModel.rows === 0) {
+                    populateGridTimer.restart();
+                } else {
+                    for (var i = 0; i < gridModel.rows; ++i) {
+                        var row = gridModel.getRow(i);
+                        for (var j = 0; j < row.length; ++j) {
+                            var note = row[j];
+                            if (note) {
+                                if (note.midiChannel !== activePattern.midiChannel) {
+                                    populateGridTimer.restart();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         onOctaveChanged: {
-            populateGridTimer.restart();
+            updateCurrentGrid();
         }
 
         onActiveBarChanged: {
@@ -163,10 +184,12 @@ Zynthian.BasePlayGrid {
             console.log('on active pattern changed', _private.activePattern)
         }
 
+        onLayerChanged: {
+            updateCurrentGrid();
+        }
+
         onGridModelChanged: {
-            if (gridModel && gridModel.rows === 0) {
-                populateGridTimer.restart();
-            }
+            updateCurrentGrid();
         }
 
         property QtObject draftSaverThrottle: Timer {
@@ -234,6 +257,8 @@ Zynthian.BasePlayGrid {
     // on component completed
     onInitialize: {
         _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+        // HACK ALERT this needs to be done somewhere more sensible
+        //_private.sequence.song = zynthian.zynthiloops.song;
         component.dashboardModel = _private.sequence;
         if (_private.gridModel.rows === 0) {
             for (var i = 0; i < 5; ++i) {
@@ -249,6 +274,14 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+
+    //Connections {
+        //// HACK ALERT this needs to be done somewhere more sensible
+        //target: zynthian.zynthiloops
+        //onSongChanged: {
+            //_private.sequence.song = zynthian.zynthiloops.song;
+        //}
+    //}
 
     onMostRecentlyPlayedNoteChanged:{
         updateActivePatternMPN.restart();
@@ -594,6 +627,10 @@ Zynthian.BasePlayGrid {
                                 onConnectedSoundsCountChanged: patternsMenuItem.updateTrack()
                                 onConnectedPatternsCountChanged: patternsMenuItem.updateTrack()
                             }
+                            Connections {
+                                target: zynthian.zynthiloops
+                                onSongChanged: patternsMenuItem.updateTrack()
+                            }
                             function adoptTrackLayer() {
                                 var connectedSound = patternsMenuItem.associatedTrack.connectedSound;
                                 if (connectedSound !== patternsMenuItem.thisPattern.layer) {
@@ -702,9 +739,9 @@ Zynthian.BasePlayGrid {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
                                                 }
-                                                if (patternsMenuItem.associatedTrack.checkIfLayerExists(patternsMenuItem.thisPattern.layer)) {
+                                                if (patternsMenuItem.associatedTrack) {
                                                     // Open library page
-                                                    zynthian.current_screen_id = 'fixed_layers';
+                                                    zynthian.current_screen_id = 'layers_for_track';
                                                 } else {
                                                     var availableSlot = -1;
                                                     for (var i = 0; i < patternsMenuItem.associatedTrack.chainedSounds.length; ++i) {

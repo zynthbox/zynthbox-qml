@@ -112,7 +112,7 @@ Zynthian.Card {
                                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                         noFreeSlotsPopup.open();
                                     } else {
-                                        parent.Window.window.requestOpenLayerSetupDialog();
+                                        applicationWindow().requestOpenLayerSetupDialog();
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
                                             var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);

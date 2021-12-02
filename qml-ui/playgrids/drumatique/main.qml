@@ -636,6 +636,7 @@ Zynthian.BasePlayGrid {
                                 if (connectedSound !== patternsMenuItem.thisPattern.layer) {
                                     patternsMenuItem.thisPattern.layer = connectedSound;
                                 }
+                                updateTrack();
                             }
                             Connections {
                                 target: patternsMenuItem.associatedTrack
@@ -731,7 +732,38 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
-                                            property string soundName: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.getLayerNameByMidiChannel(patternsMenuItem.associatedTrack.connectedSound) : "";
+                                            property string soundName
+                                            Component.onCompleted: {
+                                                updateSoundName();
+                                            }
+                                            Connections {
+                                                target: patternsMenuItem
+                                                onAssociatedTrackChanged: soundButton.updateSoundName();
+                                            }
+                                            Connections {
+                                                target: zynthian.fixed_layers
+                                                onList_updated: soundButton.updateSoundName();
+                                            }
+                                            Connections {
+                                                target: patternsMenuItem.associatedTrack
+                                                onChainedSoundsChanged: soundButton.updateSoundName();
+                                                onConnectedSoundChanged: soundButton.updateSoundName();
+                                            }
+                                            function updateSoundName() {
+                                                var text = "";
+
+                                                if (patternsMenuItem.associatedTrack) {
+                                                    for (var id in patternsMenuItem.associatedTrack.chainedSounds) {
+                                                        if (patternsMenuItem.associatedTrack.chainedSounds[id] >= 0 &&
+                                                            patternsMenuItem.associatedTrack.checkIfLayerExists(patternsMenuItem.associatedTrack.chainedSounds[id])) {
+                                                            text = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.associatedTrack.chainedSounds[id]);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+
+                                                soundName = text;
+                                            }
                                             text: (patternsMenuItem.associatedTrack && patternsMenuItem.associatedTrack.connectedSound > -1) && soundName.length > 2
                                                 ? "Sound: " + soundName
                                                 : "No sound assigned - tap to select one"

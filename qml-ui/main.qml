@@ -63,6 +63,9 @@ Kirigami.AbstractApplicationWindow {
         root.showFullScreen()
     }
 
+    signal requestOpenLayerSetupDialog()
+    signal requestCloseLayerSetupDialog()
+
     width: screen.width
     height: screen.height
 

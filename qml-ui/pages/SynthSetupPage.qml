@@ -240,6 +240,12 @@ Zynthian.ScreenPage {
                      //   layersView.selectedTrack.chainedSounds.indexOf(index) !== -1
                     /*layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1*/
                     height: layersView.view.height/5
+                    onClicked: {
+                        if (!zynthian.fixed_layers.current_index_valid) {
+                            layerSetupDialog.open();
+                            delegate.selector.activate_index(index);
+                        }
+                    }
                     function toggleCloned() {
                         if (model.metadata.midi_cloned) {
                             zynthian.layer.remove_clone_midi(model.metadata.midi_channel, model.metadata.midi_channel + 1);
@@ -334,43 +340,21 @@ Zynthian.ScreenPage {
                                 }
                             }
                         }
-                        MouseArea {
+                        RowLayout {
+                            id: fxLayout
                             implicitWidth: fxLayout.implicitWidth
                             implicitHeight: fxLayout.implicitHeight
                             Layout.fillWidth: true
-                            enabled: index < layersView.view.count - 1
-                            Rectangle {
-                                anchors {
-                                    fill: parent
-                                    margins: -Kirigami.Units.smallSpacing
-                                }
-                                radius: 3
-                                color: layersView.currentIndex == index ? Kirigami.Theme.backgroundColor : Kirigami.Theme.highlightColor
-                                opacity: parent.pressed ? 0.4 : 0
-                            }
-                            onPressAndHold: {
-                                delegate.toggleCloned();
-                                delegate.clicked();
-                            }
-                            onClicked: {
-                                delegate.clicked();
-                                if (!zynthian.fixed_layers.current_index_valid) {
-                                    layerSetupDialog.open();
-                                }
-                            }
-                            RowLayout {
-                                id: fxLayout
-                                anchors.fill: parent
-                               /* QQC2.Label {
-                                    text: "|"
-                                    opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
-                                }*/
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    font.pointSize: mainLabel.font.pointSize * 0.9
-                                    text: model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
-                                    elide: Text.ElideRight
-                                }
+
+                            /* QQC2.Label {
+                                text: "|"
+                                opacity: (model.metadata.midi_channel >= 5 && model.metadata.midi_channel <= 9) || model.metadata.midi_cloned
+                            }*/
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                font.pointSize: mainLabel.font.pointSize * 0.9
+                                text: model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                elide: Text.ElideRight
                             }
                         }
                     }
@@ -553,25 +537,11 @@ Zynthian.ScreenPage {
             }
         }
         Connections {
-            target: zynthian.fixed_layers
+            target: applicationWindow()
             property int lastCurrentIndex
             property bool currentIndexWasValid
-            onCurrent_index_validChanged: {
-                if (!zynthian.fixed_layers.current_index_valid) {
-                    //if (zynthian.current_screen_id !== "layer" &&
-                        //zynthian.current_screen_id !== "fixed_layers" &&
-                        //zynthian.current_screen_id !== "fixed_layers" &&
-                        //zynthian.current_screen_id !== "bank" &&
-                        //zynthian.current_screen_id !== "confirm" &&
-                        //zynthian.current_screen_id !== "preset") {
-                    if (zynthian.fixed_layers.current_index != lastCurrentIndex) {
-                        layerSetupDialog.open();
-                    }
-                } else {
-                    layerSetupDialog.close();
-                }
-                lastCurrentIndex = zynthian.fixed_layers.current_index;
-            }
+            onRequestOpenLayerSetupDialog: layerSetupDialog.open()
+            onRequestCloseLayerSetupDialog: layerSetupDialog.close()
         }
 
         QQC2.Dialog {

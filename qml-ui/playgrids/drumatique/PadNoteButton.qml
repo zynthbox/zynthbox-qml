@@ -55,6 +55,7 @@ QQC2.Button {
 
         property var timeOnClick
         property var timeOnRelease
+        enabled: component.playgrid.mostRecentlyPlayedNote ? true : false
 
         onPressed: {
             if (component.playgrid.mostRecentlyPlayedNote) {
@@ -111,6 +112,21 @@ QQC2.Button {
                     Layout.maximumHeight: Layout.minimumHeight
                     visible: component.mostRecentlyPlayedNote == undefined || component.mostRecentlyPlayedNote == subNote
                     color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
+                    MultiPointTouchArea {
+                        anchors.fill: parent
+                        touchPoints: [
+                            TouchPoint {
+                                onPressedChanged: {
+                                    if (!pressed) {
+                                        if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
+                                            component.playgrid.mostRecentNoteVelocity = padSubNoteRect.subNoteVelocity;
+                                            component.playgrid.mostRecentlyPlayedNote = padSubNoteRect.subNote;
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
                 }
             }
         }

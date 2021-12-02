@@ -367,8 +367,6 @@ class zynthiloops_track(QObject):
     def set_chained_sounds(self, sounds):
         self.__chained_sounds__ = sounds
         self.__song__.schedule_save()
-        self.chained_sounds_changed.emit()
-        self.connected_sound_changed.emit()
         zyngui = self.__song__.get_metronome_manager().zyngui
         #Update midi clone
         for i in range (16):
@@ -386,6 +384,8 @@ class zynthiloops_track(QObject):
                     self.zyngui.screens['layers_for_track'].current_index)
         except:
             pass
+        self.chained_sounds_changed.emit()
+        self.connected_sound_changed.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

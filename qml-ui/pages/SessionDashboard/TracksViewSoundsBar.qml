@@ -13,20 +13,6 @@ Zynthian.Card {
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
 
-    // Hack to always update UI
-    Connections {
-        target: bottomDrawer
-        onOpened: {
-            console.log("### Populating chained sounds");
-
-            chainedSoundsRepeater.model = [];
-            chainedSoundsRepeater.model = chainedSounds;
-        }
-        onClosed: {
-            chainedSoundsRepeater.model = [];
-        }
-    }
-
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SELECT_UP":
@@ -56,7 +42,7 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
-            model: root.chainedSounds
+            model: selectedTrack.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 

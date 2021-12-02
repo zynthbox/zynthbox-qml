@@ -173,51 +173,39 @@ ColumnLayout {
                                         rightMargin: Kirigami.Units.gridUnit*0.5
                                     }
                                     horizontalAlignment: Text.AlignLeft
-                                    text:  {
-//                                        track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
-                                        for (var id in track.chainedSounds) {
-                                            if (track.chainedSounds[id] >= 0) {
-                                                return zynthian.fixed_layers.selector_list.getDisplayValue(track.chainedSounds[id])
-                                            }
-                                        }
-
-                                        return ""
+                                    text: {
+                                        soundLabel.updateSoundName();
                                     }
 
                                     Connections {
                                         target: zynthian.fixed_layers
                                         onList_updated: {
-                                            var text = "";
-
-                                            // soundLabel.text = track.connectedSound >= 0 ? zynthian.fixed_layers.selector_list.getDisplayValue(track.connectedSound) : ""
-                                            for (var id in track.chainedSounds) {
-                                                if (track.chainedSounds[id] >= 0) {
-                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(track.chainedSounds[id]);
-                                                    break;
-                                                }
-                                            }
-
-                                            soundLabel.text = text;
+                                            soundLabel.updateSoundName();
                                         }
                                     }
 
                                     Connections {
                                         target: track
                                         onChainedSoundsChanged: {
-                                            var text = "";
-
-                                            for (var id in trackDelegate.track.chainedSounds) {
-                                                if (trackDelegate.track.chainedSounds[id] >= 0) {
-                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(trackDelegate.track.chainedSounds[id]);
-                                                    break;
-                                                }
-                                            }
-
-                                            soundLabel.text = text;
+                                            soundLabel.updateSoundName();
                                         }
                                     }
 
                                     elide: "ElideRight"
+
+                                    function updateSoundName() {
+                                        var text = "";
+
+                                        for (var id in trackDelegate.track.chainedSounds) {
+                                            if (trackDelegate.track.chainedSounds[id] >= 0 &&
+                                                trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[id])) {
+                                                text = zynthian.fixed_layers.selector_list.getDisplayValue(trackDelegate.track.chainedSounds[id]);
+                                                break;
+                                            }
+                                        }
+
+                                        soundLabel.text = text;
+                                    }
                                 }
 
                                 MouseArea {

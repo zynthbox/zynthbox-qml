@@ -113,6 +113,7 @@ QQC2.Button {
                     visible: component.mostRecentlyPlayedNote == undefined || component.mostRecentlyPlayedNote == subNote
                     color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
                     MultiPointTouchArea {
+                        enabled: component.playgrid.mostRecentlyPlayedNote ? false : true
                         anchors.fill: parent
                         touchPoints: [
                             TouchPoint {

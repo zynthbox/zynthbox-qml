@@ -14,6 +14,11 @@ Zynthian.Card {
     property var chainedSounds: selectedTrack.chainedSounds
 
     // Hack to always update UI
+    onChainedSoundsChanged: {
+        chainedSoundsRepeater.model = [];
+        chainedSoundsRepeater.model = chainedSounds;
+    }
+    // Hack to always update UI
     Connections {
         target: bottomDrawer
         onOpened: {
@@ -149,10 +154,15 @@ Zynthian.Card {
                         enabled: root.selectedRowIndex === index
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                bottomDrawer.close();
+//                                bottomDrawer.close();
 
-                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
-                                zynthian.layer.ask_remove_current_layer()
+//                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+//                                zynthian.layer.ask_remove_current_layer()
+                                var chainedSoundsCopy = selectedTrack.chainedSounds.slice();
+                                chainedSoundsCopy[index] = -1;
+
+                                console.log(chainedSoundsCopy);
+                                selectedTrack.chainedSounds = chainedSoundsCopy;
                             }
                         }
 

@@ -1878,8 +1878,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if from_chan == to_chan:
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 1)
-		self.zyngui.screens['main_layers_view'].fill_list()
-		self.zyngui.screens['fixed_layers'].fill_list()
+		try:
+			self.zyngui.screens['main_layers_view'].fill_list()
+			self.zyngui.screens['fixed_layers'].fill_list()
+		except:
+			pass
 
 	@Slot(int, int)
 	def remove_clone_midi(self, from_chan: int, to_chan: int):

@@ -314,13 +314,6 @@ class zynthiloops_track(QObject):
             if not found:
                 chained[0] = index
 
-            for i in range (16):
-                for j in range(16):
-                    if i != j and i in chained and j in chained:
-                        zyngui.screens['layer'].clone_midi(i, j)
-                    elif zyngui.screens['layer'].is_midi_cloned(i, j):
-                        zyngui.screens['layer'].remove_clone_midi(i, j)
-
             self.set_chained_sounds(chained)
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
@@ -376,6 +369,14 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        #Update midi clone
+        for i in range (16):
+            for j in range(16):
+                if i != j and i in sounds and j in sounds:
+                    zyngui.screens['layer'].clone_midi(i, j)
+                elif zyngui.screens['layer'].is_midi_cloned(i, j):
+                    zyngui.screens['layer'].remove_clone_midi(i, j)
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
             self.zyngui.screens['layers_for_track'].select_action(self.zyngui.screens['layers_for_track'].current_index)

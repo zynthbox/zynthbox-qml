@@ -104,32 +104,6 @@ QQC2.Dialog {
                     property int layerIndex: index
                     property bool hasConnectedTracks: false
 
-                    Kirigami.Theme.highlightColor: {
-                        if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
-                            return Qt.rgba(
-                                Kirigami.Theme.highlightColor.r,
-                                Kirigami.Theme.highlightColor.g,
-                                Kirigami.Theme.highlightColor.b,
-                                1
-                            )
-                        } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
-                                   soundsDialog.selectedTrack.checkIfLayerExists(index)) {
-                            return Qt.rgba(
-                                Kirigami.Theme.highlightColor.r,
-                                Kirigami.Theme.highlightColor.g,
-                                Kirigami.Theme.highlightColor.b,
-                                0.3
-                            )
-                        } else {
-                            return Qt.rgba(
-                                Kirigami.Theme.highlightColor.r,
-                                Kirigami.Theme.highlightColor.g,
-                                Kirigami.Theme.highlightColor.b,
-                                1
-                            )
-                        }
-                    }
-
                     Layout.fillWidth: false
                     Layout.fillHeight: false
                     Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
@@ -141,7 +115,33 @@ QQC2.Dialog {
                                  soundsDialog.selectedTrack.checkIfLayerExists(index)
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
-                        Kirigami.Theme.inherit: true
+                        Kirigami.Theme.highlightColor: {
+                            if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
+                                return Qt.rgba(
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    1
+                                )
+                            } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
+                                       soundsDialog.selectedTrack.checkIfLayerExists(index)) {
+                                return Qt.rgba(
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    0.3
+                                )
+                            } else {
+                                return Qt.rgba(
+                                    Kirigami.Theme.highlightColor.r,
+                                    Kirigami.Theme.highlightColor.g,
+                                    Kirigami.Theme.highlightColor.b,
+                                    1
+                                )
+                            }
+                        }
+
+                        Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor

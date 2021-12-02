@@ -739,28 +739,8 @@ Zynthian.BasePlayGrid {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
                                                 }
-                                                if (patternsMenuItem.associatedTrack) {
-                                                    // Open library page
-                                                    zynthian.current_screen_id = 'layers_for_track';
-                                                } else {
-                                                    var availableSlot = -1;
-                                                    for (var i = 0; i < patternsMenuItem.associatedTrack.chainedSounds.length; ++i) {
-                                                        if (patternsMenuItem.associatedTrack.chainedSounds[i] == -1) {
-                                                            availableSlot = i;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (availableSlot > -1 && patternsMenuItem.associatedTrack.createChainedSoundInNextFreeLayer(availableSlot)) {
-                                                        // We're asking for a new thing now
-                                                    } else {
-                                                        noFreeSlotsPopup.open();
-                                                    }
-                                                }
+                                                applicationWindow().requestOpenLayerSetupDialog()
                                             }
-                                            //function setLayer() {
-                                                //console.log(patternsMenuItem.thisPatternIndex, index, "on select layer", patternsMenuItem.thisPattern.layer, soundName)
-                                                //component.setPatternProperty("layer", index, patternsMenuItem.thisPatternIndex)
-                                            //}
                                         }
                                     }
                                     ColumnLayout {

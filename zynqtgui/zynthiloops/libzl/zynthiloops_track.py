@@ -355,7 +355,7 @@ class zynthiloops_track(QObject):
         # return self.__connected_sound__
         for sound in self.__chained_sounds__:
             if sound >= 0:
-                return sound
+                return math.floor(sound)
 
         return -1
     # def set_connected_sound(self, sound):

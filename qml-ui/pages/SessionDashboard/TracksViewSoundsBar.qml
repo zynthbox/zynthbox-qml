@@ -14,11 +14,6 @@ Zynthian.Card {
     property var chainedSounds: selectedTrack.chainedSounds
 
     // Hack to always update UI
-    onChainedSoundsChanged: {
-        chainedSoundsRepeater.model = [];
-        chainedSoundsRepeater.model = chainedSounds;
-    }
-    // Hack to always update UI
     Connections {
         target: bottomDrawer
         onOpened: {
@@ -61,6 +56,7 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
+            model: root.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 
@@ -130,7 +126,7 @@ Zynthian.Card {
                                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                         noFreeSlotsPopup.open();
                                     } else {
-                                        applicationWindow().requestOpenLayerSetupDialog();
+                                        parent.Window.window.requestOpenLayerSetupDialog();
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
                                             var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);

@@ -12,6 +12,20 @@ Zynthian.Card {
     property int selectedRowIndex: 0
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
+    
+    // Hack to always update UI
+    Connections {
+        target: bottomDrawer
+        onOpened: {
+            console.log("### Populating chained sounds");
+
+            chainedSoundsRepeater.model = [];
+            chainedSoundsRepeater.model = Qt.binding(function() { return chainedSounds; });
+        }
+        onClosed: {
+            chainedSoundsRepeater.model = [];
+        }
+    }
 
     function cuiaCallback(cuia) {
         switch (cuia) {

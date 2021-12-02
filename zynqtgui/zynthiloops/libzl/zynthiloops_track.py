@@ -379,7 +379,11 @@ class zynthiloops_track(QObject):
                     zyngui.screens['layer'].remove_clone_midi(i, j)
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
-            self.zyngui.screens['layers_for_track'].select_action(self.zyngui.screens['layers_for_track'].current_index)
+            if self.connectedSound >= 0:
+                self.zyngui.screens['fixed_layers'].activate_index(self.connectedSound)
+            else:
+                self.zyngui.screens['layers_for_track'].select_action(
+                    self.zyngui.screens['layers_for_track'].current_index)
         except:
             pass
 

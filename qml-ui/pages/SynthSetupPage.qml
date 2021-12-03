@@ -805,48 +805,53 @@ Zynthian.ScreenPage {
                 QQC2.Label {
                     text: qsTr("The selected sound has %1 layers: select %1 adjacent layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
                 }
-                Repeater {
-                    id: channelReplaceRepeater
-                    model: zynthian.fixed_layers.selector_list
-                    delegate: QQC2.RadioButton {
-                        id: delegate
-                        enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
-                        autoExclusive: true
-                        onCheckedChanged: {
-                            layerReplaceDialog.destinationChannels = [];
-                            var i = 0;
-                            let chan = model.metadata.midi_channel
-                            for (i in layerReplaceDialog.sourceChannels) {
-                                layerReplaceDialog.destinationChannels.push(chan);
-                                chan++;
+                GridLayout {
+                    columns: 2
+                    rows: 8
+                    flow: GridLayout.TopToBottom
+                    Repeater {
+                        id: channelReplaceRepeater
+                        model: zynthian.fixed_layers.selector_list
+                        delegate: QQC2.RadioButton {
+                            id: delegate
+                            enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
+                            autoExclusive: true
+                            onCheckedChanged: {
+                                layerReplaceDialog.destinationChannels = [];
+                                var i = 0;
+                                let chan = model.metadata.midi_channel
+                                for (i in layerReplaceDialog.sourceChannels) {
+                                    layerReplaceDialog.destinationChannels.push(chan);
+                                    chan++;
+                                }
+                                layerReplaceDialog.destinationChannelsChanged();
+                                layerReplaceDialog.sourceChannelsChanged();
                             }
-                            layerReplaceDialog.destinationChannelsChanged();
-                            layerReplaceDialog.sourceChannelsChanged();
-                        }
-                        Connections {
-                            target: layerReplaceDialog
-                            onFileToLoadChanged: {
-                                checked = false
-                                checked = index === zynthian.fixed_layers.current_index
+                            Connections {
+                                target: layerReplaceDialog
+                                onFileToLoadChanged: {
+                                    checked = false
+                                    checked = index === zynthian.fixed_layers.current_index
+                                }
                             }
-                        }
-                        indicator.opacity: enabled
-                        indicator.x: 0
-                        contentItem: RowLayout {
-                            Item {
-                                Layout.preferredWidth: delegate.indicator.width
-                            }
-                            QQC2.CheckBox {
-                                enabled: false
-                                checked: layerReplaceDialog.destinationChannels.indexOf(model.metadata.midi_channel) !== -1
-                            }
-                            QQC2.Label {
-                                text: {
-                                    let numPrefix = model.metadata.midi_channel + 1;
-                                    //if (numPrefix > 5 && numPrefix <= 10) {
-                                        //numPrefix = "6." + (numPrefix - 5);
-                                    //}
-                                    return numPrefix + " - " + model.display;
+                            indicator.opacity: enabled
+                            indicator.x: 0
+                            contentItem: RowLayout {
+                                Item {
+                                    Layout.preferredWidth: delegate.indicator.width
+                                }
+                                QQC2.CheckBox {
+                                    enabled: false
+                                    checked: layerReplaceDialog.destinationChannels.indexOf(model.metadata.midi_channel) !== -1
+                                }
+                                QQC2.Label {
+                                    text: {
+                                        let numPrefix = model.metadata.midi_channel + 1;
+                                        //if (numPrefix > 5 && numPrefix <= 10) {
+                                            //numPrefix = "6." + (numPrefix - 5);
+                                        //}
+                                        return numPrefix + " - " + model.display;
+                                    }
                                 }
                             }
                         }

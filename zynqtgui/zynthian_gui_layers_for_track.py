@@ -42,7 +42,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         super(zynthian_gui_layers_for_track, self).__init__('TrackLayers', parent)
         self.__total_chains = 5
         self.__volume_ctrls = []
-        self.zyngui.screens['session_dashboard'].selected_track_changed.connect(self.fill_list)
+        self.zyngui.screens['session_dashboard'].selected_track_changed.connect(self.update_track_sounds)
 
     def fill_list(self):
         self.list_data = []
@@ -86,6 +86,14 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             if midi_chan == item[1]:
                 self.current_index = i
                 return
+
+    def update_track_sounds(self):
+        self.fill_list()
+        connectedSound = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].get_selected_track()).connectedSound
+        if connectedSound >= 0:
+            self.zyngui.screens["layer"].activate_midichan_layer(connectedSound)
+        else:
+            self.select_action(0)
 
     def select_action(self, i, t='S'):
         if i < 0 or i >= len(self.list_data):

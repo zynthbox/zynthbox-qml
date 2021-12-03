@@ -148,11 +148,12 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
             logging.error(f"Set selected Sound : {connectedSound}")
 
+            #self.zyngui.screens['layers_for_track'].fill_list()
             if connectedSound >= 0:
-                self.zyngui.screens["fixed_layers"].activate_index(connectedSound)
+                self.zyngui.screens["layer"].activate_midichan_layer(connectedSound)
             # else:
             #     self.zyngui.screens["fixed_layers"].activate_index(track)
-            self.zyngui.screens['layers_for_track'].fill_list()
+            #self.zyngui.screens['layers_for_track'].fill_list()
 
         if self.__selected_track__ != track or force_set is True:
             self.__selected_track__ = track

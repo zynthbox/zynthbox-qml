@@ -355,10 +355,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if (self.__sketch_basepath__ / 'temp').exists():
             shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
-        self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest()
-        self.zyngui.screens["song_arranger"].stop()
-        self.resetMetronome()
+        try:
+            self.stopAllPlayback()
+            self.zyngui.screens["playgrid"].stopMetronomeRequest()
+            self.zyngui.screens["song_arranger"].stop()
+            self.resetMetronome()
+        except:
+            pass
 
         self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)

@@ -89,11 +89,11 @@ Zynthian.ScreenPage {
                 enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: zynthian.layer.ask_remove_current_layer()
             }
-            Kirigami.Action {
+            /*Kirigami.Action {
                 text: qsTr("Clear Sounds")
                 enabled: zynthian.fixed_layers.current_index_valid
                 onTriggered: zynthian.fixed_layers.ask_clear_visible_range()
-            }
+            }*/
             /*Kirigami.Action {
                 text: qsTr("Clear All")
                 onTriggered: zynthian.layer.ask_reset()

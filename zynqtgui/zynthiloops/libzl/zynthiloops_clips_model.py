@@ -48,7 +48,16 @@ class zynthiloops_clips_model(QAbstractListModel):
 
     def deserialize(self, arr):
         if not isinstance(arr, list):
+            for i in range(2):
+                clip = zynthiloops_clip(self.__track__.id, i, self.__song__, self)
+                self.add_clip(clip)
             raise Exception("Invalid json format for clips")
+
+        if len(arr) == 0:
+            for i in range(2):
+                clip = zynthiloops_clip(self.__track__.id, i, self.__song__, self)
+                self.add_clip(clip)
+            return
         for i, c in enumerate(arr):
             clip = zynthiloops_clip(self.__track__.id, i, self.__song__, self)
             clip.deserialize(c)

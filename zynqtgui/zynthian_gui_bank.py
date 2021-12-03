@@ -82,6 +82,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 				return
 			self.zyngui.curlayer.load_bank_list()
 			self.list_data = self.zyngui.curlayer.bank_list
+		self.zyngui.screens['preset'].set_select_path()
 		super().fill_list()
 
 	def get_show_top_sounds(self):

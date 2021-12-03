@@ -1807,7 +1807,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def layer_file_exists(self, file_name):
 		n_layers = 1
 		for i in range(16):
-			if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
+			if self.zyngui.curlayer and self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
 				n_layers += 1
 		final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
 		logging.error(self.__sounds_basepath__ + final_name)
@@ -1818,6 +1818,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str)
 	def save_curlayer_to_file(self, file_name):
 		try:
+			if self.zyngui.curlayer == None:
+				return
 			n_layers = 1
 			for i in range(16):
 				if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
@@ -1889,8 +1891,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if from_chan == to_chan:
 			return
 		zyncoder.lib_zyncoder.set_midi_filter_clone(from_chan, to_chan, 0)
-		self.zyngui.screens['main_layers_view'].fill_list()
-		self.zyngui.screens['fixed_layers'].fill_list()
+		if 'main_layers_view' in self.zyngui.screens:
+			self.zyngui.screens['main_layers_view'].fill_list()
+		if 'fixed_layers' in self.zyngui.screens:
+			self.zyngui.screens['fixed_layers'].fill_list()
 
 	@Slot(None)
 	def ensure_contiguous_cloned_layers(self):

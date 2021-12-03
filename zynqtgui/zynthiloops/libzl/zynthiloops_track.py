@@ -365,7 +365,14 @@ class zynthiloops_track(QObject):
         return self.__chained_sounds__
 
     def set_chained_sounds(self, sounds):
-        self.__chained_sounds__ = sounds
+        self.__chained_sounds__ = []
+        for chan in sounds:
+            if self.checkIfLayerExists(chan):
+                self.__chained_sounds__.append(chan)
+            else:
+                self.__chained_sounds__.append(-1)
+        logging.error("SETCHAINEDSOUNDS{} {}".format(sounds, self.__chained_sounds__))
+
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui
         #Update midi clone

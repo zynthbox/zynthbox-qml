@@ -260,7 +260,7 @@ class zynthiloops_track(QObject):
             self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
             self.__chained_sounds__[index] = next_free_layer
             self.__song__.schedule_save()
-            self.chained_sounds_changed.emit()
+            # self.chained_sounds_changed.emit()
             
             return True
 

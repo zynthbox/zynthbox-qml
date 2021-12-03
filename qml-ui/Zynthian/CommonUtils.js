@@ -1,17 +1,31 @@
 .import org.zynthian.quick 1.0 as ZynQuick
 
 function startMetronomeAndPlayback() {
+    console.log("Starting Metronome and Playback");
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+    if (sequence) {
+        sequence.startSequencePlayback();
+    } else {
+        console.debug("Sequence could not be fetched, and playback could not be started");
+    }
     zynthian.zynthiloops.startPlayback();
-    ZynQuick.PlayGridManager.getSequenceModel("Global").startSequencePlayback();
+    console.log("Metronome and Playback Started");
 }
 
 function stopMetronomeAndPlayback() {
+    console.log("Stopping Metronome and Playback");
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+    if (sequence) {
+        sequence.stopSequencePlayback();
+    } else {
+        console.log("Sequence could not be fetched, and playback could not be started");
+    }
     zynthian.zynthiloops.stopAllPlayback();
     zynthian.zynthiloops.stopRecording();
-    ZynQuick.PlayGridManager.getSequenceModel("Global").stopSequencePlayback();
     zynthian.playgrid.stopMetronomeRequest();
     zynthian.song_arranger.stop();
     zynthian.zynthiloops.resetMetronome();
+    console.log("Metronome and Playback Stopped");
 }
 
 function toggleLayerChaining(layer) {

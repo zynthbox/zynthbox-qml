@@ -93,6 +93,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 								"show_numbers": True})
 
 		super().fill_list()
+		self.set_select_path()
 
 
 	def show(self, show_fav_presets=None):
@@ -110,6 +111,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 		if not self.zyngui.curlayer.get_preset_name():
 			self.zyngui.curlayer.set_preset(self.zyngui.curlayer.get_preset_index())
 
+		self.set_select_path()
 		super().show()
 
 

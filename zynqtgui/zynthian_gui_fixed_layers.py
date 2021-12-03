@@ -305,7 +305,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     @Slot(None)
     def ask_clear_visible_range(self):
-        self.zyngui.show_confirm("Do you really want to remove all layers in the current block?", self.clear_visible_range)
+        self.zyngui.show_confirm("Do you really want to remove all sounds?", self.clear_visible_range)
 
     def clear_visible_range(self, params=None):
         for chan in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count - 1):

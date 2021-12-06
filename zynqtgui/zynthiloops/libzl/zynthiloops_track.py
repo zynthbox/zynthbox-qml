@@ -365,14 +365,17 @@ class zynthiloops_track(QObject):
         return self.__chained_sounds__
 
     def set_chained_sounds(self, sounds):
-        self.__chained_sounds__ = sounds
+        self.__chained_sounds__ = [-1, -1, -1, -1, -1]
+        for i, sound in enumerate(sounds):
+            if not sound in self.__chained_sounds__:
+                self.__chained_sounds__[i] = sound
 
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui
         #Update midi clone
         for i in range (16):
             for j in range(16):
-                if i != j and i in sounds and j in sounds:
+                if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
                     zyngui.screens['layer'].clone_midi(i, j)
                 elif zyngui.screens['layer'].is_midi_cloned(i, j):
                     zyngui.screens['layer'].remove_clone_midi(i, j)

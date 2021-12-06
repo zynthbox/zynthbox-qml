@@ -365,10 +365,7 @@ class zynthiloops_track(QObject):
         return self.__chained_sounds__
 
     def set_chained_sounds(self, sounds):
-        self.__chained_sounds__ = [-1, -1, -1, -1, -1]
-        for i, sound in enumerate(sounds):
-            if not sound in self.__chained_sounds__:
-                self.__chained_sounds__[i] = sound
+        self.__chained_sounds__ = sounds
 
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui

@@ -31,7 +31,7 @@ from zyncoder import *
 from . import zynthian_gui_selector
 
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-import traceback
+
 #------------------------------------------------------------------------------
 # basically a proxy model to zynthian_fixed:tracks
 #------------------------------------------------------------------------------
@@ -52,22 +52,38 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
             chain = selected_track.get_chained_sounds()
             empty_channels_needed = 0
-            duplicate_chans = []
+            used_empty_channels = []
+
             for chan in chain:
-                if chan < 0 or chan in duplicate_chans: #FIXEME: workaround form duplicate entries in chans
-                    empty_channels_needed += 1
-                duplicate_chans.append(chan)
-            used_empty_channels = 0
-            for i, element in enumerate(self.zyngui.screens['fixed_layers'].list_data):
-                if element[1] in chain:
-                    self.list_data.append(element)
-                    self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                    self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
-                elif used_empty_channels < empty_channels_needed and len(self.list_data) < self.__total_chains and  not self.zyngui.screens['fixed_layers'].index_is_valid(i):
-                    self.list_data.append(element)
-                    self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
-                    self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
-                    used_empty_channels += 1
+                for i, element in enumerate(self.zyngui.screens['fixed_layers'].list_data):
+                    if chan < 0 and not self.zyngui.screens['fixed_layers'].index_is_valid(i) and element[1] not in used_empty_channels:
+                        self.list_data.append(element)
+                        self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
+                        self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                        used_empty_channels.append(element[1])
+                        break
+                    elif element[1] == chan:
+                        self.list_data.append(element)
+                        self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
+                        self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                        break
+
+            #duplicate_chans = []
+            #for chan in chain:
+                #if chan < 0 or chan in duplicate_chans: #FIXEME: workaround form duplicate entries in chans
+                    #empty_channels_needed += 1
+                #duplicate_chans.append(chan)
+            #used_empty_channels = 0
+            #for i, element in enumerate(self.zyngui.screens['fixed_layers'].list_data):
+                #if element[1] in chain:
+                    #self.list_data.append(element)
+                    #self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
+                    #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                #elif used_empty_channels < empty_channels_needed and len(self.list_data) < self.__total_chains and  not self.zyngui.screens['fixed_layers'].index_is_valid(i):
+                    #self.list_data.append(element)
+                    #self.list_metadata.append(self.zyngui.screens['fixed_layers'].list_metadata[i])
+                    #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
+                    #used_empty_channels += 1
             self.volume_controls_changed.emit()
         except Exception as e:
             logging.error(e)
@@ -121,12 +137,9 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
 
     def select(self, index=None):
         super().select(index)
-        traceback.print_stack(None, 15)
-        logging.error("SELECT CALLED {}".format(index))
+
 
     def select_action(self, i, t='S'):
-        traceback.print_stack(None, 8)
-        logging.error("SELECT ACTION CALLED")
         if i < 0 or i >= len(self.list_data):
             return
         midichan = self.list_data[i][1]

@@ -99,6 +99,7 @@ Kirigami.AbstractApplicationWindow {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
+                    zynthian.current_screen_id = 'session_dashboard';
                     zynthian.session_dashboard.visibleTracksStart = 0;
                     zynthian.session_dashboard.visibleTracksEnd = 5;
                 }
@@ -109,6 +110,7 @@ Kirigami.AbstractApplicationWindow {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
+                    zynthian.current_screen_id = 'session_dashboard';
                     zynthian.session_dashboard.visibleTracksStart = 6;
                     zynthian.session_dashboard.visibleTracksEnd = 11;
                 }

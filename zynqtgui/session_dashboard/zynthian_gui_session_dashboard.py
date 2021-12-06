@@ -73,7 +73,14 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.zyngui.screens["layer"].layer_created.connect(self.layer_created)
         self.zyngui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
 
+        self.selected_track_changed.connect(self.selected_track_changed_handler)
+
         self.show()
+
+    def selected_track_changed_handler(self):
+        self.selected_track_name_changed.emit()
+        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+        selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
@@ -186,6 +193,17 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.visible_tracks_changed.emit()
     visibleTracksEnd = Property(int, get_visible_tracks_end, set_visible_tracks_end, notify=visible_tracks_changed)
     ### END Property visibleTracksEnd
+
+    ### Property selectedTrackName
+    def get_selected_track_name(self):
+        track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.__selected_track__)
+        if track.connectedSound >= 0:
+            return self.zyngui.screens["fixed_layers"].selector_list.getDisplayValue(track.connectedSound)
+        else:
+            return ""
+    selected_track_name_changed = Signal()
+    selectedTrackName = Property(str, get_selected_track_name, notify=selected_track_name_changed)
+    ### END Property selectedTrackName
 
     def serialize(self):
         return {

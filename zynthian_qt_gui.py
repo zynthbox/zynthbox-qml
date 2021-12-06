@@ -955,6 +955,8 @@ class zynthian_gui(QObject):
                 self._curlayer = self.curlayer
             self.curlayer = layer
             self.set_active_channel()
+            #FIXME: for some reason this is needed when switching from a synth to another
+            layer.preset_name = layer.preset_list[layer.preset_index][2]
             try:
                 self.screens["layer"].select(self.screens["layer"].root_layers.index(layer))
             except:
@@ -965,8 +967,10 @@ class zynthian_gui(QObject):
         self.screens["layers_for_track"].sync_index_from_curlayer()
         self.screens["bank"].fill_list()
         self.screens["bank"].show()
+
         self.screens["preset"].fill_list()
         self.screens["preset"].show()
+        self.screens["preset"].set_select_path()
         self.screens["control"].fill_list()
         self.screens["control"].show()
         if self.curlayer:

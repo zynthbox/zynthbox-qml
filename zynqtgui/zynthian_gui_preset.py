@@ -89,6 +89,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 
 			for item in self.zyngui.curlayer.preset_list:
 				self.list_data.append(item)
+				logging.error(item)
 				self.list_metadata.append({"icon": "starred-symbolic" if self.zyngui.curlayer.engine.is_preset_fav(item) else "non-starred-symbolic",
 								"show_numbers": True})
 

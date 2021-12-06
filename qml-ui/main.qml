@@ -156,7 +156,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: synthButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.bank.selector_path_element + "ˬ"
+                text: zynthian.session_dashboard.selectedTrackName.split(">")[0] + "ˬ"
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: soundsDialog.visible = true
@@ -172,7 +172,7 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.preset.selector_path_element
+                text: zynthian.session_dashboard.selectedTrackName.split(">")[1] ? zynthian.session_dashboard.selectedTrackName.split(">")[1] : i18n("Presets")
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = "preset"

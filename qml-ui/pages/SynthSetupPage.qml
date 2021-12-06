@@ -156,7 +156,7 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
-        layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
+        layerSetupDialog.reject(); // Close the new layer popup at any keyboard interaction
 
         if (pickerDialog.visible) {
             return pickerDialog.cuiaCallback(cuia);
@@ -541,7 +541,7 @@ Zynthian.ScreenPage {
             property int lastCurrentIndex
             property bool currentIndexWasValid
             onRequestOpenLayerSetupDialog: layerSetupDialog.open()
-            onRequestCloseLayerSetupDialog: layerSetupDialog.close()
+            onRequestCloseLayerSetupDialog: layerSetupDialog.reject()
         }
 
         QQC2.Dialog {
@@ -551,6 +551,13 @@ Zynthian.ScreenPage {
             y: Math.round(parent.height/2 - height/2)
             height: footer.implicitHeight + topMargin + bottomMargin
             modal: true
+
+            onAccepted: {
+                applicationWindow().layerSetupDialogAccepted();
+            }
+            onRejected: {
+                applicationWindow().layerSetupDialogRejected();
+            }
 
             footer: QQC2.Control {
                 leftPadding: layerSetupDialog.leftPadding
@@ -565,7 +572,8 @@ Zynthian.ScreenPage {
                         onClicked: {
                             pickerDialog.mode = "sound";
                             pickerDialog.open();
-                            layerSetupDialog.close();
+                            layerSetupDialog.accept();
+                            applicationWindow().layerSetupDialogLoadSoundClicked();
                         }
                     }
                     QQC2.Button {
@@ -573,8 +581,9 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: 1
                         text: qsTr("New Synth...")
                         onClicked: {
-                            layerSetupDialog.close();
-                            newSynthWorkaroundTimer.restart()
+                            layerSetupDialog.accept();
+                            newSynthWorkaroundTimer.restart();
+                            applicationWindow().layerSetupDialogNewSynthClicked();
                         }
                     }
                     QQC2.Button {
@@ -583,7 +592,8 @@ Zynthian.ScreenPage {
                         text: qsTr("Pick Existing Sound...")
                         onClicked: {
                             applicationWindow().openSoundsDialog();
-                            layerSetupDialog.close();
+                            layerSetupDialog.accept();
+                            applicationWindow().layerSetupDialogPickSoundClicked();
                         }
                     }
                     Timer { //HACK why is this necessary?
@@ -591,7 +601,7 @@ Zynthian.ScreenPage {
                         interval: 200
                         onTriggered: {
                             zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
-                            layerSetupDialog.close();
+                            layerSetupDialog.accept();
                         }
                     }
                 }

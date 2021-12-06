@@ -12,6 +12,17 @@ Zynthian.Card {
     property int selectedRowIndex: 0
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
+
+    function selectConnectedSound() {
+        if (selectedTrack.connectedSound >= 0) {
+            zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
+
+            if (root.selectedTrack.connectedPattern >= 0) {
+                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                seq.midiChannel = root.selectedTrack.connectedSound;
+            }
+        }
+    }
     
     // Hack to always update UI
     Connections {
@@ -24,6 +35,59 @@ Zynthian.Card {
         }
         onClosed: {
             chainedSoundsRepeater.model = [];
+        }
+    }
+
+    // When enabled, listen for layer popup rejected to re-select connected sound if any
+    Connections {
+        id: layerPopupRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onLayerSetupDialogRejected: {
+            console.log("Layer Popup Rejected");
+
+            root.selectConnectedSound();
+            layerPopupRejectedConnections.enabled = false;
+        }
+    }
+
+    // When enabled, listen for sound dialog rejected to re-select connected sound if any
+    Connections {
+        id: soundsDialogRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onSoundsDialogAccepted: {
+            console.log("Sounds Dialog Accepted");
+            soundsDialogRejectedConnections.enabled = false;
+        }
+        onSoundsDialogRejected: {
+            console.log("Sounds Dialog Rejected");
+
+            root.selectConnectedSound();
+            soundsDialogRejectedConnections.enabled = false;
+        }
+    }
+
+    Connections {
+        target: applicationWindow()
+        onLayerSetupDialogLoadSoundClicked: {
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogNewSynthClicked: {
+            bottomDrawer.close();
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogPickSoundClicked: {
+            console.log("Sound Dialog Opened");
+
+            // Enable Sounds dialog rejected handler to select sound if any on close
+            soundsDialogRejectedConnections.enabled = true;
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
         }
     }
 
@@ -126,14 +190,15 @@ Zynthian.Card {
                                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                         noFreeSlotsPopup.open();
                                     } else {
+                                        // Enable layer popup rejected handler to re-select connected sound if any
+                                        layerPopupRejectedConnections.enabled = true;
+
                                         applicationWindow().requestOpenLayerSetupDialog();
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
                                             var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
                                             seq.midiChannel = root.selectedTrack.connectedSound;
                                         }
-
-                                        bottomDrawer.close();
                                     }
                                 }
                             }

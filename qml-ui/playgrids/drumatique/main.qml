@@ -462,7 +462,7 @@ Zynthian.BasePlayGrid {
                                                     text += "quadruple";
                                                     break;
                                                 case 6:
-                                                    test += "octuple";
+                                                    text += "octuple";
                                                     break;
                                             }
                                             return text

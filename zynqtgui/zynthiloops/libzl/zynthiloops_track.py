@@ -372,7 +372,7 @@ class zynthiloops_track(QObject):
         #Update midi clone
         for i in range (16):
             for j in range(16):
-                if i != j and i in sounds and j in sounds:
+                if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
                     zyngui.screens['layer'].clone_midi(i, j)
                 elif zyngui.screens['layer'].is_midi_cloned(i, j):
                     zyngui.screens['layer'].remove_clone_midi(i, j)

@@ -86,15 +86,6 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         selft.select_action(0)
 
 
-
-    def index_supports_immediate_activation(self, index=None):
-        if index is None:
-            return False
-        chan = self.list_data[index][1]
-        if chan < 0:
-            return False
-        return True
-
     def sync_index_from_curlayer(self):
         midi_chan = -1
         if self.zyngui.curlayer:

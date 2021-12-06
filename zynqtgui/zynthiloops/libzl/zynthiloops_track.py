@@ -387,7 +387,8 @@ class zynthiloops_track(QObject):
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
             if self.connectedSound >= 0:
-                self.zyngui.screens['fixed_layers'].activate_index(self.connectedSound)
+                #self.zyngui.screens['fixed_layers'].activate_index(self.connectedSound)
+                self.zyngui.screens['layers_for_track'].layer_selection_consistency_check()
             else:
                 self.zyngui.screens['layers_for_track'].select_action(
                     self.zyngui.screens['layers_for_track'].current_index)

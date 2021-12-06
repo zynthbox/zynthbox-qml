@@ -42,7 +42,7 @@ from . import zynthian_gui_selector
 from zyngine import zynthian_layer
 
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-
+import traceback
 #------------------------------------------------------------------------------
 # Zynthian Layer Selection GUI Class
 #------------------------------------------------------------------------------
@@ -456,6 +456,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			pass
 
 	def add_layer_midich(self, midich, select=True):
+		traceback.print_stack(None, 8)
 		if self.add_layer_eng:
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
 			self.add_layer_eng = None

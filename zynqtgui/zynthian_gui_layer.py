@@ -598,6 +598,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				root_layer.mute_midi_out()
 				root_layer.mute_audio_out()
 				midi_chans_to_delete.append(root_layer.midi_chan)
+				self.layer_deleted.emit(root_layer.midi_chan)
 
 			self.zyngui.zynautoconnect(True)
 
@@ -2002,7 +2003,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	engine_nick = Property(str, get_engine_nick, notify = engine_nick_changed)
 
+	# Both parameters are midi channels
 	layer_created = Signal(int)
+	layer_deleted = Signal(int)
 
 
 #------------------------------------------------------------------------------

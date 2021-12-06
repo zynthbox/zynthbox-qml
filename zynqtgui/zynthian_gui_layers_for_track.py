@@ -31,7 +31,7 @@ from zyncoder import *
 from . import zynthian_gui_selector
 
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-
+import traceback
 #------------------------------------------------------------------------------
 # basically a proxy model to zynthian_fixed:tracks
 #------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
 
 
     def layer_selection_consistency_check(self):
+        return
         if self.zyngui.screens['layer'].is_channel_valid(self.current_index):
             return
 
@@ -103,6 +104,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
 
         for i, item in enumerate(self.list_data):
+            logging.error("sync_index_from_curlayer of layers_for_track {} {}".format(midi_chan, item[1]))
             if midi_chan == item[1]:
                 self.current_index = i
                 return
@@ -118,11 +120,19 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         # Force set chained sounds to ensure correct cloning
         track.set_chained_sounds(track.chainedSounds)
 
+    def select(self, index=None):
+        super().select(index)
+        traceback.print_stack(None, 15)
+        logging.error("SELECT CALLED {}".format(index))
+
     def select_action(self, i, t='S'):
+        traceback.print_stack(None, 8)
+        logging.error("SELECT ACTION CALLED")
         if i < 0 or i >= len(self.list_data):
             return
         midichan = self.list_data[i][1]
         self.zyngui.screens['fixed_layers'].select_action(midichan, t)
+        self.select(i)
 
     def get_volume_controls(self):
         return self.__volume_ctrls

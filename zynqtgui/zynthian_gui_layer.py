@@ -42,7 +42,7 @@ from . import zynthian_gui_selector
 from zyngine import zynthian_layer
 
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
-import traceback
+
 #------------------------------------------------------------------------------
 # Zynthian Layer Selection GUI Class
 #------------------------------------------------------------------------------
@@ -61,6 +61,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = None
 		self.auto_next_screen = False
 		self.layer_index_replace_engine = None
+		self.page_after_layer_creation = "layers_for_track"
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
 		self.create_amixer_layer()
 		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
@@ -456,7 +457,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			pass
 
 	def add_layer_midich(self, midich, select=True):
-		traceback.print_stack(None, 8)
 		if self.add_layer_eng:
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
 			self.add_layer_eng = None
@@ -517,8 +517,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.show_screen('layer')
 		self.layer_index_replace_engine = None
 		if layer.engine.type != "Audio Effect":
-			self.zyngui.show_screen('layer')
-			self.zyngui.screens['layer'].select_action(self.zyngui.screens['layer'].index)
+			self.zyngui.show_screen(self.page_after_layer_creation)
+			logging.error("AAAAAAAAA {}".format(midich ))
+			self.zyngui.screens['fixed_layers'].select_action(midich)
 			if not self.zyngui.screens['bank'].get_show_top_sounds():
 				self.zyngui.screens['bank'].select_action(0)
 

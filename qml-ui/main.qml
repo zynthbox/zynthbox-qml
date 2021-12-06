@@ -49,6 +49,7 @@ Kirigami.AbstractApplicationWindow {
     onCurrentPageChanged: zynthian.current_qml_page = currentPage
 
     property bool headerVisible: true
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     function showConfirmationDialog() {
         confirmDialog.open()
@@ -156,10 +157,42 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: synthButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.session_dashboard.selectedTrackName.split(">")[0] + "ˬ"
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: soundsDialog.visible = true
+
+                text: {
+                    synthButton.updateSoundName();
+                }
+
+                Connections {
+                    target: zynthian.fixed_layers
+                    onList_updated: {
+                        synthButton.updateSoundName();
+                    }
+                }
+
+                Connections {
+                    target: track
+                    onChainedSoundsChanged: {
+                        synthButton.updateSoundName();
+                    }
+                }
+
+                function updateSoundName() {
+                    var text = "";
+
+                    for (var id in root.selectedTrack.chainedSounds) {
+                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0] + "ˬ";
+                            break;
+                        }
+                    }
+
+                    synthButton.text = text;
+                }
+
                 SessionDashboard.SoundsDialog {
                     id: soundsDialog
                     width: Screen.width
@@ -171,11 +204,44 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
             Zynthian.BreadcrumbButton {
+                id: presetButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: zynthian.session_dashboard.selectedTrackName.split(">")[1] ? zynthian.session_dashboard.selectedTrackName.split(">")[1] : i18n("Presets")
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = "preset"
+
+                text: {
+                    presetButton.updateSoundName();
+                }
+
+                Connections {
+                    target: zynthian.fixed_layers
+                    onList_updated: {
+                        presetButton.updateSoundName();
+                    }
+                }
+
+                Connections {
+                    target: track
+                    onChainedSoundsChanged: {
+                        presetButton.updateSoundName();
+                    }
+                }
+
+                function updateSoundName() {
+                    var text = "";
+
+                    for (var id in root.selectedTrack.chainedSounds) {
+                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
+                            text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
+                            break;
+                        }
+                    }
+
+                    presetButton.text = text;
+                }
             }
             Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor

@@ -65,6 +65,13 @@ Kirigami.AbstractApplicationWindow {
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
+    signal layerSetupDialogAccepted()
+    signal layerSetupDialogRejected()
+    signal layerSetupDialogLoadSoundClicked()
+    signal layerSetupDialogNewSynthClicked()
+    signal layerSetupDialogPickSoundClicked()
+    signal soundsDialogAccepted()
+    signal soundsDialogRejected()
 
     width: screen.width
     height: screen.height

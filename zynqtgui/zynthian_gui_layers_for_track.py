@@ -75,6 +75,17 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         super().fill_list()
 
 
+    def layer_selection_consistency_check(self):
+        if self.zyngui.screens['layer'].is_channel_valid(self.current_index):
+            return
+
+        for i, element in enumerate(self.list_data):
+            if self.zyngui.screens['layer'].is_channel_valid(element[1]):
+                self.select_action(i)
+                return
+        selft.select_action(0)
+
+
     def sync_index_from_curlayer(self):
         midi_chan = -1
         if self.zyngui.curlayer:

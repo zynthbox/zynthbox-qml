@@ -50,6 +50,39 @@ Zynthian.Card {
             layerPopupRejectedConnections.enabled = false;
         }
     }
+    //NOTE: enable this if shouldn't switch to library
+    Connections {
+        id: backToSelection
+        target: zynthian.layer
+        enabled: false
+        onLayer_created: {
+            print("AAAAAAAA")
+            zynthian.current_screen_id = "session_dashboard"
+            bottomDrawer.open()
+            backToSelection.enabled = false
+            backToSelectionTimer.restart()
+        }
+    }
+    Timer {
+        id: backToSelectionTimer
+        interval: 1250
+        onTriggered: {
+            print("BBBBBBBBB")
+            zynthian.current_screen_id = "session_dashboard"
+            bottomDrawer.open()
+        }
+    }
+    Connections {
+        id: currentScreenConnection
+        property string oldScreen: "session_dashboard"
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            if (oldScreen == "engine") {
+                backToSelection.enabled = false
+            }
+            oldScreen = zynthian.current_screen_id
+        }
+    }
 
     // When enabled, listen for sound dialog rejected to re-select connected sound if any
     Connections {
@@ -194,6 +227,8 @@ Zynthian.Card {
                                         layerPopupRejectedConnections.enabled = true;
 
                                         applicationWindow().requestOpenLayerSetupDialog();
+                                        //this depends on requirements
+                                       // backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
                                             var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);

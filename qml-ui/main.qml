@@ -190,7 +190,7 @@ Kirigami.AbstractApplicationWindow {
                         }
                     }
 
-                    synthButton.text = text;
+                    synthButton.text = text == "" ? qsTr("Sounds") : text;
                 }
 
                 SessionDashboard.SoundsDialog {
@@ -240,7 +240,7 @@ Kirigami.AbstractApplicationWindow {
                         }
                     }
 
-                    presetButton.text = text;
+                    presetButton.text = text == "" ? qsTr("Presets") : text;
                 }
             }
             Zynthian.BreadcrumbButton {

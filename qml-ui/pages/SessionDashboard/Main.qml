@@ -36,6 +36,7 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     backAction: null
     contextualActions: [
@@ -214,6 +215,18 @@ Zynthian.ScreenPage {
             sessionMins = sessionMins % 60;
             sessionTimeLabel.text = pad(sessionHours) + ":" + pad(sessionMins);
             */
+        }
+    }
+
+    Connections {
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            // Select connected sound of selected track if not already selected
+            if (zynthian.current_screen_id === "session_dashboard" &&
+                !selectedTrack.checkIfLayerExists(zynthian.active_midi_channel) &&
+                zynthian.active_midi_channel !== selectedTrack.connectedSound) {
+                zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
+            }
         }
     }
 

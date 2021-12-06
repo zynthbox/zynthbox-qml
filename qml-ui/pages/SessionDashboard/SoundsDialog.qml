@@ -60,6 +60,13 @@ QQC2.Dialog {
         color: Qt.rgba(0, 0, 0, 0.2)
     }
 
+    onAccepted: {
+        applicationWindow().soundsDialogAccepted();
+    }
+    onRejected: {
+        applicationWindow().soundsDialogRejected();
+    }
+
     footer: RowLayout {
         QQC2.Button {
             Layout.fillWidth: true
@@ -72,14 +79,14 @@ QQC2.Dialog {
                     var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
                     seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
                 }*/
-                soundsDialog.close();
+                soundsDialog.accept();
             }
         }
         QQC2.Button {
             Layout.fillWidth: true
             Layout.preferredWidth: 1
             text: qsTr("Close")
-            onClicked: soundsDialog.close();
+            onClicked: soundsDialog.reject();
         }
     }
 
@@ -166,7 +173,7 @@ QQC2.Dialog {
                         }
                     }
                     onClicked: {
-                        soundsDialog.close();
+                        soundsDialog.accept();
 
                         soundsDialog.selectedTrack.selectSound(index);
 

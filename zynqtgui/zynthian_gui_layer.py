@@ -206,7 +206,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.show_modal('layer_options')
 
 	@Slot(int, result=bool)
-	def is_channel_valid(chan):
+	def is_channel_valid(self, chan):
 		return chan in self.layer_midi_map
 
 	@Slot(int)

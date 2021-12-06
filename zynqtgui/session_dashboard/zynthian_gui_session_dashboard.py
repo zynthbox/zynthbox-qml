@@ -144,19 +144,20 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             #         # logging.error(f"Removing clone {i, j}")
             #         self.zyngui.screens['layer'].remove_clone_midi(i, j)
 
-            m_track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track)
-            connectedSound = m_track.connectedSound
+            # m_track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track)
+            ## connectedSound = m_track.connectedSound
 
-            logging.error(f"Set selected Sound : {connectedSound}")
+            ## logging.error(f"Set selected Sound : {connectedSound}")
 
             #self.zyngui.screens['layers_for_track'].fill_list()
-            if connectedSound >= 0:
-                self.zyngui.screens["layer"].activate_midichan_layer(connectedSound)
+            ## if connectedSound >= 0:
+            ##     self.zyngui.screens["layer"].activate_midichan_layer(connectedSound)
             # else:
             #     self.zyngui.screens["fixed_layers"].activate_index(track)
             #self.zyngui.screens['layers_for_track'].fill_list()
 
-            m_track.set_chained_sounds(m_track.chainedSounds)
+            self.zyngui.screens["layers_for_track"].update_track_sounds()
+            ##m_track.set_chained_sounds(m_track.chainedSounds)
 
         if self.__selected_track__ != track or force_set is True:
             self.__selected_track__ = track

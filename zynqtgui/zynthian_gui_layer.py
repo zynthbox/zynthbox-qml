@@ -205,6 +205,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['layer_options'].reset()
 			self.zyngui.show_modal('layer_options')
 
+	@Slot(int, result=bool)
+	def is_channel_valid(chan):
+		return chan in self.layer_midi_map
+
 	@Slot(int)
 	def activate_layer(self, i):
 		if len(self.root_layers) == 0 or i < 0 or i >= len(self.root_layers):

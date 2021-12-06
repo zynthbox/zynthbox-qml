@@ -76,7 +76,6 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
 
 
     def layer_selection_consistency_check(self):
-        return
         if self.zyngui.screens['layer'].is_channel_valid(self.current_index):
             return
 

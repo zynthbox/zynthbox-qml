@@ -263,14 +263,16 @@ QQC2.Dialog {
 //                                    console.log("Track T"+(parseInt(k)+1))
 
                                     for (var k in track.chainedSounds) {
-//                                        console.log("Comparing layer and chained sounds : "+soundBtnDelegate.layerIndex+", "+track.chainedSounds[parseInt(k)])
-                                        if (soundBtnDelegate.layerIndex === track.chainedSounds[k] &&
-                                            soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
+                                        var chains = zynthian.layer.chainForLayer(i);
+//                                        console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
+
+                                        if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && (soundBtnDelegate.layerIndex === track.chainedSounds[k] || (chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0))) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
+
                                             break;
                                         }
                                     }

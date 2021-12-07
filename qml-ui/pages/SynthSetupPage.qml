@@ -595,7 +595,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        text: qsTr("Pick Existing Sound...")
+                        text: qsTr("Pick Existing...")
                         onClicked: {
                             applicationWindow().openSoundsDialog();
                             layerSetupDialog.accept();

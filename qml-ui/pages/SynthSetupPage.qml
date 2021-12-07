@@ -94,7 +94,7 @@ Zynthian.ScreenPage {
         // [*] Here if user rejects, make sure to select correct layer
     }
 
-    function soundPickingTransaction(index) {
+    function soundPickingTransaction() {
         // Enable layer popup rejected handler to re-select connected sound if any
         layerPopupRejectedConnections.enabled = true;
 

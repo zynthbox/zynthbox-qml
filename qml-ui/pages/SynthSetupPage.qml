@@ -574,22 +574,22 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
+                        text: qsTr("New Synth...")
+                        onClicked: {
+                            layerSetupDialog.accept();
+                            newSynthWorkaroundTimer.restart();
+                            applicationWindow().layerSetupDialogNewSynthClicked();
+                        }
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
                         text: qsTr("Load A Sound...")
                         onClicked: {
                             pickerDialog.mode = "sound";
                             pickerDialog.open();
                             layerSetupDialog.accept();
                             applicationWindow().layerSetupDialogLoadSoundClicked();
-                        }
-                    }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("New Synth...")
-                        onClicked: {
-                            layerSetupDialog.accept();
-                            newSynthWorkaroundTimer.restart();
-                            applicationWindow().layerSetupDialogNewSynthClicked();
                         }
                     }
                     QQC2.Button {

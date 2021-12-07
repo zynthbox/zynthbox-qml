@@ -94,7 +94,12 @@ Zynthian.ScreenPage {
         // [*] Here if user rejects, make sure to select correct layer
     }
 
-    function soundPickingTransaction() {
+    function soundPickingTransaction(index, channel) {
+        var chainedSounds = selectedTrack.chainedSounds.slice();
+        chainedSounds[index] = channel;
+
+        selectedTrack.chainedSounds = chainedSounds;
+
         // Enable layer popup rejected handler to re-select connected sound if any
         layerPopupRejectedConnections.enabled = true;
 
@@ -321,7 +326,7 @@ Zynthian.ScreenPage {
                     height: layersView.view.height/5
                     onClicked: {
                         if (!zynthian.fixed_layers.current_index_valid) {
-                            root.soundPickingTransaction();
+                            root.soundPickingTransaction(index, model.metadata.midi_channel);
                             delegate.selector.activate_index(index);
                         }
                     }

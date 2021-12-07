@@ -349,6 +349,13 @@ class zynthiloops_track(QObject):
     def clearChainedSoundsWithoutCloning(self):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
 
+        try: #can be called before creation
+            zyngui = self.__song__.get_metronome_manager().zyngui
+            zyngui.screens['layers_for_track'].fill_list()
+            zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
+        except Exception as e:
+            logging.error(f"Error filling list : {str(e)}")
+
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()

@@ -124,6 +124,7 @@ QQC2.Dialog {
 
                     property int layerIndex: index
                     property bool hasConnectedTracks: false
+                    property bool isChained: false
                     property color borderColor: Qt.rgba(
                                                     Kirigami.Theme.textColor.r,
                                                     Kirigami.Theme.textColor.g,
@@ -172,7 +173,9 @@ QQC2.Dialog {
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor
-                                : Kirigami.Theme.backgroundColor
+                                : soundBtnDelegate.isChained
+                                  ? Kirigami.Theme.backgroundColor
+                                  : "#000000"
                         border.width: 2
                         border.color: soundBtnDelegate.borderColor
                         radius: soundBtnDelegate.radius
@@ -188,6 +191,7 @@ QQC2.Dialog {
                                         Kirigami.Theme.textColor.b,
                                         0.1
                                     );
+                                    soundBtnDelegate.isChained = false;
                                 } else {
                                     borderColorTimer.restart();
                                 }
@@ -201,8 +205,10 @@ QQC2.Dialog {
                             running: true
                             onTriggered: {
                                 for (var j in selectedTrack.chainedSounds) {
-                                    if (index === selectedTrack.chainedSounds[j]) {
+                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
+                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
                                         soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
+                                        soundBtnDelegate.isChained = true;
                                         console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
 
                                         // Return if sound is found in selected track
@@ -218,11 +224,13 @@ QQC2.Dialog {
 
                                     for (var k in track.chainedSounds) {
 //                                        console.log("Comparing layer and chained sounds : "+soundBtnDelegate.layerIndex+", "+track.chainedSounds[parseInt(k)])
-                                        if (soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
+                                        if (soundBtnDelegate.layerIndex === track.chainedSounds[k] &&
+                                            soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = chainColors["t"+(i+1)];
+                                            soundBtnDelegate.isChained = true;
                                             break;
                                         }
                                     }

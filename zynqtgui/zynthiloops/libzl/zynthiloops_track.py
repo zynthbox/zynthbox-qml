@@ -345,6 +345,13 @@ class zynthiloops_track(QObject):
         self.connected_sound_changed.emit()
         self.chained_sounds_changed.emit()
 
+    @Slot(None)
+    def clearChainedSoundsWithoutCloning(self):
+        self.__chained_sounds__ = [-1, -1, -1, -1, -1]
+
+        self.chained_sounds_changed.emit()
+        self.connected_sound_changed.emit()
+
     ### Property connectedPattern
     def get_connected_pattern(self):
         return self.__connected_pattern__

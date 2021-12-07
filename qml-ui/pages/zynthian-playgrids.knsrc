@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
-Categories=Playgrids
+Categories=670
 XdgTargetDir=zynthian/playgrids
 Uncompress=always

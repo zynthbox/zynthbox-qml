@@ -94,22 +94,17 @@ Zynthian.ScreenPage {
         // [*] Here if user rejects, make sure to select correct layer
     }
 
-    function soundPickingTransaction() {
-        if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
-            console.log("No free slots left")
-            //  noFreeSlotsPopup.open();
-        } else {
-            // Enable layer popup rejected handler to re-select connected sound if any
-            layerPopupRejectedConnections.enabled = true;
+    function soundPickingTransaction(index) {
+        // Enable layer popup rejected handler to re-select connected sound if any
+        layerPopupRejectedConnections.enabled = true;
 
-            applicationWindow().requestOpenLayerSetupDialog();
-            //this depends on requirements
-           // backToSelection.enabled = true;
+        applicationWindow().requestOpenLayerSetupDialog();
+        //this depends on requirements
+       // backToSelection.enabled = true;
 
-            if (root.selectedTrack.connectedPattern >= 0) {
-                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
-                seq.midiChannel = root.selectedTrack.connectedSound;
-            }
+        if (root.selectedTrack.connectedPattern >= 0) {
+            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+            seq.midiChannel = root.selectedTrack.connectedSound;
         }
     }
     backAction: Kirigami.Action {

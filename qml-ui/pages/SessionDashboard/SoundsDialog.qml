@@ -42,6 +42,20 @@ QQC2.Dialog {
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSoundsArr: selectedTrack.chainedSounds.slice()
+    property var chainColors: ({
+        t1: "#e6194B",
+        t2: "#3cb44b",
+        t3: "#ffe119",
+        t4: "#4363d8",
+        t5: "#f58231",
+        t6: "#911eb4",
+        t7: "#42d4f4",
+        t8: "#f032e6",
+        t9: "#fabed4",
+        t10: "#9A6324",
+        t11: "#800000",
+        t12: "#fffac8"
+    })
 
     modal: true
 
@@ -110,6 +124,12 @@ QQC2.Dialog {
 
                     property int layerIndex: index
                     property bool hasConnectedTracks: false
+                    property color borderColor: Qt.rgba(
+                                                    Kirigami.Theme.textColor.r,
+                                                    Kirigami.Theme.textColor.g,
+                                                    Kirigami.Theme.textColor.b,
+                                                    0.1
+                                                )
 
                     Layout.fillWidth: false
                     Layout.fillHeight: false
@@ -125,24 +145,24 @@ QQC2.Dialog {
                         Kirigami.Theme.highlightColor: {
                             if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
                                 return Qt.rgba(
-                                    Kirigami.Theme.highlightColor.r,
-                                    Kirigami.Theme.highlightColor.g,
-                                    Kirigami.Theme.highlightColor.b,
+                                    soundBtnDelegate.borderColor.r,
+                                    soundBtnDelegate.borderColor.g,
+                                    soundBtnDelegate.borderColor.b,
                                     1
                                 )
                             } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                        soundsDialog.selectedTrack.checkIfLayerExists(index)) {
                                 return Qt.rgba(
-                                    Kirigami.Theme.highlightColor.r,
-                                    Kirigami.Theme.highlightColor.g,
-                                    Kirigami.Theme.highlightColor.b,
+                                    soundBtnDelegate.borderColor.r,
+                                    soundBtnDelegate.borderColor.g,
+                                    soundBtnDelegate.borderColor.b,
                                     0.3
                                 )
                             } else {
                                 return Qt.rgba(
-                                    Kirigami.Theme.highlightColor.r,
-                                    Kirigami.Theme.highlightColor.g,
-                                    Kirigami.Theme.highlightColor.b,
+                                    soundBtnDelegate.borderColor.r,
+                                    soundBtnDelegate.borderColor.g,
+                                    soundBtnDelegate.borderColor.b,
                                     1
                                 )
                             }
@@ -153,15 +173,67 @@ QQC2.Dialog {
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor
                                 : Kirigami.Theme.backgroundColor
-                        border.color: soundBtnDelegate.hasConnectedTracks
-                                        ? Kirigami.Theme.highlightColor
-                                        : Qt.rgba(
-                                                Kirigami.Theme.textColor.r,
-                                                Kirigami.Theme.textColor.g,
-                                                Kirigami.Theme.textColor.b,
-                                                0.4
-                                            )
+                        border.width: 2
+                        border.color: soundBtnDelegate.borderColor
                         radius: soundBtnDelegate.radius
+
+                        Connections {
+                            target: soundsDialog
+                            onVisibleChanged: {
+                                if (!visible) {
+                                    // Reset to base border color on dialog close
+                                    soundBtnDelegate.borderColor = Qt.rgba(
+                                        Kirigami.Theme.textColor.r,
+                                        Kirigami.Theme.textColor.g,
+                                        Kirigami.Theme.textColor.b,
+                                        0.1
+                                    );
+                                } else {
+                                    borderColorTimer.restart();
+                                }
+                            }
+                        }
+
+                        Timer {
+                            id: borderColorTimer
+                            repeat: false
+                            interval: 50
+                            running: true
+                            onTriggered: {
+                                for (var j in selectedTrack.chainedSounds) {
+                                    if (index === selectedTrack.chainedSounds[j]) {
+                                        soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
+                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
+
+                                        // Return if sound is found in selected track
+                                        return;
+                                    }
+                                }
+
+                                for (var i=0; i<zynthian.zynthiloops.song.tracksModel.count; i++) {
+                                    var found = false;
+                                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+
+//                                    console.log("Track T"+(parseInt(k)+1))
+
+                                    for (var k in track.chainedSounds) {
+//                                        console.log("Comparing layer and chained sounds : "+soundBtnDelegate.layerIndex+", "+track.chainedSounds[parseInt(k)])
+                                        if (soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
+                                            found = true
+                                            console.log((index+1)+" chained to T"+(i+1))
+                                            console.log("  > Setting color : "+chainColors["t"+(i+1)]);
+                                            soundBtnDelegate.borderColor = chainColors["t"+(i+1)];
+                                            break;
+                                        }
+                                    }
+
+                                    // Break out of loop when first connected track is found
+                                    if (found) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         Rectangle {
                             anchors.fill: parent

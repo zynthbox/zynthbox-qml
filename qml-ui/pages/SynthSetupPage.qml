@@ -248,6 +248,7 @@ Zynthian.ScreenPage {
                     height: layersView.view.height/5
                     onClicked: {
                         if (!zynthian.fixed_layers.current_index_valid) {
+                            pickExistingButton.visible = false;
                             layerSetupDialog.open();
                             delegate.selector.activate_index(index);
                         }
@@ -564,6 +565,11 @@ Zynthian.ScreenPage {
             onRejected: {
                 applicationWindow().layerSetupDialogRejected();
             }
+            onVisibleChanged: {
+                if (!visible) {
+                    pickExistingButton.visible = true
+                }
+            }
 
             footer: QQC2.Control {
                 leftPadding: layerSetupDialog.leftPadding
@@ -593,6 +599,7 @@ Zynthian.ScreenPage {
                         }
                     }
                     QQC2.Button {
+                        id: pickExistingButton
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         text: qsTr("Pick Existing...")

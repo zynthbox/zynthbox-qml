@@ -170,7 +170,6 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             highlighted: view.activeFocus
             contentItem: QQC2.ScrollView {
-                rightPadding: Kirigami.Units.gridUnit/2
                 GridView {
                     id: view
                     clip: true
@@ -231,12 +230,6 @@ Zynthian.ScreenPage {
                             }
                         }
                     }
-                }
-                QQC2.ScrollBar.vertical.width: Kirigami.Units.gridUnit/2
-                QQC2.ScrollBar.vertical.contentItem: Rectangle {
-                    radius: width
-                    color: Kirigami.Theme.textColor
-                    opacity: 0.4
                 }
             }
         }

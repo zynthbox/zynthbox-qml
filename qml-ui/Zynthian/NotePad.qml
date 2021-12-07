@@ -70,7 +70,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     color: component.foregroundColor
-                    text: modelData.name + modelData.octave
+                    text: modelData.name + (modelData.octave - 1)
                 }
             }
         }
@@ -106,7 +106,7 @@ Item {
                     if (component.scale == "major") {
                         text = component.note.name
                     } else {
-                        text = component.note.name + component.note.octave
+                        text = component.note.name + (component.note.octave - 1)
                     }
                 }
                 return text;

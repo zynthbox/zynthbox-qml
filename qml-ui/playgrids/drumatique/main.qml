@@ -933,7 +933,7 @@ Zynthian.BasePlayGrid {
                     icon.name: component.mostRecentlyPlayedNote == undefined ? "" : "edit-clear-locationbar-ltr"
                     text: "Note:\n" + (component.mostRecentlyPlayedNote == undefined
                         ? "(all)"
-                        : component.mostRecentlyPlayedNote.name + component.mostRecentlyPlayedNote.octave)
+                        : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         component.mostRecentlyPlayedNote = undefined;

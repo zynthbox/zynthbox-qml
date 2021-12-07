@@ -53,6 +53,7 @@ Zynthian.BasePlayGrid {
         id: _private
         property QtObject model
         property QtObject miniGridModel
+        property int channel: 15
         property int startingNote: component.octave * 12
         property string scale
         property int rows
@@ -61,7 +62,7 @@ Zynthian.BasePlayGrid {
     }
 
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
-        console.log("Filling notes model " + model)
+        console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 
         var scale_mode_map = {
@@ -87,7 +88,8 @@ Zynthian.BasePlayGrid {
             for (var i = 0; i < columns; ++i) {
 
                 var note = component.getNote(
-                    col
+                    col,
+                    _private.channel
                 );
                 if (scale_index >= scaleArray.length){
                     scale_index = 0;
@@ -112,6 +114,11 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
+        if (zynthian.fixed_layers.active_midi_channel > -1) {
+            _private.channel = zynthian.fixed_layers.active_midi_channel;
+        } else {
+            _private.channel = 15;
+        }
         fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
         fillModel(_private.miniGridModel, _private.startingNote + 12, _private.scale, 2, _private.columns, _private.positionalVelocity)
     }
@@ -150,6 +157,11 @@ Zynthian.BasePlayGrid {
         if (gridContentsChanged) {
             populateGridTimer.restart()
         }
+    }
+
+    Connections {
+        target: zynthian.fixed_layers
+        onList_updated: populateGridTimer.restart();
     }
 
     Timer {

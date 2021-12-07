@@ -295,6 +295,14 @@ class zynthiloops_track(QObject):
     def checkIfLayerExists(self, channel):
         return channel in self.__song__.get_metronome_manager().zyngui.screens["layer"].layer_midi_map.keys()
 
+    @Slot(int, result='QVariantList')
+    def chainForLayer(chan):
+        chain = [chan]
+        for i in range (16):
+            if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(index, i):
+                cain.append(i)
+        return chain
+
     @Slot(int)
     def selectSound(self, index):
         zyngui = self.__song__.get_metronome_manager().zyngui
@@ -302,18 +310,14 @@ class zynthiloops_track(QObject):
         if index in self.__chained_sounds__:
             zyngui.screens["fixed_layers"].activate_index(index)
         else:
-            tracks_model = zyngui.screens["zynthiloops"].song.tracksModel
-            found = False
-
-            for i in range(0, tracks_model.count):
-                track = tracks_model.getTrack(i)
-                if index in track.chainedSounds:
-                    found = True
-                    self.set_chained_sounds(track.chainedSounds)
-                    break
-
-            if not found:
-                self.set_chained_sounds([index, -1, -1, -1, -1])
+            chained = [index]
+            for i in range (16):
+                if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(index, i):
+                    chained.append(i)
+                    if len(chained) >= 5:
+                        break
+            while len(chained) < 5:
+                chained.append(-1)
 
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
@@ -328,8 +332,8 @@ class zynthiloops_track(QObject):
             #self.set_chained_sounds([index, -1, -1, -1, -1])
             #zyngui.screens["fixed_layers"].activate_index(index)
 
-        # self.connected_sound_changed.emit()
-        # self.chained_sounds_changed.emit()
+        self.connected_sound_changed.emit()
+        self.chained_sounds_changed.emit()
 
     ### Property connectedPattern
     def get_connected_pattern(self):
@@ -373,12 +377,12 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui
         #Update midi clone
-        for i in range (16):
-            for j in range(16):
-                if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
-                    zyngui.screens['layer'].clone_midi(i, j)
-                elif zyngui.screens['layer'].is_midi_cloned(i, j):
-                    zyngui.screens['layer'].remove_clone_midi(i, j)
+        #for i in range (16):
+            #for j in range(16):
+                #if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
+                    #zyngui.screens['layer'].clone_midi(i, j)
+                #elif zyngui.screens['layer'].is_midi_cloned(i, j):
+                    #zyngui.screens['layer'].remove_clone_midi(i, j)
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
             if self.connectedSound >= 0:
@@ -391,7 +395,6 @@ class zynthiloops_track(QObject):
             pass
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
-        self.__song__.tracksModel.connected_sounds_count_changed.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

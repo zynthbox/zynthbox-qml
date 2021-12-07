@@ -69,8 +69,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata = []
 
         # Main Apps
-        self.list_data.append((self.session_dashboard, 0, "Session"))
-        self.list_metadata.append({"icon":"../../img/session-dashboard.svg"})
+        self.list_data.append((self.session_dashboard, 0, "Tracks"))
+        self.list_metadata.append({"icon":"../../img/tracks.svg"})
 
         self.list_data.append((self.zynthiloops, 0, "Looper"))
         self.list_metadata.append({"icon":"../../img/looper.svg"})
@@ -85,7 +85,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata.append({"icon":"../../img/playgrid.svg"})
         
         self.list_data.append((self.layers, 0, "Library"))
-        self.list_metadata.append({"icon":"../../img/layers.svg"})
+        self.list_metadata.append({"icon":"../../img/library.svg"})
         
         #if "zynseq" in zynthian_gui_config.experimental_features:
             # self.list_data.append((self.step_sequencer, 0, "Sequencer"))

@@ -68,6 +68,24 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
 		self.show()
 
+	@Slot(int, result='QVariantList')
+	def chainForLayer(self, chan : int):
+		chain = [chan]
+		for i in range (16):
+			if self.is_midi_cloned(chan, i) or self.is_midi_cloned(i, chan):
+				chain.append(i)
+		chain.sort()
+		logging.error("AAAAA {}".format(chain))
+		return chain
+
+	@Slot(int, result=str)
+	def printableChainForLayer(self, chan):
+		chain = self.chainForLayer(chan)
+		res = ""
+		for el in chain:
+			res += ",{}".format(el)
+		return res
+
 
 	def reset(self):
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel

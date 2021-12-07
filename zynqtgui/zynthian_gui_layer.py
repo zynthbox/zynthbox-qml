@@ -20,7 +20,7 @@
 # GNU General Public License for more details.
 #
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
-# 
+#
 #******************************************************************************
 
 
@@ -433,14 +433,18 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		else:
 			self.add_layer_midich(midi_chan, select)
 
-	def add_midichannel_to_track(self, midich):
+	def add_midichannel_to_track(self, midich, position_in_track = -1):
 		try:
 			selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
 			chain = selected_track.get_chained_sounds()
 			if midich not in chain:
-				for i, el in enumerate(chain):
-					if el == -1:
-						chain[i] = midich
+				if position_in_track >= 0:
+					chain[position_in_track] = midich
+				else:
+					for i, el in enumerate(chain):
+						if el == -1:
+							chain[i] = midich
+							break
 			selected_track.set_chained_sounds(chain)
 		except:
 			pass
@@ -461,6 +465,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
 			self.add_layer_eng = None
 
+			position_in_track = -1
+			for i, element in enumerate(self.zyngui.screens['layers_for_track'].list_data):
+				if midich == element[1]:
+					position_in_track = i
+					break
+
 			if self.layer_index_replace_engine != None and len(self.layers) > self.index:
 				layer = self.root_layers[self.layer_index_replace_engine]
 				# The type of engine changed (between synth, audio effect or midi effect so audio and midi needs to be resetted
@@ -477,7 +487,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				layer = zynthian_layer(zyngine, midich, self.zyngui)
 
-			self.add_midichannel_to_track(midich)
+			self.add_midichannel_to_track(midich, position_in_track)
 
 			# Try to connect Audio Effects ...
 			if len(self.layers)>0 and layer.engine.type=="Audio Effect":

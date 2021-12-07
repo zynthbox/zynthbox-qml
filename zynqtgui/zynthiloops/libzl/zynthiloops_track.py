@@ -318,6 +318,7 @@ class zynthiloops_track(QObject):
                         break
             while len(chained) < 5:
                 chained.append(-1)
+            set_chained_sounds(chain)
 
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:

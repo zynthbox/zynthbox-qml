@@ -303,6 +303,14 @@ class zynthiloops_track(QObject):
                 cain.append(i)
         return chain
 
+    @Slot(int, result='QVariantList')
+    def printableChainForLayer(chan):
+        chain = ""
+        for i in range (16):
+            if zyngui.screens['layer'].is_midi_cloned(chan, i) or zyngui.screens['layer'].is_midi_cloned(i, chan):
+                cain.append(" {}".format(i))
+        return chain
+
     @Slot(int)
     def selectSound(self, index):
         zyngui = self.__song__.get_metronome_manager().zyngui
@@ -319,6 +327,7 @@ class zynthiloops_track(QObject):
             while len(chained) < 5:
                 chained.append(-1)
             self.set_chained_sounds(chained)
+            logging.error(chained)
 
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
@@ -382,6 +391,7 @@ class zynthiloops_track(QObject):
             for j in range(16):
                 if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
                     zyngui.screens['layer'].clone_midi(i, j)
+                    zyngui.screens['layer'].clone_midi(j, i)
 
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()

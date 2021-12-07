@@ -302,24 +302,19 @@ class zynthiloops_track(QObject):
         if index in self.__chained_sounds__:
             zyngui.screens["fixed_layers"].activate_index(index)
         else:
-            chained = self.__chained_sounds__
+            tracks_model = zyngui.screens["zynthiloops"].song.tracksModel
             found = False
-            for i, chan in enumerate(chained):
-                if chan == zyngui.get_active_midi_channel():
-                    chained[i] = index
-                    found = True
-                    break
-            if not found:
-                found = False
-                for i, chan in enumerate(chained):
-                    if chan == -1:
-                        chained[i] = index
-                        found = True
-                        break
-            if not found:
-                chained[0] = index
 
-            self.set_chained_sounds(chained)
+            for i in range(0, tracks_model.count):
+                track = tracks_model.getTrack(i)
+                if index in track.chainedSounds:
+                    found = True
+                    self.set_chained_sounds(track.chainedSounds)
+                    break
+
+            if not found:
+                self.set_chained_sounds([index, -1, -1, -1, -1])
+
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
                 #if m_sound > -1:
@@ -333,8 +328,8 @@ class zynthiloops_track(QObject):
             #self.set_chained_sounds([index, -1, -1, -1, -1])
             #zyngui.screens["fixed_layers"].activate_index(index)
 
-        self.connected_sound_changed.emit()
-        self.chained_sounds_changed.emit()
+        # self.connected_sound_changed.emit()
+        # self.chained_sounds_changed.emit()
 
     ### Property connectedPattern
     def get_connected_pattern(self):

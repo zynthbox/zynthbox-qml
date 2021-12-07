@@ -142,6 +142,8 @@ QQC2.Dialog {
                                  soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                  soundsDialog.selectedTrack.checkIfLayerExists(index)
 
+                    enabled: !highlighted && !isChained
+
                     background: Rectangle { // Derived from znthian qtquick-controls-style
                         Kirigami.Theme.highlightColor: {
                             if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {

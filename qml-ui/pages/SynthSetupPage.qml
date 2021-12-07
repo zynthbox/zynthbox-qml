@@ -35,6 +35,8 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
     // When enabled, listen for layer popup rejected to re-select connected sound if any
     Connections {
         id: layerPopupRejectedConnections

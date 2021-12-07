@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
-Categories=Zynthbox App-Modules
+Categories=671
 XdgTargetDir=zynthian/modules
 Uncompress=always

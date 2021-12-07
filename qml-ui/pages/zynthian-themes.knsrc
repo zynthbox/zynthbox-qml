@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
-Categories=Zynthbox Themes
+Categories=669
 XdgTargetDir=plasma/desktoptheme
 Uncompress=always

@@ -1,6 +1,6 @@
 [KNewStuff3]
 Name=Themes
 ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
-Categories=FX Plugin Mods
+Categories=668
 XdgTargetDir=zynthian/engineeditpages
 Uncompress=always

@@ -396,6 +396,7 @@ class zynthiloops_track(QObject):
             pass
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
+        self.__song__.tracksModel.connected_sounds_count_changed.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

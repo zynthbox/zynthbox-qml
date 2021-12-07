@@ -59,17 +59,25 @@ Zynthian.ScreenPage {
             }
         }
     ]
+    property var thePlayGridActions: []
     Instantiator {
         id: playGridActionInstantiator
-        model: playGridsRepeater.count
-        Kirigami.Action {
-            property Item relevantPlaygrid: playGridsRepeater.itemAt(index).item
-            text: relevantPlaygrid.name
+        model: ZynQuick.PlayGridManager.playgrids
+        delegate: Kirigami.Action {
+            property Item relevantPlaygrid: playGridsRepeater.itemAt(index) ? playGridsRepeater.itemAt(index).item : null
+            text: relevantPlaygrid ? relevantPlaygrid.name : ""
             onTriggered: {
                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
             }
         }
-        onObjectAdded: { playgridSwitchAction.children.push(object); }
+        onObjectAdded: {
+            thePlayGridActions.push(object);
+            playgridSwitchAction.children = thePlayGridActions;
+        }
+        onObjectRemoved: {
+            thePlayGridActions.pop(object);
+            playgridSwitchAction.children = thePlayGridActions;
+        }
     }
 
     Connections {

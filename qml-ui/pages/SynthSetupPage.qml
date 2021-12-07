@@ -34,8 +34,81 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
+
+    // When enabled, listen for layer popup rejected to re-select connected sound if any
+    Connections {
+        id: layerPopupRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onLayerSetupDialogRejected: {
+            console.log("Layer Popup Rejected");
+
+            root.selectConnectedSound();
+            layerPopupRejectedConnections.enabled = false;
+        }
+    }
+
+    // When enabled, listen for sound dialog rejected to re-select connected sound if any
+    Connections {
+        id: soundsDialogRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onSoundsDialogAccepted: {
+            console.log("Sounds Dialog Accepted");
+            soundsDialogRejectedConnections.enabled = false;
+        }
+        onSoundsDialogRejected: {
+            console.log("Sounds Dialog Rejected");
+
+            root.selectConnectedSound();
+            soundsDialogRejectedConnections.enabled = false;
+        }
+    }
+
+    Connections {
+        target: applicationWindow()
+        onLayerSetupDialogLoadSoundClicked: {
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogNewSynthClicked: {
+            bottomDrawer.close();
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogPickSoundClicked: {
+            console.log("Sound Dialog Opened");
+
+            // Enable Sounds dialog rejected handler to select sound if any on close
+            soundsDialogRejectedConnections.enabled = true;
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+    }
+
+    function selectConnectedSound() {
+        // [*] Here if user rejects, make sure to select correct layer
+    }
+
     function soundPickingTransaction() {
-        layerSetupDialog.open()
+        if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
+            console.log("No free slots left")
+            //  noFreeSlotsPopup.open();
+        } else {
+            // Enable layer popup rejected handler to re-select connected sound if any
+            layerPopupRejectedConnections.enabled = true;
+
+            applicationWindow().requestOpenLayerSetupDialog();
+            //this depends on requirements
+           // backToSelection.enabled = true;
+
+            if (root.selectedTrack.connectedPattern >= 0) {
+                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
+                seq.midiChannel = root.selectedTrack.connectedSound;
+            }
+        }
     }
     backAction: Kirigami.Action {
         text: qsTr("Back")

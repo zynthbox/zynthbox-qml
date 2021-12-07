@@ -42,20 +42,53 @@ QQC2.Dialog {
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSoundsArr: selectedTrack.chainedSounds.slice()
-    property var chainColors: ({
-        t1: "#e6194B",
-        t2: "#3cb44b",
-        t3: "#ffe119",
-        t4: "#4363d8",
-        t5: "#f58231",
-        t6: "#911eb4",
-        t7: "#42d4f4",
-        t8: "#f032e6",
-        t9: "#fabed4",
-        t10: "#9A6324",
-        t11: "#800000",
-        t12: "#fffac8"
-    })
+//     property var chainColors: ({
+//         t1: "#e6194B",
+//         t2: "#3cb44b",
+//         t3: "#ffe119",
+//         t4: "#4363d8",
+//         t5: "#f58231",
+//         t6: "#911eb4",
+//         t7: "#42d4f4",
+//         t8: "#f032e6",
+//         t9: "#fabed4",
+//         t10: "#9A6324",
+//         t11: "#800000",
+//         t12: "#fffac8"
+//     })
+    property var availableChainColors: [
+        "#e6194B",
+        "#3cb44b",
+        "#ffe119",
+        "#4363d8",
+        "#f58231",
+        "#911eb4",
+        "#42d4f4",
+        "#f032e6",
+        "#fabed4",
+        "#9A6324",
+        "#800000",
+        "#0ffac8",
+        "#0abed4",
+        "#2A6324",
+        "#00f000",
+        "#0ffac8"
+    ]
+
+    property var chainColors: {}
+
+    onVisibleChanged: {
+        if (!visible) {
+            return;
+        }
+        chainColors = {"black": "black"};
+        for (var i = 0; i < 16; ++i) {
+
+            chainColors[zynthian.layer.printableChainForLayer(i)] = availableChainColors[i];
+            print("DDDDD"+i+" "+zynthian.layer.printableChainForLayer(i))
+        }
+
+    }
 
     modal: true
 
@@ -210,17 +243,17 @@ QQC2.Dialog {
                             interval: 50
                             running: true
                             onTriggered: {
-//                                for (var j in selectedTrack.chainedSounds) {
-//                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
-//                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
-//                                        soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
-//                                        soundBtnDelegate.isChained = true;
-//                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
+                                for (var j in selectedTrack.chainedSounds) {
+                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
+                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
+                                        soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
+                                        soundBtnDelegate.isChained = true;
+                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
 
-//                                        // Return if sound is found in selected track
-//                                        return;
-//                                    }
-//                                }
+                                        // Return if sound is found in selected track
+                                        return;
+                                    }
+                                }
 
                                 for (var i=0; i<zynthian.zynthiloops.song.tracksModel.count; i++) {
                                     var found = false;
@@ -235,7 +268,7 @@ QQC2.Dialog {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
-                                            soundBtnDelegate.borderColor = chainColors["t"+(i+1)];
+                                            soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
                                             break;
                                         }

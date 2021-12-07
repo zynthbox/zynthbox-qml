@@ -101,8 +101,6 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
                 return
         selft.select_action(0)
 
-
-
     def index_supports_immediate_activation(self, index=None):
         if index is None:
             return False

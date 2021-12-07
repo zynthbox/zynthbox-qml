@@ -385,6 +385,24 @@ class zynthiloops_track(QObject):
     def get_chained_sounds(self):
         return self.__chained_sounds__
 
+    @Slot(int)
+    def remove_and_unchain_sound(self, chan):
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        for i in range (16):
+            for j in range(16):
+                if i != j and i in self.__chained_sounds__ and j in self.__chained_sounds__ and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
+                    zyngui.screens['layer'].remove_clone_midi(i, j)
+                    zyngui.screens['layer'].remove_clone_midi(j, i)
+
+        for i, sound in enumerate(self.__chained_sounds__):
+            logging.error("AAAA {} {}".format(sound, chan))
+            if sound == chan:
+                self.__chained_sounds__[i] = -1
+        zyngui.screens['layers_for_track'].fill_list()
+        self.chained_sounds_changed.emit()
+        self.connected_sound_changed.emit()
+
+
     def set_chained_sounds(self, sounds):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):

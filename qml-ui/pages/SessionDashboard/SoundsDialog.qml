@@ -204,17 +204,17 @@ QQC2.Dialog {
                             interval: 50
                             running: true
                             onTriggered: {
-                                for (var j in selectedTrack.chainedSounds) {
-                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
-                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
-                                        soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
-                                        soundBtnDelegate.isChained = true;
-                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
+//                                for (var j in selectedTrack.chainedSounds) {
+//                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
+//                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
+//                                        soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
+//                                        soundBtnDelegate.isChained = true;
+//                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
 
-                                        // Return if sound is found in selected track
-                                        return;
-                                    }
-                                }
+//                                        // Return if sound is found in selected track
+//                                        return;
+//                                    }
+//                                }
 
                                 for (var i=0; i<zynthian.zynthiloops.song.tracksModel.count; i++) {
                                     var found = false;

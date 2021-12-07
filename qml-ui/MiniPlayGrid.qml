@@ -217,7 +217,7 @@ RowLayout {
         Connections {
             target: ZynQuick.PlayGridManager
             property string currentPlaygrid
-            onCurrentPlaygridsChanged: {
+            function updatePlaygrid() {
                 if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]) {
                     var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
                     playGridStack.replace(playgrid.miniGrid);
@@ -225,6 +225,8 @@ RowLayout {
                     currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["minigrid"];
                 }
             }
+            onPlaygridsChanged: updatePlaygrid();
+            onCurrentPlaygridsChanged: updatePlaygrid();
         }
 
         Repeater {

@@ -136,7 +136,6 @@ QQC2.Dialog {
                     Layout.fillHeight: false
                     Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                     Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
-                    text: model.display
                     radius: 4
                     highlighted: soundsDialog.selectedTrack &&
                                  soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
@@ -151,7 +150,7 @@ QQC2.Dialog {
                                     soundBtnDelegate.borderColor.r,
                                     soundBtnDelegate.borderColor.g,
                                     soundBtnDelegate.borderColor.b,
-                                    1
+                                    enabled ? 1 : 0.5
                                 )
                             } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                        soundsDialog.selectedTrack.checkIfLayerExists(index)) {
@@ -179,7 +178,12 @@ QQC2.Dialog {
                                   ? Kirigami.Theme.backgroundColor
                                   : "#000000"
                         border.width: 2
-                        border.color: soundBtnDelegate.borderColor
+                        border.color: Qt.rgba(
+                                          soundBtnDelegate.borderColor.r,
+                                          soundBtnDelegate.borderColor.g,
+                                          soundBtnDelegate.borderColor.b,
+                                          0.3
+                                      )
                         radius: soundBtnDelegate.radius
 
                         Connections {
@@ -287,6 +291,23 @@ QQC2.Dialog {
                         anchors.margins: Kirigami.Units.gridUnit*0.5
                         font.pointSize: 10
                         text: (index + 1)
+                    }
+
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        width: parent.width
+                        horizontalAlignment: "AlignHCenter"
+                        verticalAlignment: "AlignVCenter"
+                        elide: "ElideRight"
+                        color: enabled
+                                ? Kirigami.Theme.textColor
+                                : Qt.rgba(
+                                      Kirigami.Theme.textColor.r,
+                                      Kirigami.Theme.textColor.g,
+                                      Kirigami.Theme.textColor.b,
+                                      0.6
+                                  )
+                        text: model.display
                     }
 
                     RowLayout {

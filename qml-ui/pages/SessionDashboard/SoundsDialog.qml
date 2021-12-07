@@ -61,7 +61,7 @@ QQC2.Dialog {
         "#3cb44b",
         "#ffe119",
         "#4363d8",
-        "#f58231",
+        "#f5f231",
         "#911eb4",
         "#42d4f4",
         "#f032e6",
@@ -85,7 +85,7 @@ QQC2.Dialog {
         for (var i = 0; i < 16; ++i) {
 
             chainColors[zynthian.layer.printableChainForLayer(i)] = availableChainColors[i];
-            print("DDDDD"+i+" "+zynthian.layer.printableChainForLayer(i))
+            print("DDDDD"+i+" "+zynthian.layer.printableChainForLayer(i)+ availableChainColors[i])
         }
 
     }

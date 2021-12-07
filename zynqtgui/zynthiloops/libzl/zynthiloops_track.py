@@ -297,9 +297,9 @@ class zynthiloops_track(QObject):
 
     @Slot(int, result='QVariantList')
     def chainForLayer(chan):
-        chain = [chan]
+        chain = []
         for i in range (16):
-            if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(index, i):
+            if zyngui.screens['layer'].is_midi_cloned(chan, i) or zyngui.screens['layer'].is_midi_cloned(i, chan):
                 cain.append(i)
         return chain
 
@@ -312,13 +312,13 @@ class zynthiloops_track(QObject):
         else:
             chained = [index]
             for i in range (16):
-                if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(index, i):
+                if i != index and zyngui.screens['layer'].is_midi_cloned(index, i) or zyngui.screens['layer'].is_midi_cloned(i, index):
                     chained.append(i)
                     if len(chained) >= 5:
                         break
             while len(chained) < 5:
                 chained.append(-1)
-            set_chained_sounds(chain)
+            self.set_chained_sounds(chained)
 
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
@@ -378,12 +378,11 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui
         #Update midi clone
-        #for i in range (16):
-            #for j in range(16):
-                #if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
-                    #zyngui.screens['layer'].clone_midi(i, j)
-                #elif zyngui.screens['layer'].is_midi_cloned(i, j):
-                    #zyngui.screens['layer'].remove_clone_midi(i, j)
+        for i in range (16):
+            for j in range(16):
+                if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
+                    zyngui.screens['layer'].clone_midi(i, j)
+
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
             if self.connectedSound >= 0:

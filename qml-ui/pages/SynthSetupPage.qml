@@ -165,6 +165,12 @@ Zynthian.ScreenPage {
         }
 
         switch (cuia) {
+        case "SWITCH_SELECT_SHORT":
+            if (zynthian.current_screen_id == "layers_for_track" && !zynthian.fixed_layers.current_index_valid) {
+                layerSetupDialog.open();
+                return true
+            }
+            return false
         case "NAVIGATE_LEFT":
             var newIndex = Math.max(0, currentScreenIndex - 1);
             zynthian.current_screen_id = root.screenIds[newIndex];

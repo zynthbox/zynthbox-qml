@@ -349,6 +349,7 @@ class zynthiloops_track(QObject):
     def clearChainedSoundsWithoutCloning(self):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
 
+        self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
 

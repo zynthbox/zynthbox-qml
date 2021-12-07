@@ -258,7 +258,8 @@ Zynthian.Card {
                                 chainedSoundsCopy[index] = -1;
 
                                 console.log(chainedSoundsCopy);
-                                selectedTrack.chainedSounds = chainedSoundsCopy;
+                                //selectedTrack.chainedSounds = chainedSoundsCopy;
+								selectedTrack.remove_and_unchain_sound(soundDelegate.chainedSound);
                             }
                         }
 

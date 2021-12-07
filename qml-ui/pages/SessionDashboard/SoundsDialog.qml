@@ -159,6 +159,7 @@ QQC2.Dialog {
                     property int layerIndex: index
                     property bool hasConnectedTracks: false
                     property bool isChained: false
+                    property bool hasTrack: false
                     property color borderColor: Qt.rgba(
                                                     Kirigami.Theme.textColor.r,
                                                     Kirigami.Theme.textColor.g,
@@ -175,7 +176,7 @@ QQC2.Dialog {
                                  soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                  soundsDialog.selectedTrack.checkIfLayerExists(index)
 
-                    enabled: !highlighted && !isChained
+                    enabled: (!highlighted && !isChained) || !hasTrack
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
                         Kirigami.Theme.highlightColor: {
@@ -208,7 +209,7 @@ QQC2.Dialog {
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor
-                                : soundBtnDelegate.isChained
+                                : soundBtnDelegate.hasTrack
                                   ? Kirigami.Theme.backgroundColor
                                   : "#000000"
                         border.width: 2
@@ -272,6 +273,7 @@ QQC2.Dialog {
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
+											soundBtnDelegate.hasTrack = (chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0)
 
                                             break;
                                         }

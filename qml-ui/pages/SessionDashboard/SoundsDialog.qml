@@ -42,20 +42,53 @@ QQC2.Dialog {
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSoundsArr: selectedTrack.chainedSounds.slice()
-    property var chainColors: ({
-        t1: "#e6194B",
-        t2: "#3cb44b",
-        t3: "#ffe119",
-        t4: "#4363d8",
-        t5: "#f58231",
-        t6: "#911eb4",
-        t7: "#42d4f4",
-        t8: "#f032e6",
-        t9: "#fabed4",
-        t10: "#9A6324",
-        t11: "#800000",
-        t12: "#fffac8"
-    })
+//     property var chainColors: ({
+//         t1: "#e6194B",
+//         t2: "#3cb44b",
+//         t3: "#ffe119",
+//         t4: "#4363d8",
+//         t5: "#f58231",
+//         t6: "#911eb4",
+//         t7: "#42d4f4",
+//         t8: "#f032e6",
+//         t9: "#fabed4",
+//         t10: "#9A6324",
+//         t11: "#800000",
+//         t12: "#fffac8"
+//     })
+    property var availableChainColors: [
+        "#e6194B",
+        "#3cb44b",
+        "#ffe119",
+        "#4363d8",
+        "#f5f231",
+        "#911eb4",
+        "#42d4f4",
+        "#f032e6",
+        "#fabed4",
+        "#9A6324",
+        "#800000",
+        "#0ffac8",
+        "#0abed4",
+        "#2A6324",
+        "#00f000",
+        "#0ffac8"
+    ]
+
+    property var chainColors: {}
+
+    onVisibleChanged: {
+        if (!visible) {
+            return;
+        }
+        chainColors = {"black": "black"};
+        for (var i = 0; i < 16; ++i) {
+
+            chainColors[zynthian.layer.printableChainForLayer(i)] = availableChainColors[i];
+            print("DDDDD"+i+" "+zynthian.layer.printableChainForLayer(i)+ availableChainColors[i])
+        }
+
+    }
 
     modal: true
 
@@ -88,7 +121,8 @@ QQC2.Dialog {
             text: qsTr("Un-select all slots")
             onClicked: {
               //  soundsDialog.selectedTrack.connectedSound = -1;
-                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
+//                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
+                soundsDialog.selectedTrack.clearChainedSoundsWithoutCloning();
                 /*if (soundsDialog.selectedTrack.connectedPattern >= 0) {
                     var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(soundsDialog.selectedTrack.connectedPattern);
                     seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
@@ -136,11 +170,12 @@ QQC2.Dialog {
                     Layout.fillHeight: false
                     Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                     Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
-                    text: model.display
                     radius: 4
                     highlighted: soundsDialog.selectedTrack &&
                                  soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                  soundsDialog.selectedTrack.checkIfLayerExists(index)
+
+                    enabled: !highlighted && !isChained
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
                         Kirigami.Theme.highlightColor: {
@@ -149,7 +184,7 @@ QQC2.Dialog {
                                     soundBtnDelegate.borderColor.r,
                                     soundBtnDelegate.borderColor.g,
                                     soundBtnDelegate.borderColor.b,
-                                    1
+                                    enabled ? 1 : 0.5
                                 )
                             } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                        soundsDialog.selectedTrack.checkIfLayerExists(index)) {
@@ -177,7 +212,12 @@ QQC2.Dialog {
                                   ? Kirigami.Theme.backgroundColor
                                   : "#000000"
                         border.width: 2
-                        border.color: soundBtnDelegate.borderColor
+                        border.color: Qt.rgba(
+                                          soundBtnDelegate.borderColor.r,
+                                          soundBtnDelegate.borderColor.g,
+                                          soundBtnDelegate.borderColor.b,
+                                          0.3
+                                      )
                         radius: soundBtnDelegate.radius
 
                         Connections {
@@ -207,7 +247,7 @@ QQC2.Dialog {
 //                                for (var j in selectedTrack.chainedSounds) {
 //                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
 //                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
-//                                        soundBtnDelegate.borderColor = chainColors["t"+(selectedTrack.id+1)];
+//                                        soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
 //                                        soundBtnDelegate.isChained = true;
 //                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
 
@@ -223,14 +263,16 @@ QQC2.Dialog {
 //                                    console.log("Track T"+(parseInt(k)+1))
 
                                     for (var k in track.chainedSounds) {
-//                                        console.log("Comparing layer and chained sounds : "+soundBtnDelegate.layerIndex+", "+track.chainedSounds[parseInt(k)])
-                                        if (soundBtnDelegate.layerIndex === track.chainedSounds[k] &&
-                                            soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
+                                        var chains = zynthian.layer.chainForLayer(i);
+//                                        console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
+
+                                        if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && (soundBtnDelegate.layerIndex === track.chainedSounds[k] || (chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0))) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
-                                            soundBtnDelegate.borderColor = chainColors["t"+(i+1)];
+                                            soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
+
                                             break;
                                         }
                                     }
@@ -285,6 +327,23 @@ QQC2.Dialog {
                         anchors.margins: Kirigami.Units.gridUnit*0.5
                         font.pointSize: 10
                         text: (index + 1)
+                    }
+
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        width: parent.width
+                        horizontalAlignment: "AlignHCenter"
+                        verticalAlignment: "AlignVCenter"
+                        elide: "ElideRight"
+                        color: enabled
+                                ? Kirigami.Theme.textColor
+                                : Qt.rgba(
+                                      Kirigami.Theme.textColor.r,
+                                      Kirigami.Theme.textColor.g,
+                                      Kirigami.Theme.textColor.b,
+                                      0.6
+                                  )
+                        text: model.display
                     }
 
                     RowLayout {

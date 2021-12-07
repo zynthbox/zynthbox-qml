@@ -34,6 +34,9 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
+    function soundPickingTransaction() {
+        layerSetupDialog.open()
+    }
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: zynthian.current_screen_id = "session_dashboard"
@@ -248,7 +251,7 @@ Zynthian.ScreenPage {
                     height: layersView.view.height/5
                     onClicked: {
                         if (!zynthian.fixed_layers.current_index_valid) {
-                            layerSetupDialog.open();
+                            root.soundPickingTransaction();
                             delegate.selector.activate_index(index);
                         }
                     }

@@ -278,7 +278,7 @@ QQC2.Dialog {
                                         if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
-                                            console.log("  > Setting color : "+chainColors["t"+(i+1)]);
+//                                            console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
                                             soundBtnDelegate.hasTrack = true;

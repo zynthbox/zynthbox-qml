@@ -43,6 +43,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         self.__total_chains = 5
         self.__volume_ctrls = []
         # self.zyngui.screens['session_dashboard'].selected_track_changed.connect(self.update_track_sounds)
+        self.zyngui.screens['layer'].layer_deleted.connect(self.update_track_sounds)
 
     def fill_list(self):
         self.list_data = []

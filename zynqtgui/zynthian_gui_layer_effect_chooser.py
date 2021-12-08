@@ -106,6 +106,8 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 			else:
 				self.zyngui.show_screen("layer_effect_chooser")
 
+			self.zyngui.screens["fixed_layers"].fill_list()
+
 
 	def back_action(self):
 		return self.effects_types_screen

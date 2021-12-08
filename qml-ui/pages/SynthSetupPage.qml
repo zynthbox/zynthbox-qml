@@ -598,7 +598,8 @@ Zynthian.ScreenPage {
                             applicationWindow().layerSetupDialogLoadSoundClicked();
                         }
                     }
-                    QQC2.Button {
+                    // As per #299 Hide "Pick Existing.." from new synth popup
+                    /*QQC2.Button {
                         id: pickExistingButton
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
@@ -608,7 +609,7 @@ Zynthian.ScreenPage {
                             layerSetupDialog.accept();
                             applicationWindow().layerSetupDialogPickSoundClicked();
                         }
-                    }
+                    }*/
                     Timer { //HACK why is this necessary?
                         id: newSynthWorkaroundTimer
                         interval: 200

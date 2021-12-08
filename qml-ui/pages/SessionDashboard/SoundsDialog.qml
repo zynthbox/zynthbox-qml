@@ -213,12 +213,19 @@ QQC2.Dialog {
                                   ? Kirigami.Theme.backgroundColor
                                   : "#000000"
                         border.width: 2
-                        border.color: Qt.rgba(
-                                          soundBtnDelegate.borderColor.r,
-                                          soundBtnDelegate.borderColor.g,
-                                          soundBtnDelegate.borderColor.b,
-                                          0.3
-                                      )
+                        border.color: soundBtnDelegate.hasTrack
+                                          ? Qt.rgba(
+                                              soundBtnDelegate.borderColor.r,
+                                              soundBtnDelegate.borderColor.g,
+                                              soundBtnDelegate.borderColor.b,
+                                              0.7
+                                            )
+                                          : Qt.rgba(
+                                                soundBtnDelegate.borderColor.r,
+                                                soundBtnDelegate.borderColor.g,
+                                                soundBtnDelegate.borderColor.b,
+                                                0.3
+                                            )
                         radius: soundBtnDelegate.radius
 
                         Connections {
@@ -233,6 +240,7 @@ QQC2.Dialog {
                                         0.1
                                     );
                                     soundBtnDelegate.isChained = false;
+                                    soundBtnDelegate.hasTrack = false;
                                 } else {
                                     borderColorTimer.restart();
                                 }

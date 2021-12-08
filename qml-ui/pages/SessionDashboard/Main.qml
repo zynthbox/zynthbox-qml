@@ -197,15 +197,18 @@ Zynthian.ScreenPage {
 
     Timer {
         interval: 10 * 1000
-        running: true
+        // Remove clock as per #299
+        running: false
         repeat: true
         triggeredOnStart: true
         function pad(d) {
             return (d < 10) ? '0' + d.toString() : d.toString();
         }
         onTriggered: {
+            /* Remove clock as per #299
             let d = new Date();
             clockLabel.text = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            */
 
             /* Remove session time as per #272
                TODO : Remove below snippet
@@ -251,9 +254,12 @@ Zynthian.ScreenPage {
             }
             Item {
                 Layout.fillWidth: true
+            }
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
 
                 RowLayout {
-                    anchors.centerIn: parent
+                    Layout.alignment: Qt.AlignVCenter
 
                     QQC2.Button {
                         Layout.preferredWidth: Kirigami.Units.gridUnit*4
@@ -288,23 +294,20 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-            }
-            RowLayout {
-                Layout.alignment: Qt.AlignCenter
+
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+
+                    font.pointSize: 12
+                    text: qsTr("%1 x Sounds | %2 x Midi")
+                            .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
+                            .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
+                }
 
                 Kirigami.Heading {
                     id: clockLabel
                     Layout.alignment: Qt.AlignCenter
-
-                    QQC2.Label {
-                        anchors.rightMargin: Kirigami.Units.gridUnit
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.left
-                        font.pointSize: 12
-                        text: qsTr("%1 x Sounds | %2 x Midi")
-                                .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
-                                .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
-                    }
                 }
             }
         }

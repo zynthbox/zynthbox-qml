@@ -159,7 +159,11 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: soundsDialog.visible = true
+                onClicked: {
+                    // As per #399, open library instead
+                    // soundsDialog.visible = true
+                    zynthian.current_screen_id = "preset"
+                }
 
                 text: {
                     synthButton.updateSoundName();

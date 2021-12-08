@@ -351,7 +351,7 @@ class zynthiloops_track(QObject):
 
         try: #can be called before creation
             zyngui = self.__song__.get_metronome_manager().zyngui
-            zyngui.screens['layers_for_track'].fill_list()
+            zyngui.screens['fixed_layers'].fill_list() #This will update *also* layers for track
             zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
         except Exception as e:
             logging.error(f"Error filling list : {str(e)}")

@@ -160,7 +160,7 @@ Kirigami.AbstractApplicationWindow {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
-                    // As per #399, open library instead
+                    // As per #299, open library instead
                     // soundsDialog.visible = true
                     zynthian.current_screen_id = "preset"
                 }

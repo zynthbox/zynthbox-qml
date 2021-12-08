@@ -108,6 +108,8 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
+                // Disable this entry as per #299
+                visible: false
                 text: qsTr("Effect Layer")
                 onTriggered: {
                     zynthian.layer.new_effect_layer(zynthian.fixed_layers.active_midi_channel)

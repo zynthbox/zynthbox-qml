@@ -125,6 +125,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
     def update_track_sounds(self):
         self.fill_list()
         track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].get_selected_track())
+        logging.error(f"Update Track Sounds : {track.connectedSound}")
         if track.connectedSound >= 0:
             self.zyngui.screens["layer"].activate_midichan_layer(track.connectedSound)
         else:
@@ -141,6 +142,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
         midichan = self.list_data[i][1]
+        logging.error(f"### layers for track select action : {midichan}")
         self.zyngui.screens['fixed_layers'].select_action(midichan, t)
         self.select(i)
 

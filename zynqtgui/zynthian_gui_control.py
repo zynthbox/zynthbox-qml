@@ -213,7 +213,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 			if Path(path).exists():
 				entries.append({"display": "Default",
 								"path": "/zynthian/zynthian-ui/qml-ui/engineeditpages/" + engine_folder_name})
-			entries.append({"display": "Basic",
+			entries.append({"display": "Zynthian",
 							"path": ""})
 			self.__control_pages_model.set_entries(entries)
 		else:

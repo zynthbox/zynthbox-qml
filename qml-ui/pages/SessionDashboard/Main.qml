@@ -197,7 +197,8 @@ Zynthian.ScreenPage {
 
     Timer {
         interval: 10 * 1000
-        running: true
+        // As per #299, disabling clock
+        running: false
         repeat: true
         triggeredOnStart: true
         function pad(d) {

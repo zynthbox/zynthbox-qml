@@ -304,6 +304,15 @@ Zynthian.ScreenPage {
                                     dim: false
                                     QQC2.MenuItem {
                                         width: parent.width
+                                        text: qsTr("Change Synth...")
+                                        onClicked: {
+                                            optionsMenu.close();
+                                            delegate.clicked();
+                                            zynthian.layer.select_engine(model.metadata.midi_channel);
+                                        }
+                                    }
+                                    QQC2.MenuItem {
+                                        width: parent.width
                                         text: qsTr("Range && Transpose...")
                                         onClicked: {
                                             optionsMenu.close();

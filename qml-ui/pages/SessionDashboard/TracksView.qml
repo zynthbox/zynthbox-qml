@@ -163,8 +163,7 @@ ColumnLayout {
                                 radius: 4
                                 opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.5
 
-                                QQC2.Label {
-                                    id: soundLabel
+                                RowLayout {
                                     anchors {
                                         verticalCenter: parent.verticalCenter
                                         left: parent.left
@@ -172,39 +171,52 @@ ColumnLayout {
                                         leftMargin: Kirigami.Units.gridUnit*0.5
                                         rightMargin: Kirigami.Units.gridUnit*0.5
                                     }
-                                    horizontalAlignment: Text.AlignLeft
-                                    text: {
-                                        soundLabel.updateSoundName();
-                                    }
 
-                                    Connections {
-                                        target: zynthian.fixed_layers
-                                        onList_updated: {
+                                    QQC2.Label {
+                                        id: soundLabel
+
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignCenter
+                                        horizontalAlignment: Text.AlignLeft
+                                        text: {
                                             soundLabel.updateSoundName();
                                         }
-                                    }
 
-                                    Connections {
-                                        target: track
-                                        onChainedSoundsChanged: {
-                                            soundLabel.updateSoundName();
-                                        }
-                                    }
-
-                                    elide: "ElideRight"
-
-                                    function updateSoundName() {
-                                        var text = "";
-
-                                        for (var id in trackDelegate.track.chainedSounds) {
-                                            if (trackDelegate.track.chainedSounds[id] >= 0 &&
-                                                trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[id])) {
-                                                text = zynthian.fixed_layers.selector_list.getDisplayValue(trackDelegate.track.chainedSounds[id]);
-                                                break;
+                                        Connections {
+                                            target: zynthian.fixed_layers
+                                            onList_updated: {
+                                                soundLabel.updateSoundName();
                                             }
                                         }
 
-                                        soundLabel.text = text;
+                                        Connections {
+                                            target: track
+                                            onChainedSoundsChanged: {
+                                                soundLabel.updateSoundName();
+                                            }
+                                        }
+
+                                        elide: "ElideRight"
+
+                                        function updateSoundName() {
+                                            var text = "";
+
+                                            for (var id in trackDelegate.track.chainedSounds) {
+                                                if (trackDelegate.track.chainedSounds[id] >= 0 &&
+                                                    trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[id])) {
+                                                    text = zynthian.fixed_layers.selector_list.getDisplayValue(trackDelegate.track.chainedSounds[id]);
+                                                    break;
+                                                }
+                                            }
+
+                                            soundLabel.text = text;
+                                        }
+                                    }
+
+                                    QQC2.Label {
+                                        Layout.fillWidth: false
+                                        Layout.alignment: Qt.AlignCenter
+                                        text: qsTr("+%1").arg(Math.max(trackDelegate.track.chainedSounds.filter(function (e) { return e >= 0; }).length-1, 0))
                                     }
                                 }
 

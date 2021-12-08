@@ -409,6 +409,13 @@ class zynthiloops_track(QObject):
             if sound == chan:
                 self.__chained_sounds__[i] = -1
         zyngui.screens['layers_for_track'].fill_list()
+
+        if zyngui.active_midi_channel == chan:
+            logging.error("Reselect any available sound since it is removing current selected channel")
+            zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
+        else:
+            logging.error("Do not Reselect track sound since it is not removing current selected channel")
+
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
 

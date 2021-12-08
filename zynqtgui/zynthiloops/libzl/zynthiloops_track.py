@@ -53,6 +53,7 @@ class zynthiloops_track(QObject):
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
+        # self.chained_sounds_changed.connect(self.select_correct_layer)
 
         if self.__id__ < 5:
             # self.__connected_sound__ = self.__id__
@@ -66,6 +67,17 @@ class zynthiloops_track(QObject):
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
 
+    def select_correct_layer(self):
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        if self.checkIfLayerExists(zyngui.active_midi_channel):
+            logging.error("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
+            # zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
+            try:
+                zyngui.screens["layers_for_track"].update_track_sounds()
+            except:
+                pass
+        else:
+            logging.error("### select_correct_layer : Do not Reselect track sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
@@ -410,11 +422,7 @@ class zynthiloops_track(QObject):
                 self.__chained_sounds__[i] = -1
         zyngui.screens['layers_for_track'].fill_list()
 
-        if zyngui.active_midi_channel == chan:
-            logging.error("Reselect any available sound since it is removing current selected channel")
-            zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
-        else:
-            logging.error("Do not Reselect track sound since it is not removing current selected channel")
+        self.select_correct_layer()
 
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()

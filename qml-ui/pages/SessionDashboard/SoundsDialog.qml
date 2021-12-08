@@ -260,28 +260,30 @@ QQC2.Dialog {
                                 for (var i=0; i<zynthian.zynthiloops.song.tracksModel.count; i++) {
                                     var found = false;
                                     var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                    var chains = zynthian.layer.chainForLayer(i);
 
-//                                    console.log("Track T"+(parseInt(k)+1))
+                                    // console.log("Track T"+(parseInt(k)+1))
 
                                     for (var k in track.chainedSounds) {
-                                        var chains = zynthian.layer.chainForLayer(i);
-//                                        console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
+                                        // console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
 
-                                        if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && (soundBtnDelegate.layerIndex === track.chainedSounds[k] || (chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0))) {
+                                        if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
                                             console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
-											soundBtnDelegate.hasTrack = (chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0)
-
-                                            break;
+                                            soundBtnDelegate.hasTrack = true;
                                         }
                                     }
 
                                     // Break out of loop when first connected track is found
                                     if (found) {
                                         break;
+                                    } else if ((chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0)) {
+                                        soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
+                                        soundBtnDelegate.isChained = true;
+                                        soundBtnDelegate.hasTrack = false;
                                     }
                                 }
                             }

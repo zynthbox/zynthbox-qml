@@ -189,7 +189,7 @@ Kirigami.AbstractApplicationWindow {
                     for (var id in root.selectedTrack.chainedSounds) {
                         if (root.selectedTrack.chainedSounds[id] >= 0 &&
                             root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0] + "ˬ";
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
                             break;
                         }
                     }

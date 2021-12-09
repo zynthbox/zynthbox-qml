@@ -562,6 +562,11 @@ class zynthian_gui_control(zynthian_gui_selector):
 		return True
 
 	def back_action(self):
+		if self.__single_effect_engine != None:
+			if "MIDI" in self.__single_effect_engine:
+				return "layer_midi_effect_chooser"
+			else:
+				return "layer_effect_chooser"
 		# If in controller map selection, back to instrument control
 		if self.mode=='select':
 			self.set_mode_control()

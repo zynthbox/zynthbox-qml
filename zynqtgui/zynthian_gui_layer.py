@@ -547,7 +547,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.layer_index_replace_engine = None
 		if layer.engine.type != "Audio Effect":
 			self.zyngui.show_screen(self.page_after_layer_creation)
-			logging.error("AAAAAAAAA {}".format(midich ))
 			self.zyngui.screens['fixed_layers'].select_action(midich)
 			if not self.zyngui.screens['bank'].get_show_top_sounds():
 				self.zyngui.screens['bank'].select_action(0)

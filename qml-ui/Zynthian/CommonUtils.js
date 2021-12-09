@@ -3,12 +3,12 @@
 function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
     var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+    zynthian.zynthiloops.startPlayback();
     if (sequence) {
         sequence.startSequencePlayback();
     } else {
         console.debug("Sequence could not be fetched, and playback could not be started");
     }
-    zynthian.zynthiloops.startPlayback();
     console.log("Metronome and Playback Started");
 }
 

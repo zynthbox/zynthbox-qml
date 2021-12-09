@@ -350,6 +350,7 @@ ColumnLayout {
                                     color: Kirigami.Theme.textColor
                                     source: trackDelegate.selectedClip.path
                                     visible: !trackDelegate.trackHasConnectedPattern && trackDelegate.hasWavLoaded
+                                    clip: true
 
                                     Rectangle {
                                         x: 0

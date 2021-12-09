@@ -540,6 +540,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.index = self.root_layers.index(root_layer)
 					self.layer_control(layer)
 					self.current_index_changed.emit()
+					self.zyngui.screens['preset'].select_action(self.zyngui.screens['preset'].current_index)
 				except Exception as e:
 					logging.error(e)
 					self.zyngui.show_screen('layer')

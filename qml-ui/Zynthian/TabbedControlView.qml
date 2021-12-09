@@ -295,7 +295,7 @@ Item {
                     margins: -1
                 }
                 color: "transparent"
-                border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
+                border.color: tabsLayout.children.length > 1 ? Kirigami.Theme.highlightColor : "transparent"
                 visible: primaryTabsScope.focus && root.visibleFocusRects
                 radius: 3
             }
@@ -382,7 +382,7 @@ Item {
                         margins: -1
                     }
                     color: "transparent"
-                    border.color: tabsLayout.children.length > 1 ? tabsLayout.children[0].palette.highlight : "transparent"
+                    border.color: tabsLayout.children.length > 1 ? Kirigami.Theme.highlightColor : "transparent"
                     visible: secondaryTabsScope.focus && root.visibleFocusRects
                     radius: 3
                 }

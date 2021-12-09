@@ -31,6 +31,7 @@ import math
 import base64
 import logging
 import collections
+import jack
 from collections import OrderedDict
 from json import JSONEncoder, JSONDecoder
 from pathlib import Path
@@ -829,8 +830,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def set_audio_routing(self, audio_routing=None):
 		for i, layer in enumerate(self.layers):
 			try:
-				layer.set_audio_out(audio_routing[layer.get_jackname()])
-			except:
+				outports = audio_routing[layer.get_jackname()]
+				sortedKeys = audio_routing.keys()
+
+				for i, element in enumerate(outports):
+					if element != "system:playback_1" and element!= "system:playback_2" and element not in sortedKeys and "-" in element:
+						base = element.split("-")[0]
+						for validKey in sortedKeys:
+							if validKey.startswith(base):
+								logging.error("{} had invalid output changing from {} to {}".format(layer.get_jackname(), outports[i], validKey))
+								outports[i] = validKey
+
+				layer.set_audio_out(outports)
+			#except:
+			except Exception as e:
+				logging.error("Resetting to default routing because: {}".format(e))
 				layer.reset_audio_out()
 
 

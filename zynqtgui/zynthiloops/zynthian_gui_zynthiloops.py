@@ -291,12 +291,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         jack_basenames = []
         selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
 
+        logging.error(f"### update_recorder_jack_port chainedSounds : {selected_track.chainedSounds}")
+
         for channel in selected_track.chainedSounds:
-            if channel >= 0:
-                try:
-                    jack_basenames.append(self.zyngui.screens['layer'].layer_midi_map[channel].jackname.split(":")[0]).split(":")[0]
-                except:
-                    pass
+            if channel >= 0 and selected_track.checkIfLayerExists(channel):
+                layer = self.zyngui.screens['layer'].layer_midi_map[channel]
+
+                logging.error(f"### FX Chain Layers : {self.zyngui.screens['layer'].get_fxchain_layers(layer)}")
+
+                for fxlayer in self.zyngui.screens['layer'].get_fxchain_layers(layer):
+                    logging.error(f"FX Layer : {fxlayer}, {fxlayer.jackname}")
+                    try:
+                        jack_basenames.append(fxlayer.jackname.split(":")[0])
+                    except Exception as e:
+                        logging.error(f"### update_recorder_jack_port Error : {str(e)}")
 
         for port in self.jack_client.get_all_connections('system:playback_1'):
             self.process_jack_port(port, self.jack_capture_port_a, jack_basenames)

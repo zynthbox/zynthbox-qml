@@ -216,7 +216,7 @@ ColumnLayout {
                                     QQC2.Label {
                                         Layout.fillWidth: false
                                         Layout.alignment: Qt.AlignCenter
-                                        text: qsTr("+%1").arg(Math.max(trackDelegate.track.chainedSounds.filter(function (e) { return e >= 0; }).length-1, 0))
+                                        text: qsTr("+%1").arg(Math.max(trackDelegate.track.chainedSounds.filter(function (e) { return e >= 0 && trackDelegate.track.checkIfLayerExists(e); }).length-1, 0))
                                     }
                                 }
 

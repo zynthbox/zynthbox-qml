@@ -314,8 +314,8 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
     @Slot(int, result=bool)
     def index_is_valid(self, index):
-        logging.error("index {} list_data {}".format(index, len(self.list_data)))
-        logging.error("midichan: {}".format(self.list_data[index][1]))
+        # logging.error("index {} list_data {}".format(index, len(self.list_data)))
+        # logging.error("midichan: {}".format(self.list_data[index][1]))
         midi_chan = self.list_data[index][1]
 
         if midi_chan < 0:

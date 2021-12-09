@@ -228,6 +228,7 @@ ColumnLayout {
                                         } else {
                                             // soundsDialog.open();
                                             console.log("Opening bottom drawer");
+                                            bottomTracksBar.forceActiveFocus();
                                             bottomStack.currentIndex = TracksView.BottomStackControlType.Sound;
                                             bottomDrawer.open();
                                         }
@@ -333,6 +334,7 @@ ColumnLayout {
                                                 sequence.activePattern = track.connectedPattern;
                                             } else if (trackDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
+                                                bottomBar.forceActiveFocus();
                                                 bottomStack.currentIndex = TracksView.BottomStackControlType.Wave;
                                                 bottomBar.controlType = ZynthiLoops.BottomBar.ControlType.Clip;
                                                 bottomBar.controlObj = trackDelegate.selectedClip;
@@ -680,6 +682,7 @@ ColumnLayout {
             }
 
             TracksViewSoundsBar {
+                id: bottomTracksBar
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }

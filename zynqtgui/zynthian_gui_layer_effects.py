@@ -60,7 +60,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		if len(self.list_data) == 1:
 			self.select_action(0)
 			self.zyngui.screens[self.types_screen].select_action(0)
-			self.zyngui.screens[self.effect_chooser_screen].select_action(0)
+			self.zyngui.screens[self.effect_chooser_screen].select(0) #Select, don't activate
 
 	def select(self, index=None):
 		self.current_effect_engine_changed.emit()

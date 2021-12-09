@@ -79,7 +79,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 
 	def select_action(self, i, t='S'):
-		if i is not None and i > 0 and i < len(self.list_data) and self.list_data[i][0]:
+		if i is not None and i >= 0 and i < len(self.list_data) and self.list_data[i][0]:
 			self.zyngui.start_loading()
 			if self.zyngui.screens[self.effects_screen].fx_layer != None and self.zyngui.screens[self.effects_screen].fx_layer in self.zyngui.screens['layer'].layers:
 				self.zyngui.screens['layer'].replace_layer_index = self.zyngui.screens['layer'].layers.index(self.zyngui.screens[self.effects_screen].fx_layer)

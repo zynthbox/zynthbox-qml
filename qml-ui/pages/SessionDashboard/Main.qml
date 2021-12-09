@@ -289,39 +289,42 @@ Zynthian.ScreenPage {
                         }
                     }
                 }
-            }
-            RowLayout {
-                Layout.alignment: Qt.AlignCenter
-                spacing: Kirigami.Units.gridUnit
 
-                QQC2.Button {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                    checkable: true
-                    checked: zynthian.zynthiloops.clickTrackEnabled
-                    onCheckedChanged: {
-                        zynthian.zynthiloops.clickTrackEnabled = checked;
+                RowLayout {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    QQC2.Button {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignCenter
+                        checkable: true
+                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        onCheckedChanged: {
+                            zynthian.zynthiloops.clickTrackEnabled = checked;
+                        }
+                        
+                        Kirigami.Icon {
+                            width: Kirigami.Units.gridUnit
+                            height: width
+                            anchors.centerIn: parent
+                            source: Qt.resolvedUrl("../../../img/metronome.svg")
+                            color: "#ffffff"
+                        }
                     }
 
-                    Kirigami.Icon {
-                        width: Kirigami.Units.gridUnit
-                        height: width
-                        anchors.centerIn: parent
-                        source: Qt.resolvedUrl("../../../img/metronome.svg")
-                        color: "#ffffff"
+                    QQC2.Label {
+                        Layout.alignment: Qt.AlignCenter
+                        font.pointSize: 12
+                        text: qsTr("%1 x Sounds | %2 x Midi")
+                        .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
+                        .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
                     }
-                }
 
-                QQC2.Label {
-                    font.pointSize: 12
-                    text: qsTr("%1 x Sounds | %2 x Midi")
-                            .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
-                            .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
-                }
-
-                Kirigami.Heading {
-                    id: clockLabel
-                    Layout.alignment: Qt.AlignCenter
+                    Kirigami.Heading {
+                        id: clockLabel
+                        Layout.alignment: Qt.AlignCenter
+                    }
                 }
             }
         }

@@ -824,6 +824,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		res = {}
 		for i, layer in enumerate(self.layers):
 			res[layer.get_jackname()] = layer.get_audio_out()
+		logging.error("XXXXXXX {}".format(res))
 		return res
 
 
@@ -831,17 +832,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for i, layer in enumerate(self.layers):
 			try:
 				outports = audio_routing[layer.get_jackname()]
-				sortedKeys = audio_routing.keys()
-
-				for i, element in enumerate(outports):
-					if element != "system:playback_1" and element!= "system:playback_2" and element not in sortedKeys and "-" in element:
-						base = element.split("-")[0]
-						for validKey in sortedKeys:
-							if validKey.startswith(base):
-								logging.error("{} had invalid output changing from {} to {}".format(layer.get_jackname(), outports[i], validKey))
-								outports[i] = validKey
-
-				layer.set_audio_out(outports)
+				layer.set_audio_out(audio_routing[layer.get_jackname()])
 			#except:
 			except Exception as e:
 				logging.error("Resetting to default routing because: {}".format(e))
@@ -1546,6 +1537,31 @@ class zynthian_gui_layer(zynthian_gui_selector):
 						else:
 							l2.set_midi_out([layer.get_jackname()])
 
+			# Strong heuristic to make sure the effect chains are properly connected
+			for layer in self.root_layers:
+				chain = self.get_fxchain_layers(layer)
+				if len(chain) > 1:
+					for sublayer in chain:
+						new_audio_out = []
+						needs_change = False
+						for othersublayer in chain:
+							if sublayer != othersublayer:
+								found = False
+								for othersublayer2 in chain:
+									if othersublayer2.jackname in othersublayer.audio_out:
+										found = True
+										break
+								if not found:
+									needs_change = True
+									for jackname in sublayer.audio_out:
+										base1 = othersublayer.jackname.split("-")[0]
+										base2 = jackname.split("-")[0]
+										if othersublayer.jackname != jackname and base1 == base2:
+											new_audio_out.append(othersublayer.jackname)
+										else:
+											new_audio_out.append(jackname)
+						if needs_change:
+							sublayer.set_audio_out(new_audio_out);
 
 			#Post action
 			if not quiet:

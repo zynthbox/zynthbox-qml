@@ -162,7 +162,7 @@ Kirigami.AbstractApplicationWindow {
                 onClicked: {
                     // As per #299, open library instead
                     // soundsDialog.visible = true
-                    zynthian.current_screen_id = "preset"
+                    zynthian.current_screen_id = "bank"
                 }
 
                 text: {

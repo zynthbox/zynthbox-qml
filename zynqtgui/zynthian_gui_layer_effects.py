@@ -59,6 +59,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		super().show()
 		if len(self.list_data) == 1:
 			self.select_action(0)
+			self.zyngui.screens[self.types_screen].select(0) #For some reason it needs a further select
 			self.zyngui.screens[self.types_screen].select_action(0)
 			self.zyngui.screens[self.types_screen].select(0) #For some reason it needs a further select
 			self.zyngui.screens[self.effect_chooser_screen].select(0) #Select, don't activate

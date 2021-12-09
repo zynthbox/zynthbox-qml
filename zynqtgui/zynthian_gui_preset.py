@@ -152,7 +152,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 					self.zyngui.start_loading()
 					engine_created = True
 					midi_chan = self.zyngui.curlayer.midi_chan
-					index_to_replace = self.zyngui.screens['layer'].layers.index(layer)
+					index_to_replace = self.zyngui.screens['layer'].root_layers.index(layer)
 					self.zyngui.screens['layer'].replace_layer_index = index_to_replace
 					self.zyngui.screens['layer'].layer_chain_parallel = False
 					self.zyngui.screens['layer'].layer_index_replace_engine = index_to_replace

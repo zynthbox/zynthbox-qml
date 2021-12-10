@@ -169,6 +169,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 					self.set_custom_control_page("")
 		except Exception as e:
 			logging.error("Can't parse control config '%s': %s" % (fpath, e))
+			if self.__single_effect_engine != None:
+				self.set_custom_control_page("")
 
 
 	def set_single_effect_engine(self, eng : str):

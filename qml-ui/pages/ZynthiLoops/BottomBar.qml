@@ -37,6 +37,7 @@ Zynthian.Card {
     property alias filePickerDialog: pickerDialog
     property var trackCopySource: null
     property var clipCopySource: null
+    property alias tabbedView: tabbedView
 
     leftPadding: 0
     rightPadding: 0
@@ -234,7 +235,7 @@ Zynthian.Card {
                 case BottomBar.ControlType.Clip:
                     return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
                 case BottomBar.ControlType.Track:
-                    return trackAction;
+                    return trackSoundsAction;
                 case BottomBar.ControlType.Part:
                     return partAction;
                 default:
@@ -292,6 +293,13 @@ Zynthian.Card {
                     text: qsTr("Info")
                     page: Qt.resolvedUrl("InfoBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: trackSoundsAction
+                    text: qsTr("Sounds")
+                    page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

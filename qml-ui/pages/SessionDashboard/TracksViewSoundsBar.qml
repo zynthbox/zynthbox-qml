@@ -147,6 +147,11 @@ Zynthian.Card {
         }
     }
 
+    function resetModel() {
+        chainedSoundsRepeater.model = [];
+        chainedSoundsRepeater.model = Qt.binding(function() { return chainedSounds; });
+    }
+
     padding: Kirigami.Units.gridUnit
     contentItem: ColumnLayout {
         anchors.margins: Kirigami.Units.gridUnit
@@ -182,7 +187,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
@@ -244,7 +249,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index
@@ -276,7 +281,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index
@@ -304,7 +309,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index
@@ -331,7 +336,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
@@ -379,7 +384,7 @@ Zynthian.Card {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
                         enabled: root.selectedRowIndex === index && fxLabel.text.length > 0
@@ -406,7 +411,8 @@ Zynthian.Card {
 
                         Layout.fillWidth: true
                         Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*0.1
+                        Layout.maximumHeight: Kirigami.Units.gridUnit*0.1
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit

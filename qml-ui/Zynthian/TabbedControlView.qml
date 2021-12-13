@@ -41,6 +41,7 @@ Item {
     property bool visibleFocusRects: true
     property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
     readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
+    readonly property QtObject activeItem: internalStack.currentItem
 
     property var cuiaCallback: function(cuia) {
         let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)

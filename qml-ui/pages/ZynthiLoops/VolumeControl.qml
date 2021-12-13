@@ -38,63 +38,7 @@ Rectangle {
             Layout.alignment: Qt.AlignLeft
             spacing: 8
 
-            Extras.Gauge {
-                id: audioGauge
 
-                Layout.fillHeight: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                Layout.leftMargin: 4
-
-                minimumValue: -40
-                maximumValue: 20
-
-                font.pointSize: 8
-
-                style: GaugeStyle {
-                    valueBar: Rectangle {
-                        color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                        implicitWidth: 6
-                    }
-                    minorTickmark: Item {
-                        implicitWidth: 8
-                        implicitHeight: 1
-
-                        Rectangle {
-                            color: "#cccccc"
-                            anchors.fill: parent
-                            anchors.leftMargin: 2
-                            anchors.rightMargin: 4
-                        }
-                    }
-                    tickmark: Item {
-                        implicitWidth: 12
-                        implicitHeight: 1
-
-                        Rectangle {
-                            color: "#dfdfdf"
-                            anchors.fill: parent
-                            anchors.leftMargin: 3
-                            anchors.rightMargin: 3
-                        }
-                    }
-                    tickmarkLabel: QQC2.Label {
-                        text: {
-                            switch (styleData.value) {
-                                case -40:
-                                    return "-40"
-                                case 0:
-                                    return "0"
-                                case 20:
-                                    return "+6"
-                                default:
-                                    return ""
-                            }
-                        }
-
-                        font: audioGauge.font
-                    }
-                }
-            }
 
             QQC2.Slider {
                 id: slider
@@ -120,7 +64,7 @@ Rectangle {
                     radius: 2
                     color: "transparent"
 
-                    Canvas {
+                    /*Canvas {
                         readonly property real xCenter: width / 2
                         readonly property real yCenter: height / 2
                         property real shineLength: height * 0.95
@@ -142,13 +86,13 @@ Rectangle {
                             ctx.fillStyle = gradient;
                             ctx.fill();
                         }
-                    }
+                    }*/
 
                     Rectangle {
                         id: valueBox
                         width: parent.width
                         height: parent.height * (1 - slider.visualPosition)
-                        color: Kirigami.Theme.highlightColor
+                        color: "transparent"//Kirigami.Theme.highlightColor
                         radius: 2
                         anchors.bottom: parent.bottom
                     }
@@ -162,6 +106,68 @@ Rectangle {
                         anchors.topMargin: -height/2
                         anchors.horizontalCenter: valueBox.horizontalCenter
                         color: "white"
+                    }
+                    Extras.Gauge {
+                        id: audioGauge
+                        z: -1
+
+                        anchors {
+                            top: parent.top
+                            bottom:parent.bottom
+                            right: parent.right
+                        }
+                        //Layout.fillHeight: true
+                        //Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                        //Layout.leftMargin: 4
+                        minimumValue: -40
+                        maximumValue: 20
+
+                        font.pointSize: 8
+
+                        style: GaugeStyle {
+                            valueBar: Rectangle {
+                                color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                implicitWidth: 6
+                            }
+                            minorTickmark: Item {
+                                implicitWidth: 8
+                                implicitHeight: 1
+
+                                Rectangle {
+                                    color: "#cccccc"
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 2
+                                    anchors.rightMargin: 4
+                                }
+                            }
+                            tickmark: Item {
+                                implicitWidth: 12
+                                implicitHeight: 1
+
+                                Rectangle {
+                                    color: "#dfdfdf"
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 3
+                                    anchors.rightMargin: 3
+                                }
+                            }
+                            tickmarkLabel: QQC2.Label {
+                                text: {
+                                    switch (styleData.value) {
+                                        case -40:
+                                            return "-40"
+                                        case 0:
+                                            return "0"
+                                        case 20:
+                                            return "+6"
+                                        default:
+                                            return ""
+                                    }
+                                }
+
+                                font: audioGauge.font
+                            }
+                        }
                     }
                 }
             }

@@ -411,8 +411,8 @@ Zynthian.Card {
 
                         Layout.fillWidth: true
                         Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*0.1
-                        Layout.maximumHeight: Kirigami.Units.gridUnit*0.1
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
+                        //Layout.maximumHeight: Kirigami.Units.gridUnit*0.1
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit

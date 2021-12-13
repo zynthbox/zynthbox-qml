@@ -48,7 +48,8 @@ QQC2.AbstractButton {
 //            // text: "Clip " + (clip.col+1) // clip.name
 //            // text2: clip.length + " Bar"
 //        }
-        TableHeaderLabel {
+        // FIXME: why TableHeaderLabel has a size of 0?
+        QQC2.Label {
             anchors {
                 right: parent.right
                 bottom: parent.bottom

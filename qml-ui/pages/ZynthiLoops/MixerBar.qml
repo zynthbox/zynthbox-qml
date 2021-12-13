@@ -128,23 +128,72 @@ Rectangle {
                             width: privateProps.cellWidth
                             height: ListView.view.height
 
-                            VolumeControl {
-                                property var audioLevelText: model.track.audioLevel.toFixed(2)
-
+                            Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
 
-                                headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
-                                footerText: model.track.name
-                                audioLeveldB: model.track.audioLevel
+                                VolumeControl {
+                                    property var audioLevelText: model.track.audioLevel.toFixed(2)
 
-                                slider.value: model.track.volume
-                                slider.onValueChanged: {
-                                    model.track.volume = slider.value
+                                    anchors.fill: parent
+
+                                    headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+                                    footerText: model.track.name
+                                    audioLeveldB: model.track.audioLevel
+
+                                    slider.value: model.track.volume
+                                    slider.onValueChanged: {
+                                        model.track.volume = slider.value
+                                    }
+
+                                    onDoubleClicked: {
+                                        slider.value = model.track.initialVolume;
+                                    }
                                 }
 
-                                onDoubleClicked: {
-                                    slider.value = model.track.initialVolume;
+                                QQC2.Label {
+                                    id: soundLabel
+                                    anchors.left: parent.right
+                                    anchors.bottom: parent.bottom
+                                    transform: Rotation {
+                                        origin.x: -10
+                                        angle: -90
+                                    }
+                                    font.pointSize: 8
+
+                                    text: {
+                                        soundLabel.updateSoundName();
+                                    }
+
+                                    Connections {
+                                        target: zynthian.fixed_layers
+                                        onList_updated: {
+                                            soundLabel.updateSoundName();
+                                        }
+                                    }
+
+                                    Connections {
+                                        target: model.track
+                                        onChainedSoundsChanged: {
+                                            soundLabel.updateSoundName();
+                                        }
+                                    }
+
+                                    elide: "ElideRight"
+
+                                    function updateSoundName() {
+                                        var text = "";
+
+                                        for (var id in model.track.chainedSounds) {
+                                            if (model.track.chainedSounds[id] >= 0 &&
+                                                model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                text = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]);
+                                                break;
+                                            }
+                                        }
+
+                                        soundLabel.text = text;
+                                    }
                                 }
                             }
 

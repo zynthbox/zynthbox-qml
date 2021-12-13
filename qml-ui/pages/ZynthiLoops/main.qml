@@ -354,6 +354,13 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Track;
                             bottomBar.controlObj = model.track;
 
+                            if (bottomBar.tabbedView.activeItem.resetModel) {
+                                // Reset model to load new changes if any
+                                bottomBar.tabbedView.activeItem.resetModel();
+                            } else {
+                                console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
+                            }
+
                             zynthian.session_dashboard.selectedTrack = index;
 
                             if (mixerActionBtn.checked) {

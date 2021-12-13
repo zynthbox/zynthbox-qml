@@ -181,6 +181,7 @@ Zynthian.ScreenPage {
                 sceneActionBtn.checked = false;
                 mixerActionBtn.checked = true;
                 bottomStack.currentIndex = 1;
+                bottomBar.controlObj = root.song;
             }
         }
     }

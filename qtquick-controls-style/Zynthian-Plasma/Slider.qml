@@ -29,8 +29,8 @@ T.Slider {
         x: Math.round(control.leftPadding + (horizontal ? control.visualPosition * (control.availableWidth - width) : (control.availableWidth - width) / 2))
         y: Math.round(control.topPadding + (horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight) - height/2))
 
-        width: grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").width : firstHandle.width
-        height: grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").height : firstHandle.height
+        width: Math.min(control.width, grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").width : firstHandle.width)
+        height: Math.min(control.height, grooveSvg.hasElement("hint-handle-size") ? grooveSvg.elementSize("hint-handle-size").height : firstHandle.height)
 
         Private.RoundShadow {
             anchors.fill: firstHandle
@@ -57,8 +57,8 @@ T.Slider {
         readonly property bool horizontal: control.orientation === Qt.Horizontal
         implicitWidth: horizontal ? PlasmaCore.Units.gridUnit * 8 : margins.left + margins.right
         implicitHeight: horizontal ? margins.top + margins.bottom : PlasmaCore.Units.gridUnit * 8
-        width: horizontal ? control.availableWidth : implicitWidth
-        height: horizontal ? implicitHeight : control.availableHeight
+        width: Math.min(control.width, horizontal ? control.availableWidth : implicitWidth)
+        height: Math.min(control.height, horizontal ? implicitHeight : control.availableHeight)
         anchors.centerIn: parent
         scale: horizontal && control.mirrored ? -1 : 1
         opacity: control.enabled ? 1 : 0.6

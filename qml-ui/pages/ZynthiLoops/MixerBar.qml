@@ -127,73 +127,92 @@ Rectangle {
                         delegate: RowLayout {
                             width: privateProps.cellWidth
                             height: ListView.view.height
+                            spacing: 0
 
-                            Item {
+                            ColumnLayout {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                spacing: 0
 
-                                VolumeControl {
-                                    property var audioLevelText: model.track.audioLevel.toFixed(2)
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
 
-                                    anchors.fill: parent
+                                    VolumeControl {
+                                        property var audioLevelText: model.track.audioLevel.toFixed(2)
 
-                                    headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
-                                    footerText: model.track.name
-                                    audioLeveldB: model.track.audioLevel
+                                        anchors.fill: parent
 
-                                    slider.value: model.track.volume
-                                    slider.onValueChanged: {
-                                        model.track.volume = slider.value
+                                        headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+    //                                    footerText: model.track.name
+                                        audioLeveldB: model.track.audioLevel
+
+                                        slider.value: model.track.volume
+                                        slider.onValueChanged: {
+                                            model.track.volume = slider.value
+                                        }
+
+                                        onDoubleClicked: {
+                                            slider.value = model.track.initialVolume;
+                                        }
                                     }
 
-                                    onDoubleClicked: {
-                                        slider.value = model.track.initialVolume;
+                                    QQC2.Label {
+                                        id: soundLabel
+                                        anchors.left: parent.right
+                                        anchors.bottom: parent.bottom
+                                        anchors.leftMargin: -soundLabel.height
+                                        anchors.bottomMargin: -(soundLabel.height/2)
+                                        transform: Rotation {
+                                            origin.x: 0
+                                            origin.y: 0
+                                            angle: -90
+                                        }
+                                        font.pointSize: 8
+
+                                        text: {
+                                            soundLabel.updateSoundName();
+                                        }
+
+                                        Connections {
+                                            target: zynthian.fixed_layers
+                                            onList_updated: {
+                                                soundLabel.updateSoundName();
+                                            }
+                                        }
+
+                                        Connections {
+                                            target: model.track
+                                            onChainedSoundsChanged: {
+                                                soundLabel.updateSoundName();
+                                            }
+                                        }
+
+                                        elide: "ElideRight"
+
+                                        function updateSoundName() {
+                                            var text = "";
+
+                                            for (var id in model.track.chainedSounds) {
+                                                if (model.track.chainedSounds[id] >= 0 &&
+                                                    model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                    text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
+                                                    break;
+                                                }
+                                            }
+
+                                            soundLabel.text = text;
+                                        }
                                     }
                                 }
 
                                 QQC2.Label {
-                                    id: soundLabel
-                                    anchors.left: parent.right
-                                    anchors.bottom: parent.bottom
-                                    transform: Rotation {
-                                        origin.x: -10
-                                        angle: -90
-                                    }
-                                    font.pointSize: 8
-
-                                    text: {
-                                        soundLabel.updateSoundName();
-                                    }
-
-                                    Connections {
-                                        target: zynthian.fixed_layers
-                                        onList_updated: {
-                                            soundLabel.updateSoundName();
-                                        }
-                                    }
-
-                                    Connections {
-                                        target: model.track
-                                        onChainedSoundsChanged: {
-                                            soundLabel.updateSoundName();
-                                        }
-                                    }
-
+                                    Layout.alignment: Qt.AlignCenter
+                                    Layout.fillWidth: true
+                                    horizontalAlignment: "AlignHCenter"
                                     elide: "ElideRight"
-
-                                    function updateSoundName() {
-                                        var text = "";
-
-                                        for (var id in model.track.chainedSounds) {
-                                            if (model.track.chainedSounds[id] >= 0 &&
-                                                model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                text = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]);
-                                                break;
-                                            }
-                                        }
-
-                                        soundLabel.text = text;
-                                    }
+                                    text: model.track.name
                                 }
                             }
 

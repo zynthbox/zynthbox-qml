@@ -173,6 +173,18 @@ Zynthian.ScreenPage {
         return false;
     }
 
+    Connections {
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            // Select connected sound of selected track if not already selected
+            if (zynthian.current_screen_id === "zynthiloops") {
+                sceneActionBtn.checked = false;
+                mixerActionBtn.checked = true;
+                bottomStack.currentIndex = 1;
+            }
+        }
+    }
+
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
         bottomBar.controlType = BottomBar.ControlType.Song;

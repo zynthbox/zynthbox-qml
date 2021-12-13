@@ -353,6 +353,8 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Track;
                             bottomBar.controlObj = model.track;
 
+                            zynthian.session_dashboard.selectedTrack = index;
+
                             if (mixerActionBtn.checked) {
                                 bottomStack.currentIndex = 0
                                 mixerActionBtn.checked = false

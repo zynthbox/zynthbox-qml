@@ -19,8 +19,8 @@ Rectangle {
     border.width: highlight ? 1 : 0
     color: Kirigami.Theme.backgroundColor
     radius: 2
-    anchors.leftMargin: 8
-    anchors.rightMargin: 8
+    anchors.leftMargin: 2
+    anchors.rightMargin: 2
 
     ColumnLayout {
         anchors.fill: parent
@@ -154,13 +154,14 @@ Rectangle {
                     }
 
                     Rectangle {
-                        width: parent.width
-                        height: 2
+                        width: parent.width + 6
+                        height: width
+                        radius: width
 
                         anchors.top: valueBox.top
-                        anchors.left: valueBox.right
+                        anchors.topMargin: -height/2
+                        anchors.horizontalCenter: valueBox.horizontalCenter
                         color: "white"
-                        opacity: 0.7
                     }
                 }
             }
@@ -170,7 +171,9 @@ Rectangle {
             id: footerLabel
             Layout.alignment: Qt.AlignCenter
             Layout.maximumWidth: parent.width
+            horizontalAlignment: "AlignHCenter"
             elide: "ElideRight"
+            visible: text && text.length>0
         }
     }
 

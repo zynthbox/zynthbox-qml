@@ -48,6 +48,7 @@ Zynthian.Card {
         Clip,
         Track,
         Part,
+        Pattern,
         None
     }
 
@@ -79,6 +80,8 @@ Zynthian.Card {
                                 return qsTr("TRACK: %1").arg(text);
                             case BottomBar.ControlType.Part:
                                 return qsTr("PART: %1").arg(text);
+                            case BottomBar.ControlType.Pattern:
+                                return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
                             default:
                                 return text;
                             }
@@ -238,6 +241,8 @@ Zynthian.Card {
                     return trackSoundsAction;
                 case BottomBar.ControlType.Part:
                     return partAction;
+                case BottomBar.ControlType.Pattern:
+                    return emptyAction;
                 default:
                     return waveAction;
                 }
@@ -313,6 +318,13 @@ Zynthian.Card {
                     text: qsTr("FX")
                     page: Qt.resolvedUrl("FXBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: emptyAction
+                    text: qsTr("Empty")
+                    page: Qt.resolvedUrl("EmptyBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Pattern
                     initialProperties: {"bottomBar": root}
                 }
             ]

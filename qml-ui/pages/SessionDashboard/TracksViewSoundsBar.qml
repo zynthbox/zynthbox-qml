@@ -14,12 +14,14 @@ Zynthian.Card {
     property var chainedSounds: selectedTrack.chainedSounds
 
     onSelectedRowIndexChanged: {
-        var selectedSound = chainedSounds[selectedRowIndex]
-        if (selectedSound >= 0 &&
+       root.selectedMidiChannel = chainedSounds[selectedRowIndex]
+       /* if (selectedSound >= 0 &&
             selectedTrack.checkIfLayerExists(selectedSound) &&
             zynthian.active_midi_channel !== selectedSound) {
             zynthian.fixed_layers.activate_index(selectedSound);
-        }
+        }*/
+       print("AAAAA"+root.selectedMidiChannel)
+       zynthian.layer.showPresets(selectedSound)
     }
 
     function selectConnectedSound() {
@@ -152,11 +154,19 @@ Zynthian.Card {
                 }
 
             case "NAVIGATE_LEFT":
-                chainedSoundsRepeater.itemAt(root.selectedRowIndex).prevPreset();
+                var selectedMidiChannel = root.chainedSounds[root.selectedRowIndex];
+                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
+                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
+                }
                 return true;
 
             case "NAVIGATE_RIGHT":
-                chainedSoundsRepeater.itemAt(root.selectedRowIndex).nextPreset();
+                var selectedMidiChannel = root.chainedSounds[root.selectedRowIndex];
+                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+                    zynthian.layer.selectNextPreset(selectedMidiChannel);
+                    chainedSoundsRepeater.itemAt(root.selectedRowIndex).update();
+                }
                 return true;
 
             default:
@@ -188,29 +198,8 @@ Zynthian.Card {
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
-
-                function prevPreset() {
-                    if (soundDelegate.chainedSound >= 0 &&
-                        root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                        if (zynthian.preset.current_index > 0) {
-                            zynthian.preset.current_index--;
-                            zynthian.preset.activate_index(zynthian.preset.current_index);
-
-                            soundLabel.updateName();
-                        }
-                    }
-                }
-
-                function nextPreset() {
-                    if (soundDelegate.chainedSound >= 0 &&
-                        root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                        if (zynthian.preset.current_index < zynthian.preset.effective_count-1) {
-                            zynthian.preset.current_index++;
-                            zynthian.preset.activate_index(zynthian.preset.current_index);
-
-                            soundLabel.updateName();
-                        }
-                    }
+                function update() {
+                    soundLabel.updateName();
                 }
 
                 MouseArea {

@@ -63,6 +63,9 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 
 		self.replot = True
 
+		self.__was_current_page = False
+		self.zyngui.current_screen_id_changed.connect(self.check_current_screen)
+
 		## TODO: Heuristics to automatically split keyboard
 		#if self.note_high < 127:
 			#zynthian_gui_config.midi_filter_rules = "MAP CH#{ch} NON#0:{high} => CH#{ch2} NON#0:{high}\nMAP CH#{ch} NOFF#0:{high} => CH#{ch2} NOFF#0:{high}\n".format(ch = self.chan, high = self.note_high, ch2 = self.chan+1)
@@ -74,6 +77,10 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 			#zynthian_gui_config.midi_filter_rules
 		#)
 
+	def check_current_screen(self):
+		if self.__was_current_page:
+			self.zyngui.screens["fixed_layers"].fill_list()
+		self.__was_current_page = (self.zyngui.current_screen_id == "midi_key_range")
 
 	def config(self, chan):
 		self.chan = chan
@@ -207,8 +214,6 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 				logging.debug("SETTING FILTER HALFTONE TRANS.: {}".format(self.halftone_trans))
 				zyncoder.lib_zyncoder.set_midi_filter_halftone_trans(self.chan, int(self.halftone_trans))
 				self.replot = True
-
-			self.zyngui.screens["fixed_layers"].fill_list()
 
 		return [0]
 

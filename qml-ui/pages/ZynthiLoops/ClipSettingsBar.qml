@@ -69,7 +69,7 @@ GridLayout {
         dial {
             stepSize: 1
             from: 1
-            to: 16
+            to: 64
         }
 
         onDoubleClicked: {

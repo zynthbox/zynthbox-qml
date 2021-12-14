@@ -176,9 +176,9 @@ Rectangle {
 
                                         Kirigami.Theme.inherit: false
                                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                        color: Kirigami.Theme.backgroundColor
+                                        color: "transparent"
 
-                                        border.color: "#ff999999"
+                                        border.color: "transparent"
                                         border.width: 1
                                         radius: 4
 
@@ -187,10 +187,10 @@ Rectangle {
 
                                             anchors.left: parent.left
                                             anchors.right: parent.right
-                                            anchors.leftMargin: Kirigami.Units.gridUnit
-                                            anchors.rightMargin: Kirigami.Units.gridUnit
-
+//                                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+//                                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
                                             anchors.verticalCenter: parent.verticalCenter
+                                            elide: "ElideRight"
 
                                             font.pointSize: 8
 
@@ -211,8 +211,6 @@ Rectangle {
                                                     soundLabel.updateSoundName();
                                                 }
                                             }
-
-                                            elide: "ElideRight"
 
                                             function updateSoundName() {
                                                 var text = "";

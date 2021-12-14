@@ -239,6 +239,7 @@ GridLayout {
                     Zynthian.CommonUtils.startMetronomeAndPlayback();
                 } else {
                     controlObj.stopRecording();
+                    zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(controlObj);
                 }
             }
         }

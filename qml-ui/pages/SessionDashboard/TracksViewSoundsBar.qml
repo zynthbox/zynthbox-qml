@@ -13,17 +13,6 @@ Zynthian.Card {
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
 
-    onSelectedRowIndexChanged: {
-       root.selectedMidiChannel = chainedSounds[selectedRowIndex]
-       /* if (selectedSound >= 0 &&
-            selectedTrack.checkIfLayerExists(selectedSound) &&
-            zynthian.active_midi_channel !== selectedSound) {
-            zynthian.fixed_layers.activate_index(selectedSound);
-        }*/
-       print("AAAAA"+root.selectedMidiChannel)
-       zynthian.layer.showPresets(selectedSound)
-    }
-
     function selectConnectedSound() {
         if (selectedTrack.connectedSound >= 0) {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);

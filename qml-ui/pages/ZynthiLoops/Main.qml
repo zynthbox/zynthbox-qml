@@ -487,6 +487,7 @@ Zynthian.ScreenPage {
 
                                             if (track.connectedPattern >= 0) {
                                                 var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                                seq.bank = model.clip.col === 0 ? "A" : "B";
                                                 seq.enabled = model.clip.inCurrentScene;
 
                                                 console.log("Clip Row :", model.clip.row, ", Enabled :", seq.enabled);

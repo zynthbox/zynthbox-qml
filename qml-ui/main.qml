@@ -393,6 +393,41 @@ Kirigami.AbstractApplicationWindow {
         Item {
             Layout.fillWidth: true
         }
+
+
+        QQC2.Button {
+            Layout.preferredWidth: Kirigami.Units.gridUnit*4
+            Layout.preferredHeight: Kirigami.Units.gridUnit*2
+            enabled: !zynthian.zynthiloops.isMetronomeRunning
+            onClicked: {
+                Zynthian.CommonUtils.startMetronomeAndPlayback();
+            }
+
+            Kirigami.Icon {
+                width: Kirigami.Units.gridUnit
+                height: width
+                anchors.centerIn: parent
+                source: "media-playback-start"
+                color: parent.enabled ? "white" : "#99999999"
+            }
+        }
+        QQC2.Button {
+            Layout.preferredWidth: Kirigami.Units.gridUnit*4
+            Layout.preferredHeight: Kirigami.Units.gridUnit*2
+            enabled: zynthian.zynthiloops.isMetronomeRunning
+            onClicked: {
+                Zynthian.CommonUtils.stopMetronomeAndPlayback();
+            }
+
+            Kirigami.Icon {
+                width: Kirigami.Units.gridUnit
+                height: width
+                anchors.centerIn: parent
+                source: "media-playback-stop"
+                color: parent.enabled ? "white" : "#99999999"
+            }
+        }
+
         Zynthian.StatusInfo {}
     }
     pageStack: screensLayer

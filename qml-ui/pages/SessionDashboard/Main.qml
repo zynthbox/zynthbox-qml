@@ -251,6 +251,27 @@ Zynthian.ScreenPage {
                 text: zynthian.zynthiloops.song.name
             }
             Item {
+                Layout.preferredWidth: Kirigami.Units.gridUnit
+            }
+            QQC2.Button {
+                text: "1-6"
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                checked: zynthian.session_dashboard.visibleTracksStart == 0
+                onClicked: {
+                    zynthian.session_dashboard.visibleTracksStart = 0;
+                    zynthian.session_dashboard.visibleTracksEnd = 5;
+                }
+            }
+            QQC2.Button {
+                text: "7-12"
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                checked: zynthian.session_dashboard.visibleTracksStart == 6
+                onClicked: {
+                    zynthian.session_dashboard.visibleTracksStart = 6;
+                    zynthian.session_dashboard.visibleTracksEnd = 11;
+                }
+            }
+            Item {
                 Layout.fillWidth: true
 
                 RowLayout {

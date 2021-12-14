@@ -173,6 +173,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         client.connect("system:capture_1", port_l.name)
         client.connect("system:capture_2", port_r.name)
 
+    def back_action(self):
+        return "zynthiloops"
+
     ### Property captureAudioLevelLeft
     def get_capture_audio_level_left(self):
         return self.__capture_audio_level_left__

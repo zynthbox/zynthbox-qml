@@ -262,7 +262,8 @@ class zynthian_gui_status_data(QObject):
 class zynthian_gui(QObject):
 
     screens_sequence = (
-        "session_dashboard",  #FIXME or main? make this more configurable?
+        #"session_dashboard",  #FIXME or main? make this more configurable?
+        "zynthiloops",
         "layers_for_track",
         "bank",
         "preset",
@@ -271,7 +272,7 @@ class zynthian_gui(QObject):
         "layer_midi_effects",
     )
     non_modal_screens = (
-        "session_dashboard",  #FIXME or main? make this more configurable?
+        #"session_dashboard",  #FIXME or main? make this more configurable?
         "main",
         "layer",
         "fixed_layers",
@@ -358,7 +359,7 @@ class zynthian_gui(QObject):
         super(zynthian_gui, self).__init__(parent)
         self.zynmidi = None
         self.screens = {}
-        self.__home_screen = "session_dashboard" #TODO: make this configurable, put same in static screens_sequence
+        self.__home_screen = "zynthiloops" #TODO: make this configurable, put same in static screens_sequence
         self.active_screen = None
         self.modal_screen = None
         self.modal_screen_back = None

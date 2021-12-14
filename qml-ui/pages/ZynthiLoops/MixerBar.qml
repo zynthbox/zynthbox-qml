@@ -139,6 +139,8 @@ Rectangle {
                                     Layout.fillHeight: true
 
                                     VolumeControl {
+                                        id: volumeControl
+
                                         property var audioLevelText: model.track.audioLevel.toFixed(2)
 
                                         anchors.fill: parent
@@ -157,52 +159,75 @@ Rectangle {
                                         }
                                     }
 
-                                    QQC2.Label {
-                                        id: soundLabel
+                                    Rectangle {
+                                        width: volumeControl.slider.height
+                                        height: soundLabel.height*1.5
+
                                         anchors.left: parent.right
                                         anchors.bottom: parent.bottom
-                                        anchors.leftMargin: -soundLabel.height
+                                        anchors.leftMargin: -soundLabel.height*2
                                         anchors.bottomMargin: -(soundLabel.height/2)
+
                                         transform: Rotation {
                                             origin.x: 0
                                             origin.y: 0
                                             angle: -90
                                         }
-                                        font.pointSize: 8
 
-                                        text: {
-                                            soundLabel.updateSoundName();
-                                        }
+                                        Kirigami.Theme.inherit: false
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                        color: Kirigami.Theme.backgroundColor
 
-                                        Connections {
-                                            target: zynthian.fixed_layers
-                                            onList_updated: {
+                                        border.color: "#ff999999"
+                                        border.width: 1
+                                        radius: 4
+
+                                        QQC2.Label {
+                                            id: soundLabel
+
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.leftMargin: Kirigami.Units.gridUnit
+                                            anchors.rightMargin: Kirigami.Units.gridUnit
+
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            font.pointSize: 8
+
+                                            text: {
                                                 soundLabel.updateSoundName();
                                             }
-                                        }
 
-                                        Connections {
-                                            target: model.track
-                                            onChainedSoundsChanged: {
-                                                soundLabel.updateSoundName();
-                                            }
-                                        }
-
-                                        elide: "ElideRight"
-
-                                        function updateSoundName() {
-                                            var text = "";
-
-                                            for (var id in model.track.chainedSounds) {
-                                                if (model.track.chainedSounds[id] >= 0 &&
-                                                    model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
-                                                    text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
-                                                    break;
+                                            Connections {
+                                                target: zynthian.fixed_layers
+                                                onList_updated: {
+                                                    soundLabel.updateSoundName();
                                                 }
                                             }
 
-                                            soundLabel.text = text;
+                                            Connections {
+                                                target: model.track
+                                                onChainedSoundsChanged: {
+                                                    soundLabel.updateSoundName();
+                                                }
+                                            }
+
+                                            elide: "ElideRight"
+
+                                            function updateSoundName() {
+                                                var text = "";
+
+                                                for (var id in model.track.chainedSounds) {
+                                                    if (model.track.chainedSounds[id] >= 0 &&
+                                                        model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                        var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                        text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
+                                                        break;
+                                                    }
+                                                }
+
+                                                soundLabel.text = text;
+                                            }
                                         }
                                     }
                                 }

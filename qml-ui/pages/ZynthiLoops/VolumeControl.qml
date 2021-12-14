@@ -38,8 +38,6 @@ Rectangle {
             Layout.alignment: Qt.AlignLeft
             spacing: 8
 
-
-
             QQC2.Slider {
                 id: slider
 
@@ -48,6 +46,7 @@ Rectangle {
                 Layout.preferredWidth: parent.width/2
                 Layout.topMargin: 6
                 Layout.bottomMargin: 6
+                Layout.leftMargin: 30
 
                 orientation: Qt.Vertical
                 from: -40

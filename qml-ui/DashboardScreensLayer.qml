@@ -32,6 +32,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 import "pages/SessionDashboard" as Dash
+import "pages/ZynthiLoops" as ZL
 
 Zynthian.Stack {
     id: root
@@ -44,10 +45,14 @@ Zynthian.Stack {
     }
 
     property var pageCache: {
-        "session_dashboard": dashboard
+        //"session_dashboard": dashboard
+        "zynthiloops": zynthiloops
     }
-    initialItem: Dash.Main {
-        id: dashboard
+    //initialItem: Dash.Main {
+        //id: dashboard
+    //}
+    initialItem: ZL.Main {
+        id: zynthiloops
     }
     data: [
         Timer {
@@ -79,11 +84,11 @@ Zynthian.Stack {
 
 
                 // Skipping modal screen requests
-                if (zynthian.current_screen_id === zynthian.current_modal_screen_id) {
+                /*if (zynthian.current_screen_id === zynthian.current_modal_screen_id) {
                     root.clear(QQC2.StackView.PopTransition);
                     root.depthChanged()
                     return;
-                }
+                }*/
 
 
                 if (root.currentItem && root.currentItem.hasOwnProperty("screenId") && root.currentItem.screenId === zynthian.current_screen_id) {

@@ -77,6 +77,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
         self.show()
 
+    def back_action(self):
+        return "zynthiloops"
+
     def selected_track_changed_handler(self):
         self.selected_track_name_changed.emit()
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)

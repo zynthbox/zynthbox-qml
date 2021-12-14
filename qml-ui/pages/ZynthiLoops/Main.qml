@@ -484,8 +484,15 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        bottomBar.controlType = BottomBar.ControlType.Clip;
-                                        bottomBar.controlObj = model.clip;
+                                        if (track.connectedPattern >= 0) {
+                                            bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                            bottomBar.controlObj = model.clip;
+                                        } else {
+                                            bottomBar.controlType = BottomBar.ControlType.Clip;
+                                            bottomBar.controlObj = model.clip;
+                                        }
+
+
                                         if (dblTimer.running || sceneActionBtn.checked) {
                                             root.song.scenesModel.toggleClipInCurrentScene(model.clip);
 

@@ -170,6 +170,10 @@ Zynthian.ScreenPage {
             return bottomBar.filePickerDialog.cuiaCallback(cuia);
         }
 
+        if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
+            return bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
+        }
+
         return false;
     }
 

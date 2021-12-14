@@ -13,6 +13,15 @@ Zynthian.Card {
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
 
+    onSelectedRowIndexChanged: {
+        var selectedSound = chainedSounds[selectedRowIndex]
+        if (selectedSound >= 0 &&
+            selectedTrack.checkIfLayerExists(selectedSound) &&
+            zynthian.active_midi_channel !== selectedSound) {
+            zynthian.fixed_layers.activate_index(selectedSound);
+        }
+    }
+
     function selectConnectedSound() {
         if (selectedTrack.connectedSound >= 0) {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
@@ -142,6 +151,14 @@ Zynthian.Card {
                     return false;
                 }
 
+            case "NAVIGATE_LEFT":
+                chainedSoundsRepeater.itemAt(root.selectedRowIndex).prevPreset();
+                return true;
+
+            case "NAVIGATE_RIGHT":
+                chainedSoundsRepeater.itemAt(root.selectedRowIndex).nextPreset();
+                return true;
+
             default:
                 return false;
         }
@@ -172,6 +189,30 @@ Zynthian.Card {
                 color: "transparent"
                 radius: 4
 
+                function prevPreset() {
+                    if (soundDelegate.chainedSound >= 0 &&
+                        root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                        if (zynthian.preset.current_index > 0) {
+                            zynthian.preset.current_index--;
+                            zynthian.preset.activate_index(zynthian.preset.current_index);
+
+                            soundLabel.updateName();
+                        }
+                    }
+                }
+
+                function nextPreset() {
+                    if (soundDelegate.chainedSound >= 0 &&
+                        root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                        if (zynthian.preset.current_index < zynthian.preset.effective_count-1) {
+                            zynthian.preset.current_index++;
+                            zynthian.preset.activate_index(zynthian.preset.current_index);
+
+                            soundLabel.updateName();
+                        }
+                    }
+                }
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -201,6 +242,7 @@ Zynthian.Card {
                         radius: 4
 
                         QQC2.Label {
+                            id: soundLabel
                             anchors {
                                 verticalCenter: parent.verticalCenter
                                 left: parent.left
@@ -212,6 +254,10 @@ Zynthian.Card {
                             text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound)
 
                             elide: "ElideRight"
+
+                            function updateName() {
+                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound)
+                            }
                         }
 
                         MouseArea {
@@ -316,7 +362,10 @@ Zynthian.Card {
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 // Open library edit page
+
+                                // Not sure if switching to the channel is required here
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
+
                                 zynthian.current_modal_screen_id = "midi_key_range";
 
                                 bottomDrawer.close();
@@ -327,7 +376,7 @@ Zynthian.Card {
                             width: Math.round(Kirigami.Units.gridUnit)
                             height: width
                             anchors.centerIn: parent
-                            source: "documentinfo"
+                            source: "settings-configure"
                             color: Kirigami.Theme.textColor
                         }
                     }

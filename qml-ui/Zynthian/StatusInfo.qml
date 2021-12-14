@@ -301,7 +301,7 @@ MouseArea {
         id: popup
         y: parent.height
         modal: true
-        width: Kirigami.Units.gridUnit * 20
+        width: Kirigami.Units.gridUnit * 30
         height: Kirigami.Units.gridUnit * 15
         x: parent.width - width
         contentItem: GridLayout {
@@ -363,43 +363,55 @@ MouseArea {
                 }
             }
 
-            Card {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-                contentItem: RowLayout {
-                    Layout.alignment: Qt.AlignLeft
-                    QQC2.Label {
-                        text: qsTr("Click")
-                    }
+            RowLayout {
+                Layout.columnSpan: 3
+                Card {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    contentItem: RowLayout {
+                        Layout.alignment: Qt.AlignLeft
+                        QQC2.Label {
+                            text: qsTr("Click")
+                        }
 
-                    QQC2.Switch {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.zynthiloops.clickTrackEnabled
-                        onToggled: {
-                            zynthian.zynthiloops.clickTrackEnabled = checked
+                        QQC2.Switch {
+                            Layout.alignment: Qt.AlignVCenter
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                            checked: zynthian.zynthiloops.clickTrackEnabled
+                            onToggled: {
+                                zynthian.zynthiloops.clickTrackEnabled = checked
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
                         }
                     }
-                    Item {
-                        Layout.fillWidth: true
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Stop All Notes")
+                    onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Start Playback")
+                    onClicked: {
+                        Zynthian.CommonUtils.startMetronomeAndPlayback();
                     }
                 }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                text: qsTr("Stop All Notes")
-                onClicked: zynthian.callable_ui_action("ALL_NOTES_OFF")
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-                text: qsTr("Stop Playback")
-                onClicked: {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Stop Playback")
+                    onClicked: {
+                        Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                    }
                 }
             }
         }

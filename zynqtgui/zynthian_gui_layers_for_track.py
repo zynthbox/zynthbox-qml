@@ -91,6 +91,8 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             pass
         super().fill_list()
 
+    def back_action(self):
+        return "zynthiloops"
 
     def layer_selection_consistency_check(self):
         if self.zyngui.screens['layer'].is_channel_valid(self.current_index):

@@ -67,9 +67,7 @@ Zynthian.Card {
         interval: 250
         onTriggered: {
             bottomDrawer.open()
-			print("AAAAAA"+zynthian.current_modal_screen_id)
             zynthian.current_modal_screen_id = "session_dashboard"
-			print("BBBBBB"+zynthian.current_modal_screen_id)
         }
     }
     Connections {

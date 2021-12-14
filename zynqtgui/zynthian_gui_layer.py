@@ -76,7 +76,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if self.is_midi_cloned(chan, i) or self.is_midi_cloned(i, chan):
 				chain.append(i)
 		chain.sort()
-		logging.error("AAAAA {}".format(chain))
 		return chain
 
 	@Slot(int, result=str)
@@ -87,6 +86,24 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			res += ",{}".format(el)
 		return res
 
+	@Slot(int)
+	def selectPrevPreset(self, midi_chan):
+		if midi_chan in self.layer_midi_map:
+			layer = self.layer_midi_map[midi_chan]
+			layer.set_preset(max(0, layer.preset_index - 1), True)
+			logging.error(layer.preset_index)
+			self.zyngui.screens['control'].show()
+			self.fill_list()
+
+
+	@Slot(int)
+	def selectNextPreset(self, midi_chan):
+		if midi_chan in self.layer_midi_map:
+			layer = self.layer_midi_map[midi_chan]
+			layer.set_preset(min(layer.preset_index + 1, len(layer.preset_list) -1), True)
+			logging.error(layer.preset_index)
+			self.zyngui.screens['control'].show()
+			self.fill_list()
 
 	def reset(self):
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel

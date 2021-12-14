@@ -56,8 +56,7 @@ Zynthian.Card {
         target: zynthian.layer
         enabled: false
         onLayer_created: {
-            print("AAAAAAAA")
-            zynthian.current_screen_id = "session_dashboard"
+            zynthian.current_modal_screen_id = "session_dashboard"
             bottomDrawer.open()
             backToSelection.enabled = false
             backToSelectionTimer.restart()
@@ -65,11 +64,12 @@ Zynthian.Card {
     }
     Timer {
         id: backToSelectionTimer
-        interval: 1250
+        interval: 250
         onTriggered: {
-            print("BBBBBBBBB")
-            zynthian.current_screen_id = "session_dashboard"
             bottomDrawer.open()
+			print("AAAAAA"+zynthian.current_modal_screen_id)
+            zynthian.current_modal_screen_id = "session_dashboard"
+			print("BBBBBB"+zynthian.current_modal_screen_id)
         }
     }
     Connections {
@@ -257,7 +257,7 @@ Zynthian.Card {
 
                                         applicationWindow().requestOpenLayerSetupDialog();
                                         //this depends on requirements
-                                       // backToSelection.enabled = true;
+                                        backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
                                             var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);

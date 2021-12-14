@@ -38,7 +38,7 @@ Kirigami.AbstractApplicationWindow {
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: {
-        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "session_dashboard") {
+        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "zynthiloops") {
             return dashboardLayer.currentItem;
         } else if (modalScreensLayer.depth > 0) {
             return modalScreensLayer.currentItem;
@@ -80,21 +80,28 @@ Kirigami.AbstractApplicationWindow {
     header: RowLayout {
             spacing: 0
             Zynthian.BreadcrumbButton {
-                id: homeButton
-                icon.name: "go-home"
+                id: menuButton
+                icon.name: "application-menu"
                 icon.color: customTheme.Kirigami.Theme.textColor
+                padding: Kirigami.Units.largeSpacing*1.5
+                rightPadding: Kirigami.Units.largeSpacing*1.5
+                onClicked: zynthian.current_screen_id = 'main'
+                highlighted: zynthian.current_screen_id === 'main'
+            }
+            Zynthian.BreadcrumbButton {
+                id: homeButton
                 text: zynthian.zynthiloops.song.name
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 padding: Kirigami.Units.largeSpacing*1.5
                 rightPadding: Kirigami.Units.largeSpacing*1.5
                 onClicked: {
-                    zynthian.current_screen_id = 'session_dashboard'
+                    zynthian.current_modal_screen_id = 'zynthiloops'
                     // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
                 }
-                onPressAndHold: zynthian.current_screen_id = 'main'
-                highlighted: zynthian.current_screen_id === 'session_dashboard'
+                //onPressAndHold: zynthian.current_screen_id = 'main'
+                highlighted: zynthian.current_screen_id === 'zynthiloops'
             }
-            Zynthian.BreadcrumbButton {
+           /* Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("1-6")
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
@@ -115,7 +122,7 @@ Kirigami.AbstractApplicationWindow {
                     zynthian.session_dashboard.visibleTracksStart = 6;
                     zynthian.session_dashboard.visibleTracksEnd = 11;
                 }
-            }
+            }*/
             /*Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor

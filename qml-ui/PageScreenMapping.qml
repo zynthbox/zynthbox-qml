@@ -77,6 +77,7 @@ QtObject {
     }
 
     readonly property var modalScreens: {
+        "session_dashboard": "SessionDashboard/Main.qml",
         "midi_key_range": "MidiKeyRangePage.qml",
         "engine": "EnginePage.qml",
         "midi_chan": "MidiChanPage.qml",
@@ -102,7 +103,6 @@ QtObject {
         "playgrid": "PlayGrid.qml",
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "track": "TrackPage.qml",
-        "zynthiloops": "ZynthiLoops/main.qml",
         "song_arranger": "SongArranger/main.qml",
         "sketch_copier": "SketchCopier/main.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
@@ -113,6 +113,6 @@ QtObject {
 
     readonly property var dashboardScreens: {
         "main": "MainPage.qml",
-        "session_dashboard": "SessionDashboard/main.qml",
+        "zynthiloops": "ZynthiLoops/Main.qml",
     }
 }

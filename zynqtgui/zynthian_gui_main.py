@@ -69,11 +69,11 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata = []
 
         # Main Apps
+        self.list_data.append((self.zynthiloops, 0, "Clips View"))
+        self.list_metadata.append({"icon":"../../img/clipsview.svg"})
+
         self.list_data.append((self.session_dashboard, 0, "Tracks"))
         self.list_metadata.append({"icon":"../../img/tracks.svg"})
-
-        self.list_data.append((self.zynthiloops, 0, "Looper"))
-        self.list_metadata.append({"icon":"../../img/looper.svg"})
 
         self.list_data.append((self.song_arranger, 0, "Song Arranger"))
         self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
@@ -81,8 +81,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
         self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
         
-        self.list_data.append((self.playgrid, 0, "Play Grid"))
-        self.list_metadata.append({"icon":"../../img/playgrid.svg"})
+        self.list_data.append((self.playgrid, 0, "Playground"))
+        self.list_metadata.append({"icon":"../../img/playground.svg"})
         
         self.list_data.append((self.layers, 0, "Library"))
         self.list_metadata.append({"icon":"../../img/library.svg"})
@@ -260,7 +260,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         return "main"
 
     def back_action(self):
-        return "session_dashboard"
+        return "zynthiloops"
 
     def layers(self):
         logging.info("Layers")
@@ -309,7 +309,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def session_dashboard(self):
         logging.info("Session")
-        self.zyngui.show_screen("session_dashboard")
+        self.zyngui.show_modal("session_dashboard")
 
     def zynthiloops(self):
         logging.info("ZynthiLoops")

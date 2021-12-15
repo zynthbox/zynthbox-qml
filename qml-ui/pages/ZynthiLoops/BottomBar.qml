@@ -200,33 +200,51 @@ Zynthian.Card {
             orientation: Qt.Vertical
             visibleFocusRects: false
 
-            initialHeaderItem: EditableHeader {
+            initialHeaderItem: RowLayout {
                 visible: root.controlType === BottomBar.ControlType.Track
-                text: {
-                    let text = root.controlObj ? root.controlObj.name : "";
-                    switch (root.controlType) {
-                    case BottomBar.ControlType.Song:
-                        return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
-                    case BottomBar.ControlType.Clip:
-                        return qsTr("CLIP: %1").arg(text);
-                    case BottomBar.ControlType.Track:
-                        return qsTr("TRACK: %1").arg(text);
-                    case BottomBar.ControlType.Part:
-                        return qsTr("PART: %1").arg(text);
-                    case BottomBar.ControlType.Pattern:
-                        return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
-                    default:
-                        return text;
+                EditableHeader {
+                    text: {
+                        let text = root.controlObj ? root.controlObj.name : "";
+                        switch (root.controlType) {
+                        case BottomBar.ControlType.Song:
+                            return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                        case BottomBar.ControlType.Clip:
+                            return qsTr("CLIP: %1").arg(text);
+                        case BottomBar.ControlType.Track:
+                            return qsTr("TRACK: %1").arg(text);
+                        case BottomBar.ControlType.Part:
+                            return qsTr("PART: %1").arg(text);
+                        case BottomBar.ControlType.Pattern:
+                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+                        default:
+                            return text;
+                        }
                     }
+                }
+                Item {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                 }
             }
             finalHeaderItem: RowLayout {
                 visible: root.controlType === BottomBar.ControlType.Track
+                Item {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                }
+                QQC2.Label {
+                    visible: controlObj.connectedPattern >= 0
+                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
+                    text: qsTr("Pattern %1%2 (%3)")
+                                                .arg(controlObj.connectedPattern+1)
+                                                .arg(pattern ? pattern.bank : "")
+                                                .arg(pattern ? pattern.availableBars : "")
+                }
                 QQC2.Button {
+                    visible: controlObj.connectedPattern < 0
                     Layout.fillHeight: true
 
                     text: qsTr("Midi")
-                    enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+                    //enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
 
                     onClicked: {
                         zynthian.session_dashboard.midiSelectionRequested();

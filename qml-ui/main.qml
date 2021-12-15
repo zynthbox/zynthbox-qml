@@ -85,7 +85,21 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 padding: Kirigami.Units.largeSpacing*1.5
                 rightPadding: Kirigami.Units.largeSpacing*1.5
-                onClicked: zynthian.current_screen_id = 'main'
+                property string oldPage: "zynthiloops"
+                property string oldModalPage: "zynthiloops"
+                onClicked: {
+                    if (zynthian.current_screen_id === 'main') {
+                        if (oldModalPage !== "") {
+                            zynthian.current_modal_screen_id = oldModalPage;
+                        } else if (oldPage !== "") {
+                            zynthian.current_screen_id = oldPage;
+                        }
+                    } else {
+                        oldModalPage = zynthian.current_modal_screen_id;
+                        oldPage = zynthian.current_screen_id;
+                        zynthian.current_screen_id = 'main';
+                    }
+                }
                 highlighted: zynthian.current_screen_id === 'main'
             }
             Zynthian.BreadcrumbButton {

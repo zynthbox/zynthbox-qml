@@ -63,62 +63,28 @@ Zynthian.Card {
         RowLayout {
             Layout.fillWidth: true
             Layout.maximumHeight: Kirigami.Units.gridUnit * 2
+            visible: root.controlType !== BottomBar.ControlType.Track
 
-            StackLayout {
-                id: titleStack
-                RowLayout {
-                    Kirigami.Heading {
-                        id: heading
-                        text: {
-                            let text = root.controlObj ? root.controlObj.name : "";
-                            switch (root.controlType) {
-                            case BottomBar.ControlType.Song:
-                                return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
-                            case BottomBar.ControlType.Clip:
-                                return qsTr("CLIP: %1").arg(text);
-                            case BottomBar.ControlType.Track:
-                                return qsTr("TRACK: %1").arg(text);
-                            case BottomBar.ControlType.Part:
-                                return qsTr("PART: %1").arg(text);
-                            case BottomBar.ControlType.Pattern:
-                                return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
-                            default:
-                                return text;
-                            }
-                        }
-                        //Layout.fillWidth: true
-                        wrapMode: Text.NoWrap
-                    }
-                    QQC2.Button {
-                        icon.name: "document-edit"
-                        visible: controlObj &&
-                                 controlType !== BottomBar.ControlType.Song &&
-                                 controlObj.nameEditable
-                        onClicked: {
-                            titleStack.currentIndex = 1;
-                            objNameEdit.text = root.controlObj ? root.controlObj.name : "";
-                            objNameEdit.forceActiveFocus();
-                        }
-                        Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
-                        Layout.preferredHeight: Layout.preferredWidth
-                    }
-                    Connections {
-                        target: Qt.inputMethod
-                        onVisibleChanged: {
-                            if (!Qt.inputMethod.visible) {
-                                titleStack.currentIndex = 0;
-                            }
-                        }
-                    }
-                }
-                QQC2.TextField {
-                    id: objNameEdit
-                    onAccepted: {
-                        controlObj.name = text
-                        titleStack.currentIndex = 0;
+            EditableHeader {
+                text: {
+                    let text = root.controlObj ? root.controlObj.name : "";
+                    switch (root.controlType) {
+                    case BottomBar.ControlType.Song:
+                        return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                    case BottomBar.ControlType.Clip:
+                        return qsTr("CLIP: %1").arg(text);
+                    case BottomBar.ControlType.Track:
+                        return qsTr("TRACK: %1").arg(text);
+                    case BottomBar.ControlType.Part:
+                        return qsTr("PART: %1").arg(text);
+                    case BottomBar.ControlType.Pattern:
+                        return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+                    default:
+                        return text;
                     }
                 }
             }
+
 
             Item {
                 Layout.fillWidth: true
@@ -230,6 +196,37 @@ Zynthian.Card {
             Layout.fillHeight: true
             minimumTabsCount: 4
             orientation: Qt.Vertical
+
+            initialHeaderItem: EditableHeader {
+                visible: root.controlType === BottomBar.ControlType.Track
+                text: {
+                    let text = root.controlObj ? root.controlObj.name : "";
+                    switch (root.controlType) {
+                    case BottomBar.ControlType.Song:
+                        return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                    case BottomBar.ControlType.Clip:
+                        return qsTr("CLIP: %1").arg(text);
+                    case BottomBar.ControlType.Track:
+                        return qsTr("TRACK: %1").arg(text);
+                    case BottomBar.ControlType.Part:
+                        return qsTr("PART: %1").arg(text);
+                    case BottomBar.ControlType.Pattern:
+                        return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+                    default:
+                        return text;
+                    }
+                }
+            }
+            finalHeaderItem: RowLayout {
+                visible: root.controlType === BottomBar.ControlType.Track
+                SidebarButton {
+                    icon.name: "edit-clear-all"
+                    visible: (controlObj != null) && controlObj.clearable
+                    enabled: controlObj ? !controlObj.isPlaying : false
+
+                    onClicked: controlObj.clear()
+                }
+            }
 
             initialAction: {
                 switch (root.controlType) {

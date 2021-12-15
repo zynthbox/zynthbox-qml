@@ -490,9 +490,9 @@ Zynthian.ScreenPage {
 
                                     highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundColor: /*model.clip.inCurrentScene
+                                    backgroundColor: model.clip.inCurrentScene
                                                        ? "#3381d4fa"
-                                                       :*/ (track.connectedPattern >= 0 || (model.clip.path && model.clip.path.length > 0)
+                                                       : (track.connectedPattern >= 0 || (model.clip.path && model.clip.path.length > 0)
                                                          ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                                          : Qt.rgba(0, 0, 0, 1))
 

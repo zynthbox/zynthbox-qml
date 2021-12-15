@@ -133,14 +133,14 @@ RowLayout {
             function getYChoice() {
                 var choice = 0;
                 if (settingsSlidePoint.pressed) {
-                    choice = Math.floor(settingsSlidePoint.y / settingsButton.width);
+                    choice = Math.floor(settingsSlidePoint.y / settingsButton.height);
                 }
                 return choice;
             }
             function getXChoice() {
                 var choice = 0;
                 if (settingsSlidePoint.pressed) {
-                    choice = Math.floor(settingsSlidePoint.x / settingsButton.height);
+                    choice = Math.floor(settingsSlidePoint.x / settingsButton.width);
                 }
                 return choice;
             }

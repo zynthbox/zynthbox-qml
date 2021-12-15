@@ -97,6 +97,7 @@ ColumnLayout {
                 spacing: 0
 
                 Repeater {
+                    id: tracksRepeater
                     model: zynthian.zynthiloops.song.tracksModel
                     delegate: Rectangle {
                         property QtObject track: model.track
@@ -581,6 +582,15 @@ ColumnLayout {
         }
     }
 
+    Connections {
+        target: zynthian.session_dashboard
+        onMidiSelectionRequested: {
+            var trackDelegate = tracksRepeater.itemAt(zynthian.session_dashboard.selectedTrack)
+            playgridPickerPopup.trackObj = trackDelegate.track;
+            playgridPickerPopup.clipObj = trackDelegate.selectedClip;
+            playgridPickerPopup.open()
+        }
+    }
     QQC2.Popup {
         property QtObject trackObj
         property QtObject clipObj

@@ -628,6 +628,8 @@ Zynthian.BasePlayGrid {
                             property int associatedTrackIndex: -1
                             Layout.fillHeight: true
                             Layout.fillWidth: true
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
                             color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
                             border.color: Kirigami.Theme.textColor
                             function pickThisPattern() {

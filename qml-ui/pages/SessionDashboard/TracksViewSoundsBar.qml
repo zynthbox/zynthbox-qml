@@ -259,7 +259,6 @@ Zynthian.Card {
 
                                         applicationWindow().requestOpenLayerSetupDialog();
                                         //this depends on requirements
-                                        print ("AAAAAAAAAAAAAAADDDDDD"+zynthian.current_screen_id)
                                         backToSelection.screenToGetBack = zynthian.current_screen_id;
                                         backToSelection.enabled = true;
 

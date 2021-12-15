@@ -79,13 +79,11 @@ Zynthian.Card {
                     case BottomBar.ControlType.Part:
                         return qsTr("PART: %1").arg(text);
                     case BottomBar.ControlType.Pattern:
-                        print("AAAAA"+controlObj)
                         var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
                         var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-                        return qsTr("PATTERN %1, pt.%2")
+                        return qsTr("PATTERN: %1, pt.%2")
                                                 .arg(pattern.objectName)
                                                 .arg(root.controlObj.col == 0 ? "I" : "II")
-                        return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
                     default:
                         return text;
                     }
@@ -240,10 +238,7 @@ Zynthian.Card {
                     visible: controlObj.connectedPattern >= 0
                     property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
                     property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
-                    text: qsTr("Pattern %1%2 (%3)")
-                                                .arg(controlObj.connectedPattern+1)
-                                                .arg(pattern ? pattern.bank : "")
-                                                .arg(pattern ? pattern.availableBars : "")
+                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
                 }
                 QQC2.Button {
                     visible: controlObj.connectedPattern < 0

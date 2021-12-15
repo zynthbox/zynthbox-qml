@@ -418,7 +418,7 @@ ColumnLayout {
                                         anchors.fill: parent
                                         horizontalAlignment: Text.AlignRight
                                         verticalAlignment: Text.AlignBottom
-                                        text: qsTr("Pattern %1%2 (%3)")
+                                        text: qsTr("Pattern %1, pt.%2 (%3)")
                                                 .arg(track.connectedPattern+1)
                                                 .arg(patternVisualiser.pattern ? patternVisualiser.pattern.bank : "")
                                                 .arg(patternVisualiser.pattern ? patternVisualiser.pattern.availableBars : "")

@@ -165,6 +165,21 @@ Zynthian.BasePlayGrid {
                 _private.associatedTrackIndex = foundIndex;
             }
         }
+
+        property QtObject currentTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+        property string currentSoundName: {
+            var text = "(no sound)";
+            if (_private.currentTrack) {
+                for (var id in _private.currentTrack.chainedSounds) {
+                    if (_private.currentTrack.chainedSounds[id] >= 0 &&
+                        _private.currentTrack.checkIfLayerExists(_private.currentTrack.chainedSounds[id])) {
+                        text = zynthian.fixed_layers.selector_list.getDisplayValue(_private.currentTrack.chainedSounds[id]);
+                        break;
+                    }
+                }
+            }
+            return text;
+        }
         //property QtObject activeBarModel: ZynQuick.FilterProxy {
             //sourceModel: patternModel
             //filterRowStart: activeBar
@@ -525,7 +540,7 @@ Zynthian.BasePlayGrid {
                                     text: "copy\n"
                                     onClicked: {
                                         _private.copyRange(
-                                            (_private.activePattern + 1) + _private.bankName + "/" + (_private.activeBar + 1),
+                                            (_private.activePattern + 1) + " pt." + _private.bankName + "/" + (_private.activeBar + 1),
                                             _private.activeBarModel.parentModel,
                                             _private.activeBar + _private.bankOffset,
                                             _private.activeBar + _private.bankOffset
@@ -552,14 +567,14 @@ Zynthian.BasePlayGrid {
                                 ColumnLayout {
                                     Layout.fillHeight: true
                                     Zynthian.PlayGridButton {
-                                        text: "bank A"
+                                        text: "part I"
                                         checked: _private.bankOffset === 0
                                         onClicked: {
                                             component.setPatternProperty("bankOffset", 0)
                                         }
                                     }
                                     Zynthian.PlayGridButton {
-                                        text: "bank B"
+                                        text: "part II"
                                         checked: _private.bankOffset === 8
                                         onClicked: {
                                             component.setPatternProperty("bankOffset", 8)
@@ -797,6 +812,8 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
+                                            enabled: patternsMenuItem.associatedTrack
+                                            opacity: enabled ? 1 : 0.7
                                             property string soundName
                                             Component.onCompleted: {
                                                 updateSoundName();
@@ -829,9 +846,11 @@ Zynthian.BasePlayGrid {
 
                                                 soundName = text;
                                             }
-                                            text: (patternsMenuItem.associatedTrack && patternsMenuItem.associatedTrack.connectedSound > -1) && soundName.length > 2
-                                                ? "Sound: " + soundName
-                                                : "No sound assigned - tap to select one"
+                                            text: patternsMenuItem.associatedTrack
+                                                ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                    ? "Sound: " + soundName
+                                                    : "No sound assigned - tap to select one"
+                                                : "Unassigned - playing to: " + _private.currentSoundName
                                             onClicked: {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
@@ -843,14 +862,14 @@ Zynthian.BasePlayGrid {
                                     ColumnLayout {
                                         Layout.fillHeight: true
                                         Zynthian.PlayGridButton {
-                                            text: "bank A"
+                                            text: "part I"
                                             checked: patternsMenuItem.thisPattern.bankOffset === 0
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
                                             }
                                         }
                                         Zynthian.PlayGridButton {
-                                            text: "bank B"
+                                            text: "part II"
                                             checked: patternsMenuItem.thisPattern.bankOffset === 8
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
@@ -861,7 +880,7 @@ Zynthian.BasePlayGrid {
                                         text: "copy\n"
                                         onClicked: {
                                             _private.copyRange(
-                                                (patternsMenuItem.thisPatternIndex + 1) + patternsMenuItem.thisPattern.bank,
+                                                (patternsMenuItem.thisPatternIndex + 1) + " pt." + patternsMenuItem.thisPattern.bank,
                                                 patternsMenuItem.thisPattern,
                                                 patternsMenuItem.thisPattern.bankOffset,
                                                 patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.bankLength
@@ -929,8 +948,8 @@ Zynthian.BasePlayGrid {
 
                 Zynthian.PlayGridButton {
                     text: _private.sequence && _private.sequence.soloPattern > -1
-                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + _private.sequence.get(_private.sequence.soloPattern).bank + "\nSOLO"
-                        : "Pattern:\n" + (_private.activePattern + 1) + _private.bankName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "");
+                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + " pt." + _private.sequence.get(_private.sequence.soloPattern).bank + "\nSOLO"
+                        : "Pattern:\n" + (_private.activePattern + 1) + " pt." + _private.bankName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)");
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         component.showPatternsMenu = !component.showPatternsMenu;

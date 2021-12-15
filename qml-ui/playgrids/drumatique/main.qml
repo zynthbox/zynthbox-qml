@@ -140,7 +140,31 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : 0
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
+        property QtObject associatedTrack;
+        property int associatedTrackIndex;
 
+        function updateTrack() {
+            trackUpdater.restart();
+        }
+        property QtObject trackUpdater: Timer {
+            running: false;
+            repeat: false;
+            interval: 1;
+            onTriggered: {
+                var foundTrack = null;
+                var foundIndex = -1;
+                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                    if (track && track.connectedPattern === _private.activePattern) {
+                        foundTrack = track;
+                        foundIndex = i;
+                        break;
+                    }
+                }
+                _private.associatedTrack = foundTrack;
+                _private.associatedTrackIndex = foundIndex;
+            }
+        }
         //property QtObject activeBarModel: ZynQuick.FilterProxy {
             //sourceModel: patternModel
             //filterRowStart: activeBar
@@ -181,14 +205,17 @@ Zynthian.BasePlayGrid {
         }
 
         onActivePatternChanged:{
+            updateTrack();
             console.log('on active pattern changed', _private.activePattern)
         }
 
         onLayerChanged: {
+            updateTrack();
             updateCurrentGrid();
         }
 
         onGridModelChanged: {
+            updateTrack();
             updateCurrentGrid();
         }
 
@@ -252,6 +279,20 @@ Zynthian.BasePlayGrid {
             }
             component.refreshSteps();
         }
+    }
+    Connections {
+        target: zynthian.zynthiloops.song.tracksModel
+        onConnectedSoundsCountChanged: _private.updateTrack()
+        onConnectedPatternsCountChanged: _private.updateTrack()
+    }
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: _private.updateTrack()
+    }
+    Connections {
+        target: _private.associatedTrack
+        onConnectedPatternChanged: _private.updateTrack()
+        onConnectedSoundChanged: _private.updateTrack()
     }
 
     // on component completed
@@ -659,9 +700,31 @@ Zynthian.BasePlayGrid {
                                             Layout.fillHeight: true
                                             Layout.fillWidth: true
                                             Layout.margins: Kirigami.Units.largeSpacing
+                                            text: qsTr("Solo")
+                                            checked: _private.sequence && _private.sequence.soloPattern === patternsMenuItem.thisPatternIndex
+                                            onClicked: {
+                                                if (_private.sequence.soloPattern === patternsMenuItem.thisPatternIndex) {
+                                                    _private.sequence.soloPattern = -1;
+                                                } else {
+                                                    _private.sequence.soloPattern = patternsMenuItem.thisPatternIndex;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillHeight: true
+                                        Layout.minimumWidth: height
+                                        Layout.maximumWidth: height
+                                        Zynthian.PlayGridButton {
+                                            Layout.fillHeight: true
+                                            Layout.fillWidth: true
+                                            Layout.margins: Kirigami.Units.largeSpacing
+                                            opacity: _private.sequence.soloPattern === -1 ? 1 : 0.5
                                             icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : ""
                                             onClicked: {
-                                                patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                if (_private.sequence.soloPattern === -1) {
+                                                    patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                }
                                             }
                                         }
                                     }
@@ -863,7 +926,9 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    text: "Pattern:\n" + (_private.activePattern + 1) + _private.bankName;
+                    text: _private.sequence && _private.sequence.soloPattern > -1
+                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + _private.sequence.get(_private.sequence.soloPattern).bank + "\nSOLO"
+                        : "Pattern:\n" + (_private.activePattern + 1) + _private.bankName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "");
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         component.showPatternsMenu = !component.showPatternsMenu;

@@ -470,14 +470,31 @@ Zynthian.ScreenPage {
 
                                 delegate: ClipCell {
                                     id: clipCell
-                                    isPlaying: model.clip.isPlaying
+                                    isPlaying: {
+                                        if (track.connectedPattern < 0) {
+                                            return model.clip.isPlaying;
+                                        } else {
+                                            var patternIsPlaying = false;
+                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                                            if (sequence && sequence.isPlaying) {
+                                                var pattern = sequence.get(track.connectedPattern);
+                                                if (sequence.soloPattern > -1) {
+                                                    patternIsPlaying = (sequence.soloPattern == track.connectedPattern)
+                                                } else if (pattern) {
+                                                    patternIsPlaying = pattern.enabled
+                                                }
+                                            }
+                                            return patternIsPlaying;
+                                        }
+                                    }
+
                                     highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundColor: model.clip.inCurrentScene
+                                    backgroundColor: /*model.clip.inCurrentScene
                                                        ? "#3381d4fa"
-                                                       : model.clip.path.length > 0
+                                                       :*/ (track.connectedPattern >= 0 || (model.clip.path && model.clip.path.length > 0)
                                                          ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-                                                         : Qt.rgba(0, 0, 0, 1)
+                                                         : Qt.rgba(0, 0, 0, 1))
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth

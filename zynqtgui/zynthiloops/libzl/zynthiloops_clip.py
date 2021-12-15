@@ -84,6 +84,12 @@ class zynthiloops_clip(QObject):
     initialStartPosition = Property(float, get_initial_start_position, constant=True)
     ### END Property initialStartPosition
 
+    ### Property initialStartPosition
+    def get_track(self):
+        return self.track
+    clipTrack = Property(QObject, get_track, constant=True)
+    ### END Property initialStartPosition
+
     ### Property initialLength
     def get_initial_length(self):
         return self.__initial_length__

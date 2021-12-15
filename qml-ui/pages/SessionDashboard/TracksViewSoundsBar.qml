@@ -55,19 +55,23 @@ Zynthian.Card {
         id: backToSelection
         target: zynthian.layer
         enabled: false
+        property string screenToGetBack: "session_dashboard"
         onLayer_created: {
-            zynthian.current_modal_screen_id = "session_dashboard"
-            bottomDrawer.open()
+            zynthian.current_modal_screen_id = screenToGetBack
             backToSelection.enabled = false
             backToSelectionTimer.restart()
+            bottomDrawer.open()
         }
     }
     Timer {
         id: backToSelectionTimer
         interval: 250
         onTriggered: {
+            zynthian.current_modal_screen_id = backToSelection.screenToGetBack
+            for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
+                chainedSoundsRepeater.itemAt(i).update();
+            }
             bottomDrawer.open()
-            zynthian.current_modal_screen_id = "session_dashboard"
         }
     }
     Connections {
@@ -255,6 +259,8 @@ Zynthian.Card {
 
                                         applicationWindow().requestOpenLayerSetupDialog();
                                         //this depends on requirements
+                                        print ("AAAAAAAAAAAAAAADDDDDD"+zynthian.current_screen_id)
+                                        backToSelection.screenToGetBack = zynthian.current_screen_id;
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {

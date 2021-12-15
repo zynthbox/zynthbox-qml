@@ -181,7 +181,8 @@ Zynthian.ScreenPage {
         target: zynthian
         onCurrent_screen_idChanged: {
             // Select connected sound of selected track if not already selected
-            if (zynthian.current_screen_id === "zynthiloops") {
+            if (zynthian.current_screen_id === "zynthiloops"
+                && bottomBar.controlType !== BottomBar.ControlType.Track) {
                 sceneActionBtn.checked = false;
                 mixerActionBtn.checked = true;
                 bottomStack.currentIndex = 1;

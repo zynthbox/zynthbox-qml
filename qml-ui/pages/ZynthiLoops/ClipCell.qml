@@ -28,7 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
 import org.kde.kirigami 2.4 as Kirigami
-
+import org.zynthian.quick 1.0 as ZynQuick
 import Zynthian 1.0 as Zynthian
 
 QQC2.AbstractButton {
@@ -92,7 +92,7 @@ QQC2.AbstractButton {
             visible: model.clip.isPlaying
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width)
+            width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width);
         }
     }
 

@@ -272,7 +272,7 @@ ColumnLayout {
                                     text: ((index + 1) + ". ") + (patternsViewMainRepeater.count === 1 ? model.text : model.text + " (" + playgridId.split("/").slice(-1)[0] + ")")
                                 }
                                 QQC2.Label {
-                                    text: "A"
+                                    text: "I"
                                     Rectangle {
                                         anchors {
                                             fill: parent
@@ -284,7 +284,7 @@ ColumnLayout {
                                     }
                                 }
                                 QQC2.Label {
-                                    text: "B"
+                                    text: "II"
                                     Rectangle {
                                         anchors {
                                             fill: parent

@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.Card {
     property alias filePickerDialog: pickerDialog
@@ -190,12 +191,14 @@ Zynthian.Card {
 //            }
         }
 
+
         Zynthian.TabbedControlView {
             id: tabbedView
             Layout.fillWidth: true
             Layout.fillHeight: true
             minimumTabsCount: 4
             orientation: Qt.Vertical
+            visibleFocusRects: false
 
             initialHeaderItem: EditableHeader {
                 visible: root.controlType === BottomBar.ControlType.Track
@@ -219,12 +222,28 @@ Zynthian.Card {
             }
             finalHeaderItem: RowLayout {
                 visible: root.controlType === BottomBar.ControlType.Track
+                QQC2.Button {
+                    Layout.fillHeight: true
+
+                    text: qsTr("Midi")
+                    enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+
+                    onClicked: {
+                        zynthian.session_dashboard.midiSelectionRequested();
+                    }
+                }
                 SidebarButton {
                     icon.name: "edit-clear-all"
                     visible: (controlObj != null) && controlObj.clearable
                     enabled: controlObj ? !controlObj.isPlaying : false
 
-                    onClicked: controlObj.clear()
+                    onClicked: {
+                        controlObj.clear()
+
+                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(controlObj.connectedPattern);
+                        seq.enabled = false;
+                        controlObj.connectedPattern = -1;
+                    }
                 }
             }
 
@@ -311,12 +330,12 @@ Zynthian.Card {
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
-                Zynthian.TabbedControlViewAction {
+               /* Zynthian.TabbedControlViewAction {
                     text: qsTr("FX")
                     page: Qt.resolvedUrl("FXBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
-                },
+                },*/
                 Zynthian.TabbedControlViewAction {
                     id: emptyAction
                     text: qsTr("Empty")

@@ -107,6 +107,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         logging.error(f"FX Layer Changed")
         QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
+    @Signal
+    def midiSelectionRequested(self):
+        pass
+
     @Slot(None)
     def emit_chained_sounds_changed(self):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)

@@ -162,8 +162,8 @@ Zynthian.ScreenPage {
                     id: settingsButton
                     // Let's put our friend here on top of the things underneath (which would usually be stacked above)
                     z: 1000
-                    Layout.minimumHeight: width
-                    Layout.maximumHeight: width
+                    Layout.minimumHeight: width * 0.6
+                    Layout.maximumHeight: width * 0.6
                     icon.name: "application-menu"
                     Rectangle {
                         id: slideDelegateIconMask

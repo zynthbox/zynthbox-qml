@@ -95,8 +95,13 @@ Kirigami.AbstractApplicationWindow {
                             zynthian.current_screen_id = oldPage;
                         }
                     } else {
-                        oldModalPage = zynthian.current_modal_screen_id;
-                        oldPage = zynthian.current_screen_id;
+                        if (zynthian.current_screen_id === "control") {
+                            oldModalPage = "";
+                            oldPage = "preset"
+                        } else {
+                            oldModalPage = zynthian.current_modal_screen_id;
+                            oldPage = zynthian.current_screen_id;
+                        }
                         zynthian.current_screen_id = 'main';
                     }
                 }

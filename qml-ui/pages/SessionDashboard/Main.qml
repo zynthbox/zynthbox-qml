@@ -251,24 +251,33 @@ Zynthian.ScreenPage {
                 text: zynthian.zynthiloops.song.name
             }
             Item {
-                Layout.preferredWidth: Kirigami.Units.gridUnit
-            }
-            QQC2.Button {
-                text: "1-6"
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                checked: zynthian.session_dashboard.visibleTracksStart == 0
-                onClicked: {
-                    zynthian.session_dashboard.visibleTracksStart = 0;
-                    zynthian.session_dashboard.visibleTracksEnd = 5;
-                }
-            }
-            QQC2.Button {
-                text: "7-12"
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                checked: zynthian.session_dashboard.visibleTracksStart == 6
-                onClicked: {
-                    zynthian.session_dashboard.visibleTracksStart = 6;
-                    zynthian.session_dashboard.visibleTracksEnd = 11;
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit*2
+
+                RowLayout {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    x: Math.round(parent.mapFromItem(root, root.width/2-width/2, 0).x)
+                    QQC2.Button {
+                        text: "1-6"
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                        checked: zynthian.session_dashboard.visibleTracksStart == 0
+                        onClicked: {
+                            zynthian.session_dashboard.visibleTracksStart = 0;
+                            zynthian.session_dashboard.visibleTracksEnd = 5;
+                        }
+                    }
+                    QQC2.Button {
+                        text: "7-12"
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                        checked: zynthian.session_dashboard.visibleTracksStart == 6
+                        onClicked: {
+                            zynthian.session_dashboard.visibleTracksStart = 6;
+                            zynthian.session_dashboard.visibleTracksEnd = 11;
+                        }
+                    }
                 }
             }
             Item {

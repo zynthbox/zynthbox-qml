@@ -375,7 +375,7 @@ Zynthian.ScreenPage {
 
                         onPressAndHold: {
                             zynthian.track.trackId = model.track.id
-                            zynthian.current_modal_screen_id = "track"
+                            //zynthian.current_modal_screen_id = "track"
                         }
                     }
                 }
@@ -484,6 +484,7 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
+                                        zynthian.session_dashboard.selectedTrack = track.id;
                                         if (track.connectedPattern >= 0) {
                                             bottomBar.controlType = BottomBar.ControlType.Pattern;
                                             bottomBar.controlObj = model.clip;

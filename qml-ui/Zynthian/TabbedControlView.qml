@@ -42,6 +42,8 @@ Item {
     property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
     readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
     readonly property QtObject activeItem: internalStack.currentItem
+    property alias initialHeaderItem: initialItem.contentItem
+    property alias finalHeaderItem: finalItem.contentItem
 
     property var cuiaCallback: function(cuia) {
         let focusedScope = internalStack.activeFocus ? internalStack : (primaryTabsScope.activeFocus ? primaryTabsScope : secondaryTabsScope)
@@ -287,7 +289,7 @@ Item {
             Layout.minimumWidth: root.orientation === Qt.Horizontal ? Layout.maximumWidth : -1
             Layout.maximumWidth: root.orientation === Qt.Horizontal ? Kirigami.Units.gridUnit * 6 : -1
             Layout.minimumHeight: root.orientation === Qt.Horizontal ? -1 : Layout.maximumHeight
-            Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 1.6
+            Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 2
             Layout.fillHeight: root.orientation === Qt.Horizontal
             Layout.fillWidth: root.orientation !== Qt.Horizontal
             Rectangle {
@@ -305,6 +307,11 @@ Item {
                 columns: root.orientation === Qt.Horizontal ? 1 : undefined
                 rows: root.orientation === Qt.Horizontal ? undefined : 1
                 anchors.fill: parent
+                QQC2.Control {
+                    id: initialItem
+                    visible: contentItem
+                    Layout.maximumWidth: contentItem && contentItem.visible ? contentItem.implicitWidth : 0
+                }
 
                 Repeater {
                     model: root.tabActions
@@ -349,6 +356,11 @@ Item {
                         implicitHeight: 1
                         enabled: false
                     }
+                }
+                QQC2.Control {
+                    id: finalItem
+                    visible: contentItem
+                    Layout.maximumWidth: contentItem && contentItem.visible ? contentItem.implicitWidth : 0
                 }
             }
         }

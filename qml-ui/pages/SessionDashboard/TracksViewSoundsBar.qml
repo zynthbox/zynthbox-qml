@@ -12,6 +12,7 @@ Zynthian.Card {
     property int selectedRowIndex: 0
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSounds: selectedTrack.chainedSounds
+    property bool openBottomDrawerOnLoad: false
 
     function selectConnectedSound() {
         if (selectedTrack.connectedSound >= 0) {
@@ -74,11 +75,16 @@ Zynthian.Card {
             bottomDrawer.open()
         }
     }
+
     Connections {
         id: currentScreenConnection
         property string oldScreen: "session_dashboard"
         target: zynthian
         onCurrent_screen_idChanged: {
+            if (zynthian.current_screen_id === "session_dashboard" && root.openBottomDrawerOnLoad) {
+                bottomDrawer.open()
+                root.openBottomDrawerOnLoad = false;
+            }
             if (oldScreen == "engine") {
                 backToSelection.enabled = false
             }
@@ -317,7 +323,9 @@ Zynthian.Card {
                                 // Open library edit page
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                 zynthian.control.single_effect_engine = null;
+                                root.openBottomDrawerOnLoad = true;
                                 zynthian.current_screen_id = "control";
+                                zynthian.forced_modal_screen_back = "session_dashboard"
 
                                 bottomDrawer.close();
                             }
@@ -347,7 +355,9 @@ Zynthian.Card {
                                 // Not sure if switching to the channel is required here
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
 
+                                root.openBottomDrawerOnLoad = true;
                                 zynthian.current_modal_screen_id = "midi_key_range";
+                                zynthian.forced_modal_screen_back = "session_dashboard"
 
                                 bottomDrawer.close();
                             }

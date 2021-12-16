@@ -364,6 +364,8 @@ class zynthian_gui(QObject):
         self.modal_screen = None
         self.modal_screen_back = None
         self.screen_back = None
+        self.__forced_modal_screen_back = None
+        self.__forced_screen_back = None
 
         self.modal_timer = QTimer(self)
         self.modal_timer.setInterval(3000)
@@ -712,6 +714,8 @@ class zynthian_gui(QObject):
         exclude_obj = self.screens[exclude]
 
     def show_screen(self, screen=None):
+        self.__forced_modal_screen_back = None
+        self.__forced_screen_back = None
         if screen is None:
             if self.active_screen:
                 screen = self.active_screen
@@ -755,6 +759,8 @@ class zynthian_gui(QObject):
 
     @Slot(str)
     def show_modal(self, screen, mode=None):
+        self.__forced_modal_screen_back = None
+        self.__forced_screen_back = None
         if screen == "alsa_mixer":
             if (
                 self.modal_screen != screen
@@ -1526,6 +1532,16 @@ class zynthian_gui(QObject):
 
         elif i == 1:
             screen_back = None
+            if self.__forced_modal_screen_back != None:
+                self.show_modal(self.__forced_modal_screen_back)
+                self.__forced_modal_screen_back = None
+                self.__forced_screen_back = None
+                return
+            elif  self.__forced_screen_back != None:
+                self.show_modal(self.__forced_screen_back)
+                self.__forced_modal_screen_back = None
+                self.__forced_screen_back = None
+                return
             # If modal screen ...
             if self.modal_screen:
                 logging.debug("CLOSE MODAL => " + self.modal_screen)
@@ -2586,6 +2602,8 @@ class zynthian_gui(QObject):
     home_screen_changed = Signal()
     active_midi_channel_changed = Signal()
     last_note_changed = Signal()
+    forced_modal_screen_back_changed = Signal()
+    forced_screen_back_changed = Signal()
 
     current_screen_id = Property(
         str,
@@ -2611,6 +2629,23 @@ class zynthian_gui(QObject):
     home_screen = Property(str, get_home_screen, set_home_screen, notify=home_screen_changed)
 
     active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
+
+    def get_forced_modal_screen_back(self):
+        return self.__forced_modal_screen_back
+    def set_forced_modal_screen_back(self, screen):
+        if self.__forced_modal_screen_back == screen:
+            return
+        self.__forced_modal_screen_back = screen
+        self.forced_modal_screen_back_changed.emit()
+    forced_modal_screen_back = Property(str, get_forced_modal_screen_back, set_forced_modal_screen_back, notify=forced_modal_screen_back_changed)
+    def get_forced_screen_back(self):
+        return self.__forced_screen_back
+    def set_forced_screen_back(self, screen):
+        if self.__forced_screen_back == screen:
+            return
+        self.__forced_screen_back = screen
+        self.forced_screen_back_changed.emit()
+    forced_screen_back = Property(str, get_forced_screen_back, set_forced_screen_back, notify=forced_screen_back_changed)
 
     status_information = Property(
         QObject, get_status_information, constant=True

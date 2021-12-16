@@ -163,6 +163,8 @@ Zynthian.BasePlayGrid {
                 }
                 _private.associatedTrack = foundTrack;
                 _private.associatedTrackIndex = foundIndex;
+                var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                ZynQuick.PlayGridManager.currentMidiChannel = (theTrack != null) ? theTrack.connectedSound : -1;
             }
         }
 
@@ -309,6 +311,13 @@ Zynthian.BasePlayGrid {
         onConnectedPatternChanged: _private.updateTrack()
         onConnectedSoundChanged: _private.updateTrack()
     }
+    Connections {
+        target: zynthian.session_dashboard
+        onSelectedTrackChanged: {
+            var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+            ZynQuick.PlayGridManager.currentMidiChannel = (theTrack != null) ? theTrack.connectedSound : -1;
+        }
+    }
 
     // on component completed
     onInitialize: {
@@ -321,6 +330,8 @@ Zynthian.BasePlayGrid {
                 component.populateGrid(component.getModel("pattern grid model " + i), i);
             }
         }
+        var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+        ZynQuick.PlayGridManager.currentMidiChannel = (theTrack != null) ? theTrack.connectedSound : -1;
     }
     Connections {
         target: ZynQuick.PlayGridManager
@@ -659,7 +670,7 @@ Zynthian.BasePlayGrid {
                                 }
                                 component.saveDraft();
                             }
-                            function updateTrack() {
+                            function adoptTrackLayer() {
                                 var foundTrack = null;
                                 var foundIndex = -1;
                                 for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
@@ -672,34 +683,39 @@ Zynthian.BasePlayGrid {
                                 }
                                 patternsMenuItem.associatedTrack = foundTrack;
                                 patternsMenuItem.associatedTrackIndex = foundIndex;
-                            }
-                            Component.onCompleted: {
-                                updateTrack();
+
+                                if (patternsMenuItem.associatedTrackIndex > -1) {
+                                    var connectedSound = patternsMenuItem.associatedTrack.connectedSound;
+                                    if (connectedSound !== patternsMenuItem.thisPattern.layer) {
+                                        component.setPatternProperty("layer", connectedSound, patternsMenuItem.thisPatternIndex);
+                                    }
+                                } else {
+                                    // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                                    component.setPatternProperty("layer", 15, patternsMenuItem.thisPatternIndex);
+                                }
                             }
                             Connections {
                                 target: patternsMenuItem.thisPattern
-                                onLayerChanged: patternsMenuItem.updateTrack()
+                                onLayerChanged: patternsMenuItem.adoptTrackLayer()
+                                onEnabledChanged: component.saveDraft()
+                                onBankOffsetChanged: component.saveDraft()
                             }
                             Connections {
                                 target: zynthian.zynthiloops.song.tracksModel
-                                onConnectedSoundsCountChanged: patternsMenuItem.updateTrack()
-                                onConnectedPatternsCountChanged: patternsMenuItem.updateTrack()
+                                onConnectedSoundsCountChanged: patternsMenuItem.adoptTrackLayer()
+                                onConnectedPatternsCountChanged: patternsMenuItem.adoptTrackLayer()
                             }
                             Connections {
                                 target: zynthian.zynthiloops
-                                onSongChanged: patternsMenuItem.updateTrack()
-                            }
-                            function adoptTrackLayer() {
-                                var connectedSound = patternsMenuItem.associatedTrack.connectedSound;
-                                if (connectedSound !== patternsMenuItem.thisPattern.layer) {
-                                    patternsMenuItem.thisPattern.layer = connectedSound;
-                                }
-                                updateTrack();
+                                onSongChanged: patternsMenuItem.adoptTrackLayer()
                             }
                             Connections {
                                 target: patternsMenuItem.associatedTrack
                                 onConnectedPatternChanged: patternsMenuItem.adoptTrackLayer()
                                 onConnectedSoundChanged: patternsMenuItem.adoptTrackLayer()
+                            }
+                            Component.onCompleted: {
+                                adoptTrackLayer();
                             }
                             MouseArea {
                                 anchors.fill: parent
@@ -789,9 +805,9 @@ Zynthian.BasePlayGrid {
                                                         top: parent.top
                                                         bottom: parent.bottom
                                                     }
-                                                    visible: _private.sequence.isPlaying && patternsMenuItem.thisPattern.enabled
+                                                    visible: patternsMenuItem.thisPattern.isPlaying
                                                     color: Kirigami.Theme.highlightColor
-                                                    width: widthFactor
+                                                    width: Math.max(1, Math.floor(widthFactor))
                                                     property double widthFactor: parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength)
                                                     x: patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor
                                                 }

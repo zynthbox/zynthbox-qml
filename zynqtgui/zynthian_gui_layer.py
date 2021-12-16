@@ -606,7 +606,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	@Slot(None)
 	def ask_remove_current_layer(self):
-		self.zyngui.show_confirm("Do you really want to remove this layer?", self.remove_current_layer)
+		self.zyngui.show_confirm("Do you really want to remove this synth?", self.remove_current_layer)
 
 	def remove_current_layer(self, params=None):
 		logging.error("REMOVING {}".format(self.index))

@@ -289,7 +289,7 @@ Item {
             Layout.minimumWidth: root.orientation === Qt.Horizontal ? Layout.maximumWidth : -1
             Layout.maximumWidth: root.orientation === Qt.Horizontal ? Kirigami.Units.gridUnit * 6 : -1
             Layout.minimumHeight: root.orientation === Qt.Horizontal ? -1 : Layout.maximumHeight
-            Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 2.3
+            Layout.maximumHeight: root.orientation === Qt.Horizontal ? -1 : Kirigami.Units.gridUnit * 1.6
             Layout.fillHeight: root.orientation === Qt.Horizontal
             Layout.fillWidth: root.orientation !== Qt.Horizontal
             Rectangle {

@@ -277,7 +277,7 @@ Zynthian.Card {
                 case BottomBar.ControlType.Part:
                     return partAction;
                 case BottomBar.ControlType.Pattern:
-                    return emptyAction;
+                    return patternAction;
                 default:
                     return waveAction;
                 }
@@ -304,7 +304,7 @@ Zynthian.Card {
                     id: recordingAction
                     text: qsTr("Record")
                     page: Qt.resolvedUrl("RecordingBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.recordable && !controlObj.path
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.recordable && !controlObj.path
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
@@ -356,9 +356,9 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },*/
                 Zynthian.TabbedControlViewAction {
-                    id: emptyAction
-                    text: qsTr("Empty")
-                    page: Qt.resolvedUrl("EmptyBar.qml")
+                    id: patternAction
+                    text: qsTr("Pattern")
+                    page: Qt.resolvedUrl("PatternBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Pattern
                     initialProperties: {"bottomBar": root}
                 }

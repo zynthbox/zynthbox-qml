@@ -47,8 +47,8 @@ Zynthian.Stack {
                 let screenId = zynthian.current_screen_id;
                 print("SCREEN ID CHANGED: "+lastScreen + "->"+screenId);
 
-                if (applicationWindow().pageScreenMapping.pageForScreen(screenId) !== applicationWindow().pageScreenMapping.pageForScreen(lastScreen)) {
-                    zynthian.forced_modal_screen_back = null
+                if (lastScreen != "" && applicationWindow().pageScreenMapping.pageForScreen(screenId) !== applicationWindow().pageScreenMapping.pageForScreen(lastScreen)) {
+					print("AAAAAAAAAAAAAA resetting zynthian.forced_screen_back")
                     zynthian.forced_screen_back = null
                 }
 

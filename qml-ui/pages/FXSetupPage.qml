@@ -42,9 +42,7 @@ Zynthian.MultiSelectorPage {
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: {
-            if (zynthian.forced_modal_screen_back !== "") {
-                zynthian.current_modal_screen_id = zynthian.forced_modal_screen_back;
-            } else if (zynthian.forced_screen_back !== "") {
+            if (zynthian.forced_screen_back !== "") {
                 zynthian.current_screen_id = zynthian.forced_screen_back;
             } else {
                 zynthian.current_screen_id = "preset"

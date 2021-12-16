@@ -65,8 +65,9 @@ GridLayout {
         MouseArea {
             anchors.fill:parent
             onClicked: {
+                var screenBack = zynthian.current_screen_id;
                 zynthian.current_modal_screen_id = "playgrid";
-                zynthian.forced_modal_screen_back = "zynthiloops"
+                zynthian.forced_screen_back = "zynthiloops";
                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                 var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
                 sequence.activePattern = controlObj.clipTrack.connectedPattern;

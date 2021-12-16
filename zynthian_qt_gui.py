@@ -782,6 +782,7 @@ class zynthian_gui(QObject):
 
         self.screen_back = None
         self.modal_screen = screen
+        logging.error("AAAAA{}".format(screen))
         logging.error(self.screens[screen])
         if screen != "confirm":
             self.screens[screen].show()
@@ -1528,12 +1529,12 @@ class zynthian_gui(QObject):
 
         elif i == 1:
             screen_back = None
-            if self.__forced_modal_screen_back != None:
+            if self.__forced_modal_screen_back != None and self.__forced_modal_screen_back != "":
                 self.show_modal(self.__forced_modal_screen_back)
                 self.__forced_modal_screen_back = None
                 self.__forced_screen_back = None
                 return
-            elif  self.__forced_screen_back != None:
+            elif  self.__forced_screen_back != None and self.__forced_screen_back != "":
                 self.show_modal(self.__forced_screen_back)
                 self.__forced_modal_screen_back = None
                 self.__forced_screen_back = None

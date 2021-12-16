@@ -78,7 +78,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		if self.fx_layers and len(self.fx_layers) > 0:
 			self.fx_layers.remove(self.zyngui.curlayer)
 
-		if len(self.fx_layers) > 0:
+		if self.fx_layers != None and len(self.fx_layers) > 0:
 			# Add Audio-FX layers
 			sl0 = None
 
@@ -98,7 +98,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 
 		if self.midi_mode:
-			if len(self.fx_layers) > 0:
+			if self.fx_layers != None and len(self.fx_layers) > 0:
 				self.list_data.append(('ADD-SERIAL-FX',len(self.list_data),"Add Serial Midi-FX"))
 				self.list_data.append(('ADD-PARALLEL-FX',len(self.list_data),"Add Parallel Midi-FX"))
 				self.list_data.append(('CLEAR-FX',len(self.list_data),"Remove All Midi-FX"))
@@ -107,7 +107,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 				self.select_action(0)
 				self.zyngui.screens[self.types_screen].select_action(0)
 		else:
-			if len(self.fx_layers) > 0:
+			if self.fx_layers != None and len(self.fx_layers) > 0:
 				self.list_data.append(('ADD-SERIAL-FX',len(self.list_data),"Add Serial Audio-FX"))
 				self.list_data.append(('ADD-PARALLEL-FX',len(self.list_data),"Add Parallel Audio-FX"))
 				self.list_data.append(('CLEAR-FX',len(self.list_data),"Remove All Audio-FX"))

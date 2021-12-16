@@ -1079,6 +1079,7 @@ Zynthian.BasePlayGrid {
 
             QQC2.Switch {
                 Layout.fillWidth: true
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 5
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
                 checked: _private.positionalVelocity
                 onClicked: {

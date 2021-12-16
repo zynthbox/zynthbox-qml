@@ -479,9 +479,9 @@ Zynthian.ScreenPage {
                                             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
                                             if (sequence && sequence.isPlaying) {
                                                 var pattern = sequence.get(track.connectedPattern);
-                                                if (pattern.isEmpty) {
+                                                /*if (pattern.isEmpty) {
                                                     return false
-                                                } else if ((model.clip.col === 0 && pattern.bank !== "I")
+                                                } else */if ((model.clip.col === 0 && pattern.bank !== "I")
                                                     || (model.clip.col === 1 && pattern.bank !== "II")) {
                                                     return false
                                                 } else if (sequence.soloPattern > -1) {
@@ -499,7 +499,7 @@ Zynthian.ScreenPage {
                                     backgroundColor: {
                                             if (model.clip.inCurrentScene) {
                                                 return "#3381d4fa";
-                                            } else if ((track.connectedPattern >= 0 && !pattern.isEmpty && ((model.clip.col === 0 && pattern.bank === "I") || (model.clip.col === 1 && pattern.bank === "II")))
+                                            } else if ((track.connectedPattern >= 0)
                                                 || (model.clip.path && model.clip.path.length > 0)) {
                                                 return Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                             } else {

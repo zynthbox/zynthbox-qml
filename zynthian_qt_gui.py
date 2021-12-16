@@ -364,7 +364,6 @@ class zynthian_gui(QObject):
         self.modal_screen = None
         self.modal_screen_back = None
         self.screen_back = None
-        self.__forced_modal_screen_back = None
         self.__forced_screen_back = None
 
         self.modal_timer = QTimer(self)
@@ -1529,14 +1528,11 @@ class zynthian_gui(QObject):
 
         elif i == 1:
             screen_back = None
-            if self.__forced_modal_screen_back != None and self.__forced_modal_screen_back != "":
-                self.show_modal(self.__forced_modal_screen_back)
-                self.__forced_modal_screen_back = None
-                self.__forced_screen_back = None
-                return
-            elif  self.__forced_screen_back != None and self.__forced_screen_back != "":
-                self.show_modal(self.__forced_screen_back)
-                self.__forced_modal_screen_back = None
+            if  self.__forced_screen_back != None and self.__forced_screen_back != "":
+                if self.__forced_screen_back in self.non_modal_screens:
+                    self.show_screen(self.__forced_screen_back)
+                else:
+                    self.show_modal(self.__forced_screen_back)
                 self.__forced_screen_back = None
                 return
             # If modal screen ...
@@ -2599,7 +2595,6 @@ class zynthian_gui(QObject):
     home_screen_changed = Signal()
     active_midi_channel_changed = Signal()
     last_note_changed = Signal()
-    forced_modal_screen_back_changed = Signal()
     forced_screen_back_changed = Signal()
 
     current_screen_id = Property(
@@ -2627,14 +2622,6 @@ class zynthian_gui(QObject):
 
     active_midi_channel = Property(int, get_active_midi_channel, notify = active_midi_channel_changed)
 
-    def get_forced_modal_screen_back(self):
-        return self.__forced_modal_screen_back
-    def set_forced_modal_screen_back(self, screen):
-        if self.__forced_modal_screen_back == screen:
-            return
-        self.__forced_modal_screen_back = screen
-        self.forced_modal_screen_back_changed.emit()
-    forced_modal_screen_back = Property(str, get_forced_modal_screen_back, set_forced_modal_screen_back, notify=forced_modal_screen_back_changed)
     def get_forced_screen_back(self):
         return self.__forced_screen_back
     def set_forced_screen_back(self, screen):

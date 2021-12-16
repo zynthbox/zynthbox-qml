@@ -255,9 +255,9 @@ Zynthian.Card {
                                 } else {
                                     if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
                                         // Open library page
-                                        var screenBack = zynthian.current_modal_screen_id;
+                                        var screenBack = zynthian.current_screen_id;
                                         zynthian.current_screen_id = 'layers_for_track';
-                                        zynthian.forced_modal_screen_back = screenBack;
+                                        zynthian.forced_screen_back = screenBack;
                                         bottomDrawer.close();
                                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                         noFreeSlotsPopup.open();
@@ -327,9 +327,9 @@ Zynthian.Card {
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                 zynthian.control.single_effect_engine = null;
                                 root.openBottomDrawerOnLoad = true;
-                                var screenBack = zynthian.current_modal_screen_id;
+                                var screenBack = zynthian.current_screen_id;
                                 zynthian.current_screen_id = "control";
-                                zynthian.forced_modal_screen_back = screenBack;
+                                zynthian.forced_screen_back = screenBack;
 
                                 bottomDrawer.close();
                             }
@@ -360,9 +360,9 @@ Zynthian.Card {
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
 
                                 root.openBottomDrawerOnLoad = true;
-                                var screenBack = zynthian.current_modal_screen_id;
+                                var screenBack = zynthian.current_screen_id;
                                 zynthian.current_modal_screen_id = "midi_key_range";
-                                zynthian.forced_modal_screen_back = screenBack
+                                zynthian.forced_screen_back = screenBack
 
                                 bottomDrawer.close();
                             }
@@ -417,10 +417,10 @@ Zynthian.Card {
                                 } else {
                                     zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                     zynthian.layer_options.show();
-                                    var screenBack = zynthian.current_modal_screen_id;
+                                    var screenBack = zynthian.current_screen_id;
                                     zynthian.current_screen_id = "layer_effects";
                                     root.openBottomDrawerOnLoad = true;
-                                    zynthian.forced_modal_screen_back = screenBack;
+                                    zynthian.forced_screen_back = screenBack;
 
                                     bottomDrawer.close();
                                 }

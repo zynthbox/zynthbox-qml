@@ -263,6 +263,7 @@ Zynthian.Card {
                                         // Enable layer popup rejected handler to re-select connected sound if any
                                         layerPopupRejectedConnections.enabled = true;
 
+                                        zynthian.layer.page_after_layer_creation = "session_dashboard";
                                         applicationWindow().requestOpenLayerSetupDialog();
                                         //this depends on requirements
                                         backToSelection.screenToGetBack = zynthian.current_screen_id;
@@ -413,6 +414,7 @@ Zynthian.Card {
                                     zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                     zynthian.layer_options.show();
                                     zynthian.current_screen_id = "layer_effects";
+                                    root.openBottomDrawerOnLoad = true;
                                     zynthian.forced_modal_screen_back = "session_dashboard"
 
                                     bottomDrawer.close();

@@ -42,9 +42,17 @@ Zynthian.Stack {
     data: [
         Connections {
             target: zynthian
+            property string lastScreen
             onCurrent_screen_idChanged: {
                 let screenId = zynthian.current_screen_id;
-                print("SCREEN ID CHANGED: "+screenId);
+                print("SCREEN ID CHANGED: "+lastScreen + "->"+screenId);
+
+                if (applicationWindow().pageScreenMapping.pageForScreen(screenId) !== applicationWindow().pageScreenMapping.pageForScreen(lastScreen)) {
+                    zynthian.forced_modal_screen_back = null
+                    zynthian.forced_screen_back = null
+                }
+
+                lastScreen = screenId;
 
                 // This should never happen
                 if (screenId.length === 0) {

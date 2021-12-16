@@ -104,6 +104,7 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: {
+                    zynthian.layer.page_after_layer_creation = "layers_for_track";
                     zynthian.layer.select_engine(zynthian.fixed_layers.active_midi_channel)
                 }
             }
@@ -619,6 +620,7 @@ Zynthian.ScreenPage {
                         id: newSynthWorkaroundTimer
                         interval: 200
                         onTriggered: {
+                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id;
                             zynthian.layer.select_engine(zynthian.fixed_layers.index_to_midi(zynthian.fixed_layers.current_index))
                             layerSetupDialog.accept();
                         }

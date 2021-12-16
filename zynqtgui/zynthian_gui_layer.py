@@ -62,7 +62,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = None
 		self.auto_next_screen = False
 		self.layer_index_replace_engine = None
-		self.page_after_layer_creation = "layers_for_track"
+		self.__page_after_layer_creation = "layers_for_track"
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
 		self.create_amixer_layer()
 		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
@@ -564,7 +564,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					self.zyngui.show_screen('layer')
 		self.layer_index_replace_engine = None
 		if layer.engine.type != "Audio Effect":
-			self.zyngui.show_screen(self.page_after_layer_creation)
+			if self.__page_after_layer_creation in self.zyngui.non_modal_screens:
+				self.zyngui.show_screen(self.__page_after_layer_creation)
+			else:
+				self.zyngui.show_modal(self.__page_after_layer_creation)
 			self.zyngui.screens['fixed_layers'].select_action(midich)
 			if not self.zyngui.screens['bank'].get_show_top_sounds():
 				self.zyngui.screens['bank'].select_action(0)
@@ -2074,10 +2077,21 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		return self.zyngui.curlayer.engine.nickname
 
 
+	def set_page_after_layer_creation(self, page):
+		if self.__page_after_layer_creation == page:
+			return
+		self.__page_after_layer_creation = page
+		self.page_after_layer_creation_changed.emit()
+
+	def get_page_after_layer_creation(self):
+		return self.__page_after_layer_creation;
+
 
 	engine_nick_changed = Signal()
+	page_after_layer_creation_changed = Signal()
 
 	engine_nick = Property(str, get_engine_nick, notify = engine_nick_changed)
+	page_after_layer_creation = Property(str, get_page_after_layer_creation, set_page_after_layer_creation, notify = page_after_layer_creation_changed)
 
 	# Both parameters are midi channels
 	layer_created = Signal(int)

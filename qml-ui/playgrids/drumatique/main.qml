@@ -660,7 +660,6 @@ Zynthian.BasePlayGrid {
                             border.color: Kirigami.Theme.textColor
                             function pickThisPattern() {
                                 console.log(patternsMenuItem.thisPatternIndex, "index");
-                                _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
                                 for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
                                     var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
                                     if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
@@ -668,6 +667,7 @@ Zynthian.BasePlayGrid {
                                         break;
                                     }
                                 }
+                                _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
                                 component.saveDraft();
                             }
                             function adoptTrackLayer() {
@@ -686,7 +686,10 @@ Zynthian.BasePlayGrid {
 
                                 if (patternsMenuItem.associatedTrackIndex > -1) {
                                     var connectedSound = patternsMenuItem.associatedTrack.connectedSound;
-                                    if (connectedSound !== patternsMenuItem.thisPattern.layer) {
+                                    if (connectedSound === -1) {
+                                        // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                                        component.setPatternProperty("layer", 15, patternsMenuItem.thisPatternIndex);
+                                    } else if (connectedSound !== patternsMenuItem.thisPattern.layer) {
                                         component.setPatternProperty("layer", connectedSound, patternsMenuItem.thisPatternIndex);
                                     }
                                 } else {

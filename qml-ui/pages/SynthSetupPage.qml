@@ -84,11 +84,6 @@ Zynthian.ScreenPage {
                 text: qsTr("Get New Soundsets...")
                 onTriggered: zynthian.show_modal("soundset_downloader")
             }*/
-            Kirigami.Action {
-                text: qsTr("Clear Sound")
-                enabled: zynthian.fixed_layers.current_index_valid
-                onTriggered: zynthian.layer.ask_remove_current_layer()
-            }
             /*Kirigami.Action {
                 text: qsTr("Clear Sounds")
                 enabled: zynthian.fixed_layers.current_index_valid
@@ -107,6 +102,11 @@ Zynthian.ScreenPage {
                     zynthian.layer.page_after_layer_creation = "layers_for_track";
                     zynthian.layer.select_engine(zynthian.fixed_layers.active_midi_channel)
                 }
+            }
+            Kirigami.Action {
+                text: qsTr("Remove Synth")
+                enabled: zynthian.fixed_layers.current_index_valid
+                onTriggered: zynthian.layer.ask_remove_current_layer()
             }
             Kirigami.Action {
                 // Disable this entry as per #299

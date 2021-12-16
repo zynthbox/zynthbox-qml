@@ -723,15 +723,11 @@ Zynthian.BasePlayGrid {
                             Component.onCompleted: {
                                 adoptTrackLayer();
                             }
-                            Repeater {
-                                // TODO One of the many things which need to go into the looper logic
-                                // directly, or into the components... At any rate, it should not live
-                                // in a playgrid, because that is just kind of silly...
-                                id: trackClipsRepeater
-                                model: patternsMenuItem.trackClipsModel
-                                function updateEnabledFromClips() {
+                            Timer {
+                                id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
+                                onTriggered: {
                                     var enabledBank = -1;
-                                    for(var i = 0; i < trackClipsModel.count; ++i) {
+                                    for(var i = 0; i < trackClipsRepeater.count; ++i) {
                                         var clipItem = trackClipsRepeater.itemAt(i);
                                         if (clipItem.clipInScene) {
                                             enabledBank = i;
@@ -740,8 +736,45 @@ Zynthian.BasePlayGrid {
                                     }
                                     component.setPatternProperty("enabled", (enabledBank > -1), patternsMenuItem.thisPatternIndex);
                                     if (enabledBank > -1) {
-                                        component.setPatternProperty("bankOffset", enabledBank * patternsMenuItem.thispattern.bankLength, patternsMenuItem.thisPatternIndex);
+                                        component.setPatternProperty("bankOffset", enabledBank * patternsMenuItem.thisPattern.bankLength, patternsMenuItem.thisPatternIndex);
                                     }
+                                }
+                            }
+                            Timer {
+                                id: updateClipsFromEnabledTimer; interval: 1; repeat: false; running: false
+                                onTriggered: {
+                                    var enabledClip = patternsMenuItem.thisPattern.bankOffset / patternsMenuItem.thisPattern.bankLength;
+                                    if (!patternsMenuItem.thisPattern.enabled) {
+                                        enabledClip = -1;
+                                    }
+                                    for (var i = 0; i < trackClipsRepeater.count; ++i) {
+                                        var clipItem = trackClipsRepeater.itemAt(i);
+                                        if (i === enabledClip && !clipItem.clipInScene) {
+                                            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clipItem.clip);
+                                            // Since the call above already disables all other clips from the same
+                                            // track, there's no particular need to keep this going
+                                            break;
+                                        } else if (enabledClip === -1 && clipItem.clipInScene) {
+                                            // If there are no enabled clips, then we'll need to remove any that are
+                                            // set as in the scene right now
+                                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(clipItem.clip);
+                                        }
+                                    }
+                                }
+                            }
+                            Repeater {
+                                // TODO One of the many things which need to go into the looper logic
+                                // directly, or into the components... At any rate, it should not live
+                                // in a playgrid, because that is just kind of silly...
+                                id: trackClipsRepeater
+                                model: patternsMenuItem.trackClipsModel
+                                function updateEnabledFromClips() {
+                                    updateEnabledFromClipsTimer.restart();
+                                }
+                                // The inverse situation of the above - if we're setting the state here,
+                                // we should feed it back to the scene model, so it knows what's going on
+                                function updateClipsFromEnabled() {
+                                    updateClipsFromEnabledTimer.restart();
                                 }
                                 delegate: Item {
                                     id: clipProxyDelegate
@@ -795,6 +828,7 @@ Zynthian.BasePlayGrid {
                                             onClicked: {
                                                 if (_private.sequence.soloPattern === -1) {
                                                     patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                    trackClipsRepeater.updateClipsFromEnabled();
                                                 }
                                             }
                                         }
@@ -920,6 +954,7 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern.bankOffset === 0
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
+                                                trackClipsRepeater.updateClipsFromEnabled();
                                             }
                                         }
                                         Zynthian.PlayGridButton {
@@ -927,6 +962,7 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern.bankOffset === 8
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
+                                                trackClipsRepeater.updateClipsFromEnabled();
                                             }
                                         }
                                     }

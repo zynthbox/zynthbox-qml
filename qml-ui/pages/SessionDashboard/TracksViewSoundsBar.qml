@@ -413,6 +413,7 @@ Zynthian.Card {
                                     zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                     zynthian.layer_options.show();
                                     zynthian.current_screen_id = "layer_effects";
+                                    zynthian.forced_modal_screen_back = "session_dashboard"
 
                                     bottomDrawer.close();
                                 }

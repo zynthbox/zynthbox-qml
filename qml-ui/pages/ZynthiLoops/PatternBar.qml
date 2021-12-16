@@ -45,6 +45,7 @@ GridLayout {
         id: patternVisualiser
         Layout.fillWidth: true
         Layout.fillHeight: true
+        smooth: false
 
         visible: controlObj.clipTrack.connectedPattern >= 0
         property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null

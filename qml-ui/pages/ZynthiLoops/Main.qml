@@ -478,7 +478,12 @@ Zynthian.ScreenPage {
                                             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
                                             if (sequence && sequence.isPlaying) {
                                                 var pattern = sequence.get(track.connectedPattern);
-                                                if (sequence.soloPattern > -1) {
+                                                if (pattern.isEmpty) {
+                                                    return false
+                                                } else if ((model.clip.col === 0 && pattern.bank !== "I")
+                                                    || (model.clip.col === 1 && pattern.bank !== "II")) {
+                                                    return false
+                                                } else if (sequence.soloPattern > -1) {
                                                     patternIsPlaying = (sequence.soloPattern == track.connectedPattern)
                                                 } else if (pattern) {
                                                     patternIsPlaying = pattern.enabled
@@ -490,12 +495,40 @@ Zynthian.ScreenPage {
 
                                     highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundColor: model.clip.inCurrentScene
-                                                       ? "#3381d4fa"
-                                                       : (track.connectedPattern >= 0 || (model.clip.path && model.clip.path.length > 0)
-                                                         ? Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-                                                         : Qt.rgba(0, 0, 0, 1))
+                                    backgroundColor: {
+                                            if (model.clip.inCurrentScene) {
+                                                return "#3381d4fa";
+                                            } else if ((track.connectedPattern >= 0 && !pattern.isEmpty && ((model.clip.col === 0 && pattern.bank === "I") || (model.clip.col === 1 && pattern.bank === "II")))
+                                                || (model.clip.path && model.clip.path.length > 0)) {
+                                                return Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
+                                            } else {
+                                                return Qt.rgba(0, 0, 0, 1);
+                                            }
+                                    }
 
+                                    property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+
+                                    Image {
+                                        id: patternVisualiser
+                                        anchors {
+                                            fill: parent
+                                            margins: 2
+                                        }
+                                        opacity: 0.8
+                                        height: parent.height/2
+                                        visible: track.connectedPattern >= 0 && ((model.clip.col === 0 && parent.pattern.bank === "I") || (model.clip.col === 1 && parent.pattern.bank === "II")) && !parent.pattern.isEmpty
+                                        source: pattern ? "image://pattern/Global/" + track.connectedPattern + "/" + (parent.pattern.bankOffset / 8) + "?" + parent.pattern.lastModified : ""
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                zynthian.current_modal_screen_id = "playgrid";
+                                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                                                sequence.activePattern = track.connectedPattern;
+                                            }
+                                        }
+                                    }
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
                                     Layout.preferredHeight: privateProps.cellHeight

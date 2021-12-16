@@ -124,14 +124,15 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
+           /* text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
             onTriggered: {
                 if (zynthian.zynthiloops.isMetronomeRunning) {
                     Zynthian.CommonUtils.stopMetronomeAndPlayback();
                 } else {
                     Zynthian.CommonUtils.startMetronomeAndPlayback();
                 }
-            }
+            }*/
+           enabled: false
         },
         Kirigami.Action {
             id: mixerActionBtn

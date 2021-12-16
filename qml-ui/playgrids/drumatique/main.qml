@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
+import "../../pages/SessionDashboard/" as SessionDashboard
 
 Zynthian.BasePlayGrid {
     id: component
@@ -874,7 +875,7 @@ Zynthian.BasePlayGrid {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
                                                 }
-                                                applicationWindow().requestOpenLayerSetupDialog()
+                                                tracksViewDrawer.open();
                                             }
                                         }
                                     }
@@ -947,6 +948,20 @@ Zynthian.BasePlayGrid {
                     verticalAlignment: "AlignVCenter"
                     text: qsTr("No free slots remaining")
                     font.italic: true
+                }
+            }
+            QQC2.Drawer {
+                id: tracksViewDrawer
+
+                edge: Qt.BottomEdge
+                modal: true
+
+                width: parent.width
+                height: Kirigami.Units.gridUnit * 15
+
+                SessionDashboard.TracksViewSoundsBar {
+                    anchors.fill: parent
+                    property Item bottomDrawer: tracksViewDrawer
                 }
             }
         }

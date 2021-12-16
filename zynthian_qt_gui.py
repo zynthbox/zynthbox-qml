@@ -714,8 +714,6 @@ class zynthian_gui(QObject):
         exclude_obj = self.screens[exclude]
 
     def show_screen(self, screen=None):
-        self.__forced_modal_screen_back = None
-        self.__forced_screen_back = None
         if screen is None:
             if self.active_screen:
                 screen = self.active_screen
@@ -759,8 +757,6 @@ class zynthian_gui(QObject):
 
     @Slot(str)
     def show_modal(self, screen, mode=None):
-        self.__forced_modal_screen_back = None
-        self.__forced_screen_back = None
         if screen == "alsa_mixer":
             if (
                 self.modal_screen != screen

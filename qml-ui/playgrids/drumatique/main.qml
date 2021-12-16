@@ -651,6 +651,7 @@ Zynthian.BasePlayGrid {
                             property int thisPatternIndex: model.index
                             property int bankIndex: thisPattern.bankOffset / 8;
                             property int activePattern: _private.activePattern
+                            property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
                             property QtObject associatedTrack: null
                             property int associatedTrackIndex: -1
                             Layout.fillHeight: true
@@ -697,6 +698,7 @@ Zynthian.BasePlayGrid {
                                     // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
                                     component.setPatternProperty("layer", 15, patternsMenuItem.thisPatternIndex);
                                 }
+                                trackClipsRepeater.updateEnabledFromClips();
                             }
                             Connections {
                                 target: patternsMenuItem.thisPattern
@@ -720,6 +722,38 @@ Zynthian.BasePlayGrid {
                             }
                             Component.onCompleted: {
                                 adoptTrackLayer();
+                            }
+                            Repeater {
+                                // TODO One of the many things which need to go into the looper logic
+                                // directly, or into the components... At any rate, it should not live
+                                // in a playgrid, because that is just kind of silly...
+                                id: trackClipsRepeater
+                                model: patternsMenuItem.trackClipsModel
+                                function updateEnabledFromClips() {
+                                    var enabledBank = -1;
+                                    for(var i = 0; i < trackClipsModel.count; ++i) {
+                                        var clipItem = trackClipsRepeater.itemAt(i);
+                                        if (clipItem.clipInScene) {
+                                            enabledBank = i;
+                                            break;
+                                        }
+                                    }
+                                    component.setPatternProperty("enabled", (enabledBank > -1), patternsMenuItem.thisPatternIndex);
+                                    if (enabledBank > -1) {
+                                        component.setPatternProperty("bankOffset", enabledBank * patternsMenuItem.thispattern.bankLength, patternsMenuItem.thisPatternIndex);
+                                    }
+                                }
+                                delegate: Item {
+                                    id: clipProxyDelegate
+                                    property QtObject clip: model.clip
+                                    property bool clipInScene: model.clip.inCurrentScene
+                                    Connections {
+                                        target: clipProxyDelegate.clip
+                                        onInCurrentSceneChanged: {
+                                            trackClipsRepeater.updateEnabledFromClips();
+                                        }
+                                    }
+                                }
                             }
                             MouseArea {
                                 anchors.fill: parent
@@ -961,7 +995,7 @@ Zynthian.BasePlayGrid {
 
                 SessionDashboard.TracksViewSoundsBar {
                     anchors.fill: parent
-                    property Item bottomDrawer: tracksViewDrawer
+                    property QtObject bottomDrawer: tracksViewDrawer
                 }
             }
         }

@@ -836,35 +836,27 @@ Zynthian.BasePlayGrid {
                                             }
                                         }
                                     }
-                                    MouseArea {
+                                    ColumnLayout {
                                         Layout.fillHeight: true
                                         Layout.minimumWidth: (parent.width / 7);
                                         Layout.maximumWidth: (parent.width / 7);
-                                        onClicked: {
-                                            trackPicker.pickTrack(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
+                                        QQC2.Label {
+                                            Layout.fillHeight: true
+                                            Layout.preferredHeight: parent.height / 2
+                                            Layout.fillWidth: true
+                                            text: "Track:"
+                                            font.pixelSize: 15
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: Kirigami.Theme.textColor
+                                            horizontalAlignment: Text.AlignHCenter
                                         }
-                                        ColumnLayout {
-                                            anchors.fill: parent;
-                                            QQC2.Label {
-                                                Layout.fillHeight: true
-                                                Layout.fillWidth: true
-                                                text: "Track:"
-                                                font.pixelSize: 15
-                                                Kirigami.Theme.inherit: false
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                color: Kirigami.Theme.textColor
-                                                horizontalAlignment: Text.AlignHCenter
-                                            }
-                                            QQC2.Label {
-                                                Layout.fillHeight: true
-                                                Layout.fillWidth: true
-                                                text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
-                                                elide: Text.ElideRight
-                                                font.pixelSize: 15
-                                                Kirigami.Theme.inherit: false
-                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                                color: Kirigami.Theme.textColor
-                                                horizontalAlignment: Text.AlignHCenter
+                                        Zynthian.PlayGridButton {
+                                            Layout.fillHeight: true
+                                            Layout.preferredHeight: parent.height / 2
+                                            text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                            onClicked: {
+                                                trackPicker.pickTrack(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
                                             }
                                         }
                                     }

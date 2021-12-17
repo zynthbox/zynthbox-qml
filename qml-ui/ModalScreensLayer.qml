@@ -89,6 +89,12 @@ Zynthian.Stack {
                     root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["sketch_copier"].visible = false;
                 }
+                if (!root.pageCache["midi_key_range"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["midi_key_range"].visible = false;
+                }
             }
         },
         Connections {

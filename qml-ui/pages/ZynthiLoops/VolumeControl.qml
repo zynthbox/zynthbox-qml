@@ -195,7 +195,7 @@ Rectangle {
         }
         onPositionChanged: {
             let delta = mouse.y - startY;
-            let value = Math.max(slider.from, Math.min(slider.to, startValue - (slider.to / slider.stepSize) * (delta*slider.stepSize/(Kirigami.Units.gridUnit*5))));
+            let value = Math.max(slider.from, Math.min(slider.to, startValue - (slider.to / slider.stepSize) * (delta*slider.stepSize/(Kirigami.Units.gridUnit*8))));
             let floored = Math.floor(value/slider.stepSize) * slider.stepSize;
 
             slider.value = value;

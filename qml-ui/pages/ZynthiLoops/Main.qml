@@ -518,9 +518,6 @@ Zynthian.ScreenPage {
                                     onPressed: {
                                         zynthian.session_dashboard.selectedTrack = track.id;
                                         if (track.connectedPattern >= 0) {
-                                            if (pattern) {
-                                                pattern.bank = model.clip.col === 0 ? "A" : "B";
-                                            }
                                             bottomBar.controlType = BottomBar.ControlType.Pattern;
                                             bottomBar.controlObj = model.clip;
                                         } else {

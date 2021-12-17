@@ -57,7 +57,7 @@ Zynthian.Stack {
     data: [
         Timer {
             id: preloadTimer
-            interval: 2000
+            interval: 0
             running: true
             onTriggered: {
                 let file = ""

@@ -833,31 +833,36 @@ Zynthian.BasePlayGrid {
                                             }
                                         }
                                     }
-                                    ColumnLayout {
+                                    MouseArea {
                                         Layout.fillHeight: true
                                         Layout.minimumWidth: (parent.width / 7);
                                         Layout.maximumWidth: (parent.width / 7);
-
-                                        QQC2.Label {
-                                            Layout.fillHeight: true
-                                            Layout.fillWidth: true
-                                            text: "Track:"
-                                            font.pixelSize: 15
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: Kirigami.Theme.textColor
-                                            horizontalAlignment: Text.AlignHCenter
+                                        onClicked: {
+                                            trackPicker.pickTrack(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
                                         }
-                                        QQC2.Label {
-                                            Layout.fillHeight: true
-                                            Layout.fillWidth: true
-                                            text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
-                                            elide: Text.ElideRight
-                                            font.pixelSize: 15
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: Kirigami.Theme.textColor
-                                            horizontalAlignment: Text.AlignHCenter
+                                        ColumnLayout {
+                                            anchors.fill: parent;
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: "Track:"
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                                elide: Text.ElideRight
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
                                         }
                                     }
                                     ColumnLayout {
@@ -1004,22 +1009,6 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
-            QQC2.Popup {
-                id: noFreeSlotsPopup
-                x: Math.round(parent.width/2 - width/2)
-                y: Math.round(parent.height/2 - height/2)
-                width: Kirigami.Units.gridUnit*12
-                height: Kirigami.Units.gridUnit*4
-                modal: true
-
-                QQC2.Label {
-                    anchors.fill: parent
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    text: qsTr("No free slots remaining")
-                    font.italic: true
-                }
-            }
             QQC2.Drawer {
                 id: tracksViewDrawer
 
@@ -1032,6 +1021,71 @@ Zynthian.BasePlayGrid {
                 SessionDashboard.TracksViewSoundsBar {
                     anchors.fill: parent
                     property QtObject bottomDrawer: tracksViewDrawer
+                }
+            }
+            QQC2.Popup {
+                id: trackPicker
+                function pickTrack(patternIndex, associatedTrackIndex) {
+                    trackPicker.patternIndex = patternIndex;
+                    trackPicker.associatedTrackIndex = associatedTrackIndex;
+                    open();
+                }
+                modal: true
+                x: Math.round(parent.width/2 - width/2)
+                y: Math.round(parent.height/2 - height/2)
+                width: parent.width * 0.9
+                height: parent.height * 0.8
+                property int patternIndex: -1
+                property int associatedTrackIndex: -1
+                ColumnLayout {
+                    anchors.fill: parent
+                    Kirigami.Heading {
+                        Layout.fillWidth: true
+                        text: qsTr("Move Pattern To Another Track")
+                    }
+                    GridLayout {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        columns: 4
+                        Repeater {
+                            model: zynthian.zynthiloops.song.tracksModel
+                            delegate: Zynthian.PlayGridButton {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: trackPicker.width / 4
+                                Layout.fillHeight: true
+                                text: model.track.connectedPattern === trackPicker.patternIndex
+                                    ? qsTr("Remove from:\nTrack %1").arg(model.id + 1)
+                                    : qsTr("Move to:\nTrack %1").arg(model.id + 1)
+                                onClicked: {
+                                    if (model.track.connectedPattern === trackPicker.patternIndex) {
+                                        // Remove the pattern from this track
+                                        model.track.connectedPattern = -1;
+                                    } else {
+                                        // If we already were associated with a track, unassociate, otherwise it gets weird
+                                        if (trackPicker.associatedTrackIndex > -1) {
+                                            var oldTrack = zynthian.zynthiloops.song.tracksModel.getTrack(trackPicker.associatedTrackIndex);
+                                            oldTrack.connectedPattern = -1;
+                                        }
+                                        // Add the pattern to this track
+                                        model.track.connectedPattern = trackPicker.patternIndex;
+                                    }
+                                    trackPicker.close();
+                                }
+                            }
+                        }
+                    }
+                    Zynthian.ActionBar {
+                        Layout.fillWidth: true
+                        currentPage: Item {
+                            property QtObject backAction: Kirigami.Action {
+                                text: "Back"
+                                onTriggered: {
+                                    trackPicker.close();
+                                }
+                            }
+                            property list<QtObject> contextualActions
+                        }
+                    }
                 }
             }
         }

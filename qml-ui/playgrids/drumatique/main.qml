@@ -162,6 +162,9 @@ Zynthian.BasePlayGrid {
                         break;
                     }
                 }
+                if (foundIndex > -1 && zynthian.session_dashboard.selectedTrack !== foundIndex) {
+                    zynthian.session_dashboard.selectedTrack = foundIndex;
+                }
                 _private.associatedTrack = foundTrack;
                 _private.associatedTrackIndex = foundIndex;
                 var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);

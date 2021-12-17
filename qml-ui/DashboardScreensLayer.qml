@@ -37,7 +37,7 @@ import "pages/ZynthiLoops" as ZL
 Zynthian.Stack {
     id: root
 
-    visible: depth > 0 || busy
+    //visible: depth > 0 || busy
     onVisibleChanged: {
         if (visible) {
             root.forceActiveFocus()
@@ -77,10 +77,12 @@ Zynthian.Stack {
                 // This should never happen
                 if (zynthian.current_screen_id.length === 0) {
                     print("Warning: empty screen requested")
-                    root.clear(QQC2.StackView.PopTransition);
-                    root.depthChanged() // this old qt didn't emit it after clear
+                    root.visible = false;
+                   // root.clear(QQC2.StackView.PopTransition);
+                   // root.depthChanged() // this old qt didn't emit it after clear
                     return;
                 }
+                root.visible = true;
 
 
                 // Skipping modal screen requests
@@ -95,17 +97,24 @@ Zynthian.Stack {
                     return;
                 }
 
-
+                var newItem = null;
                 if (root.pageCache && root.pageCache[zynthian.current_screen_id]) {
-                    root.replace(root.pageCache[zynthian.current_screen_id]);
+                    newItem = root.pageCache[zynthian.current_screen_id];
+                    for (var i = 0; i < root.depth; ++i) {
+                        var otherItem = root.get(i);
+                        if (newItem == otherItem) {
+                            root.pop(otherItem, QQC2.StackView.ImmediateTransition);
+                            return;
+                        }
+                    }
+                    root.push(newItem, QQC2.StackView.ImmediateTransition);
                 } else {
                     let file = applicationWindow().pageScreenMapping.pageForDashboardScreen(zynthian.current_screen_id);
                     if (file.length > 0) {
-                        root.replace(file, QQC2.StackView.PushTransition);
+                        root.replace(file, QQC2.StackView.ImmediateTransition);
                     } else {
                         print("Non managed dashboard screen " + zynthian.current_screen_id);
-                        root.clear(QQC2.StackView.PopTransition);
-                        root.depthChanged()
+                        root.visible = false;
                     }
                 }
             }

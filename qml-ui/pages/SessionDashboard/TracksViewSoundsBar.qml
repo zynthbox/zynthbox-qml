@@ -89,6 +89,9 @@ Zynthian.Card {
                 backToSelection.enabled = false
             }
             oldScreen = zynthian.current_screen_id
+            for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
+                chainedSoundsRepeater.itemAt(i).update();
+            }
         }
     }
 
@@ -197,6 +200,7 @@ Zynthian.Card {
                 radius: 4
                 function update() {
                     soundLabel.updateName();
+                    fxLabel.updateName();
                 }
 
                 MouseArea {
@@ -405,6 +409,9 @@ Zynthian.Card {
                             }
                             horizontalAlignment: Text.AlignLeft
                             text: root.selectedTrack.getEffectsNameByMidiChannel(chainedSound)
+                            function updateName() {
+                                text = root.selectedTrack.getEffectsNameByMidiChannel(chainedSound)
+                            }
 
                             elide: "ElideRight"
                         }

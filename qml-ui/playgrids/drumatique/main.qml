@@ -162,9 +162,10 @@ Zynthian.BasePlayGrid {
                         break;
                     }
                 }
-                if (foundIndex > -1 && zynthian.session_dashboard.selectedTrack !== foundIndex) {
-                    zynthian.session_dashboard.selectedTrack = foundIndex;
-                }
+                //TODO: the idea is good, but it switches track too often, a way that does the switch only when needed must be in place
+//                 if (foundIndex > -1 && zynthian.session_dashboard.selectedTrack !== foundIndex) {
+//                     zynthian.session_dashboard.selectedTrack = foundIndex;
+//                 }
                 _private.associatedTrack = foundTrack;
                 _private.associatedTrackIndex = foundIndex;
                 var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
@@ -342,6 +343,17 @@ Zynthian.BasePlayGrid {
         onDashboardItemPicked: {
             if (component.dashboardModel === model) {
                 _private.sequence.activePattern = index;
+                var foundIndex = -1;
+                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                    if (track && track.connectedPattern === index) {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+                if (foundIndex > -1 && zynthian.session_dashboard.selectedTrack !== foundIndex) {
+                    zynthian.session_dashboard.selectedTrack = foundIndex;
+                }
             }
         }
     }

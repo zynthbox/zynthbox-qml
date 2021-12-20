@@ -624,21 +624,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # if self.countInValue > 0:
         #     self.countInValue -= 1
 
-        if self.__current_beat__ == 0:
-            if self.metronome_schedule_stop:
-                libzl.stopTimer()
+        # Immediately stop clips when scheduled to stop
+        if self.metronome_schedule_stop:
+            libzl.stopTimer()
 
-                self.click_track_click.stop()
-                self.click_track_clack.stop()
-                self.__current_beat__ = -1
-                self.__current_bar__ = -1
-                self.current_beat_changed.emit()
-                self.current_bar_changed.emit()
-                self.metronome_schedule_stop = False
-                self.metronome_running_changed.emit()
-            else:
-                self.__current_bar__ += 1
-                self.current_bar_changed.emit()
+            self.click_track_click.stop()
+            self.click_track_clack.stop()
+            self.__current_beat__ = -1
+            self.__current_bar__ = -1
+            self.current_beat_changed.emit()
+            self.current_bar_changed.emit()
+            self.metronome_schedule_stop = False
+            self.metronome_running_changed.emit()
+
+        if self.__current_beat__ == 0:
+            self.__current_bar__ += 1
+            self.current_bar_changed.emit()
 
         self.current_beat_changed.emit()
 

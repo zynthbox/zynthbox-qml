@@ -124,126 +124,136 @@ Rectangle {
 
                         model: root.song.tracksModel
 
-                        delegate: RowLayout {
+                        delegate: Rectangle {
+                            property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
                             height: ListView.view.height
-                            spacing: 0
+                            color: "transparent"
+                            radius: 2
+                            border.width: 1
+                            border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.topMargin: 4
                                 spacing: 0
 
-                                Item {
+                                ColumnLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                    spacing: 0
 
-                                    VolumeControl {
-                                        id: volumeControl
+                                    Item {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
 
-                                        property var audioLevelText: model.track.audioLevel.toFixed(2)
+                                        VolumeControl {
+                                            id: volumeControl
 
-                                        anchors.fill: parent
+                                            property var audioLevelText: model.track.audioLevel.toFixed(2)
 
-                                        headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
-    //                                    footerText: model.track.name
-                                        audioLeveldB: model.track.audioLevel
+                                            anchors.fill: parent
 
-                                        slider.value: model.track.volume
-                                        slider.onValueChanged: {
-                                            model.track.volume = slider.value
-                                        }
+                                            headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+        //                                    footerText: model.track.name
+                                            audioLeveldB: model.track.audioLevel
 
-                                        onDoubleClicked: {
-                                            slider.value = model.track.initialVolume;
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        width: volumeControl.slider.height
-                                        height: soundLabel.height*1.5
-
-                                        anchors.left: parent.right
-                                        anchors.bottom: parent.bottom
-                                        anchors.leftMargin: -soundLabel.height*2
-                                        anchors.bottomMargin: -(soundLabel.height/2)
-
-                                        transform: Rotation {
-                                            origin.x: 0
-                                            origin.y: 0
-                                            angle: -90
-                                        }
-
-                                        Kirigami.Theme.inherit: false
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                        color: "transparent"
-
-                                        border.color: "transparent"
-                                        border.width: 1
-                                        radius: 4
-
-                                        QQC2.Label {
-                                            id: soundLabel
-
-                                            anchors.left: parent.left
-                                            anchors.right: parent.right
-//                                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-//                                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            elide: "ElideRight"
-
-                                            font.pointSize: 8
-
-                                            text: {
-                                                soundLabel.updateSoundName();
+                                            slider.value: model.track.volume
+                                            slider.onValueChanged: {
+                                                model.track.volume = slider.value
                                             }
 
-                                            Connections {
-                                                target: zynthian.fixed_layers
-                                                onList_updated: {
+                                            onDoubleClicked: {
+                                                slider.value = model.track.initialVolume;
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: volumeControl.slider.height
+                                            height: soundLabel.height*1.5
+
+                                            anchors.left: parent.right
+                                            anchors.bottom: parent.bottom
+                                            anchors.leftMargin: -soundLabel.height*2
+                                            anchors.bottomMargin: -(soundLabel.height/2)
+
+                                            transform: Rotation {
+                                                origin.x: 0
+                                                origin.y: 0
+                                                angle: -90
+                                            }
+
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: "transparent"
+
+                                            border.color: "transparent"
+                                            border.width: 1
+                                            radius: 4
+
+                                            QQC2.Label {
+                                                id: soundLabel
+
+                                                anchors.left: parent.left
+                                                anchors.right: parent.right
+    //                                            anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+    //                                            anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                elide: "ElideRight"
+
+                                                font.pointSize: 8
+
+                                                text: {
                                                     soundLabel.updateSoundName();
                                                 }
-                                            }
 
-                                            Connections {
-                                                target: model.track
-                                                onChainedSoundsChanged: {
-                                                    soundLabel.updateSoundName();
-                                                }
-                                            }
-
-                                            function updateSoundName() {
-                                                var text = "";
-
-                                                for (var id in model.track.chainedSounds) {
-                                                    if (model.track.chainedSounds[id] >= 0 &&
-                                                        model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                        var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
-                                                        text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
-                                                        break;
+                                                Connections {
+                                                    target: zynthian.fixed_layers
+                                                    onList_updated: {
+                                                        soundLabel.updateSoundName();
                                                     }
                                                 }
 
-                                                soundLabel.text = text;
+                                                Connections {
+                                                    target: model.track
+                                                    onChainedSoundsChanged: {
+                                                        soundLabel.updateSoundName();
+                                                    }
+                                                }
+
+                                                function updateSoundName() {
+                                                    var text = "";
+
+                                                    for (var id in model.track.chainedSounds) {
+                                                        if (model.track.chainedSounds[id] >= 0 &&
+                                                            model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                            var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                            text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    soundLabel.text = text;
+                                                }
                                             }
                                         }
                                     }
+
+                                    QQC2.Label {
+                                        Layout.alignment: Qt.AlignCenter
+                                        Layout.fillWidth: true
+                                        horizontalAlignment: "AlignHCenter"
+                                        elide: "ElideRight"
+                                        text: model.track.name
+                                    }
                                 }
 
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignCenter
-                                    Layout.fillWidth: true
-                                    horizontalAlignment: "AlignHCenter"
-                                    elide: "ElideRight"
-                                    text: model.track.name
+                                Kirigami.Separator {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: 1
+                                    color: "#ff31363b"
+                                    visible: index != root.song.tracksModel.count-1 && !highlighted
                                 }
-                            }
-
-                            Kirigami.Separator {
-                                Layout.fillHeight: true
-                                Layout.preferredWidth: 1
-                                color: "#ff31363b"
-                                visible: index != root.song.tracksModel.count-1
                             }
                         }
                     }

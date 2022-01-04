@@ -357,21 +357,30 @@ Zynthian.ScreenPage {
                         height: ListView.view.height
 
                         onPressed: {
-                            bottomBar.controlType = BottomBar.ControlType.Track;
-                            bottomBar.controlObj = model.track;
+                            if (bottomBar.controlObj !== model.track) {
+                                // Set current selected track
+                                bottomBar.controlType = BottomBar.ControlType.Track;
+                                bottomBar.controlObj = model.track;
 
-                            if (bottomBar.tabbedView.activeItem.resetModel) {
-                                // Reset model to load new changes if any
-                                bottomBar.tabbedView.activeItem.resetModel();
+                                zynthian.session_dashboard.selectedTrack = index;
+
+                                sceneActionBtn.checked = false;
+                                mixerActionBtn.checked = true;
+                                bottomStack.currentIndex = 1;
                             } else {
-                                console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
-                            }
+                                // Current selected track is already set. open sounds dialog
 
-                            zynthian.session_dashboard.selectedTrack = index;
+                                if (bottomBar.tabbedView.activeItem.resetModel) {
+                                    // Reset model to load new changes if any
+                                    bottomBar.tabbedView.activeItem.resetModel();
+                                } else {
+                                    console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
+                                }
 
-                            if (mixerActionBtn.checked) {
-                                bottomStack.currentIndex = 0
-                                mixerActionBtn.checked = false
+                                if (mixerActionBtn.checked) {
+                                    bottomStack.currentIndex = 0
+                                    mixerActionBtn.checked = false
+                                }
                             }
                         }
 

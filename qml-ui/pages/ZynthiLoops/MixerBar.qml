@@ -28,6 +28,8 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
+import QtQuick.Extras 1.4 as Extras
+import QtQuick.Controls.Styles 1.4
 
 //import Zynthian 1.0 as Zynthian
 
@@ -87,6 +89,7 @@ Rectangle {
                                         : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
                         footerText: "Master"
                         audioLeveldB: zynthian.zynthiloops.masterAudioLevel
+                        inputAudioLeveldB: -200
 
                         Binding {
                             target: masterVolume.slider
@@ -156,7 +159,8 @@ Rectangle {
 
                                             headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
-                                            audioLeveldB: model.track.audioLevel
+                                            audioLeveldB:  model.track.audioLevel
+                                            inputAudioLeveldB: highlighted ? zynthian.zynthiloops.recordingAudioLevel : -200
 
                                             slider.value: model.track.volume
                                             slider.onValueChanged: {

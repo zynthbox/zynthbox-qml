@@ -31,7 +31,6 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
             Layout.topMargin: 8
             font.pointSize: 9
-            visible: text.length > 0
         }
 
         RowLayout {

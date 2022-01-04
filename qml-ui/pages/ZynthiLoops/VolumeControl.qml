@@ -10,6 +10,7 @@ Rectangle {
     property alias headerText: headerLabel.text
     property alias footerText: footerLabel.text
     property alias audioLeveldB: audioGauge.value
+    property alias inputAudioLeveldB: inputAudioLevelGauge.value
     property alias slider: slider
 
     signal doubleClicked();
@@ -166,6 +167,28 @@ Rectangle {
 
                                 font: audioGauge.font
                             }
+                        }
+                    }
+
+                    Extras.Gauge {
+                        id: inputAudioLevelGauge
+                        anchors.top: audioGauge.top
+                        anchors.bottom: audioGauge.bottom
+                        anchors.left: audioGauge.right + 6
+
+                        minimumValue: -200
+                        maximumValue: 0
+
+                        font.pointSize: 8
+
+                        style: GaugeStyle {
+                            valueBar: Rectangle {
+                                color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                implicitWidth: 3
+                            }
+                            minorTickmark: null
+                            tickmark: null
+                            tickmarkLabel: null
                         }
                     }
                 }

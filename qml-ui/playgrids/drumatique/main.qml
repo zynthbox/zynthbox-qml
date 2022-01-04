@@ -631,12 +631,12 @@ Zynthian.BasePlayGrid {
                 id: patternsMenu
                 visible: component.showPatternsMenu
                 anchors {
-                    verticalCenter: parent.verticalCenter
-                    left: parent.left
+                    fill: parent
                     leftMargin: -5
+                    topMargin: Kirigami.Units.largeSpacing
+                    bottomMargin: Kirigami.Units.largeSpacing
+                    rightMargin: Kirigami.Units.largeSpacing * 2
                 }
-                width:900
-                height:450
                 Zynthian.Card {
                     anchors.fill: parent
                 }

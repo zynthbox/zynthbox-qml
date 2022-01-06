@@ -206,8 +206,8 @@ Zynthian.ScreenPage {
         id: privateProps
 
         //Try to fit exactly 12 cells + a header cell
-        property int headerWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2)
-        property int headerHeight: Math.round(Kirigami.Units.gridUnit * 3)
+        property int headerWidth: (tableLayout.width - loopGrid.columnSpacing*12)/13
+        property int headerHeight: (tableLayout.height - loopGrid.rowSpacing*2)/3
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
     }
@@ -292,7 +292,6 @@ Zynthian.ScreenPage {
     }
 
     contentItem : ColumnLayout {
-
         ColumnLayout {
             id: tableLayout
             Layout.fillHeight: true
@@ -308,8 +307,8 @@ Zynthian.ScreenPage {
 
                 TableHeader {
                     id: songCell
-                    Layout.preferredWidth: privateProps.headerWidth
-                    Layout.maximumWidth: privateProps.headerWidth
+                    Layout.preferredWidth: privateProps.headerWidth + 8
+                    Layout.maximumWidth: privateProps.headerWidth + 8
                     Layout.fillHeight: true
 
                     text: root.song.name
@@ -352,6 +351,9 @@ Zynthian.ScreenPage {
                                 ? "P" + (model.track.connectedPattern+1)
                                 : model.track.name
                         // subText: model.track.type === "audio" ? "Audio" : "Midi"
+                        color: index === zynthian.session_dashboard.selectedTrack
+                                ? Qt.lighter(Kirigami.Theme.backgroundColor)
+                                : Kirigami.Theme.backgroundColor
 
                         width: privateProps.headerWidth
                         height: ListView.view.height
@@ -402,8 +404,8 @@ Zynthian.ScreenPage {
                 ListView {
                     id: tracksHeaderColumns
 
-                    Layout.preferredWidth: privateProps.headerWidth
-                    Layout.maximumWidth: privateProps.headerWidth
+                    Layout.preferredWidth: privateProps.headerWidth + 8
+                    Layout.maximumWidth: privateProps.headerWidth + 8
                     Layout.fillHeight: true
 
                     clip: true
@@ -515,6 +517,7 @@ Zynthian.ScreenPage {
                                                 return Qt.rgba(0, 0, 0, 1);
                                             }
                                     }
+                                    isTrackSelected: rowIndex === zynthian.session_dashbard.selectedTrack
 
                                     property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
                                     property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null

@@ -46,6 +46,8 @@ QQC2.AbstractButton {
     property alias subTextSize: contents.text2Size
     property alias subSubTextSize: contents.text3Size
 
+    property color color: Kirigami.Theme.backgroundColor
+
     contentItem: TableHeaderLabel {
         id: contents
         text: root.text
@@ -61,6 +63,6 @@ QQC2.AbstractButton {
         border.width: root.activeFocus ? 1 : 0
         border.color: Kirigami.Theme.highlightColor
 
-        color: Kirigami.Theme.backgroundColor
+        color: root.color
     }
 }

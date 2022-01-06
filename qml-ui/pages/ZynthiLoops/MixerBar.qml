@@ -41,7 +41,7 @@ Rectangle {
         id: privateProps
 
         //Try to fit exactly 12 mixers + a master mixer
-        property int cellWidth: Math.round(tableLayout.width/13 - loopGrid.columnSpacing*2) + 1
+        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
     }
 
     GridLayout {
@@ -57,6 +57,7 @@ Rectangle {
             Layout.fillWidth: true
 
             Kirigami.Heading {
+                visible: false
                 text: qsTr("Mixer : %1").arg(song.name)
             }
 
@@ -81,8 +82,8 @@ Rectangle {
 
                     VolumeControl {
                         id: masterVolume
-                        Layout.preferredWidth: privateProps.cellWidth
-                        Layout.maximumWidth: privateProps.cellWidth
+                        Layout.preferredWidth: privateProps.cellWidth + 6
+                        Layout.maximumWidth: privateProps.cellWidth + 6
                         Layout.fillHeight: true
                         headerText: zynthian.zynthiloops.masterAudioLevel <= -40
                                         ? ""
@@ -131,7 +132,7 @@ Rectangle {
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
                             height: ListView.view.height
-                            color: "transparent"
+                            color: highlighted ? "#22ffffff" : "transparent"
                             radius: 2
                             border.width: 1
                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
@@ -249,6 +250,29 @@ Rectangle {
                                         horizontalAlignment: "AlignHCenter"
                                         elide: "ElideRight"
                                         text: model.track.name
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                                        Layout.margins: 4
+                                        spacing: 2
+
+                                        QQC2.Button {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            font.pointSize: 8
+                                            checkable: true
+                                            text: qsTr("S")
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillWidth: true
+                                            Layout.fillHeight: true
+                                            font.pointSize: 8
+                                            checkable: true
+                                            text: qsTr("M")
+                                        }
                                     }
                                 }
 

@@ -38,6 +38,7 @@ QQC2.AbstractButton {
     property bool highlighted: false
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
+    property bool isTrackSelected: false
 
     onPressed: forceActiveFocus()
 
@@ -83,8 +84,12 @@ QQC2.AbstractButton {
     background: Rectangle {
         color: root.backgroundColor
 
-        border.width: root.highlighted ? 1 : 0
-        border.color: Kirigami.Theme.highlightColor
+        border.width: 1
+        border.color: root.highlighted
+                      ? Kirigami.Theme.highlightColor
+                      : root.isTrackSelected
+                         ?"#22ffffff"
+                         : "transparent"
 
         Rectangle {
             id: progressRect

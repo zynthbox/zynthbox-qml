@@ -102,7 +102,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -200
         self.__capture_audio_level_right__ = -200
-        self.__recording_audio_level__ = -200
+        self.__recording_audio_level__ = -400
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -165,10 +165,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @staticmethod
     def convertToDBFS(raw):
         if raw <= 0:
-            return -200
+            return -400
         fValue = 20 * math.log10(raw)
-        if fValue < -200:
-            fValue = -200
+        if fValue < -400:
+            fValue = -400
         return fValue
 
     @Slot(None)

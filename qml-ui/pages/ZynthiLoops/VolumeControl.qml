@@ -19,7 +19,7 @@ Rectangle {
     id: control
     border.color: Kirigami.Theme.highlightColor
     border.width: highlight ? 1 : 0
-    color: Kirigami.Theme.backgroundColor
+    color: "transparent"
     radius: 2
     anchors.leftMargin: 2
     anchors.rightMargin: 2

@@ -125,30 +125,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
 
     def recording_jack_client_process_callback(self, frames):
-        buf_l = np.frombuffer(self.jack_capture_port_a.get_buffer())
-        buf_r = np.frombuffer(self.jack_capture_port_b.get_buffer())
-        raw_peak_l = 0
-        raw_peak_r = 0
-
-        for i in range(0, frames):
-            try:
-                sample_l = abs(buf_l[i])
-                sample_r = abs(buf_r[i])
-
-                if sample_l > raw_peak_l:
-                    raw_peak_l = sample_l
-                if sample_r > raw_peak_r:
-                    raw_peak_r = sample_r
-            except:
-                pass
-
-        if raw_peak_l < 0.0:
-            raw_peak_l = 0.0
-        if raw_peak_r < 0.0:
-            raw_peak_r = 0.0
-
-        db_left = self.convertToDBFS(raw_peak_l)
-        db_right = self.convertToDBFS(raw_peak_r)
+        db_left = self.peak_dbFS_from_jack_output(self.jack_capture_port_a, frames)
+        db_right = self.peak_dbFS_from_jack_output(self.jack_capture_port_b, frames)
 
         if db_left <= -400 and db_right <= -400:
             self.__recording_audio_level__ = -400
@@ -165,13 +143,31 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     ### END Property recordingAudioLevel
 
     @staticmethod
-    def convertToDBFS(raw):
-        if raw <= 0:
-            return -400
-        fValue = 20 * math.log10(raw)
-        if fValue < -400:
-            fValue = -400
-        return fValue
+    def peak_dbFS_from_jack_output(port, frames):
+        def convertToDBFS(raw):
+            if raw <= 0:
+                return -400
+            fValue = 20 * math.log10(raw)
+            if fValue < -400:
+                fValue = -400
+            return fValue
+
+        buf = np.frombuffer(port.get_buffer())
+        raw_peak = 0
+
+        for i in range(0, frames):
+            try:
+                sample = abs(buf[i])
+
+                if sample > raw_peak:
+                    raw_peak = sample
+            except:
+                pass
+
+        if raw_peak < 0.0:
+            raw_peak = 0.0
+
+        return convertToDBFS(raw_peak)
 
     @Slot(None)
     def monitorCaptureAudioLevels(self):
@@ -181,30 +177,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         @client.set_process_callback
         def process(frames):
-            buf_l = np.frombuffer(port_l.get_buffer())
-            buf_r = np.frombuffer(port_r.get_buffer())
-            raw_peak_l = 0
-            raw_peak_r = 0
-
-            for i in range(0, frames):
-                try:
-                    sample_l = abs(buf_l[i])
-                    sample_r = abs(buf_r[i])
-
-                    if sample_l > raw_peak_l:
-                        raw_peak_l = sample_l
-                    if sample_r > raw_peak_r:
-                        raw_peak_r = sample_r
-                except:
-                    pass
-
-            if raw_peak_l < 0.0:
-                raw_peak_l = 0.0
-            if raw_peak_r < 0.0:
-                raw_peak_r = 0.0
-
-            db_left = self.convertToDBFS(raw_peak_l)
-            db_right = self.convertToDBFS(raw_peak_r)
+            db_left = self.peak_dbFS_from_jack_output(port_l, frames)
+            db_right = self.peak_dbFS_from_jack_output(port_r, frames)
 
             if self.__capture_audio_level_left__ != db_left:
                 self.__capture_audio_level_left__ = db_left

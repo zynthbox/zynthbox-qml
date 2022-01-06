@@ -89,7 +89,7 @@ Rectangle {
                                         : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
                         footerText: "Master"
                         audioLeveldB: zynthian.zynthiloops.masterAudioLevel
-                        inputAudioLeveldB: -200
+                        inputAudioLevelVisible: false
 
                         Binding {
                             target: masterVolume.slider
@@ -160,7 +160,7 @@ Rectangle {
                                             headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
                                             audioLeveldB:  model.track.audioLevel
-                                            inputAudioLeveldB: highlighted ? zynthian.zynthiloops.recordingAudioLevel : -200
+                                            inputAudioLeveldB: highlighted ? zynthian.zynthiloops.recordingAudioLevel : -400
 
                                             slider.value: model.track.volume
                                             slider.onValueChanged: {

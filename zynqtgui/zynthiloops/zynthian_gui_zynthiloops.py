@@ -100,8 +100,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.recorder_process = None
         self.recorder_process_internal_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
         self.__last_recording_type__ = ""
-        self.__capture_audio_level_left__ = -200
-        self.__capture_audio_level_right__ = -200
+        self.__capture_audio_level_left__ = -400
+        self.__capture_audio_level_right__ = -400
         self.__recording_audio_level__ = -400
 
         self.__master_audio_level__ = -200
@@ -150,9 +150,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         db_left = self.convertToDBFS(raw_peak_l)
         db_right = self.convertToDBFS(raw_peak_r)
 
-        self.__recording_audio_level__ = 10 * math.log10(pow(10, db_left/10) + pow(10, db_right/10))
+        if db_left <= -400 and db_right <= -400:
+            self.__recording_audio_level__ = -400
+        else:
+            self.__recording_audio_level__ = 10 * math.log10(pow(10, db_left/10) + pow(10, db_right/10))
 
-        # logging.error(f"### Recording audio level : {db_left}, {db_right}, {self.__recording_audio_level__}")
         self.recording_audio_level_changed.emit()
 
     ### Property recordingAudioLevel
@@ -176,14 +178,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         client = jack.Client('zynthiloops_monitor')
         port_l = client.inports.register("l")
         port_r = client.inports.register("r")
-
-        def convertToDBFS(raw):
-            if raw <= 0:
-                return -200
-            fValue = 20 * math.log10(raw)
-            if fValue < -200:
-                fValue = -200
-            return fValue
 
         @client.set_process_callback
         def process(frames):
@@ -209,8 +203,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if raw_peak_r < 0.0:
                 raw_peak_r = 0.0
 
-            db_left = convertToDBFS(raw_peak_l)
-            db_right = convertToDBFS(raw_peak_r)
+            db_left = self.convertToDBFS(raw_peak_l)
+            db_right = self.convertToDBFS(raw_peak_r)
 
             if self.__capture_audio_level_left__ != db_left:
                 self.__capture_audio_level_left__ = db_left

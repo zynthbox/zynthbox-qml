@@ -11,6 +11,7 @@ Rectangle {
     property alias footerText: footerLabel.text
     property alias audioLeveldB: audioGauge.value
     property alias inputAudioLeveldB: inputAudioLevelGauge.value
+    property alias inputAudioLevelVisible: inputAudioLevelGauge.visible
     property alias slider: slider
 
     signal doubleClicked();
@@ -174,7 +175,8 @@ Rectangle {
                         id: inputAudioLevelGauge
                         anchors.top: audioGauge.top
                         anchors.bottom: audioGauge.bottom
-                        anchors.left: audioGauge.right + 6
+                        anchors.right: audioGauge.right
+                        anchors.rightMargin: -8
 
                         minimumValue: -400
                         maximumValue: 0

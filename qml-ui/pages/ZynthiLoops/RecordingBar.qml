@@ -162,9 +162,13 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -200
+                    minimumValue: -400
                     maximumValue: 0
-                    value: zynthian.zynthiloops.captureAudioLevelLeft
+                    value: monitorColumn.isCapturing
+                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                  ? zynthian.zynthiloops.recordingAudioLevel
+                                  : zynthian.zynthiloops.captureAudioLevelLeft
+                               : -400
 
                     font.pointSize: 8
 
@@ -182,9 +186,13 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -200
+                    minimumValue: -400
                     maximumValue: 0
-                    value: zynthian.zynthiloops.captureAudioLevelRight
+                    value: monitorColumn.isCapturing
+                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                  ? zynthian.zynthiloops.recordingAudioLevel
+                                  : zynthian.zynthiloops.captureAudioLevelRight
+                               : -400
 
                     font.pointSize: 8
 

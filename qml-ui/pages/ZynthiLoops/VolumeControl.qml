@@ -176,7 +176,7 @@ Rectangle {
                         anchors.bottom: audioGauge.bottom
                         anchors.left: audioGauge.right + 6
 
-                        minimumValue: -200
+                        minimumValue: -400
                         maximumValue: 0
 
                         font.pointSize: 8

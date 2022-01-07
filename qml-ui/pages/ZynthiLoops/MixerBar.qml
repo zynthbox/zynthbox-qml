@@ -259,19 +259,35 @@ Rectangle {
                                         Layout.margins: 4
                                         spacing: 2
 
-                                        QQC2.Button {
+                                        QQC2.RoundButton {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
+                                            Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                            radius: 2
                                             font.pointSize: 8
                                             checkable: true
                                             text: qsTr("S")
+                                            background: Rectangle {
+                                                radius: parent.radius
+                                                border.width: 1
+                                                border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                color: parent.down || parent.checked ? "#4caf50" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                            }
                                         }
-                                        QQC2.Button {
+                                        QQC2.RoundButton {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
+                                            Layout.preferredWidth: (parent.width-parent.spacing)/2
+                                            radius: 2
                                             font.pointSize: 8
                                             checkable: true
                                             text: qsTr("M")
+                                            background: Rectangle {
+                                                radius: parent.radius
+                                                border.width: 1
+                                                border.color: Qt.rgba(50, 50, 50, 0.1)
+                                                color: parent.down || parent.checked ? "#f44336" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                            }
                                         }
                                     }
                                 }

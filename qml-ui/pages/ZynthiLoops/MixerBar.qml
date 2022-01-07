@@ -158,10 +158,11 @@ Rectangle {
 
                                             anchors.fill: parent
 
-                                            headerText: model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+                                            enabled: !model.track.muted
+                                            headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
-                                            audioLeveldB:  model.track.audioLevel
-                                            inputAudioLeveldB: highlighted ? zynthian.zynthiloops.recordingAudioLevel : -400
+                                            audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
+                                            inputAudioLeveldB: highlighted || !model.track.muted ? zynthian.zynthiloops.recordingAudioLevel : -400
 
                                             slider.value: model.track.volume
                                             slider.onValueChanged: {
@@ -273,6 +274,8 @@ Rectangle {
                                                 border.color: Qt.rgba(50, 50, 50, 0.1)
                                                 color: parent.down || parent.checked ? "#4caf50" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                             }
+                                            onCheckedChanged: {
+                                            }
                                         }
                                         QQC2.RoundButton {
                                             Layout.fillWidth: true
@@ -287,6 +290,9 @@ Rectangle {
                                                 border.width: 1
                                                 border.color: Qt.rgba(50, 50, 50, 0.1)
                                                 color: parent.down || parent.checked ? "#f44336" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
+                                            }
+                                            onCheckedChanged: {
+                                                model.track.muted = checked;
                                             }
                                         }
                                     }

@@ -13,6 +13,7 @@ Rectangle {
     property alias inputAudioLeveldB: inputAudioLevelGauge.value
     property alias inputAudioLevelVisible: inputAudioLevelGauge.visible
     property alias slider: slider
+    property bool enabled: true
 
     signal doubleClicked();
 
@@ -50,6 +51,7 @@ Rectangle {
                 Layout.bottomMargin: 6
                 Layout.leftMargin: 30
 
+                enabled: control.enabled
                 orientation: Qt.Vertical
                 from: -40
                 to: 20
@@ -213,6 +215,7 @@ Rectangle {
 
         id: mouseArea
         anchors.fill: parent
+        enabled: control.enabled
 
         onPressed: {
             startY = mouse.y

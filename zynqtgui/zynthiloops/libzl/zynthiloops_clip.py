@@ -135,6 +135,11 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.set_volume(self.track.volume)
 
+    @Slot(int)
+    def setVolume(self, vol):
+        if self.audioSource is not None:
+            self.audioSource.set_volume(vol)
+
     @Signal
     def current_beat_changed(self):
         pass

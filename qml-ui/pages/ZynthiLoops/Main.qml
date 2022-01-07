@@ -299,7 +299,6 @@ Zynthian.ScreenPage {
             repeat: false
             interval: 1000
             onTriggered: {
-                console.log(">>>>>>")
                 selectedTrackOutline.x = partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x
                 selectedTrackOutline.y = partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y
             }

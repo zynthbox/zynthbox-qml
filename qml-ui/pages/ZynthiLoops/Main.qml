@@ -291,140 +291,51 @@ Zynthian.ScreenPage {
         }
     }
 
-    contentItem : ColumnLayout {
+    contentItem : Item {
+        id: content
+
+        Rectangle {
+            id: selectedTrackOutline
+            width: privateProps.headerWidth
+            height: privateProps.headerHeight*3 + loopGrid.columnSpacing*2
+            color: "#22ffffff"
+            visible: index === zynthian.session_dashboard.selectedTrack
+            z: 100
+        }
+
         ColumnLayout {
-            id: tableLayout
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            spacing: 1
-
-            // HEADER ROW
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.preferredHeight: privateProps.headerHeight
-                Layout.maximumHeight: privateProps.headerHeight
-                spacing: 1
-
-                TableHeader {
-                    id: songCell
-                    Layout.preferredWidth: privateProps.headerWidth + 8
-                    Layout.maximumWidth: privateProps.headerWidth + 8
-                    Layout.fillHeight: true
-
-                    text: root.song.name
-                    subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
-                    // subText: "BPM: " + root.song.bpm
-                    // subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
-
-                    textSize: 11
-                    subTextSize: 9
-                    subSubTextSize: 0
-
-                    onPressed: {
-                        bottomBar.controlType = BottomBar.ControlType.Song;
-                        bottomBar.controlObj = root.song;
-
-                        if (mixerActionBtn.checked) {
-                            bottomStack.currentIndex = 0
-                            mixerActionBtn.checked = false
-                        }
-                    }
-
-                }
-
-                ListView {
-                    id: partsHeaderRow
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    clip: true
-                    spacing: 1
-                    contentX: loopGridFlickable.contentX
-                    orientation: Qt.Horizontal
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    model: root.song.tracksModel
-
-                    delegate: TableHeader {
-                        text: model.track.name
-                         subText: model.track.connectedPattern >= 0
-                                  ? "Pat. " + (model.track.connectedPattern+1)
-                                  : ""
-                        color: index === zynthian.session_dashboard.selectedTrack
-                                ? Qt.lighter(Kirigami.Theme.backgroundColor)
-                                : Kirigami.Theme.backgroundColor
-
-                        width: privateProps.headerWidth
-                        height: ListView.view.height
-
-                        onPressed: {
-                            if (bottomBar.controlObj !== model.track) {
-                                // Set current selected track
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = model.track;
-
-                                zynthian.session_dashboard.selectedTrack = index;
-
-                                sceneActionBtn.checked = false;
-                                mixerActionBtn.checked = true;
-                                bottomStack.currentIndex = 1;
-                            } else {
-                                // Current selected track is already set. open sounds dialog
-
-                                if (bottomBar.tabbedView.activeItem.resetModel) {
-                                    // Reset model to load new changes if any
-                                    bottomBar.tabbedView.activeItem.resetModel();
-                                } else {
-                                    console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
-                                }
-
-                                if (mixerActionBtn.checked) {
-                                    bottomStack.currentIndex = 0
-                                    mixerActionBtn.checked = false
-                                }
-                            }
-                        }
-
-                        onPressAndHold: {
-                            zynthian.track.trackId = model.track.id
-                            //zynthian.current_modal_screen_id = "track"
-                        }
-                    }
-                }
-            }
-            // END HEADER ROW
-
-            RowLayout {
+            anchors.fill: parent
+            ColumnLayout {
+                id: tableLayout
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-
                 spacing: 1
 
-                ListView {
-                    id: tracksHeaderColumns
-
-                    Layout.preferredWidth: privateProps.headerWidth + 8
-                    Layout.maximumWidth: privateProps.headerWidth + 8
-                    Layout.fillHeight: true
-
-                    clip: true
+                // HEADER ROW
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: privateProps.headerHeight
+                    Layout.maximumHeight: privateProps.headerHeight
                     spacing: 1
-                    contentY: loopGridFlickable.contentY
-                    boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.song.partsModel
+                    TableHeader {
+                        id: songCell
+                        Layout.preferredWidth: privateProps.headerWidth + 8
+                        Layout.maximumWidth: privateProps.headerWidth + 8
+                        Layout.fillHeight: true
 
-                    delegate: TableHeader {
-                        text: part.name
-                        // subText: qsTr("%L1 Bar").arg(model.part.length)
+                        text: root.song.name
+                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
+                        // subText: "BPM: " + root.song.bpm
+                        // subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
 
-                        width: ListView.view.width
-                        height: privateProps.headerHeight
+                        textSize: 11
+                        subTextSize: 9
+                        subSubTextSize: 0
 
                         onPressed: {
-                            bottomBar.controlType = BottomBar.ControlType.Part;
-                            bottomBar.controlObj = model.part;
+                            bottomBar.controlType = BottomBar.ControlType.Song;
+                            bottomBar.controlObj = root.song;
 
                             if (mixerActionBtn.checked) {
                                 bottomStack.currentIndex = 0
@@ -432,133 +343,250 @@ Zynthian.ScreenPage {
                             }
                         }
 
-                        Kirigami.Icon {
-                            width: 14
-                            height: 14
-                            color: "white"
-                            anchors {
-                                right: parent.right
-                                top: parent.top
+                    }
+
+                    ListView {
+                        id: partsHeaderRow
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        clip: true
+                        spacing: 1
+                        contentX: loopGridFlickable.contentX
+                        orientation: Qt.Horizontal
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        model: root.song.tracksModel
+
+//                        Component.onCompleted: {
+//                            var header = partsHeaderRow.itemAtIndex(zynthian.session_dashboard.selectedTrack)
+//                            selectedTrackOutline.x = partsHeaderRow.mapToItem(content, header.x, header.y).x
+//                            selectedTrackOutline.y = partsHeaderRow. mapToItem(content, header.x, header.y).y
+//                        }
+
+                        delegate: TableHeader {
+                            text: model.track.name
+                            subText: model.track.connectedPattern >= 0
+                                      ? "Pat. " + (model.track.connectedPattern+1)
+                                      : ""
+                            color: Kirigami.Theme.backgroundColor
+
+                            width: privateProps.headerWidth
+                            height: ListView.view.height
+
+                            onPressed: {
+                                if (bottomBar.controlObj !== model.track) {
+                                    // Set current selected track
+                                    bottomBar.controlType = BottomBar.ControlType.Track;
+                                    bottomBar.controlObj = model.track;
+
+                                    selectedTrackOutline.x = partsHeaderRow.mapToItem(content, x, y).x
+                                    selectedTrackOutline.y = partsHeaderRow. mapToItem(content, x, y).y
+
+                                    zynthian.session_dashboard.selectedTrack = index;
+
+                                    sceneActionBtn.checked = false;
+                                    mixerActionBtn.checked = true;
+                                    bottomStack.currentIndex = 1;
+                                } else {
+                                    // Current selected track is already set. open sounds dialog
+
+                                    if (bottomBar.tabbedView.activeItem.resetModel) {
+                                        // Reset model to load new changes if any
+                                        bottomBar.tabbedView.activeItem.resetModel();
+                                    } else {
+                                        console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
+                                    }
+
+                                    if (mixerActionBtn.checked) {
+                                        bottomStack.currentIndex = 0
+                                        mixerActionBtn.checked = false
+                                    }
+                                }
                             }
 
-                            source: "media-playback-start"
-                            visible: model.part.isPlaying
+                            onPressAndHold: {
+                                zynthian.track.trackId = model.track.id
+                                //zynthian.current_modal_screen_id = "track"
+                            }
                         }
                     }
                 }
+                // END HEADER ROW
 
-                Flickable {
-                    id: loopGridFlickable
-
-                    Layout.fillWidth: true
+                RowLayout {
                     Layout.fillHeight: true
-                    contentWidth: loopGrid.width
-                    contentHeight: loopGrid.height
+                    Layout.fillWidth: true
 
-                    clip: true
-                    flickableDirection: Flickable.HorizontalAndVerticalFlick
-                    boundsBehavior: Flickable.StopAtBounds
-                    QQC2.ScrollBar.horizontal: QQC2.ScrollBar {
-                        height: 4
+                    spacing: 1
+
+                    ListView {
+                        id: tracksHeaderColumns
+
+                        Layout.preferredWidth: privateProps.headerWidth + 8
+                        Layout.maximumWidth: privateProps.headerWidth + 8
+                        Layout.fillHeight: true
+
+                        clip: true
+                        spacing: 1
+                        contentY: loopGridFlickable.contentY
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        model: root.song.partsModel
+
+                        delegate: TableHeader {
+                            text: part.name
+                            // subText: qsTr("%L1 Bar").arg(model.part.length)
+
+                            width: ListView.view.width
+                            height: privateProps.headerHeight
+
+                            onPressed: {
+                                bottomBar.controlType = BottomBar.ControlType.Part;
+                                bottomBar.controlObj = model.part;
+
+                                if (mixerActionBtn.checked) {
+                                    bottomStack.currentIndex = 0
+                                    mixerActionBtn.checked = false
+                                }
+                            }
+
+                            Kirigami.Icon {
+                                width: 14
+                                height: 14
+                                color: "white"
+                                anchors {
+                                    right: parent.right
+                                    top: parent.top
+                                }
+
+                                source: "media-playback-start"
+                                visible: model.part.isPlaying
+                            }
+                        }
                     }
 
-                    contentX: partsHeaderRow.contentX - partsHeaderRow.originX
-                    contentY: tracksHeaderColumns.contentY
+                    Flickable {
+                        id: loopGridFlickable
 
-                    GridLayout {
-                        id: loopGrid
-                        rows: root.song.partsModel.count
-                        flow: GridLayout.TopToBottom
-                        rowSpacing: 1
-                        columnSpacing: 1
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentWidth: loopGrid.width
+                        contentHeight: loopGrid.height
 
-                        Repeater {
-                            model: root.song.tracksModel
+                        clip: true
+                        flickableDirection: Flickable.HorizontalAndVerticalFlick
+                        boundsBehavior: Flickable.StopAtBounds
+                        QQC2.ScrollBar.horizontal: QQC2.ScrollBar {
+                            height: 4
+                        }
 
-                            delegate: Repeater {
-                                property int rowIndex: index
+                        contentX: partsHeaderRow.contentX - partsHeaderRow.originX
+                        contentY: tracksHeaderColumns.contentY
 
-                                model: track.clipsModel
+                        GridLayout {
+                            id: loopGrid
+                            rows: root.song.partsModel.count
+                            flow: GridLayout.TopToBottom
+                            rowSpacing: 1
+                            columnSpacing: 1
 
-                                delegate: ClipCell {
-                                    id: clipCell
-                                    isPlaying: {
-                                        if (track.connectedPattern < 0) {
-                                            return model.clip.isPlaying;
-                                        } else {
-                                            var patternIsPlaying = false;
-                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
-                                            if (sequence && sequence.isPlaying) {
-                                                var pattern = sequence.get(track.connectedPattern);
-                                                /*if (pattern.isEmpty) {
-                                                    return false
-                                                } else */if ((model.clip.col === 0 && pattern.bank !== "I")
-                                                    || (model.clip.col === 1 && pattern.bank !== "II")) {
-                                                    return false
-                                                } else if (sequence.soloPattern > -1) {
-                                                    patternIsPlaying = (sequence.soloPattern == track.connectedPattern)
-                                                } else if (pattern) {
-                                                    patternIsPlaying = pattern.enabled
+                            Repeater {
+                                model: root.song.tracksModel
+
+                                delegate: Repeater {
+                                    property int rowIndex: index
+
+                                    model: track.clipsModel
+
+                                    delegate: ClipCell {
+                                        id: clipCell
+                                        isPlaying: {
+                                            if (track.connectedPattern < 0) {
+                                                return model.clip.isPlaying;
+                                            } else {
+                                                var patternIsPlaying = false;
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                                                if (sequence && sequence.isPlaying) {
+                                                    var pattern = sequence.get(track.connectedPattern);
+                                                    /*if (pattern.isEmpty) {
+                                                        return false
+                                                    } else */if ((model.clip.col === 0 && pattern.bank !== "I")
+                                                        || (model.clip.col === 1 && pattern.bank !== "II")) {
+                                                        return false
+                                                    } else if (sequence.soloPattern > -1) {
+                                                        patternIsPlaying = (sequence.soloPattern == track.connectedPattern)
+                                                    } else if (pattern) {
+                                                        patternIsPlaying = pattern.enabled
+                                                    }
                                                 }
+                                                return patternIsPlaying && model.clip.inCurrentScene;
                                             }
-                                            return patternIsPlaying && model.clip.inCurrentScene;
                                         }
-                                    }
 
-                                    highlighted: bottomBar.controlObj === model.clip
+                                        highlighted: bottomBar.controlObj === model.clip
 
-                                    backgroundColor: {
+                                        backgroundColor: {
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                            var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+
                                             if (model.clip.inCurrentScene) {
                                                 return "#3381d4fa";
-                                            } else if ((track.connectedPattern >= 0)
+                                            } else if ((track.connectedPattern >= 0 && hasNotes)
                                                 || (model.clip.path && model.clip.path.length > 0)) {
                                                 return Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                             } else {
                                                 return Qt.rgba(0, 0, 0, 1);
                                             }
-                                    }
-                                    isTrackSelected: rowIndex === zynthian.session_dashbard.selectedTrack
-
-                                    property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
-                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
-
-                                    Layout.preferredWidth: privateProps.cellWidth
-                                    Layout.maximumWidth: privateProps.cellWidth
-                                    Layout.preferredHeight: privateProps.cellHeight
-                                    Layout.maximumHeight: privateProps.cellHeight
-
-                                    onPressed: {
-                                        zynthian.session_dashboard.selectedTrack = track.id;
-                                        if (track.connectedPattern >= 0) {
-                                            bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                            bottomBar.controlObj = model.clip;
-                                        } else {
-                                            bottomBar.controlType = BottomBar.ControlType.Clip;
-                                            bottomBar.controlObj = model.clip;
                                         }
 
+                                        property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+                                        property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
 
-                                        if (dblTimer.running || sceneActionBtn.checked) {
-                                            root.song.scenesModel.toggleClipInCurrentScene(model.clip);
+                                        Layout.preferredWidth: privateProps.cellWidth
+                                        Layout.maximumWidth: privateProps.cellWidth
+                                        Layout.preferredHeight: privateProps.cellHeight
+                                        Layout.maximumHeight: privateProps.cellHeight
+
+                                        onPressed: {
+                                            zynthian.session_dashboard.selectedTrack = track.id;
+
+//                                            var header = partsHeaderRow.itemAtIndex(rowIndex)
+//                                            selectedTrackOutline.x = partsHeaderRow.mapToItem(content, header.x, header.y).x
+//                                            selectedTrackOutline.y = partsHeaderRow. mapToItem(content, header.x, header.y).y
 
                                             if (track.connectedPattern >= 0) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
-                                                seq.bank = model.clip.col === 0 ? "A" : "B";
-                                                seq.enabled = model.clip.inCurrentScene;
+                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                bottomBar.controlObj = model.clip;
+                                            } else {
+                                                bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                bottomBar.controlObj = model.clip;
+                                            }
 
-                                                console.log("Clip Row :", model.clip.row, ", Enabled :", seq.enabled);
+
+                                            if (dblTimer.running || sceneActionBtn.checked) {
+                                                root.song.scenesModel.toggleClipInCurrentScene(model.clip);
+
+                                                if (track.connectedPattern >= 0) {
+                                                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                                    seq.bank = model.clip.col === 0 ? "A" : "B";
+                                                    seq.enabled = model.clip.inCurrentScene;
+
+                                                    console.log("Clip Row :", model.clip.row, ", Enabled :", seq.enabled);
+                                                }
+                                            }
+                                            dblTimer.restart()
+
+                                            if (mixerActionBtn.checked) {
+                                                bottomStack.currentIndex = 0
+                                                mixerActionBtn.checked = false
                                             }
                                         }
-                                        dblTimer.restart()
-
-                                        if (mixerActionBtn.checked) {
-                                            bottomStack.currentIndex = 0
-                                            mixerActionBtn.checked = false
+                                        Timer { //FIXME: why onDoubleClicked doesn't work
+                                            id: dblTimer
+                                            interval: 200
                                         }
-                                    }
-                                    Timer { //FIXME: why onDoubleClicked doesn't work
-                                        id: dblTimer
-                                        interval: 200
                                     }
                                 }
                             }
@@ -566,30 +594,30 @@ Zynthian.ScreenPage {
                     }
                 }
             }
-        }
 
-        StackLayout {
-            id: bottomStack
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 15
-            Layout.fillWidth: true
-            Layout.fillHeight: false
-
-            BottomBar {
-                id: bottomBar
+            StackLayout {
+                id: bottomStack
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 15
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
+                Layout.fillHeight: false
 
-            MixerBar {
-                id: mixerBar
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
+                BottomBar {
+                    id: bottomBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
 
-            ScenesBar {
-                id: scenesBar
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                MixerBar {
+                    id: mixerBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                ScenesBar {
+                    id: scenesBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
             }
         }
     }

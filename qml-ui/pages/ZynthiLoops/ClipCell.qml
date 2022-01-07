@@ -38,7 +38,6 @@ QQC2.AbstractButton {
     property bool highlighted: false
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool isTrackSelected: false
 
     onPressed: forceActiveFocus()
 
@@ -63,6 +62,11 @@ QQC2.AbstractButton {
                     } else {
                         return model.clip.length
                     }
+                } else if (track.connectedPattern >= 0) {
+                    var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                    var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+
+                    return hasNotes ? pattern.availableBars : ""
                 } else {
                     return ""
                 }
@@ -86,10 +90,8 @@ QQC2.AbstractButton {
 
         border.width: 1
         border.color: root.highlighted
-                      ? Kirigami.Theme.highlightColor
-                      : root.isTrackSelected
-                         ?"#22ffffff"
-                         : "transparent"
+                        ? Kirigami.Theme.highlightColor
+                        : "transparent"
 
         Rectangle {
             id: progressRect

@@ -294,17 +294,35 @@ Zynthian.ScreenPage {
     contentItem : Item {
         id: content
 
+        Timer {
+            id: selectedTrackOutlineTimer
+            repeat: false
+            interval: 1000
+            onTriggered: {
+                console.log(">>>>>>")
+                selectedTrackOutline.x = partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x
+                selectedTrackOutline.y = partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y
+            }
+        }
+
         Rectangle {
             id: selectedTrackOutline
             width: privateProps.headerWidth
             height: privateProps.headerHeight*3 + loopGrid.columnSpacing*2
-            color: "#22ffffff"
+            color: "#2affffff"
             visible: index === zynthian.session_dashboard.selectedTrack
+            x: partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x
+            y: partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y
             z: 100
         }
 
         ColumnLayout {
             anchors.fill: parent
+
+            Component.onCompleted: {
+                selectedTrackOutlineTimer.start()
+            }
+
             ColumnLayout {
                 id: tableLayout
                 Layout.fillHeight: true
@@ -345,70 +363,65 @@ Zynthian.ScreenPage {
 
                     }
 
-                    ListView {
+                    RowLayout {
+                    // ListView {
                         id: partsHeaderRow
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        clip: true
+//                        clip: true
                         spacing: 1
-                        contentX: loopGridFlickable.contentX
-                        orientation: Qt.Horizontal
-                        boundsBehavior: Flickable.StopAtBounds
+//                        contentX: loopGridFlickable.contentX
+//                        orientation: Qt.Horizontal
+//                        boundsBehavior: Flickable.StopAtBounds
 
-                        model: root.song.tracksModel
+                        Repeater {
+                            id: partsHeaderRepeater
+                            model: root.song.tracksModel
 
-//                        Component.onCompleted: {
-//                            var header = partsHeaderRow.itemAtIndex(zynthian.session_dashboard.selectedTrack)
-//                            selectedTrackOutline.x = partsHeaderRow.mapToItem(content, header.x, header.y).x
-//                            selectedTrackOutline.y = partsHeaderRow. mapToItem(content, header.x, header.y).y
-//                        }
+                            delegate: TableHeader {
+                                text: model.track.name
+                                subText: model.track.connectedPattern >= 0
+                                          ? "Pat. " + (model.track.connectedPattern+1)
+                                          : ""
+                                color: Kirigami.Theme.backgroundColor
 
-                        delegate: TableHeader {
-                            text: model.track.name
-                            subText: model.track.connectedPattern >= 0
-                                      ? "Pat. " + (model.track.connectedPattern+1)
-                                      : ""
-                            color: Kirigami.Theme.backgroundColor
+                                width: privateProps.headerWidth
+                                height: ListView.view.height
 
-                            width: privateProps.headerWidth
-                            height: ListView.view.height
+                                onPressed: {
+                                    if (bottomBar.controlObj !== model.track) {
+                                        // Set current selected track
+                                        bottomBar.controlType = BottomBar.ControlType.Track;
+                                        bottomBar.controlObj = model.track;
 
-                            onPressed: {
-                                if (bottomBar.controlObj !== model.track) {
-                                    // Set current selected track
-                                    bottomBar.controlType = BottomBar.ControlType.Track;
-                                    bottomBar.controlObj = model.track;
+                                        zynthian.session_dashboard.selectedTrack = index;
 
-                                    selectedTrackOutline.x = partsHeaderRow.mapToItem(content, x, y).x
-                                    selectedTrackOutline.y = partsHeaderRow. mapToItem(content, x, y).y
-
-                                    zynthian.session_dashboard.selectedTrack = index;
-
-                                    sceneActionBtn.checked = false;
-                                    mixerActionBtn.checked = true;
-                                    bottomStack.currentIndex = 1;
-                                } else {
-                                    // Current selected track is already set. open sounds dialog
-
-                                    if (bottomBar.tabbedView.activeItem.resetModel) {
-                                        // Reset model to load new changes if any
-                                        bottomBar.tabbedView.activeItem.resetModel();
+                                        sceneActionBtn.checked = false;
+                                        mixerActionBtn.checked = true;
+                                        bottomStack.currentIndex = 1;
                                     } else {
-                                        console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
-                                    }
+                                        // Current selected track is already set. open sounds dialog
 
-                                    if (mixerActionBtn.checked) {
-                                        bottomStack.currentIndex = 0
-                                        mixerActionBtn.checked = false
+                                        if (bottomBar.tabbedView.activeItem.resetModel) {
+                                            // Reset model to load new changes if any
+                                            bottomBar.tabbedView.activeItem.resetModel();
+                                        } else {
+                                            console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
+                                        }
+
+                                        if (mixerActionBtn.checked) {
+                                            bottomStack.currentIndex = 0
+                                            mixerActionBtn.checked = false
+                                        }
                                     }
                                 }
-                            }
 
-                            onPressAndHold: {
-                                zynthian.track.trackId = model.track.id
-                                //zynthian.current_modal_screen_id = "track"
+                                onPressAndHold: {
+                                    zynthian.track.trackId = model.track.id
+                                    //zynthian.current_modal_screen_id = "track"
+                                }
                             }
                         }
                     }
@@ -551,10 +564,6 @@ Zynthian.ScreenPage {
 
                                         onPressed: {
                                             zynthian.session_dashboard.selectedTrack = track.id;
-
-//                                            var header = partsHeaderRow.itemAtIndex(rowIndex)
-//                                            selectedTrackOutline.x = partsHeaderRow.mapToItem(content, header.x, header.y).x
-//                                            selectedTrackOutline.y = partsHeaderRow. mapToItem(content, header.x, header.y).y
 
                                             if (track.connectedPattern >= 0) {
                                                 bottomBar.controlType = BottomBar.ControlType.Pattern;

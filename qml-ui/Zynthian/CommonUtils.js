@@ -21,13 +21,11 @@ function startMetronomeAndPlayback() {
                 pattern.enabled = false;
             }
         }
+        sequence.prepareSequencePlayback();
+    } else {
+        console.debug("Sequence could not be fetched, and playback could not be prepared");
     }
     zynthian.zynthiloops.startPlayback();
-    if (sequence) {
-        sequence.startSequencePlayback();
-    } else {
-        console.debug("Sequence could not be fetched, and playback could not be started");
-    }
     console.log("Metronome and Playback Started");
 }
 
@@ -37,7 +35,7 @@ function stopMetronomeAndPlayback() {
     if (sequence) {
         sequence.stopSequencePlayback();
     } else {
-        console.log("Sequence could not be fetched, and playback could not be started");
+        console.log("Sequence could not be fetched, and playback could not be stopped");
     }
     zynthian.zynthiloops.stopAllPlayback();
     zynthian.zynthiloops.stopRecording();

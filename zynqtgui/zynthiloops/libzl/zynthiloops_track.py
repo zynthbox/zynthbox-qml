@@ -53,6 +53,7 @@ class zynthiloops_track(QObject):
         # self.__connected_sound__ = -1
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
+        self.__muted__ = False
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
         if self.__id__ < 5:
@@ -427,7 +428,6 @@ class zynthiloops_track(QObject):
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
 
-
     def set_chained_sounds(self, sounds):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
@@ -459,3 +459,20 @@ class zynthiloops_track(QObject):
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
     ### END Property chainedSounds
+
+    ### Property muted
+    def get_muted(self):
+        return self.__muted__
+    def set_muted(self, muted):
+        self.__muted__ = muted
+        for clip_index in range(0, self.__clips_model__.count):
+            clip = self.__clips_model__.getClip(clip_index)
+            if clip is not None:
+                if muted:
+                    clip.setVolume(-40)
+                else:
+                    clip.setVolume(self.volume)
+        self.isMutedChanged.emit()
+    isMutedChanged = Signal()
+    muted = Property(bool, get_muted, set_muted, notify=isMutedChanged)
+    ### End Property muted

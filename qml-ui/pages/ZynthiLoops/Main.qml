@@ -538,8 +538,12 @@ Zynthian.ScreenPage {
                                         highlighted: bottomBar.controlObj === model.clip
 
                                         backgroundColor: {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
-                                            var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+                                            var pattern = null;
+                                            var hasNotes = false;
+                                            try {
+                                                pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                                                hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+                                            } catch(err) {}
 
                                             if (model.clip.inCurrentScene) {
                                                 return "#3381d4fa";

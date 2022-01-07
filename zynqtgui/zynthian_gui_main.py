@@ -115,7 +115,6 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata.append({"icon":"../../img/settings.svg"})
 
         apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
-        self.global_recordings_dir = "/zynthian/zynthian-my-data/sounds/capture"
         if Path(apps_folder).exists():
             for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
                 try:
@@ -126,7 +125,7 @@ class zynthian_gui_main(zynthian_gui_selector):
                     self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
                     # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
                     # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
-                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : self.global_recordings_dir + "/" + metadata["Name"]})
+                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"]})
                 except Exception as e:
                     logging.error(e)
 
@@ -134,7 +133,8 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
-            self.__current_recordings_file_base__ = self.list_metadata[i]["recordings_file_base"]
+            self.song_recordings_dir = self.zyngui.screens["zynthiloops"].song.sketch_folder + "wav"
+            self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             Popen([self.list_data[i][1]])
         elif self.list_data[i][0]:
@@ -144,7 +144,7 @@ class zynthian_gui_main(zynthian_gui_selector):
     @Slot(None)
     def start_recording(self):
         if (self.__is_recording__ == False):
-            Path(self.global_recordings_dir).mkdir(parents=True, exist_ok=True)
+            Path(self.song_recordings_dir).mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S");
             self.__recording_file__ = f"{self.__current_recordings_file_base__}{'-'+timestamp}.clip.wav"
 

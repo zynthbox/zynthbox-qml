@@ -347,10 +347,10 @@ Zynthian.ScreenPage {
                     model: root.song.tracksModel
 
                     delegate: TableHeader {
-                        text: model.track.connectedPattern >= 0
-                                ? "P" + (model.track.connectedPattern+1)
-                                : model.track.name
-                        // subText: model.track.type === "audio" ? "Audio" : "Midi"
+                        text: model.track.name
+                         subText: model.track.connectedPattern >= 0
+                                  ? "Pat. " + (model.track.connectedPattern+1)
+                                  : ""
                         color: index === zynthian.session_dashboard.selectedTrack
                                 ? Qt.lighter(Kirigami.Theme.backgroundColor)
                                 : Kirigami.Theme.backgroundColor

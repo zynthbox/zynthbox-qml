@@ -104,6 +104,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_right__ = -400
         self.__recording_audio_level__ = -400
 
+        self.update_recorder_jack_port_timer = QTimer()
+        self.update_recorder_jack_port_timer.setInterval(500)
+        self.update_recorder_jack_port_timer.setSingleShot(True)
+        self.update_recorder_jack_port_timer.timeout.connect(lambda: self.update_recorder_jack_port())
+
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
@@ -122,7 +127,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.update_timer_bpm()
 
-        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port_timer.start())
 
     def recording_jack_client_process_callback(self, frames):
         db_left = self.peak_dbFS_from_jack_output(self.jack_capture_port_a, frames)

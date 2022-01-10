@@ -137,6 +137,13 @@ Rectangle {
                             border.width: 1
                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    zynthian.session_dashboard.selectedTrack = track.id;
+                                }
+                            }
+
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.topMargin: 4
@@ -173,6 +180,9 @@ Rectangle {
                                                 model.track.volume = slider.value
                                             }
 
+                                            onClicked: {
+                                                zynthian.session_dashboard.selectedTrack = track.id;
+                                            }
                                             onDoubleClicked: {
                                                 slider.value = model.track.initialVolume;
                                             }

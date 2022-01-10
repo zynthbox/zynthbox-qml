@@ -162,7 +162,11 @@ Rectangle {
                                             headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
                                             audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
-                                            inputAudioLeveldB: highlighted || !model.track.muted ? zynthian.zynthiloops.recordingAudioLevel : -400
+                                            inputAudioLeveldB: highlighted
+                                                                ? !model.track.muted
+                                                                    ? zynthian.zynthiloops.recordingAudioLevel
+                                                                    : -400
+                                                                : null
 
                                             slider.value: model.track.volume
                                             slider.onValueChanged: {

@@ -15,6 +15,7 @@ Rectangle {
     property alias slider: slider
     property bool enabled: true
 
+    signal clicked();
     signal doubleClicked();
 
     id: control
@@ -211,9 +212,20 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: dblTimer
+        interval: 200
+        onTriggered: {
+            if (!mouseArea.valueChanged) {
+                control.clicked();
+            }
+        }
+    }
+
     MouseArea {
         property real startY
         property real startValue
+        property bool valueChanged: false
 
         id: mouseArea
         anchors.fill: parent
@@ -222,6 +234,7 @@ Rectangle {
         onPressed: {
             startY = mouse.y
             startValue = slider.value
+            valueChanged = false
         }
         onPositionChanged: {
             let delta = mouse.y - startY;
@@ -229,9 +242,14 @@ Rectangle {
             let floored = Math.floor(value/slider.stepSize) * slider.stepSize;
 
             slider.value = value;
+            valueChanged = true
         }
-        onDoubleClicked: {
-            control.doubleClicked();
+        onClicked: {
+            if (dblTimer.running) {
+                valueChanged = true;
+                control.doubleClicked();
+            }
+            dblTimer.restart();
         }
     }
 }

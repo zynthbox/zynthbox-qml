@@ -316,7 +316,7 @@ Zynthian.ScreenPage {
             anchors.fill: parent
 
             Component.onCompleted: {
-//                selectedTrackOutlineTimer.start()
+                selectedTrackOutlineTimer.start()
             }
 
             ColumnLayout {

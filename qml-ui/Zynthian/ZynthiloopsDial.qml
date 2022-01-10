@@ -14,7 +14,11 @@ ColumnLayout {
     property string controlProperty
     property real buttonStepSize
     signal doubleClicked()
-    onControlObjChanged: dial.value = controlObj[controlProperty]
+    onControlObjChanged: {
+        if (controlObj[controlProperty]) {
+            dial.value = controlObj[controlProperty]
+        }
+    }
 
     //visible: controlObj && controlObj.hasOwnProperty(root.controlProperty) ? true : false
 

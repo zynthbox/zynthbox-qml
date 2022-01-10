@@ -173,7 +173,7 @@ Rectangle {
                                                                 ? !model.track.muted
                                                                     ? zynthian.zynthiloops.recordingAudioLevel
                                                                     : -400
-                                                                : null
+                                                                : -400
 
                                             slider.value: model.track.volume
                                             slider.onValueChanged: {

@@ -10,7 +10,7 @@ Rectangle {
     property alias headerText: headerLabel.text
     property alias footerText: footerLabel.text
     property alias audioLeveldB: audioGauge.value
-    property alias inputAudioLeveldB: inputAudioLevelGauge.value
+    property var inputAudioLeveldB: null
     property alias inputAudioLevelVisible: inputAudioLevelGauge.visible
     property alias slider: slider
     property bool enabled: true
@@ -179,9 +179,11 @@ Rectangle {
                         anchors.bottom: audioGauge.bottom
                         anchors.right: audioGauge.right
                         anchors.rightMargin: -8
+                        visible: control.inputAudioLeveldB != null
 
                         minimumValue: -400
                         maximumValue: 0
+                        value: control.inputAudioLeveldB ? control.inputAudioLeveldB : minimumValue
 
                         font.pointSize: 8
 

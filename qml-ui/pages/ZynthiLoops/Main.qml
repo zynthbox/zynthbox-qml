@@ -297,7 +297,7 @@ Zynthian.ScreenPage {
         Timer {
             id: selectedTrackOutlineTimer
             repeat: false
-            interval: 1000
+            interval: 100
             onTriggered: {
                 selectedTrackOutline.x = Qt.binding(function() { return partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
                 selectedTrackOutline.y = Qt.binding(function() { return partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })

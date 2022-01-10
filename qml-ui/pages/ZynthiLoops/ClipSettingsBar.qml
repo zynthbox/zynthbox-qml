@@ -155,7 +155,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.bottomBar.controlObj ? (root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)) : ""
+            text: root.bottomBar.controlObj && root.bottomBar.controlObj.bpm ? (root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)) : ""
             // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
             /** Float Matching : Matches exactly one '0' after decimal point

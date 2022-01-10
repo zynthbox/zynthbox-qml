@@ -309,7 +309,6 @@ Zynthian.ScreenPage {
             width: privateProps.headerWidth
             height: privateProps.headerHeight*3 + loopGrid.columnSpacing*2
             color: "#2affffff"
-            visible: index === zynthian.session_dashboard.selectedTrack
             z: 100
         }
 
@@ -317,7 +316,7 @@ Zynthian.ScreenPage {
             anchors.fill: parent
 
             Component.onCompleted: {
-                selectedTrackOutlineTimer.start()
+//                selectedTrackOutlineTimer.start()
             }
 
             ColumnLayout {
@@ -390,14 +389,14 @@ Zynthian.ScreenPage {
                                 onPressed: {
                                     if (bottomBar.controlObj !== model.track) {
                                         // Set current selected track
-                                        bottomBar.controlType = BottomBar.ControlType.Track;
-                                        bottomBar.controlObj = model.track;
+//                                        bottomBar.controlType = BottomBar.ControlType.Track;
+//                                        bottomBar.controlObj = model.track;
 
                                         zynthian.session_dashboard.selectedTrack = index;
 
-                                        sceneActionBtn.checked = false;
-                                        mixerActionBtn.checked = true;
-                                        bottomStack.currentIndex = 1;
+//                                        sceneActionBtn.checked = false;
+//                                        mixerActionBtn.checked = true;
+//                                        bottomStack.currentIndex = 1;
                                     } else {
                                         // Current selected track is already set. open sounds dialog
 

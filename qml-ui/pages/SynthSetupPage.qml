@@ -208,6 +208,8 @@ Zynthian.ScreenPage {
         id: layout
         spacing: Kirigami.Units.gridUnit
 
+        CustomElement {}
+
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true

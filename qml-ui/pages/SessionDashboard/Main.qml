@@ -324,41 +324,41 @@ Zynthian.ScreenPage {
             }
         }
 
-        Zynthian.TabbedControlView {
-            id: tabbedView
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            visibleFocusRects: false
-            minimumTabsCount: 5
+//        Zynthian.TabbedControlView {
+//            id: tabbedView
+//            Layout.fillWidth: true
+//            Layout.fillHeight: true
+//            visibleFocusRects: false
+//            minimumTabsCount: 5
 
-            property QQC2.StackView stack
+//            property QQC2.StackView stack
 
-            tabActions: [
-                Zynthian.TabbedControlViewAction {
-                    id: tracksViewTab
-                    text: qsTr("Tracks")
-                    page: Qt.resolvedUrl("TracksView.qml")
-                },
-                Zynthian.TabbedControlViewAction {
-                    // Sketches tab renamed to sessions
-                    text: qsTr("Sessions")
-                    page: Qt.resolvedUrl("SketchesView.qml")
-                },
-                Zynthian.TabbedControlViewAction {
-                    // Sessions tab renamed to Wiring
-                    text: qsTr("Wiring")
-                    page: Qt.resolvedUrl("SessionView.qml")
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Templates")
-                    page: Qt.resolvedUrl("TemplatesView.qml")
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Discover")
-                    page: Qt.resolvedUrl("DiscoverView.qml")
-                }
-            ]
-        }
+//            tabActions: [
+//                Zynthian.TabbedControlViewAction {
+//                    id: tracksViewTab
+//                    text: qsTr("Tracks")
+//                    page: Qt.resolvedUrl("TracksView.qml")
+//                },
+//                Zynthian.TabbedControlViewAction {
+//                    // Sketches tab renamed to sessions
+//                    text: qsTr("Sessions")
+//                    page: Qt.resolvedUrl("SketchesView.qml")
+//                },
+//                Zynthian.TabbedControlViewAction {
+//                    // Sessions tab renamed to Wiring
+//                    text: qsTr("Wiring")
+//                    page: Qt.resolvedUrl("SessionView.qml")
+//                },
+//                Zynthian.TabbedControlViewAction {
+//                    text: qsTr("Templates")
+//                    page: Qt.resolvedUrl("TemplatesView.qml")
+//                },
+//                Zynthian.TabbedControlViewAction {
+//                    text: qsTr("Discover")
+//                    page: Qt.resolvedUrl("DiscoverView.qml")
+//                }
+//            ]
+//        }
     }
 }
 

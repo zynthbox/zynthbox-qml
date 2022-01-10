@@ -65,36 +65,36 @@ Zynthian.Stack {
 //                     root.pageCache["zynthiloops"] = component.createObject(root, {"width": root.width, "height": root.height});
 //                     root.pageCache["zynthiloops"].visible = false;
 //                 }
-                if (!root.pageCache["session_dashboard"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("session_dashboard");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["session_dashboard"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["session_dashboard"].visible = false;
-                }
-                if (!root.pageCache["song_arranger"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["song_arranger"].visible = false;
-                }
-                if (!root.pageCache["playgrid"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["playgrid"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["playgrid"].visible = false;
-                }
-                if (!root.pageCache["sketch_copier"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["sketch_copier"].visible = false;
-                }
-                if (!root.pageCache["midi_key_range"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
-                    var component = Qt.createComponent(file);
-                    root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["midi_key_range"].visible = false;
-                }
+//                 if (!root.pageCache["session_dashboard"]) {
+//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("session_dashboard");
+//                     var component = Qt.createComponent(file);
+//                     root.pageCache["session_dashboard"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                     root.pageCache["session_dashboard"].visible = false;
+//                 }
+//                 if (!root.pageCache["song_arranger"]) {
+//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
+//                     var component = Qt.createComponent(file);
+//                     root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                     root.pageCache["song_arranger"].visible = false;
+//                 }
+//                 if (!root.pageCache["playgrid"]) {
+//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
+//                     var component = Qt.createComponent(file);
+//                     root.pageCache["playgrid"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                     root.pageCache["playgrid"].visible = false;
+//                 }
+//                 if (!root.pageCache["sketch_copier"]) {
+//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
+//                     var component = Qt.createComponent(file);
+//                     root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                     root.pageCache["sketch_copier"].visible = false;
+//                 }
+//                 if (!root.pageCache["midi_key_range"]) {
+//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
+//                     var component = Qt.createComponent(file);
+//                     root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
+//                     root.pageCache["midi_key_range"].visible = false;
+//                 }
             }
         },
         Connections {

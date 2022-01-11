@@ -389,14 +389,14 @@ Zynthian.ScreenPage {
                                 onPressed: {
                                     if (bottomBar.controlObj !== model.track) {
                                         // Set current selected track
-//                                        bottomBar.controlType = BottomBar.ControlType.Track;
-//                                        bottomBar.controlObj = model.track;
+                                        bottomBar.controlType = BottomBar.ControlType.Track;
+                                        bottomBar.controlObj = model.track;
 
                                         zynthian.session_dashboard.selectedTrack = index;
 
-//                                        sceneActionBtn.checked = false;
-//                                        mixerActionBtn.checked = true;
-//                                        bottomStack.currentIndex = 1;
+                                        sceneActionBtn.checked = false;
+                                        mixerActionBtn.checked = true;
+                                        bottomStack.currentIndex = 1;
                                     } else {
                                         // Current selected track is already set. open sounds dialog
 

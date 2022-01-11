@@ -103,7 +103,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         # Snapshot Management
         # self.list_data.append((None, 0, ""))
 
-        self.list_data.append((self.snapshots_menu, 0, "Snapshots"))
+        # As per #299, rename Snapshots to Soundsets
+        self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
         self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
         # if len(self.zyngui.screens["layer"].layers) > 0:

@@ -50,9 +50,10 @@ class zynthian_gui_snapshots_menu(zynthian_gui_selector):
 
     def fill_list(self):
         self.list_data = []
-        self.list_data.append((self.load_snapshot, 0, "Load Snapshot"))
+        # As per #299 rename Snapshots to Soundsets
+        self.list_data.append((self.load_snapshot, 0, "Load Soundset"))
         if len(self.zyngui.screens["layer"].layers) > 0:
-            self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
+            self.list_data.append((self.save_snapshot, 0, "Save Soundset"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
         super().fill_list()
 

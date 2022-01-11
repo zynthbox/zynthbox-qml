@@ -505,4 +505,169 @@ Zynthian.ScreenPage {
         }
     }
 
+    /*
+     * TODO
+     * The code below likely wants to live somewhere not here, like a central location for
+     * synchronising the behaviour of sequences with zynthiloops, but for now, this location
+     * works (it's a single instance location which is always loaded)
+     */
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: {
+            _private.sequence.song = zynthian.zynthiloops.song;
+        }
+    }
+    function adoptCurrentMidiChannel() {
+        adoptCurrentMidiChannelTimer.restart();
+    }
+    Timer {
+        id: adoptCurrentMidiChannelTimer; interval: 1; repeat: false; running: false
+        onTriggered: {
+            var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+            ZynQuick.PlayGridManager.currentMidiChannel = (theTrack != null) ? theTrack.connectedSound : -1;
+        }
+    }
+    Connections {
+        target: zynthian.session_dashboard
+        onSelectedTrackChanged: adoptCurrentMidiChannel()
+    }
+    Connections {
+        target: zynthian.zynthiloops.song.tracksModel
+        onConnectedSoundsCountChanged: adoptCurrentMidiChannel()
+        onConnectedPatternsCountChanged: adoptCurrentMidiChannel();
+    }
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: adoptCurrentMidiChannel();
+    }
+    Repeater {
+        model: ZynQuick.PlayGridManager.getSequenceModel("Global")
+        delegate: Item {
+            id: patternObject
+            property QtObject thisPattern: model.pattern
+            property int thisPatternIndex: model.index
+            property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
+            property QtObject associatedTrack: null
+            property int associatedTrackIndex: -1
+            function adoptTrackLayer() {
+                trackAdopterTimer.restart();
+            }
+            Timer {
+                id: trackAdopterTimer; interval: 1; repeat: false; running: false
+                onTriggered: {
+                    var foundTrack = null;
+                    var foundIndex = -1;
+                    for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                        var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                        if (track && track.connectedPattern === patternObject.thisPatternIndex) {
+                            foundTrack = track;
+                            foundIndex = i;
+                            break;
+                        }
+                    }
+                    patternObject.associatedTrack = foundTrack;
+                    patternObject.associatedTrackIndex = foundIndex;
+
+                    if (patternObject.associatedTrackIndex > -1) {
+                        var connectedSound = patternObject.associatedTrack.connectedSound;
+                        if (connectedSound === -1) {
+                            // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                            patternObject.thisPattern.layer = 15;
+                        } else if (connectedSound !== patternObject.thisPattern.layer) {
+                            patternObject.thisPattern.layer = connectedSound;
+                        }
+                    } else {
+                        // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                        patternObject.thisPattern.layer = 15;
+                    }
+                    trackClipsRepeater.updateEnabledFromClips();
+                }
+            }
+            Connections {
+                target: patternObject.thisPattern
+                onLayerChanged: patternObject.adoptTrackLayer()
+                onEnabledChanged: trackClipsRepeater.updateClipsFromEnabled()
+                onBankOffsetChanged: trackClipsRepeater.updateClipsFromEnabled()
+            }
+            Connections {
+                target: zynthian.zynthiloops.song.tracksModel
+                onConnectedSoundsCountChanged: patternObject.adoptTrackLayer()
+                onConnectedPatternsCountChanged: patternObject.adoptTrackLayer()
+            }
+            Connections {
+                target: zynthian.zynthiloops
+                onSongChanged: patternObject.adoptTrackLayer()
+            }
+            Connections {
+                target: patternObject.associatedTrack
+                onConnectedPatternChanged: patternObject.adoptTrackLayer()
+                onConnectedSoundChanged: patternObject.adoptTrackLayer()
+            }
+            Component.onCompleted: {
+                adoptTrackLayer();
+            }
+            Timer {
+                id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
+                onTriggered: {
+                    var enabledBank = -1;
+                    for(var i = 0; i < trackClipsRepeater.count; ++i) {
+                        var clipItem = trackClipsRepeater.itemAt(i);
+                        if (clipItem.clipInScene) {
+                            enabledBank = i;
+                            break;
+                        }
+                    }
+                    patternObject.thisPattern.enabled = (enabledBank > -1);
+                    if (enabledBank > -1) {
+                        patternObject.thisPattern.bankOffset = enabledBank * patternObject.thisPattern.bankLength;
+                    }
+                }
+            }
+            Timer {
+                id: updateClipsFromEnabledTimer; interval: 1; repeat: false; running: false
+                onTriggered: {
+                    var enabledClip = patternObject.thisPattern.bankOffset / patternObject.thisPattern.bankLength;
+                    if (!patternObject.thisPattern.enabled) {
+                        enabledClip = -1;
+                    }
+                    for (var i = 0; i < trackClipsRepeater.count; ++i) {
+                        var clipItem = trackClipsRepeater.itemAt(i);
+                        if (i === enabledClip && !clipItem.clipInScene) {
+                            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clipItem.clip);
+                            // Since the call above already disables all other clips from the same
+                            // track, there's no particular need to keep this going
+                            break;
+                        } else if (enabledClip === -1 && clipItem.clipInScene) {
+                            // If there are no enabled clips, then we'll need to remove any that are
+                            // set as in the scene right now
+                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(clipItem.clip);
+                        }
+                    }
+                }
+            }
+            Repeater {
+                id: trackClipsRepeater
+                model: patternObject.trackClipsModel
+                function updateEnabledFromClips() {
+                    updateEnabledFromClipsTimer.restart();
+                }
+                // The inverse situation of the above - if we're setting the state here,
+                // we should feed it back to the scene model, so it knows what's going on
+                function updateClipsFromEnabled() {
+                    updateClipsFromEnabledTimer.restart();
+                }
+                delegate: Item {
+                    id: clipProxyDelegate
+                    property QtObject clip: model.clip
+                    property bool clipInScene: model.clip.inCurrentScene
+                    Connections {
+                        target: clipProxyDelegate.clip
+                        onInCurrentSceneChanged: {
+                            trackClipsRepeater.updateEnabledFromClips();
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

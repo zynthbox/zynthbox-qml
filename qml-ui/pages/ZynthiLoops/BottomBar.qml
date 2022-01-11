@@ -338,7 +338,7 @@ Zynthian.Card {
                 Zynthian.TabbedControlViewAction {
                     id: trackSoundsAction
                     text: qsTr("Sounds")
-                    page: Qt.resolvedUrl("EmptyBar.qml")
+                    page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },

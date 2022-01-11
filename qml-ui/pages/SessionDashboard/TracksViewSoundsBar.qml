@@ -185,7 +185,7 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
-            model: selectedTrack.chainedSounds
+//            model: selectedTrack.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 

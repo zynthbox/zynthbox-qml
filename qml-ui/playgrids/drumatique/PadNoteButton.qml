@@ -166,9 +166,13 @@ QQC2.Button {
                 margins: 1
             }
             height:9
-            color: component.patternModel.sequence.isPlaying && component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex
-                ? "yellow"
-                : component.backgroundColor
+            color: component.patternModel.sequence.isPlaying
+                ? component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex
+                    ? "yellow"
+                    : component.backgroundColor
+                : component.padNoteRow === component.patternModel.bankOffset && component.padNoteIndex === 0 && ((component.patternModel.sequence.soloPattern > -1 && component.patternModel.sequence.soloPatternObject === component.patternModel) || (component.patternModel.sequence.soloPattern === -1 && component.patternModel.enabled))
+                    ? "yellow"
+                    : component.backgroundColor
         }
     }
 }

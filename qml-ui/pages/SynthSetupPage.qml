@@ -842,7 +842,7 @@ Zynthian.ScreenPage {
                     flow: GridLayout.TopToBottom
                     Repeater {
                         id: channelReplaceRepeater
-                        model: zynthian.fixed_layers.selector_list
+                        model: layerReplaceDialog.visible ? zynthian.fixed_layers.selector_list : []
                         delegate: QQC2.RadioButton {
                             id: delegate
                             enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length

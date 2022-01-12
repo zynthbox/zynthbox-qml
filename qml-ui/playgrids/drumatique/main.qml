@@ -45,6 +45,9 @@ Zynthian.BasePlayGrid {
     property bool showPatternsMenu: false;
     property var mostRecentlyPlayedNote
     property var mostRecentNoteVelocity
+    property bool listenForNotes: false
+    property var heardNotes: []
+    property var heardVelocities: []
 
     property bool isEditSequencer: false
 
@@ -330,6 +333,25 @@ Zynthian.BasePlayGrid {
                 }
                 if (foundIndex > -1 && zynthian.session_dashboard.selectedTrack !== foundIndex) {
                     zynthian.session_dashboard.selectedTrack = foundIndex;
+                }
+            }
+        }
+        onMostRecentlyChangedNotesChanged: {
+            if (component.listenForNotes && _private.activePatternModel) {
+                var mostRecentNoteData = ZynQuick.PlayGridManager.mostRecentlyChangedNotes[ZynQuick.PlayGridManager.mostRecentlyChangedNotes.length - 1];
+                if (mostRecentNoteData.channel == _private.activePatternModel.midiChannel) {
+                    // Same channel, that makes us friends!
+                    // Create a new note based on the new thing that just arrived, but only if it's an on note
+                    if (mostRecentNoteData.type == "note_on") {
+                        var newNote = component.getNote(mostRecentNoteData.note, mostRecentNoteData.channel);
+                        var existingIndex = component.heardNotes.indexOf(newNote);
+                        if (existingIndex > -1) {
+                            component.heardNotes.splice(existingIndex, 1);
+                            component.heardVelocities.splice(existingIndex, 1);
+                        }
+                        component.heardNotes.push(newNote);
+                        component.heardVelocities.push(mostRecentNoteData.velocity);
+                    }
                 }
             }
         }
@@ -1083,13 +1105,43 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    icon.name: component.mostRecentlyPlayedNote == undefined ? "" : "edit-clear-locationbar-ltr"
-                    text: "Note:\n" + (component.mostRecentlyPlayedNote == undefined
-                        ? "(all)"
-                        : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
+                    icon.name: component.listenForNotes
+                        ? "dialog-ok"
+                        : (component.mostRecentlyPlayedNote == undefined && component.heardNotes.length == 0) ? "" : "edit-clear-locationbar-ltr"
+                    text: component.listenForNotes
+                        ? "List-\nening"
+                        : "Note:\n" + (component.heardNotes.length == 0
+                            ? (component.mostRecentlyPlayedNote == undefined
+                                ? "(all)"
+                                : component.mostRecentlyPlayedNote.name + (component.mostRecentlyPlayedNote.octave - 1))
+                            : component.heardNotes.length + " ♫")
+                    visualPressAndHold: true
                     onClicked: {
                         sidebarRoot.hideAllMenus();
+                        if (!pressingAndHolding) {
+                            if (component.listenForNotes) {
+                                component.listenForNotes = false;
+                                if (component.heardNotes.length === 1) {
+                                    component.mostRecentlyPlayedNote = component.heardNotes[0];
+                                    component.mostRecentNoteVelocity = component.heardVelocities[0];
+                                    component.heardNotes = [];
+                                    component.heardVelocities = [];
+                                } else {
+                                    component.mostRecentlyPlayedNote = undefined;
+                                }
+                            } else {
+                                component.mostRecentlyPlayedNote = undefined;
+                                component.heardNotes = [];
+                                component.heardVelocities = [];
+                            }
+                        }
+                    }
+                    onPressAndHold: {
+                        // Clear the existing notes when starting listening
                         component.mostRecentlyPlayedNote = undefined;
+                        component.heardNotes = [];
+                        component.heardVelocities = [];
+                        component.listenForNotes = true;
                     }
                 }
 

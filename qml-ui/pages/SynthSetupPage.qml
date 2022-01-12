@@ -35,6 +35,13 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
+    property bool isVisible: zynthian.current_screen_id === "layer" ||
+                             zynthian.current_screen_id === "fixed_layers" ||
+                             zynthian.current_screen_id === "main_layers_view" ||
+                             zynthian.current_screen_id === "layers_for_track" ||
+                             zynthian.current_screen_id === "bank" ||
+                             zynthian.current_screen_id === "preset"
+
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: zynthian.current_screen_id = "zynthiloops"
@@ -450,7 +457,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.layers_for_track.volume_controls
+                            model: root.isVisible ? zynthian.layers_for_track.volume_controls : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing

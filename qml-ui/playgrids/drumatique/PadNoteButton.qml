@@ -55,10 +55,30 @@ QQC2.Button {
 
         property var timeOnClick
         property var timeOnRelease
-        enabled: component.playgrid.mostRecentlyPlayedNote ? true : false
+        enabled: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
 
         onPressed: {
-            if (component.playgrid.mostRecentlyPlayedNote) {
+            if (component.playgrid.heardNotes.length > 0) {
+                var removedAtLeastOne = false;
+                // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+                for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                    var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
+                    if (subNoteIndex > -1) {
+                        component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
+                        removedAtLeastOne = true;
+                    }
+                }
+
+                // And then, only if we didn't remove anything should we be adding the notes
+                if (!removedAtLeastOne) {
+                    for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                        var subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
+                        component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
+                    }
+                }
+                component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
+                component.saveDraft();
+            } else if (component.playgrid.mostRecentlyPlayedNote) {
                 var aNoteData = {
                     velocity: component.playgrid.mostRecentNoteVelocity,
                     note: component.playgrid.mostRecentlyPlayedNote.midiNote,

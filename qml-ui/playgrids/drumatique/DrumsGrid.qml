@@ -49,12 +49,17 @@ ColumnLayout {
                     note: component.model.data(component.model.index(row, index), component.model.roles['note'])
                     property color noteColor: component.playgrid.getNoteSpecificColor(note.name,note.octave)
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
-                    backgroundColor: component.playgrid.mostRecentlyPlayedNote === note ? noteColor : Kirigami.Theme.textColor
-                    playingBackgroundColor: component.playgrid.mostRecentlyPlayedNote !== note ? noteColor : tintedNoteColor
+                    property bool weAreChosen: component.playgrid.mostRecentlyPlayedNote === note || component.playgrid.heardNotes.indexOf(note) > -1
+                    backgroundColor: weAreChosen ? noteColor : Kirigami.Theme.textColor
+                    playingBackgroundColor: weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
                     onNotePlayed: {
-                        component.playgrid.mostRecentNoteVelocity = velocity;
-                        component.playgrid.mostRecentlyPlayedNote = note;
+                        if (!component.playgrid.listenForNotes) {
+                            component.playgrid.heardNotes = [];
+                            component.playgrid.heardVelocities = [];
+                            component.playgrid.mostRecentNoteVelocity = velocity;
+                            component.playgrid.mostRecentlyPlayedNote = note;
+                        }
                     }
                 }
             }

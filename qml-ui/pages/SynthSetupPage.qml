@@ -35,13 +35,6 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    property bool isVisible: zynthian.current_screen_id === "layer" ||
-                             zynthian.current_screen_id === "fixed_layers" ||
-                             zynthian.current_screen_id === "main_layers_view" ||
-                             zynthian.current_screen_id === "layers_for_track" ||
-                             zynthian.current_screen_id === "bank" ||
-                             zynthian.current_screen_id === "preset"
-
     backAction: Kirigami.Action {
         text: qsTr("Back")
         onTriggered: zynthian.current_screen_id = "zynthiloops"
@@ -238,7 +231,6 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
-                visible: root.isVisible
 
                 property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
@@ -420,7 +412,6 @@ Zynthian.ScreenPage {
                     id: bankView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    visible: root.isVisible
                     screenId: "bank"
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
@@ -543,7 +534,6 @@ Zynthian.ScreenPage {
                 id: presetView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: root.isVisible
                 screenId: "preset"
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)

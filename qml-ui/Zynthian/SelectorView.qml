@@ -75,6 +75,7 @@ QQC2.ScrollView {
         keyNavigationWraps: false
         clip: true
         currentIndex: root.selector.current_index
+        cacheBuffer: delegate.height*2
 
         onActiveFocusChanged: {
             if (activeFocus) {
@@ -88,7 +89,7 @@ QQC2.ScrollView {
         preferredHighlightBegin: Kirigami.Units.gridUnit * 2
         preferredHighlightEnd: Kirigami.Units.gridUnit * 4
 
-        model: root.visible ? root.selector.selector_list : []
+        model: root.selector.selector_list
 
         delegate: SelectorDelegate {
             screenId: root.screenId

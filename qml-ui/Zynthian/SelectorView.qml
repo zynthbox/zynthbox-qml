@@ -88,7 +88,7 @@ QQC2.ScrollView {
         preferredHighlightBegin: Kirigami.Units.gridUnit * 2
         preferredHighlightEnd: Kirigami.Units.gridUnit * 4
 
-        model: root.selector.selector_list
+        model: root.visible ? root.selector.selector_list : []
 
         delegate: SelectorDelegate {
             screenId: root.screenId

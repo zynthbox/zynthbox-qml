@@ -32,6 +32,10 @@ import org.kde.kirigami 2.4 as Kirigami
 
 QQC2.Button {
     id: component
+    // Whether or not pressing and holding the button should be visualised
+    property bool visualPressAndHold: false
+    // Whether or not we are currently holding the button down and are past the press and hold threshold
+    property bool pressingAndHolding: false
     // Because otherwise we can't emit the signal, because the pressed property takes over...
     signal pressed();
     Layout.fillWidth: true
@@ -48,6 +52,41 @@ QQC2.Button {
         }
         color: component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor
     }
+    Rectangle {
+        id: pressAndHoldVisualiser
+        anchors {
+            left: parent.right
+            leftMargin: width / 2
+            bottom: parent.bottom
+        }
+        width: Kirigami.Units.smallSpacing
+        visible: component.visualPressAndHold
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+        color: Kirigami.Theme.focusColor
+        height: 0
+        opacity: 0
+        states: [
+            State {
+                name: "held"; when: (longPressTimer.running || component.pressingAndHolding);
+                PropertyChanges { target: pressAndHoldVisualiser; height: component.height; opacity: 1 }
+            }
+        ]
+        transitions: [
+            Transition {
+                from: ""; to: "held";
+                NumberAnimation { property: "height"; duration: longPressTimer.interval; }
+                NumberAnimation { property: "opacity"; duration: longPressTimer.interval; }
+            }
+        ]
+        Timer {
+            id: longPressTimer;
+            interval: 1000; repeat: false; running: false
+            onTriggered: {
+                component.pressingAndHolding = true;
+            }
+        }
+    }
     MultiPointTouchArea {
         anchors.fill: parent
         touchPoints: [
@@ -57,12 +96,18 @@ QQC2.Button {
                         component.pressed();
                         component.down = true;
                         component.focus = true;
+                        longPressTimer.restart();
                     } else {
                         component.released();
                         component.down = false;
                         if (x > -1 && y > -1 && x < component.width && y < component.height) {
                             component.clicked();
+                            if (component.pressingAndHolding) {
+                                component.pressAndHold()
+                            }
                         }
+                        component.pressingAndHolding = false;
+                        longPressTimer.stop();
                     }
                 }
             }

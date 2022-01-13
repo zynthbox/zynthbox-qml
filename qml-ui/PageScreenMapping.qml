@@ -106,6 +106,7 @@ QtObject {
         "song_arranger": "SongArranger/main.qml",
         "sketch_copier": "SketchCopier/main.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
+        "soundfont_downloader": "SoundfontDownloaderPage.qml",
         "soundset_downloader": "SoundsetsDownloaderPage.qml",
         "control_downloader": "ControlDownloaderPage.qml",
         "fx_control_downloader": "FXControlDownloaderPage.qml"

@@ -24,8 +24,9 @@
 # ******************************************************************************
 import logging
 import math
+import threading
 
-from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
 from . import libzl
 from .zynthiloops_clips_model import zynthiloops_clips_model
@@ -429,6 +430,16 @@ class zynthiloops_track(QObject):
         self.connected_sound_changed.emit()
 
     def set_chained_sounds(self, sounds):
+        class Worker:
+            def run(self, parent, _zyngui, _sounds):
+                # Update midi clone
+                for i in range(16):
+                    for j in range(16):
+                        if i != j and i in _sounds and j in sounds and parent.checkIfLayerExists(
+                                i) and parent.checkIfLayerExists(j):
+                            _zyngui.screens['layer'].clone_midi(i, j)
+                            _zyngui.screens['layer'].clone_midi(j, i)
+
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
             if not sound in self.__chained_sounds__:
@@ -436,12 +447,10 @@ class zynthiloops_track(QObject):
 
         self.__song__.schedule_save()
         zyngui = self.__song__.get_metronome_manager().zyngui
-        #Update midi clone
-        for i in range (16):
-            for j in range(16):
-                if i != j and i in sounds and j in sounds and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
-                    zyngui.screens['layer'].clone_midi(i, j)
-                    zyngui.screens['layer'].clone_midi(j, i)
+
+        worker = Worker()
+        worker_thread = threading.Thread(target=worker.run, args=(self, zyngui, sounds))
+        worker_thread.start()
 
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()

@@ -67,6 +67,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.create_amixer_layer()
 		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
 		self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
+		saveToPath = Path(self.__sounds_basepath__) / "my-sounds"
+		Path(saveToPath).mkdir(parents=True, exist_ok=True)
 		self.show()
 
 	@Slot(int, result='QVariantList')
@@ -1750,7 +1752,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str, result="QVariantList")
 	def soundset_metadata_from_file(self, file_name):
 		try:
-			f = open(self.__soundsets_basepath__ + file_name, "r")
+			if file_name.startswith("/"):
+				actualPath = Path(file_name)
+			else:
+				actualPath = Path(self.__soundsets_basepath__ + file_name)
+			f = open(actualPath, "r")
 			snapshot = JSONDecoder().decode(f.read())
 			data = []
 			for layer_data in snapshot["layers"]:
@@ -1798,7 +1804,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str)
 	def load_soundset_from_file(self, file_name):
 		try:
-			f = open(self.__soundsets_basepath__ + file_name, "r")
+			if file_name.startswith("/"):
+				actualPath = Path(file_name)
+			else:
+				actualPath = Path(self.__soundsets_basepath__ + file_name)
+			f = open(actualPath, "r")
 			for i in range(5):
 				self.remove_midichan_layer(i)
 			layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 5)
@@ -1816,7 +1826,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def load_layer_channels_from_file(self, file_name):
 		result = []
 		try:
-			f = open(self.__sounds_basepath__ + file_name, "r")
+			if file_name.startswith("/"):
+				actualPath = Path(file_name)
+			else:
+				actualPath = Path(self.__sounds_basepath__ + file_name)
+			f = open(actualPath, "r")
 			snapshot = JSONDecoder().decode(f.read())
 			if not isinstance(snapshot, dict):
 				return
@@ -1837,7 +1851,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str, 'QVariantMap')
 	def load_layer_from_file(self, file_name, channels_mapping):
 		try:
-			f = open(self.__sounds_basepath__ + file_name, "r")
+			if file_name.startswith("/"):
+				actualPath = Path(file_name)
+			else:
+				actualPath = Path(self.__sounds_basepath__ + file_name)
+			f = open(actualPath, "r")
 			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
 			self.activate_index(self.index)
 		except Exception as e:
@@ -1883,8 +1901,12 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def soundset_file_exists(self, file_name):
 		final_name = file_name
 		if not final_name.endswith(".soundset"):
-				final_name += ".soundset"
-		return os.path.isfile(self.__soundsets_basepath__ + final_name)
+			final_name += ".soundset"
+		if final_name.startswith("/"):
+			actualPath = Path(final_name)
+		else:
+			actualPath = Path(self.__soundsets_basepath__ + final_name)
+		return os.path.isfile(actualPath)
 
 
 	@Slot(str, result=bool)
@@ -1894,9 +1916,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if self.zyngui.curlayer and self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
 				n_layers += 1
 		final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
-		logging.error(self.__sounds_basepath__ + final_name)
-		logging.error(os.path.isfile(self.__sounds_basepath__ + final_name))
-		return os.path.isfile(self.__sounds_basepath__ + final_name)
+		if final_name.startswith("/"):
+			actualPath = Path(final_name)
+		else:
+			actualPath = Path(self.__sounds_basepath__ + final_name)
+		logging.error(actualPath)
+		logging.error(os.path.isfile(actualPath))
+		return os.path.isfile(actualPath)
 
 
 	@Slot(str)
@@ -1909,8 +1935,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				if self.zyngui.curlayer.midi_chan != i and zyncoder.lib_zyncoder.get_midi_filter_clone(self.zyngui.curlayer.midi_chan, i):
 					n_layers += 1
 			final_name = file_name.split(".")[0] + "." + str(n_layers) + ".sound"
-			Path(self.__sounds_basepath__).mkdir(parents=True, exist_ok=True)
-			f = open(self.__sounds_basepath__ + final_name, "w")
+			if final_name.startswith("/"):
+				saveToPath = Path(final_name)
+				final_name = saveToPath.name
+				saveToPath = saveToPath.parent
+			else:
+				saveToPath = Path(self.__sounds_basepath__ + final_name)
+			saveToPath.mkdir(parents=True, exist_ok=True)
+			f = open(saveToPath / final_name, "w")
 			f.write(JSONEncoder().encode(self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan))) #TODO: get cloned midi channels
 			f.flush()
 			os.fsync(f.fileno())
@@ -1924,8 +1956,14 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			final_name = file_name
 			if not final_name.endswith(".soundset"):
 				final_name += ".soundset"
-			Path(self.__soundsets_basepath__).mkdir(parents=True, exist_ok=True)
-			f = open(self.__soundsets_basepath__ + final_name, "w")
+			if final_name.startswith("/"):
+				saveToPath = Path(final_name)
+				final_name = saveToPath.name
+				saveToPath = saveToPath.parent
+			else:
+				saveToPath = Path(self.__soundsets_basepath__ + final_name)
+			saveToPath.mkdir(parents=True, exist_ok=True)
+			f = open(saveToPath + final_name, "w")
 			f.write(JSONEncoder().encode(self.export_channels_snapshot(list(range(0, 5)))))
 			f.flush()
 			os.fsync(f.fileno())

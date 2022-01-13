@@ -74,6 +74,10 @@ Zynthian.ScreenPage {
                 text: qsTr("Get New Sounds...")
                 onTriggered: zynthian.show_modal("sound_downloader")
             }
+            //Kirigami.Action {
+                //text: qsTr("Get New Soundfonts...")
+                //onTriggered: zynthian.show_modal("soundfont_downloader")
+            //}
             /*Kirigami.Action {
                 text: qsTr("Load Soundset...")
                 onTriggered: {

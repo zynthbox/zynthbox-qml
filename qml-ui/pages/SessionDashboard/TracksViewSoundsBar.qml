@@ -24,18 +24,18 @@ Zynthian.Card {
             }
         }
     }
-    
-    // Hack to always update UI
-    Connections {
-        target: bottomDrawer
-        onOpened: {
-            console.log("### Populating chained sounds");
 
+    onChainedSoundsChanged: {
+        chainedSoundsRepeaterTimer.start()
+    }
+
+    Timer {
+        id: chainedSoundsRepeaterTimer
+        interval: 50
+        repeat: false
+        onTriggered: {
             chainedSoundsRepeater.model = [];
-            chainedSoundsRepeater.model = Qt.binding(function() { return chainedSounds; });
-        }
-        onClosed: {
-            chainedSoundsRepeater.model = [];
+            chainedSoundsRepeater.model = chainedSounds;
         }
     }
 
@@ -174,22 +174,19 @@ Zynthian.Card {
         }
     }
 
-    function resetModel() {
-        chainedSoundsRepeater.model = [];
-        chainedSoundsRepeater.model = Qt.binding(function() { return chainedSounds; });
-    }
-
     padding: Kirigami.Units.gridUnit
     contentItem: ColumnLayout {
         anchors.margins: Kirigami.Units.gridUnit
 
         Repeater {
             id: chainedSoundsRepeater
-//            model: selectedTrack.chainedSounds
             delegate: Rectangle {
                 id: soundDelegate
 
                 property int chainedSound: modelData
+
+                // Component.onCompleted: console.log("Tracks View Sounds Bar Row Created")
+                // Component.onDestruction: console.log("Tracks View Sounds Bar Row Destructed")
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true

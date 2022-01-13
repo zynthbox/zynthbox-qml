@@ -232,7 +232,7 @@ QQC2.Dialog {
 
                     focus: true
                     onCurrentIndexChanged: {
-                        filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem.fileProperties;
+                        filePropertiesColumn.filePropertiesHelperObj = filesListView.currentItem ? filesListView.currentItem.fileProperties : null;
                     }
                     Layout.leftMargin: 8
                     clip: true

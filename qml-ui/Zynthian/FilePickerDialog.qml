@@ -266,6 +266,22 @@ QQC2.Dialog {
                         anchors.centerIn: parent
                         visible: filesListView.count === 0
                         text: qsTr("There are no files present")
+                        QQC2.Label {
+                            anchors {
+                                top: parent.bottom
+                                margins: Kirigami.Units.largeSpacing
+                                horizontalCenter: parent.horizontalCenter
+                            }
+                            function getHelp(folderName) {
+                                if (folderName == "file:///zynthian/zynthian-my-data/sounds/community-sounds") {
+                                    return qsTr("When you use Get New Sounds, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
+                                    return qsTr("This is where you should store your own sounds");
+                                }
+                                return "";
+                            }
+                            text: getHelp(folderModel.folder)
+                        }
                     }
 
 

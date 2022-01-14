@@ -487,6 +487,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def loadSketch(self, sketch):
         logging.error(f"Loading sketch : {sketch}")
 
+        self.zyngui.start_loading()
+
         try:
             self.__song__.bpm_changed.disconnect()
         except Exception as e:
@@ -501,6 +503,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
         self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
+
+        # Load snapshot
+        logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem) + '.zss'}")
+        self.zyngui.screens["layer"].load_snapshot(
+            str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem) + ".zss")
+
+        self.zyngui.stop_loading()
 
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
@@ -583,7 +592,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
             self.clip_to_record.isRecording = True
-            
+
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))

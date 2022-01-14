@@ -83,6 +83,8 @@ GridLayout {
         visible: !bottomBar.controlObj.isEmpty()
 
         QQC2.Button {
+            // As per #299 disable this button
+            visible: false
             Layout.alignment: Qt.AlignCenter
             text: "Track Editor..."
             onClicked: {

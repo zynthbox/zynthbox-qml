@@ -386,133 +386,152 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def newSketch(self):
-        try:
-            self.__song__.bpm_changed.disconnect()
-        except Exception as e:
-            logging.error(f"Already disconnected : {str(e)}")
+        def task():
+            try:
+                self.__song__.bpm_changed.disconnect()
+            except Exception as e:
+                logging.error(f"Already disconnected : {str(e)}")
 
-        if (self.__sketch_basepath__ / 'temp').exists():
-            shutil.rmtree(self.__sketch_basepath__ / 'temp')
+            if (self.__sketch_basepath__ / 'temp').exists():
+                shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
-        try:
+            try:
+                self.stopAllPlayback()
+                self.zyngui.screens["playgrid"].stopMetronomeRequest()
+                self.zyngui.screens["song_arranger"].stop()
+                self.resetMetronome()
+            except:
+                pass
+
+            self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
+            self.__song__.bpm_changed.connect(self.update_timer_bpm)
+            self.song_changed.emit()
+            self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+
+            self.end_long_task()
+
+        self.do_long_task(task)
+
+    @Slot(None)
+    def saveSketch(self):
+        def task():
+            self.__song__.save(False)
+            self.end_long_task()
+        self.do_long_task(task)
+
+    @Slot(str)
+    def createSketch(self, name):
+        def task():
             self.stopAllPlayback()
             self.zyngui.screens["playgrid"].stopMetronomeRequest()
             self.zyngui.screens["song_arranger"].stop()
             self.resetMetronome()
-        except:
-            pass
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
-        self.song_changed.emit()
-        self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+            # Rename temp sketch folder to the user defined name
+            Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
 
-    @Slot(None)
-    def saveSketch(self):
-        self.__song__.save(False)
+            # Rename temp sketch json filename to user defined name
+            Path(self.__sketch_basepath__ / name / (self.__song__.name + ".json")).rename(self.__sketch_basepath__ / name / (name + ".json"))
 
-    @Slot(str)
-    def createSketch(self, name):
-        self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest()
-        self.zyngui.screens["song_arranger"].stop()
-        self.resetMetronome()
+            obj = {}
 
-        # Rename temp sketch folder to the user defined name
-        Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
-
-        # Rename temp sketch json filename to user defined name
-        Path(self.__sketch_basepath__ / name / (self.__song__.name + ".json")).rename(self.__sketch_basepath__ / name / (name + ".json"))
-
-        obj = {}
-
-        # Read sketch json data to dict
-        try:
-            with open(self.__sketch_basepath__ / name / (name + ".json"), "r") as f:
-                obj = json.loads(f.read())
-        except Exception as e:
-            logging.error(e)
-
-        # Update temp sketch name to user defined name and update clip paths to point to new sketch dir
-        try:
-            with open(self.__sketch_basepath__ / name / (name + ".json"), "w") as f:
-                obj["name"] = name
-
-                for i, track in enumerate(obj["tracks"]):
-                    for j, clip in enumerate(track["clips"]):
-                        if clip['path'] is not None:
-                            path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
-                            logging.error(f"Clip Path : {clip['path']}")
-                            obj["tracks"][i]["clips"][j]["path"] = path
-
-                f.write(json.dumps(obj))
-                f.flush()
-                os.fsync(f.fileno())
-        except Exception as e:
-            logging.error(e)
-
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name) + "/", name, self)
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
-        self.song_changed.emit()
-
-        logging.error("### Saving sketch to session")
-        self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
-
-    @Slot(str)
-    def saveCopy(self, name):
-        old_folder = self.__song__.sketch_folder
-        shutil.copytree(old_folder, self.__sketch_basepath__ / name)
-
-        for json_path in (self.__sketch_basepath__ / name).glob("**/*.json"):
+            # Read sketch json data to dict
             try:
-                with open(json_path, "r+") as f:
-                    obj = json.load(f)
-                    f.seek(0)
+                with open(self.__sketch_basepath__ / name / (name + ".json"), "r") as f:
+                    obj = json.loads(f.read())
+            except Exception as e:
+                logging.error(e)
+
+            # Update temp sketch name to user defined name and update clip paths to point to new sketch dir
+            try:
+                with open(self.__sketch_basepath__ / name / (name + ".json"), "w") as f:
+                    obj["name"] = name
 
                     for i, track in enumerate(obj["tracks"]):
                         for j, clip in enumerate(track["clips"]):
                             if clip['path'] is not None:
-                                path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
+                                path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
                                 logging.error(f"Clip Path : {clip['path']}")
                                 obj["tracks"][i]["clips"][j]["path"] = path
 
-                    json.dump(obj, f)
-                    f.truncate()
+                    f.write(json.dumps(obj))
                     f.flush()
                     os.fsync(f.fileno())
             except Exception as e:
                 logging.error(e)
 
+            self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name) + "/", name, self)
+            self.__song__.bpm_changed.connect(self.update_timer_bpm)
+            self.song_changed.emit()
+
+            logging.error("### Saving sketch to session")
+            self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
+
+            self.end_long_task()
+
+        self.do_long_task(task)
+
+    @Slot(str)
+    def saveCopy(self, name):
+        def task():
+            old_folder = self.__song__.sketch_folder
+            shutil.copytree(old_folder, self.__sketch_basepath__ / name)
+
+            for json_path in (self.__sketch_basepath__ / name).glob("**/*.json"):
+                try:
+                    with open(json_path, "r+") as f:
+                        obj = json.load(f)
+                        f.seek(0)
+
+                        for i, track in enumerate(obj["tracks"]):
+                            for j, clip in enumerate(track["clips"]):
+                                if clip['path'] is not None:
+                                    path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
+                                    logging.error(f"Clip Path : {clip['path']}")
+                                    obj["tracks"][i]["clips"][j]["path"] = path
+
+                        json.dump(obj, f)
+                        f.truncate()
+                        f.flush()
+                        os.fsync(f.fileno())
+                except Exception as e:
+                    logging.error(e)
+
+            self.end_long_task()
+
+        self.do_long_task(task)
+
     @Slot(str)
     def loadSketch(self, sketch):
-        logging.error(f"Loading sketch : {sketch}")
+        def task():
+            logging.error(f"Loading sketch : {sketch}")
 
-        self.zyngui.start_loading()
+            try:
+                self.__song__.bpm_changed.disconnect()
+            except Exception as e:
+                logging.error(f"Already disconnected : {str(e)}")
 
-        try:
-            self.__song__.bpm_changed.disconnect()
-        except Exception as e:
-            logging.error(f"Already disconnected : {str(e)}")
+            sketch_path = Path(sketch)
 
-        sketch_path = Path(sketch)
+            self.stopAllPlayback()
+            self.zyngui.screens["playgrid"].stopMetronomeRequest()
+            self.zyngui.screens["song_arranger"].stop()
+            self.resetMetronome()
 
-        self.stopAllPlayback()
-        self.zyngui.screens["playgrid"].stopMetronomeRequest()
-        self.zyngui.screens["song_arranger"].stop()
-        self.resetMetronome()
+            logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
+            self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
 
-        logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
+            # Load snapshot
+            logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem) + '.zss'}")
+            self.zyngui.screens["layer"].load_snapshot(
+                str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem) + ".zss")
 
-        # Load snapshot
-        logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem) + '.zss'}")
-        self.zyngui.screens["layer"].load_snapshot(
-            str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem) + ".zss")
+            self.__song__.bpm_changed.connect(self.update_timer_bpm)
+            self.song_changed.emit()
 
-        self.zyngui.stop_loading()
+            self.end_long_task()
 
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
-        self.song_changed.emit()
+        self.do_long_task(task)
 
     @Slot(str)
     def loadSketchVersion(self, version):
@@ -715,6 +734,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return True
         else:
             return False
+
+    def do_long_task(self, cb):
+        self.zyngui.loading = self.zyngui.loading + 1
+        if self.zyngui.loading < 1:
+            self.zyngui.loading = 1
+        self.zyngui.is_loading_changed.emit()
+
+        QTimer.singleShot(2000, cb)
+
+    def end_long_task(self):
+        self.zyngui.loading = self.zyngui.loading - 1
+        if self.zyngui.loading < 0:
+            self.zyngui.loading = 0
+
+        if self.zyngui.loading == 0:
+            self.zyngui.is_loading_changed.emit()
 
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)

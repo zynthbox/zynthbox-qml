@@ -69,6 +69,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
 		saveToPath = Path(self.__sounds_basepath__) / "my-sounds"
 		Path(saveToPath).mkdir(parents=True, exist_ok=True)
+		communitySoundsPath = Path(self.__sounds_basepath__) / "community-sounds"
+		Path(communitySoundsPath).mkdir(parents=True, exist_ok=True)
 		self.show()
 
 	@Slot(int, result='QVariantList')

@@ -138,6 +138,17 @@ class zynthiloops_song(QObject):
             except Exception as e:
                 logging.error(e)
 
+            # Save snapshot with sketch if not temp
+            if not self.isTemp:
+                try:
+                    soundsets_dir = Path(self.sketch_folder) / "soundsets"
+                    soundsets_dir.mkdir(parents=True, exist_ok=True)
+
+                    self.__metronome_manager__.zyngui.screens["layer"].save_snapshot(
+                        str(soundsets_dir) + "/" + self.__name__ + ".zss")
+                except Exception as e:
+                    logging.error(f"Error saving snapshot to sketch folder : {str(e)}")
+
             self.versions_changed.emit()
         else:
             filename = self.__initial_name__ + ".json"

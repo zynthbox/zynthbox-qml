@@ -63,10 +63,15 @@ QQC2.AbstractButton {
                         return model.clip.length
                     }
                 } else if (track.connectedPattern >= 0) {
-                    var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(track.connectedPattern);
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
+                    var pattern = sequence.get(track.connectedPattern);
                     var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
 
-                    return hasNotes ? pattern.availableBars : ""
+                    return hasNotes
+                            ? sequence && sequence.isPlaying
+                              ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
+                              : (pattern.availableBars*4)
+                            : ""
                 } else {
                     return ""
                 }
@@ -96,10 +101,25 @@ QQC2.AbstractButton {
         Rectangle {
             id: progressRect
             anchors.bottom: parent.bottom
-            visible: model.clip.isPlaying
+            visible: model.clip.isPlaying && track.connectedPattern < 0
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width);
+        }
+        Rectangle {
+            id: patternProgressRect
+
+            property var sequence: ZynQuick.PlayGridManager.getSequenceModel("Global")
+            property var pattern: sequence.get(track.connectedPattern)
+
+            property var isPlaying: ((pattern.bank === "I" && model.clip.col === 0 && sequence.isPlaying)
+                                    || (pattern.bank === "II" && model.clip.col === 1 && sequence.isPlaying)) ? true : false
+
+            anchors.bottom: parent.bottom
+            visible: track.connectedPattern >= 0 && isPlaying
+            color: Kirigami.Theme.textColor
+            height: Kirigami.Units.smallSpacing
+            width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0
         }
     }
 

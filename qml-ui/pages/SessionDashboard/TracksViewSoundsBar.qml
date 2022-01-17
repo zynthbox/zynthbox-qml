@@ -324,8 +324,13 @@ Zynthian.Card {
                         enabled: root.selectedRowIndex === index && soundDelegate.chainedSound !== -1
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                                zynthian.start_loading()
+
                                 // Open library edit page
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
+
+                                zynthian.stop_loading()
+
                                 zynthian.control.single_effect_engine = null;
                                 root.openBottomDrawerOnLoad = true;
                                 var screenBack = zynthian.current_screen_id;
@@ -333,6 +338,7 @@ Zynthian.Card {
                                 zynthian.forced_screen_back = screenBack;
 
                                 bottomDrawer.close();
+
                             }
                         }
 
@@ -355,10 +361,13 @@ Zynthian.Card {
                         enabled: root.selectedRowIndex === index && soundDelegate.chainedSound !== -1
                         onClicked: {
                             if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                // Open library edit page
+                                zynthian.start_loading()
 
+                                // Open library edit page
                                 // Not sure if switching to the channel is required here
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
+
+                                zynthian.stop_loading()
 
                                 root.openBottomDrawerOnLoad = true;
                                 var screenBack = zynthian.current_screen_id;

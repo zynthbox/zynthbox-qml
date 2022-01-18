@@ -652,7 +652,7 @@ Zynthian.ScreenPage {
             folderModel {
                 nameFilters: [saveDialog.mode === "soundset" ? "*.soundset" : "*.*.sound"]
             }
-            onVisibleChanged: folderModel.folder = rootFolder + (saveDialog.mode === "soundset" ? "soundsets/" : "sounds/my-sounds/")
+            onVisibleChanged: folderModel.folder = rootFolder + (saveDialog.mode === "soundset" ? "soundsets/my-soundsets/" : "sounds/my-sounds/")
 
             filePropertiesComponent: Flow {
                 Repeater {

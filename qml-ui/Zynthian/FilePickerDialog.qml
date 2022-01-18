@@ -277,6 +277,10 @@ QQC2.Dialog {
                                     return qsTr("When you use Get New Sounds, you will be able to find them here");
                                 } else if (folderName == "file:///zynthian/zynthian-my-data/sounds/my-sounds") {
                                     return qsTr("This is where you should store your own sounds");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/community-soundsets") {
+                                    return qsTr("When you use Get New Soundsets, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
+                                    return qsTr("This is where you should store your own soundsets");
                                 }
                                 return "";
                             }

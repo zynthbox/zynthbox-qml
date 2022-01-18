@@ -511,12 +511,27 @@ Zynthian.ScreenPage {
      * synchronising the behaviour of sequences with zynthiloops, but for now, this location
      * works (it's a single instance location which is always loaded)
      */
-    Connections {
-        target: zynthian.zynthiloops
-        onSongChanged: {
-            _private.sequence.song = zynthian.zynthiloops.song;
+    function adoptSong() {
+        adoptSongTimer.restart();
+    }
+    Timer {
+        id: adoptSongTimer; interval: 1; repeat: false; running: false
+        onTriggered: {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            if (sequence) {
+                // This operation is potentially a bit pricy, as setting the song
+                // to something new will cause the global sequence to be reloaded
+                // to match what is in that song
+                sequence.song = zynthian.zynthiloops.song;
+            }
         }
     }
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: adoptSong()
+    }
+    Component.onCompleted: adoptSong();
+
     function adoptCurrentMidiChannel() {
         adoptCurrentMidiChannelTimer.restart();
     }

@@ -67,10 +67,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.create_amixer_layer()
 		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
 		self.__sounds_basepath__ = "/zynthian/zynthian-my-data/sounds/"
-		saveToPath = Path(self.__sounds_basepath__) / "my-sounds"
-		Path(saveToPath).mkdir(parents=True, exist_ok=True)
-		communitySoundsPath = Path(self.__sounds_basepath__) / "community-sounds"
-		Path(communitySoundsPath).mkdir(parents=True, exist_ok=True)
+		for pathToMake in [self.__soundsets_basepath__ + "my-soundsets/", self.__soundsets_basepath__ + "community-soundsets/", self.__sounds_basepath__ + "my-sounds/", self.__sounds_basepath__ + "community-sounds/"]:
+			Path(pathToMake).mkdir(parents=True, exist_ok=True)
 		self.show()
 
 	@Slot(int, result='QVariantList')
@@ -848,7 +846,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		res = {}
 		for i, layer in enumerate(self.layers):
 			res[layer.get_jackname()] = layer.get_audio_out()
-		logging.error("XXXXXXX {}".format(res))
+		#logging.error("XXXXXXX {}".format(res))
 		return res
 
 

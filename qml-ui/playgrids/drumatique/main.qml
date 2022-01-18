@@ -386,20 +386,29 @@ Zynthian.BasePlayGrid {
         var rows = 4;
         var columns = 4;
 
-        var midiChannel = _private.sequence.get(patternIndex).layer;
-        console.log("Populating grid for pattern " + patternIndex + " which has midi channel " + midiChannel);
-        for (var row = 0; row < rows; ++row){
+        if (_private.sequence) {
+            var pattern = _private.sequence.get(patternIndex);
+            if (pattern) {
+                var midiChannel = pattern.layer;
+                console.log("Populating grid for pattern " + patternIndex + " which has midi channel " + midiChannel);
+                for (var row = 0; row < rows; ++row){
 
-            var rowStartingNote = startingNote + (row * columns);
-            var rowEndingNote = rowStartingNote + columns;
-            var notes = [];
+                    var rowStartingNote = startingNote + (row * columns);
+                    var rowEndingNote = rowStartingNote + columns;
+                    var notes = [];
 
-            for(var col = rowStartingNote; col < rowEndingNote; ++col) {
-                var note = component.getNote(col, midiChannel);
-                notes.push(note);
+                    for(var col = rowStartingNote; col < rowEndingNote; ++col) {
+                        var note = component.getNote(col, midiChannel);
+                        notes.push(note);
+                    }
+
+                    model.addRow(notes);
+                }
+            } else {
+                console.debug("Attempted to populate grid for a nonexistent pattern, given index", patternIndex);
             }
-
-            model.addRow(notes);
+        } else {
+            console.debug("Attempted to populate grid without a sequence loaded");
         }
     }
 

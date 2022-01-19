@@ -1777,13 +1777,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.error(e)
 			return []
 
-	@Slot(str, result="QVariantList")
-	def sound_metadata_from_file(self, file_name):
+	@Slot(str, result='QVariantList')
+	def sound_metadata_from_json(self, layers):
 		try:
-			f = open(self.__sounds_basepath__ + file_name, "r")
-			snapshot = JSONDecoder().decode(f.read())
 			data = []
-			for layer_data in snapshot["layers"]:
+			for layer_data in layers:
 				#if not layer_data["midi_chan"] in data:
 					#data[layer_data["midi_chan"]] = []
 				item = {"name": layer_data["engine_name"].split("/")[-1]}
@@ -1797,6 +1795,16 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					item["preset_name"] = layer_data["preset_name"]
 				data.append(item)
 			return data
+		except Exception as e:
+			logging.error(e)
+			return []
+
+	@Slot(str, result="QVariantList")
+	def sound_metadata_from_file(self, file_name):
+		try:
+			f = open(self.__sounds_basepath__ + file_name, "r")
+			snapshot = JSONDecoder().decode(f.read())
+			return self.sound_metadata_from_json(snapshot["layers"])
 		except Exception as e:
 			logging.error(e)
 			return []
@@ -1849,6 +1857,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 	@Slot(str, 'QVariantMap')
+	def load_layer_from_json(self, json_data, channels_mapping):
+		self.load_channels_snapshot(JSONDecoder().decode(json_data), 0, 16, channels_mapping)
+
+	@Slot(str, 'QVariantMap')
 	def load_layer_from_file(self, file_name, channels_mapping):
 		try:
 			if file_name.startswith("/"):
@@ -1860,6 +1872,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.activate_index(self.index)
 		except Exception as e:
 			logging.error(e)
+
+	@Slot(int, result=str)
+	def layer_as_json(self, midi_channel):
+		return JSONEncoder().encode(self.export_multichannel_snapshot(midi_channel))
 
 	def export_multichannel_snapshot(self, midi_chan):
 		channels = [midi_chan]

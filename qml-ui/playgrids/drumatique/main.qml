@@ -64,7 +64,6 @@ Zynthian.BasePlayGrid {
             //console.log("Attempting to change " + property + " from " + currentValue + " to " + value)
             if (currentValue != value) {
                 _private.sequence.setPatternProperty(patternIndex, property, value);
-                _private.draftSaverThrottle.restart()
                 if (_private.activePattern == patternIndex) {
                     switch (property) {
                     case "noteLength":
@@ -209,14 +208,6 @@ Zynthian.BasePlayGrid {
             updateCurrentGrid();
         }
 
-        onActiveBarChanged: {
-            draftSaverThrottle.restart()
-        }
-
-        onAvailableBarsChanged:{
-            draftSaverThrottle.restart()
-        }
-
         onActivePatternChanged:{
             updateTrack();
             console.log('on active pattern changed', _private.activePattern)
@@ -230,15 +221,6 @@ Zynthian.BasePlayGrid {
         onGridModelChanged: {
             updateTrack();
             updateCurrentGrid();
-        }
-
-        property QtObject draftSaverThrottle: Timer {
-            repeat: false
-            running: false
-            interval: 100
-            onTriggered: {
-                _private.sequence.save();
-            }
         }
 
         /**
@@ -412,10 +394,6 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    function saveDraft() {
-        _private.draftSaverThrottle.restart();
-    }
-
     // Drum Grid Component
     Component {
         id: drumsGrid
@@ -460,9 +438,6 @@ Zynthian.BasePlayGrid {
                                 padNoteIndex: model.index
                                 note: _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
-                                onSaveDraft: {
-                                    component.saveDraft();
-                                }
                             }
                         }
                     }
@@ -685,7 +660,6 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                                 _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
-                                component.saveDraft();
                             }
                             function adoptTrackLayer() {
                                 trackAdopterTimer.restart();

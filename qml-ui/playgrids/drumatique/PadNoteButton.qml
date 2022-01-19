@@ -42,7 +42,6 @@ QQC2.Button {
     property int padNoteRow: activeBar + component.patternModel.bankOffset
     property int padNoteIndex
     property var mostRecentlyPlayedNote
-    signal saveDraft();
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -77,7 +76,6 @@ QQC2.Button {
                     }
                 }
                 component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
-                component.saveDraft();
             } else if (component.playgrid.mostRecentlyPlayedNote) {
                 var aNoteData = {
                     velocity: component.playgrid.mostRecentNoteVelocity,
@@ -93,7 +91,6 @@ QQC2.Button {
                     component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
                 }
                 component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
-                component.saveDraft();
             }
         }
     }

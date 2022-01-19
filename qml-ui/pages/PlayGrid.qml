@@ -555,6 +555,24 @@ Zynthian.ScreenPage {
         target: zynthian.zynthiloops
         onSongChanged: adoptCurrentMidiChannel();
     }
+    property QtObject globalSequence: ZynQuick.PlayGridManager.getSequenceModel("Global")
+    Connections {
+        target: globalSequence
+        onIsDirtyChanged: {
+            if (globalSequence.isDirty) {
+                scheduleSequenceSave()
+            }
+        }
+    }
+    function scheduleSequenceSave() {
+        sequenceSaverThrottle.restart();
+    }
+    Timer {
+        id: sequenceSaverThrottle; repeat: false; running: false; interval: 100
+        onTriggered: {
+            globalSequence.save();
+        }
+    }
     Repeater {
         model: ZynQuick.PlayGridManager.getSequenceModel("Global")
         delegate: Item {
@@ -594,6 +612,11 @@ Zynthian.ScreenPage {
                     } else {
                         // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
                         patternObject.thisPattern.layer = 15;
+                    }
+                    if (patternObject.thisPattern.layer === 15) {
+                        patternObject.thisPattern.layerData = "";
+                    } else {
+                        patternObject.thisPattern.layerData = zynthian.layer.layer_as_json(patternObject.associatedTrack.connectedSound);
                     }
                     trackClipsRepeater.updateEnabledFromClips();
                 }

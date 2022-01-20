@@ -1831,6 +1831,25 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.error(e)
 
 	@Slot(str, result='QVariantList')
+	def load_layer_channels_from_json(self, json_data):
+		result = []
+		try:
+			if not isinstance(json_data, dict):
+				return
+			if not "layers" in json_data:
+				return
+			if not isinstance(json_data["layers"], list):
+				return
+			for layer_data in json_data["layers"]:
+				if "midi_chan" in layer_data:
+					midi_chan = layer_data['midi_chan']
+					if not midi_chan in result:
+						result.append(midi_chan)
+		except Exception as e:
+			logging.error(e)
+		return result
+
+	@Slot(str, result='QVariantList')
 	def load_layer_channels_from_file(self, file_name):
 		result = []
 		try:
@@ -1840,17 +1859,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				actualPath = Path(self.__sounds_basepath__ + file_name)
 			f = open(actualPath, "r")
 			snapshot = JSONDecoder().decode(f.read())
-			if not isinstance(snapshot, dict):
-				return
-			if not "layers" in snapshot:
-				return
-			if not isinstance(snapshot["layers"], list):
-				return
-			for layer_data in snapshot["layers"]:
-				if "midi_chan" in layer_data:
-					midi_chan = layer_data['midi_chan']
-					if not midi_chan in result:
-						result.append(midi_chan)
+			result = load_layer_channels_from_json(snapshot)
 		except Exception as e:
 			logging.error(e)
 		return result

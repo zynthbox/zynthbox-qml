@@ -41,15 +41,33 @@ Zynthian.BasePlayGrid {
     sidebar: drumsGridSidebar
     name:'Drumatique'
     useOctaves: true
+    additionalActions: [
+        Kirigami.Action {
+            text: "Load Sequence or Pattern"
+            onTriggered: {
+                sequenceLoader.loadSequenceFromFile()
+            }
+        },
+        Kirigami.Action {
+            text: "Export Sequence"
+            onTriggered: {
+            }
+        },
+        Kirigami.Action {
+            text: "Export Current Pattern"
+            onTriggered: {
+            }
+        }
+    ]
 
-    property bool showPatternsMenu: false;
+    property bool showPatternsMenu: false
+    property bool showPatternSettings: false
+
     property var mostRecentlyPlayedNote
     property var mostRecentNoteVelocity
     property bool listenForNotes: false
     property var heardNotes: []
     property var heardVelocities: []
-
-    property bool isEditSequencer: false
 
     function setActiveBar(activeBar) {
         _private.sequence.activePatternObject.activeBar = activeBar;
@@ -394,6 +412,10 @@ Zynthian.BasePlayGrid {
         }
     }
 
+    Zynthian.SequenceLoader {
+        id: sequenceLoader
+    }
+
     // Drum Grid Component
     Component {
         id: drumsGrid
@@ -449,7 +471,7 @@ Zynthian.BasePlayGrid {
                     Layout.fillWidth: true; 
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
-                    visible: component.isEditSequencer
+                    visible: component.showPatternSettings
                     color:"transparent"
                     RowLayout {
                         anchors.fill:parent
@@ -1135,7 +1157,7 @@ Zynthian.BasePlayGrid {
                     icon.name: "configure"
                     onClicked: {
                         sidebarRoot.hideAllMenus();
-                        component.isEditSequencer = !component.isEditSequencer;
+                        component.showPatternSettings = !component.showPatternSettings;
                     }
                 }
             }

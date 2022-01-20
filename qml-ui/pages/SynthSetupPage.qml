@@ -808,120 +808,16 @@ Zynthian.ScreenPage {
             }
         }
 
-        QQC2.Dialog {
+        Zynthian.LayerReplaceDialog {
             id: layerReplaceDialog
             parent: root.parent
             modal: true
             x: Math.round(parent.width/2 - width/2)
             y: Math.round(parent.height/2 - height/2)
             height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
-            property var sourceChannels: []
-            property var destinationChannels: []
-            property string fileToLoad
-            function clear () {
-                sourceChannels = [];
-                destinationChannels = [];
-                fileToLoad = "";
-            }
-            onAccepted: {
-                if (sourceChannels.length !== destinationChannels.length) {
-                    return;
-                }
-                let map = {};
-                var i = 0;
-                for (i in sourceChannels) {
-                    map[sourceChannels[i]] = destinationChannels[i];
-                }
-                for (i in map) {
-                    print("Mapping midi channel " + i + " to " + map[i]);
-                }
-                zynthian.layer.load_layer_from_file(fileToLoad, map);
-                clear();
-            }
-            onRejected: {
-                clear();
-            }
-            header: Kirigami.Heading {
-                text: qsTr("Pick Layers To Replace")
-            }
-            contentItem: ColumnLayout {
-                QQC2.Label {
-                    text: qsTr("The selected sound has %1 layers: select %1 adjacent layers that should be replaced by them.").arg(layerReplaceDialog.sourceChannels.length)
-                }
-                GridLayout {
-                    columns: 2
-                    rows: 8
-                    flow: GridLayout.TopToBottom
-                    Repeater {
-                        id: channelReplaceRepeater
-                        model: layerReplaceDialog.visible ? zynthian.fixed_layers.selector_list : []
-                        delegate: QQC2.RadioButton {
-                            id: delegate
-                            enabled: channelReplaceRepeater.count - index >= layerReplaceDialog.sourceChannels.length
-                            autoExclusive: true
-                            onCheckedChanged: {
-                                layerReplaceDialog.destinationChannels = [];
-                                var i = 0;
-                                let chan = model.metadata.midi_channel
-                                for (i in layerReplaceDialog.sourceChannels) {
-                                    layerReplaceDialog.destinationChannels.push(chan);
-                                    chan++;
-                                }
-                                layerReplaceDialog.destinationChannelsChanged();
-                                layerReplaceDialog.sourceChannelsChanged();
-                            }
-                            Connections {
-                                target: layerReplaceDialog
-                                onFileToLoadChanged: {
-                                    checked = false
-                                    checked = index === zynthian.fixed_layers.current_index
-                                }
-                            }
-                            indicator.opacity: enabled
-                            indicator.x: 0
-                            contentItem: RowLayout {
-                                Item {
-                                    Layout.preferredWidth: delegate.indicator.width
-                                }
-                                QQC2.CheckBox {
-                                    enabled: false
-                                    checked: layerReplaceDialog.destinationChannels.indexOf(model.metadata.midi_channel) !== -1
-                                }
-                                QQC2.Label {
-                                    text: {
-                                        let numPrefix = model.metadata.midi_channel + 1;
-                                        //if (numPrefix > 5 && numPrefix <= 10) {
-                                            //numPrefix = "6." + (numPrefix - 5);
-                                        //}
-                                        return numPrefix + " - " + model.display;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            footer: QQC2.Control {
-                leftPadding: saveDialog.leftPadding
-                topPadding: Kirigami.Units.smallSpacing
-                rightPadding: saveDialog.rightPadding
-                bottomPadding: saveDialog.bottomPadding
-                contentItem: RowLayout {
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        text: qsTr("Cancel")
-                        onClicked: layerReplaceDialog.close()
-                    }
-                    QQC2.Button {
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        enabled: layerReplaceDialog.destinationChannels.length === layerReplaceDialog.sourceChannels.length
-                        text: qsTr("Load && Replace")
-                        onClicked: layerReplaceDialog.accept()
-                    }
-                }
-            }
+            footerLeftPadding: saveDialog.leftPadding
+            footerRightPadding: saveDialog.rightPadding
+            footerBottomPadding: saveDialog.bottomPadding
         }
     }
 }

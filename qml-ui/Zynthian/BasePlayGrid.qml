@@ -181,6 +181,12 @@ ZynQuick.PlayGrid {
      */
     property Component popup
     /**
+     * \brief An optional list of actions
+     *
+     * These actions will be used on the main Playground page, and shown as a popup menu
+     */
+    property list<QtObject> additionalActions
+    /**
      * \brief Whether or not this playgrid makes use of the octave setting in the sidebar
      *
      * If this is set to false, the octave buttons in the sidebar will be disabled

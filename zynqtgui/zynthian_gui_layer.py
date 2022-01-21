@@ -1778,10 +1778,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			return []
 
 	@Slot(str, result='QVariantList')
-	def sound_metadata_from_json(self, layers):
+	def sound_metadata_from_json(self, snapshot):
 		try:
 			data = []
-			for layer_data in layers:
+			layers = JSONDecoder().decode(snapshot)
+			for layer_data in layers["layers"]:
 				#if not layer_data["midi_chan"] in data:
 					#data[layer_data["midi_chan"]] = []
 				item = {"name": layer_data["engine_name"].split("/")[-1]}
@@ -1803,8 +1804,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def sound_metadata_from_file(self, file_name):
 		try:
 			f = open(self.__sounds_basepath__ + file_name, "r")
-			snapshot = JSONDecoder().decode(f.read())
-			return self.sound_metadata_from_json(snapshot["layers"])
+			return self.sound_metadata_from_json(f.read())
 		except Exception as e:
 			logging.error(e)
 			return []
@@ -1834,19 +1834,20 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	def load_layer_channels_from_json(self, json_data):
 		result = []
 		try:
-			if not isinstance(json_data, dict):
+			snapshot = JSONDecoder().decode(json_data)
+			if not isinstance(snapshot, dict):
 				return
-			if not "layers" in json_data:
+			if not "layers" in snapshot:
 				return
-			if not isinstance(json_data["layers"], list):
+			if not isinstance(snapshot["layers"], list):
 				return
-			for layer_data in json_data["layers"]:
+			for layer_data in snapshot["layers"]:
 				if "midi_chan" in layer_data:
 					midi_chan = layer_data['midi_chan']
 					if not midi_chan in result:
 						result.append(midi_chan)
 		except Exception as e:
-			logging.error(e)
+			logging.error("Attempted to load from json data. Reported error was {} and the data was {}".format(e, json_data));
 		return result
 
 	@Slot(str, result='QVariantList')
@@ -1858,8 +1859,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				actualPath = Path(self.__sounds_basepath__ + file_name)
 			f = open(actualPath, "r")
-			snapshot = JSONDecoder().decode(f.read())
-			result = load_layer_channels_from_json(snapshot)
+			result = self.load_layer_channels_from_json(f.read())
 		except Exception as e:
 			logging.error(e)
 		return result

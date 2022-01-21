@@ -25,6 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
@@ -78,11 +79,11 @@ Item {
             // Should we be deleting the sequences and patterns we're getting here?
             if (sequenceFilePicker.currentFileInfo) {
                 if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".sequence.json")) {
-                    sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.currentFileInfo.fileName);
+                    sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.currentFileInfo.filePath);
                     sequenceFilePicker.currentFileObject.load(sequenceFilePicker.currentFileInfo.fileName);
                 } else if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".pattern.json")) {
-                    // Not yet... We need to be able to fetch and use orphaned patterns, otherwise this ends up weird...
-                    // sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.currentFileInfo.fileName);
+                    sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.currentFileInfo.filePath);
+                    ZynQuick.PlayGridManager.setModelFromJsonFile(sequenceFilePicker.currentFileObject, sequenceFilePicker.currentFileInfo.filePath);
                 } else {
                     sequenceFilePicker.currentFileObject = null;
                 }
@@ -94,21 +95,44 @@ Item {
             id: sequenceFileInfoComponent
             ColumnLayout {
                 QQC2.Label {
+                    Layout.fillWidth: true
                     text: qsTr("Sequence");
                 }
+                Item { Layout.fillWidth: true; Layout.minimumHeight: Kirigami.Units.smallSpacing;  Layout.maximumHeight: Kirigami.Units.smallSpacing; }
                 Repeater {
                     model: sequenceFilePicker.currentFileObject
                     delegate: patternFileInfoComponent
                 }
+                Item { Layout.fillWidth: true; Layout.fillHeight: true; }
             }
         }
+        // TODO Identify identical layers and match them up so we only assign the same Sound once
         Component {
             id: patternFileInfoComponent
             ColumnLayout {
                 Layout.fillWidth: true
+                property string layerJson: model.pattern === undefined ? sequenceFilePicker.currentFileObject.layerData : model.pattern.layerData
+                property var soundInfo: layerJson.length > 0 ? zynthian.layer.sound_metadata_from_json(layerJson) : [];
                 QQC2.Label {
-                    text: qsTr("Pattern");
+                    Layout.fillWidth: true
+                    text: qsTr("Pattern %1").arg(model.index + 1);
                 }
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    text: qsTr("Sound (%1)").arg(soundInfo ? (soundInfo.length === 1 ? qsTr("1 Layer") : qsTr("%1 Layers").arg(soundInfo.length)) : "0");
+                }
+                Repeater {
+                    model: soundInfo
+                    delegate: QQC2.Label {
+                        Layout.fillWidth: true
+                        elide: Text.ElideRight
+                        text: modelData["preset_name"].length > 0
+                            ? "• %1 (%2)".arg(modelData["name"]).arg(modelData["preset_name"])
+                            : "• %1".arg(modelData["name"])
+                    }
+                }
+                Item { visible: model.pattern === undefined; Layout.fillWidth: true; Layout.fillHeight: true; }
             }
         }
         filesListView.delegate: Kirigami.BasicListItem {
@@ -143,13 +167,17 @@ Item {
     QQC2.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
-        parent: component.parent
+        y: root.parent.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.parent.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        width: component.Window.width
+        height: Math.round(component.Window.height * 0.8)
+        z: 999999999
         modal: true
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
         header: Kirigami.Heading {
             text: qsTr("Loading Sequence: Pick Pattern Options")
+            font.pointSize: 16
+            Layout.leftMargin: 12
+            Layout.topMargin: 12
         }
         contentItem: ColumnLayout {
             Repeater {
@@ -158,6 +186,10 @@ Item {
             }
         }
         footer: QQC2.Control {
+            leftPadding: root.leftPadding
+            topPadding: Kirigami.Units.smallSpacing
+            rightPadding: root.rightPadding
+            bottomPadding: root.bottomPadding
             contentItem: RowLayout {
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -187,21 +219,31 @@ Item {
     QQC2.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
-        parent: component.parent
+        y: root.parent.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.parent.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        width: component.Window.width
+        height: Math.round(component.Window.height * 0.3)
+        z: 999999999
         modal: true
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
         header: Kirigami.Heading {
             text: qsTr("Loading Single Pattern: Pick Options")
+            font.pointSize: 16
+            Layout.leftMargin: 12
+            Layout.topMargin: 12
         }
         contentItem: ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             Repeater {
                 model: [loadedPatternOptionsPicker.loadedPattern]
                 delegate: patternOptions
             }
         }
         footer: QQC2.Control {
+            leftPadding: root.leftPadding
+            topPadding: Kirigami.Units.smallSpacing
+            rightPadding: root.rightPadding
+            bottomPadding: root.bottomPadding
             contentItem: RowLayout {
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -231,6 +273,7 @@ Item {
     Component {
         id: patternOptions
         RowLayout {
+            Layout.fillWidth: true
             property QtObject patternObject: modelData
             QQC2.CheckBox {
                 id: importPattern
@@ -242,15 +285,18 @@ Item {
             QQC2.Label {
                 // This likely wants to be nicer...
                 text: "Pattern " + (model.index + 1)
+                Layout.fillWidth: true
             }
             QQC2.CheckBox {
                 id: importSoundCheck
             }
             QQC2.Button {
                 id: pickSoundDestination
+                Layout.fillWidth: true
             }
             QQC2.ComboBox {
                 id: importToTrack
+                Layout.fillWidth: true
             }
         }
     }

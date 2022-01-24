@@ -266,6 +266,11 @@ Zynthian.ScreenPage {
                            && fileNameDialog.fileName.length > 0
                            && zynthian.zynthiloops.versionExists(fileNameDialog.fileName)) {
                     fileNameDialog.conflict = true;
+                } else if (fileNameDialog.dialogType === "save"
+                           && root.song.isTemp
+                           && fileNameDialog.fileName.length > 0
+                           && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                    fileNameDialog.conflict = true;
                 } else {
                     fileNameDialog.conflict = false;
                 }

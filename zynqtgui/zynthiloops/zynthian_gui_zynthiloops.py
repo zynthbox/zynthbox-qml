@@ -461,13 +461,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 logging.error(e)
 
             self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name) + "/", name, self)
+            self.__song__.save(False)
+
+            self.end_long_task()
+
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
             self.song_changed.emit()
 
             logging.error("### Saving sketch to session")
             self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
-
-            self.end_long_task()
 
         self.do_long_task(task)
 

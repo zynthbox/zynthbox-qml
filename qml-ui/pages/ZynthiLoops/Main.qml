@@ -196,6 +196,7 @@ Zynthian.ScreenPage {
         target: zynthian.zynthiloops
         onNewSketchLoaded: {
             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            sequence.song = zynthian.zynthiloops.song;
             sequence.clear();
 
             for (var i=0; i<5; i++) {

@@ -408,6 +408,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.song_changed.emit()
             self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
 
+            self.newSketchLoaded.emit()
+
             self.end_long_task()
 
         self.do_long_task(task)
@@ -762,3 +764,4 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     metronomeBeatUpdate128th = Signal(int)
 
     cannotRecordEmptyLayer = Signal()
+    newSketchLoaded = Signal()

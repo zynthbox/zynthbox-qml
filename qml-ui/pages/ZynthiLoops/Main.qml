@@ -192,6 +192,19 @@ Zynthian.ScreenPage {
         }
     }
 
+    Connections {
+        target: zynthian.zynthiloops
+        onNewSketchLoaded: {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            sequence.clear();
+
+            for (var i=0; i<5; i++) {
+                var pattern = sequence.get(i);
+                pattern.enabled = false;
+            }
+        }
+    }
+
     Component.onCompleted: {
         applicationWindow().controlsVisible = true;
         bottomBar.controlType = BottomBar.ControlType.Song;

@@ -35,6 +35,7 @@ import "pages/SessionDashboard" as SessionDashboard
 
 Kirigami.AbstractApplicationWindow {
     id: root
+    visible: false
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: {
@@ -61,7 +62,7 @@ Kirigami.AbstractApplicationWindow {
         soundsDialog.open();
     }
     Component.onCompleted: {
-        root.showFullScreen()
+        displayWindowTimer.start()
     }
 
     signal requestOpenLayerSetupDialog()
@@ -76,6 +77,17 @@ Kirigami.AbstractApplicationWindow {
 
     width: screen.width
     height: screen.height
+
+    Timer {
+        id: displayWindowTimer
+        // This interval makes sure to wait until all the pages are cached before showing window
+        interval: 13000
+        repeat: false
+        onTriggered: {
+            root.showFullScreen();
+            zynthian.stop_splash();
+        }
+    }
 
     header: RowLayout {
             spacing: 0
@@ -577,7 +589,7 @@ Kirigami.AbstractApplicationWindow {
         x: 0
         y: screen.height - height
         flags: Qt.WindowDoesNotAcceptFocus
-        visible: !root.active
+        visible: root.visible && !root.active
         QQC2.ToolBar {
             anchors.fill: parent
             position: QQC2.ToolBar.Footer

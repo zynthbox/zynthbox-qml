@@ -659,8 +659,8 @@ Zynthian.ScreenPage {
                     id: infoRepeater
                     model: saveDialog.currentFileInfo
                         ? (saveDialog.mode === "soundset"
-                            ? zynthian.layer.soundset_metadata_from_file(saveDialog.currentFileInfo.fileName)
-                            : zynthian.layer.sound_metadata_from_file(saveDialog.currentFileInfo.fileName))
+                            ? zynthian.layer.soundset_metadata_from_file(saveDialog.currentFileInfo.filePath)
+                            : zynthian.layer.sound_metadata_from_file(saveDialog.currentFileInfo.filePath))
                         : []
                     delegate: QQC2.Label {
                         width: modelData.preset_name ? parent.width - 10 : implicitWidth
@@ -737,8 +737,8 @@ Zynthian.ScreenPage {
                     id: infoRepeater
                     model: pickerDialog.currentFileInfo
                         ? (pickerDialog.mode === "soundset"
-                            ? zynthian.layer.soundset_metadata_from_file(pickerDialog.currentFileInfo.fileName)
-                            : zynthian.layer.sound_metadata_from_file(pickerDialog.currentFileInfo.fileName))
+                            ? zynthian.layer.soundset_metadata_from_file(pickerDialog.currentFileInfo.filePath)
+                            : zynthian.layer.sound_metadata_from_file(pickerDialog.currentFileInfo.filePath))
                         : []
                     delegate: QQC2.Label {
                         width: modelData.preset_name ? parent.width - 10 : implicitWidth
@@ -792,7 +792,7 @@ Zynthian.ScreenPage {
                 if (pickerDialog.mode === "soundset") {
                     zynthian.layer.load_soundset_from_file(file.filePath)
                 } else {
-                    //zynthian.layer.load_layer_from_file(file.fileName)
+                    //zynthian.layer.load_layer_from_file(file.filePath)
                     layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(file.filePath);
                     if (layerReplaceDialog.sourceChannels.length > 1) {
                         layerReplaceDialog.fileToLoad = file.filePath;

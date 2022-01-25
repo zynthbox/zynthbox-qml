@@ -80,7 +80,7 @@ Zynthian.Card {
                         return qsTr("PART: %1").arg(text);
                     case BottomBar.ControlType.Pattern:
                         var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
-                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+                        var pattern = sequence.get(root.controlObj.connectedPattern)
                         return qsTr("PATTERN: %1, pt.%2")
                                                 .arg(pattern.objectName)
                                                 .arg(root.controlObj.col == 0 ? "I" : "II")

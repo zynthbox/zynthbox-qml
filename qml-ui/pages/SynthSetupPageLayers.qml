@@ -786,17 +786,17 @@ Zynthian.ScreenPage {
             onFileSelected: {
                 console.log(file.filePath);
                 if (pickerDialog.mode === "soundset") {
-                    zynthian.layer.load_soundset_from_file(file.fileName)
+                    zynthian.layer.load_soundset_from_file(file.filePath)
                 } else {
-                    //zynthian.layer.load_layer_from_file(file.fileName)
-                    layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(file.fileName);
+                    //zynthian.layer.load_layer_from_file(file.filePath)
+                    layerReplaceDialog.sourceChannels = zynthian.layer.load_layer_channels_from_file(file.filePath);
                     if (layerReplaceDialog.sourceChannels.length > 1) {
-                        layerReplaceDialog.fileToLoad = file.fileName;
+                        layerReplaceDialog.fileToLoad = file.filePath;
                         layerReplaceDialog.open();
                     } else {
                         let map = {}
                         map[layerReplaceDialog.sourceChannels[0].toString()] = zynthian.main_layers_view.index_to_midi(zynthian.main_layers_view.current_index);
-                        zynthian.layer.load_layer_from_file(file.fileName, map);
+                        zynthian.layer.load_layer_from_file(file.filePath, map);
                     }
                 }
                 zynthian.bank.show_top_sounds = false;

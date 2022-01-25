@@ -95,11 +95,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
-        self.jack_client = jack.Client('zynthiloops_client')
-        self.jack_capture_port_a = self.jack_client.inports.register(f"capture_port_a")
-        self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
+        # self.jack_client = jack.Client('zynthiloops_client')
+        # self.jack_capture_port_a = self.jack_client.inports.register(f"capture_port_a")
+        # self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
         self.recorder_process = None
-        self.recorder_process_internal_arguments = ["--daemon", "--port", f"{self.jack_client.name}:*"]
+        self.recorder_process_internal_arguments = ["--daemon", "--port", f"zynthiloops_client:*"]
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
@@ -345,9 +345,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 except Exception as e:
                     logging.error(f"Error processing jack port : {port}({str(e)})")
 
-        self.jack_client.deactivate()
-        self.jack_client.set_process_callback(self.recording_jack_client_process_callback)
-        self.jack_client.activate()
+        # self.jack_client.deactivate()
+        # self.jack_client.set_process_callback(self.recording_jack_client_process_callback)
+        # self.jack_client.activate()
 
         selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
         worker = Worker()

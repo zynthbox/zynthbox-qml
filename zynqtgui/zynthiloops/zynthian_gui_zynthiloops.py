@@ -433,20 +433,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
 
             # Rename temp sketch json filename to user defined name
-            Path(self.__sketch_basepath__ / name / (self.__song__.name + ".json")).rename(self.__sketch_basepath__ / name / (name + ".json"))
+            Path(self.__sketch_basepath__ / name / (self.__song__.name + ".sketch.json")).rename(self.__sketch_basepath__ / name / (name + ".sketch.json"))
 
             obj = {}
 
             # Read sketch json data to dict
             try:
-                with open(self.__sketch_basepath__ / name / (name + ".json"), "r") as f:
+                with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "r") as f:
                     obj = json.loads(f.read())
             except Exception as e:
                 logging.error(e)
 
             # Update temp sketch name to user defined name and update clip paths to point to new sketch dir
             try:
-                with open(self.__sketch_basepath__ / name / (name + ".json"), "w") as f:
+                with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "w") as f:
                     obj["name"] = name
 
                     for i, track in enumerate(obj["tracks"]):
@@ -481,7 +481,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             old_folder = self.__song__.sketch_folder
             shutil.copytree(old_folder, self.__sketch_basepath__ / name)
 
-            for json_path in (self.__sketch_basepath__ / name).glob("**/*.json"):
+            for json_path in (self.__sketch_basepath__ / name).glob("**/*.sketch.json"):
                 try:
                     with open(json_path, "r+") as f:
                         obj = json.load(f)
@@ -523,12 +523,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.resetMetronome()
 
             logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
-            self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self)
+            self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
 
             # Load snapshot
-            logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem) + '.zss'}")
+            logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
             self.zyngui.screens["layer"].load_snapshot(
-                str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem) + ".zss")
+                str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem.replace(".sketch", "")) + ".zss")
 
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
             self.song_changed.emit()
@@ -563,7 +563,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(str, result=bool)
     def versionExists(self, name):
         sketch_path = Path(self.__song__.sketch_folder)
-        return (sketch_path / (name+'.json')).exists()
+        return (sketch_path / (name+'.sketch.json')).exists()
 
     @Slot(None, result=bool)
     def sketchIsTemp(self):

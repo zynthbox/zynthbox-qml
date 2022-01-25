@@ -5,6 +5,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.Card {
     id: root
@@ -19,8 +20,8 @@ Zynthian.Card {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
 
             if (root.selectedTrack.connectedPattern >= 0) {
-                var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
-                seq.midiChannel = root.selectedTrack.connectedSound;
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                pattern.midiChannel = root.selectedTrack.connectedSound;
             }
         }
     }
@@ -273,8 +274,8 @@ Zynthian.Card {
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
-                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Global").get(playgridPickerPopup.trackObj.connectedPattern);
-                                            seq.midiChannel = root.selectedTrack.connectedSound;
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                                            pattern.midiChannel = root.selectedTrack.connectedSound;
                                         }
                                     }
                                 }

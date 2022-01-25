@@ -313,10 +313,17 @@ Zynthian.ScreenPage {
     contentItem : Item {
         id: content
 
+        Connections {
+            target: applicationWindow()
+            onVisibleChanged: {
+                selectedTrackOutlineTimer.start()
+            }
+        }
+
         Timer {
             id: selectedTrackOutlineTimer
             repeat: false
-            interval: 100
+            interval: 1000
             onTriggered: {
                 selectedTrackOutline.x = Qt.binding(function() { return partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
                 selectedTrackOutline.y = Qt.binding(function() { return partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })
@@ -333,10 +340,6 @@ Zynthian.ScreenPage {
 
         ColumnLayout {
             anchors.fill: parent
-
-            Component.onCompleted: {
-                selectedTrackOutlineTimer.start()
-            }
 
             ColumnLayout {
                 id: tableLayout

@@ -70,6 +70,9 @@ Item {
         rootFolder: "/zynthian/zynthian-my-data/"
         onVisibleChanged: folderModel.folder = rootFolder + "sequences/"
         property QtObject currentFileObject;
+        folderModel {
+            nameFilters: ["*.pattern.json", "*.sequence.json"]
+        }
         filePropertiesComponent: sequenceFilePicker.currentFileObject === null
             ? null
             : sequenceFilePicker.currentFileObject.hasOwnProperty("activePattern")
@@ -167,8 +170,8 @@ Item {
     QQC2.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
-        y: root.parent.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.parent.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.8)
         z: 999999999
@@ -181,6 +184,7 @@ Item {
         }
         contentItem: ColumnLayout {
             Repeater {
+                id: loadedSequenceOptionsRepeater
                 model: loadedSequenceOptionsPicker.loadedSequence
                 delegate: patternOptions
             }
@@ -212,6 +216,7 @@ Item {
             clear();
         }
         onAccepted: {
+            applyLoadedSequence(loadedSequenceOptionsRepeater);
             clear();
         }
     }
@@ -219,8 +224,8 @@ Item {
     QQC2.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
-        y: root.parent.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.parent.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.3)
         z: 999999999
@@ -235,6 +240,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Repeater {
+                id: loadedPatternOptionsRepeater
                 model: [loadedPatternOptionsPicker.loadedPattern]
                 delegate: patternOptions
             }
@@ -266,20 +272,38 @@ Item {
             clear();
         }
         onAccepted: {
+            applyLoadedSequence(loadedPatternOptionsRepeater);
             clear();
+        }
+    }
+
+    function applyLoadedSequence(repeaterObject) {
+        if (repeaterObject.model.hasOwnProperty("patterns")) {
+            // Then it's a sequence, and we should apply all the options from the sequence as well
+            // basically import bpm?
+            var sequenceModel = repeaterObject.model;
+        }
+        for (var i = 0; i < repeaterObject.count; i++) {
+            var theItem = repeaterObject.itemAt(i);
+            if (theItem.patternObject.enabled) {
+                // Only import a pattern object that is actually enabled
+                // Run through all other tracks, and un-associate with this index of pattern if one exists...
+            }
         }
     }
 
     Component {
         id: patternOptions
         RowLayout {
+            id: patternOptionsRoot
             Layout.fillWidth: true
-            property QtObject patternObject: modelData
+            property QtObject patternObject: model.pattern === undefined ? modelData : model.pattern
+            property var destinationChannels: []
             QQC2.CheckBox {
                 id: importPattern
-                checked: modelData.enabled
+                checked: patternOptionsRoot.patternObject.enabled
                 onClicked: {
-                    modelData.enabled = !modelData.enabled
+                    patternOptionsRoot.patternObject.enabled = !patternOptionsRoot.patternObject.enabled
                 }
             }
             QQC2.Label {
@@ -289,14 +313,124 @@ Item {
             }
             QQC2.CheckBox {
                 id: importSoundCheck
+                text: qsTr("Import Sound")
+                enabled: patternOptionsRoot.patternObject.enabled && patternOptionsRoot.layerData !== ""
             }
             QQC2.Button {
                 id: pickSoundDestination
                 Layout.fillWidth: true
+                text: qsTr("Pick Layer")
+                enabled: patternOptionsRoot.patternObject.enabled && patternOptionsRoot.layerData !== ""
+                property bool pickingLayer: false
+                onClicked: {
+                    pickingLayer = true;
+                    layerReplacer.sourceChannels = zynthian.layer.load_layer_channels_from_json(patternOptionsRoot.patternObject.layerData);
+                    layerReplacer.jsonToLoad = patternOptionsRoot.patternObject.layerData;
+                    layerReplacer.open();
+                }
+                Connections {
+                    target: layerReplacer
+                    onAccepted: {
+                        if (pickSoundDestination.pickingLayer) {
+                            patternOptionsRoot.destinationChannels = layerReplacer.destinationChannels;
+                            layerReplacer.clear();
+                            pickSoundDestination.pickingLayer = false;
+                        }
+                    }
+                }
             }
-            QQC2.ComboBox {
+            QQC2.Button {
                 id: importToTrack
                 Layout.fillWidth: true
+                text: qsTr("Import to Track %1").arg(patternOptionsRoot.patternObject.layer + 1)
+                enabled: patternOptionsRoot.patternObject.enabled
+                property bool pickingTrack: false
+                onClicked: {
+                    pickingTrack = true;
+                    trackPicker.open()
+                }
+                Connections {
+                    target: trackPicker;
+                    onVisibleChanged: {
+                        if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.patternObject.layer !== trackPicker.associatedTrackIndex) {
+                            patternOptionsRoot.patternObject.enabled = (trackPicker.associatedTrackIndex > -1);
+                            patternOptionsRoot.patternObject.layer = trackPicker.associatedTrackIndex;
+                            importToTrack.pickingTrack = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Zynthian.LayerReplaceDialog {
+        id: layerReplacer
+        parent: root.parent
+        modal: true
+        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
+        z: 1999999999
+        footerLeftPadding: saveDialog.leftPadding
+        footerRightPadding: saveDialog.rightPadding
+        footerBottomPadding: saveDialog.bottomPadding
+    }
+    QQC2.Popup {
+        id: trackPicker
+        modal: true
+        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        width: component.Window.width
+        height: Math.round(component.Window.height * 0.8)
+        z: 1999999999
+        property int associatedTrackIndex: -1
+        ColumnLayout {
+            anchors.fill: parent
+            Kirigami.Heading {
+                Layout.fillWidth: true
+                text: qsTr("Pick Track To Import Pattern Into")
+            }
+            GridLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                columns: 4
+                Repeater {
+                    model: zynthian.zynthiloops.song.tracksModel
+                    delegate: Zynthian.PlayGridButton {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: trackPicker.width / 4
+                        Layout.fillHeight: true
+                        text: model.track.connectedPattern > -1
+                            ? qsTr("Replace pattern on:\nTrack %1").arg(model.id + 1)
+                            : qsTr("Import to:\nTrack %1").arg(model.id + 1)
+                        onClicked: {
+                            trackPicker.associatedTrackIndex = model.id
+                            trackPicker.close();
+                        }
+                    }
+                }
+            }
+            Zynthian.ActionBar {
+                Layout.fillWidth: true
+                currentPage: Item {
+                    property QtObject backAction: Kirigami.Action {
+                        text: "Back"
+                        onTriggered: {
+                            trackPicker.close();
+                        }
+                    }
+                    property list<QtObject> contextualActions: [
+                        Kirigami.Action {},
+                        Kirigami.Action {},
+                        Kirigami.Action {
+                            text: qsTr("Unassign")
+                            onTriggered: {
+                                trackPicker.associatedTrackIndex = -1
+                                trackPicker.close();
+                            }
+                        }
+                    ]
+                }
             }
         }
     }

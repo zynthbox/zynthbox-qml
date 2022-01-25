@@ -1414,7 +1414,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.info("Saving snapshot %s => \n%s" % (fpath,json))
 
 		except Exception as e:
-			logging.error("Can't generate snapshot: %s" %e)
+			logging.error("Can't generate snapshot: %s" % e)
 			return False
 
 		try:
@@ -1803,7 +1803,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	@Slot(str, result="QVariantList")
 	def sound_metadata_from_file(self, file_name):
 		try:
-			f = open(self.__sounds_basepath__ + file_name, "r")
+			if file_name.startswith("/"):
+				actualPath = Path(file_name)
+			else:
+				actualPath = Path(self.__sounds_basepath__ + file_name)
+			f = open(actualPath, "r")
 			return self.sound_metadata_from_json(f.read())
 		except Exception as e:
 			logging.error(e)

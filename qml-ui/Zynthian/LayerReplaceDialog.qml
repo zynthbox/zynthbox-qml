@@ -39,6 +39,8 @@ QQC2.Dialog {
     property var destinationChannels: []
     property string fileToLoad
     property string jsonToLoad
+    // If you set this to false, make sure to manually call clear after you are done with the dialog's data
+    property bool actuallyReplace: true
     function clear () {
         sourceChannels = [];
         destinationChannels = [];
@@ -46,23 +48,25 @@ QQC2.Dialog {
         jsonToLoad = "";
     }
     onAccepted: {
-        if (sourceChannels.length !== destinationChannels.length) {
-            return;
+        if (actuallyReplace) {
+            if (sourceChannels.length !== destinationChannels.length) {
+                return;
+            }
+            let map = {};
+            var i = 0;
+            for (i in sourceChannels) {
+                map[sourceChannels[i]] = destinationChannels[i];
+            }
+            for (i in map) {
+                print("Mapping midi channel " + i + " to " + map[i]);
+            }
+            if (fileToLoad != "") {
+                zynthian.layer.load_layer_from_file(fileToLoad, map);
+            } else if (jsonToLoad != "") {
+                zynthian.layer.load_layer_from_json(jsonToLoad, map);
+            }
+            clear();
         }
-        let map = {};
-        var i = 0;
-        for (i in sourceChannels) {
-            map[sourceChannels[i]] = destinationChannels[i];
-        }
-        for (i in map) {
-            print("Mapping midi channel " + i + " to " + map[i]);
-        }
-        if (fileToLoad != "") {
-            zynthian.layer.load_layer_from_file(fileToLoad, map);
-        } else if (jsonToLoad != "") {
-            zynthian.layer.load_layer_from_json(jsonToLoad, map);
-        }
-        clear();
     }
     onRejected: {
         clear();

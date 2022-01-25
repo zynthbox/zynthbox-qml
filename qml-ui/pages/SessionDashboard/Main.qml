@@ -187,7 +187,7 @@ Zynthian.ScreenPage {
         headerText: qsTr("Pick a sketch")
         rootFolder: "/zynthian/zynthian-my-data/sketches"
         folderModel {
-            nameFilters: ["*.json"]
+            nameFilters: ["*.sketch.json"]
         }
         onFileSelected: {
             console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")

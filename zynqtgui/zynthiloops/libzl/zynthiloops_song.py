@@ -103,16 +103,16 @@ class zynthiloops_song(QObject):
         if self.isTemp or not cache:
             if not self.isTemp:
                 # Clear previous history and remove cache files if not temp
-                with open(self.sketch_folder + self.__initial_name__ + ".json", "r+") as f:
+                with open(self.sketch_folder + self.__initial_name__ + ".sketch.json", "r+") as f:
                     obj = json.load(f)
                     f.seek(0)
 
                     if "history" in obj and len(obj["history"]) > 0:
                         for history in obj["history"]:
                             try:
-                                Path(cache_dir / (history + ".json")).unlink()
+                                Path(cache_dir / (history + ".sketch.json")).unlink()
                             except Exception as e:
-                                logging.error(f"Error while trying to remove cache file .cache/{history}.json : {str(e)}")
+                                logging.error(f"Error while trying to remove cache file .cache/{history}.sketch.json : {str(e)}")
 
                     obj["history"] = []
                     self.__history_length__ = 0
@@ -123,7 +123,7 @@ class zynthiloops_song(QObject):
                     f.flush()
                     os.fsync(f.fileno())
 
-            filename = self.__name__ + ".json"
+            filename = self.__name__ + ".sketch.json"
             self.__initial_name__ = self.name
 
             logging.error(f"Storing to {filename}")
@@ -151,12 +151,12 @@ class zynthiloops_song(QObject):
 
             self.versions_changed.emit()
         else:
-            filename = self.__initial_name__ + ".json"
+            filename = self.__initial_name__ + ".sketch.json"
 
             # Handle saving to cache
             cache_id = str(uuid.uuid1())
 
-            logging.error(f"Storing to cache {cache_id}.json")
+            logging.error(f"Storing to cache {cache_id}.sketch.json")
 
             try:
                 with open(self.sketch_folder + filename, "r+") as f:
@@ -177,7 +177,7 @@ class zynthiloops_song(QObject):
                     logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
 
                     if self.serialize() != comparing_obj:
-                        with open(cache_dir / (cache_id + ".json"), "w") as f_cache:
+                        with open(cache_dir / (cache_id + ".sketch.json"), "w") as f_cache:
                             f_cache.write(json.dumps(self.serialize()))
                             f_cache.flush()
                             os.fsync(f_cache.fileno())
@@ -201,7 +201,7 @@ class zynthiloops_song(QObject):
         self.__save_timer__.start()
 
     def restore(self):
-        filename = self.__name__ + ".json"
+        filename = self.__name__ + ".sketch.json"
 
         try:
             logging.error(f"Restoring {self.sketch_folder + filename}")
@@ -210,7 +210,7 @@ class zynthiloops_song(QObject):
 
                 if "history" in sketch and len(sketch["history"]) > 0:
                     cache_dir = Path(self.sketch_folder) / ".cache"
-                    with open(cache_dir / (sketch["history"][-1] + ".json"), "r") as f_cache:
+                    with open(cache_dir / (sketch["history"][-1] + ".sketch.json"), "r") as f_cache:
                         sketch = json.load(f_cache)
 
                 if "name" in sketch:
@@ -280,7 +280,7 @@ class zynthiloops_song(QObject):
         pass
 
     def get_versions(self):
-        versions = [f.name.replace(".json", "") for f in Path(self.sketch_folder).glob("*.json")]
+        versions = [f.name.replace(".sketch.json", "") for f in Path(self.sketch_folder).glob("*.sketch.json")]
         return versions
 
     versions = Property('QVariantList', get_versions, notify=versions_changed)
@@ -419,7 +419,7 @@ class zynthiloops_song(QObject):
         cache_dir = Path(self.sketch_folder) / ".cache"
 
         try:
-            with open(self.sketch_folder + self.__initial_name__ + ".json", "r+") as f:
+            with open(self.sketch_folder + self.__initial_name__ + ".sketch.json", "r+") as f:
                 obj = json.load(f)
                 f.seek(0)
 
@@ -427,7 +427,7 @@ class zynthiloops_song(QObject):
                     cache_file = obj["history"].pop()
 
                 try:
-                    Path(cache_dir / (cache_file + ".json")).unlink()
+                    Path(cache_dir / (cache_file + ".sketch.json")).unlink()
                 except:
                     pass
 

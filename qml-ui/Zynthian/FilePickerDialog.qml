@@ -121,6 +121,7 @@ QQC2.Dialog {
                     onTextChanged: {
                         if (filesListView.selectedModelData) {
                             filesListView.selectedModelData.fileName = text;
+                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
                         } else {
                             filesListView.selectedModelData = {};
                             filesListView.selectedModelData.fileName = nameFiled.text;
@@ -281,6 +282,10 @@ QQC2.Dialog {
                                     return qsTr("When you use Get New Soundsets, you will be able to find them here");
                                 } else if (folderName == "file:///zynthian/zynthian-my-data/soundsets/my-soundsets") {
                                     return qsTr("This is where you should store your own soundsets");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/community-sequences") {
+                                    return qsTr("When you use Get New Sequences, you will be able to find them here");
+                                } else if (folderName == "file:///zynthian/zynthian-my-data/sequences/my-sequences") {
+                                    return qsTr("This is where you should store sequences you create");
                                 }
                                 return "";
                             }

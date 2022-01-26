@@ -59,7 +59,7 @@ Item {
      * @param sequenceName The sequence you wish to save
      */
     function saveSequenceToFile(sequenceName) {
-        if (sequenceName == "") {
+        if (sequenceName == undefined || sequenceName == "") {
             sequenceFilePicker.sequenceName = "Global";
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
@@ -72,7 +72,13 @@ Item {
         id: sequenceFilePicker
         property string sequenceName
         rootFolder: "/zynthian/zynthian-my-data/"
-        onVisibleChanged: folderModel.folder = rootFolder + "sequences/"
+        onVisibleChanged: {
+            if (saveMode) {
+                folderModel.folder = rootFolder + "sequences/my-sequences/";
+            } else {
+                folderModel.folder = rootFolder + "sequences/";
+            }
+        }
         property QtObject currentFileObject;
         folderModel {
             nameFilters: ["*.pattern.json", "*.sequence.json"]
@@ -155,8 +161,14 @@ Item {
             icon: model.fileIsDir ? "folder" : "audio-midi"
             onClicked: sequenceFilePicker.filesListView.selectItem(model)
         }
-        onFileSelected: {
+        property var mostRecentlyPicked;
+        onAccepted: {
             if (saveMode) {
+                // For now, full sequences only! For later, also export individual patterns
+                if (mostRecentlyPicked) {
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.sequenceName);
+                    sequence.save(mostRecentlyPicked + "/metadata.sequence.json", true); // Explicitly export-only to this location
+                }
             } else {
                 if (sequenceFilePicker.currentFileObject.hasOwnProperty("activePattern")) {
                     // If this is a sequence, load a full sequence...
@@ -168,6 +180,9 @@ Item {
                     loadedPatternOptionsPicker.open();
                 }
             }
+        }
+        onFileSelected: {
+            mostRecentlyPicked = file.filePath;
         }
     }
 

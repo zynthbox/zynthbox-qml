@@ -142,7 +142,13 @@ Zynthian.Card {
                 visible: (controlObj != null) && controlObj.clearable
                 enabled: controlObj ? !controlObj.isPlaying : false
 
-                onClicked: controlObj.clear()
+                onClicked: {
+                    controlObj.clear()
+
+                    if (root.controlType === BottomBar.ControlType.Clip) {
+                        zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                    }
+                }
             }
 
             SidebarButton {

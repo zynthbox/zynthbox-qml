@@ -35,6 +35,10 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 Item {
     id: component
+    property int topPadding: Kirigami.Units.largeSpacing
+    property int leftPadding: Kirigami.Units.largeSpacing
+    property int rightPadding: Kirigami.Units.largeSpacing
+    property int bottomPadding: Kirigami.Units.largeSpacing
 
     /**
      * \brief Load a sequence from a file into a named sequence (loads into the global sequence if none is specified)
@@ -170,8 +174,8 @@ Item {
     QQC2.Dialog {
         id: loadedSequenceOptionsPicker
         property QtObject loadedSequence
-        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.8)
         z: 999999999
@@ -190,10 +194,10 @@ Item {
             }
         }
         footer: QQC2.Control {
-            leftPadding: root.leftPadding
+            leftPadding: component.leftPadding
             topPadding: Kirigami.Units.smallSpacing
-            rightPadding: root.rightPadding
-            bottomPadding: root.bottomPadding
+            rightPadding: component.rightPadding
+            bottomPadding: component.bottomPadding
             contentItem: RowLayout {
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -224,8 +228,8 @@ Item {
     QQC2.Dialog {
         id: loadedPatternOptionsPicker
         property QtObject loadedPattern
-        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.3)
         z: 999999999
@@ -241,15 +245,15 @@ Item {
             Layout.fillHeight: true
             Repeater {
                 id: loadedPatternOptionsRepeater
-                model: [loadedPatternOptionsPicker.loadedPattern]
+                model: loadedPatternOptionsPicker.loadedPattern ? [loadedPatternOptionsPicker.loadedPattern] : []
                 delegate: patternOptions
             }
         }
         footer: QQC2.Control {
-            leftPadding: root.leftPadding
+            leftPadding: component.leftPadding
             topPadding: Kirigami.Units.smallSpacing
-            rightPadding: root.rightPadding
-            bottomPadding: root.bottomPadding
+            rightPadding: component.rightPadding
+            bottomPadding: component.bottomPadding
             contentItem: RowLayout {
                 QQC2.Button {
                     Layout.fillWidth: true
@@ -278,84 +282,158 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
+        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
         if (repeaterObject.model.hasOwnProperty("patterns")) {
-            // Then it's a sequence, and we should apply all the options from the sequence as well
-            // basically import bpm?
+            // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;
+            globalSequence.activePattern = sequenceModel.activePattern;
         }
-        for (var i = 0; i < repeaterObject.count; i++) {
-            var theItem = repeaterObject.itemAt(i);
-            if (theItem.patternObject.enabled) {
-                // Only import a pattern object that is actually enabled
-                // Run through all other tracks, and un-associate with this index of pattern if one exists...
+        for (var patternIndex = 0; patternIndex < repeaterObject.count; patternIndex++) {
+            var theItem = repeaterObject.itemAt(patternIndex);
+            // Only import a pattern object that is actually enabled
+            if (theItem.importPattern) {
+                // As we're importing to the global sequence, operate on the pattern in the appropriate position
+                var globalPattern = globalSequence.get(theItem.importIndex);
+
+                // First, remove this pattern from whatever track it was associated with, if any
+                var foundTrack = null;
+                var foundIndex = -1;
+                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                    if (track && track.connectedPattern === theItem.importIndex) {
+                        foundTrack = track;
+                        foundIndex = i;
+                        break;
+                    }
+                }
+                if (foundIndex > -1) {
+                    foundTrack.connectedPattern = -1;
+                }
+
+                // Now apply our loaded pattern onto the global one
+                globalPattern.cloneOther(theItem.patternObject);
+
+                // Then associate this pattern with the track we requested, if requested
+                if (theItem.associatedTrackIndex > -1) {
+                    var trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
+                    trackToAssociate.connectedPattern = theItem.importIndex;
+                }
+
+                // Finally, actually import the sound if requested
+                var jsonToLoad = theItem.patternObject.layerData;
+                if (jsonToLoad != "") {
+                    var sourceChannels = zynthian.layer.load_layer_channels_from_json(jsonToLoad);
+                    var destinationChannels = theItem.destinationChannels;
+                    if (sourceChannels.length === destinationChannels.length) {
+                        let map = {};
+                        var i = 0;
+                        for (i in sourceChannels) {
+                            map[sourceChannels[i]] = destinationChannels[i];
+                        }
+                        for (i in map) {
+                            console.log("Mapping midi channel " + i + " to " + map[i]);
+                        }
+                        zynthian.layer.load_layer_from_json(jsonToLoad, map);
+                    }
+                }
             }
         }
     }
 
     Component {
         id: patternOptions
-        RowLayout {
+        ColumnLayout {
             id: patternOptionsRoot
             Layout.fillWidth: true
             property QtObject patternObject: model.pattern === undefined ? modelData : model.pattern
             property var destinationChannels: []
-            QQC2.CheckBox {
-                id: importPattern
-                checked: patternOptionsRoot.patternObject.enabled
-                onClicked: {
-                    patternOptionsRoot.patternObject.enabled = !patternOptionsRoot.patternObject.enabled
-                }
-            }
-            QQC2.Label {
-                // This likely wants to be nicer...
-                text: "Pattern " + (model.index + 1)
+            property bool importPattern: patternObject.enabled
+            property int associatedTrackIndex: 6 + model.index
+            property int importIndex: model.index
+            property var soundInfo: patternObject.layerData.length > 0 ? zynthian.layer.sound_metadata_from_json(patternObject.layerData) : [];
+            RowLayout {
                 Layout.fillWidth: true
-            }
-            QQC2.CheckBox {
-                id: importSoundCheck
-                text: qsTr("Import Sound")
-                enabled: patternOptionsRoot.patternObject.enabled && patternOptionsRoot.layerData !== ""
-            }
-            QQC2.Button {
-                id: pickSoundDestination
-                Layout.fillWidth: true
-                text: qsTr("Pick Layer")
-                enabled: patternOptionsRoot.patternObject.enabled && patternOptionsRoot.layerData !== ""
-                property bool pickingLayer: false
-                onClicked: {
-                    pickingLayer = true;
-                    layerReplacer.sourceChannels = zynthian.layer.load_layer_channels_from_json(patternOptionsRoot.patternObject.layerData);
-                    layerReplacer.jsonToLoad = patternOptionsRoot.patternObject.layerData;
-                    layerReplacer.open();
+                QQC2.CheckBox {
+                    checked: patternOptionsRoot.importPattern
+                    onClicked: {
+                        patternOptionsRoot.importPattern = !patternOptionsRoot.importPattern
+                    }
                 }
-                Connections {
-                    target: layerReplacer
-                    onAccepted: {
-                        if (pickSoundDestination.pickingLayer) {
-                            patternOptionsRoot.destinationChannels = layerReplacer.destinationChannels;
-                            layerReplacer.clear();
-                            pickSoundDestination.pickingLayer = false;
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                    enabled: patternOptionsRoot.importPattern
+                    text: "Pattern " + (model.index + 1)
+                }
+                QQC2.ComboBox {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1
+                    enabled: patternOptionsRoot.importPattern
+                    model: ["Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5"]
+                    currentIndex: patternOptionsRoot.importIndex
+                    onCurrentIndexChanged: {
+                        console.log(patternOptionsRoot.patternObject, patternOptionsRoot.importIndex, currentIndex);
+                        if (currentIndex === -1) {
+                            patternOptionsRoot.importIndex = currentIndex;
+                        }
+                    }
+                    popup.z: 1999999999
+                }
+                QQC2.Button {
+                    id: importToTrack
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                    text: patternOptionsRoot.associatedTrackIndex > -1 && patternOptionsRoot.associatedTrackIndex < 12
+                        ? qsTr("Import to Track %1").arg(patternOptionsRoot.associatedTrackIndex + 1)
+                        : qsTr("Pick Track Association")
+                    enabled: patternOptionsRoot.importPattern
+                    property bool pickingTrack: false
+                    onClicked: {
+                        pickingTrack = true;
+                        trackPicker.associatedTrackIndex = patternOptionsRoot.associatedTrackIndex;
+                        trackPicker.open()
+                    }
+                    Connections {
+                        target: trackPicker;
+                        onVisibleChanged: {
+                            if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.associatedTrackIndex !== trackPicker.associatedTrackIndex) {
+                                patternOptionsRoot.associatedTrackIndex = trackPicker.associatedTrackIndex;
+                                importToTrack.pickingTrack = false;
+                            }
                         }
                     }
                 }
-            }
-            QQC2.Button {
-                id: importToTrack
-                Layout.fillWidth: true
-                text: qsTr("Import to Track %1").arg(patternOptionsRoot.patternObject.layer + 1)
-                enabled: patternOptionsRoot.patternObject.enabled
-                property bool pickingTrack: false
-                onClicked: {
-                    pickingTrack = true;
-                    trackPicker.open()
+                QQC2.CheckBox {
+                    id: importSoundCheck
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 1.5
+                    text: qsTr("Import Sound")
+                    enabled: patternOptionsRoot.importPattern && patternOptionsRoot.soundInfo.length > 0
+                    opacity: enabled ? 1 : 0.5
                 }
-                Connections {
-                    target: trackPicker;
-                    onVisibleChanged: {
-                        if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.patternObject.layer !== trackPicker.associatedTrackIndex) {
-                            patternOptionsRoot.patternObject.enabled = (trackPicker.associatedTrackIndex > -1);
-                            patternOptionsRoot.patternObject.layer = trackPicker.associatedTrackIndex;
-                            importToTrack.pickingTrack = false;
+                QQC2.Button {
+                    id: pickSoundDestination
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                    text: patternOptionsRoot.soundInfo.length === 0
+                        ? qsTr("No Embedded Sound")
+                        : qsTr("Pick Sound Destination")
+                    enabled: patternOptionsRoot.importPattern && patternOptionsRoot.soundInfo.length > 0
+                    property bool pickingLayer: false
+                    onClicked: {
+                        pickingLayer = true;
+                        layerReplacer.sourceChannels = zynthian.layer.load_layer_channels_from_json(patternOptionsRoot.patternObject.layerData);
+                        layerReplacer.jsonToLoad = patternOptionsRoot.patternObject.layerData;
+                        layerReplacer.open();
+                    }
+                    Connections {
+                        target: layerReplacer
+                        onAccepted: {
+                            if (pickSoundDestination.pickingLayer) {
+                                patternOptionsRoot.destinationChannels = layerReplacer.destinationChannels;
+                                layerReplacer.clear();
+                                pickSoundDestination.pickingLayer = false;
+                            }
                         }
                     }
                 }
@@ -365,21 +443,22 @@ Item {
 
     Zynthian.LayerReplaceDialog {
         id: layerReplacer
-        parent: root.parent
+        parent: component.parent
         modal: true
-        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        actuallyReplace: false
+        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
         z: 1999999999
-        footerLeftPadding: saveDialog.leftPadding
-        footerRightPadding: saveDialog.rightPadding
-        footerBottomPadding: saveDialog.bottomPadding
+        footerLeftPadding: component.leftPadding
+        footerRightPadding: component.rightPadding
+        footerBottomPadding: component.bottomPadding
     }
     QQC2.Popup {
         id: trackPicker
         modal: true
-        y: root.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: root.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
+        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
+        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.8)
         z: 1999999999
@@ -400,9 +479,10 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredWidth: trackPicker.width / 4
                         Layout.fillHeight: true
-                        text: model.track.connectedPattern > -1
-                            ? qsTr("Replace pattern on:\nTrack %1").arg(model.id + 1)
-                            : qsTr("Import to:\nTrack %1").arg(model.id + 1)
+                        text: (trackPicker.associatedTrackIndex === model.id ? qsTr("Current") : "") + "\n\n" +
+                            (model.track.connectedPattern > -1
+                                ? qsTr("Replace pattern on:\nTrack %1").arg(model.id + 1)
+                                : qsTr("Import to:\nTrack %1").arg(model.id + 1))
                         onClicked: {
                             trackPicker.associatedTrackIndex = model.id
                             trackPicker.close();

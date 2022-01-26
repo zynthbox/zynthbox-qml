@@ -73,6 +73,11 @@ def cb(beat):
     zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate128th.emit(beat)
 
 
+@ctypes.CFUNCTYPE(None, ctypes.c_float)
+def audioLevelCb(dbFS):
+    zynthian_gui_zynthiloops.__instance__.set_recording_audio_level(dbFS)
+
+
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     __instance__ = None
 
@@ -95,20 +100,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
-        # self.jack_client = jack.Client('zynthiloops_client')
-        # self.jack_capture_port_a = self.jack_client.inports.register(f"capture_port_a")
-        # self.jack_capture_port_b = self.jack_client.inports.register(f"capture_port_b")
+        self.jack_client = jack.Client('zynthiloops_client')
         self.recorder_process = None
         self.recorder_process_internal_arguments = ["--daemon", "--port", f"zynthiloops_client:*"]
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
-        self.__recording_audio_level__ = -400
-
-        self.update_recorder_jack_port_timer = QTimer()
-        self.update_recorder_jack_port_timer.setInterval(500)
-        self.update_recorder_jack_port_timer.setSingleShot(True)
-        self.update_recorder_jack_port_timer.timeout.connect(lambda: self.update_recorder_jack_port())
+        self.__recording_audio_level__ = -100
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -121,29 +119,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         libzl.registerTimerCallback(cb)
         libzl.registerGraphicTypes()
+        libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
         self.metronomeBeatUpdate4th.connect(self.metronome_update)
-
         self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
-
         self.update_timer_bpm()
-
-        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port_timer.start())
-
-    def recording_jack_client_process_callback(self, frames):
-        db_left = self.peak_dbFS_from_jack_output(self.jack_capture_port_a, frames)
-        db_right = self.peak_dbFS_from_jack_output(self.jack_capture_port_b, frames)
-
-        if db_left <= -400 and db_right <= -400:
-            self.__recording_audio_level__ = -400
-        else:
-            self.__recording_audio_level__ = 10 * math.log10(pow(10, db_left/10) + pow(10, db_right/10))
-
-        self.recording_audio_level_changed.emit()
+        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
 
     ### Property recordingAudioLevel
     def get_recording_audio_level(self):
         return self.__recording_audio_level__
+    def set_recording_audio_level(self, db):
+        if db < -100:
+            db = -100
+
+        if self.__recording_audio_level__ != db:
+            self.__recording_audio_level__ = db
+            self.recording_audio_level_changed.emit()
     recording_audio_level_changed = Signal()
     recordingAudioLevel = Property(float, get_recording_audio_level, notify=recording_audio_level_changed)
     ### END Property recordingAudioLevel
@@ -327,31 +319,35 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                             except Exception as e:
                                 logging.error(f"### update_recorder_jack_port Error : {str(e)}")
 
-                for port in jack_client.get_all_connections('system:playback_1'):
-                    self.process_jack_port(jack_client, port, jack_capture_port_a, jack_basenames)
+                # Disconnect all connected ports first
+                for port in jack_client.get_all_connections(jack_capture_port_a):
+                    jack_client.disconnect(port.name, jack_capture_port_a)
+                for port in jack_client.get_all_connections(jack_capture_port_b):
+                    jack_client.disconnect(port.name, jack_capture_port_b)
+                ###
 
+                # Connect to selected track's output ports
+                for port in jack_client.get_all_connections('system:playback_1'):
+                    self.process_jack_port(jack_client, port.name, jack_capture_port_a, jack_basenames)
                 for port in jack_client.get_all_connections('system:playback_2'):
-                    self.process_jack_port(jack_client, port, jack_capture_port_b, jack_basenames)
+                    self.process_jack_port(jack_client, port.name, jack_capture_port_b, jack_basenames)
+                ###
 
             def process_jack_port(self, jack_client, port, target, active_jack_basenames):
                 try:
                     for jack_basename in active_jack_basenames:
-                        if not (port.name.startswith("JUCE") or port.name.startswith(
-                                "system")) and port.name.startswith(jack_basename):
-                            logging.error("ACCEPTED {}".format(port.name))
-                            jack_client.connect(port.name, target.name)
+                        if not (port.startswith("JUCE") or port.startswith(
+                                "system")) and port.startswith(jack_basename):
+                            logging.error("ACCEPTED {}".format(port))
+                            jack_client.connect(port, target)
                         else:
-                            logging.error("REJECTED {}".format(port.name))
+                            logging.error("REJECTED {}".format(port))
                 except Exception as e:
                     logging.error(f"Error processing jack port : {port}({str(e)})")
 
-        # self.jack_client.deactivate()
-        # self.jack_client.set_process_callback(self.recording_jack_client_process_callback)
-        # self.jack_client.activate()
-
         selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
         worker = Worker()
-        worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, self.jack_capture_port_a, self.jack_capture_port_b, selected_track))
+        worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, "zynthiloops_client:capture_port_a", "zynthiloops_client:capture_port_b", selected_track))
         worker_thread.start()
 
     def recording_process_stopped(self, exitCode, exitStatus):

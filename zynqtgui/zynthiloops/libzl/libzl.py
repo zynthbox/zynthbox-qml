@@ -101,10 +101,12 @@ def init():
             libzl = None
             print(f"Failed to initialise libzl library: {str(e)}")
 
+
 @ctypes.CFUNCTYPE(ctypes.c_void_p)
 def getSyncTimerInstance():
     if libzl:
         return libzl.SyncTimer_instance()
+
 
 def registerTimerCallback(callback):
     if libzl:
@@ -140,6 +142,11 @@ def stopClips(clips: list):
 def dbFromVolume(vol: float):
     if libzl:
         return libzl.dBFromVolume(vol)
+
+
+def setRecordingAudioLevelCallback(cb):
+    if libzl:
+        libzl.setRecordingAudioLevelCallback(cb)
 
 
 class ClipAudioSource(QObject):

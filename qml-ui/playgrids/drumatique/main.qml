@@ -43,21 +43,23 @@ Zynthian.BasePlayGrid {
     useOctaves: true
     additionalActions: [
         Kirigami.Action {
-            text: "Load Sequence or Pattern"
+            text: "Load Sequence or Pattern..."
             onTriggered: {
                 sequenceLoader.loadSequenceFromFile()
             }
         },
         Kirigami.Action {
-            text: "Export Sequence"
+            text: "Export Sequence..."
             onTriggered: {
-            }
-        },
-        Kirigami.Action {
-            text: "Export Current Pattern"
-            onTriggered: {
+                sequenceLoader.saveSequenceToFile()
             }
         }
+        //,
+        //Kirigami.Action {
+        //    text: "Export Current Pattern"
+        //    onTriggered: {
+        //    }
+        //}
     ]
 
     property bool showPatternsMenu: false

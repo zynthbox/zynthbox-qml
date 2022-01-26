@@ -532,6 +532,16 @@ Zynthian.ScreenPage {
         target: zynthian.zynthiloops
         onSongChanged: adoptSong()
     }
+    Connections {
+        target: zynthian.zynthiloops.song
+        onBpmChanged: {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            if (sequence && sequence.bpm != zynthian.zynthiloops.song.bpm) {
+                sequence.bpm = zynthian.zynthiloops.song.bpm;
+                scheduleSequenceSave();
+            }
+        }
+    }
     Component.onCompleted: adoptSong();
 
     function adoptCurrentMidiChannel() {

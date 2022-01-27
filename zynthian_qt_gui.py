@@ -647,6 +647,7 @@ class zynthian_gui(QObject):
         self.screens["sound_downloader"] = zynthian_gui_newstuff(self)
         self.screens["soundfont_downloader"] = zynthian_gui_newstuff(self)
         self.screens["soundset_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["sequence_downloader"] = zynthian_gui_newstuff(self)
 
         ###
         # Playgrid depends on zynthiloops screen for metronome related functionalities
@@ -2548,6 +2549,9 @@ class zynthian_gui(QObject):
     def get_soundset_downloader(self):
         return self.screens["soundset_downloader"]
 
+    def get_sequence_downloader(self):
+        return self.screens["sequence_downloader"]
+
     @Property(QObject, constant=True)
     def test_touchpoints(self):
         return self.screens["test_touchpoints"]
@@ -2693,6 +2697,7 @@ class zynthian_gui(QObject):
     sound_downloader = Property(QObject, get_sound_downloader, constant=True)
     soundfont_downloader = Property(QObject, get_soundfont_downloader, constant=True)
     soundset_downloader = Property(QObject, get_soundset_downloader, constant=True)
+    sequence_downloader = Property(QObject, get_sequence_downloader, constant=True)
 
 
 # ------------------------------------------------------------------------------

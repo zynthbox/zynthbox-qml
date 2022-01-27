@@ -43,22 +43,28 @@ Zynthian.BasePlayGrid {
     useOctaves: true
     additionalActions: [
         Kirigami.Action {
-            text: "Load Sequence or Pattern..."
+            text: qsTr("Load Sequence or Pattern...")
             onTriggered: {
                 sequenceLoader.loadSequenceFromFile();
             }
         },
         Kirigami.Action {
-            text: "Export Sequence..."
+            text: qsTr("Export Sequence...")
             onTriggered: {
                 sequenceLoader.saveSequenceToFile();
             }
         },
         Kirigami.Action {
-           text: "Export Current Pattern..."
+           text: qsTr("Export Current Pattern...")
            onTriggered: {
                sequenceLoader.savePatternToFile();
            }
+        },
+        Kirigami.Action {
+            text: qsTr("Get New Sequences...")
+            onTriggered: {
+                zynthian.show_modal("sequence_downloader")
+            }
         }
     ]
 
@@ -103,13 +109,14 @@ Zynthian.BasePlayGrid {
         }
     }
     function refreshSteps() {
-        var activePattern = _private.sequence.activePattern;
-        if (_private.sequence.activePattern === 0) {
-            _private.sequence.activePattern = activePattern + 1;
-        } else {
-            _private.sequence.activePattern = activePattern - 1;
-        }
-        _private.sequence.activePattern = activePattern;
+        // TODO If things keep working, then... this can go away :)
+        //var activePattern = _private.sequence.activePattern;
+        //if (_private.sequence.activePattern === 0) {
+            //_private.sequence.activePattern = activePattern + 1;
+        //} else {
+            //_private.sequence.activePattern = activePattern - 1;
+        //}
+        //_private.sequence.activePattern = activePattern;
     }
 
     property var noteSpecificColor: {
@@ -453,6 +460,7 @@ Zynthian.BasePlayGrid {
                             id:drumPadRepeater
                             model: _private.activeBarModel
                             PadNoteButton {
+                                id: sequencerPad
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
                                 playgrid: component
@@ -461,6 +469,21 @@ Zynthian.BasePlayGrid {
                                 mostRecentlyPlayedNote: component.mostRecentlyPlayedNote
                                 padNoteIndex: model.index
                                 note: _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                Timer {
+                                    id: sequenderPadNoteApplicator
+                                    repeat: false; running: false; interval: 1
+                                    onTriggered: {
+                                        sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                    }
+                                }
+                                Connections {
+                                    target: _private.activePatternModel
+                                    onLastModifiedChanged: sequenderPadNoteApplicator.restart();
+                                }
+                                Connections {
+                                    target: ZynQuick.PlayGridManager
+                                    onCurrentMidiChannelChanged: sequenderPadNoteApplicator.restart();
+                                }
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                             }
                         }

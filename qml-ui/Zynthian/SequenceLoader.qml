@@ -50,6 +50,7 @@ Item {
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
+        sequenceFilePicker.patternName = "";
         sequenceFilePicker.saveMode = false;
         sequenceFilePicker.open();
     }
@@ -64,6 +65,25 @@ Item {
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
+        sequenceFilePicker.patternName = "";
+        sequenceFilePicker.saveMode = true;
+        sequenceFilePicker.open();
+    }
+
+    /**
+     * \brief Save a pattern to file (otherwise the currently selected pattern on the global sequence will be saved)
+     * @param patternName The name of the pattern you wish to save
+     */
+    function savePatternToFile(patternName) {
+        if (patternName == undefined || patternName == "") {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            if (sequence.activePattern > -1) {
+                sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
+            }
+        } else {
+            sequenceFilePicker.patternName = patternName;
+        }
+        sequenceFilePicker.sequenceName = "";
         sequenceFilePicker.saveMode = true;
         sequenceFilePicker.open();
     }
@@ -71,6 +91,18 @@ Item {
     Zynthian.FilePickerDialog {
         id: sequenceFilePicker
         property string sequenceName
+        property string patternName;
+        headerText: {
+            if (saveMode) {
+                if (sequenceName != "") {
+                    return qsTr("Save Sequence");
+                } else {
+                    return qsTr("Save Pattern");
+                }
+            } else {
+                return qsTr("Load Sequence or Pattern");
+            }
+        }
         rootFolder: "/zynthian/zynthian-my-data/"
         onVisibleChanged: {
             if (saveMode) {
@@ -161,13 +193,23 @@ Item {
             icon: model.fileIsDir ? "folder" : "audio-midi"
             onClicked: sequenceFilePicker.filesListView.selectItem(model)
         }
-        property var mostRecentlyPicked;
+        property string mostRecentlyPicked;
         onAccepted: {
             if (saveMode) {
-                // For now, full sequences only! For later, also export individual patterns
                 if (mostRecentlyPicked) {
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.sequenceName);
-                    sequence.save(mostRecentlyPicked + "/metadata.sequence.json", true); // Explicitly export-only to this location
+                    if (sequenceName != "") {
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.sequenceName);
+                        sequence.save(mostRecentlyPicked + "/metadata.sequence.json", true); // Explicitly export-only to this location
+                    } else if (patternName != "") {
+                        var saveFileName = mostRecentlyPicked;
+                        if (!saveFileName.endsWith(".pattern.json")) {
+                            saveFileName = saveFileName + ".pattern.json";
+                        }
+                        var pattern = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.patternName);
+                        if (pattern) {
+                            pattern.saveFileName(saveFileName);
+                        }
+                    }
                 }
             } else {
                 if (sequenceFilePicker.currentFileObject.hasOwnProperty("activePattern")) {

@@ -45,21 +45,21 @@ Zynthian.BasePlayGrid {
         Kirigami.Action {
             text: "Load Sequence or Pattern..."
             onTriggered: {
-                sequenceLoader.loadSequenceFromFile()
+                sequenceLoader.loadSequenceFromFile();
             }
         },
         Kirigami.Action {
             text: "Export Sequence..."
             onTriggered: {
-                sequenceLoader.saveSequenceToFile()
+                sequenceLoader.saveSequenceToFile();
             }
+        },
+        Kirigami.Action {
+           text: "Export Current Pattern..."
+           onTriggered: {
+               sequenceLoader.savePatternToFile();
+           }
         }
-        //,
-        //Kirigami.Action {
-        //    text: "Export Current Pattern"
-        //    onTriggered: {
-        //    }
-        //}
     ]
 
     property bool showPatternsMenu: false

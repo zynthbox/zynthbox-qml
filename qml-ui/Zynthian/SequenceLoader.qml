@@ -207,7 +207,7 @@ Item {
                         }
                         var pattern = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.patternName);
                         if (pattern) {
-                            pattern.saveFileName(saveFileName);
+                            pattern.exportToFile(saveFileName);
                         }
                     }
                 }
@@ -456,6 +456,7 @@ Item {
                             if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.associatedTrackIndex !== trackPicker.associatedTrackIndex) {
                                 patternOptionsRoot.associatedTrackIndex = trackPicker.associatedTrackIndex;
                                 importToTrack.pickingTrack = false;
+                                // TODO Should we maybe set the sound destination to whereever the track is pointed if that's a thing already, or...?
                             }
                         }
                     }

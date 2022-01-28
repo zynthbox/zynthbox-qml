@@ -56,7 +56,11 @@ GridLayout {
                 top: parent.top
                 bottom: parent.bottom
             }
-            visible: patternVisualiser.sequence && patternVisualiser.sequence.isPlaying && patternVisualiser.pattern && patternVisualiser.pattern.enabled
+            visible: patternVisualiser.sequence &&
+                     patternVisualiser.sequence.isPlaying &&
+                     patternVisualiser.pattern &&
+                     patternVisualiser.pattern.enabled &&
+                     ((controlObj.col === 0 && patternVisualiser.pattern.bank === "I") || (controlObj.col === 1 && patternVisualiser.pattern.bank === "II"))
             color: Kirigami.Theme.highlightColor
             width: widthFactor // this way the progress rect is the same width as a step
             property double widthFactor: patternVisualiser.pattern ? parent.width / (patternVisualiser.pattern.width * patternVisualiser.pattern.bankLength) : 1

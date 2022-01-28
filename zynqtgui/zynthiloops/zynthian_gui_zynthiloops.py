@@ -404,6 +404,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.song_changed.emit()
             self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
 
+            # Set ALSA Mixer volume to 100% when creating new sketch
+            self.zyngui.screens["master_alsa_mixer"].volume = 100
+
+
             self.newSketchLoaded.emit()
 
             self.end_long_task()

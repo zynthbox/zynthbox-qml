@@ -316,7 +316,7 @@ Zynthian.ScreenPage {
         Connections {
             target: applicationWindow()
             onVisibleChanged: {
-                selectedTrackOutlineTimer.start()
+                selectedTrackOutlineTimer.restart()
             }
         }
 

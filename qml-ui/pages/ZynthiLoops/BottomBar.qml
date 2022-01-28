@@ -56,6 +56,12 @@ Zynthian.Card {
     property int controlType: BottomBar.ControlType.None
     property QtObject controlObj: null
 
+    onControlObjChanged: {
+        if (root.controlType === BottomBar.ControlType.Pattern) {
+            patternAction.trigger();
+        }
+    }
+
     transform: Translate {
         y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 6 : 0
     }

@@ -80,7 +80,7 @@ Zynthian.Card {
                         return qsTr("PART: %1").arg(text);
                     case BottomBar.ControlType.Pattern:
                         var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
-                        var pattern = sequence.get(root.controlObj.connectedPattern)
+                        var pattern = sequence.get(zynthian.zynthiloops.song.tracksModel.getTrack(root.controlObj.row).connectedPattern)
                         return qsTr("PATTERN: %1, pt.%2")
                                                 .arg(pattern.objectName)
                                                 .arg(root.controlObj.col == 0 ? "I" : "II")
@@ -317,7 +317,7 @@ Zynthian.Card {
                     id: waveAction
                     text: qsTr("Clip Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                     preload: true
                 },

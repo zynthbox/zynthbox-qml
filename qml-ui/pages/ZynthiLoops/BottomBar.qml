@@ -149,11 +149,16 @@ Zynthian.Card {
                 enabled: controlObj ? !controlObj.isPlaying : false
 
                 onClicked: {
-                    controlObj.clear()
+                    if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
+                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
 
-                    if (root.controlType === BottomBar.ControlType.Clip) {
-                        zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                        // TODO : Clear pattern
+                    } else {
+                        controlObj.clear()
                     }
+
+                    zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
                 }
             }
 

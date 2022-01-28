@@ -27,7 +27,7 @@ Zynthian.Card {
     }
 
     onChainedSoundsChanged: {
-        chainedSoundsRepeaterTimer.start()
+        chainedSoundsRepeaterTimer.restart()
     }
 
     Timer {

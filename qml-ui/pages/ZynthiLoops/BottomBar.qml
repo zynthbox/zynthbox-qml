@@ -153,12 +153,14 @@ Zynthian.Card {
                         var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global")
                         var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
 
-                        // TODO : Clear pattern
+//                        pattern.clearBank(root.controlObj.col);
                     } else {
                         controlObj.clear()
                     }
 
-                    zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                    if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
+                        zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                    }
                 }
             }
 

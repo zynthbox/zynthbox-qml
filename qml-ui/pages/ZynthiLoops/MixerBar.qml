@@ -105,6 +105,7 @@ Rectangle {
                             stepSize: 1
                             onValueChanged: {
                                 zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
+                                zynthian.zynthiloops.song.volume = masterVolume.slider.value;
                             }
                         }
                     }

@@ -170,6 +170,13 @@ Zynthian.Card {
                 }
                 return true;
 
+            case "SWITCH_BACK_SHORT":
+                sceneActionBtn.checked = false;
+                mixerActionBtn.checked = true;
+                bottomStack.currentIndex = 1;
+
+                return true;
+
             default:
                 return false;
         }

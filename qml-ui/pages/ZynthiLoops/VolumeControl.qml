@@ -214,7 +214,7 @@ Rectangle {
 
     Timer {
         id: dblTimer
-        interval: 200
+        interval: 150
         onTriggered: {
             if (!mouseArea.valueChanged) {
                 control.clicked();

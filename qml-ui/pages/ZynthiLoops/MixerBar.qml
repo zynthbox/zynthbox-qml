@@ -144,6 +144,20 @@ Rectangle {
 
                         model: root.song.tracksModel
 
+                        function handleClick(track) {
+                            if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                zynthian.session_dashboard.selectedTrack = track.id;
+                                bottomBar.controlType = BottomBar.ControlType.Track;
+                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                            } else {
+                                bottomBar.controlType = BottomBar.ControlType.Track;
+                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+
+                                bottomStack.currentIndex = 0
+                                mixerActionBtn.checked = false;
+                            }
+                        }
+
                         delegate: Rectangle {
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
@@ -156,7 +170,7 @@ Rectangle {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    zynthian.session_dashboard.selectedTrack = track.id;
+                                    tracksVolumeRow.handleClick(track);
                                 }
                             }
 
@@ -197,7 +211,7 @@ Rectangle {
                                             }
 
                                             onClicked: {
-                                                zynthian.session_dashboard.selectedTrack = track.id;
+                                                tracksVolumeRow.handleClick(track);
                                             }
                                             onDoubleClicked: {
                                                 slider.value = model.track.initialVolume;

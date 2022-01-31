@@ -1,0 +1,6 @@
+[KNewStuff3]
+Name=Sketches
+ProvidersUrl=https://autoconfig.kde.org/ocs/providers.xml
+Categories=679
+AbsoluteInstallPath=/zynthian/zynthian-my-data/sketches/community-sketches/
+Uncompress=always

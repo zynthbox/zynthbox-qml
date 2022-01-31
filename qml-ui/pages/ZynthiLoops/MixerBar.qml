@@ -37,6 +37,21 @@ Rectangle {
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
+    function cuiaCallback(cuia) {
+        switch (cuia) {
+            case "SWITCH_SELECT_SHORT":
+                bottomBar.controlType = BottomBar.ControlType.Track;
+                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+
+                bottomStack.currentIndex = 0;
+                mixerActionBtn.checked = false;
+
+                return true;
+        }
+
+        return false;
+    }
+
     QtObject {
         id: privateProps
 

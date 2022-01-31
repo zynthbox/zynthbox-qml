@@ -67,6 +67,22 @@ Zynthian.BasePlayGrid {
             }
         }
     ]
+    cuiaCallback: function(cuia) {
+        var returnValue = false;
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                if (component.showPatternsMenu) {
+                    component.showPatternsMenu = false;
+                    returnValue = true;
+                }
+                break;
+            default:
+                break;
+        }
+        return returnValue;
+    }
 
     property bool showPatternsMenu: false
     property bool showPatternSettings: false

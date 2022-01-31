@@ -42,6 +42,43 @@ Zynthian.ScreenPage {
     bottomPadding: 5
     anchors.fill: parent
 
+    cuiaCallback: function(cuia) {
+        var returnValue = false;
+
+        // Before passing on to the current playgrid, handle our internals
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                if (playGridSwitcher.visible) {
+                    playGridSwitcher.visible = false;
+                    returnValue = true;
+                } else if (settingsPopup.visible) {
+                    settingsPopup.visible = false;
+                    returnValue = true;
+                } else if (settingsDialog.visible) {
+                    settingsDialog.visible = false;
+                    returnValue = true;
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (!returnValue) {
+            if (playGridsRepeater.count > 0 && playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback != null) {
+                try {
+                    returnValue = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback(cuia);
+                }
+                catch(error) {
+                    console.log("Error in the current playgrid's cuia callback:", error);
+                    // No change here, if there's an error in the playgrid's, pass the handling along as though nothing changed
+                }
+            }
+        }
+        return returnValue;
+    }
+
     contextualActions: [
         Kirigami.Action {
             id: placeholderAction

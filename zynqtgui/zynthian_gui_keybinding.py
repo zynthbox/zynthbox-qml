@@ -136,6 +136,9 @@ class zynthian_gui_keybinding(QObject):
 			"TRACK_11": { "modifier": 4, "keysym": "5" },
 			"TRACK_12": { "modifier": 4, "keysym": "6" },
 
+			"TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
+			"TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
+
 			"INCREASE" : { "modifier": 0, "keysym": "+" },
 			"DECREASE" : { "modifier": 0, "keysym": "-" },
 

@@ -187,6 +187,13 @@ ZynQuick.PlayGrid {
      */
     property list<QtObject> additionalActions
     /**
+     * \brief An optional function to handle key press interactions using the cuia system
+     * This can be a function taking the cuia action name as paramenter. if returns
+     * true the python part won't manage that action.
+     * Useful for custom navigation in pages
+     */
+    property var cuiaCallback
+    /**
      * \brief Whether or not this playgrid makes use of the octave setting in the sidebar
      *
      * If this is set to false, the octave buttons in the sidebar will be disabled

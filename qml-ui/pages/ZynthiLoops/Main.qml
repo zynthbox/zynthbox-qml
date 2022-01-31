@@ -167,12 +167,15 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         console.log("ZL Cuia Handler :", cuia)
 
-        if (bottomBar.filePickerDialog.opened) {
-            return bottomBar.filePickerDialog.cuiaCallback(cuia);
-        }
+        // Forward CUIA only when bottomBar is open
+        if (bottomStack.currentIndex === 0) {
+            if (bottomBar.filePickerDialog.opened) {
+                return bottomBar.filePickerDialog.cuiaCallback(cuia);
+            }
 
-        if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
-            return bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
+            if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
+                return bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
+            }
         }
 
         return false;

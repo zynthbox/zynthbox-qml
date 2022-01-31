@@ -204,7 +204,8 @@ Zynthian.Card {
                 color: "transparent"
                 radius: 4
                 function update() {
-                    soundLabel.updateName();
+                    soundLabelSynth.updateName();
+                    soundLabelPreset.updateName();
                     fxLabel.updateName();
                 }
 
@@ -222,10 +223,78 @@ Zynthian.Card {
                     Rectangle {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*10
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
+
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
+
+                        border.color: "#ff999999"
+                        border.width: 1
+                        radius: 4
+
+                        QQC2.Label {
+                            id: soundLabelSynth
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                right: parent.right
+                                leftMargin: Kirigami.Units.gridUnit*0.5
+                                rightMargin: Kirigami.Units.gridUnit*0.5
+                            }
+                            horizontalAlignment: Text.AlignLeft
+                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0]
+
+                            elide: "ElideRight"
+
+                            function updateName() {
+                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0]
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: {
+                                if (root.selectedRowIndex !== index) {
+                                    root.selectedRowIndex = index;
+                                } else {
+                                    if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                                        // Handle Click
+                                        zynthian.layer.page_after_layer_creation = "layers_for_track";
+                                        zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
+                                        zynthian.layer.select_engine(soundDelegate.chainedSound);
+                                    } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
+                                        noFreeSlotsPopup.open();
+                                    } else {
+                                        // Enable layer popup rejected handler to re-select connected sound if any
+                                        layerPopupRejectedConnections.enabled = true;
+
+                                        zynthian.layer.page_after_layer_creation = "session_dashboard";
+                                        applicationWindow().requestOpenLayerSetupDialog();
+                                        //this depends on requirements
+                                        backToSelection.screenToGetBack = zynthian.current_screen_id;
+                                        backToSelection.enabled = true;
+
+                                        if (root.selectedTrack.connectedPattern >= 0) {
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                                            pattern.midiChannel = root.selectedTrack.connectedSound;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*10
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
                         Kirigami.Theme.inherit: false
@@ -237,7 +306,7 @@ Zynthian.Card {
                         radius: 4
 
                         QQC2.Label {
-                            id: soundLabel
+                            id: soundLabelPreset
                             anchors {
                                 verticalCenter: parent.verticalCenter
                                 left: parent.left
@@ -246,12 +315,12 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound)
+                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
 
                             elide: "ElideRight"
 
                             function updateName() {
-                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound)
+                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
                             }
                         }
 
@@ -398,7 +467,7 @@ Zynthian.Card {
                     Rectangle {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*10
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit

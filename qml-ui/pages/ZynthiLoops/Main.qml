@@ -439,6 +439,10 @@ Zynthian.ScreenPage {
                                         if (mixerActionBtn.checked) {
                                             bottomStack.currentIndex = 0
                                             mixerActionBtn.checked = false
+                                        } else {
+                                            sceneActionBtn.checked = false;
+                                            mixerActionBtn.checked = true;
+                                            bottomStack.currentIndex = 1;
                                         }
                                     }
                                 }

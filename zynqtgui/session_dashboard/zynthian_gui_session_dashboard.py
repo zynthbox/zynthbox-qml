@@ -56,6 +56,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
         self.__visible_tracks_start__ = 0
         self.__visible_tracks_end__ = 5
+        self.__change_track_sound_timer__ = QTimer()
+        self.__change_track_sound_timer__.setInterval(500)
+        self.__change_track_sound_timer__.setSingleShot(True)
+        self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound)
 
         if not self.restore():
             self.__name__ = None
@@ -83,6 +87,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def selected_track_changed_handler(self):
         self.selected_track_name_changed.emit()
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+        selected_track.chained_sounds_changed.connect(lambda: logging.error(f"Chained Sounds Changed"))
         selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
@@ -147,37 +152,16 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     ### END Property sessionSketchesModel
 
     ### Property selectedTrack
+    def change_to_track_sound(self):
+        self.zyngui.screens["layers_for_track"].update_track_sounds()
+        self.schedule_save()
     def get_selected_track(self):
         return self.__selected_track__
     def set_selected_track(self, track, force_set=False):
-        def change_to_track_sound():
-            # logging.error(f"### Remove previous clones")
-            # current_layers = [x for x in self.zyngui.screens['layer'].layer_midi_map.keys()]
-            # for i in range(0, 16):
-            #     for j in range(0, 16):
-            #         # logging.error(f"Removing clone {i, j}")
-            #         self.zyngui.screens['layer'].remove_clone_midi(i, j)
-
-            # m_track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(track)
-            ## connectedSound = m_track.connectedSound
-
-            ## logging.error(f"Set selected Sound : {connectedSound}")
-
-            #self.zyngui.screens['layers_for_track'].fill_list()
-            ## if connectedSound >= 0:
-            ##     self.zyngui.screens["layer"].activate_midichan_layer(connectedSound)
-            # else:
-            #     self.zyngui.screens["fixed_layers"].activate_index(track)
-            #self.zyngui.screens['layers_for_track'].fill_list()
-
-            self.zyngui.screens["layers_for_track"].update_track_sounds()
-            ##m_track.set_chained_sounds(m_track.chainedSounds)
-
         if self.__selected_track__ != track or force_set is True:
             self.__selected_track__ = track
             self.selected_track_changed.emit()
-            self.schedule_save()
-            QTimer.singleShot(1, change_to_track_sound)
+            self.__change_track_sound_timer__.start()
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack

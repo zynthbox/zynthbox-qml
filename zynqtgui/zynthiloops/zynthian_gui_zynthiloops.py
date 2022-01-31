@@ -126,6 +126,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.update_timer_bpm()
         self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
 
+    def switch_select(self, t):
+        pass
+
     ### Property recordingAudioLevel
     def get_recording_audio_level(self):
         return self.__recording_audio_level__

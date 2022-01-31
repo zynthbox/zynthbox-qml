@@ -415,6 +415,9 @@ Zynthian.ScreenPage {
                                 width: privateProps.headerWidth
                                 height: ListView.view.height
 
+                                highlightOnFocus: false
+                                highlighted: index === zynthian.session_dashboard.selectedTrack
+
                                 onPressed: {
                                     if (bottomBar.controlObj !== model.track) {
                                         // Set current selected track

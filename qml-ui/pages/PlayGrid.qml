@@ -48,7 +48,14 @@ Zynthian.ScreenPage {
             text: children.length > 0 ? qsTr("%1 Actions").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ") : "       "
             enabled: children.length > 0
             children: playGridsRepeater.count === 0 ? [] : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
-        },
+        }
+    ]
+
+/*
+Leaving this here, because it was awkward to work out and if we suddenly
+decide to change our minds yet again about where these controls go, i
+don't want to have to dig too far...
+        ,
         Kirigami.Action {
             id: playgridSwitchAction
             text: "Switch Playgrid"
@@ -59,7 +66,6 @@ Zynthian.ScreenPage {
                 zynthian.show_modal("playgrid_downloader");
             }
         }
-    ]
     property var thePlayGridActions: []
     Instantiator {
         id: playGridActionInstantiator
@@ -80,6 +86,7 @@ Zynthian.ScreenPage {
             playgridSwitchAction.children = thePlayGridActions;
         }
     }
+*/
 
     Connections {
         target: ZynQuick.PlayGridManager
@@ -193,18 +200,42 @@ Zynthian.ScreenPage {
                             top: parent.top
                             topMargin: -8
                         }
-                        height: controlsPanel.height / 3
+                        height: controlsPanel.height / 2
                         width: component.width / 3
                         Zynthian.Card {
                             anchors.fill: parent
+                        }
+                        onVisibleChanged: {
+                            playGridSwitcher.visible = false;
                         }
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: 0
                             QQC2.Button {
                                 Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.height
-                                Layout.maximumHeight: settingsButton.height
+                                Layout.minimumHeight: settingsButton.width
+                                Layout.maximumHeight: settingsButton.width
+                                icon.name: "view-grid-symbolic"
+                                text: "Switch Playgrid"
+                                display: QQC2.AbstractButton.TextBesideIcon
+                                onClicked: {
+                                    playGridSwitcher.visible = !playGridSwitcher.visible;
+                                }
+                                Kirigami.Icon {
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                        margins: Kirigami.Units.smallSpacing
+                                    }
+                                    width: height
+                                    source: "arrow-right"
+                                }
+                            }
+                            QQC2.Button {
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: settingsButton.width
+                                Layout.maximumHeight: settingsButton.width
                                 icon.name: "view-fullscreen"
                                 text: "Toggle Full Screen"
                                 display: QQC2.AbstractButton.TextBesideIcon
@@ -215,14 +246,62 @@ Zynthian.ScreenPage {
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
-                                Layout.minimumHeight: settingsButton.height
-                                Layout.maximumHeight: settingsButton.height
+                                Layout.minimumHeight: settingsButton.width
+                                Layout.maximumHeight: settingsButton.width
+                                icon.name: "get-hot-new-stuff"
+                                text: "Get More Playgrids..."
+                                display: QQC2.AbstractButton.TextBesideIcon
+                                onClicked: {
+                                    settingsPopup.visible = false;
+                                    zynthian.show_modal("playgrid_downloader");
+                                }
+                            }
+                            QQC2.Button {
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: settingsButton.width
+                                Layout.maximumHeight: settingsButton.width
                                 icon.name: "configure"
                                 text: "More Settings..."
                                 display: QQC2.AbstractButton.TextBesideIcon
                                 onClicked: {
                                     settingsPopup.visible = false;
                                     settingsDialog.visible = true;
+                                }
+                            }
+                        }
+                        Item {
+                            id: playGridSwitcher
+                            visible: false
+                            anchors {
+                                left: parent.right
+                                leftMargin: -Kirigami.Units.largeSpacing
+                                top: parent.top
+                                topMargin:Kirigami.Units.largeSpacing
+                            }
+                            height: playGridSwitcherRepeater.count * settingsButton.width
+                            width: component.width / 3
+                            Zynthian.Card {
+                                anchors.fill: parent
+                            }
+                            ColumnLayout {
+                                anchors.fill: parent;
+                                spacing: 0
+                                Repeater {
+                                    id: playGridSwitcherRepeater
+                                    model: ZynQuick.PlayGridManager.playgrids
+                                    delegate: QQC2.Button {
+                                        Layout.fillWidth: true
+                                        Layout.minimumHeight: settingsButton.width
+                                        Layout.maximumHeight: settingsButton.width
+                                        property Item relevantPlaygrid: playGridsRepeater.itemAt(index) ? playGridsRepeater.itemAt(index).item : null
+                                        text: relevantPlaygrid ? relevantPlaygrid.name : ""
+                                        icon.name: relevantPlaygrid ? relevantPlaygrid.icon : "view-grid-symbolic"
+                                        display: QQC2.AbstractButton.TextBesideIcon
+                                        onClicked: {
+                                            settingsPopup.visible = false;
+                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
+                                        }
+                                    }
                                 }
                             }
                         }

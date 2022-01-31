@@ -110,7 +110,8 @@ QtObject {
         "soundset_downloader": "SoundsetsDownloaderPage.qml",
         "control_downloader": "ControlDownloaderPage.qml",
         "fx_control_downloader": "FXControlDownloaderPage.qml",
-        "sequence_downloader": "SequenceDownloaderPage.qml"
+        "sequence_downloader": "SequenceDownloaderPage.qml",
+        "sketch_downloader": "SketchDownloaderPage.qml"
     }
 
     readonly property var dashboardScreens: {

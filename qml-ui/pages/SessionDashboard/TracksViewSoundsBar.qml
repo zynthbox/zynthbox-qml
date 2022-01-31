@@ -32,7 +32,7 @@ Zynthian.Card {
 
     Timer {
         id: chainedSoundsRepeaterTimer
-        interval: 50
+        interval: 500
         repeat: false
         onTriggered: {
             chainedSoundsRepeater.model = [];

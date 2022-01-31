@@ -47,20 +47,18 @@ QQC2.AbstractButton {
     property alias subSubTextSize: contents.text3Size
 
     property color color: Kirigami.Theme.backgroundColor
+    property bool highlighted: false
+    property bool highlightOnFocus: true
 
     contentItem: TableHeaderLabel {
         id: contents
         text: root.text
     }
 
-    onPressed: root.forceActiveFocus();
-
-    onActiveFocusChanged: {
-        console.log("Item with active Focus :", activeFocus)
-    }
+    onPressed: root.forceActiveFocus()
 
     background: Rectangle { //TODO: plasma theming
-        border.width: root.activeFocus ? 1 : 0
+        border.width: (root.highlightOnFocus && root.activeFocus) || root.highlighted ? 1 : 0
         border.color: Kirigami.Theme.highlightColor
 
         color: root.color

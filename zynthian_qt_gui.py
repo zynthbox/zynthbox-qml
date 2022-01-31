@@ -1292,6 +1292,13 @@ class zynthian_gui(QObject):
         elif cuia == "TRACK_12":
             self.screens["session_dashboard"].selectedTrack = 11
 
+        elif cuia == "TRACK_PREVIOUS":
+            if self.screens["session_dashboard"].selectedTrack > 0:
+                self.screens["session_dashboard"].selectedTrack -= 1
+        elif cuia == "TRACK_NEXT":
+            if self.screens["session_dashboard"].selectedTrack < 11:
+                self.screens["session_dashboard"].selectedTrack += 1
+
         elif cuia == "KEYBOARD":
             logging.error("KEYBOARD")
             self.miniPlayGridToggle.emit()

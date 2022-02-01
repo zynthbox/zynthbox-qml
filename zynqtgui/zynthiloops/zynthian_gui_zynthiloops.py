@@ -92,7 +92,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
         self.metronome_running_refcount = 0
-        self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/")
+        self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/my-sketches/")
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording_complete = False
         self.recording_count_in_value = 0
@@ -219,12 +219,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.stop()
 
     def master_volume_level_timer_timeout(self):
-        added_db = 0
-        for i in range(0, self.__song__.tracksModel.count):
-            track = self.__song__.tracksModel.getTrack(i)
-            added_db += pow(10, track.get_audioLevel()/10)
+        try:
+            added_db = 0
+            for i in range(0, self.__song__.tracksModel.count):
+                track = self.__song__.tracksModel.getTrack(i)
+                added_db += pow(10, track.get_audioLevel()/10)
 
-        self.set_master_audio_level(10*math.log10(added_db))
+            self.set_master_audio_level(10*math.log10(added_db))
+        except:
+            self.set_master_audio_level(0)
 
     ### Property masterAudioLevel
     def get_master_audio_level(self):
@@ -324,9 +327,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 # Disconnect all connected ports first
                 for port in jack_client.get_all_connections(jack_capture_port_a):
-                    jack_client.disconnect(port.name, jack_capture_port_a)
+                    try:
+                        jack_client.disconnect(port.name, jack_capture_port_a)
+                    except Exception as e:
+                        logging.error(f"Error disconnecting jack port : {str(e)}")
                 for port in jack_client.get_all_connections(jack_capture_port_b):
-                    jack_client.disconnect(port.name, jack_capture_port_b)
+                    try:
+                        jack_client.disconnect(port.name, jack_capture_port_b)
+                    except Exception as e:
+                        logging.error(f"Error disconnecting jack port : {str(e)}")
                 ###
 
                 # Connect to selected track's output ports
@@ -452,12 +461,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "w") as f:
                     obj["name"] = name
 
-                    for i, track in enumerate(obj["tracks"]):
-                        for j, clip in enumerate(track["clips"]):
-                            if clip['path'] is not None:
-                                path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
-                                logging.error(f"Clip Path : {clip['path']}")
-                                obj["tracks"][i]["clips"][j]["path"] = path
+                    # for i, track in enumerate(obj["tracks"]):
+                    #     for j, clip in enumerate(track["clips"]):
+                    #         if clip['path'] is not None:
+                    #             path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/my-sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
+                    #             logging.error(f"Clip Path : {clip['path']}")
+                    #             obj["tracks"][i]["clips"][j]["path"] = path
 
                     f.write(json.dumps(obj))
                     f.flush()
@@ -473,8 +482,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
             self.song_changed.emit()
 
-            logging.error("### Saving sketch to session")
-            self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
+            # logging.error("### Saving sketch to session")
+            # self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
 
         self.do_long_task(task)
 
@@ -484,25 +493,25 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             old_folder = self.__song__.sketch_folder
             shutil.copytree(old_folder, self.__sketch_basepath__ / name)
 
-            for json_path in (self.__sketch_basepath__ / name).glob("**/*.sketch.json"):
-                try:
-                    with open(json_path, "r+") as f:
-                        obj = json.load(f)
-                        f.seek(0)
-
-                        for i, track in enumerate(obj["tracks"]):
-                            for j, clip in enumerate(track["clips"]):
-                                if clip['path'] is not None:
-                                    path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
-                                    logging.error(f"Clip Path : {clip['path']}")
-                                    obj["tracks"][i]["clips"][j]["path"] = path
-
-                        json.dump(obj, f)
-                        f.truncate()
-                        f.flush()
-                        os.fsync(f.fileno())
-                except Exception as e:
-                    logging.error(e)
+            # for json_path in (self.__sketch_basepath__ / name).glob("**/*.sketch.json"):
+            #     try:
+            #         with open(json_path, "r+") as f:
+            #             obj = json.load(f)
+            #             f.seek(0)
+            #
+            #             for i, track in enumerate(obj["tracks"]):
+            #                 for j, clip in enumerate(track["clips"]):
+            #                     if clip['path'] is not None:
+            #                         path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
+            #                         logging.error(f"Clip Path : {clip['path']}")
+            #                         obj["tracks"][i]["clips"][j]["path"] = path
+            #
+            #             json.dump(obj, f)
+            #             f.truncate()
+            #             f.flush()
+            #             os.fsync(f.fileno())
+            #     except Exception as e:
+            #         logging.error(e)
 
             self.end_long_task()
 
@@ -533,10 +542,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.screens["layer"].load_snapshot(
                 str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem.replace(".sketch", "")) + ".zss")
 
+            self.end_long_task()
+
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
             self.song_changed.emit()
-
-            self.end_long_task()
 
         self.do_long_task(task)
 

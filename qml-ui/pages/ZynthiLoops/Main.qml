@@ -124,15 +124,10 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-           /* text: zynthian.zynthiloops.isMetronomeRunning ? qsTr("Stop") : qsTr("Start")
+            text: "Get New Sketches"
             onTriggered: {
-                if (zynthian.zynthiloops.isMetronomeRunning) {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                } else {
-                    Zynthian.CommonUtils.startMetronomeAndPlayback();
-                }
-            }*/
-           enabled: false
+                zynthian.show_modal("sketch_downloader")
+            }
         },
         Kirigami.Action {
             id: mixerActionBtn
@@ -307,7 +302,7 @@ Zynthian.ScreenPage {
         parent: root
 
         headerText: qsTr("Pick a sketch")
-        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        rootFolder: "/zynthian/zynthian-my-data/sketches/"
         folderModel {
             nameFilters: ["*.sketch.json"]
         }

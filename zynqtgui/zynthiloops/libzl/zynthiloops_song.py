@@ -293,7 +293,7 @@ class zynthiloops_song(QObject):
         pass
 
     def get_isTemp(self):
-        return self.sketch_folder == str(Path("/zynthian/zynthian-my-data/sketches/") / "temp") + "/"
+        return self.sketch_folder == str(Path("/zynthian/zynthian-my-data/sketches/my-sketches/") / "temp") + "/"
 
     isTemp = Property(bool, get_isTemp, notify=is_temp_changed)
 

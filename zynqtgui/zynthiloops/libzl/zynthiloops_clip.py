@@ -67,6 +67,7 @@ class zynthiloops_clip(QObject):
         self.audio_metadata = None
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
+        self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
@@ -181,7 +182,7 @@ class zynthiloops_clip(QObject):
             if obj["path"] is None:
                 self.__path__ = None
             else:
-                self.path = obj["path"]
+                self.path = str(self.wav_path / obj["path"])
         if "start" in obj:
             self.__start_position__ = obj["start"]
             self.set_start_position(self.__start_position__, True)
@@ -492,19 +493,18 @@ class zynthiloops_clip(QObject):
 
 
     def path(self):
-        return self.__path__
+        return None if self.__path__ is None else str(self.wav_path / self.__path__)
 
     def set_path(self, path):
         selected_path = Path(path)
-        wav_path = Path(self.__song__.sketch_folder) / 'wav'
 
-        if selected_path.parent != wav_path:
-            logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({wav_path / selected_path.name})")
-            shutil.copy2(selected_path, wav_path / selected_path.name)
+        if selected_path.parent != self.wav_path:
+            logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
+            shutil.copy2(selected_path, self.wav_path / selected_path.name)
         else:
-            logging.error(f"Clip({wav_path / selected_path.name}) is from same sketch")
+            logging.error(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
 
-        self.__path__ = str(wav_path / selected_path.name)
+        self.__path__ = str(selected_path.name)
         self.stop()
 
         if self.audioSource is not None:
@@ -673,7 +673,7 @@ class zynthiloops_clip(QObject):
 
     def __read_metadata__(self):
         try:
-            self.audio_metadata = taglib.File(self.__path__).tags
+            self.audio_metadata = taglib.File(self.wav_path / self.__path__).tags
 
             try:
                 if self.__bpm__ <= 0:
@@ -702,7 +702,7 @@ class zynthiloops_clip(QObject):
     def write_metadata(self, key, value: list):
         if self.__path__ is not None:
             try:
-                file = taglib.File(self.__path__)
+                file = taglib.File(self.wav_path / self.__path__)
                 file.tags[key] = value
                 file.save()
             except Exception as e:
@@ -751,10 +751,8 @@ class zynthiloops_clip(QObject):
 
     @Property(str, constant=True)
     def recordingDir(self):
-        wav_dir = Path(self.__song__.sketch_folder) / 'wav'
-
-        if wav_dir.exists():
-            return str(wav_dir)
+        if self.wav_path.exists():
+            return str(self.wav_path)
         else:
             return self.__song__.sketch_folder
 

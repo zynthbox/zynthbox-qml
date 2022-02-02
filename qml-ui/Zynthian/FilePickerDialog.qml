@@ -40,11 +40,12 @@ QQC2.Dialog {
     property alias breadcrumb: folderBreadcrumbs
     signal fileSelected(var file)
     property bool saveMode
-    property alias fileNameToSave: nameFiled.text
+    property alias fileNameToSave: namedFile.text
     property alias noFilesMessage: noFilesMessage.text
     property alias conflictMessageLabel: conflictLabel
     property alias filePropertiesComponent: filePropertiesColumn.sourceComponent
     property var currentFileInfo: null
+    property string autoExtension: "" // Set this to suggest what the file extension will be on a saved file (so the overwrite checking logic can be retained)
 
     modal: true
 
@@ -100,7 +101,7 @@ QQC2.Dialog {
         }
     }
     onVisibleChanged: {
-        nameFiled.text = "";
+        namedFile.text = "";
         filesListView.currentIndex = -1;
     }
     footer: QQC2.Control {
@@ -115,17 +116,17 @@ QQC2.Dialog {
                     text: qsTr("File Name:")
                 }
                 QQC2.TextField {
-                    id: nameFiled
+                    id: namedFile
                     Layout.fillWidth: true
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 1.6
                     onTextChanged: {
                         if (filesListView.selectedModelData) {
                             filesListView.selectedModelData.fileName = text;
-                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
                         } else {
                             filesListView.selectedModelData = {};
-                            filesListView.selectedModelData.fileName = nameFiled.text;
-                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                            filesListView.selectedModelData.fileName = namedFile.text;
+                            filesListView.selectedModelData.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
                             root.fileSelected(filesListView.selectedModelData);
                         }
                     }
@@ -133,10 +134,14 @@ QQC2.Dialog {
             }
             QQC2.Label {
                 id: conflictLabel
-                opacity: nameFiled.text !== "" && zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text)
+                opacity: namedFile.text !== "" && (root.autoExtension === "" || namedFile.text.endsWith(root.autoExtension)
+                    ? zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text)
+                    : zynthian.file_exists(String(folderModel.folder).replace("file://", "") + "/" + namedFile.text + root.autoExtension)
+                    )
+                visible: opacity > 0
                 Layout.preferredHeight: opacity > 0 ? implicitHeight : 0
                 Layout.fillWidth: true
-                text: qsTr("File Exists: overwrite?")
+                text: qsTr("File Exists: Overwrite?")
                 horizontalAlignment: Text.AlignHCenter
             }
 
@@ -162,10 +167,10 @@ QQC2.Dialog {
                     enabled: filesListView.selectedModelData !== null
                     onClicked: {
                         /*if (root.saveMode) {
-                            if (nameFiled.text.length > 0) {
+                            if (namedFile.text.length > 0) {
                                 let file = {};
-                                file.fileName = nameFiled.text;
-                                file.filePath = String(folderModel.folder).replace("file://", "") + "/" + nameFiled.text;
+                                file.fileName = namedFile.text;
+                                file.filePath = String(folderModel.folder).replace("file://", "") + "/" + namedFile.text;
                                 root.fileSelected(file);
                                 root.accept();
                             }
@@ -255,7 +260,7 @@ QQC2.Dialog {
                         } else {
                             filesListView.selectedModelData = model;
                             if (root.saveMode) {
-                                nameFiled.text = model.fileName;
+                                namedFile.text = model.fileName;
                             }
                             root.filesListView.currentIndex = model.index;
                         }

@@ -24,6 +24,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 */
 
 import QtQuick 2.10
+import QtQuick.Window 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
@@ -206,6 +207,12 @@ Zynthian.ScreenPage {
                 pattern.enabled = false;
             }
         }
+        onLongTaskStarted: {
+            longTaskOverlay.open = true;
+        }
+        onLongTaskEnded: {
+            longTaskOverlay.open = false;
+        }
     }
 
     Component.onCompleted: {
@@ -338,6 +345,14 @@ Zynthian.ScreenPage {
             height: privateProps.headerHeight*3 + loopGrid.columnSpacing*2
             color: "#2affffff"
             z: 100
+        }
+
+        Zynthian.ModalLoadingOverlay {
+            id: longTaskOverlay
+            parent: applicationWindow().contentItem.parent
+            anchors.fill: parent
+            z: 9999999
+            open: false
         }
 
         ColumnLayout {

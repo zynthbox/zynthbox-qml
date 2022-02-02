@@ -125,7 +125,7 @@ Item {
             if (sequenceFilePicker.currentFileInfo) {
                 if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".sequence.json")) {
                     sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getSequenceModel(sequenceFilePicker.currentFileInfo.filePath);
-                    sequenceFilePicker.currentFileObject.load(sequenceFilePicker.currentFileInfo.fileName);
+                    sequenceFilePicker.currentFileObject.load(sequenceFilePicker.currentFileInfo.filePath);
                 } else if (sequenceFilePicker.currentFileInfo.fileName.endsWith(".pattern.json")) {
                     sequenceFilePicker.currentFileObject = ZynQuick.PlayGridManager.getPatternModel(sequenceFilePicker.currentFileInfo.filePath);
                     ZynQuick.PlayGridManager.setModelFromJsonFile(sequenceFilePicker.currentFileObject, sequenceFilePicker.currentFileInfo.filePath);
@@ -366,6 +366,7 @@ Item {
                 if (foundIndex > -1) {
                     foundTrack.connectedPattern = -1;
                 }
+                console.log("Importing", theItem.patternObject, "into", globalPattern, "originally on track", foundTrack);
 
                 // Now apply our loaded pattern onto the global one
                 globalPattern.cloneOther(theItem.patternObject);
@@ -374,7 +375,9 @@ Item {
                 if (theItem.associatedTrackIndex > -1) {
                     var trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
                     trackToAssociate.connectedPattern = theItem.importIndex;
+                    console.log("Newly associated track is", trackToAssociate);
                 }
+
 
                 // Finally, actually import the sound if requested
                 var jsonToLoad = theItem.patternObject.layerData;

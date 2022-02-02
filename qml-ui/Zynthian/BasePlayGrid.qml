@@ -44,18 +44,20 @@ import org.zynthian.quick 1.0 as ZynQuick
  *
  * * name: The name of your playgrid
  * * icon: A small graphic used to represent your playgrid
- * * grid: The component which is used in the PlayGrid section to paint the main area
+ * * grid: The component which is used in Playground to paint the main area
  * * miniGrid: The component which is used in the popup mini grid
- * * settings: The component used to display settings to the user in the main PlayGrid section's settings dialog
- * * sidebar: An optional component you can use to override the sidebar in the main PlayGrid section
- * * popup: An optional component used to paint in the area shown beside the menu popup in the main PlayGrid section
+ * * settings: The component used to display settings to the user in Playground's settings dialog
+ * * sidebar: An optional component you can use to override the sidebar in Playground
+ * * popup: An optional component used to paint in the area shown beside the menu popup in Playground
+ * * additionalActions: An optional list of actions, which will be shown at the bottom of Playground
+ * * cuiaCallback: An optional function which can be used to consume abstract input events (called cuia events)
  *
  * The `initialize` signal is your entrypoint for setting things up. Use this signal to perform any
  * initialisation work that is needed for your playgrid. A few important points that you should make
  * a note of:
  *
- * * Don't do heavy operations in the initialisation handler. This is run when entering the PlayGrid
- *   section, and will want to be as fast as possible.
+ * * Don't do heavy operations in the initialisation handler. This is run when entering Playground,
+ *   and will want to be as fast as possible.
  * * Throttle any regeneration of your model (this can be heavy and will impact the performance of
  *   your playgrid, which will make it look silly). You can do this by having any regeneration done
  *   through a timer instead of directly calling it on properties changing.

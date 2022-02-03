@@ -45,7 +45,7 @@ from pathlib import Path
 class zynthiloops_song(QObject):
     __instance__ = None
 
-    def __init__(self, sketch_folder: str, name, parent=None):
+    def __init__(self, sketch_folder: str, name, parent=None, suggested_name=None):
         super(zynthiloops_song, self).__init__(parent)
 
         self.__metronome_manager__ = parent
@@ -69,6 +69,7 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__name__ = name
+        self.__suggested_name__ = suggested_name
         self.__initial_name__ = name # To be used while storing cache details when name changes
 
         if not self.restore():
@@ -89,6 +90,7 @@ class zynthiloops_song(QObject):
 
     def serialize(self):
         return {"name": self.__name__,
+                "suggestedName": self.__suggested_name__,
                 "bpm": self.__bpm__,
                 "volume": self.__volume__,
                 "selectedScaleIndex": self.__selected_scale_index__,
@@ -215,6 +217,9 @@ class zynthiloops_song(QObject):
 
                 if "name" in sketch:
                     self.__name__ = sketch["name"]
+                if "suggestedName" in sketch:
+                    self.__suggested_name__ = sketch["suggestedName"]
+                    self.set_suggested_name(self.__suggested_name__, True)
                 if "volume" in sketch:
                     self.__volume__ = sketch["volume"]
                     self.set_volume(self.__volume__, True)
@@ -482,6 +487,17 @@ class zynthiloops_song(QObject):
         return self.sketch_folder
     sketchFolder = Property(str, get_sketch_folder, constant=True)
     ### END Property sketchFolder
+
+    ### Property suggestedName
+    def get_suggested_name(self):
+        return self.__suggested_name__
+    def set_suggested_name(self, suggested_name, force_set=False):
+        if self.__suggested_name__ != suggested_name or force_set is True:
+            self.__suggested_name__ = suggested_name
+            self.suggested_name_changed.emit()
+    suggested_name_changed = Signal()
+    suggestedName = Property(str, get_suggested_name, set_suggested_name, notify=suggested_name_changed)
+    ### End Property suggestedName
 
     def stop(self):
         for i in range(0, self.__parts_model__.count):

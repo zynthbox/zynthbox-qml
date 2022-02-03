@@ -70,7 +70,7 @@ Zynthian.ScreenPage {
                 onTriggered: {
                     if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
-                        fileNameDialog.fileName = "Sketch-1";
+                        fileNameDialog.fileName = zynthian.zynthiloops.song.suggestedName ? zynthian.zynthiloops.song.suggestedName : "Sketch-1";
                         fileNameDialog.open();
                     } else {
                         zynthian.zynthiloops.saveSketch();

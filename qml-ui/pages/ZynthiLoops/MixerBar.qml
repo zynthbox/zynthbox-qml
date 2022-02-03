@@ -47,6 +47,20 @@ Rectangle {
                 mixerActionBtn.checked = false;
 
                 return true;
+
+            case "NAVIGATE_LEFT":
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack -= 1;
+                }
+
+                return true;
+
+            case "NAVIGATE_RIGHT":
+                if (zynthian.session_dashboard.selectedTrack < 11) {
+                    zynthian.session_dashboard.selectedTrack += 1;
+                }
+
+                return true;
         }
 
         return false;

@@ -839,6 +839,7 @@ Zynthian.BasePlayGrid {
                                             Layout.fillHeight: true
                                             Layout.preferredHeight: parent.height / 2
                                             text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             onClicked: {
                                                 trackPicker.pickTrack(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
                                             }
@@ -884,7 +885,7 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
-                                            enabled: patternsMenuItem.associatedTrack
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack
                                             opacity: enabled ? 1 : 0.7
                                             property string soundName
                                             Component.onCompleted: {
@@ -935,6 +936,7 @@ Zynthian.BasePlayGrid {
                                         Layout.fillHeight: true
                                         Zynthian.PlayGridButton {
                                             text: "part I"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern.bankOffset === 0
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
@@ -942,6 +944,7 @@ Zynthian.BasePlayGrid {
                                         }
                                         Zynthian.PlayGridButton {
                                             text: "part II"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern.bankOffset === 8
                                             onClicked: {
                                                 component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
@@ -950,6 +953,7 @@ Zynthian.BasePlayGrid {
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "copy\n"
+                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                         onClicked: {
                                             _private.copyRange(
                                                 (patternsMenuItem.thisPatternIndex + 1) + " pt." + patternsMenuItem.thisPattern.bank,
@@ -961,7 +965,7 @@ Zynthian.BasePlayGrid {
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
-                                        enabled: _private.clipBoard !== undefined
+                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && _private.clipBoard !== undefined
                                         onClicked: {
                                             _private.pasteInPlace(patternsMenuItem.thisPattern, patternsMenuItem.thisPattern.bankOffset, _private.bankOffset + patternsMenuItem.thisPattern.bankLength);
                                             if (_private.activePatternModel == patternsMenuItem.thisPattern) {
@@ -972,6 +976,7 @@ Zynthian.BasePlayGrid {
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "clear\n"
+                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                         onClicked: {
                                             patternsMenuItem.thisPattern.clear();
                                             patternsMenuItem.thisPattern.availableBars = 1;

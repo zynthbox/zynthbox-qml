@@ -92,6 +92,7 @@ Item {
         id: sequenceFilePicker
         property string sequenceName
         property string patternName;
+        autoExtension: sequenceName != "" ? "/metadata.sequence.json" : ".pattern.json"
         headerText: {
             if (saveMode) {
                 if (sequenceName != "") {

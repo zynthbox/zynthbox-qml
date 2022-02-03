@@ -143,6 +143,11 @@ while true; do
 	export QT_SCREEN_SCALE_FACTORS=1
 	export QT_AUTO_SCREEN_SCALE_FACTOR=0
 	export QT_QPA_PLATFORMTHEME=generic
+    if [-z ${XRANDR_ROTATE}]; then
+            echo "not rotating"
+        else
+            xrandr -o $XRANDR_ROTATE
+    fi
         if command -v kwin_x11 &> /dev/null
         then
             kwin_x11&

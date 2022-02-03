@@ -393,15 +393,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return self.__song__
 
     @Slot(None)
-    def newSketch(self):
+    def newSketch(self, base_sketch=None):
         def task():
             try:
                 self.__song__.bpm_changed.disconnect()
             except Exception as e:
                 logging.error(f"Already disconnected : {str(e)}")
-
-            if (self.__sketch_basepath__ / 'temp').exists():
-                shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
             try:
                 self.stopAllPlayback()
@@ -411,15 +408,53 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             except:
                 pass
 
-            self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
-            self.__song__.bpm_changed.connect(self.update_timer_bpm)
-            self.song_changed.emit()
-            self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+            if (self.__sketch_basepath__ / 'temp').exists():
+                shutil.rmtree(self.__sketch_basepath__ / 'temp')
+
+            if base_sketch is not None:
+                base_sketch_path = Path(base_sketch)
+                shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / 'temp')
+
+                # Rename sketch file basename to Sketch-1
+                (self.__sketch_basepath__ / 'temp' / base_sketch_path.name).rename('Sketch-1.sketch.json')
+
+                # Rename soundset basename to Sketch-1
+                (self.__sketch_basepath__ / 'temp' / 'soundsets' / (
+                            base_sketch_path.stem.replace(".sketch", "") + ".zss")).rename('Sketch-1.zss')
+
+                # # Remove any other versions
+                # for f in (self.__sketch_basepath__ / 'temp').glob("*.sketch.json"):
+                #     if f.name is not "Sketch-1.sketch.json":
+                #         logging.error(f"Removing {f.name}")
+                #         try:
+                #             f.unlink()
+                #         except:
+                #             pass
+                #
+                # # Remove soundsets of other versions
+                # for f in (self.__sketch_basepath__ / 'temp' / 'soundsets').glob("*.zss"):
+                #     if f.name is not "Sketch-1.zss":
+                #         logging.error(f"Removing {f.name}")
+                #         try:
+                #             f.unlink()
+                #         except:
+                #             pass
+
+                self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/",
+                                                                  "Sketch-1", self)
+                self.__song__.bpm_changed.connect(self.update_timer_bpm)
+                self.song_changed.emit()
+                self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+            else:
+                self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
+                self.__song__.bpm_changed.connect(self.update_timer_bpm)
+                self.song_changed.emit()
+                self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+                self.newSketchLoaded.emit()
 
             # Set ALSA Mixer volume to 100% when creating new sketch
             self.zyngui.screens["master_alsa_mixer"].volume = 100
 
-            self.newSketchLoaded.emit()
             QTimer.singleShot(3000, self.end_long_task)
 
         self.do_long_task(task)
@@ -532,16 +567,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.screens["song_arranger"].stop()
             self.resetMetronome()
 
-            logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
-            self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
+            if sketch_path.parent.match("*/zynthian-my-data/sketches/community-sketches/*"):
+                self.newSketch(sketch)
+                # Load snapshot
+                logging.error(
+                    "Loading snapshot : '/zynthian/zynthian-my-data/sketches/my-sketches/temp/soundsets/Sketch-1.zss'")
+                self.zyngui.screens["layer"].load_snapshot(
+                    '/zynthian/zynthian-my-data/sketches/my-sketches/temp/soundsets/Sketch-1.zss')
+            else:
+                logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
+                self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
 
-            # Load snapshot
-            logging.error(f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
-            self.zyngui.screens["layer"].load_snapshot(
-                str(sketch_path.parent.absolute()) + "/soundsets/" + str(sketch_path.stem.replace(".sketch", "")) + ".zss")
+                # Load snapshot
+                logging.error(
+                    f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
+                self.zyngui.screens["layer"].load_snapshot(
+                    str(sketch_path.parent.absolute()) + "/soundsets/" + str(
+                        sketch_path.stem.replace(".sketch", "")) + ".zss")
 
-            self.__song__.bpm_changed.connect(self.update_timer_bpm)
-            self.song_changed.emit()
+                self.__song__.bpm_changed.connect(self.update_timer_bpm)
+                self.song_changed.emit()
 
             QTimer.singleShot(3000, self.end_long_task)
 

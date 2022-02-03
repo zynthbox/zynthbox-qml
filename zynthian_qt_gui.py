@@ -608,6 +608,7 @@ class zynthian_gui(QObject):
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
 
         self.screens["network"] = zynthian_gui_network(self)
+        self.screens["network_info"] = self.screens["network"]
         self.screens["hardware"] = zynthian_gui_hardware(self)
 
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)

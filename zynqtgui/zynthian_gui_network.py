@@ -25,14 +25,18 @@
 
 import os
 import re
+import socket
 import sys
 import signal
 import logging
+from collections import OrderedDict
 from time import sleep
 from threading import Thread
 from subprocess import check_output, Popen, PIPE, STDOUT
 
 # Zynthian specific modules
+from PySide2.QtCore import Property, Signal, Slot
+
 import zynconf
 from . import zynthian_gui_config
 from . import zynthian_gui_selector
@@ -194,14 +198,15 @@ class zynthian_gui_network(zynthian_gui_selector):
         self.zyngui.show_modal("network")
 
     def network_info(self):
-        self.zyngui.show_info("NETWORK INFO\n")
-
-        res = zynconf.network_info()
-        for k, v in res.items():
-            self.zyngui.add_info(" {} => {}\n".format(k, v[0]), v[1])
-
-        self.zyngui.hide_info_timer(5000)
-        self.zyngui.stop_loading()
+        # self.zyngui.show_info("NETWORK INFO\n")
+        #
+        # res = zynconf.network_info()
+        # for k, v in res.items():
+        #     self.zyngui.add_info(" {} => {}\n".format(k, v[0]), v[1])
+        #
+        # self.zyngui.hide_info_timer(5000)
+        # self.zyngui.stop_loading()
+        self.zyngui.show_modal("network_info")
 
     def start_wifi(self):
         if not zynconf.start_wifi():
@@ -302,5 +307,64 @@ class zynthian_gui_network(zynthian_gui_selector):
             self.start_vncserver(False)
         else:
             self.stop_vncserver(False)
+
+    @Slot(None, result='QVariantMap')
+    def getNetworkInfo(self):
+        return zynconf.network_info()
+
+    @Slot(None, result=str)
+    def getHostname(self):
+        return socket.gethostname()
+
+    @Slot(str)
+    def setHostname(self, hostname):
+        self.update_system_hostname(hostname)
+        self.zyngui.show_confirm(
+            "Device needs to reboot for the hostname change to take effect.\nDo you want to reboot?",
+            self.reboot_confirmed)
+    
+    def reboot_confirmed(self, params=None):
+        logging.error(f"Rebooting")
+        self.zyngui.screens["admin"].reboot_confirmed()
+
+    # Derived from webconf security_config_handler.py
+    def update_system_hostname(self, newHostname):
+        previousHostname = ''
+        with open("/etc/hostname", 'r') as f:
+            previousHostname = f.readline()
+            f.close()
+
+        if previousHostname != newHostname:
+            with open("/etc/hostname", 'w') as f:
+                f.write(newHostname)
+                f.close()
+
+            with open("/etc/hosts", "r+") as f:
+                contents = f.read()
+                # contents = contents.replace(previousHostname, newHostname)
+                contents = re.sub(r"127\.0\.1\.1.*$", "127.0.1.1\t{}".format(newHostname), contents)
+                f.seek(0)
+                f.truncate()
+                f.write(contents)
+                f.close()
+
+            check_output(["hostnamectl", "set-hostname", newHostname])
+
+            try:
+                fpath = '/etc/hostapd/hostapd.conf'
+                conf = OrderedDict()
+                with open(fpath, 'r+') as f:
+                    lines = f.readlines()
+                    for l in lines:
+                        parts = l.split("=", 1)
+                        conf[parts[0]] = parts[1]
+                    conf["ssid"] = newHostname + "\n"
+                    f.seek(0)
+                    f.truncate()
+                    for k, v in conf.items():
+                        f.write("{}={}".format(k, v))
+                    f.close()
+            except Exception as e:
+                logging.error("Can't set WIFI HotSpot name! => {}".format(e))
 
 # ------------------------------------------------------------------------------

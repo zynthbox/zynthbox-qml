@@ -111,7 +111,8 @@ QtObject {
         "control_downloader": "ControlDownloaderPage.qml",
         "fx_control_downloader": "FXControlDownloaderPage.qml",
         "sequence_downloader": "SequenceDownloaderPage.qml",
-        "sketch_downloader": "SketchDownloaderPage.qml"
+        "sketch_downloader": "SketchDownloaderPage.qml",
+        "network_info": "NetworkInfoPage.qml"
     }
 
     readonly property var dashboardScreens: {

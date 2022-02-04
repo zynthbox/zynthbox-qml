@@ -47,7 +47,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
             QQC2.Label {
-                Kirigami.FormData.label: "Zynthbox:"
+                Kirigami.FormData.label: "Zynthbox OS:"
                 text: zynthian.about.zynthbox_version
             }
             QQC2.Label {

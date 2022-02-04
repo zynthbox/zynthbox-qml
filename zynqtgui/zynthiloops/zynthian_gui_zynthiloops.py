@@ -335,16 +335,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                                 logging.error(f"### update_recorder_jack_port Error : {str(e)}")
 
                 # Disconnect all connected ports first
-                for port in jack_client.get_all_connections(jack_capture_port_a):
-                    try:
-                        jack_client.disconnect(port.name, jack_capture_port_a)
-                    except Exception as e:
-                        logging.error(f"Error disconnecting jack port : {str(e)}")
-                for port in jack_client.get_all_connections(jack_capture_port_b):
-                    try:
-                        jack_client.disconnect(port.name, jack_capture_port_b)
-                    except Exception as e:
-                        logging.error(f"Error disconnecting jack port : {str(e)}")
+                try:
+                    for port in jack_client.get_all_connections(jack_capture_port_a):
+                        try:
+                            jack_client.disconnect(port.name, jack_capture_port_a)
+                        except Exception as e:
+                            logging.error(f"Error disconnecting jack port : {str(e)}")
+                    for port in jack_client.get_all_connections(jack_capture_port_b):
+                        try:
+                            jack_client.disconnect(port.name, jack_capture_port_b)
+                        except Exception as e:
+                            logging.error(f"Error disconnecting jack port : {str(e)}")
+                except Exception as e:
+                    logging.error(f"Error while disconnecting ports : {str(e)}")
                 ###
 
                 # Connect to selected track's output ports

@@ -74,6 +74,10 @@ Zynthian.ScreenPage {
                 Kirigami.FormData.label: "Kernel:"
                 text: zynthian.about.kernel_version
             }
+            QQC2.Label {
+                Kirigami.FormData.label: "Hostname:"
+                text: zynthian.network.getHostname()
+            }
         }
 
     }

@@ -54,7 +54,7 @@ import jack
 
 
 @ctypes.CFUNCTYPE(None, ctypes.c_int)
-def cb(beat):
+def libzlCb(beat):
     if beat % 32 == 0:
         zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate4th.emit(beat / 32)
 
@@ -107,24 +107,33 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
         self.__recording_audio_level__ = -100
+        self.__song__ = None
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
+
+    def init_sketch(self, sketch, cb=None):
+        def _cb():
+            libzl.registerTimerCallback(libzlCb)
+            libzl.registerGraphicTypes()
+            libzl.setRecordingAudioLevelCallback(audioLevelCb)
+
+            self.metronomeBeatUpdate4th.connect(self.metronome_update)
+            self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
+            self.update_timer_bpm()
+            self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+
+            if cb is not None:
+                cb()
+
         self.master_audio_level_timer.start()
 
-        self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
-        self.__song__.bpm_changed.connect(self.update_timer_bpm)
-
-        libzl.registerTimerCallback(cb)
-        libzl.registerGraphicTypes()
-        libzl.setRecordingAudioLevelCallback(audioLevelCb)
-
-        self.metronomeBeatUpdate4th.connect(self.metronome_update)
-        self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
-        self.update_timer_bpm()
-        self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+        if sketch is not None and Path(sketch).exists():
+            self.loadSketch(sketch, _cb)
+        else:
+            self.newSketch(None, _cb)
 
     def switch_select(self, t):
         pass
@@ -408,62 +417,36 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             except:
                 pass
 
+            if self.__song__ is not None:
+                self.__song__.to_be_deleted()
+
             if (self.__sketch_basepath__ / 'temp').exists():
                 shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
             if base_sketch is not None:
+                logging.error(f"Creating New Sketch from community sketch : {base_sketch}")
+
                 suggested_name = None
                 base_sketch_path = Path(base_sketch)
 
-                # Create soundsets dir and parent dirs
-                (self.__sketch_basepath__ / 'temp' / 'soundsets').mkdir(parents=True, exist_ok=True)
+                # Copy community sketch as temp
+                shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / 'temp')
 
-                # Copy wav dir
-                logging.error(f"Copying wav : src({base_sketch_path.parent / 'wav'}), dest({self.__sketch_basepath__ / 'temp' / 'wav'})")
-                shutil.copytree(base_sketch_path.parent / 'wav', self.__sketch_basepath__ / 'temp' / 'wav')
-
-                # Copy sequence dir
-                logging.error(f"Copying sequences : src({base_sketch_path.parent / 'sequences'}), dest({self.__sketch_basepath__ / 'temp' / 'sequences'})")
-                shutil.copytree(base_sketch_path.parent / 'sequences', self.__sketch_basepath__ / 'temp' / 'sequences')
-
-                # Copy just the selected sketch json as Sketch-1.sketch.json
-                logging.error(f"Copying sketch json : src({base_sketch_path}), dest({self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json'})")
-                shutil.copy2(base_sketch_path, self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json')
-
-                # Copy just the selected sketch's soundset as Sketch-1.zss
-                logging.error(f"Copying soundset snapshot : src({base_sketch_path.parent / 'soundsets' / (base_sketch_path.name.replace('.sketch.json', '') + '.zss')}), dest({self.__sketch_basepath__ / 'temp' / 'soundsets' / 'Sketch-1.zss'})")
-                shutil.copy2(
-                    base_sketch_path.parent / 'soundsets' / (base_sketch_path.name.replace(".sketch.json", "") + ".zss"),
-                    self.__sketch_basepath__ / 'temp' / 'soundsets' / 'Sketch-1.zss')
-
-                obj = {}
-
-                # Read sketch json data to dict
-                try:
-                    with open(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json', "r") as f:
-                        obj = json.loads(f.read())
-                except Exception as e:
-                    logging.error(e)
-
-                # Update sketch name to Sketch-1 and set suggestedName
-                try:
-                    with open(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json', "w") as f:
-                        suggested_name = obj["name"]
-                        obj["name"] = "Sketch-1"
-
-                        f.write(json.dumps(obj))
-                        f.flush()
-                        os.fsync(f.fileno())
-                except Exception as e:
-                    logging.error(e)
+                logging.error(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name)}")
 
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/",
-                                                                  "Sketch-1", self, suggested_name)
+                                                                  base_sketch_path.stem.replace(".sketch", ""), self)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
+                    str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name))
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
             else:
+                logging.error(f"Creating New Sketch")
+
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
+                    str(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json'))
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
@@ -529,6 +512,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 logging.error(e)
 
             self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / name) + "/", name, self)
+            self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
+                str(self.__sketch_basepath__ / name / f'{name}.sketch.json'))
             self.__song__.save(False)
 
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -572,7 +557,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.do_long_task(task)
 
     @Slot(str)
-    def loadSketch(self, sketch):
+    def loadSketch(self, sketch, cb=None):
         def task():
             logging.error(f"Loading sketch : {sketch}")
 
@@ -583,25 +568,31 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             sketch_path = Path(sketch)
 
-            self.stopAllPlayback()
-            self.zyngui.screens["playgrid"].stopMetronomeRequest()
-            self.zyngui.screens["song_arranger"].stop()
-            self.resetMetronome()
+            try:
+                self.stopAllPlayback()
+                self.zyngui.screens["playgrid"].stopMetronomeRequest()
+                self.zyngui.screens["song_arranger"].stop()
+                self.resetMetronome()
+            except:
+                pass
 
             if sketch_path.parent.match("*/zynthian-my-data/sketches/community-sketches/*"):
-                def cb():
+                def _cb():
+                    last_selected_sketch_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketch())
+
                     # Load snapshot
                     logging.error(
-                        "Loading snapshot : '/zynthian/zynthian-my-data/sketches/my-sketches/temp/soundsets/Sketch-1.zss'")
+                        f"Loading snapshot : '{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss'")
                     self.zyngui.screens["layer"].load_snapshot(
-                        '/zynthian/zynthian-my-data/sketches/my-sketches/temp/soundsets/Sketch-1.zss')
+                        f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
 
                     QTimer.singleShot(3000, self.end_long_task)
 
-                self.newSketch(sketch, cb)
+                self.newSketch(sketch, _cb)
             else:
                 logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
                 # Load snapshot
                 logging.error(
@@ -614,6 +605,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.song_changed.emit()
 
                 QTimer.singleShot(3000, self.end_long_task)
+
+            if cb is not None:
+                cb()
 
         self.do_long_task(task)
 

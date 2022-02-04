@@ -48,7 +48,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__playing_bar__ = -1
 
         self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)
-        self.generate_tracks_model()
+        self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)
 
     ### Property bars
     def get_bars(self):
@@ -115,13 +115,12 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(f"Already disconnected : {str(e)}")
 
-        try:
-            self.zyngui.zynthiloops.song_changed.disconnect()
-        except Exception as e:
-            logging.error(f"Already disconnected: {str(e)}")
+        # try:
+        #     self.zyngui.zynthiloops.song_changed.disconnect()
+        # except Exception as e:
+        #     logging.error(f"Already disconnected: {str(e)}")
 
         self.__sketch__.tracksModel.countChanged.connect(self.generate_tracks_model)
-        self.zyngui.zynthiloops.song_changed.connect(self.generate_tracks_model)
 
         for i in range(self.__sketch__.tracksModel.count):
             zl_track: zynthiloops_track = self.__sketch__.tracksModel.getTrack(i)

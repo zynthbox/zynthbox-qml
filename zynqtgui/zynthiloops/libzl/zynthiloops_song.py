@@ -24,6 +24,7 @@
 # ******************************************************************************
 import ctypes as ctypes
 import math
+import traceback
 import uuid
 
 from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
@@ -71,6 +72,7 @@ class zynthiloops_song(QObject):
         self.__name__ = name
         self.__suggested_name__ = suggested_name
         self.__initial_name__ = name # To be used while storing cache details when name changes
+        self.__to_be_deleted__ = False
 
         if not self.restore():
             # Add default parts
@@ -88,6 +90,9 @@ class zynthiloops_song(QObject):
 
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
 
+    def to_be_deleted(self):
+        self.__to_be_deleted__ = True
+
     def serialize(self):
         return {"name": self.__name__,
                 "suggestedName": self.__suggested_name__,
@@ -99,6 +104,9 @@ class zynthiloops_song(QObject):
                 "scenes": self.__scenes_model__.serialize()}
 
     def save(self, cache=True):
+        if self.__to_be_deleted__:
+            return
+
         cache_dir = Path(self.sketch_folder) / ".cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
 
@@ -128,7 +136,8 @@ class zynthiloops_song(QObject):
             filename = self.__name__ + ".sketch.json"
             self.__initial_name__ = self.name
 
-            logging.error(f"Storing to {filename}")
+            logging.error(f"Storing to {filename} : {self}")
+
             # Handle saving to sketch json file
             try:
                 Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)

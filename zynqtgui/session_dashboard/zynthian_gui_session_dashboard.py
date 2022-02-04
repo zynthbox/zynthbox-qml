@@ -56,19 +56,25 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
         self.__visible_tracks_start__ = 0
         self.__visible_tracks_end__ = 5
+        self.__last_selected_sketch__ = None
         self.__change_track_sound_timer__ = QTimer()
         self.__change_track_sound_timer__.setInterval(500)
         self.__change_track_sound_timer__.setSingleShot(True)
         self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound)
 
         if not self.restore():
+            def cb():
+                logging.error("Session dashboard Init Sketch CB (No restore)")
+                self.set_selected_track(self.__selected_track__, True)
+
+                selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
+                selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+
             self.__name__ = None
             self.__id__ = 0
             self.__selected_track__ = 0
-            self.set_selected_track(self.__selected_track__, True)
 
-            selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-            selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+            self.zyngui.screens["zynthiloops"].init_sketch(None, cb)
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -201,7 +207,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             "name": self.__name__,
             "id": self.__id__,
             "selectedTrack": self.__selected_track__,
-            "sketches": self.__session_sketches_model__.serialize()
+            "sketches": self.__session_sketches_model__.serialize(),
+            "lastSelectedSketch": self.__last_selected_sketch__
         }
 
     def schedule_save(self):
@@ -244,6 +251,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             logging.error(f"Error deleting cache : {str(e)}")
 
     def restore(self, sketch=""):
+        def sketch_loaded_cb():
+            self.selected_track_changed.emit()
+            QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+
         if self.__cache_json_path__.exists():
             logging.error(f"Cache found. Restoring Session from {self.__cache_json_path__}")
             session_json_path = self.__cache_json_path__
@@ -267,11 +278,14 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             if "selectedTrack" in session:
                 self.__selected_track__ = session["selectedTrack"]
                 self.set_selected_track(session["selectedTrack"], True)
-                self.selected_track_changed.emit()
-                QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
             if "sketches" in session:
                 self.__session_sketches_model__.deserialize(session["sketches"])
                 self.session_sketches_model_changed.emit()
+            if "lastSelectedSketch" in session:
+                self.__last_selected_sketch__ = session["lastSelectedSketch"]
+                self.zyngui.screens["zynthiloops"].init_sketch(self.__last_selected_sketch__, sketch_loaded_cb)
+            else:
+                self.zyngui.screens["zynthiloops"].init_sketch(None, sketch_loaded_cb)
 
             return True
         except Exception as e:
@@ -309,3 +323,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(str, result=bool)
     def exists(self, filename):
         return (Path(self.__sessions_base_dir__) / (filename + ".json")).exists()
+
+    def get_last_selected_sketch(self):
+        return self.__last_selected_sketch__
+
+    def set_last_selected_sketch(self, sketch):
+        self.__last_selected_sketch__ = sketch
+        self.schedule_save()

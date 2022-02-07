@@ -161,6 +161,7 @@ Rectangle {
 
                         function handleClick(track) {
                             if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                 zynthian.session_dashboard.selectedTrack = track.id;
                                 bottomBar.controlType = BottomBar.ControlType.Track;
                                 bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);

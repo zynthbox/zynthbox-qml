@@ -160,6 +160,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     ### Property selectedTrack
     def change_to_track_sound(self):
         self.zyngui.screens["layers_for_track"].update_track_sounds()
+
+        # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
+        self.__change_track_sound_timer__.setInterval(250)
+
         self.schedule_save()
     def get_selected_track(self):
         return self.__selected_track__
@@ -330,3 +334,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_last_selected_sketch(self, sketch):
         self.__last_selected_sketch__ = sketch
         self.schedule_save()
+
+    @Slot(None)
+    def disableNextSoundSwitchTimer(self):
+        self.__change_track_sound_timer__.setInterval(0)

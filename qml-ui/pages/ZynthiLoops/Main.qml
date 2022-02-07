@@ -707,6 +707,91 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                 }
             }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                color: Kirigami.Theme.backgroundColor
+
+                RowLayout {
+                    id: infoBar
+
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, root.selectedClipCol)
+                    property string synthName: ""
+                    property string presetName: ""
+
+                    width: parent.width - Kirigami.Units.gridUnit
+                    anchors.centerIn: parent
+                    spacing: Kirigami.Units.gridUnit
+
+                    onClipChanged: infoBar.updateSoundName()
+
+                    function updateSoundName() {
+                        for (var id in infoBar.clip.clipTrack.chainedSounds) {
+                            if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
+                                infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
+                                var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
+                                infoBar.synthName = soundName[0] ? soundName[0].trim() : "";
+                                infoBar.presetName = soundName[1] ? soundName[1].trim() : "";
+                                break;
+                            }
+
+                            // If sound not connected, set text to none
+                            infoBar.synthName = "<none>"
+                            infoBar.presetName = "<none>"
+
+                        }
+                    }
+
+                    Connections {
+                        target: zynthian.fixed_layers
+                        onList_updated: {
+                            infoBar.updateSoundName();
+                        }
+                    }
+
+                    Connections {
+                        target: infoBar.clip.clipTrack
+                        onChainedSoundsChanged: {
+                            infoBar.updateSoundName();
+                        }
+                    }
+
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Synth: %1").arg(infoBar.synthName)
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Preset: %1").arg(infoBar.presetName)
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("%1 %2")
+                                .arg(infoBar.clip.name)
+                                .arg(infoBar.clip.inCurrentScene ? "(Active)" : "")
+                    }
+                }
+            }
         }
     }
 }

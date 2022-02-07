@@ -598,6 +598,11 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
+                                        highlightColor: !highlighted && model.clip.inCurrentScene
+                                                            ? Qt.rgba(255,255,255,0.6)
+                                                            : highlighted
+                                                                ? Kirigami.Theme.highlightColor
+                                                                : "transparent"
                                         highlighted: model.clip.row === zynthian.session_dashboard.selectedTrack && model.clip.col === root.selectedClipCol // bottomBar.controlObj === model.clip
                                         onHighlightedChanged: {
                                             console.log("Clip : (" + model.clip.row+", "+model.clip.col+")", "Selected Track :", zynthian.session_dashboard.selectedTrack)

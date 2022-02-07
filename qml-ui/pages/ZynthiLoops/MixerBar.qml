@@ -113,6 +113,7 @@ Rectangle {
                         id: masterVolume
                         Layout.preferredWidth: privateProps.cellWidth + 6
                         Layout.maximumWidth: privateProps.cellWidth + 6
+                        Layout.bottomMargin: 5
                         Layout.fillHeight: true
                         headerText: zynthian.zynthiloops.masterAudioLevel <= -40
                                         ? ""

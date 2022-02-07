@@ -253,7 +253,7 @@ Zynthian.BasePlayGrid {
 
         onActivePatternChanged:{
             updateTrack();
-            console.log('on active pattern changed', _private.activePattern)
+            updateCurrentGrid();
         }
 
         onLayerChanged: {
@@ -332,7 +332,22 @@ Zynthian.BasePlayGrid {
         onConnectedPatternChanged: _private.updateTrack()
         onConnectedSoundChanged: _private.updateTrack()
     }
-
+    Connections {
+        target: _private.sequence
+        onModelReset: _private.updateCurrentGrid();
+    }
+    Connections {
+        target: _private.activePatternModel
+        onLastModifiedChanged: _private.updateCurrentGrid();
+    }
+    Connections {
+        target: ZynQuick.PlayGridManager
+        onCurrentMidiChannelChanged: _private.updateCurrentGrid();
+    }
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: _private.updateCurrentGrid();
+    }
     // on component completed
     onInitialize: {
         _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
@@ -484,6 +499,7 @@ Zynthian.BasePlayGrid {
                                 activeBar:_private.activeBar
                                 mostRecentlyPlayedNote: component.mostRecentlyPlayedNote
                                 padNoteIndex: model.index
+                                padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                                 note: _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
                                 Timer {
                                     id: sequenderPadNoteApplicator
@@ -493,6 +509,10 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                                 Connections {
+                                    target: _private.sequence
+                                    onModelReset: sequenderPadNoteApplicator.restart();
+                                }
+                                Connections {
                                     target: _private.activePatternModel
                                     onLastModifiedChanged: sequenderPadNoteApplicator.restart();
                                 }
@@ -500,7 +520,10 @@ Zynthian.BasePlayGrid {
                                     target: ZynQuick.PlayGridManager
                                     onCurrentMidiChannelChanged: sequenderPadNoteApplicator.restart();
                                 }
-                                padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
+                                Connections {
+                                    target: zynthian.zynthiloops
+                                    onSongChanged: sequenderPadNoteApplicator.restart();
+                                }
                             }
                         }
                     }

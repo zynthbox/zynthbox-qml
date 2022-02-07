@@ -58,7 +58,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__visible_tracks_end__ = 5
         self.__last_selected_sketch__ = None
         self.__change_track_sound_timer__ = QTimer()
-        self.__change_track_sound_timer__.setInterval(500)
+        self.__change_track_sound_timer__.setInterval(250)
         self.__change_track_sound_timer__.setSingleShot(True)
         self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound)
 

@@ -127,12 +127,6 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: "Get New Sketches"
-            onTriggered: {
-                zynthian.show_modal("sketch_downloader")
-            }
-        },
-        Kirigami.Action {
             id: mixerActionBtn
             text: qsTr("Mixer")
             checkable: true
@@ -148,6 +142,12 @@ Zynthian.ScreenPage {
                      zynthian.zynthiloops.stopMonitorMasterAudioLevels();
                     bottomStack.currentIndex = 0;
                 }
+            }
+        },
+        Kirigami.Action {
+            text: "Get New Sketches"
+            onTriggered: {
+                zynthian.show_modal("sketch_downloader")
             }
         }
 

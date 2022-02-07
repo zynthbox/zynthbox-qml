@@ -640,9 +640,6 @@ Zynthian.ScreenPage {
                                         Layout.maximumHeight: privateProps.cellHeight
 
                                         onPressed: {
-                                            zynthian.session_dashboard.selectedTrack = track.id;
-                                            root.selectedClipCol = model.clip.col
-
                                             if (dblTimer.running || sceneActionBtn.checked) {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);
 
@@ -656,10 +653,18 @@ Zynthian.ScreenPage {
                                             }
                                             dblTimer.restart()
 
-                                            if (mixerActionBtn.checked) {
+                                            if (zynthian.session_dashboard.selectedTrack === track.id
+                                                && mixerActionBtn.checked) {
                                                 bottomStack.currentIndex = 0
                                                 mixerActionBtn.checked = false
+                                            } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                                sceneActionBtn.checked = false;
+                                                mixerActionBtn.checked = true;
+                                                bottomStack.currentIndex = 1;
                                             }
+
+                                            zynthian.session_dashboard.selectedTrack = track.id;
+                                            root.selectedClipCol = model.clip.col
                                         }
                                         Timer { //FIXME: why onDoubleClicked doesn't work
                                             id: dblTimer

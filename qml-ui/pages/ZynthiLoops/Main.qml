@@ -452,6 +452,7 @@ Zynthian.ScreenPage {
                                         bottomBar.controlType = BottomBar.ControlType.Track;
                                         bottomBar.controlObj = model.track;
 
+                                        zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                         zynthian.session_dashboard.selectedTrack = index;
 
                                         sceneActionBtn.checked = false;
@@ -668,6 +669,7 @@ Zynthian.ScreenPage {
                                                 bottomStack.currentIndex = 1;
                                             }
 
+                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.id;
                                             root.selectedClipCol = model.clip.col
                                         }

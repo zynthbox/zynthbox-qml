@@ -39,6 +39,8 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    property int selectedClipCol: 0
+
     signal cuiaNavUp();
     signal cuiaNavDown();
     signal cuiaNavBack();
@@ -166,16 +168,32 @@ Zynthian.ScreenPage {
         // Forward CUIA actions to bottomBar only when bottomBar is open
         if (bottomStack.currentIndex === 0) {
             if (bottomBar.filePickerDialog.opened) {
-                return bottomBar.filePickerDialog.cuiaCallback(cuia);
+                if (bottomBar.filePickerDialog.cuiaCallback(cuia)) {
+                    return true;
+                }
             }
 
             if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
-                return bottomBar.tabbedView.activeItem.cuiaCallback(cuia);
+                if (bottomBar.tabbedView.activeItem.cuiaCallback(cuia)) {
+                    return true;
+                }
             }
         } else {
             if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback != null) {
-                return bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia);
+                if (bottomStack.itemAt(bottomStack.currentIndex).cuiaCallback(cuia)) {
+                    return true;
+                }
             }
+        }
+
+        switch (cuia) {
+            case "SELECT_UP":
+                root.selectedClipCol = 0
+                return true;
+
+            case "SELECT_DOWN":
+                root.selectedClipCol = 1
+                return true;
         }
 
         return false;
@@ -580,7 +598,20 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        highlighted: bottomBar.controlObj === model.clip
+                                        highlighted: model.clip.row === zynthian.session_dashboard.selectedTrack && model.clip.col === root.selectedClipCol // bottomBar.controlObj === model.clip
+                                        onHighlightedChanged: {
+                                            console.log("Clip : (" + model.clip.row+", "+model.clip.col+")", "Selected Track :", zynthian.session_dashboard.selectedTrack)
+
+                                            if (highlighted) {
+                                                if (track.connectedPattern >= 0) {
+                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                    bottomBar.controlObj = model.clip;
+                                                } else {
+                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                    bottomBar.controlObj = model.clip;
+                                                }
+                                            }
+                                        }
 
                                         backgroundColor: {
                                             var pattern = null;
@@ -610,15 +641,7 @@ Zynthian.ScreenPage {
 
                                         onPressed: {
                                             zynthian.session_dashboard.selectedTrack = track.id;
-
-                                            if (track.connectedPattern >= 0) {
-                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                bottomBar.controlObj = model.clip;
-                                            } else {
-                                                bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                bottomBar.controlObj = model.clip;
-                                            }
-
+                                            root.selectedClipCol = model.clip.col
 
                                             if (dblTimer.running || sceneActionBtn.checked) {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);

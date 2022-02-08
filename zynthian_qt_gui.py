@@ -59,6 +59,7 @@ from soundfile import SoundFile
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.utils import file_properties_helper
+from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
@@ -604,6 +605,7 @@ class zynthian_gui(QObject):
         self.screens["main"] = zynthian_gui_main(self)
         self.screens["module_downloader"] = zynthian_gui_newstuff(self)
         self.screens["admin"] = zynthian_gui_admin(self)
+        self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
 
@@ -2579,6 +2581,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def zynthiloops(self):
         return self.screens["zynthiloops"]
+
+    @Property(QObject, constant=True)
+    def audio_settings(self):
+        return self.screens["audio_settings"]
 
     @Property(QObject, constant=True)
     def synth_behaviour(self):

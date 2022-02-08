@@ -96,6 +96,7 @@ QtObject {
         "module_downloader": "ModuleDownloaderPage.qml",
         "norns_shield": "NornsPage.qml",
         "test_touchpoints": "TestTouchpoints.qml",
+        "audio_settings":"AudioSettingsPage.qml",
         "synth_behaviour":"SynthBehaviourPage.qml",
         "snapshots_menu":"SnapshotsMenuPage.qml",
         "network":"NetworkPage.qml",

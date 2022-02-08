@@ -43,9 +43,32 @@ Zynthian.ScreenPage {
             QQC2.Label {
                 Layout.topMargin: Kirigami.Units.gridUnit
                 Layout.leftMargin: Kirigami.Units.gridUnit
-                Layout.bottomMargin: Kirigami.Units.gridUnit * 2
                 font.pointSize: 20
                 text: root.title
+            }
+
+            RowLayout {
+                Layout.leftMargin: Kirigami.Units.gridUnit*2
+                Layout.bottomMargin: Kirigami.Units.gridUnit
+                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
+
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+                    horizontalAlignment: TextInput.AlignLeft
+                    text: "Card Name"
+                }
+
+                QQC2.TextField {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    horizontalAlignment: TextInput.AlignHCenter
+                    readOnly: true
+                    text: zynthian.audio_settings.soundcardName
+                }
             }
 
             QQC2.Label {
@@ -55,7 +78,7 @@ Zynthian.ScreenPage {
             }
 
             Repeater {
-                model: 2
+                model: zynthian.audio_settings.channels
                 delegate: RowLayout {
                     Layout.leftMargin: Kirigami.Units.gridUnit*2
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
@@ -66,7 +89,7 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         horizontalAlignment: TextInput.AlignLeft
-                        text: "Capture port name"
+                        text: modelData
                     }
 
                     QQC2.TextField {
@@ -75,7 +98,7 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         horizontalAlignment: TextInput.AlignHCenter
                         readOnly: true
-                        text: "Audio Level"
+                        text: "0.0dB"
                     }
                 }
             }

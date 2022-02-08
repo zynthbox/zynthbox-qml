@@ -44,7 +44,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
             data = f.read()
 
             # Get jackd command line args
-            args = re.search("ExecStart=(.*)", data).group(1).split(" ")
+            args = re.search("\nExecStart=(.*)", data).group(1).split(" ")
 
             # Discard everything before first occurrence of -d
             while args.pop(0) != "-d":
@@ -61,9 +61,13 @@ class zynthian_gui_master_alsa_mixer(QObject):
         logging.error(f"### ALSA Mixer card : {dev}")
 
         try:
+            accepted_mixer_names = ["Master", "Headphone", "HDMI", "Digital"];
             card = alsaaudio.cards().index(dev)
-            mixer_name = alsaaudio.mixers(card)[0]
-            self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
+            for mixer_name in alsaaudio.mixers(card):
+                if mixer_name in accepted_mixer_names:
+                    self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
+                    break
+            logging.error(f"Using the mixer named {self.__mixer.mixer()}")
         except Exception as e:
             self.__mixer = None
             logging.error(e)
@@ -84,7 +88,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
         logging.error("SETTING VOLUME TO{}".format(vol))
         if self.__mixer is None:
             return
-        self.__mixer.setvolume(vol)
+        self.__mixer.setvolume(max(0, min(100, vol)))
         self.volume_changed.emit()
 
     volume = Property(int, get_volume, set_volume, notify = volume_changed)

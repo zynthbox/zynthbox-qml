@@ -554,10 +554,14 @@ Zynthian.Card {
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        from: 0
-                        to: 100
-                        stepSize: 1
-                        value: 100
+                        enabled: root.selectedRowIndex === index && soundDelegate.chainedSound >= 0 && root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)
+                        value: zynthian.layers_for_track.volume_controls[index].value
+                        stepSize: zynthian.layers_for_track.volume_controls[index].step_size
+                        from: zynthian.layers_for_track.volume_controls[index].value_min
+                        to: zynthian.layers_for_track.volume_controls[index].value_max
+                        onMoved: {
+                            zynthian.layers_for_track.volume_controls[index].value = value;
+                        }
                     }
                 }
             }

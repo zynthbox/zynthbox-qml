@@ -193,6 +193,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         # self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
         # self.list_data.append((None, 0, "-----------------------------"))
 
+        self.list_data.append((self.audio_settings, 0, "Audio Settings"))
         self.list_data.append((self.synth_behaviour, 0, "Synth Behaviour"))
         self.list_data.append((self.network, 0, "Network"))
         self.list_data.append((self.hardware, 0, "Hardware"))
@@ -325,6 +326,10 @@ class zynthian_gui_admin(zynthian_gui_selector):
     # ------------------------------------------------------------------------------
     # CONFIG OPTIONS
     # ------------------------------------------------------------------------------
+
+    def audio_settings(self):
+        logging.info("Audio Settings")
+        self.zyngui.show_modal("audio_settings")
 
     def synth_behaviour(self):
         logging.info("Synth Behaviour")

@@ -26,14 +26,45 @@
 import os
 
 import jack
-from PySide2.QtCore import Property
+from PySide2.QtCore import Property,Signal,Slot
 
-from . import zynthian_qt_gui_base
-
+import logging
+import re
+import zyngine
+from . import zynthian_qt_gui_base,zynthian_gui_master_alsa_mixer
 
 class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_audio_settings, self).__init__(parent)
+        try:
+            scmix = os.environ.get('SOUNDCARD_MIXER',"").replace("\\n","")
+            self.ctrl_list = [item.strip() for item in scmix.split(',')]
+        except:
+            self.ctrl_list = None
+        self.audio_device = ""
+
+        # Read jack2.service file to find selected card name
+        with open("/etc/systemd/system/jack2.service", "r") as f:
+            data = f.read()
+
+            # Get jackd command line args
+            args = re.search("\nExecStart=(.*)", data).group(1).split(" ")
+
+            # Discard everything before first occurrence of -d
+            while args.pop(0) != "-d":
+                continue
+
+            # Find next -d or -P
+            while True:
+                option = args.pop(0)
+                if option == "-d" or option == "-P":
+                    raw_dev = args.pop(0)
+                    self.audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
+                    break
+        soundcard_name = self.audio_device
+        self.zynthian_mixer = zyngine.zynthian_engine_mixer()
+        self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
+        self.update_channels()
 
     def show(self):
         pass
@@ -52,10 +83,29 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
 
     ### Property channels
     def get_channels(self):
-        _channels = []
-        for port in jack.Client('').get_ports("system:capture"):
-            _channels.append(port.name.replace("system:", ""))
+        return self._channels
 
-        return _channels
-    channels = Property('QVariantList', get_channels, constant=True)
+    @Signal
+    def channels_changed(self):
+        pass
+
+    def update_channels(self):
+        self._channels = []
+        for key,zctrl in self.zctrls.items():
+            self._channels.append({
+                "name": key,
+                "value": zctrl.value,
+                "value_min": zctrl.value_min,
+                "value_max": zctrl.value_max
+            })
+        self.channels_changed.emit()
+
+    channels = Property('QVariantList', get_channels, notify=channels_changed)
     ### END Property channels
+
+    @Slot(int,int)
+    def setChannelValue(self, channel_index, new_value):
+        if channel_index > -1 and channel_index < len(self.zctrls):
+            if (self.zctrls[channel_index].get_value() != new_value):
+                self.zctrls[channel_index].set_value(new_value)
+                self.channels_changed.emit()

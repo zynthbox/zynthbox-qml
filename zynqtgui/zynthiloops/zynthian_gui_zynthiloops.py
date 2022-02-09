@@ -117,7 +117,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def init_sketch(self, sketch, cb=None):
         def _cb():
             libzl.registerTimerCallback(libzlCb)
-            libzl.registerGraphicTypes()
+            libzl.registerQmlTypes()
             libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)

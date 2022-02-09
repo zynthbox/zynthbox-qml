@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
+import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 import "pages/SessionDashboard" as SessionDashboard
@@ -77,6 +78,10 @@ Kirigami.AbstractApplicationWindow {
 
     width: screen.width
     height: screen.height
+    
+    ZL.AudioLevels {
+        id: audioLevels
+    }
 
     Timer {
         id: displayWindowTimer

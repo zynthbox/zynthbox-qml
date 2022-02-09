@@ -113,9 +113,9 @@ def registerTimerCallback(callback):
         libzl.SyncTimer_registerTimerCallback(callback)
 
 
-def registerGraphicTypes():
+def registerQmlTypes():
     if libzl:
-        libzl.registerGraphicTypes()
+        libzl.registerQmlTypes()
 
 
 def startTimer(interval: int):

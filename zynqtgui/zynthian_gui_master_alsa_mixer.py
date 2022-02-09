@@ -37,7 +37,7 @@ import re
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
-        dev = ""
+        self.audio_device = ""
 
         # Read jack2.service file to find selected card name
         with open("/etc/systemd/system/jack2.service", "r") as f:
@@ -55,14 +55,14 @@ class zynthian_gui_master_alsa_mixer(QObject):
                 option = args.pop(0)
                 if option == "-d" or option == "-P":
                     raw_dev = args.pop(0)
-                    dev = re.search("hw:([^ ]*)", raw_dev).group(1)
+                    self.audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
                     break
 
-        logging.error(f"### ALSA Mixer card : {dev}")
+        logging.error(f"### ALSA Mixer card : {self.audio_device}")
 
         try:
             accepted_mixer_names = ["Master", "Headphone", "HDMI", "Digital"];
-            card = alsaaudio.cards().index(dev)
+            card = alsaaudio.cards().index(self.audio_device)
             for mixer_name in alsaaudio.mixers(card):
                 if mixer_name in accepted_mixer_names:
                     self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)

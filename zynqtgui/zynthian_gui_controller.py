@@ -456,14 +456,14 @@ class zynthian_gui_controller(QObject):
 			v=self.ctrl_max_value
 		elif v<0:
 			v=0
-		if self.ctrl_value is None or self.ctrl_value!=v:
+		if self.ctrl_value is None or self.ctrl_value!=v or True:
 			self.ctrl_value=v
-			#logging.debug("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
+			#logging.error("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
 			if self.__visible:
 				if set_zynpot:
 					if self.mult>1: v = self.mult*v
 					zyncoder.lib_zyncoder.set_value_zynpot(self.index,int(v),int(send_zynpot))
-					#logging.debug("set_value_zyncoder {} ({}, {}) => {}".format(self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
+					#logging.error("set_value_zyncoder {} {} ({}, {}) => {}".format(self, self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
 			self.calculate_plot_values()
 			self.value_changed.emit()
 			return True

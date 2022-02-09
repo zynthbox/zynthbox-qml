@@ -76,30 +76,50 @@ Zynthian.ScreenPage {
                 font.pointSize: 16
                 text: qsTr("Channels")
             }
-
-            Repeater {
-                model: zynthian.audio_settings.channels
-                delegate: RowLayout {
-                    Layout.leftMargin: Kirigami.Units.gridUnit*2
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-
-                    QQC2.Label {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                        Layout.leftMargin: Kirigami.Units.gridUnit
-                        horizontalAlignment: TextInput.AlignLeft
-                        text: modelData
-                    }
-
-                    QQC2.TextField {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                        horizontalAlignment: TextInput.AlignHCenter
-                        readOnly: true
-                        text: "0.0dB"
-                    }
+            
+            RowLayout {
+                Layout.leftMargin: Kirigami.Units.gridUnit*2
+                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
+                
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+                    horizontalAlignment: TextInput.AlignLeft
+                    text: "system:capture_1"
+                }
+                
+                QQC2.TextField {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    horizontalAlignment: TextInput.AlignHCenter
+                    readOnly: true
+                    text: qsTr("%1dB").arg(audioLevels.capture1)
+                }
+            }
+            
+            RowLayout {
+                Layout.leftMargin: Kirigami.Units.gridUnit*2
+                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
+                
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+                    horizontalAlignment: TextInput.AlignLeft
+                    text: "system:capture_2"
+                }
+                
+                QQC2.TextField {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    horizontalAlignment: TextInput.AlignHCenter
+                    readOnly: true
+                    text: qsTr("%1dB").arg(audioLevels.capture2)
                 }
             }
         }

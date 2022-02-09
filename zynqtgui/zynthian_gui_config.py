@@ -75,6 +75,9 @@ if os.environ.get('ZYNTHIAN_WIRING_SWITCHES'):
 else:
 	zynswitch_pin=None
 
+num_zynswitches = 32
+last_zynswitch_index = 32
+
 #------------------------------------------------------------------------------
 # Encoder & Switches GPIO pin assignment (wiringPi numbering)
 #------------------------------------------------------------------------------
@@ -196,6 +199,9 @@ try:
 	n_custom_switches = max(0, len(zynswitch_pin) - 4)
 except:
 	n_custom_switches = 0
+
+# TODO: make it come from some config
+n_custom_switches = 33
 
 for i in range(0, n_custom_switches):
 	cuias = {}

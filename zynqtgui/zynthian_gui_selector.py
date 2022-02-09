@@ -185,6 +185,23 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.auto_activation_timer.setSingleShot(True)
 		self.auto_activation_timer.timeout.connect(self.auto_activation_timeout)
 		self.screen_at_timer_start = None
+		self.auto_activation_timer_requested.connect(self.schedule_activation, Qt.QueuedConnection)
+
+		self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
+
+	auto_activation_timer_requested = Signal(int)
+
+	def sync_selector_visibility(self):
+		if self.zselector:
+			if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+				self.zselector.show()
+			else:
+				self.zselector.hide()
+
+	def schedule_activation(self, interval=250):
+		self.auto_activation_timer.stop()
+		self.auto_activation_timer.setInterval(interval)
+		self.auto_activation_timer.start()
 
 	def get_selector_list(self):
 		if self.list_model == None:
@@ -208,9 +225,12 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def set_selector(self, zs_hiden=False):
 		if self.zselector:
-			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
+			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data)-1, 'value':self.index })
 			self.zselector.config(self.zselector_ctrl)
-			self.zselector.show()
+			if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+				self.zselector.show()
+			else:
+				self.zselector.hide()
 		else:
 			self.zselector_ctrl=zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
@@ -265,10 +285,12 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def zyncoder_read(self):
 		# FIXME: figure out why sometimes the value is wrong
-		if False: #self.zselector:
+		if self.zselector:
 			self.zselector.read_zyncoder()
 			if self.index!=self.zselector.value:
 				self.select(self.zselector.value)
+				self.screen_at_timer_start = self.zyngui.get_current_screen_id()
+				self.auto_activation_timer_requested.emit(500)
 		return [0,1,2]
 
 	@Slot('int')
@@ -283,12 +305,14 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def auto_activation_timeout(self):
 		if self.screen_at_timer_start == self.zyngui.get_current_screen_id() and self.index_supports_immediate_activation(self.index):
 			old_screen = self.zyngui.get_current_screen_id()
+			self.select(self.index)
 			self.select_action(self.index, 'S')
 			if self.zyngui.get_current_screen_id() != old_screen:
 				if self.zyngui.modal_screen:
 					self.zyngui.show_modal(old_screen)
 				else:
 					self.zyngui.show_screen(old_screen)
+			self.zselector.set_value(self.index, True, True)
 
 	@Slot('int')
 	def activate_index_secondary(self, index):
@@ -323,14 +347,14 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def select_up(self, n=1):
 		new_index = max(0, self.index - n)
 		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
-		self.auto_activation_timer.start()
+		self.schedule_activation()
 		self.select(new_index)
 
 
 	def select_down(self, n=1):
 		new_index = min(len(self.list_data) - 1, self.index + n)
 		self.screen_at_timer_start = self.zyngui.get_current_screen_id()
-		self.auto_activation_timer.start()
+		self.schedule_activation()
 		self.select(self.index + n)
 
 	# TODO: remove

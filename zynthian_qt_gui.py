@@ -44,6 +44,7 @@ from ctypes import c_float, c_double, CDLL
 from PySide2.QtCore import (
     Qt,
     QObject,
+    QMetaObject,
     Slot,
     Signal,
     Property,
@@ -55,6 +56,8 @@ from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCu
 # from PySide2.QtWidgets import QApplication
 from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
 from soundfile import SoundFile
+
+from pynput.keyboard import Key, Controller
 
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
@@ -366,6 +369,12 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+
+        # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
+        self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
+        self.zynswitch_long_triggered.connect(self.zynswitch_long, Qt.QueuedConnection)
+        self.zynswitch_bold_triggered.connect(self.zynswitch_bold, Qt.QueuedConnection)
+        self.fakeKeyboard = Controller()
 
         self.modal_timer = QTimer(self)
         self.modal_timer.setInterval(3000)
@@ -1231,6 +1240,9 @@ class zynthian_gui(QObject):
         elif cuia == "SCREEN_LAYER":
             self.show_screen("layers_for_track")
 
+        elif cuia == "SCREEN_LAYER_FX":
+            self.show_screen("layer_effects")
+
         elif cuia == "SCREEN_BANK":
             self.show_screen("bank")
 
@@ -1320,6 +1332,7 @@ class zynthian_gui(QObject):
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
+                logging.error("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
                 self.callable_ui_action(
                     zynthian_gui_config.custom_switch_ui_actions[i][t]
                 )
@@ -1332,13 +1345,10 @@ class zynthian_gui(QObject):
 
     # Init GPIO Switches
     def zynswitches_init(self):
-        if lib_zyncoder:
-            ts = datetime.now()
-            logging.info("SWITCHES INIT...")
-            for i, pin in enumerate(zynthian_gui_config.zynswitch_pin):
-                self.dtsw.append(ts)
-                lib_zyncoder.setup_zynswitch(i, pin)
-                logging.info("SETUP ZYNSWITCH {} => wpGPIO {}".format(i, pin))
+        if not lib_zyncore: return
+        logging.info("INIT {} ZYNSWITCHES ...".format(zynthian_gui_config.num_zynswitches))
+        ts=datetime.now()
+        self.dtsw = [ts] * (zynthian_gui_config.num_zynswitches + 4)
 
     def zynswitches_midi_setup(self, curlayer_chan=None):
         logging.info("MIDI SWITCHES SETUP...")
@@ -1409,27 +1419,57 @@ class zynthian_gui(QObject):
                     logging.info("ZYNTOF {}: DISABLED!".format(i))
 
     def zynswitches(self):
-        if lib_zyncoder:
-            for i in range(len(zynthian_gui_config.zynswitch_pin)):
-                dtus = lib_zyncoder.get_zynswitch_dtus(
-                    i, zynthian_gui_config.zynswitch_long_us
-                )
-                if dtus > zynthian_gui_config.zynswitch_long_us:
-                    self.zynswitch_long(i)
+        if not lib_zyncoder: return
+        last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
+        i = 0
+        while i<=last_zynswitch_index:
+            dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
+            if dtus>0:
+                logging.error("keypress: {} {}".format(i, dtus))
+                if self.fake_key_event_for_zynswitch(i):
                     return
-                if dtus > zynthian_gui_config.zynswitch_bold_us:
-                    # Double switches must be bold!!! => by now ...
-                    if self.zynswitch_double(i):
-                        return
-                    self.zynswitch_bold(i)
-                    return
-                if dtus > 0:
-                    # print("Switch "+str(i)+" dtus="+str(dtus))
-                    self.zynswitch_short(i)
+
+            if dtus <= 0:
+                pass
+            elif dtus>zynthian_gui_config.zynswitch_long_us:
+                self.zynswitch_long_triggered.emit(i)
+            elif dtus>zynthian_gui_config.zynswitch_bold_us:
+                # Double switches must be bold!!! => by now ...
+                if not self.zynswitch_double(i):
+                    self.zynswitch_bold_triggered.emit(i)
+            elif dtus>0:
+                #print("Switch "+str(i)+" dtus="+str(dtus))
+                self.zynswitch_short_triggered.emit(i)
+            i += 1;
+
+    zynswitch_short_triggered = Signal(int)
+    zynswitch_long_triggered = Signal(int)
+    zynswitch_bold_triggered = Signal(int)
+
+    def fake_key_event_for_zynswitch(self, i):
+        if i == 23:
+            # TODO: manage proper press and release on press and release of the button
+            self.fakeKeyboard.press(Key.up)
+            self.fakeKeyboard.release(Key.up)
+            return True
+        elif i == 26:
+            self.fakeKeyboard.press(Key.down)
+            self.fakeKeyboard.release(Key.down)
+            return True
+        elif i == 25:
+            self.fakeKeyboard.press(Key.left)
+            self.fakeKeyboard.release(Key.left)
+            return True
+        elif i == 27:
+            self.fakeKeyboard.press(Key.right)
+            self.fakeKeyboard.release(Key.right)
+            return True
+        else:
+            return False
 
     def zynswitch_long(self, i):
         logging.info("Looooooooong Switch " + str(i))
-        self.start_loading()
+        #self.start_loading()
 
         # Standard 4 ZynSwitches
         if i == 0 and "zynseq" in zynthian_gui_config.experimental_features:
@@ -1449,11 +1489,11 @@ class zynthian_gui(QObject):
         elif i >= 4:
             self.custom_switch_ui_action(i - 4, "L")
 
-        self.stop_loading()
+        #self.stop_loading()
 
     def zynswitch_bold(self, i):
         logging.info("Bold Switch " + str(i))
-        self.start_loading()
+        #self.start_loading()
 
         if self.modal_screen in ["stepseq", "keyboard"]:
             self.stop_loading()
@@ -1503,7 +1543,7 @@ class zynthian_gui(QObject):
         elif i >= 4:
             self.custom_switch_ui_action(i - 4, "B")
 
-        self.stop_loading()
+        #self.stop_loading()
 
     def zynswitch_short(self, i):
         logging.info("Short Switch " + str(i))
@@ -1512,8 +1552,8 @@ class zynthian_gui(QObject):
             if self.screens[self.modal_screen].switch(i, "S"):
                 return
 
-        if i != 1:  # HACK to not show loading screen when just going back
-            self.start_loading()
+        #if i != 1:  # HACK to not show loading screen when just going back
+            #self.start_loading()
 
         # Standard 4 ZynSwitches
         if i == 0:
@@ -1645,9 +1685,24 @@ class zynthian_gui(QObject):
         elif i >= 4:
             self.custom_switch_ui_action(i - 4, "S")
 
+        #self.stop_loading()
+
+    def zynswitch_push(self,i):
+        logging.info('Push Switch '+str(i))
+        self.start_loading()
+
+        # Standard 4 ZynSwitches
+        if i>=0 and i<=3:
+            pass
+
+        # Custom ZynSwitches
+        elif i>=4:
+            self.custom_switch_ui_action(i-4, "P")
+
         self.stop_loading()
 
     def zynswitch_double(self, i):
+        if not i in self.dtsw: return
         self.dtsw[i] = datetime.now()
         for j in range(4):
             if j == i:

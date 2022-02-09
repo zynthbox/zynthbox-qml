@@ -391,55 +391,81 @@ class zynthian_gui_controller(QObject):
 		#logging.debug("ZCTRL SYNC {} => {}".format(self.ctrl_title, val))
 
 
+	#def setup_zyncoder(self):
+		#self.init_value=None
+		#try:
+			#if isinstance(self.zctrl.osc_path,str):
+				##logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.osc_path))
+				#midi_cc=None
+				#zyn_osc_path="{}:{}".format(self.zctrl.osc_port,self.zctrl.osc_path)
+				#osc_path_char=ctypes.c_char_p(zyn_osc_path.encode('UTF-8'))
+				##if zctrl.engine.osc_target:
+				##	liblo.send(zctrl.engine.osc_target, self.zctrl.osc_path)
+			#elif isinstance(self.zctrl.graph_path,str):
+				##logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.graph_path))
+				#midi_cc=None
+				#osc_path_char=None
+			#else:
+				##logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.midi_cc))
+				#midi_cc=self.zctrl.midi_cc
+				#osc_path_char=None
+			#if zyncoder.lib_zyncoder:
+				#if self.inverted:
+					#pin_a=zynthian_gui_config.zyncoder_pin_b[self.index]
+					#pin_b=zynthian_gui_config.zyncoder_pin_a[self.index]
+				#else:
+					#pin_a=zynthian_gui_config.zyncoder_pin_a[self.index]
+					#pin_b=zynthian_gui_config.zyncoder_pin_b[self.index]
+				#zyncoder.lib_zyncoder.setup_zyncoder(self.index,pin_a,pin_b,self.zctrl.midi_chan,midi_cc,osc_path_char,int(self.mult*self.ctrl_value),int(self.mult*(self.ctrl_max_value-self.val0)),self.step)
+		#except Exception as err:
+			#logging.error("%s" % err)
+
 	def setup_zyncoder(self):
 		self.init_value=None
 		try:
+			if self.inverted:
+				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, int(self.mult*(self.max_value-self.val0)), 0, int(self.mult*self.value), self.step)
+			else:
+				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, 0, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step)
+
 			if isinstance(self.zctrl.osc_path,str):
 				#logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.osc_path))
-				midi_cc=None
-				zyn_osc_path="{}:{}".format(self.zctrl.osc_port,self.zctrl.osc_path)
-				osc_path_char=ctypes.c_char_p(zyn_osc_path.encode('UTF-8'))
-				#if zctrl.engine.osc_target:
-				#	liblo.send(zctrl.engine.osc_target, self.zctrl.osc_path)
+				midi_cc = None
+				#zyn_osc_path="{}:{}".format(self.zctrl.osc_port,self.zctrl.osc_path)
+				#osc_path_char=ctypes.c_char_p(zyn_osc_path.encode('UTF-8'))
+				osc_path_char = None
+				##if zctrl.engine.osc_target:
+				##	liblo.send(zctrl.engine.osc_target, self.zctrl.osc_path)
 			elif isinstance(self.zctrl.graph_path,str):
 				#logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.graph_path))
-				midi_cc=None
+				midi_cc = None
 				osc_path_char=None
 			else:
 				#logging.debug("Setup zyncoder %d => %s" % (self.index,self.zctrl.midi_cc))
-				midi_cc=self.zctrl.midi_cc
-				osc_path_char=None
-			if zyncoder.lib_zyncoder:
-				if self.inverted:
-					pin_a=zynthian_gui_config.zyncoder_pin_b[self.index]
-					pin_b=zynthian_gui_config.zyncoder_pin_a[self.index]
-				else:
-					pin_a=zynthian_gui_config.zyncoder_pin_a[self.index]
-					pin_b=zynthian_gui_config.zyncoder_pin_b[self.index]
-				zyncoder.lib_zyncoder.setup_zyncoder(self.index,pin_a,pin_b,self.zctrl.midi_chan,midi_cc,osc_path_char,int(self.mult*self.ctrl_value),int(self.mult*(self.ctrl_max_value-self.val0)),self.step)
+				midi_cc = self.zctrl.midi_cc
+				osc_path_char = None
+
+			zyncoder.lib_zyncoder.setup_midi_zynpot(self.index, self.zctrl.midi_chan, midi_cc)
+			zyncoder.lib_zyncoder.setup_osc_zynpot(self.index, osc_path_char)
+
 		except Exception as err:
 			logging.error("%s" % err)
 
-	def set_value(self, v, set_zyncoder=False, send_zyncoder=True):
+	def set_value(self, v, set_zynpot=False, send_zynpot=True):
 		if v>self.ctrl_max_value:
 			v=self.ctrl_max_value
 		elif v<0:
 			v=0
 		if self.ctrl_value is None or self.ctrl_value!=v:
 			self.ctrl_value=v
-
 			#logging.debug("CONTROL %d VALUE => %s" % (self.index,self.ctrl_value))
-			if set_zyncoder and zyncoder.lib_zyncoder:
-				if self.mult>1: v = self.mult*v
-				if self.zctrl.index >= 0:
-					zyncoder.lib_zyncoder.set_value_zyncoder(self.zctrl.index,ctypes.c_uint(int(v)),int(send_zyncoder))
-				else:
-					zyncoder.lib_zyncoder.set_value_zyncoder(self.index,ctypes.c_uint(int(v)),int(send_zyncoder))
-				#logging.debug("set_value_zyncoder {} ({}, {}) => {}".format(self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
+			if self.__visible:
+				if set_zynpot:
+					if self.mult>1: v = self.mult*v
+					zyncoder.lib_zyncoder.set_value_zynpot(self.index,int(v),int(send_zynpot))
+					#logging.debug("set_value_zyncoder {} ({}, {}) => {}".format(self.index, self.zctrl.symbol,self.zctrl.midi_cc,v))
 			self.calculate_plot_values()
 			self.value_changed.emit()
-			if "snapshot" in self.zyngui.screens:
-				self.zyngui.screens["snapshot"].schedule_save_last_state_snapshot()
 			return True
 
 
@@ -450,17 +476,19 @@ class zynthian_gui_controller(QObject):
 			logging.debug("INIT VALUE %s => %s" % (self.index,v))
 
 
+
 	def read_zyncoder(self):
-		if zyncoder.lib_zyncoder:
-			val=zyncoder.lib_zyncoder.get_value_zyncoder(self.index)
-			#logging.debug("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.ctrl_title,val))
+		#if self.canvas_push_ts:
+		#	return
+		if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
+			val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)
+			logging.error("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))
+			if self.mult>1:
+				val = int((val+1)/self.mult)
+			return self.set_value(val)
+
 		else:
-			val=self.ctrl_value*self.mult-self.val0
-
-		if self.mult>1:
-			val = int((val+1)/self.mult)
-
-		return self.set_value(val)
+			return False
 
 
 	def cb_canvas_wheel(self,event):

@@ -49,9 +49,7 @@ from .libzl import zynthiloops_song
 from .libzl import zynthiloops_clip
 
 from .. import zynthian_qt_gui_base
-from .. import zynthian_gui_controller
-from .. import zynthian_gui_config
-from zyngine import zynthian_controller
+
 import jack
 
 
@@ -110,7 +108,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_right__ = -400
         # self.__recording_audio_level__ = -100
         self.__song__ = None
-        self.zselector = None
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -137,37 +134,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.loadSketch(sketch, _cb)
         else:
             self.newSketch(None, _cb)
-
-
-
-    def zyncoder_read(self):
-        # FIXME: figure out why sometimes the value is wrong
-        if self.zselector:
-            self.zselector.read_zyncoder()
-            track = self.__song__.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-            if track and self.zselector.value != track.get_volume():
-                track.set_volume(self.zselector.value - 40, True)
-        return [0,1,2]
-
-    def set_selector(self, zs_hiden=False):
-        volume = 0
-        track = None
-        if self.__song__:
-            self.__song__.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-        if track:
-            volume = track.get_volume()
-            track.volume_changed.connect(this.set_selector, Qt.UniqueConnection)
-        if self.zselector:
-            self.zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':60, 'value':volume + 40 })
-            self.zselector.config(self.zselector_ctrl)
-            if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-                self.zselector.show()
-            else:
-                self.zselector.hide()
-        else:
-            self.zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value':volume + 40})
-            self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
-
 
     def switch_select(self, t):
         pass
@@ -413,7 +379,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
 
     def show(self):
-        self.set_selector()
+        pass
 
     @Signal
     def current_beat_changed(self):

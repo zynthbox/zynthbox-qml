@@ -34,6 +34,7 @@ import math
 # import alsaseq
 import logging
 import threading
+import rpi_ws281x
 import time
 from datetime import datetime
 from threading import Thread, Lock
@@ -381,6 +382,8 @@ class zynthian_gui(QObject):
         self.modal_timer.setSingleShot(False)
         self.modal_timer.timeout.connect(self.close_modal)
 
+        self.init_wsleds()
+
         self.info_timer = QTimer(self)
         self.info_timer.setInterval(3000)
         self.info_timer.setSingleShot(False)
@@ -465,6 +468,181 @@ class zynthian_gui(QObject):
                 "/zynthian/zynthian-ui/zynlibs/zynseq/build/libzynseq.so"
             )
             self.libseq.init(True)
+
+
+    # ---------------------------------------------------------------------------
+    # WS281X LEDs
+    # ---------------------------------------------------------------------------
+
+    def init_wsleds(self):
+        if zynthian_gui_config.wiring_layout=="Z2_V1":
+            # LEDS with PWM1 (pin 13, channel 1)
+            pin = 13
+            chan = 1
+        elif zynthian_gui_config.wiring_layout=="Z2_V2":
+            # LEDS with SPI0 (pin 10, channel 0)
+            pin = 10
+            chan = 0
+        else:
+            self.wsleds = None
+            return 0
+
+        self.wsleds_num = 25
+        self.wsleds=rpi_ws281x.PixelStrip(self.wsleds_num, pin, dma=10, channel=chan, strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
+        self.wsleds.begin()
+
+        self.wscolor_off = rpi_ws281x.Color(0,0,0)
+        self.wscolor_light = rpi_ws281x.Color(0,0,255)
+        self.wscolor_active = rpi_ws281x.Color(0,255,0)
+        self.wscolor_admin = rpi_ws281x.Color(120,0,0)
+        self.wscolor_red = rpi_ws281x.Color(120,0,0)
+        self.wscolor_green = rpi_ws281x.Color(0,255,0)
+
+        # Light all LEDs
+        for i in range(0,25):
+            self.wsleds.setPixelColor(i,self.wscolor_light)
+        self.wsleds.show()
+
+        self.wsleds_blink_count = 0
+
+        return self.wsleds_num
+
+
+    def end_wsleds(self):
+        # Light-off all LEDs
+        for i in range(0,25):
+            self.wsleds.setPixelColor(i,self.wscolor_off)
+        self.wsleds.show()
+
+
+    def wsled_blink(self, i, color):
+        if self.wsleds_blink:
+            self.wsleds.setPixelColor(i, color)
+        else:
+            self.wsleds.setPixelColor(i, self.wscolor_light)
+
+
+    def update_wsleds(self):
+        if self.wsleds_blink_count % 6 > 2:
+            self.wsleds_blink = True
+        else:
+            self.wsleds_blink = False
+
+        try:
+            # Menu
+            if self.active_screen=="main":
+                self.wsleds.setPixelColor(0,self.wscolor_active)
+            elif self.modal_screen=="stepseq" and self.screens['stepseq'].is_shown_menu():
+                self.wsleds.setPixelColor(0,self.wscolor_active)
+            elif self.modal_screen=="admin":
+                self.wsleds.setPixelColor(0,self.wscolor_admin)
+            else:
+                self.wsleds.setPixelColor(0,self.wscolor_light)
+
+            # Active Track
+            for i in range(6):
+                self.wsleds.setPixelColor(1+i,self.wscolor_light)
+            i = self.screens['session_dashboard'].selectedTrack
+            if i is not None and i<6:
+                self.wsleds.setPixelColor(1+i,self.wscolor_active)
+
+            if self.active_screen=="layer_effects" or self.active_screen=="layer_effect_chooser" or self.active_screen=="effect_types":
+                self.wsleds.setPixelColor(7,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(7,self.wscolor_light)
+
+            # Stepseq screen:
+            if self.modal_screen=="stepseq":
+                self.wsleds.setPixelColor(8,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(8,self.wscolor_light)
+
+            # Audio Recorder screen:
+            if self.modal_screen=="audio_recorder":
+                self.wsleds.setPixelColor(9,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(9,self.wscolor_light)
+
+            # MIDI Recorder screen:
+            if self.modal_screen=="midi_recorder":
+                self.wsleds.setPixelColor(10,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(10,self.wscolor_light)
+
+            # Snapshot screen:
+            if self.modal_screen=="snapshot":
+                self.wsleds.setPixelColor(11,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(11,self.wscolor_light)
+
+            # Presets screen:
+            if self.modal_screen=="preset" or self.modal_screen=="bank":
+                self.wsleds.setPixelColor(12,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(12,self.wscolor_light)
+
+            # Light ALT button
+            self.wsleds.setPixelColor(13,self.wscolor_light)
+
+            # REC/PLAY Audio buttons:
+            if self.status_info['audio_recorder']:
+                if "REC" in self.status_info['audio_recorder']:
+                    self.wsleds.setPixelColor(14,self.wscolor_red)
+                else:
+                    self.wsleds.setPixelColor(14,self.wscolor_light)
+
+                if "PLAY" in self.status_info['audio_recorder']:
+                    self.wsleds.setPixelColor(15,self.wscolor_active)
+                else:
+                    self.wsleds.setPixelColor(15,self.wscolor_light)
+            else:
+                self.wsleds.setPixelColor(14,self.wscolor_light)
+                self.wsleds.setPixelColor(15,self.wscolor_light)
+
+            # REC/PLAY MIDI buttons:
+            if self.status_info['midi_recorder']:
+                if "REC" in self.status_info['midi_recorder']:
+                    self.wsleds.setPixelColor(16,self.wscolor_red)
+                else:
+                    self.wsleds.setPixelColor(16,self.wscolor_light)
+
+                if "PLAY" in self.status_info['midi_recorder']:
+                    self.wsleds.setPixelColor(17,self.wscolor_active)
+                else:
+                    self.wsleds.setPixelColor(17,self.wscolor_light)
+            else:
+                self.wsleds.setPixelColor(16,self.wscolor_light)
+                self.wsleds.setPixelColor(17,self.wscolor_light)
+
+            # Back/No button
+            self.wsleds.setPixelColor(18,self.wscolor_red)
+
+            # Up button
+            self.wsleds.setPixelColor(19,self.wscolor_light)
+
+            # Select/Yes button
+            self.wsleds.setPixelColor(20,self.wscolor_green)
+
+            # Left, Bottom, Right button
+            for i in range(3):
+                self.wsleds.setPixelColor(21+i,self.wscolor_light)
+
+            # Audio Mixer/Levels screen
+            if self.modal_screen=="audio_mixer" or (self.active_screen=="audio_mixer" and not self.modal_screen):
+                self.wsleds.setPixelColor(24,self.wscolor_active)
+            elif self.modal_screen=="alsa_mixer":
+                self.wsleds.setPixelColor(24,self.wscolor_admin)
+            else:
+                self.wsleds.setPixelColor(24,self.wscolor_light)
+
+            # Refresh LEDs
+            self.wsleds.show()
+
+        except Exception as e:
+            logging.error(e)
+
+        self.wsleds_blink_count += 1
+
 
     # ---------------------------------------------------------------------------
     # MIDI Router Init & Config
@@ -702,6 +880,7 @@ class zynthian_gui(QObject):
         # Start polling threads
         self.start_polling()
         self.start_loading_thread()
+        self.start_status_thread()
         self.start_zyncoder_thread()
 
         # Run autoconnect if needed
@@ -2092,6 +2271,24 @@ class zynthian_gui(QObject):
     @Slot(str, result=bool)
     def file_exists(self, file_path):
         return os.path.isfile(file_path)
+
+    #------------------------------------------------------------------
+    # Status Refresh Thread
+    #------------------------------------------------------------------
+
+    def start_status_thread(self):
+        self.status_thread=Thread(target=self.status_thread_task, args=())
+        self.status_thread.daemon = True # thread dies with the program
+        self.status_thread.start()
+
+
+    def status_thread_task(self):
+        while not self.exit_flag:
+            #self.refresh_status()
+            if self.wsleds:
+                self.update_wsleds()
+            time.sleep(0.2)
+        self.end_wsleds()
 
     # ------------------------------------------------------------------
     # Polling

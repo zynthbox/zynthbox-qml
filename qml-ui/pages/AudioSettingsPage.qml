@@ -28,6 +28,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import "ZynthiLoops" as ZynthiLoops
 
 Zynthian.ScreenPage {
     id: root
@@ -40,6 +41,7 @@ Zynthian.ScreenPage {
         radius: 2
 
         ColumnLayout {
+            anchors.fill: parent
             QQC2.Label {
                 Layout.topMargin: Kirigami.Units.gridUnit
                 Layout.leftMargin: Kirigami.Units.gridUnit
@@ -77,28 +79,44 @@ Zynthian.ScreenPage {
                 text: qsTr("Channels")
             }
 
-            Repeater {
-                model: zynthian.audio_settings.channels
-                delegate: RowLayout {
-                    Layout.leftMargin: Kirigami.Units.gridUnit*2
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.leftMargin: Kirigami.Units.gridUnit * 2
+                Layout.rightMargin: Kirigami.Units.gridUnit * 2
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 16
+                Repeater {
+                    model: zynthian.audio_settings.channels
+                    delegate: ColumnLayout {
+                        ZynthiLoops.VolumeControl {
+                            id: volumeDelegate
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 16
+                            Layout.bottomMargin: 5
+//                             headerText: zynthian.zynthiloops.masterAudioLevel <= -40
+//                                             ? ""
+//                                             : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
+                            footerText: modelData.name
+                            audioLeveldB: modelData.value
+                            inputAudioLevelVisible: false
 
-                    QQC2.Label {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                        Layout.leftMargin: Kirigami.Units.gridUnit
-                        horizontalAlignment: TextInput.AlignLeft
-                        text: modelData
-                    }
+                            Binding {
+                                target: volumeDelegate.slider
+                                property: "value"
+                                value: modelData.value
+                            }
 
-                    QQC2.TextField {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*12
-                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                        horizontalAlignment: TextInput.AlignHCenter
-                        readOnly: true
-                        text: "0.0dB"
+                            slider {
+                                value: modelData.value
+                                from: modelData.value_min
+                                to: modelData.value_max
+                                stepSize: 1
+                                onValueChanged: {
+                                    zynthian.audio_settings.setChannelValue(model.index, volumeDelegate.value);
+                                }
+                            }
+                        }
                     }
                 }
             }

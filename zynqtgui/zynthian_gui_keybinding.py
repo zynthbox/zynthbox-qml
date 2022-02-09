@@ -117,6 +117,7 @@ class zynthian_gui_keybinding(QObject):
 			"SCREEN_ARRANGER": { "modifier": 0, "keysym": "F2" },
 			"SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F3" },
 			"SCREEN_LAYER": { "modifier": 0, "keysym": "F4" },
+			"SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 
 			# Added in QML version
 			"NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },

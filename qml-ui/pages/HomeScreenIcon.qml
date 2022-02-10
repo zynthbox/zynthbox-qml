@@ -14,7 +14,7 @@ Rectangle {
     property bool highlighted: false
 
 
-    color: highlighted ? Qt.rgba(buttonId.palette.highlight.r, buttonId.palette.highlight.g, buttonId.palette.highlight.b, 0.3) : "transparent"
+    color: highlighted ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.3) : "transparent"
 
     QQC2.Button {
         id: buttonId

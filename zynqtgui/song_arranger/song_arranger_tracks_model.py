@@ -50,7 +50,7 @@ class song_arranger_tracks_model(QAbstractListModel):
         return self.__tracks__[row]
 
     def data(self, index, role=None):
-        logging.info(index.row(), self.__tracks__[index.row()])
+        # logging.info(index.row(), self.__tracks__[index.row()])
 
         if not index.isValid():
             return None

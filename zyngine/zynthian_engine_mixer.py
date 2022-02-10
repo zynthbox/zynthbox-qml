@@ -327,7 +327,7 @@ class zynthian_engine_mixer(zynthian_engine):
 								zctrls[zctrl_symbol] = zctrl
 
 		except Exception as err:
-			logging.error(err)
+			logging.error(f"Error getting zctrls : {str(err)}")
 
 		return zctrls
 

@@ -192,11 +192,11 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	auto_activation_timer_requested = Signal(int)
 
 	def sync_selector_visibility(self):
-		if self.zselector:
-			if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-				self.zselector.show()
-			else:
-				self.zselector.hide()
+		if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+			self.set_selector()
+			self.zselector.show()
+		elif self.zselector:
+			self.zselector.hide()
 
 	def schedule_activation(self, interval=250):
 		self.auto_activation_timer.stop()

@@ -95,6 +95,15 @@ class zynthian_gui_controller(QObject):
 	def get_visible(self):
 		return self.__visible
 
+	def get_index(self):
+		return self.index
+
+	def set_index(self, idx):
+		if self.index == idx:
+			return
+		self.index = idx
+		self.setup_zyncoder()
+		self.index_changed.emit()
 
 	def calculate_plot_values(self):
 		# FIXME: probably what's needed would be an actual threading semaphore?
@@ -269,12 +278,14 @@ class zynthian_gui_controller(QObject):
 					self.inverted=True
 				if (isinstance(zctrl.midi_cc, int) and zctrl.midi_cc>0):
 					self.ctrl_max_value=127
-					self.step=max(1,int(16/self.n_values))
+					#self.step=max(1,int(16/self.n_values))
+					self.step = 1
 					val=zctrl.value-zctrl.value_min
 				else:
 					self.selmode = True
 					self.ctrl_max_value = self.n_values-1
-					self.mult = max(4,int(32/self.n_values))
+					#self.mult = max(4,int(32/self.n_values))
+					self.mult = 4
 					val=zctrl.get_value2index()
 
 					#if zctrl.value_range>32:
@@ -285,7 +296,8 @@ class zynthian_gui_controller(QObject):
 					#	self.ctrl_max_value = zctrl.value_range + 1
 			else:
 				self.ctrl_max_value=127;
-				self.step=max(1,int(16/self.n_values))
+				#self.step=max(1,int(16/self.n_values))
+				self.step = 1
 				val=zctrl.value-zctrl.value_min
 
 		#Numeric value
@@ -297,9 +309,8 @@ class zynthian_gui_controller(QObject):
 				val=zctrl.value
 
 				#If many values => use adaptative step size based on rotary speed
-				if self.n_values>=96:
+				if self.n_values>=32:
 					self.step=0
-					self.mult=1
 				else:
 					self.mult=4
 
@@ -308,8 +319,13 @@ class zynthian_gui_controller(QObject):
 					#Integer < 127
 					if zctrl.value_range<=127:
 						self.ctrl_max_value=self.n_values=zctrl.value_range
-						self.mult=max(1,int(128/self.n_values))
 						val=zctrl.value-zctrl.value_min
+						#If many values => use adaptative step size based on rotary speed
+						if self.n_values>32:
+							self.step=0
+							self.mult=1
+						else:
+							self.mult=4
 					#Integer > 127
 					else:
 						#Not MIDI controller
@@ -334,9 +350,8 @@ class zynthian_gui_controller(QObject):
 						self.scale_value = zctrl.value_range/self.ctrl_max_value
 						val = (zctrl.value-zctrl.value_min)/self.scale_value
 
-				#If many values => use adaptative step size based on rotary speed
-				if self.n_values>=96:
-					self.step=0
+				#Use adaptative step size based on rotary speed
+				self.step=0
 
 		#Calculate scale parameter for plotting
 		if self.selmode:
@@ -498,6 +513,7 @@ class zynthian_gui_controller(QObject):
 			self.set_value(self.ctrl_value + 1, True)
 
 
+	index_changed = Signal()
 	title_changed = Signal()
 	midi_bind_changed = Signal()
 	value_changed = Signal()
@@ -508,6 +524,7 @@ class zynthian_gui_controller(QObject):
 	step_size_changed = Signal()
 	visible_changed = Signal()
 
+	encoder_index = Property(str, get_index, set_index, notify = index_changed)
 	title = Property(str, get_title, notify = title_changed)
 	visible = Property(bool, get_visible, notify = visible_changed)
 	midi_bind = Property(str, get_midi_bind, notify = midi_bind_changed)

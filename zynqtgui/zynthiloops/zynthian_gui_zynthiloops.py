@@ -39,7 +39,7 @@ from time import sleep
 import json
 
 import numpy as np
-from PySide2.QtCore import Property, QObject, QProcess, QTimer, Signal, Slot
+from PySide2.QtCore import Qt, Property, QObject, QProcess, QTimer, Signal, Slot
 
 from .libzl.libzl import ClipAudioSource
 
@@ -110,12 +110,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_right__ = -400
         self.__recording_audio_level__ = -100
         self.__song__ = None
-        self.zselector = None
+        self.__zselector = None
+        self.__zselector_track = -1
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
+        self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
+
+
+    def sync_selector_visibility(self):
+        if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+            self.set_selector()
+            self.__zselector.show()
+        elif self.__zselector:
+            self.__zselector.hide()
 
     def init_sketch(self, sketch, cb=None):
         def _cb():
@@ -142,31 +152,41 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def zyncoder_read(self):
         # FIXME: figure out why sometimes the value is wrong
-        if self.zselector:
-            self.zselector.read_zyncoder()
-            track = self.__song__.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-            if track and self.zselector.value - 40 != track.get_volume():
-                track.set_volume(self.zselector.value - 40, False)
+        if self.__zselector and self.__song__:
+            current_track = self.zyngui.screens["session_dashboard"].selectedTrack
+            if current_track != self.__zselector_track:
+                return
+            self.__zselector.read_zyncoder()
+            track = self.__song__.tracksModel.getTrack(current_track)
+            if track and self.__zselector.value - 40 != track.get_volume():
+                # FIXME: why sometimes this goes out of range?
+                if self.__zselector.value <= 61 :
+                    track.set_volume(self.__zselector.value - 40, False)
+                else:
+                    self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':61, 'value':track.get_volume() + 40 })
+                    self.__zselector.config(self.__zselector_ctrl)
         return [0,1,2]
 
     def set_selector(self, zs_hiden=False):
         volume = 0
-        track = None
-        if self.__song__:
-            self.__song__.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
+        if self.__song__ == None:
+            return
+        self.__zselector_track = self.zyngui.screens["session_dashboard"].selectedTrack
+        track = self.__song__.tracksModel.getTrack(self.__zselector_track)
         if track:
             volume = track.get_volume()
-            track.volume_changed.connect(this.set_selector, Qt.UniqueConnection)
-        if self.zselector:
-            self.zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':60, 'value':volume + 40 })
-            self.zselector.config(self.zselector_ctrl)
+            track.volume_changed.connect(self.set_selector, Qt.UniqueConnection)
+            self.zyngui.screens["session_dashboard"].selected_track_changed.connect(self.set_selector, Qt.UniqueConnection)
+        if self.__zselector:
+            self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':61, 'value':volume + 40 })
+            self.__zselector.config(self.__zselector_ctrl)
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-                self.zselector.show()
+                self.__zselector.show()
             else:
-                self.zselector.hide()
+                self.__zselector.hide()
         else:
-            self.zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value':volume + 40})
-            self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
+            self.__zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value':volume + 40})
+            self.__zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.__zselector_ctrl, self)
 
 
     def switch_select(self, t):

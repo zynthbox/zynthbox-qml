@@ -145,8 +145,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zselector:
             self.zselector.read_zyncoder()
             track = self.__song__.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-            if track and self.zselector.value != track.get_volume():
-                track.set_volume(self.zselector.value - 40, True)
+            if track and self.zselector.value - 40 != track.get_volume():
+                track.set_volume(self.zselector.value - 40, False)
         return [0,1,2]
 
     def set_selector(self, zs_hiden=False):

@@ -53,7 +53,7 @@ class zynthiloops_tracks_model(QAbstractListModel):
             track.deserialize(t)
 
     def data(self, index, role=None):
-        logging.info(index.row(), self.__tracks__[index.row()])
+        # logging.info(index.row(), self.__tracks__[index.row()])
 
         if not index.isValid():
             return None

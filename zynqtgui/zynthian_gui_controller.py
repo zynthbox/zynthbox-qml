@@ -95,10 +95,16 @@ class zynthian_gui_controller(QObject):
 	def get_visible(self):
 		return self.__visible
 
+	def set_visible(self, visible):
+		if self.__visible == visible:
+			return
+		self.__visible = visible
+		self.visible_changed.emit()
+
 	def get_index(self):
 		return self.index
 
-	def set_index(self, idx):
+	def set_index(self, idx: int):
 		if self.index == idx:
 			return
 		self.index = idx
@@ -497,7 +503,7 @@ class zynthian_gui_controller(QObject):
 		#	return
 		if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
 			val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)
-			logging.error("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))
+			#logging.error("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))
 			if self.mult>1:
 				val = int((val+1)/self.mult)
 			return self.set_value(val)
@@ -524,9 +530,9 @@ class zynthian_gui_controller(QObject):
 	step_size_changed = Signal()
 	visible_changed = Signal()
 
-	encoder_index = Property(str, get_index, set_index, notify = index_changed)
+	encoder_index = Property(int, get_index, set_index, notify = index_changed)
 	title = Property(str, get_title, notify = title_changed)
-	visible = Property(bool, get_visible, notify = visible_changed)
+	visible = Property(bool, get_visible, set_visible, notify = visible_changed)
 	midi_bind = Property(str, get_midi_bind, notify = midi_bind_changed)
 	value = Property(float, get_value, write_value, notify = value_changed)
 	value_print = Property(str, get_value_print, notify = value_print_changed)

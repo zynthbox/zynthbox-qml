@@ -41,6 +41,7 @@ Card {
     property alias title: heading.text
     property alias heading: heading
     property alias legend: legend.text
+    property int encoderIndex: -1
 
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -48,8 +49,27 @@ Card {
     Layout.preferredHeight: 1
     visible: controller.ctrl !== null
 
+    onVisibleChanged: controller.ctrl.visible = visible
+    Component.onCompleted: {
+        controller.ctrl.visible = root.visible
+        if (root.encoderIndex < 0) {
+            root.encoderIndex = controller.ctrl.encoder_index;
+        } else {
+            controller.ctrl.encoder_index = root.encoderIndex
+        }
+    }
+
+    onEncoderIndexChanged: {
+		if (_oldEncoderIndex != -1 && encoderIndex != _oldEncoderIndex) {
+			controller.ctrl.encoder_index = encoderIndex;
+		}
+
+		_oldEncoderIndex = encoderIndex;
+	}
+
     property alias control: contentItem.contentItem
 
+    property int _oldEncoderIndex: -1
     onActiveFocusChanged: {
         if (activeFocus) {
             control.forceActiveFocus();

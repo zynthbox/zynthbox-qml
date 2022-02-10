@@ -34,6 +34,7 @@ from collections import OrderedDict
 
 from . import zynthian_engine
 from . import zynthian_controller
+from zyncoder import *
 
 #------------------------------------------------------------------------------
 # Mixer Engine Class
@@ -153,6 +154,24 @@ class zynthian_engine_mixer(zynthian_engine):
 		self.stop_sender_poll()
 
 		zctrls = self.get_mixer_zctrls(self.device_name, ctrl_list)
+
+		# Add HP amplifier interface if available
+		try:
+			if callable(zyncoder.lib_zyncoder.set_hpvol):
+				hp_zctrl = zynthian_controller(self, "Headphones", "Headphones", {
+					'graph_path': zyncoder.lib_zyncoder.set_hpvol,
+					'value': zyncoder.lib_zyncoder.get_hpvol(),
+					'value_min': 0,
+					'value_max': zyncoder.lib_zyncoder.get_hpvol_max(),
+					'is_integer': True
+				})
+				hp_zctrl.last_value_sent = None
+				zctrls["Headphones"] = hp_zctrl
+				ctrl_list.insert(0, "Headphones")
+				logging.debug("Added Headphones Amplifier volume control")
+		except:
+			pass
+
 		if self.allow_headphones() and self.zyngui and self.zyngui.get_zynthian_config("rbpi_headphones"):
 			try:
 				zctrls_headphones = self.get_mixer_zctrls(self.rbpi_device_name, ["Headphone","PCM"])
@@ -329,6 +348,7 @@ class zynthian_engine_mixer(zynthian_engine):
 		except Exception as err:
 			logging.error(f"Error getting zctrls : {str(err)}")
 
+
 		return zctrls
 
 
@@ -338,31 +358,34 @@ class zynthian_engine_mixer(zynthian_engine):
 
 	def _send_controller_value(self, zctrl):
 		try:
-			if zctrl.labels:
-				if zctrl.graph_path[1]=="VToggle":
-					amixer_command = "amixer -M -c {} set '{}' '{}%'".format(self.device_name, zctrl.graph_path[0], zctrl.value)
-				else:
-					amixer_command = "amixer -M -c {} set '{}' '{}'".format(self.device_name, zctrl.graph_path[0], zctrl.get_value2label())
+			if callable(zctrl.graph_path):
+				zctrl.graph_path(zctrl.value)
 			else:
-				if zctrl.symbol=="Headphone" and self.allow_headphones() and self.zyngui and self.zyngui.get_zynthian_config("rbpi_headphones"):
-					devname = self.rbpi_device_name
+				if zctrl.labels:
+					if zctrl.graph_path[1]=="VToggle":
+						amixer_command = "amixer -M -c {} set '{}' '{}%'".format(self.device_name, zctrl.graph_path[0], zctrl.value)
+					else:
+						amixer_command = "amixer -M -c {} set '{}' '{}'".format(self.device_name, zctrl.graph_path[0], zctrl.get_value2label())
 				else:
-					devname = self.device_name
+					if zctrl.symbol=="Headphone" and self.allow_headphones() and self.zyngui and self.zyngui.get_zynthian_config("rbpi_headphones"):
+						devname = self.rbpi_device_name
+					else:
+						devname = self.device_name
 
-				values=[]
-				if len(zctrl.graph_path)>2:
-					nchans = zctrl.graph_path[3]
-					symbol_prefix = zctrl.symbol[:-1]
-					for i in range(0, nchans):
-						symbol_i = symbol_prefix + str(i)
-						if symbol_i in self.zctrls:
-							values.append("{}%".format(self.zctrls[symbol_i].value))
-						else:
-							values.append("0%")
-				else:
-					values.append("{}%".format(zctrl.value))
+					values=[]
+					if len(zctrl.graph_path)>2:
+						nchans = zctrl.graph_path[3]
+						symbol_prefix = zctrl.symbol[:-1]
+						for i in range(0, nchans):
+							symbol_i = symbol_prefix + str(i)
+							if symbol_i in self.zctrls:
+								values.append("{}%".format(self.zctrls[symbol_i].value))
+							else:
+								values.append("0%")
+					else:
+						values.append("{}%".format(zctrl.value))
 
-				amixer_command = "amixer -M -c {} set '{}' '{}' {} unmute".format(devname, zctrl.graph_path[0], zctrl.graph_path[1], ','.join(values))
+					amixer_command = "amixer -M -c {} set '{}' '{}' {} unmute".format(devname, zctrl.graph_path[0], zctrl.graph_path[1], ','.join(values))
 
 			logging.debug(amixer_command)
 			check_output(shlex.split(amixer_command))

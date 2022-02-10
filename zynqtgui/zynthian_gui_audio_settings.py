@@ -33,6 +33,9 @@ import re
 import zyngine
 from . import zynthian_qt_gui_base,zynthian_gui_master_alsa_mixer
 
+from zyncoder import *
+
+
 class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_audio_settings, self).__init__(parent)
@@ -64,10 +67,11 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
         soundcard_name = self.audio_device
         self.zynthian_mixer = zyngine.zynthian_engine_mixer()
 
-        if self.audio_device == "Headphones":
-            self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=["Headphone", "PCM"])
-        else:
-            self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
+        #if self.audio_device == "Headphones":
+            #self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=["Headphone", "PCM"])
+        #else:
+            #self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
+        self.zctrls = self.zynthian_mixer.get_controllers_dict(None)
 
         self.update_channels()
 

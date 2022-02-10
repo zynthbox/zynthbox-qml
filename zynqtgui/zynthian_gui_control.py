@@ -133,6 +133,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__custom_control_page = None
 		self.__conf = {}
 		self.__single_effect_engine = None
+		self.__custom_controller_mode = False
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -142,7 +143,6 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.load_config()
 
 		self.show()
-
 
 	def load_config(self):
 		json = None
@@ -353,6 +353,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 			if self.__custom_control_page != final_path:
 				self.__custom_control_page = final_path
 				self.custom_control_page_changed.emit()
+			for ctrl in self.zgui_custom_controllers_map.values():
+				ctrl.setup_zyncoder()
 		try:
 			if self.__single_effect_engine == None:
 				self.__conf[self.zyngui.curlayer.engine.nickname] = {"custom_control_page": self.__custom_control_page}
@@ -637,21 +639,26 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def zyncoder_read(self, zcnums=None):
 		#Read Controller
 		if self.controllers_lock and self.mode=='control' and self.zcontrollers:
-			for i, zctrl in enumerate(self.zcontrollers):
-				#print('Read Control ' + str(self.zgui_controllers[i].title))
+			if self.__custom_control_page == "":
+				for i, zctrl in enumerate(self.zcontrollers):
+					#print('Read Control ' + str(self.zgui_controllers[i].title))
 
-				if not zcnums or i in zcnums:
-					if i >= len(self.zgui_controllers):
-						continue
-					res=self.zgui_controllers[i].read_zyncoder()
-					
-					if res and self.zyngui.midi_learn_mode:
-						logging.debug("MIDI-learn ZController {}".format(i))
-						self.zyngui.midi_learn_mode = False
-						self.midi_learn(i)
+					if not zcnums or i in zcnums:
+						if i >= len(self.zgui_controllers):
+							continue
+						res=self.zgui_controllers[i].read_zyncoder()
 
-					if res and self.xyselect_mode:
-						self.zyncoder_read_xyselect(zctrl, i)
+						if res and self.zyngui.midi_learn_mode:
+							logging.debug("MIDI-learn ZController {}".format(i))
+							self.zyngui.midi_learn_mode = False
+							self.midi_learn(i)
+
+						if res and self.xyselect_mode:
+							self.zyncoder_read_xyselect(zctrl, i)
+			else:
+				for ctrl in self.zgui_custom_controllers_map.values():
+					if ctrl.index <= 3:
+						ctrl.read_zyncoder()
 
 		elif self.mode=='select':
 			super().zyncoder_read()
@@ -810,6 +817,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	custom_control_page_changed = Signal()
 	default_custom_control_page_changed = Signal()
 	single_effect_engine_changed = Signal()
+	custom_controller_mode_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
 	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)

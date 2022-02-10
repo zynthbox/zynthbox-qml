@@ -62,17 +62,12 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
                     self.audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
                     break
         soundcard_name = self.audio_device
-
-        logging.debug(f"### Audio Settings : audio_device({self.audio_device}), ctrl_list({self.ctrl_list})")
-
         self.zynthian_mixer = zyngine.zynthian_engine_mixer()
 
         if self.audio_device == "Headphones":
             self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=["Headphone", "PCM"])
         else:
             self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
-
-        # logging.debug(f"### Audio Settings : zctrls({self.zctrls})")
 
         self.update_channels()
 
@@ -100,8 +95,6 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
         pass
 
     def update_channels(self):
-        logging.error(f"### update_channels called")
-
         self._channels = []
         for key,zctrl in self.zctrls.items():
             self._channels.append({
@@ -110,8 +103,6 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
                 "value_min": zctrl.value_min,
                 "value_max": zctrl.value_max
             })
-
-        logging.error(f"### update_channels : {self.channels}")
         self.channels_changed.emit()
 
     channels = Property('QVariantList', get_channels, notify=channels_changed)
@@ -123,5 +114,3 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
             if self.zctrls[channel_index].get_value() != new_value:
                 self.zctrls[channel_index].set_value(new_value)
                 self.channels_changed.emit()
-
-            logging.debug(f"{self.zctrls}, {channel_index}, {new_value}, {self.zctrls[channel_index].get_value()}")

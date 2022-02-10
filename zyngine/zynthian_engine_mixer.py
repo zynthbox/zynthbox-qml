@@ -387,9 +387,9 @@ class zynthian_engine_mixer(zynthian_engine):
 
 					amixer_command = "amixer -M -c {} set '{}' '{}' {} unmute".format(devname, zctrl.graph_path[0], zctrl.graph_path[1], ','.join(values))
 
-			logging.debug(amixer_command)
-			check_output(shlex.split(amixer_command))
-			sleep(0.05)
+					logging.debug(amixer_command)
+					check_output(shlex.split(amixer_command))
+					sleep(0.05)
 
 		except Exception as err:
 			logging.error(err)

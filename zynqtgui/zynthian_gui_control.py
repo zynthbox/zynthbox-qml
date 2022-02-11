@@ -144,6 +144,19 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.load_config()
 
 		self.show()
+		self.sync_selectors_visibility()
+
+	def sync_selectors_visibility(self):
+		if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+			for ctrl in self.zgui_controllers:
+				ctrl.show()
+			for ctrl in self.zgui_custom_controllers_map.values():
+				ctrl.show()
+		else:
+			for ctrl in self.zgui_controllers:
+				ctrl.hide()
+			for ctrl in self.zgui_custom_controllers_map.values():
+				ctrl.hide()
 
 	def load_config(self):
 		json = None
@@ -483,8 +496,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def set_zcontroller(self, i, ctrl):
 		if i < len(self.zgui_controllers):
+			self.zgui_controllers[i].set_visible(self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self)
 			self.zgui_controllers[i].config(ctrl)
-			self.zgui_controllers[i].show()
 		else:
 			self.zgui_controllers.append(zynthian_gui_controller(i, ctrl, self))
 			self.controllers_count_changed.emit()
@@ -493,8 +506,8 @@ class zynthian_gui_control(zynthian_gui_selector):
 
 	def set_custom_zcontroller(self, i, ctrl):
 		if i < len(self.zgui_custom_controllers):
+			self.zgui_custom_controllers[i].set_visible(self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self)
 			self.zgui_custom_controllers[i].config(ctrl)
-			self.zgui_custom_controllers[i].show()
 		else:
 			self.zgui_custom_controllers.append(zynthian_gui_controller(i + self.custom_controller_id_start, ctrl, self))
 		self.zgui_custom_controllers_map[ctrl]=self.zgui_custom_controllers[i]

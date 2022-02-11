@@ -574,6 +574,8 @@ Kirigami.AbstractApplicationWindow {
     Connections {
         target: zynthian
         onMiniPlayGridToggle: miniPlayGridDrawer.visible = !miniPlayGridDrawer.visible
+        onRun_start_metronome_and_playback: Zynthian.CommonUtils.startMetronomeAndPlayback()
+        onRun_stop_metronome_and_playback: Zynthian.CommonUtils.stopMetronomeAndPlayback()
     }
     QQC2.Drawer {
         id: miniPlayGridDrawer

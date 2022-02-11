@@ -1540,6 +1540,32 @@ class zynthian_gui(QObject):
             self.screens["song_arranger"].stop()
             zl.resetMetronome()
 
+        elif cuia == "START_RECORD":
+            zl = self.screens["zynthiloops"]
+            if zl.clipToRecord is None:
+                # No clips are currently being recorded
+                logging.error("CUIA Start Recording")
+                clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
+                logging.error(f"Recording Clip : {clip}")
+                clip.queueRecording("internal", "*")
+                self.run_start_metronome_and_playback.emit()
+            else:
+                # Some Clip is currently being recorded
+                logging.error("Cannot start recording until the current recording is stopped")
+
+        elif cuia == "STOP_RECORD":
+            zl = self.screens["zynthiloops"]
+            if zl.clipToRecord is not None:
+                # A Clip is currently being recorded
+                clip = zl.clipToRecord
+                logging.error("CUIA Stop Recording")
+                logging.error(f"Recording Clip : {clip}")
+                clip.stopRecording()
+                zl.song.scenesModel.addClipToCurrentScene(clip)
+            else:
+                # No Clip is currently being recorded
+                logging.error("No clip is being recorded")
+
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
@@ -2957,6 +2983,8 @@ class zynthian_gui(QObject):
     active_midi_channel_changed = Signal()
     last_note_changed = Signal()
     forced_screen_back_changed = Signal()
+    run_start_metronome_and_playback = Signal()
+    run_stop_metronome_and_playback = Signal()
 
     current_screen_id = Property(
         str,

@@ -127,6 +127,8 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
 
     def update_track_sounds(self):
         self.fill_list()
+        if not self.zyngui.screens["zynthiloops"].song:
+            return
         track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].get_selected_track())
         logging.error(f"Update Track Sounds : {track.connectedSound}")
         if track.connectedSound >= 0:

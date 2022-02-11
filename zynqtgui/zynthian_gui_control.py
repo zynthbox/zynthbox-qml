@@ -199,7 +199,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self._active_custom_controller = controller
 		if controller:
 			self._active_custom_controller.old_index = self._active_custom_controller.index
-			self._active_custom_controller.index = 3
+			self._active_custom_controller.index = zynthian_gui_config.select_ctrl
 			self._active_custom_controller.setup_zyncoder()
 		active_custom_controller_changed.emit()
 
@@ -675,7 +675,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 							self.zyncoder_read_xyselect(zctrl, i)
 			else:
 				for ctrl in self.zgui_custom_controllers_map.values():
-					if ctrl.index <= 3:
+					if ctrl.index <= zynthian_gui_config.select_ctrl:
 						ctrl.read_zyncoder()
 
 		elif self.mode=='select':

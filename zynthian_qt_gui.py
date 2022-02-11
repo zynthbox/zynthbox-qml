@@ -492,7 +492,7 @@ class zynthian_gui(QObject):
         self.wsleds.begin()
 
         self.wscolor_off = rpi_ws281x.Color(0,0,0)
-        self.wscolor_light = rpi_ws281x.Color(0,0,255)
+        self.wscolor_light = rpi_ws281x.Color(0,30,255)
         self.wscolor_active = rpi_ws281x.Color(0,255,0)
         self.wscolor_admin = rpi_ws281x.Color(120,0,0)
         self.wscolor_red = rpi_ws281x.Color(120,0,0)
@@ -539,6 +539,8 @@ class zynthian_gui(QObject):
             else:
                 self.wsleds.setPixelColor(0,self.wscolor_light)
 
+            # To blink aled
+            #self.wsled_blink(0,self.wscolor_active)
             # Active Track
             for i in range(6):
                 self.wsleds.setPixelColor(1+i,self.wscolor_light)

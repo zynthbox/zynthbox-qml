@@ -502,6 +502,8 @@ class zynthian_gui_controller(QObject):
 	def read_zyncoder(self):
 		#if self.canvas_push_ts:
 		#	return
+		if not self.__visible:
+			return
 		if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
 			val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)
 			#logging.error("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))

@@ -157,7 +157,7 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -40
+                    minimumValue: -100
                     maximumValue: 20
                     value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
                               ? audioLevels.playbackA
@@ -179,7 +179,7 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -40
+                    minimumValue: -100
                     maximumValue: 20
                     value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
                               ? audioLevels.playbackB
@@ -237,6 +237,26 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
+
+        QQC2.Label {
+            text: "Playback A : " + audioLevels.playbackA.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Playback B : " + audioLevels.playbackB.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Playback : " + audioLevels.add(audioLevels.playbackA, audioLevels.playbackB).toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Capture A : " + audioLevels.captureA
+        }
+
+        QQC2.Label {
+            text: "Capture B : " + audioLevels.captureB
+        }
     }
 
     ColumnLayout {

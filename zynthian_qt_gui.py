@@ -439,6 +439,8 @@ class zynthian_gui(QObject):
         self.jackd_options = zynconf.get_jackd_options()
 
         self.__fake_keys_pressed = set()
+        # When true 1-6 switch sounds instead of tracks
+        self.__layer_track_mode_switch = False
 
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
@@ -532,9 +534,7 @@ class zynthian_gui(QObject):
 
         try:
             # Menu
-            if self.active_screen=="main":
-                self.wsleds.setPixelColor(0,self.wscolor_active)
-            elif self.modal_screen=="stepseq" and self.screens['stepseq'].is_shown_menu():
+            if self.modal_screen==None and self.active_screen=="main":
                 self.wsleds.setPixelColor(0,self.wscolor_active)
             elif self.modal_screen=="admin":
                 self.wsleds.setPixelColor(0,self.wscolor_admin)
@@ -546,47 +546,58 @@ class zynthian_gui(QObject):
             # Active Track
             for i in range(6):
                 self.wsleds.setPixelColor(1+i,self.wscolor_light)
-            i = self.screens['session_dashboard'].selectedTrack
+            i = None
+            if self.__layer_track_mode_switch:
+                i = self.screens['layers_for_track'].index
+            else:
+                i = self.screens['session_dashboard'].selectedTrack
             if i is not None and i<6:
                 self.wsleds.setPixelColor(1+i,self.wscolor_active)
 
-            if self.active_screen=="layer_effects" or self.active_screen=="layer_effect_chooser" or self.active_screen=="effect_types":
+            if self.__layer_track_mode_switch:
                 self.wsleds.setPixelColor(7,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(7,self.wscolor_light)
 
             # Stepseq screen:
-            if self.modal_screen=="stepseq":
+            if self.modal_screen=="zynthiloops":
                 self.wsleds.setPixelColor(8,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(8,self.wscolor_light)
 
             # Audio Recorder screen:
-            if self.modal_screen=="audio_recorder":
+            if self.modal_screen=="playgrid":
                 self.wsleds.setPixelColor(9,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(9,self.wscolor_light)
 
             # MIDI Recorder screen:
-            if self.modal_screen=="midi_recorder":
+            if self.modal_screen==None and (self.active_screen=="layers_for_track" or self.active_screen=="bank" or self.active_screen=="preset"):
                 self.wsleds.setPixelColor(10,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(10,self.wscolor_light)
 
             # Snapshot screen:
-            if self.modal_screen=="snapshot":
+            if self.modal_screen=="song_arranger":
                 self.wsleds.setPixelColor(11,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(11,self.wscolor_light)
 
             # Presets screen:
-            if self.modal_screen=="preset" or self.modal_screen=="bank":
+            if self.modal_screen=="admin":
                 self.wsleds.setPixelColor(12,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(12,self.wscolor_light)
 
             # Light ALT button
             self.wsleds.setPixelColor(13,self.wscolor_light)
+
+            self.wsleds.setPixelColor(14,self.wscolor_red)
+
+            if self.screens["zynthiloops"].isMetronomeRunning:
+                self.wsleds.setPixelColor(15,self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(15,self.wscolor_light)
 
             ## REC/PLAY Audio buttons:
             #if self.status_info['audio_recorder']:
@@ -1418,7 +1429,7 @@ class zynthian_gui(QObject):
                 self.show_screen("main")
 
         elif cuia == "SCREEN_ADMIN":
-            self.show_screen("admin")
+            self.show_modal("admin")
 
         elif cuia == "SCREEN_LAYER":
             self.show_screen("layers_for_track")
@@ -1466,17 +1477,35 @@ class zynthian_gui(QObject):
             self.toggle_modal("stepseq")
 
         elif cuia == "TRACK_1":
-            self.screens["session_dashboard"].selectedTrack = 0
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(0)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 0
         elif cuia == "TRACK_2":
-            self.screens["session_dashboard"].selectedTrack = 1
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(1)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 1
         elif cuia == "TRACK_3":
-            self.screens["session_dashboard"].selectedTrack = 2
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(2)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 2
         elif cuia == "TRACK_4":
-            self.screens["session_dashboard"].selectedTrack = 3
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(3)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 3
         elif cuia == "TRACK_5":
-            self.screens["session_dashboard"].selectedTrack = 4
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(4)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 4
         elif cuia == "TRACK_6":
-            self.screens["session_dashboard"].selectedTrack = 5
+            if self.__layer_track_mode_switch:
+                self.screens['layers_for_track'].select_action(5)
+            else:
+                self.screens["session_dashboard"].selectedTrack = 5
         elif cuia == "TRACK_7":
             self.screens["session_dashboard"].selectedTrack = 6
         elif cuia == "TRACK_8":
@@ -1613,6 +1642,10 @@ class zynthian_gui(QObject):
                     return
             elif dtus > 0:
                 logging.error("key release: {} {}".format(i, dtus))
+                # Switch between track and sound mode
+                if i == 11:
+                    self.__layer_track_mode_switch = not self.__layer_track_mode_switch
+                    return
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 
@@ -1665,6 +1698,17 @@ class zynthian_gui(QObject):
             fake_key = "5"
         elif i == 10:
             fake_key = "6"
+        #F1 .. F5
+        elif i == 12:
+            fake_key = Key.f1
+        elif i == 13:
+            fake_key = Key.f2
+        elif i == 14:
+            fake_key = Key.f3
+        elif i == 15:
+            fake_key = Key.f4
+        elif i == 16:
+            fake_key = Key.f5
 
         if fake_key == None:
             return False

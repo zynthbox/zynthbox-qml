@@ -584,35 +584,35 @@ class zynthian_gui(QObject):
             # Light ALT button
             self.wsleds.setPixelColor(13,self.wscolor_light)
 
-            # REC/PLAY Audio buttons:
-            if self.status_info['audio_recorder']:
-                if "REC" in self.status_info['audio_recorder']:
-                    self.wsleds.setPixelColor(14,self.wscolor_red)
-                else:
-                    self.wsleds.setPixelColor(14,self.wscolor_light)
+            ## REC/PLAY Audio buttons:
+            #if self.status_info['audio_recorder']:
+                #if "REC" in self.status_info['audio_recorder']:
+                    #self.wsleds.setPixelColor(14,self.wscolor_red)
+                #else:
+                    #self.wsleds.setPixelColor(14,self.wscolor_light)
 
-                if "PLAY" in self.status_info['audio_recorder']:
-                    self.wsleds.setPixelColor(15,self.wscolor_active)
-                else:
-                    self.wsleds.setPixelColor(15,self.wscolor_light)
-            else:
-                self.wsleds.setPixelColor(14,self.wscolor_light)
-                self.wsleds.setPixelColor(15,self.wscolor_light)
+                #if "PLAY" in self.status_info['audio_recorder']:
+                    #self.wsleds.setPixelColor(15,self.wscolor_active)
+                #else:
+                    #self.wsleds.setPixelColor(15,self.wscolor_light)
+            #else:
+                #self.wsleds.setPixelColor(14,self.wscolor_light)
+                #self.wsleds.setPixelColor(15,self.wscolor_light)
 
-            # REC/PLAY MIDI buttons:
-            if self.status_info['midi_recorder']:
-                if "REC" in self.status_info['midi_recorder']:
-                    self.wsleds.setPixelColor(16,self.wscolor_red)
-                else:
-                    self.wsleds.setPixelColor(16,self.wscolor_light)
+            ## REC/PLAY MIDI buttons:
+            #if self.status_info['midi_recorder']:
+                #if "REC" in self.status_info['midi_recorder']:
+                    #self.wsleds.setPixelColor(16,self.wscolor_red)
+                #else:
+                    #self.wsleds.setPixelColor(16,self.wscolor_light)
 
-                if "PLAY" in self.status_info['midi_recorder']:
-                    self.wsleds.setPixelColor(17,self.wscolor_active)
-                else:
-                    self.wsleds.setPixelColor(17,self.wscolor_light)
-            else:
-                self.wsleds.setPixelColor(16,self.wscolor_light)
-                self.wsleds.setPixelColor(17,self.wscolor_light)
+                #if "PLAY" in self.status_info['midi_recorder']:
+                    #self.wsleds.setPixelColor(17,self.wscolor_active)
+                #else:
+                    #self.wsleds.setPixelColor(17,self.wscolor_light)
+            #else:
+                #self.wsleds.setPixelColor(16,self.wscolor_light)
+                #self.wsleds.setPixelColor(17,self.wscolor_light)
 
             # Back/No button
             self.wsleds.setPixelColor(18,self.wscolor_red)

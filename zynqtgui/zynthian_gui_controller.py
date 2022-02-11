@@ -73,6 +73,7 @@ class zynthian_gui_controller(QObject):
 		self.ctrl_midi_bind=None
 
 		self.index=indx
+		self.old_index = indx
 		#self.row=zynthian_gui_config.ctrl_pos[indx][0]
 		#self.col=zynthian_gui_config.ctrl_pos[indx][1]
 		#self.sticky=zynthian_gui_config.ctrl_pos[indx][2]

@@ -492,7 +492,7 @@ class zynthian_gui(QObject):
         self.wsleds.begin()
 
         self.wscolor_off = rpi_ws281x.Color(0,0,0)
-        self.wscolor_light = rpi_ws281x.Color(0,30,255)
+        self.wscolor_light = rpi_ws281x.Color(0,50,200)
         self.wscolor_active = rpi_ws281x.Color(0,255,0)
         self.wscolor_admin = rpi_ws281x.Color(120,0,0)
         self.wscolor_red = rpi_ws281x.Color(120,0,0)
@@ -1605,12 +1605,16 @@ class zynthian_gui(QObject):
         i = 0
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
-            if dtus>0:
-                logging.error("keypress: {} {}".format(i, dtus))
-                if self.fake_key_event_for_zynswitch(i):
+            if dtus == 0:
+                logging.error("key press: {} {}".format(i, dtus))
+                if self.fake_key_press_for_zynswitch(i):
+                    return
+            elif dtus > 0:
+                logging.error("key release: {} {}".format(i, dtus))
+                if self.fake_key_release_for_zynswitch(i):
                     return
 
-            if dtus <= 0:
+            if dtus < 0:
                 pass
             elif dtus>zynthian_gui_config.zynswitch_long_us:
                 self.zynswitch_long_triggered.emit(i)
@@ -1627,24 +1631,47 @@ class zynthian_gui(QObject):
     zynswitch_long_triggered = Signal(int)
     zynswitch_bold_triggered = Signal(int)
 
-    def fake_key_event_for_zynswitch(self, i):
+    def fake_key_press_for_zynswitch(self, i):
         if i == 23:
             # TODO: manage proper press and release on press and release of the button
             self.fakeKeyboard.press(Key.up)
-            self.fakeKeyboard.release(Key.up)
             return True
         elif i == 26:
             self.fakeKeyboard.press(Key.down)
-            self.fakeKeyboard.release(Key.down)
             return True
         elif i == 25:
             self.fakeKeyboard.press(Key.left)
-            self.fakeKeyboard.release(Key.left)
             return True
         elif i == 27:
             self.fakeKeyboard.press(Key.right)
+            return True
+        elif i == 24:
+            self.fakeKeyboard.press(Key.enter)
+            return True
+        elif i == 22:
+            self.fakeKeyboard.press(Key.esc)
+            return True
+        else:
+            return False
+
+    def fake_key_release_for_zynswitch(self, i):
+        if i == 23:
+            self.fakeKeyboard.release(Key.up)
+            return True
+        elif i == 26:
+            self.fakeKeyboard.release(Key.down)
+            return True
+        elif i == 25:
+            self.fakeKeyboard.release(Key.left)
+            return True
+        elif i == 27:
             self.fakeKeyboard.release(Key.right)
             return True
+        elif i == 24:
+            self.fakeKeyboard.release(Key.enter)
+            return True
+        elif i == 22:
+            self.fakeKeyboard.release(Key.esc)
         else:
             return False
 

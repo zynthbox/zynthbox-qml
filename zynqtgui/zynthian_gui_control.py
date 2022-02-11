@@ -201,7 +201,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self._active_custom_controller.old_index = self._active_custom_controller.index
 			self._active_custom_controller.index = zynthian_gui_config.select_ctrl
 			self._active_custom_controller.setup_zyncoder()
-		active_custom_controller_changed.emit()
+		self.active_custom_controller_changed.emit()
 
 	def show(self):
 		super().show()

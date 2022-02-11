@@ -102,9 +102,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
-        self.jack_client = jack.Client('zynthiloops_client')
+        self.jack_client = None
+        self.__jack_client_init_timer__ = QTimer()
+        self.__jack_client_init_timer__.setInterval(1000)
+        self.__jack_client_init_timer__.setSingleShot(True)
+        self.__jack_client_init_timer__.timeout.connect(self.init_jack_client)
         self.recorder_process = None
-        self.recorder_process_internal_arguments = ["--daemon", "--port", f"zynthiloops_client:*"]
+        self.recorder_process_internal_arguments = ["--daemon", "--port", f"zynthiloops_audio_levels_client:synth_port_a",
+                                                    "--port", f"zynthiloops_audio_levels_client:synth_port_b"]
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
@@ -119,6 +124,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
+    def init_jack_client(self):
+        try:
+            jack.Client('').get_port_by_name("zynthiloops_audio_levels_client:playback_port_a")
+            self.jack_client = jack.Client('zynthiloops_audio_levels_client')
+            logging.error(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
+            self.update_recorder_jack_port()
+        except:
+            logging.error(f"*** zynthiloops_audio_levels_client Jack client not found. Checking again in 1000ms")
+            self.__jack_client_init_timer__.start()
 
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
@@ -206,56 +220,56 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     # recordingAudioLevel = Property(float, get_recording_audio_level, notify=recording_audio_level_changed)
     # ### END Property recordingAudioLevel
 
-    @staticmethod
-    def peak_dbFS_from_jack_output(port, frames):
-        def convertToDBFS(raw):
-            if raw <= 0:
-                return -400
-            fValue = 20 * math.log10(raw)
-            if fValue < -400:
-                fValue = -400
-            return fValue
-
-        buf = np.frombuffer(port.get_buffer())
-        raw_peak = 0
-
-        for i in range(0, frames):
-            try:
-                sample = abs(buf[i])
-
-                if sample > raw_peak:
-                    raw_peak = sample
-            except:
-                pass
-
-        if raw_peak < 0.0:
-            raw_peak = 0.0
-
-        return convertToDBFS(raw_peak)
-
-    @Slot(None)
-    def monitorCaptureAudioLevels(self):
-        # client = jack.Client('zynthiloops_monitor')
-        # port_l = client.inports.register("l")
-        # port_r = client.inports.register("r")
-        #
-        # @client.set_process_callback
-        # def process(frames):
-        #     db_left = self.peak_dbFS_from_jack_output(port_l, frames)
-        #     db_right = self.peak_dbFS_from_jack_output(port_r, frames)
-        #
-        #     if self.__capture_audio_level_left__ != db_left:
-        #         self.__capture_audio_level_left__ = db_left
-        #         self.capture_audio_level_left_changed.emit()
-        #     if self.__capture_audio_level_right__ != db_right:
-        #         self.__capture_audio_level_right__ = db_right
-        #         self.capture_audio_level_right_changed.emit()
-        #
-        # client.activate()
-        #
-        # client.connect("system:capture_1", port_l.name)
-        # client.connect("system:capture_2", port_r.name)
-        pass
+    # @staticmethod
+    # def peak_dbFS_from_jack_output(port, frames):
+    #     def convertToDBFS(raw):
+    #         if raw <= 0:
+    #             return -400
+    #         fValue = 20 * math.log10(raw)
+    #         if fValue < -400:
+    #             fValue = -400
+    #         return fValue
+    #
+    #     buf = np.frombuffer(port.get_buffer())
+    #     raw_peak = 0
+    #
+    #     for i in range(0, frames):
+    #         try:
+    #             sample = abs(buf[i])
+    #
+    #             if sample > raw_peak:
+    #                 raw_peak = sample
+    #         except:
+    #             pass
+    #
+    #     if raw_peak < 0.0:
+    #         raw_peak = 0.0
+    #
+    #     return convertToDBFS(raw_peak)
+    #
+    # @Slot(None)
+    # def monitorCaptureAudioLevels(self):
+    #     # client = jack.Client('zynthiloops_monitor')
+    #     # port_l = client.inports.register("l")
+    #     # port_r = client.inports.register("r")
+    #     #
+    #     # @client.set_process_callback
+    #     # def process(frames):
+    #     #     db_left = self.peak_dbFS_from_jack_output(port_l, frames)
+    #     #     db_right = self.peak_dbFS_from_jack_output(port_r, frames)
+    #     #
+    #     #     if self.__capture_audio_level_left__ != db_left:
+    #     #         self.__capture_audio_level_left__ = db_left
+    #     #         self.capture_audio_level_left_changed.emit()
+    #     #     if self.__capture_audio_level_right__ != db_right:
+    #     #         self.__capture_audio_level_right__ = db_right
+    #     #         self.capture_audio_level_right_changed.emit()
+    #     #
+    #     # client.activate()
+    #     #
+    #     # client.connect("system:capture_1", port_l.name)
+    #     # client.connect("system:capture_2", port_r.name)
+    #     pass
 
     def back_action(self):
         return "zynthiloops"
@@ -424,10 +438,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 except Exception as e:
                     logging.error(f"Error processing jack port : {port}({str(e)})")
 
-        selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-        worker = Worker()
-        worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:playback_port_a", "zynthiloops_audio_levels_client:playback_port_b", selected_track))
-        worker_thread.start()
+        if self.jack_client is None:
+            logging.error(f'*** Jack client not set. Starting jack client init timer')
+            self.__jack_client_init_timer__.start()
+        else:
+            selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
+            worker = Worker()
+            worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:synth_port_a", "zynthiloops_audio_levels_client:synth_port_b", selected_track))
+            worker_thread.start()
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")

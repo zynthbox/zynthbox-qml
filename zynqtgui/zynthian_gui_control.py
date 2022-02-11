@@ -134,6 +134,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.__conf = {}
 		self.__single_effect_engine = None
 		self.__custom_controller_mode = False
+		self._active_custom_controller = None
 
 		# xyselect mode vars
 		self.xyselect_mode=False
@@ -186,6 +187,21 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def get_single_effect_engine(self):
 		return self.__single_effect_engine
 
+	def get_active_custom_controller(self):
+		return self._active_custom_controller
+
+	def set_active_custom_controller(self, controller):
+		if self._active_custom_controller == controller:
+			return
+		if self._active_custom_controller:
+			self._active_custom_controller.index = self._active_custom_controller.old_index
+			self._active_custom_controller.setup_zyncoder()
+		self._active_custom_controller = controller
+		if controller:
+			self._active_custom_controller.old_index = self._active_custom_controller.index
+			self._active_custom_controller.index = 3
+			self._active_custom_controller.setup_zyncoder()
+		active_custom_controller_changed.emit()
 
 	def show(self):
 		super().show()
@@ -639,7 +655,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def zyncoder_read(self, zcnums=None):
 		#Read Controller
 		if self.controllers_lock and self.mode=='control' and self.zcontrollers:
-			if self.__custom_control_page == "":
+			if self._active_custom_controller:
+				self._active_custom_controller.read_zyncoder()
+			elif self.__custom_control_page == "":
 				for i, zctrl in enumerate(self.zcontrollers):
 					#print('Read Control ' + str(self.zgui_controllers[i].title))
 
@@ -818,11 +836,13 @@ class zynthian_gui_control(zynthian_gui_selector):
 	default_custom_control_page_changed = Signal()
 	single_effect_engine_changed = Signal()
 	custom_controller_mode_changed = Signal()
+	active_custom_controller_changed = Signal()
 
 	controllers_count = Property(int, get_controllers_count, notify = controllers_count_changed)
 	custom_control_page = Property(str, get_custom_control_page, set_custom_control_page, notify = custom_control_page_changed)
 	default_custom_control_page = Property(str, get_default_custom_control_page, notify = default_custom_control_page_changed)
 	control_pages_model = Property(QObject, get_control_pages_model, constant = True)
 	single_effect_engine = Property(str, get_single_effect_engine, set_single_effect_engine, notify = single_effect_engine_changed)
+	active_custom_controller = Property(QObject, get_active_custom_controller, set_active_custom_controller, notify = active_custom_controller_changed)
 
 #------------------------------------------------------------------------------

@@ -39,6 +39,7 @@ GridLayout {
             category: "Ctrls#12"
             index: 1
         }
+        encoderIndex: 0
     }
 
     // Resonance
@@ -47,6 +48,7 @@ GridLayout {
             category: "Ctrls#12"
             index: 2
         }
+        encoderIndex: 1
     }
 
 
@@ -56,6 +58,7 @@ GridLayout {
             category: "Ctrls#12"
             index: 0
         }
+        encoderIndex: 2
     }
 
     // Filter env amount
@@ -64,6 +67,7 @@ GridLayout {
             category: "Ctrls#13"
             index: 3
         }
+        encoderIndex: 3
     }
 
     // Warm

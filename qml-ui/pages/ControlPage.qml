@@ -67,6 +67,25 @@ Zynthian.ScreenPage {
         }
     ]
 
+    Connections {
+		target: applicationWindow()
+		onActiveFocusItemChanged: {
+			var candidate = applicationWindow().activeFocusItem
+			print("ACTIVE FOCUS ITEM"+candidate)
+			while(candidate) {
+				print("CANDIDATE"+candidate+candidate.hasOwnProperty("controller"))
+				if (candidate.hasOwnProperty("controller")) {
+					break;
+				}
+				candidate = candidate.parent
+			}
+			if (candidate) {
+				zynthian.control.active_custom_controller = candidate.controller.ctrl
+			} else {
+				zynthian.control.active_custom_controller = null
+			}
+		}
+	}
     QQC2.Menu {
         id: customControlsMenu
         y: -height

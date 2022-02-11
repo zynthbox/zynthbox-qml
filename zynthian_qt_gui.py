@@ -536,8 +536,6 @@ class zynthian_gui(QObject):
             # Menu
             if self.modal_screen==None and self.active_screen=="main":
                 self.wsleds.setPixelColor(0,self.wscolor_active)
-            elif self.modal_screen=="admin":
-                self.wsleds.setPixelColor(0,self.wscolor_admin)
             else:
                 self.wsleds.setPixelColor(0,self.wscolor_light)
 
@@ -643,10 +641,8 @@ class zynthian_gui(QObject):
                 self.wsleds.setPixelColor(21+i,self.wscolor_light)
 
             # Audio Mixer/Levels screen
-            if self.modal_screen=="audio_mixer" or (self.active_screen=="audio_mixer" and not self.modal_screen):
+            if self.modal_screen=="audio_settings":
                 self.wsleds.setPixelColor(24,self.wscolor_active)
-            elif self.modal_screen=="alsa_mixer":
-                self.wsleds.setPixelColor(24,self.wscolor_admin)
             else:
                 self.wsleds.setPixelColor(24,self.wscolor_light)
 
@@ -1454,6 +1450,9 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_PLAYGRID":
             self.show_modal("playgrid")
+
+        elif cuia == "SCREEN_AUDIO_SETTINGS":
+            self.toggle_modal("audio_settings")
 
         elif cuia == "MODAL_SNAPSHOT_LOAD":
             self.toggle_modal("snapshot", "LOAD")

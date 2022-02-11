@@ -149,6 +149,9 @@ class zynthian_gui_keybinding(QObject):
 			"KEYBOARD" : { "modifier": 0, "keysym": "k" },
 			"ZL_PLAY" : { "modifier": 0, "keysym": "a" },
 			"ZL_STOP" : { "modifier": 0, "keysym": "s" },
+
+			"START_RECORD": {"modifier": 0, "keysym": "`"},
+			"STOP_RECORD": {"modifier": 4, "keysym": "`"},
 		}
 	}
 

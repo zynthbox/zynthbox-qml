@@ -39,7 +39,6 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    property int selectedClipCol: 0
 
     signal cuiaNavUp();
     signal cuiaNavDown();
@@ -188,11 +187,11 @@ Zynthian.ScreenPage {
 
         switch (cuia) {
             case "SELECT_UP":
-                root.selectedClipCol = 0
+                zynthian.zynthiloops.selectedClipCol = 0
                 return true;
 
             case "SELECT_DOWN":
-                root.selectedClipCol = 1
+                zynthian.zynthiloops.selectedClipCol = 1
                 return true;
         }
 
@@ -604,7 +603,7 @@ Zynthian.ScreenPage {
                                                             : highlighted
                                                                 ? Kirigami.Theme.highlightColor
                                                                 : "transparent"
-                                        highlighted: model.clip.row === zynthian.session_dashboard.selectedTrack && model.clip.col === root.selectedClipCol // bottomBar.controlObj === model.clip
+                                        highlighted: model.clip.row === zynthian.session_dashboard.selectedTrack && model.clip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === model.clip
                                         onHighlightedChanged: {
                                             console.log("Clip : (" + model.clip.row+", "+model.clip.col+")", "Selected Track :", zynthian.session_dashboard.selectedTrack)
 
@@ -671,7 +670,7 @@ Zynthian.ScreenPage {
 
                                             zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.id;
-                                            root.selectedClipCol = model.clip.col
+                                            zynthian.zynthiloops.selectedClipCol = model.clip.col
                                         }
                                         Timer { //FIXME: why onDoubleClicked doesn't work
                                             id: dblTimer
@@ -719,7 +718,7 @@ Zynthian.ScreenPage {
                 RowLayout {
                     id: infoBar
 
-                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, root.selectedClipCol)
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
                     property string synthName: ""
                     property string presetName: ""
 

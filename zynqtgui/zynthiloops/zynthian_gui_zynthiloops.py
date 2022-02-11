@@ -112,6 +112,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = None
         self.__zselector = None
         self.__zselector_track = -1
+        self.__selected_clip_col__ = 0
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -301,6 +302,35 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     master_audio_level_changed = Signal()
     masterAudioLevel = Property(float, get_master_audio_level, notify=master_audio_level_changed)
     ### END Property masterAudioLevelLeft
+
+    ### Property selectedClipCol
+    def get_selected_clip_col(self):
+        return self.__selected_clip_col__
+
+    def set_selected_clip_col(self, col):
+        if self.__selected_clip_col__ != col:
+            logging.error(f"### Selected Clip Col Changed : {col}")
+            self.__selected_clip_col__ = col
+            self.selectedClipColChanged.emit()
+
+    selectedClipColChanged = Signal()
+
+    selectedClipCol = Property(int, get_selected_clip_col, set_selected_clip_col, notify=selectedClipColChanged)
+    ### END Property selectedClipCol
+
+    ### Property clipToRecord
+    def get_clip_to_record(self):
+        return self.clip_to_record
+
+    def set_clip_to_record(self, clip):
+        if self.clip_to_record != clip:
+            self.clip_to_record = clip
+            self.clipToRecordChanged.emit()
+
+    clipToRecordChanged = Signal()
+
+    clipToRecord = Property(QObject, get_clip_to_record, set_clip_to_record, notify=clipToRecordChanged)
+    ### END Property clipToRecord
 
     @Signal
     def master_volume_changed(self):
@@ -720,7 +750,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
             self.update_recorder_jack_port()
-            self.clip_to_record = clip
+            self.set_clip_to_record(clip)
             (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
             if source == 'internal':
@@ -845,7 +875,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
-        self.clip_to_record = None
+        self.set_clip_to_record(None)
         self.clip_to_record_path = None
         self.recorder_process = None
         self.__last_recording_type__ = ""

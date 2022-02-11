@@ -49,7 +49,9 @@ Card {
     Layout.preferredHeight: 1
     visible: controller.ctrl !== null
 
-    onVisibleChanged: controller.ctrl.visible = visible
+    onVisibleChanged: {
+        controller.ctrl.visible = visible
+    }
     Component.onCompleted: {
         controller.ctrl.visible = root.visible
         if (root.encoderIndex < 0) {
@@ -60,12 +62,12 @@ Card {
     }
 
     onEncoderIndexChanged: {
-		if (_oldEncoderIndex != -1 && encoderIndex != _oldEncoderIndex) {
-			controller.ctrl.encoder_index = encoderIndex;
-		}
+        if (_oldEncoderIndex != -1 && encoderIndex != _oldEncoderIndex) {
+            controller.ctrl.encoder_index = encoderIndex;
+        }
 
-		_oldEncoderIndex = encoderIndex;
-	}
+        _oldEncoderIndex = encoderIndex;
+    }
 
     property alias control: contentItem.contentItem
 

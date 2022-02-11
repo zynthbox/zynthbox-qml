@@ -217,7 +217,7 @@ Rectangle {
                                             audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
                                             inputAudioLeveldB: highlighted
                                                                 ? !model.track.muted
-                                                                    ? zynthian.zynthiloops.recordingAudioLevel
+                                                                    ? audioLevels.add(audioLevels.playbackA, audioLevels.playbackB)
                                                                     : -400
                                                                 : -400
 

@@ -443,11 +443,14 @@ class zynthian_gui_controller(QObject):
 			#logging.error("%s" % err)
 
 	def setup_zyncoder(self):
+		if not self.__visible:
+			return
 		self.init_value=None
 		try:
 			if self.inverted:
 				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, int(self.mult*(self.max_value-self.val0)), 0, int(self.mult*self.value), self.step)
 			else:
+				#logging.error("SETTING UP RANGE SCALE {} {} max {} step {}".format(self.index, self.ctrl_title, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step))
 				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, 0, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step)
 
 			if isinstance(self.zctrl.osc_path,str):

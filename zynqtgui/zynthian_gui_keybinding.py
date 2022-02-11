@@ -113,10 +113,13 @@ class zynthian_gui_keybinding(QObject):
 			#"TOGGLE_MIDI_PLAY": { "modifier": 12, "keysym": "r" },
 
 			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
+
 			"SCREEN_ZYNTHILOOPS": { "modifier": 0, "keysym": "F1" },
-			"SCREEN_ARRANGER": { "modifier": 0, "keysym": "F2" },
-			"SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F3" },
-			"SCREEN_LAYER": { "modifier": 0, "keysym": "F4" },
+			"SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F2" },
+			"SCREEN_LAYER": { "modifier": 0, "keysym": "F3" },
+			"SCREEN_ARRANGER": { "modifier": 0, "keysym": "F4" },
+			"SCREEN_ADMIN": { "modifier": 0, "keysym": "F5" },
+
 			"SCREEN_LAYER_FX": { "modifier": 0, "keysym": "f" },
 
 			# Added in QML version

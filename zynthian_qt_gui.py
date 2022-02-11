@@ -438,6 +438,8 @@ class zynthian_gui(QObject):
         # Get Jackd Options
         self.jackd_options = zynconf.get_jackd_options()
 
+        self.__alt_button_pressed = False
+
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
             try:
@@ -1464,17 +1466,35 @@ class zynthian_gui(QObject):
             self.toggle_modal("stepseq")
 
         elif cuia == "TRACK_1":
-            self.screens["session_dashboard"].selectedTrack = 0
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 6
+            else:
+                self.screens["session_dashboard"].selectedTrack = 0
         elif cuia == "TRACK_2":
-            self.screens["session_dashboard"].selectedTrack = 1
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 7
+            else:
+                self.screens["session_dashboard"].selectedTrack = 1
         elif cuia == "TRACK_3":
-            self.screens["session_dashboard"].selectedTrack = 2
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 8
+            else:
+                self.screens["session_dashboard"].selectedTrack = 2
         elif cuia == "TRACK_4":
-            self.screens["session_dashboard"].selectedTrack = 3
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 9
+            else:
+                self.screens["session_dashboard"].selectedTrack = 3
         elif cuia == "TRACK_5":
-            self.screens["session_dashboard"].selectedTrack = 4
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 10
+            else:
+                self.screens["session_dashboard"].selectedTrack = 4
         elif cuia == "TRACK_6":
-            self.screens["session_dashboard"].selectedTrack = 5
+            if self.__alt_button_pressed:
+                self.screens["session_dashboard"].selectedTrack = 11
+            else:
+                self.screens["session_dashboard"].selectedTrack = 5
         elif cuia == "TRACK_7":
             self.screens["session_dashboard"].selectedTrack = 6
         elif cuia == "TRACK_8":
@@ -1607,10 +1627,15 @@ class zynthian_gui(QObject):
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
             if dtus == 0:
                 logging.error("key press: {} {}".format(i, dtus))
+                # ALT button
+                if i == 17:
+                    self.__alt_button_pressed = True
                 if self.fake_key_press_for_zynswitch(i):
                     return
             elif dtus > 0:
                 logging.error("key release: {} {}".format(i, dtus))
+                if i == 17:
+                    self.__alt_button_pressed = False
                 if self.fake_key_release_for_zynswitch(i):
                     return
 

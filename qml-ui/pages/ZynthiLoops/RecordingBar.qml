@@ -139,10 +139,6 @@ GridLayout {
     }
 
     ColumnLayout {
-        property bool isCapturing: false
-
-        id: monitorColumn
-
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -152,7 +148,6 @@ GridLayout {
             Layout.fillHeight: true
 
             RowLayout {
-                opacity: monitorColumn.isCapturing ? 1 : 0.3
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -162,13 +157,11 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -400
-                    maximumValue: 0
-                    value: monitorColumn.isCapturing
-                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                  ? zynthian.zynthiloops.recordingAudioLevel
-                                  : zynthian.zynthiloops.captureAudioLevelLeft
-                               : -400
+                    minimumValue: -40
+                    maximumValue: 20
+                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                              ? audioLevels.playbackA
+                              : audioLevels.captureA
 
                     font.pointSize: 8
 
@@ -186,13 +179,11 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -400
-                    maximumValue: 0
-                    value: monitorColumn.isCapturing
-                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                  ? zynthian.zynthiloops.recordingAudioLevel
-                                  : zynthian.zynthiloops.captureAudioLevelRight
-                               : -400
+                    minimumValue: -40
+                    maximumValue: 20
+                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                              ? audioLevels.playbackB
+                              : audioLevels.captureB
 
                     font.pointSize: 8
 
@@ -205,16 +196,6 @@ GridLayout {
                         tickmark: null
                         tickmarkLabel: null
                     }
-                }
-            }
-
-            QQC2.Button {
-                visible: !monitorColumn.isCapturing
-                text: "Monitor"
-                anchors.centerIn: parent
-                onClicked: {
-                    monitorColumn.isCapturing = true;
-                    zynthian.zynthiloops.monitorCaptureAudioLevels();
                 }
             }
         }

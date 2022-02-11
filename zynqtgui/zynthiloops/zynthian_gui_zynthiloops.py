@@ -73,9 +73,9 @@ def libzlCb(beat):
     zynthian_gui_zynthiloops.__instance__.metronomeBeatUpdate128th.emit(beat)
 
 
-@ctypes.CFUNCTYPE(None, ctypes.c_float)
-def audioLevelCb(dbFS):
-    zynthian_gui_zynthiloops.__instance__.set_recording_audio_level(dbFS)
+# @ctypes.CFUNCTYPE(None, ctypes.c_float)
+# def audioLevelCb(dbFS):
+#     zynthian_gui_zynthiloops.__instance__.set_recording_audio_level(dbFS)
 
 
 class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
@@ -106,7 +106,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
-        self.__recording_audio_level__ = -100
+        # self.__recording_audio_level__ = -100
         self.__song__ = None
 
         self.__master_audio_level__ = -200
@@ -118,7 +118,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         def _cb():
             libzl.registerTimerCallback(libzlCb)
             libzl.registerQmlTypes()
-            libzl.setRecordingAudioLevelCallback(audioLevelCb)
+            # libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
@@ -138,19 +138,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def switch_select(self, t):
         pass
 
-    ### Property recordingAudioLevel
-    def get_recording_audio_level(self):
-        return self.__recording_audio_level__
-    def set_recording_audio_level(self, db):
-        if db < -100:
-            db = -100
-
-        if self.__recording_audio_level__ != db:
-            self.__recording_audio_level__ = db
-            self.recording_audio_level_changed.emit()
-    recording_audio_level_changed = Signal()
-    recordingAudioLevel = Property(float, get_recording_audio_level, notify=recording_audio_level_changed)
-    ### END Property recordingAudioLevel
+    # ### Property recordingAudioLevel
+    # def get_recording_audio_level(self):
+    #     return self.__recording_audio_level__
+    # def set_recording_audio_level(self, db):
+    #     if db < -100:
+    #         db = -100
+    #
+    #     if self.__recording_audio_level__ != db:
+    #         self.__recording_audio_level__ = db
+    #         self.recording_audio_level_changed.emit()
+    # recording_audio_level_changed = Signal()
+    # recordingAudioLevel = Property(float, get_recording_audio_level, notify=recording_audio_level_changed)
+    # ### END Property recordingAudioLevel
 
     @staticmethod
     def peak_dbFS_from_jack_output(port, frames):
@@ -181,26 +181,27 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def monitorCaptureAudioLevels(self):
-        client = jack.Client('zynthiloops_monitor')
-        port_l = client.inports.register("l")
-        port_r = client.inports.register("r")
-
-        @client.set_process_callback
-        def process(frames):
-            db_left = self.peak_dbFS_from_jack_output(port_l, frames)
-            db_right = self.peak_dbFS_from_jack_output(port_r, frames)
-
-            if self.__capture_audio_level_left__ != db_left:
-                self.__capture_audio_level_left__ = db_left
-                self.capture_audio_level_left_changed.emit()
-            if self.__capture_audio_level_right__ != db_right:
-                self.__capture_audio_level_right__ = db_right
-                self.capture_audio_level_right_changed.emit()
-
-        client.activate()
-
-        client.connect("system:capture_1", port_l.name)
-        client.connect("system:capture_2", port_r.name)
+        # client = jack.Client('zynthiloops_monitor')
+        # port_l = client.inports.register("l")
+        # port_r = client.inports.register("r")
+        #
+        # @client.set_process_callback
+        # def process(frames):
+        #     db_left = self.peak_dbFS_from_jack_output(port_l, frames)
+        #     db_right = self.peak_dbFS_from_jack_output(port_r, frames)
+        #
+        #     if self.__capture_audio_level_left__ != db_left:
+        #         self.__capture_audio_level_left__ = db_left
+        #         self.capture_audio_level_left_changed.emit()
+        #     if self.__capture_audio_level_right__ != db_right:
+        #         self.__capture_audio_level_right__ = db_right
+        #         self.capture_audio_level_right_changed.emit()
+        #
+        # client.activate()
+        #
+        # client.connect("system:capture_1", port_l.name)
+        # client.connect("system:capture_2", port_r.name)
+        pass
 
     def back_action(self):
         return "zynthiloops"
@@ -371,7 +372,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
         worker = Worker()
-        worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, "zynthiloops_client:capture_port_a", "zynthiloops_client:capture_port_b", selected_track))
+        worker_thread = threading.Thread(target=worker.run, args=(self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:playback_port_a", "zynthiloops_audio_levels_client:playback_port_b", selected_track))
         worker_thread.start()
 
     def recording_process_stopped(self, exitCode, exitStatus):

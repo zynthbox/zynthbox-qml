@@ -90,7 +90,7 @@ def init():
 
             libzl.ClipAudioSource_setVolume.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-            libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
+            # libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
 
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
             ### END Type Definition
@@ -143,14 +143,14 @@ def dbFromVolume(vol: float):
     if libzl:
         return libzl.dBFromVolume(vol)
 
-
-def setRecordingAudioLevelCallback(cb):
-    if libzl:
-        libzl.setRecordingAudioLevelCallback(cb)
+#
+# def setRecordingAudioLevelCallback(cb):
+#     if libzl:
+#         libzl.setRecordingAudioLevelCallback(cb)
 
 
 class ClipAudioSource(QObject):
-    audioLevelChanged = Signal(float)
+    # audioLevelChanged = Signal(float)
     progressChanged = Signal(float)
 
     def __init__(self, zl_clip, filepath: bytes, muted=False):
@@ -160,14 +160,14 @@ class ClipAudioSource(QObject):
             self.obj = libzl.ClipAudioSource_new(filepath, muted)
 
             if zl_clip is not None:
-                self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)
+                # self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)
                 self.progress_changed_callback = ProgressChangedCallback(self.progress_changed_callback)
 
                 libzl.ClipAudioSource_setProgressCallback(self.obj, self.progress_changed_callback)
-                libzl.ClipAudioSource_setAudioLevelChangedCallback(self.obj, self.audio_level_changed_callback)
+                # libzl.ClipAudioSource_setAudioLevelChangedCallback(self.obj, self.audio_level_changed_callback)
 
-    def audio_level_changed_callback(self, level_db):
-        self.audioLevelChanged.emit(level_db)
+    # def audio_level_changed_callback(self, level_db):
+    #     self.audioLevelChanged.emit(level_db)
 
     def progress_changed_callback(self, progress):
         self.progressChanged.emit(progress)

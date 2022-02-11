@@ -438,7 +438,7 @@ class zynthian_gui(QObject):
         # Get Jackd Options
         self.jackd_options = zynconf.get_jackd_options()
 
-        self.__alt_button_pressed = False
+        self.__fake_keys_pressed = set()
 
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
@@ -1466,35 +1466,17 @@ class zynthian_gui(QObject):
             self.toggle_modal("stepseq")
 
         elif cuia == "TRACK_1":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 6
-            else:
-                self.screens["session_dashboard"].selectedTrack = 0
+            self.screens["session_dashboard"].selectedTrack = 0
         elif cuia == "TRACK_2":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 7
-            else:
-                self.screens["session_dashboard"].selectedTrack = 1
+            self.screens["session_dashboard"].selectedTrack = 1
         elif cuia == "TRACK_3":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 8
-            else:
-                self.screens["session_dashboard"].selectedTrack = 2
+            self.screens["session_dashboard"].selectedTrack = 2
         elif cuia == "TRACK_4":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 9
-            else:
-                self.screens["session_dashboard"].selectedTrack = 3
+            self.screens["session_dashboard"].selectedTrack = 3
         elif cuia == "TRACK_5":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 10
-            else:
-                self.screens["session_dashboard"].selectedTrack = 4
+            self.screens["session_dashboard"].selectedTrack = 4
         elif cuia == "TRACK_6":
-            if self.__alt_button_pressed:
-                self.screens["session_dashboard"].selectedTrack = 11
-            else:
-                self.screens["session_dashboard"].selectedTrack = 5
+            self.screens["session_dashboard"].selectedTrack = 5
         elif cuia == "TRACK_7":
             self.screens["session_dashboard"].selectedTrack = 6
         elif cuia == "TRACK_8":
@@ -1627,16 +1609,11 @@ class zynthian_gui(QObject):
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
             if dtus == 0:
                 logging.error("key press: {} {}".format(i, dtus))
-                # ALT button
-                if i == 17:
-                    self.__alt_button_pressed = True
-                if self.fake_key_press_for_zynswitch(i):
+                if self.fake_key_event_for_zynswitch(i, True):
                     return
             elif dtus > 0:
                 logging.error("key release: {} {}".format(i, dtus))
-                if i == 17:
-                    self.__alt_button_pressed = False
-                if self.fake_key_release_for_zynswitch(i):
+                if self.fake_key_event_for_zynswitch(i, False):
                     return
 
             if dtus < 0:
@@ -1656,49 +1633,52 @@ class zynthian_gui(QObject):
     zynswitch_long_triggered = Signal(int)
     zynswitch_bold_triggered = Signal(int)
 
-    def fake_key_press_for_zynswitch(self, i):
+    def fake_key_event_for_zynswitch(self, i : int, press : bool):
+        fake_key = None
+
+        # ALT
+        if i == 17:
+            fake_key = Key.ctrl
+        # NAV CLUSTER
         if i == 23:
-            # TODO: manage proper press and release on press and release of the button
-            self.fakeKeyboard.press(Key.up)
-            return True
+            fake_key = Key.up
         elif i == 26:
-            self.fakeKeyboard.press(Key.down)
-            return True
+            fake_key = Key.down
         elif i == 25:
-            self.fakeKeyboard.press(Key.left)
-            return True
+            fake_key = Key.left
         elif i == 27:
-            self.fakeKeyboard.press(Key.right)
-            return True
+            fake_key = Key.right
         elif i == 24:
-            self.fakeKeyboard.press(Key.enter)
-            return True
+            fake_key = Key.enter
         elif i == 22:
-            self.fakeKeyboard.press(Key.esc)
-            return True
-        else:
+            fake_key = Key.esc
+        # Track buttons
+        elif i == 5:
+            fake_key = "1"
+        elif i == 6:
+            fake_key = "2"
+        elif i == 7:
+            fake_key = "3"
+        elif i == 8:
+            fake_key = "4"
+        elif i == 9:
+            fake_key = "5"
+        elif i == 10:
+            fake_key = "6"
+
+        if fake_key == None:
             return False
 
-    def fake_key_release_for_zynswitch(self, i):
-        if i == 23:
-            self.fakeKeyboard.release(Key.up)
-            return True
-        elif i == 26:
-            self.fakeKeyboard.release(Key.down)
-            return True
-        elif i == 25:
-            self.fakeKeyboard.release(Key.left)
-            return True
-        elif i == 27:
-            self.fakeKeyboard.release(Key.right)
-            return True
-        elif i == 24:
-            self.fakeKeyboard.release(Key.enter)
-            return True
-        elif i == 22:
-            self.fakeKeyboard.release(Key.esc)
+        if press:
+            if not fake_key in self.__fake_keys_pressed:
+                self.__fake_keys_pressed.add(fake_key)
+                self.fakeKeyboard.press(fake_key)
         else:
-            return False
+            if fake_key in self.__fake_keys_pressed:
+                self.__fake_keys_pressed.discard(fake_key)
+                self.fakeKeyboard.release(fake_key)
+        return True
+
 
     def zynswitch_long(self, i):
         logging.info("Looooooooong Switch " + str(i))

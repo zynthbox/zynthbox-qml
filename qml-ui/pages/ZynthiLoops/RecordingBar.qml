@@ -160,7 +160,7 @@ GridLayout {
                     minimumValue: -100
                     maximumValue: 20
                     value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? audioLevels.playbackA
+                              ? audioLevels.synthA
                               : audioLevels.captureA
 
                     font.pointSize: 8
@@ -182,7 +182,7 @@ GridLayout {
                     minimumValue: -100
                     maximumValue: 20
                     value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? audioLevels.playbackB
+                              ? audioLevels.synthB
                               : audioLevels.captureB
 
                     font.pointSize: 8
@@ -247,15 +247,19 @@ GridLayout {
         }
 
         QQC2.Label {
-            text: "Playback : " + audioLevels.add(audioLevels.playbackA, audioLevels.playbackB).toFixed(2)
+            text: "Synth A : " + audioLevels.synthA.toFixed(2)
         }
 
         QQC2.Label {
-            text: "Capture A : " + audioLevels.captureA
+            text: "Synth B : " + audioLevels.synthB.toFixed(2)
         }
 
         QQC2.Label {
-            text: "Capture B : " + audioLevels.captureB
+            text: "Capture A : " + audioLevels.captureA.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Capture B : " + audioLevels.captureB.toFixed(2)
         }
     }
 

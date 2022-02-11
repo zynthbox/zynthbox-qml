@@ -217,7 +217,7 @@ Rectangle {
                                             audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
                                             inputAudioLeveldB: highlighted
                                                                 ? !model.track.muted
-                                                                    ? audioLevels.add(audioLevels.playbackA, audioLevels.playbackB)
+                                                                    ? audioLevels.add(audioLevels.synthA, audioLevels.synthB)
                                                                     : -400
                                                                 : -400
 

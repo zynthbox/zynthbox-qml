@@ -590,7 +590,10 @@ class zynthian_gui(QObject):
             # Light ALT button
             self.wsleds.setPixelColor(13,self.wscolor_light)
 
-            self.wsleds.setPixelColor(14,self.wscolor_red)
+            if self.screens["zynthiloops"].clipToRecord is None:
+                self.wsleds.setPixelColor(14,self.wscolor_light)
+            else:
+                self.wsleds.setPixelColor(14,self.wscolor_red)
 
             if self.screens["zynthiloops"].isMetronomeRunning:
                 self.wsleds.setPixelColor(15,self.wscolor_active)
@@ -1530,15 +1533,18 @@ class zynthian_gui(QObject):
             self.miniPlayGridToggle.emit()
 
         elif cuia == "ZL_PLAY":
-            zl = self.screens["zynthiloops"]
-            zl.startPlayback()
+            self.run_start_metronome_and_playback.emit()
 
         elif cuia == "ZL_STOP":
             zl = self.screens["zynthiloops"]
-            zl.stopAllPlayback();
-            self.screens["playgrid"].stopMetronomeRequest()
-            self.screens["song_arranger"].stop()
-            zl.resetMetronome()
+            if zl.clipToRecord is not None:
+                # A Clip is currently being recorded
+                clip = zl.clipToRecord
+                logging.error("CUIA Stop Recording")
+                logging.error(f"Recording Clip : {clip}")
+                clip.stopRecording()
+                zl.song.scenesModel.addClipToCurrentScene(clip)
+            self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
             zl = self.screens["zynthiloops"]
@@ -1552,6 +1558,8 @@ class zynthian_gui(QObject):
             else:
                 # Some Clip is currently being recorded
                 logging.error("Cannot start recording until the current recording is stopped")
+                zl.clipToRecord.stopRecording()
+                zl.song.scenesModel.addClipToCurrentScene(zl.clipToRecord)
 
         elif cuia == "STOP_RECORD":
             zl = self.screens["zynthiloops"]

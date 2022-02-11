@@ -124,7 +124,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
-            self.__zselector.show()
+            if self.__zselector:
+                self.__zselector.show()
         elif self.__zselector:
             self.__zselector.hide()
 

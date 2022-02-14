@@ -193,6 +193,21 @@ Zynthian.ScreenPage {
             case "SELECT_DOWN":
                 zynthian.zynthiloops.selectedClipCol = 1
                 return true;
+            case "MODE_SWITCH_SHORT":
+            case "MODE_SWITCH_LONG":
+            case "MODE_SWITCH_BOLD":
+                if (mixerActionBtn.checked) {
+                    bottomBar.controlType = BottomBar.ControlType.Track;
+                    bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                    
+                    bottomStack.currentIndex = 0;
+                    mixerActionBtn.checked = false;
+                } else {
+                    sceneActionBtn.checked = false;
+                    mixerActionBtn.checked = true;
+                    bottomStack.currentIndex = 1;
+                }
+                return true;
         }
 
         return false;

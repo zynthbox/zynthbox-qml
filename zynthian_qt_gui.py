@@ -1558,8 +1558,9 @@ class zynthian_gui(QObject):
             else:
                 # Some Clip is currently being recorded
                 logging.error("Cannot start recording until the current recording is stopped")
-                zl.clipToRecord.stopRecording()
-                zl.song.scenesModel.addClipToCurrentScene(zl.clipToRecord)
+                clip = zl.clipToRecord
+                clip.stopRecording()
+                zl.song.scenesModel.addClipToCurrentScene(clip)
 
         elif cuia == "STOP_RECORD":
             zl = self.screens["zynthiloops"]

@@ -1575,6 +1575,10 @@ class zynthian_gui(QObject):
                 # No Clip is currently being recorded
                 logging.error("No clip is being recorded")
 
+        elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":
+            # Switch between track and sound mode
+            self.__layer_track_mode_switch = not self.__layer_track_mode_switch
+
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
@@ -1676,10 +1680,6 @@ class zynthian_gui(QObject):
                     return
             elif dtus > 0:
                 logging.error("key release: {} {}".format(i, dtus))
-                # Switch between track and sound mode
-                if i == 11:
-                    self.__layer_track_mode_switch = not self.__layer_track_mode_switch
-                    return
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 

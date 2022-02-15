@@ -140,18 +140,14 @@ Zynthian.Card {
             case "SELECT_UP":
                 if (zynthian.session_dashboard.selectedSoundRow > 0) {
                     zynthian.session_dashboard.selectedSoundRow -= 1
-                    return true;
-                } else {
-                    return false;
                 }
+                return true;
 
             case "SELECT_DOWN":
                 if (zynthian.session_dashboard.selectedSoundRow < 4) {
                     zynthian.session_dashboard.selectedSoundRow += 1
-                    return true;
-                } else {
-                    return false;
                 }
+                return true;
 
             case "NAVIGATE_LEFT":
                 var selectedMidiChannel = root.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
@@ -175,6 +171,28 @@ Zynthian.Card {
                 bottomStack.currentIndex = 1;
 
                 return true;
+
+            // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
+            case "TRACK_1":
+            case "TRACK_6":
+                zynthian.session_dashboard.selectedSoundRow = 0
+                return true
+            case "TRACK_2":
+            case "TRACK_7":
+                zynthian.session_dashboard.selectedSoundRow = 1
+                return true
+            case "TRACK_3":
+            case "TRACK_8":
+                zynthian.session_dashboard.selectedSoundRow = 2
+                return true
+            case "TRACK_4":
+            case "TRACK_9":
+                zynthian.session_dashboard.selectedSoundRow = 3
+                return true
+            case "TRACK_5":
+            case "TRACK_10":
+                zynthian.session_dashboard.selectedSoundRow = 4
+                return true
 
             default:
                 return false;

@@ -566,25 +566,27 @@ class zynthian_gui(QObject):
             # To blink aled
             #self.wsled_blink(0,self.wscolor_active)
             # Active Track
-            for i in range(5):
+
+            # Set light color to all 1-6 buttons first
+            for i in range(6):
                 self.wsleds.setPixelColor(1+i,self.wscolor_light)
-            i = None
-            if self.__layer_track_mode_switch:
-                i = self.screens['layers_for_track'].index
+
+            if self.active_screen == "zynthiloops" and self.soundCombinatorActive:
+                # Set active color to selected sound row when combinator is open
+                self.wsleds.setPixelColor(1 + self.session_dashboard.selectedSoundRow, self.wscolor_active)
             else:
+                # Set active color to selected track when combinator is open
                 i = self.screens['session_dashboard'].selectedTrack
-            if i is not None and not self.tracks_mod_active and i<5:
-                # If track mod is not active, light but 1-5 if track 1-5 is selected
-                self.wsleds.setPixelColor(1+i,self.wscolor_active)
-            elif i is not None and self.tracks_mod_active and 5 <= i <= 9:
-                # If track mod is active, light but 1-5 if track 6-10 is selected
-                self.wsleds.setPixelColor(i - 4, self.wscolor_active)
+                if not self.tracks_mod_active and i < 5:
+                    # If track mod is not active, light but 1-5 if track 1-5 is selected
+                    self.wsleds.setPixelColor(1 + i, self.wscolor_active)
+                elif self.tracks_mod_active and 5 <= i <= 9:
+                    # If track mod is active, light but 1-5 if track 6-10 is selected
+                    self.wsleds.setPixelColor(i - 4, self.wscolor_active)
 
             # Button 6 will act as modifier key to select track 6-10 when active
             if self.tracks_mod_active:
                 self.wsleds.setPixelColor(6, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(6, self.wscolor_light)
 
             # FX Button
             # Set FX Button to active when __layer_track_mode_switch is active or soundCombinator is active when zynthiloops page is visible

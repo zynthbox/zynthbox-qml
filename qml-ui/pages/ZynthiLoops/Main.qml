@@ -115,6 +115,7 @@ Zynthian.ScreenPage {
             id: sceneActionBtn
             text: qsTr("Scenes")
             checkable: true
+            onCheckedChanged: updateLedVariablesTimer.restart()
             onTriggered: {
                 mixerActionBtn.checked = false;
 
@@ -129,6 +130,7 @@ Zynthian.ScreenPage {
             id: mixerActionBtn
             text: qsTr("Mixer")
             checkable: true
+            onCheckedChanged: updateLedVariablesTimer.restart()
             onTriggered: {
                 sceneActionBtn.checked = false;
 
@@ -211,6 +213,26 @@ Zynthian.ScreenPage {
         }
 
         return false;
+    }
+
+    Timer {
+        id: updateLedVariablesTimer
+        interval: 100
+        repeat: false
+        onTriggered: {
+            // Check and set proper variables
+
+            // Check if sound combinator is active
+            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 && // Checks if current active page is sound combinator or not
+                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
+                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
+            {
+                zynthian.soundCombinatorActive = true;
+            } else {
+                zynthian.soundCombinatorActive = false;
+            }
+        }
     }
 
     Connections {
@@ -704,6 +726,7 @@ Zynthian.ScreenPage {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 15
                 Layout.fillWidth: true
                 Layout.fillHeight: false
+                onCurrentIndexChanged: updateLedVariablesTimer.restart()
 
                 BottomBar {
                     id: bottomBar

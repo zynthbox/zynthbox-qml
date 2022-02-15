@@ -372,6 +372,20 @@ class zynthian_gui(QObject):
         self.screen_back = None
         self.__forced_screen_back = None
 
+        # Create variables for LED control
+        self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
+        self.wscolor_light = rpi_ws281x.Color(0, 50, 200)
+        self.wscolor_active = rpi_ws281x.Color(0, 255, 0)
+        self.wscolor_admin = rpi_ws281x.Color(120, 0, 0)
+        self.wscolor_red = rpi_ws281x.Color(120, 0, 0)
+        self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
+
+        self.wsleds_num = 25
+        self.wsleds = None
+        self.wsleds_blink_count = 0
+
+        self.sound_combinator_active = False
+
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
         self.zynswitch_long_triggered.connect(self.zynswitch_long, Qt.QueuedConnection)
@@ -479,6 +493,22 @@ class zynthian_gui(QObject):
     # WS281X LEDs
     # ---------------------------------------------------------------------------
 
+    # LED management properties
+
+    def get_sound_combinator_active(self):
+        return self.sound_combinator_active
+
+    def set_sound_combinator_active(self, isActive):
+        if self.sound_combinator_active != isActive:
+            self.sound_combinator_active = isActive
+            self.soundCombinatorActiveChanged.emit()
+
+    soundCombinatorActiveChanged = Signal()
+
+    soundCombinatorActive = Property(bool, get_sound_combinator_active, set_sound_combinator_active,
+                                     notify=soundCombinatorActiveChanged)
+    ###
+
     def init_wsleds(self):
         if zynthian_gui_config.wiring_layout=="Z2_V1":
             # LEDS with PWM1 (pin 13, channel 1)
@@ -489,26 +519,16 @@ class zynthian_gui(QObject):
             pin = 10
             chan = 0
         else:
-            self.wsleds = None
             return 0
 
-        self.wsleds_num = 25
-        self.wsleds=rpi_ws281x.PixelStrip(self.wsleds_num, pin, dma=10, channel=chan, strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
+        self.wsleds = rpi_ws281x.PixelStrip(self.wsleds_num, pin, dma=10, channel=chan,
+                                            strip_type=rpi_ws281x.ws.WS2811_STRIP_GRB)
         self.wsleds.begin()
-
-        self.wscolor_off = rpi_ws281x.Color(0,0,0)
-        self.wscolor_light = rpi_ws281x.Color(0,50,200)
-        self.wscolor_active = rpi_ws281x.Color(0,255,0)
-        self.wscolor_admin = rpi_ws281x.Color(120,0,0)
-        self.wscolor_red = rpi_ws281x.Color(120,0,0)
-        self.wscolor_green = rpi_ws281x.Color(0,255,0)
 
         # Light all LEDs
         for i in range(0,25):
-            self.wsleds.setPixelColor(i,self.wscolor_light)
+            self.wsleds.setPixelColor(i, self.wscolor_light)
         self.wsleds.show()
-
-        self.wsleds_blink_count = 0
 
         return self.wsleds_num
 
@@ -553,7 +573,9 @@ class zynthian_gui(QObject):
             if i is not None and i<6:
                 self.wsleds.setPixelColor(1+i,self.wscolor_active)
 
-            if self.__layer_track_mode_switch:
+            # FX Button
+            # Set FX Button to active when __layer_track_mode_switch is active or soundCombinator is active when zynthiloops page is visible
+            if self.__layer_track_mode_switch or ((self.active_screen == "zynthiloops" or self.active_screen == "main") and self.soundCombinatorActive):
                 self.wsleds.setPixelColor(7,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(7,self.wscolor_light)
@@ -3084,7 +3106,6 @@ class zynthian_gui(QObject):
     soundset_downloader = Property(QObject, get_soundset_downloader, constant=True)
     sequence_downloader = Property(QObject, get_sequence_downloader, constant=True)
     sketch_downloader = Property(QObject, get_sketch_downloader, constant=True)
-
 
 # ------------------------------------------------------------------------------
 # Reparent Top Window using GTK XEmbed protocol features

@@ -61,6 +61,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__change_track_sound_timer__.setInterval(250)
         self.__change_track_sound_timer__.setSingleShot(True)
         self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound)
+        self.__selected_sound_row__ = 0
 
         if not self.restore():
             def cb():
@@ -205,6 +206,20 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     selected_track_name_changed = Signal()
     selectedTrackName = Property(str, get_selected_track_name, notify=selected_track_name_changed)
     ### END Property selectedTrackName
+
+    ### Property selectedSoundRow
+    def get_selected_sound_row(self):
+        return self.__selected_sound_row__
+
+    def set_selected_sound_row(self, row):
+        if self.__selected_sound_row__ != row:
+            self.__selected_sound_row__ = row
+            self.selected_sound_row_changed.emit()
+
+    selected_sound_row_changed = Signal()
+
+    selectedSoundRow = Property(int, get_selected_sound_row, set_selected_sound_row, notify=selected_sound_row_changed)
+    ### END Property selectedSoundRow
 
     def serialize(self):
         return {

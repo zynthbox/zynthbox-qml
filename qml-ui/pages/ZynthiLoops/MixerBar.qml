@@ -175,6 +175,9 @@ Rectangle {
                         }
 
                         delegate: Rectangle {
+                            // Temporarily hide track 11 and 12
+                            opacity: index >=10 ? 0 : 1
+
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
                             height: ListView.view.height

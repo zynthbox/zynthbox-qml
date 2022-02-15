@@ -372,6 +372,9 @@ class zynthian_gui(QObject):
         self.screen_back = None
         self.__forced_screen_back = None
 
+        # When true, 1-5 buttons selects track 6-10
+        self.tracks_mod_active = False
+
         # Create variables for LED control
         self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
         self.wscolor_light = rpi_ws281x.Color(0, 50, 200)
@@ -563,15 +566,25 @@ class zynthian_gui(QObject):
             # To blink aled
             #self.wsled_blink(0,self.wscolor_active)
             # Active Track
-            for i in range(6):
+            for i in range(5):
                 self.wsleds.setPixelColor(1+i,self.wscolor_light)
             i = None
             if self.__layer_track_mode_switch:
                 i = self.screens['layers_for_track'].index
             else:
                 i = self.screens['session_dashboard'].selectedTrack
-            if i is not None and i<6:
+            if i is not None and not self.tracks_mod_active and i<5:
+                # If track mod is not active, light but 1-5 if track 1-5 is selected
                 self.wsleds.setPixelColor(1+i,self.wscolor_active)
+            elif i is not None and self.tracks_mod_active and 5 <= i <= 9:
+                # If track mod is active, light but 1-5 if track 6-10 is selected
+                self.wsleds.setPixelColor(i - 4, self.wscolor_active)
+
+            # Button 6 will act as modifier key to select track 6-10 when active
+            if self.tracks_mod_active:
+                self.wsleds.setPixelColor(6, self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(6, self.wscolor_light)
 
             # FX Button
             # Set FX Button to active when __layer_track_mode_switch is active or soundCombinator is active when zynthiloops page is visible
@@ -1602,6 +1615,10 @@ class zynthian_gui(QObject):
             # Switch between track and sound mode
             self.__layer_track_mode_switch = not self.__layer_track_mode_switch
 
+        elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
+            self.tracks_mod_active = not self.tracks_mod_active
+            logging.error(f'self.tracks_mod_active({self.tracks_mod_active})')
+
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
@@ -1753,8 +1770,10 @@ class zynthian_gui(QObject):
             fake_key = "4"
         elif i == 9:
             fake_key = "5"
-        elif i == 10:
-            fake_key = "6"
+
+        # Disable emitting key 6 as it will act as modifier
+        # elif i == 10:
+        #     fake_key = "6"
         #F1 .. F5
         elif i == 12:
             fake_key = Key.f1
@@ -1772,10 +1791,16 @@ class zynthian_gui(QObject):
 
         if press:
             if not fake_key in self.__fake_keys_pressed:
+                if self.tracks_mod_active:
+                    self.fakeKeyboard.press(Key.ctrl)
+
                 self.__fake_keys_pressed.add(fake_key)
                 self.fakeKeyboard.press(fake_key)
         else:
             if fake_key in self.__fake_keys_pressed:
+                if self.tracks_mod_active:
+                    self.fakeKeyboard.release(Key.ctrl)
+
                 self.__fake_keys_pressed.discard(fake_key)
                 self.fakeKeyboard.release(fake_key)
         return True

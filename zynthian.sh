@@ -110,7 +110,13 @@ screensaver_off
 while true; do
     #Load Config Environment
 	load_config_env
-	
+
+	if [ -z ${XRANDR_ROTATE} ]; then
+        echo "not rotating"
+    else
+        xrandr -o $XRANDR_ROTATE
+    fi
+
 	# Throw up a splash screen while we load up the UI proper
 	if [ ! -p /tmp/mplayer-splash-control ]; then
         mkfifo /tmp/mplayer-splash-control
@@ -169,20 +175,15 @@ while true; do
 	export QT_SCREEN_SCALE_FACTORS=1
 	export QT_AUTO_SCREEN_SCALE_FACTOR=0
 	export QT_QPA_PLATFORMTHEME=generic
-        if [ -z ${XRANDR_ROTATE} ]; then
-            echo "not rotating"
-        else
-            xrandr -o $XRANDR_ROTATE
-        fi
-	
-        if command -v kwin_x11 &> /dev/null
-        then
-            kwin_x11&
-        else
-            echo "WARNING: kwin was not installed, falling back to matchbox - this will likely cause issues with some parts of the software (in particular for example modules which require xembed, such as norns)"
-            matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
-            #openbox&
-        fi
+
+    if command -v kwin_x11 &> /dev/null
+    then
+        kwin_x11&
+    else
+        echo "WARNING: kwin was not installed, falling back to matchbox - this will likely cause issues with some parts of the software (in particular for example modules which require xembed, such as norns)"
+        matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
+        #openbox&
+    fi
 	./zynthian_qt_gui.py
 	status=$?
 

@@ -278,6 +278,7 @@ class zynthian_gui(QObject):
     )
     non_modal_screens = (
         #"session_dashboard",  #FIXME or main? make this more configurable?
+        "zynthiloops",
         "main",
         "layer",
         "fixed_layers",

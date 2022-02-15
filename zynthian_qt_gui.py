@@ -575,7 +575,7 @@ class zynthian_gui(QObject):
 
             # FX Button
             # Set FX Button to active when __layer_track_mode_switch is active or soundCombinator is active when zynthiloops page is visible
-            if self.__layer_track_mode_switch or ((self.active_screen == "zynthiloops" or self.active_screen == "main") and self.soundCombinatorActive):
+            if self.__layer_track_mode_switch or (self.active_screen == "zynthiloops" and self.soundCombinatorActive):
                 self.wsleds.setPixelColor(7,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(7,self.wscolor_light)

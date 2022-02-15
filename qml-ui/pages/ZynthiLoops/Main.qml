@@ -470,6 +470,8 @@ Zynthian.ScreenPage {
                             model: root.song.tracksModel
 
                             delegate: TableHeader {
+                                opacity: index >= 10 ? 0 : 1
+
                                 text: model.track.name
                                 subText: model.track.connectedPattern >= 0
                                           ? "Pat. " + (model.track.connectedPattern+1)
@@ -611,6 +613,8 @@ Zynthian.ScreenPage {
                                     model: track.clipsModel
 
                                     delegate: ClipCell {
+                                        opacity: model.clip.row >= 10 ? 0 : 1
+
                                         id: clipCell
                                         isPlaying: {
                                             if (track.connectedPattern < 0) {

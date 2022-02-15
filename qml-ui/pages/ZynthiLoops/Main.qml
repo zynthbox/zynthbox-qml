@@ -470,6 +470,7 @@ Zynthian.ScreenPage {
                             model: root.song.tracksModel
 
                             delegate: TableHeader {
+                                // Temporarily hide track 11 and 12
                                 opacity: index >= 10 ? 0 : 1
 
                                 text: model.track.name
@@ -613,6 +614,7 @@ Zynthian.ScreenPage {
                                     model: track.clipsModel
 
                                     delegate: ClipCell {
+                                        // Temporarily hide track 11 and 12
                                         opacity: model.clip.row >= 10 ? 0 : 1
 
                                         id: clipCell

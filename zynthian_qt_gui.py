@@ -581,7 +581,7 @@ class zynthian_gui(QObject):
                 self.wsleds.setPixelColor(7,self.wscolor_light)
 
             # Stepseq screen:
-            if self.modal_screen=="zynthiloops":
+            if self.active_screen=="zynthiloops":
                 self.wsleds.setPixelColor(8,self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(8,self.wscolor_light)
@@ -1469,7 +1469,7 @@ class zynthian_gui(QObject):
             self.show_screen("control")
 
         elif cuia == "SCREEN_ZYNTHILOOPS":
-            self.show_modal("zynthiloops")
+            self.show_screen("zynthiloops")
 
         elif cuia == "SCREEN_ARRANGER":
             self.show_modal("song_arranger")

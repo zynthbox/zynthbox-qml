@@ -39,8 +39,6 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    property int selectedPart: 0
-
     signal cuiaNavUp();
     signal cuiaNavDown();
     signal cuiaNavBack();
@@ -189,13 +187,6 @@ Zynthian.ScreenPage {
         }
 
         switch (cuia) {
-            case "SELECT_UP":
-                zynthian.zynthiloops.selectedClipCol = 0
-                return true;
-
-            case "SELECT_DOWN":
-                zynthian.zynthiloops.selectedClipCol = 1
-                return true;
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":
@@ -454,28 +445,25 @@ Zynthian.ScreenPage {
                         }
                     }
 
-                    TableHeader {
-                        text: "A"
-                        color: Kirigami.Theme.backgroundColor
+                    Repeater {
+                        model: root.song.scenesModel
+                        delegate: TableHeader {
+                            text: model.scene.name
+                            color: Kirigami.Theme.backgroundColor
 
-                        Layout.fillWidth: false
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: privateProps.headerWidth
+                            Layout.fillWidth: false
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: privateProps.headerWidth
 
-                        highlightOnFocus: false
-                        highlighted: false
-                    }
+                            highlightOnFocus: false
+                            highlighted: false
 
-                    TableHeader {
-                        text: "B"
-                        color: Kirigami.Theme.backgroundColor
-
-                        Layout.fillWidth: false
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: privateProps.headerWidth
-
-                        highlightOnFocus: false
-                        highlighted: false
+                            onPressed: {
+                                root.song.scenesModel.stopScene(root.song.scenesModel.selectedSceneIndex);
+                                root.song.scenesModel.selectedSceneIndex = index;
+                                zynthian.zynthiloops.selectedClipCol = index;
+                            }
+                        }
                     }
                 }
 
@@ -696,10 +684,11 @@ Zynthian.ScreenPage {
                                         property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
                                         property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
 
-                                        Layout.preferredWidth: model.clip.col !== root.selectedPart ? 0 : privateProps.cellWidth
-                                        Layout.maximumWidth: model.clip.col !== root.selectedPart ? 0 : privateProps.cellWidth
-                                        Layout.preferredHeight: model.clip.col !== root.selectedPart ? 0 : privateProps.cellHeight
-                                        Layout.maximumHeight: model.clip.col !== root.selectedPart ? 0 : privateProps.cellHeight
+                                        visible: model.clip.col === zynthian.zynthiloops.selectedClipCol
+                                        Layout.preferredWidth: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellWidth
+                                        Layout.maximumWidth: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellWidth
+                                        Layout.preferredHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
+                                        Layout.maximumHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
 
                                         onPressed: {
                                             if (dblTimer.running || sceneActionBtn.checked) {

@@ -63,8 +63,8 @@ class zynthiloops_track(QObject):
 
         # Connect to default patterns on init
         # This will be overwritten by deserialize if user changed the value, so it is safe to always set the value
-        if self.__id__ > 5 and self.__id__ < 11:
-             self.__connected_pattern__ = self.__id__ - 6
+        if 5 <= self.__id__ <= 9:
+             self.__connected_pattern__ = self.__id__ - 5
 
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])

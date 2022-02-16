@@ -39,6 +39,7 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    property int selectedPart: 0
 
     signal cuiaNavUp();
     signal cuiaNavDown();
@@ -388,8 +389,8 @@ Zynthian.ScreenPage {
             repeat: false
             interval: 1000
             onTriggered: {
-                selectedTrackOutline.x = Qt.binding(function() { return partsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
-                selectedTrackOutline.y = Qt.binding(function() { return partsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })
+                selectedTrackOutline.x = Qt.binding(function() { return variationsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
+                selectedTrackOutline.y = Qt.binding(function() { return variationsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })
             }
         }
 
@@ -420,6 +421,8 @@ Zynthian.ScreenPage {
 
                 // HEADER ROW
                 RowLayout {
+                    id: variationsHeaderRow
+
                     Layout.fillWidth: true
                     Layout.preferredHeight: privateProps.headerHeight
                     Layout.maximumHeight: privateProps.headerHeight
@@ -449,80 +452,115 @@ Zynthian.ScreenPage {
                                 mixerActionBtn.checked = false
                             }
                         }
-
                     }
 
-                    RowLayout {
-                    // ListView {
-                        id: partsHeaderRow
+                    TableHeader {
+                        text: "A"
+                        color: Kirigami.Theme.backgroundColor
 
-                        Layout.fillWidth: true
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: privateProps.headerWidth
+
+                        highlightOnFocus: false
+                        highlighted: false
+                    }
+
+                    TableHeader {
+                        text: "B"
+                        color: Kirigami.Theme.backgroundColor
+
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: privateProps.headerWidth
+
+                        highlightOnFocus: false
+                        highlighted: false
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: privateProps.headerHeight
+                    Layout.maximumHeight: privateProps.headerHeight
+
+                    spacing: 1
+
+                    TableHeader {
+                        Layout.preferredWidth: privateProps.headerWidth + 8
+                        Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
-//                        clip: true
-                        spacing: 1
-//                        contentX: loopGridFlickable.contentX
-//                        orientation: Qt.Horizontal
-//                        boundsBehavior: Flickable.StopAtBounds
+                        text: "Tracks"
 
-                        Repeater {
-                            id: partsHeaderRepeater
-                            model: root.song.tracksModel
+                        textSize: 11
+                        subTextSize: 9
+                        subSubTextSize: 0
 
-                            delegate: TableHeader {
-                                // Temporarily hide track 11 and 12
-                                opacity: index >= 10 ? 0 : 1
-                                enabled: index >= 10 ? false : true
+                        highlightOnFocus: false
+                        highlighted: false
 
-                                text: model.track.name
-                                subText: model.track.connectedPattern >= 0
-                                          ? "Pat. " + (model.track.connectedPattern+1)
-                                          : ""
-                                color: Kirigami.Theme.backgroundColor
+                        onPressed: {
+                        }
+                    }
 
-                                width: privateProps.headerWidth
-                                height: ListView.view.height
+                    Repeater {
+                        id: partsHeaderRepeater
+                        model: root.song.tracksModel
 
-                                highlightOnFocus: false
-                                highlighted: index === zynthian.session_dashboard.selectedTrack
+                        delegate: TableHeader {
+                            // Temporarily hide track 11 and 12
+                            opacity: index >= 10 ? 0 : 1
+                            enabled: index >= 10 ? false : true
 
-                                onPressed: {
-                                    if (bottomBar.controlObj !== model.track) {
-                                        // Set current selected track
-                                        bottomBar.controlType = BottomBar.ControlType.Track;
-                                        bottomBar.controlObj = model.track;
+                            text: model.track.name
+                            subText: model.track.connectedPattern >= 0
+                                      ? "Pat. " + (model.track.connectedPattern+1)
+                                      : ""
+                            color: Kirigami.Theme.backgroundColor
 
-                                        zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                        zynthian.session_dashboard.selectedTrack = index;
+                            width: privateProps.headerWidth
+                            height: ListView.view.height
 
+                            highlightOnFocus: false
+                            highlighted: index === zynthian.session_dashboard.selectedTrack
+
+                            onPressed: {
+                                if (bottomBar.controlObj !== model.track) {
+                                    // Set current selected track
+                                    bottomBar.controlType = BottomBar.ControlType.Track;
+                                    bottomBar.controlObj = model.track;
+
+                                    zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                    zynthian.session_dashboard.selectedTrack = index;
+
+                                    sceneActionBtn.checked = false;
+                                    mixerActionBtn.checked = true;
+                                    bottomStack.currentIndex = 1;
+                                } else {
+                                    // Current selected track is already set. open sounds dialog
+
+                                    if (bottomBar.tabbedView.activeItem.resetModel) {
+                                        // Reset model to load new changes if any
+                                        bottomBar.tabbedView.activeItem.resetModel();
+                                    } else {
+                                        console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
+                                    }
+
+                                    if (mixerActionBtn.checked) {
+                                        bottomStack.currentIndex = 0
+                                        mixerActionBtn.checked = false
+                                    } else {
                                         sceneActionBtn.checked = false;
                                         mixerActionBtn.checked = true;
                                         bottomStack.currentIndex = 1;
-                                    } else {
-                                        // Current selected track is already set. open sounds dialog
-
-                                        if (bottomBar.tabbedView.activeItem.resetModel) {
-                                            // Reset model to load new changes if any
-                                            bottomBar.tabbedView.activeItem.resetModel();
-                                        } else {
-                                            console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
-                                        }
-
-                                        if (mixerActionBtn.checked) {
-                                            bottomStack.currentIndex = 0
-                                            mixerActionBtn.checked = false
-                                        } else {
-                                            sceneActionBtn.checked = false;
-                                            mixerActionBtn.checked = true;
-                                            bottomStack.currentIndex = 1;
-                                        }
                                     }
                                 }
+                            }
 
-                                onPressAndHold: {
-                                    zynthian.track.trackId = model.track.id
-                                    //zynthian.current_modal_screen_id = "track"
-                                }
+                            onPressAndHold: {
+                                zynthian.track.trackId = model.track.id
+                                //zynthian.current_modal_screen_id = "track"
                             }
                         }
                     }
@@ -536,8 +574,6 @@ Zynthian.ScreenPage {
                     spacing: 1
 
                     ListView {
-                        id: tracksHeaderColumns
-
                         Layout.preferredWidth: privateProps.headerWidth + 8
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
@@ -547,37 +583,16 @@ Zynthian.ScreenPage {
                         contentY: loopGridFlickable.contentY
                         boundsBehavior: Flickable.StopAtBounds
 
-                        model: root.song.partsModel
+                        model: 1
 
                         delegate: TableHeader {
-                            text: part.name
-                            // subText: qsTr("%L1 Bar").arg(model.part.length)
+                            text: "Clips"
 
                             width: ListView.view.width
                             height: privateProps.headerHeight
 
-                            onPressed: {
-                                bottomBar.controlType = BottomBar.ControlType.Part;
-                                bottomBar.controlObj = model.part;
-
-                                if (mixerActionBtn.checked) {
-                                    bottomStack.currentIndex = 0
-                                    mixerActionBtn.checked = false
-                                }
-                            }
-
-                            Kirigami.Icon {
-                                width: 14
-                                height: 14
-                                color: "white"
-                                anchors {
-                                    right: parent.right
-                                    top: parent.top
-                                }
-
-                                source: "media-playback-start"
-                                visible: model.part.isPlaying
-                            }
+                            highlightOnFocus: false
+                            highlighted: false
                         }
                     }
 
@@ -596,12 +611,9 @@ Zynthian.ScreenPage {
                             height: 4
                         }
 
-                        contentX: partsHeaderRow.contentX - partsHeaderRow.originX
-                        contentY: tracksHeaderColumns.contentY
-
                         GridLayout {
                             id: loopGrid
-                            rows: root.song.partsModel.count
+                            rows: 1
                             flow: GridLayout.TopToBottom
                             rowSpacing: 1
                             columnSpacing: 1
@@ -684,10 +696,10 @@ Zynthian.ScreenPage {
                                         property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
                                         property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
 
-                                        Layout.preferredWidth: privateProps.cellWidth
-                                        Layout.maximumWidth: privateProps.cellWidth
-                                        Layout.preferredHeight: privateProps.cellHeight
-                                        Layout.maximumHeight: privateProps.cellHeight
+                                        Layout.preferredWidth: model.clip.col !== root.selectedPart ? 0 : privateProps.cellWidth
+                                        Layout.maximumWidth: model.clip.col !== root.selectedPart ? 0 : privateProps.cellWidth
+                                        Layout.preferredHeight: model.clip.col !== root.selectedPart ? 0 : privateProps.cellHeight
+                                        Layout.maximumHeight: model.clip.col !== root.selectedPart ? 0 : privateProps.cellHeight
 
                                         onPressed: {
                                             if (dblTimer.running || sceneActionBtn.checked) {

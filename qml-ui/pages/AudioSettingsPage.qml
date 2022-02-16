@@ -90,10 +90,10 @@ Zynthian.ScreenPage {
                     delegate: ColumnLayout {
                         ZynthiLoops.VolumeControl {
                             id: volumeDelegate
-                            Layout.fillWidth: false
+                            Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 16
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                             Layout.bottomMargin: 5
 //                             headerText: zynthian.zynthiloops.masterAudioLevel <= -40
 //                                             ? ""
@@ -102,11 +102,11 @@ Zynthian.ScreenPage {
                             audioLeveldB: -200
                             inputAudioLevelVisible: false
 
-                            Binding {
-                                target: volumeDelegate.slider
-                                property: "value"
-                                value: modelData.value
-                            }
+//                            Binding {
+//                                target: volumeDelegate.slider
+//                                property: "value"
+//                                value: modelData.value
+//                            }
 
                             slider {
                                 value: modelData.value

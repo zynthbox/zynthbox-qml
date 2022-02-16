@@ -448,8 +448,10 @@ Zynthian.ScreenPage {
                     Repeater {
                         model: root.song.scenesModel
                         delegate: TableHeader {
+                            id: sceneHeaderDelegate
                             text: model.scene.name
                             color: Kirigami.Theme.backgroundColor
+                            opacity: root.song.scenesModel.clipCountInScene(index) > 0 ? 1 : 0.5
 
                             Layout.fillWidth: false
                             Layout.fillHeight: true
@@ -462,6 +464,15 @@ Zynthian.ScreenPage {
                                 root.song.scenesModel.stopScene(root.song.scenesModel.selectedSceneIndex);
                                 root.song.scenesModel.selectedSceneIndex = index;
                                 zynthian.zynthiloops.selectedClipCol = index;
+                            }
+
+                            Connections {
+                                target: root.song.scenesModel
+                                onClipCountChanged: {
+                                    sceneHeaderDelegate.opacity = root.song.scenesModel.clipCountInScene(index) > 0
+                                                        ? 1
+                                                        : 0.5
+                                }
                             }
                         }
                     }

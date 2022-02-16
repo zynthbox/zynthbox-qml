@@ -472,6 +472,7 @@ Zynthian.ScreenPage {
                             delegate: TableHeader {
                                 // Temporarily hide track 11 and 12
                                 opacity: index >= 10 ? 0 : 1
+                                enabled: index >= 10 ? false : true
 
                                 text: model.track.name
                                 subText: model.track.connectedPattern >= 0
@@ -616,6 +617,7 @@ Zynthian.ScreenPage {
                                     delegate: ClipCell {
                                         // Temporarily hide track 11 and 12
                                         opacity: model.clip.row >= 10 ? 0 : 1
+                                        enabled: model.clip.row >= 10 ? false : true
 
                                         id: clipCell
                                         isPlaying: {

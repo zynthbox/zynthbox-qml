@@ -47,8 +47,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
             "7": {"name": "H", "clips": []},
             "8": {"name": "I", "clips": []},
             "9": {"name": "J", "clips": []},
-            "10": {"name": "K", "clips": []},
-            "11": {"name": "L", "clips": []},
+            # "10": {"name": "K", "clips": []},
+            # "11": {"name": "L", "clips": []},
         }
 
     def serialize(self):

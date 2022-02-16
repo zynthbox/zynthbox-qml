@@ -275,7 +275,7 @@ Zynthian.ScreenPage {
         id: privateProps
 
         //Try to fit exactly 12 cells + a header cell
-        property int headerWidth: (tableLayout.width - loopGrid.columnSpacing*12)/11
+        property int headerWidth: (tableLayout.width - loopGrid.columnSpacing*12)/13
         property int headerHeight: (tableLayout.height - loopGrid.rowSpacing*2)/3
         property int cellWidth: headerWidth
         property int cellHeight: headerHeight
@@ -510,6 +510,10 @@ Zynthian.ScreenPage {
                         model: root.song.tracksModel
 
                         delegate: TableHeader {
+                            // Temporarily hide track 11 and 12
+                            opacity: index >= 10 ? 0 : 1
+                            enabled: index >= 10 ? false : true
+
                             text: model.track.name
                             subText: model.track.connectedPattern >= 0
                                       ? "Pat. " + (model.track.connectedPattern+1)
@@ -624,6 +628,10 @@ Zynthian.ScreenPage {
                                     model: track.clipsModel
 
                                     delegate: ClipCell {
+                                        // Temporarily hide track 11 and 12
+                                        opacity: model.clip.row >= 10 ? 0 : 1
+                                        enabled: model.clip.row >= 10 ? false : true
+
                                         id: clipCell
                                         isPlaying: {
                                             if (track.connectedPattern < 0) {

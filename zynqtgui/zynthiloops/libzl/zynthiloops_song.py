@@ -79,7 +79,7 @@ class zynthiloops_song(QObject):
             for i in range(0, 10):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
 
-            for _ in range(0, 10):
+            for _ in range(0, 12):
                 track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
                 self.__tracks_model__.add_track(track)
                 for i in range(0, 10):

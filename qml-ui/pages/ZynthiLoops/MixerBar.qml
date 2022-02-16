@@ -56,7 +56,7 @@ Rectangle {
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < 11) {
+                if (zynthian.session_dashboard.selectedTrack < 9) {
                     zynthian.session_dashboard.selectedTrack += 1;
                 }
 

@@ -26,7 +26,7 @@
 import os
 
 import jack
-from PySide2.QtCore import Property,Signal,Slot
+from PySide2.QtCore import Property, QTimer, Signal, Slot
 
 import logging
 import re
@@ -45,6 +45,10 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
         except:
             self.ctrl_list = None
         self.audio_device = ""
+        self.channels_changed_timer = QTimer()
+        self.channels_changed_timer.setInterval(1000)
+        self.channels_changed_timer.setSingleShot(True)
+        self.channels_changed_timer.timeout.connect(lambda: self.update_channels())
 
         # Read jack2.service file to find selected card name
         with open("/etc/systemd/system/jack2.service", "r") as f:
@@ -113,8 +117,8 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
     ### END Property channels
 
     @Slot(str, int)
-    def setChannelValue(self, channel_index, new_value):
-        if channel_index in self.zctrls:
-            if self.zctrls[channel_index].get_value() != new_value:
-                self.zctrls[channel_index].set_value(new_value)
-                self.channels_changed.emit()
+    def setChannelValue(self, name, new_value):
+        if name in self.zctrls:
+            if self.zctrls[name].get_value() != new_value:
+                self.zctrls[name].set_value(new_value)
+                self.channels_changed_timer.start()

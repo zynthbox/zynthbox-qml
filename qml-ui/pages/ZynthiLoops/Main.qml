@@ -380,15 +380,15 @@ Zynthian.ScreenPage {
             repeat: false
             interval: 1000
             onTriggered: {
-                selectedTrackOutline.x = Qt.binding(function() { return variationsHeaderRow.mapToItem(content, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
-                selectedTrackOutline.y = Qt.binding(function() { return variationsHeaderRow.mapToItem(content, 0, partsHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })
+                selectedTrackOutline.x = Qt.binding(function() { return tracksHeaderRow.mapToItem(content, tracksHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).x, 0).x })
+                selectedTrackOutline.y = Qt.binding(function() { return tracksHeaderRow.mapToItem(content, 0, tracksHeaderRepeater.itemAt(zynthian.session_dashboard.selectedTrack).y).y })
             }
         }
 
         Rectangle {
             id: selectedTrackOutline
             width: privateProps.headerWidth
-            height: privateProps.headerHeight*3 + loopGrid.columnSpacing*2
+            height: privateProps.headerHeight*2 + loopGrid.columnSpacing*2
             color: "#2affffff"
             z: 100
         }
@@ -456,7 +456,7 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: false
+                            highlighted: root.song.scenesModel.selectedSceneIndex === index
 
                             onPressed: {
                                 root.song.scenesModel.stopScene(root.song.scenesModel.selectedSceneIndex);
@@ -468,6 +468,8 @@ Zynthian.ScreenPage {
                 }
 
                 RowLayout {
+                    id: tracksHeaderRow
+
                     Layout.fillWidth: true
                     Layout.preferredHeight: privateProps.headerHeight
                     Layout.maximumHeight: privateProps.headerHeight
@@ -493,7 +495,7 @@ Zynthian.ScreenPage {
                     }
 
                     Repeater {
-                        id: partsHeaderRepeater
+                        id: tracksHeaderRepeater
                         model: root.song.tracksModel
 
                         delegate: TableHeader {

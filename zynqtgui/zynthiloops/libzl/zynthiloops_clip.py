@@ -388,13 +388,13 @@ class zynthiloops_clip(QObject):
 
 
     def get_part_name(self):
-        # return chr(self.__col_index__+65)
-        if self.__col_index__ == 0:
-            return "I"
-        elif self.__col_index__ == 1:
-            return "II"
-        else:
-            return ""
+        return chr(self.__col_index__+65)
+        # if self.__col_index__ == 0:
+        #     return "I"
+        # elif self.__col_index__ == 1:
+        #     return "II"
+        # else:
+        #     return ""
     partName = Property(str, get_part_name, constant=True)
 
 

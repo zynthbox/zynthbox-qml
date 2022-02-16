@@ -70,7 +70,7 @@ Rectangle {
         id: privateProps
 
         //Try to fit exactly 12 mixers + a master mixer
-        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/11
+        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
     }
 
     GridLayout {
@@ -175,6 +175,10 @@ Rectangle {
                         }
 
                         delegate: Rectangle {
+                            // Temporarily hide track 11 and 12
+                            opacity: index >=10 ? 0 : 1
+                            enabled: index >= 10 ? false : true
+
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
                             height: ListView.view.height

@@ -673,7 +673,7 @@ class zynthiloops_clip(QObject):
 
     def __read_metadata__(self):
         try:
-            self.audio_metadata = taglib.File(self.wav_path / self.__path__).tags
+            self.audio_metadata = taglib.File(str(self.wav_path / self.__path__)).tags
 
             try:
                 if self.__bpm__ <= 0:
@@ -702,7 +702,7 @@ class zynthiloops_clip(QObject):
     def write_metadata(self, key, value: list):
         if self.__path__ is not None:
             try:
-                file = taglib.File(self.wav_path / self.__path__)
+                file = taglib.File(str(self.wav_path / self.__path__))
                 file.tags[key] = value
                 file.save()
             except Exception as e:

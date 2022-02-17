@@ -130,6 +130,13 @@ class zynthiloops_scenes_model(QAbstractListModel):
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex
 
+    ### Property selectedSceneName
+    def get_selected_scene_name(self):
+        return chr(self.__selected_scene_index__ + 65)
+
+    selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_index_changed)
+    ### END Property selectedSceneName
+
     @Slot(int)
     def playScene(self, sceneIndex):
         scene = self.getScene(sceneIndex)

@@ -19,7 +19,7 @@ Zynthian.Card {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
 
             if (root.selectedTrack.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
                 pattern.midiChannel = root.selectedTrack.connectedSound;
             }
         }
@@ -297,7 +297,7 @@ Zynthian.Card {
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
                                             pattern.midiChannel = root.selectedTrack.connectedSound;
                                         }
                                     }
@@ -367,7 +367,7 @@ Zynthian.Card {
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global").get(root.selectedTrack.connectedPattern);
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
                                             pattern.midiChannel = root.selectedTrack.connectedSound;
                                         }
                                     }

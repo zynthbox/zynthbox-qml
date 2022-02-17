@@ -76,7 +76,7 @@ Item {
      */
     function savePatternToFile(patternName) {
         if (patternName == undefined || patternName == "") {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
             if (sequence.activePattern > -1) {
                 sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
             }
@@ -340,7 +340,7 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
-        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
         if (repeaterObject.model.hasOwnProperty("patterns")) {
             // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;

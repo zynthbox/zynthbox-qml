@@ -86,6 +86,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         zynthian_gui_zynthiloops.__instance__ = self
+        libzl.registerGraphicTypes()
         self.recorder_process = None
         self.clip_to_record = None
         self.clip_to_record_path = None
@@ -132,7 +133,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def init_sketch(self, sketch, cb=None):
         def _cb():
             libzl.registerTimerCallback(libzlCb)
-            libzl.registerGraphicTypes()
             libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)

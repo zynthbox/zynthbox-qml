@@ -259,7 +259,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		if self.list_model != None:
 			self.list_model.set_entries(self.list_data, self.list_metadata)
 		if self.zselector and len(self.list_data) > 0:
-			self.zselector.custom_encoder_speed = max(1, 32/len(list_data))
+			self.zselector.custom_encoder_speed = max(1, 32/len(self.list_data))
 		self.select()
 		self.last_index_change_ts = datetime.min
 		self.effective_count_changed.emit()

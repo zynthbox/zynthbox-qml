@@ -864,13 +864,25 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Synth: %1").arg(infoBar.synthName)
+                        text: qsTr("Layer %1").arg("<layer>")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("Preset: %1").arg(infoBar.presetName)
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Bank: %1").arg("<bank>")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Synth: %1").arg(infoBar.synthName)
                     }
 
                     Item {

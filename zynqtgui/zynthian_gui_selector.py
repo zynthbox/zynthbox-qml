@@ -188,8 +188,18 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.auto_activation_timer_requested.connect(self.schedule_activation, Qt.QueuedConnection)
 
 		self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
+		self.zyngui.encoder_list_speed_multiplier_changed.connect(self.adjust_knob_speed)
 
 	auto_activation_timer_requested = Signal(int)
+
+	def adjust_knob_speed(self):
+		if self.zselector and len(self.list_data) > 0:
+			logging.error("ADJUSTING KNOB SPEED")
+			if self.zyngui.get_encoder_list_speed_multiplier() == 0:
+				self.zselector.custom_encoder_speed = 0
+			else:
+				self.zselector.custom_encoder_speed = round(len(self.list_data) / self.zyngui.get_encoder_list_speed_multiplier())
+			self.zselector.config(self.zselector_ctrl)
 
 	def sync_selector_visibility(self):
 		if self.zselector == None:
@@ -258,8 +268,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 	def fill_list(self):
 		if self.list_model != None:
 			self.list_model.set_entries(self.list_data, self.list_metadata)
-		if self.zselector and len(self.list_data) > 0:
-			self.zselector.custom_encoder_speed = max(1, 32/len(self.list_data))
+		self.adjust_knob_speed()
 		self.select()
 		self.last_index_change_ts = datetime.min
 		self.effective_count_changed.emit()

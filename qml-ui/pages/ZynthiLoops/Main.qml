@@ -861,10 +861,12 @@ Zynthian.ScreenPage {
                         text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
                     }
                     QQC2.Label {
+                        property int layerIndex: infoBar.clip.clipTrack.connectedSound
+
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Layer %1").arg("<layer>")
+                        text: qsTr("Layer %1").arg(layerIndex >=0 ? layerIndex+1 : "<none>")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
@@ -876,7 +878,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Bank: %1").arg("<bank>")
+                        text: qsTr("Bank: %1").arg(zynthian.bank.selector_list.getDisplayValue(zynthian.bank.current_index))
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

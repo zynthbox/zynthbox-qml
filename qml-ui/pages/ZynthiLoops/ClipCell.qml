@@ -115,8 +115,8 @@ QQC2.AbstractButton {
             property var sequence: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
             property var pattern: sequence.get(track.connectedPattern)
 
-            property var isPlaying: ((pattern.bank === "I" && model.clip.col === 0 && sequence.isPlaying)
-                                    || (pattern.bank === "II" && model.clip.col === 1 && sequence.isPlaying)) ? true : false
+            property var isPlaying: ((pattern && pattern.bank === "I" && model.clip.col === 0 && sequence.isPlaying)
+                                    || (pattern && pattern.bank === "II" && model.clip.col === 1 && sequence.isPlaying)) ? true : false
 
             anchors.bottom: parent.bottom
             visible: track.connectedPattern >= 0 && isPlaying

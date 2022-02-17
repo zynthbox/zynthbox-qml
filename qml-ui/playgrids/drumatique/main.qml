@@ -659,23 +659,23 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Zynthian.PlayGridButton {
-                                        text: "part I"
-                                        checked: _private.bankOffset === 0
-                                        onClicked: {
-                                            component.setPatternProperty("bankOffset", 0)
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "part II"
-                                        checked: _private.bankOffset === 8
-                                        onClicked: {
-                                            component.setPatternProperty("bankOffset", 8)
-                                        }
-                                    }
-                                }
+                                //ColumnLayout {
+                                    //Layout.fillHeight: true
+                                    //Zynthian.PlayGridButton {
+                                        //text: "part I"
+                                        //checked: _private.bankOffset === 0
+                                        //onClicked: {
+                                            //component.setPatternProperty("bankOffset", 0)
+                                        //}
+                                    //}
+                                    //Zynthian.PlayGridButton {
+                                        //text: "part II"
+                                        //checked: _private.bankOffset === 8
+                                        //onClicked: {
+                                            //component.setPatternProperty("bankOffset", 8)
+                                        //}
+                                    //}
+                                //}
                             }
                         }
 
@@ -962,25 +962,25 @@ Zynthian.BasePlayGrid {
                                             }
                                         }
                                     }
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Zynthian.PlayGridButton {
-                                            text: "part I"
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern.bankOffset === 0
-                                            onClicked: {
-                                                component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
-                                            }
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            text: "part II"
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern.bankOffset === 8
-                                            onClicked: {
-                                                component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
-                                            }
-                                        }
-                                    }
+                                    //ColumnLayout {
+                                        //Layout.fillHeight: true
+                                        //Zynthian.PlayGridButton {
+                                            //text: "part I"
+                                            //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            //checked: patternsMenuItem.thisPattern.bankOffset === 0
+                                            //onClicked: {
+                                                //component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
+                                            //}
+                                        //}
+                                        //Zynthian.PlayGridButton {
+                                            //text: "part II"
+                                            //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            //checked: patternsMenuItem.thisPattern.bankOffset === 8
+                                            //onClicked: {
+                                                //component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
+                                            //}
+                                        //}
+                                    //}
                                     Zynthian.PlayGridButton {
                                         text: "copy\n"
                                         enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex

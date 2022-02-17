@@ -82,7 +82,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             id: placeholderAction
-            text: children.length > 0 ? qsTr("%1 Actions").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ") : "       "
+            text: children.length > 0 ? qsTr("%1 Actions").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ") : "       "
             enabled: children.length > 0
             children: playGridsRepeater.count === 0 ? [] : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
         }
@@ -635,7 +635,7 @@ don't want to have to dig too far...
     Timer {
         id: adoptSongTimer; interval: 1; repeat: false; running: false
         onTriggered: {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
             if (sequence) {
                 // This operation is potentially a bit pricy, as setting the song
                 // to something new will cause the global sequence to be reloaded
@@ -651,7 +651,7 @@ don't want to have to dig too far...
     Connections {
         target: zynthian.zynthiloops.song
         onBpmChanged: {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
             if (sequence && sequence.bpm != zynthian.zynthiloops.song.bpm) {
                 sequence.bpm = zynthian.zynthiloops.song.bpm;
                 scheduleSequenceSave();
@@ -683,7 +683,7 @@ don't want to have to dig too far...
         target: zynthian.zynthiloops
         onSongChanged: adoptCurrentMidiChannel();
     }
-    property QtObject globalSequence: ZynQuick.PlayGridManager.getSequenceModel("Global")
+    property QtObject globalSequence: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
     Connections {
         target: globalSequence
         onIsDirtyChanged: {
@@ -702,7 +702,7 @@ don't want to have to dig too far...
         }
     }
     Repeater {
-        model: ZynQuick.PlayGridManager.getSequenceModel("Global")
+        model: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
         delegate: Item {
             id: patternObject
             property QtObject thisPattern: model.pattern

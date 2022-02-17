@@ -48,9 +48,9 @@ GridLayout {
         smooth: false
 
         visible: controlObj.clipTrack.connectedPattern >= 0
-        property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global") : null
+        property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
         property QtObject pattern: sequence ? sequence.get(controlObj.clipTrack.connectedPattern) : null
-        source: pattern ? "image://pattern/Global/" + controlObj.clipTrack.connectedPattern + "/" + controlObj.col + "?" + pattern.lastModified : ""
+        source: pattern ? "image://pattern/Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/" + controlObj.col + "?" + pattern.lastModified : ""
         Rectangle { // Progress
             anchors {
                 top: parent.top
@@ -73,7 +73,7 @@ GridLayout {
                 zynthian.current_modal_screen_id = "playgrid";
                 zynthian.forced_screen_back = "zynthiloops";
                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
                 sequence.activePattern = controlObj.clipTrack.connectedPattern;
             }
         }

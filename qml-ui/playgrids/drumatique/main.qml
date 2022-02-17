@@ -350,7 +350,7 @@ Zynthian.BasePlayGrid {
     }
     // on component completed
     onInitialize: {
-        _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
+        _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
         component.dashboardModel = _private.sequence;
         if (_private.gridModel.rows === 0) {
             for (var i = 0; i < 5; ++i) {

@@ -350,7 +350,7 @@ Zynthian.BasePlayGrid {
     }
     Connections {
         target: zynthian.zynthiloops.song.scenesModel
-        onConnectedSequenceChanged: {
+        onSelectedSceneNameChanged: {
             _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
             component.dashboardModel = _private.sequence;
         }

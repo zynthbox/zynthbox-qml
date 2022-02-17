@@ -348,10 +348,15 @@ Zynthian.BasePlayGrid {
         target: zynthian.zynthiloops
         onSongChanged: _private.updateCurrentGrid();
     }
+    Connections {
+        target: zynthian.zynthiloops.song.scenesModel
+        onConnectedSequenceChanged: {
+            _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+            component.dashboardModel = _private.sequence;
+        }
+    }
     // on component completed
     onInitialize: {
-        _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-        component.dashboardModel = _private.sequence;
         if (_private.gridModel.rows === 0) {
             for (var i = 0; i < 5; ++i) {
                 component.populateGrid(component.getModel("pattern grid model " + i), i);

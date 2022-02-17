@@ -1,6 +1,6 @@
 # Zynthbox
 
-Zynthbox OS is a Minimal Workstation UI on top of Zynthian, using Zynthians Engines and Plugin System.
+Zynthbox OS is a Open Workstation UI making use of Zynthians Engines and Plugin Layers System.
 
 # Zynthian
 [Zynthian](http://zynthian.org) is an Open Synth Platform based in Raspberry Pi, Linux (Raspbian) and some Open Software Synthesizers.

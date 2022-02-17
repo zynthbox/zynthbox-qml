@@ -40,6 +40,7 @@ Zynthian.BasePlayGrid {
     settings: drumsGridSettings
     sidebar: drumsGridSidebar
     name:'Drumatique'
+    dashboardModel: _private.sequence
     useOctaves: true
     additionalActions: [
         Kirigami.Action {
@@ -317,15 +318,14 @@ Zynthian.BasePlayGrid {
             }
             component.refreshSteps();
         }
+        function adoptSequence() {
+            _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+        }
     }
     Connections {
         target: zynthian.zynthiloops.song.tracksModel
         onConnectedSoundsCountChanged: _private.updateTrack()
         onConnectedPatternsCountChanged: _private.updateTrack()
-    }
-    Connections {
-        target: zynthian.zynthiloops
-        onSongChanged: _private.updateTrack()
     }
     Connections {
         target: _private.associatedTrack
@@ -346,17 +346,19 @@ Zynthian.BasePlayGrid {
     }
     Connections {
         target: zynthian.zynthiloops
-        onSongChanged: _private.updateCurrentGrid();
+        onSongChanged: {
+            _private.adoptSequence();
+            _private.updateCurrentGrid();
+            _private.updateTrack();
+        }
     }
     Connections {
         target: zynthian.zynthiloops.song.scenesModel
-        onSelectedSceneNameChanged: {
-            _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-            component.dashboardModel = _private.sequence;
-        }
+        onSelectedSceneNameChanged: _private.adoptSequence()
     }
     // on component completed
     onInitialize: {
+        _private.adoptSequence();
         if (_private.gridModel.rows === 0) {
             for (var i = 0; i < 5; ++i) {
                 component.populateGrid(component.getModel("pattern grid model " + i), i);

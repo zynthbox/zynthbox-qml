@@ -516,6 +516,10 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                                 Connections {
+                                    target: _private
+                                    onSequenceChanged: sequenderPadNoteApplicator.restart();
+                                }
+                                Connections {
                                     target: _private.sequence
                                     onModelReset: sequenderPadNoteApplicator.restart();
                                 }
@@ -886,7 +890,7 @@ Zynthian.BasePlayGrid {
                                             Image {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
-                                                source: "image://pattern/Global/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified
+                                                source: "image://pattern/" + _private.sequence.objectName + "/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified
                                                 Rectangle {
                                                     anchors {
                                                         top: parent.top

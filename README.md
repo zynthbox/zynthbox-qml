@@ -1,6 +1,7 @@
 # Zynthbox
 
-zynthbox-qml is the ui of Zynthbox OS, an Open Workstation UI making use of Zynthians Engines and Plugin Layers System.
+zynthbox-qml is part of Zynthbox OS, an Open Workstation for music creation using Zynthians Engines and Plugin Layers System.
+It provides UI parts via QML and Python.
 
 # Zynthian
 [Zynthian](http://zynthian.org) is an Open Synth Platform based in Raspberry Pi, Linux (Raspbian) and some Open Software Synthesizers.

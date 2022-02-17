@@ -658,7 +658,14 @@ don't want to have to dig too far...
             }
         }
     }
-    Component.onCompleted: adoptSong();
+    Component.onCompleted: {
+        var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+        for (var i = 0; i < 10; ++i) {
+            console.log("Fetching sequence Global " + sceneNames[i]);
+            ZynQuick.PlayGridManager.getSequenceModel("Global " + sceneNames[i]);
+        }
+        adoptSong();
+    }
 
     function adoptCurrentMidiChannel() {
         adoptCurrentMidiChannelTimer.restart();

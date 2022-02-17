@@ -402,7 +402,7 @@ ColumnLayout {
                                     visible: trackDelegate.trackHasConnectedPattern
                                     property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
                                     property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
-                                    source: pattern ? "image://pattern/Global/" + track.connectedPattern + "/" + (pattern.bankOffset / 8) + "?" + pattern.lastModified : ""
+                                    source: pattern ? "image://pattern/" + sequence.objectName + "/" + track.connectedPattern + "/" + (pattern.bankOffset / 8) + "?" + pattern.lastModified : ""
                                     Rectangle { // Progress
                                         anchors {
                                             top: parent.top

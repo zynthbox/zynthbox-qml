@@ -102,40 +102,22 @@ Rectangle {
                     Layout.fillHeight: true
                     spacing: 1
 
-                    Connections {
-                        target: zynthian.status_information
-                        onStatus_changed: {
-                            // masterVolume.audioLeveldB = zynthian.status_information.peakB;
-                        }
-                    }
-
                     VolumeControl {
-                        id: masterVolume
+                        id: externalVolume
                         Layout.preferredWidth: privateProps.cellWidth + 6
                         Layout.maximumWidth: privateProps.cellWidth + 6
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
-                        headerText: zynthian.zynthiloops.masterAudioLevel <= -40
-                                        ? ""
-                                        : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
-                        footerText: "Master"
-                        audioLeveldB: zynthian.zynthiloops.masterAudioLevel
+                        footerText: "External"
+                        audioLeveldB: -200
                         inputAudioLevelVisible: false
 
-                        Binding {
-                            target: masterVolume.slider
-                            property: "value"
-                            value: zynthian.master_alsa_mixer.volume
-                        }
-
                         slider {
-                            value: zynthian.master_alsa_mixer.volume
+                            value: 0
                             from: 0
                             to: 100
                             stepSize: 1
                             onValueChanged: {
-                                zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
-                                zynthian.zynthiloops.song.volume = masterVolume.slider.value;
                             }
                         }
                     }
@@ -175,10 +157,6 @@ Rectangle {
                         }
 
                         delegate: Rectangle {
-                            // Temporarily hide track 11 and 12
-                            opacity: index >=10 ? 0 : 1
-                            enabled: index >= 10 ? false : true
-
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
                             width: privateProps.cellWidth
                             height: ListView.view.height
@@ -370,6 +348,51 @@ Rectangle {
                                 }
                             }
                         }
+                    }
+
+                    Item {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.leftMargin: 2
+                        Layout.preferredWidth: privateProps.cellWidth*2 - 2
+                        Layout.bottomMargin: 5
+
+                        VolumeControl {
+                            id: masterVolume
+                            width: privateProps.cellWidth
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            headerText: zynthian.zynthiloops.masterAudioLevel <= -40
+                                            ? ""
+                                            : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
+                            footerText: "Master"
+                            audioLeveldB: zynthian.zynthiloops.masterAudioLevel
+                            inputAudioLevelVisible: false
+
+                            Binding {
+                                target: masterVolume.slider
+                                property: "value"
+                                value: zynthian.master_alsa_mixer.volume
+                            }
+
+                            slider {
+                                value: zynthian.master_alsa_mixer.volume
+                                from: 0
+                                to: 100
+                                stepSize: 1
+                                onValueChanged: {
+                                    zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
+                                    zynthian.zynthiloops.song.volume = masterVolume.slider.value;
+                                }
+                            }
+                        }
+                    }
+
+                    Kirigami.Separator {
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 1
+                        color: "#ff31363b"
                     }
                 }
             }

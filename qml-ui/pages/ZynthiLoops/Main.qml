@@ -274,7 +274,8 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        //Try to fit exactly 12 cells + a header cell
+        // Try to fit exactly 12 cells + a header cell
+        // These 12 cells consists of 1 header column + 10 tracks columna + 2 cell empty space for buttons
         property int headerWidth: (tableLayout.width - loopGrid.columnSpacing*12)/13
         property int headerHeight: (tableLayout.height - loopGrid.rowSpacing*2)/3
         property int cellWidth: headerWidth
@@ -510,10 +511,6 @@ Zynthian.ScreenPage {
                         model: root.song.tracksModel
 
                         delegate: TableHeader {
-                            // Temporarily hide track 11 and 12
-                            opacity: index >= 10 ? 0 : 1
-                            enabled: index >= 10 ? false : true
-
                             text: model.track.name
                             subText: model.track.connectedPattern >= 0
                                       ? "Pat. " + (model.track.connectedPattern+1)
@@ -628,10 +625,6 @@ Zynthian.ScreenPage {
                                     model: track.clipsModel
 
                                     delegate: ClipCell {
-                                        // Temporarily hide track 11 and 12
-                                        opacity: model.clip.row >= 10 ? 0 : 1
-                                        enabled: model.clip.row >= 10 ? false : true
-
                                         id: clipCell
                                         isPlaying: {
                                             if (track.connectedPattern < 0) {
@@ -736,6 +729,48 @@ Zynthian.ScreenPage {
                                             interval: 200
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+
+                    // Create a cell in top most header row
+                    Item {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: privateProps.headerWidth*2
+
+                        // Create a rectangle with 2 header cell width and 3 cell height to cover the entire empty header space
+                        Rectangle {
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            width: privateProps.headerWidth*2
+                            height: privateProps.headerHeight*3 + 2 // 3 cell height + 2 spacing height in between
+                            color: Kirigami.Theme.backgroundColor
+
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 1
+
+                                QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    text: qsTr("Copy")
+                                }
+
+                                QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    text: qsTr("Paste")
+                                }
+
+                                QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    text: qsTr("Delete")
                                 }
                             }
                         }

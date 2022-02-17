@@ -419,7 +419,7 @@ Zynthian.BasePlayGrid {
     Timer {
         id: populateGridTimer
         repeat: false
-        interval: 1
+        interval: 10
         onTriggered: {
             component.populateGrid(_private.gridModel, _private.activePattern);
         }

@@ -509,19 +509,23 @@ don't want to have to dig too far...
             }
         }
 
-        QQC2.StackView {
-            id: playGridStack
-            z: 0
+        MouseArea {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
-            replaceEnter: Transition {}
-            replaceExit: Transition {}
-            popEnter: Transition {}
-            popExit: Transition {}
-            pushEnter: Transition {}
-            pushExit: Transition {}
-            initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.grid
+            z: 0
+            onClicked: { /* Just need a body here... let's try and stop clicks from traveling through, see what happens */ }
+            QQC2.StackView {
+                id: playGridStack
+                anchors.fill: parent
+                clip: true
+                replaceEnter: Transition {}
+                replaceExit: Transition {}
+                popEnter: Transition {}
+                popExit: Transition {}
+                pushEnter: Transition {}
+                pushExit: Transition {}
+                initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.grid
+            }
         }
     }
 

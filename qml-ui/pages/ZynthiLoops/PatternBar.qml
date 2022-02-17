@@ -50,7 +50,7 @@ GridLayout {
         visible: controlObj.clipTrack.connectedPattern >= 0
         property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
         property QtObject pattern: sequence ? sequence.get(controlObj.clipTrack.connectedPattern) : null
-        source: pattern ? "image://pattern/Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/" + controlObj.col + "?" + pattern.lastModified : ""
+        source: pattern ? "image://pattern/Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
         Rectangle { // Progress
             anchors {
                 top: parent.top

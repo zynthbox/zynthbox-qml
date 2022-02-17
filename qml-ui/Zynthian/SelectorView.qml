@@ -76,6 +76,8 @@ QQC2.ScrollView {
         clip: true
         currentIndex: root.selector.current_index
         cacheBuffer: delegate.height*2
+        highlightMoveDuration: 0
+        highlightMoveVelocity: -1
 
         onActiveFocusChanged: {
             if (activeFocus) {

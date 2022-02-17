@@ -68,7 +68,7 @@ class zynthian_gui_controller(QObject):
 		self.ctrl_value_plot=0
 		self.ctrl_value_print=None
 		self.__visible = True
-		self.custom_encoder_speed = 1
+		self.custom_encoder_speed = 0
 
 
 		self.ctrl_midi_bind=None
@@ -293,7 +293,7 @@ class zynthian_gui_controller(QObject):
 					self.selmode = True
 					self.ctrl_max_value = self.n_values-1
 					#self.mult = max(4,int(32/self.n_values))
-					self.mult = 4 * self.custom_encoder_speed
+					self.mult = 4
 					val=zctrl.get_value2index()
 
 					#if zctrl.value_range>32:
@@ -320,7 +320,7 @@ class zynthian_gui_controller(QObject):
 				if self.n_values>=32:
 					self.step=0
 				else:
-					self.mult = 4 * self.custom_encoder_speed
+					self.mult = 4
 
 			else:
 				if zctrl.is_integer:
@@ -331,9 +331,9 @@ class zynthian_gui_controller(QObject):
 						#If many values => use adaptative step size based on rotary speed
 						if self.n_values>32:
 							self.step=0
-							self.mult = 1 * self.custom_encoder_speed
+							self.mult = 1
 						else:
-							self.mult = 4 * self.custom_encoder_speed
+							self.mult = 4
 					#Integer > 127
 					else:
 						#Not MIDI controller
@@ -451,7 +451,10 @@ class zynthian_gui_controller(QObject):
 			if self.inverted:
 				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, int(self.mult*(self.max_value-self.val0)), 0, int(self.mult*self.value), self.step)
 			else:
-				#logging.error("SETTING UP RANGE SCALE {} {} max {} step {}".format(self.index, self.ctrl_title, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step))
+				#self.step=4
+				if self.custom_encoder_speed > 0:
+					self.step = self.custom_encoder_speed
+				#logging.error("SETTING UP RANGE SCALE {} {} max {} value {} step {}".format(self.index, self.ctrl_title, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step))
 				zyncoder.lib_zyncoder.setup_rangescale_zynpot(self.index, 0, int(self.mult*(self.max_value-self.val0)), int(self.mult*self.value), self.step)
 
 			if isinstance(self.zctrl.osc_path,str):

@@ -68,6 +68,7 @@ class zynthian_gui_controller(QObject):
 		self.ctrl_value_plot=0
 		self.ctrl_value_print=None
 		self.__visible = True
+		self.custom_encoder_speed = 1
 
 
 		self.ctrl_midi_bind=None
@@ -292,7 +293,7 @@ class zynthian_gui_controller(QObject):
 					self.selmode = True
 					self.ctrl_max_value = self.n_values-1
 					#self.mult = max(4,int(32/self.n_values))
-					self.mult = 4
+					self.mult = 4 * self.custom_encoder_speed
 					val=zctrl.get_value2index()
 
 					#if zctrl.value_range>32:
@@ -319,7 +320,7 @@ class zynthian_gui_controller(QObject):
 				if self.n_values>=32:
 					self.step=0
 				else:
-					self.mult=4
+					self.mult = 4 * self.custom_encoder_speed
 
 			else:
 				if zctrl.is_integer:
@@ -330,9 +331,9 @@ class zynthian_gui_controller(QObject):
 						#If many values => use adaptative step size based on rotary speed
 						if self.n_values>32:
 							self.step=0
-							self.mult=1
+							self.mult = 1 * self.custom_encoder_speed
 						else:
-							self.mult=4
+							self.mult = 4 * self.custom_encoder_speed
 					#Integer > 127
 					else:
 						#Not MIDI controller

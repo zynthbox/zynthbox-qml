@@ -39,6 +39,8 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
     signal cuiaNavUp();
     signal cuiaNavDown();
     signal cuiaNavBack();
@@ -187,6 +189,20 @@ Zynthian.ScreenPage {
         }
 
         switch (cuia) {
+            case "SELECT_UP":
+                var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+                if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
+                }
+                return true;
+
+            case "SELECT_DOWN":
+                var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+                if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+                    zynthian.layer.selectNextPreset(selectedMidiChannel);
+                }
+                return true;
+
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":

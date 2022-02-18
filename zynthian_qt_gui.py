@@ -430,6 +430,8 @@ class zynthian_gui(QObject):
         self.deferred_loading_timer = QTimer(self)
         self.deferred_loading_timer.setInterval(0)
         self.deferred_loading_timer.setSingleShot(False)
+        self.deferred_loading_timer_start.connect(self.deferred_loading_timer.start)
+        self.deferred_loading_timer_stop.connect(self.deferred_loading_timer.stop)
         self.deferred_loading_timer.timeout.connect(self.is_loading_changed)
 
         self.curlayer = None
@@ -1303,7 +1305,8 @@ class zynthian_gui(QObject):
             try:
                 js_value = self.current_qml_page_prop.property("cuiaCallback")
                 if js_value != None and js_value.isCallable():
-                    if js_value.call([cuia]).toBool():
+                    _result = js_value.call([cuia])
+                    if _result != None and _result.toBool():
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
@@ -2386,7 +2389,7 @@ class zynthian_gui(QObject):
             self.loading = 1
         self.is_loading_changed.emit()
         # FIXME Apparently needs bot hthe timer *and* processEvents for qml to actually receive the signal before the sync loading is done
-        self.deferred_loading_timer.start()
+        self.deferred_loading_timer_start.emit()
         QGuiApplication.instance().processEvents(QEventLoop.AllEvents, 1000)
         self.is_loading_changed.emit()
         # logging.debug("START LOADING %d" % self.loading)
@@ -2398,13 +2401,13 @@ class zynthian_gui(QObject):
             self.loading = 0
 
         if self.loading == 0:
-            self.deferred_loading_timer.stop()
+            self.deferred_loading_timer_stop.emit()
             self.is_loading_changed.emit()
         # logging.debug("STOP LOADING %d" % self.loading)
 
     def reset_loading(self):
         self.is_loading_changed.emit()
-        self.deferred_loading_timer.stop()
+        self.deferred_loading_timer_stop.emit()
         self.loading = 0
 
     def get_is_loading(self):
@@ -3073,6 +3076,8 @@ class zynthian_gui(QObject):
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
+    deferred_loading_timer_start = Signal()
+    deferred_loading_timer_stop = Signal()
     is_loading_changed = Signal()
     status_info_changed = Signal()
     current_qml_page_changed = Signal()

@@ -144,6 +144,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.master_audio_level_timer.start()
 
+        if sketch is not None:
+            logging.error(f"### Checking Sketch {sketch} : exists({Path(sketch).exists()}) ")
+        else:
+            logging.error(f"### Checking Sketch sketch is none ")
+
         if sketch is not None and Path(sketch).exists():
             self.loadSketch(sketch, _cb)
         else:
@@ -153,34 +158,64 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def zyncoder_set_selected_track(self):
         self.zyngui.session_dashboard.set_selected_track(self.__zselector.value)
 
+    @Slot(None)
+    def zyncoder_set_preset(self):
+        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+        selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+        if self.zyngui.preset.current_index < self.__zselector.value:
+            if track.checkIfLayerExists(selected_channel):
+                logging.error(f"Selecting Next preset")
+                self.zyngui.layer.selectNextPreset(selected_channel)
+        else:
+            if track.checkIfLayerExists(selected_channel):
+                logging.error(f"Selecting Prev preset")
+                self.zyngui.layer.selectPrevPreset(selected_channel)
+
+        self.set_selector()
+
     def zyncoder_read(self):
         if self.__zselector and self.__song__:
             self.__zselector.read_zyncoder()
 
-            if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
-                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+            if self.zyngui.sound_combinator_active:
+                if self.zyngui.preset.current_index != self.__zselector.value:
+                    QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+            else:
+                if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
+                    QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
 
         return [0, 1, 2]
 
     def set_selector(self, zs_hiden=False):
-        logging.error(f"### set_selector called : selectedTrack({self.zyngui.session_dashboard.get_selected_track()})")
-
         if self.__song__ is None:
             return
 
         if self.__zselector:
-            logging.error(f"### Setting Selector value : {self.zyngui.session_dashboard.get_selected_track()}")
-            self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track() })
-            self.__zselector.config(self.__zselector_ctrl)
-            self.__zselector.custom_encoder_speed = 4
+            if self.zyngui.sound_combinator_active:
+                self.__zselector_ctrl.set_options(
+                    {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                     'value_max': self.zyngui.preset.selector_list.get_count(), 'value': self.zyngui.preset.current_index})
+                self.__zselector.config(self.__zselector_ctrl)
+                self.__zselector.custom_encoder_speed = 0
+            else:
+                self.__zselector_ctrl.set_options(
+                    {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                     'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track()})
+                self.__zselector.config(self.__zselector_ctrl)
+                self.__zselector.custom_encoder_speed = 4
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
                 self.__zselector.show()
             else:
                 self.__zselector.hide()
         else:
-            self.__zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value': self.zyngui.session_dashboard.selectedTrack})
-            self.__zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.__zselector_ctrl, self)
-            self.__zselector.custom_encoder_speed = 4
+            if self.zyngui.sound_combinator_active:
+                self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                   'value': self.zyngui.preset.current_index})
+                self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
+            else:
+                self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                   'value': self.zyngui.session_dashboard.selectedTrack})
+                self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
 
 
     def switch_select(self, t):

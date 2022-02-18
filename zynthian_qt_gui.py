@@ -404,7 +404,7 @@ class zynthian_gui(QObject):
 
         self.init_wsleds()
 
-        self.__encoder_list_speed_multiplier = 0
+        self.__encoder_list_speed_multiplier = 4
 
         self.info_timer = QTimer(self)
         self.info_timer.setInterval(3000)

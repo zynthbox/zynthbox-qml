@@ -319,7 +319,12 @@ Zynthian.BasePlayGrid {
             component.refreshSteps();
         }
         function adoptSequence() {
-            _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+            console.log("Adopting the scene sequence");
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+            if (_private.sequence != sequence) {
+                console.log("Scene has changed, switch places!");
+                _private.sequence = sequence;
+            }
         }
     }
     Connections {
@@ -368,6 +373,7 @@ Zynthian.BasePlayGrid {
     Connections {
         target: ZynQuick.PlayGridManager
         onDashboardItemPicked: {
+            adoptSequence(); // just to be safe...
             if (component.dashboardModel === model) {
                 _private.sequence.activePattern = index;
                 var foundIndex = -1;

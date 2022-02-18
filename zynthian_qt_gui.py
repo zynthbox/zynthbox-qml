@@ -522,6 +522,7 @@ class zynthian_gui(QObject):
     def set_sound_combinator_active(self, isActive):
         if self.sound_combinator_active != isActive:
             self.sound_combinator_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.soundCombinatorActiveChanged.emit()
 
     soundCombinatorActiveChanged = Signal()
@@ -1740,11 +1741,11 @@ class zynthian_gui(QObject):
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
             if dtus == 0:
-                logging.error("key press: {} {}".format(i, dtus))
+                # logging.error("key press: {} {}".format(i, dtus))
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
             elif dtus > 0:
-                logging.error("key release: {} {}".format(i, dtus))
+                # logging.error("key release: {} {}".format(i, dtus))
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 

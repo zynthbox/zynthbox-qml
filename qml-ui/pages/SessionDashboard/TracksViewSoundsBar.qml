@@ -149,21 +149,21 @@ Zynthian.Card {
                 }
                 return true;
 
-            case "NAVIGATE_LEFT":
-                var selectedMidiChannel = root.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
-                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
-                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
-                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
-                }
-                return true;
+//            case "NAVIGATE_LEFT":
+//                var selectedMidiChannel = root.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+//                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+//                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
+//                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
+//                }
+//                return true;
 
-            case "NAVIGATE_RIGHT":
-                var selectedMidiChannel = root.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
-                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
-                    zynthian.layer.selectNextPreset(selectedMidiChannel);
-                    chainedSoundsRepeater.itemAt(zynthian.session_dashboard.selectedSoundRow).update();
-                }
-                return true;
+//            case "NAVIGATE_RIGHT":
+//                var selectedMidiChannel = root.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+//                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+//                    zynthian.layer.selectNextPreset(selectedMidiChannel);
+//                    chainedSoundsRepeater.itemAt(zynthian.session_dashboard.selectedSoundRow).update();
+//                }
+//                return true;
 
             case "SWITCH_BACK_SHORT":
                 sceneActionBtn.checked = false;
@@ -171,6 +171,15 @@ Zynthian.Card {
                 bottomStack.currentIndex = 1;
 
                 return true;
+
+            case "SWITCH_SELECT_SHORT":
+            case "SWITCH_SELECT_BOLD":
+            case "SWITCH_SELECT_LONG":
+                var row = chainedSoundsRepeater.itemAt(zynthian.session_dashboard.selectedSoundRow);
+                row.openSynthPopupOrGotoLibrary();
+
+                return true;
+
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
             case "TRACK_1":
@@ -209,6 +218,32 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: modelData
+
+                function openSynthPopupOrGotoLibrary() {
+                    if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                        // Open library page
+                        var screenBack = zynthian.current_screen_id;
+                        zynthian.current_screen_id = 'layers_for_track';
+                        zynthian.forced_screen_back = screenBack;
+                        bottomDrawer.close();
+                    } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
+                        noFreeSlotsPopup.open();
+                    } else {
+                        // Enable layer popup rejected handler to re-select connected sound if any
+                        layerPopupRejectedConnections.enabled = true;
+
+                        zynthian.layer.page_after_layer_creation = "session_dashboard";
+                        applicationWindow().requestOpenLayerSetupDialog();
+                        //this depends on requirements
+                        backToSelection.screenToGetBack = zynthian.current_screen_id;
+                        backToSelection.enabled = true;
+
+                        if (root.selectedTrack.connectedPattern >= 0) {
+                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
+                            pattern.midiChannel = root.selectedTrack.connectedSound;
+                        }
+                    }
+                }
 
                 // Component.onCompleted: console.log("Tracks View Sounds Bar Row Created")
                 // Component.onDestruction: console.log("Tracks View Sounds Bar Row Destructed")
@@ -254,6 +289,54 @@ Zynthian.Card {
                         radius: 4
 
                         QQC2.Label {
+                            id: soundLabelPreset
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                right: parent.right
+                                leftMargin: Kirigami.Units.gridUnit*0.5
+                                rightMargin: Kirigami.Units.gridUnit*0.5
+                            }
+                            horizontalAlignment: Text.AlignLeft
+                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+
+                            elide: "ElideRight"
+
+                            function updateName() {
+                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: {
+                                if (zynthian.session_dashboard.selectedSoundRow !== index) {
+                                    zynthian.session_dashboard.selectedSoundRow = index;
+                                } else {
+                                    soundDelegate.openSynthPopupOrGotoLibrary();
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*10
+                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.rightMargin: Kirigami.Units.gridUnit
+
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
+
+                        border.color: "#ff999999"
+                        border.width: 1
+                        radius: 4
+
+                        QQC2.Label {
                             id: soundLabelSynth
                             anchors {
                                 verticalCenter: parent.verticalCenter
@@ -284,76 +367,6 @@ Zynthian.Card {
                                         zynthian.layer.page_after_layer_creation = "layers_for_track";
                                         zynthian.fixed_layers.activate_index(soundDelegate.chainedSound);
                                         zynthian.layer.select_engine(soundDelegate.chainedSound);
-                                    } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
-                                        noFreeSlotsPopup.open();
-                                    } else {
-                                        // Enable layer popup rejected handler to re-select connected sound if any
-                                        layerPopupRejectedConnections.enabled = true;
-
-                                        zynthian.layer.page_after_layer_creation = "session_dashboard";
-                                        applicationWindow().requestOpenLayerSetupDialog();
-                                        //this depends on requirements
-                                        backToSelection.screenToGetBack = zynthian.current_screen_id;
-                                        backToSelection.enabled = true;
-
-                                        if (root.selectedTrack.connectedPattern >= 0) {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
-                                            pattern.midiChannel = root.selectedTrack.connectedSound;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.preferredWidth: Kirigami.Units.gridUnit*10
-                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.rightMargin: Kirigami.Units.gridUnit
-
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        color: Kirigami.Theme.backgroundColor
-
-                        border.color: "#ff999999"
-                        border.width: 1
-                        radius: 4
-
-                        QQC2.Label {
-                            id: soundLabelPreset
-                            anchors {
-                                verticalCenter: parent.verticalCenter
-                                left: parent.left
-                                right: parent.right
-                                leftMargin: Kirigami.Units.gridUnit*0.5
-                                rightMargin: Kirigami.Units.gridUnit*0.5
-                            }
-                            horizontalAlignment: Text.AlignLeft
-                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
-
-                            elide: "ElideRight"
-
-                            function updateName() {
-                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-
-                            onClicked: {
-                                if (zynthian.session_dashboard.selectedSoundRow !== index) {
-                                    zynthian.session_dashboard.selectedSoundRow = index;
-                                } else {
-                                    if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                        // Open library page
-                                        var screenBack = zynthian.current_screen_id;
-                                        zynthian.current_screen_id = 'layers_for_track';
-                                        zynthian.forced_screen_back = screenBack;
-                                        bottomDrawer.close();
                                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(index)) {
                                         noFreeSlotsPopup.open();
                                     } else {

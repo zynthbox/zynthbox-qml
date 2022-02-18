@@ -94,8 +94,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def selected_track_changed_handler(self):
         self.selected_track_name_changed.emit()
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        selected_track.chained_sounds_changed.connect(lambda: logging.error(f"Chained Sounds Changed"))
-        selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
+        if selected_track != None:
+            selected_track.chained_sounds_changed.connect(lambda: logging.error(f"Chained Sounds Changed"))
+            selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)

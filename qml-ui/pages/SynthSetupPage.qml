@@ -184,6 +184,15 @@ Zynthian.ScreenPage {
             if (zynthian.current_screen_id == "layers_for_track" && !zynthian.fixed_layers.current_index_valid) {
                 layerSetupDialog.open();
                 return true
+            } else if (zynthian.fixed_layers.current_index_valid) {
+                zynthian.preset.current_is_favorite = !zynthian.preset.current_is_favorite;
+            }
+            return false
+        case "SWITCH_SELECT_BOLD":
+            if (zynthian.fixed_layers.current_index_valid) {
+                zynthian.control.single_effect_engine = null;
+                zynthian.current_screen_id = "control";
+                return true
             }
             return false
         case "NAVIGATE_LEFT":

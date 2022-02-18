@@ -697,7 +697,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
-        self.do_long_task(task)
+        task()
+        #self.do_long_task(task)
 
     @Slot(str)
     def loadSketchVersion(self, version):

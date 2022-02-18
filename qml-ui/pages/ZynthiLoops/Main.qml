@@ -782,6 +782,14 @@ Zynthian.ScreenPage {
                                                 zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                                 zynthian.session_dashboard.selectedTrack = track.id;
                                                 zynthian.zynthiloops.selectedClipCol = model.clip.col
+
+                                                if (track.connectedPattern >= 0) {
+                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                    bottomBar.controlObj = model.clip;
+                                                } else {
+                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                    bottomBar.controlObj = model.clip;
+                                                }
                                             }
                                         }
                                     }

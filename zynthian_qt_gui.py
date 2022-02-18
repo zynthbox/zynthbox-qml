@@ -51,6 +51,7 @@ from PySide2.QtCore import (
     Property,
     QTimer,
     QEventLoop,
+    QSettings
 )
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap
 
@@ -404,7 +405,14 @@ class zynthian_gui(QObject):
 
         self.init_wsleds()
 
-        self.__encoder_list_speed_multiplier = 4
+        speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
+        if speed_settings.status() != QSettings.NoError:
+            self.__encoder_list_speed_multiplier = 4
+        else:
+            speed_settings.beginGroup("Encoder0")
+            self.__encoder_list_speed_multiplier = int(speed_settings.value("speed"));
+            if self.__encoder_list_speed_multiplier is None:
+                self.__encoder_list_speed_multiplier = 4
 
         self.info_timer = QTimer(self)
         self.info_timer.setInterval(3000)
@@ -2864,6 +2872,11 @@ class zynthian_gui(QObject):
         if self.__encoder_list_speed_multiplier == val:
             return
         self.__encoder_list_speed_multiplier = val
+        speed_settings = QSettings("/home/pi/config/gui_optionsrc", QSettings.IniFormat)
+        speed_settings.beginGroup("Encoder0")
+        speed_settings.setValue("speed", self.__encoder_list_speed_multiplier);
+        speed_settings.endGroup()
+
         self.encoder_list_speed_multiplier_changed.emit()
 
     # ---------------------------------------------------------------------------

@@ -37,6 +37,9 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
+        case "SWITCH_SELECT_BOLD":
+            zynthian.main.power_off()
+            return true
         case "SELECT_UP":
             mainviewGridId.moveCurrentIndexUp();
             return true;

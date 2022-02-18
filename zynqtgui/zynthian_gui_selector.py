@@ -237,7 +237,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def set_selector(self, zs_hiden=False):
 		if self.zselector:
-			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data)-1, 'value':self.index })
+			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector.config(self.zselector_ctrl)
 			if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
 				self.zselector.show()

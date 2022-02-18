@@ -888,7 +888,6 @@ class zynthian_gui(QObject):
         # Session Dashboard depends on ZL to load sketches and hence needs to be initialized after ZL page
         ###
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
-        self.screens["zynthiloops"].newSketch()
         ###
         # Fixed layers depends on zynthiloops and session_dashboard screens and hence needs to be initialized
         # after those 2 pages
@@ -1831,6 +1830,8 @@ class zynthian_gui(QObject):
 
     def zynswitch_long(self, i):
         logging.info("Looooooooong Switch " + str(i))
+        # Disabling ald loong presses for the moment
+        return
         #self.start_loading()
 
         # Standard 4 ZynSwitches

@@ -655,16 +655,6 @@ don't want to have to dig too far...
         target: zynthian.zynthiloops
         onSongChanged: adoptSong()
     }
-    Connections {
-        target: zynthian.zynthiloops.song
-        onBpmChanged: {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-            if (sequence && sequence.bpm != zynthian.zynthiloops.song.bpm) {
-                sequence.bpm = zynthian.zynthiloops.song.bpm;
-                scheduleSequenceSave();
-            }
-        }
-    }
     Component.onCompleted: {
         adoptSong();
     }
@@ -692,22 +682,38 @@ don't want to have to dig too far...
         target: zynthian.zynthiloops
         onSongChanged: adoptCurrentMidiChannel();
     }
-    property QtObject globalSequence: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-    Connections {
-        target: globalSequence
-        onIsDirtyChanged: {
-            if (globalSequence.isDirty) {
-                scheduleSequenceSave()
+    Repeater {
+        model: zynthian.zynthiloops.song.scenesModel
+        delegate: Item {
+            id: sceneObject
+            property string connectedSequenceName: "Global " + model.scene.name
+            property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName)
+            Connections {
+                target: zynthian.zynthiloops.song
+                onBpmChanged: {
+                    if (sceneObject.sequence && sceneObject.sequence.bpm != zynthian.zynthiloops.song.bpm) {
+                        sceneObject.sequence.bpm = zynthian.zynthiloops.song.bpm;
+                        scheduleSequenceSave();
+                    }
+                }
             }
-        }
-    }
-    function scheduleSequenceSave() {
-        sequenceSaverThrottle.restart();
-    }
-    Timer {
-        id: sequenceSaverThrottle; repeat: false; running: false; interval: 100
-        onTriggered: {
-            globalSequence.save();
+            Connections {
+                target: sceneObject.sequence
+                onIsDirtyChanged: {
+                    if (sceneObject.sequence.isDirty) {
+                        scheduleSequenceSave()
+                    }
+                }
+            }
+            function scheduleSequenceSave() {
+                sequenceSaverThrottle.restart();
+            }
+            Timer {
+                id: sequenceSaverThrottle; repeat: false; running: false; interval: 100
+                onTriggered: {
+                    sceneObject.sequence.save();
+                }
+            }
         }
     }
     Repeater {

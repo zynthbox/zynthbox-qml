@@ -39,7 +39,7 @@ from time import sleep
 import json
 
 import numpy as np
-from PySide2.QtCore import Qt, Property, QObject, QProcess, QTimer, Signal, Slot
+from PySide2.QtCore import QMetaObject, Qt, Property, QObject, QProcess, QTimer, Signal, Slot
 
 from .libzl.libzl import ClipAudioSource
 
@@ -121,7 +121,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
-
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
@@ -150,44 +149,35 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             self.newSketch(None, _cb)
 
-
+    @Slot(None)
+    def zyncoder_set_selected_track(self):
+        self.zyngui.session_dashboard.set_selected_track(self.__zselector.value)
 
     def zyncoder_read(self):
-        # FIXME: figure out why sometimes the value is wrong
         if self.__zselector and self.__song__:
-            current_track = self.zyngui.screens["session_dashboard"].selectedTrack
-            if current_track != self.__zselector_track:
-                return
             self.__zselector.read_zyncoder()
-            track = self.__song__.tracksModel.getTrack(current_track)
-            if track and self.__zselector.value - 40 != track.get_volume():
-                # FIXME: why sometimes this goes out of range?
-                if self.__zselector.value <= 61 :
-                    track.set_volume(self.__zselector.value - 40, False)
-                else:
-                    self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':61, 'value':track.get_volume() + 40 })
-                    self.__zselector.config(self.__zselector_ctrl)
-        return [0,1,2]
+
+            if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
+                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+
+        return [0, 1, 2]
 
     def set_selector(self, zs_hiden=False):
-        volume = 0
-        if self.__song__ == None:
+        logging.error(f"### set_selector called : selectedTrack({self.zyngui.session_dashboard.get_selected_track()})")
+
+        if self.__song__ is None:
             return
-        self.__zselector_track = self.zyngui.screens["session_dashboard"].selectedTrack
-        track = self.__song__.tracksModel.getTrack(self.__zselector_track)
-        if track:
-            volume = track.get_volume()
-            track.volume_changed.connect(self.set_selector, Qt.UniqueConnection)
-            self.zyngui.screens["session_dashboard"].selected_track_changed.connect(self.set_selector, Qt.UniqueConnection)
+
         if self.__zselector:
-            self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max':61, 'value':volume + 40 })
+            logging.error(f"### Setting Selector value : {self.zyngui.session_dashboard.get_selected_track()}")
+            self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track() })
             self.__zselector.config(self.__zselector_ctrl)
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
                 self.__zselector.show()
             else:
                 self.__zselector.hide()
         else:
-            self.__zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value':volume + 40})
+            self.__zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value': self.zyngui.session_dashboard.selectedTrack})
             self.__zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.__zselector_ctrl, self)
 
 

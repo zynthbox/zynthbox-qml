@@ -410,7 +410,11 @@ class zynthian_gui(QObject):
             self.__encoder_list_speed_multiplier = 4
         else:
             speed_settings.beginGroup("Encoder0")
-            self.__encoder_list_speed_multiplier = int(speed_settings.value("speed"));
+            self.__encoder_list_speed_multiplier = None
+            try:
+                self.__encoder_list_speed_multiplier = int(speed_settings.value("speed"));
+            except:
+                pass
             if self.__encoder_list_speed_multiplier is None:
                 self.__encoder_list_speed_multiplier = 4
 

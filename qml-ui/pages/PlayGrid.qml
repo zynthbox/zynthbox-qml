@@ -639,12 +639,15 @@ don't want to have to dig too far...
     Timer {
         id: adoptSongTimer; interval: 1; repeat: false; running: false
         onTriggered: {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-            if (sequence) {
-                // This operation is potentially a bit pricy, as setting the song
-                // to something new will cause the global sequence to be reloaded
-                // to match what is in that song
-                sequence.song = zynthian.zynthiloops.song;
+            var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+            for (var i = 0; i < 10; ++i) {
+                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + sceneNames[i]);
+                if (sequence) {
+                    // This operation is potentially a bit pricy, as setting the song
+                    // to something new will cause the global sequence to be reloaded
+                    // to match what is in that song
+                    sequence.song = zynthian.zynthiloops.song;
+                }
             }
         }
     }
@@ -663,11 +666,6 @@ don't want to have to dig too far...
         }
     }
     Component.onCompleted: {
-        var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-        for (var i = 0; i < 10; ++i) {
-            console.log("Fetching sequence Global " + sceneNames[i]);
-            ZynQuick.PlayGridManager.getSequenceModel("Global " + sceneNames[i]);
-        }
         adoptSong();
     }
 

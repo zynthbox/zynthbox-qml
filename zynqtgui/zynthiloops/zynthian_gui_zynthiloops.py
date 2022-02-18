@@ -172,6 +172,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"### Setting Selector value : {self.zyngui.session_dashboard.get_selected_track()}")
             self.__zselector_ctrl.set_options({ 'symbol':'track_volume', 'name':'Track Volume', 'short_name':'Volume', 'midi_cc':0, 'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track() })
             self.__zselector.config(self.__zselector_ctrl)
+            self.__zselector.custom_encoder_speed = 4
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
                 self.__zselector.show()
             else:
@@ -179,6 +180,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             self.__zselector_ctrl=zynthian_controller(None,'track_volume','track_volume',{ 'midi_cc':0, 'value': self.zyngui.session_dashboard.selectedTrack})
             self.__zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.__zselector_ctrl, self)
+            self.__zselector.custom_encoder_speed = 4
 
 
     def switch_select(self, t):

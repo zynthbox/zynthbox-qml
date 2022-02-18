@@ -1297,10 +1297,14 @@ class zynthian_gui(QObject):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 
         if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
-            js_value = self.current_qml_page_prop.property("cuiaCallback")
-            if js_value != None and js_value.isCallable():
-                if js_value.call([cuia]).toBool():
-                    return
+            try:
+                js_value = self.current_qml_page_prop.property("cuiaCallback")
+                if js_value != None and js_value.isCallable():
+                    if js_value.call([cuia]).toBool():
+                        return
+            except Exception as e:
+                logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
+                pass
 
         if cuia == "POWER_OFF":
             self.screens["admin"].power_off_confirmed()

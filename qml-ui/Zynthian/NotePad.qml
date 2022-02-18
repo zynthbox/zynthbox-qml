@@ -141,11 +141,15 @@ Item {
                             velocityValue = slidePoint.pressure > 0.99999 ? 64 : Math.floor(slidePoint.pressure * 127);
                         }
                         playingNote = component.note;
-                        ZynQuick.PlayGridManager.setNoteOn(playingNote, velocityValue)
+                        if (component.note.midiChannel < 15) {
+                            ZynQuick.PlayGridManager.setNoteOn(playingNote, velocityValue)
+                        }
                         component.notePlayed(playingNote, velocityValue);
                         component.focus = true;
                     } else {
-                        ZynQuick.PlayGridManager.setNoteOff(playingNote)
+                        if (component.note.midiChannel < 15) {
+                            ZynQuick.PlayGridManager.setNoteOff(playingNote)
+                        }
                         ZynQuick.PlayGridManager.pitch = 0;
                         ZynQuick.PlayGridManager.modulation = 0;
                     }

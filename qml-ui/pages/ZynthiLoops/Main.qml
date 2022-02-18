@@ -452,6 +452,15 @@ Zynthian.ScreenPage {
                         subSubTextSize: 0
 
                         onPressed: {
+                            // If Mixer is not open, open mixer first
+                            if (bottomStack.currentIndex !== 1) {
+                                bottomStack.currentIndex = 1
+                                mixerActionBtn.checked = true;
+                                sceneActionBtn.checked = false;
+
+                                return;
+                            }
+
                             bottomBar.controlType = BottomBar.ControlType.Song;
                             bottomBar.controlObj = root.song;
 
@@ -478,6 +487,15 @@ Zynthian.ScreenPage {
                             highlighted: root.song.scenesModel.selectedSceneIndex === index
 
                             onPressed: {
+                                // If Mixer is not open, open mixer first
+                                if (bottomStack.currentIndex !== 1) {
+                                    bottomStack.currentIndex = 1
+                                    mixerActionBtn.checked = true;
+                                    sceneActionBtn.checked = false;
+
+                                    return;
+                                }
+
                                 root.song.scenesModel.stopScene(root.song.scenesModel.selectedSceneIndex);
                                 root.song.scenesModel.selectedSceneIndex = index;
                                 zynthian.zynthiloops.selectedClipCol = index;
@@ -540,6 +558,15 @@ Zynthian.ScreenPage {
                             highlighted: index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
+                                // If Mixer is not open, open mixer first
+                                if (bottomStack.currentIndex !== 1) {
+                                    bottomStack.currentIndex = 1
+                                    mixerActionBtn.checked = true;
+                                    sceneActionBtn.checked = false;
+
+                                    return;
+                                }
+
                                 if (bottomBar.controlObj !== model.track) {
                                     // Set current selected track
                                     bottomBar.controlType = BottomBar.ControlType.Track;
@@ -723,26 +750,39 @@ Zynthian.ScreenPage {
 
                                                     console.log("Clip Row :", model.clip.row, ", Enabled :", seq.enabled);
                                                 }
+                                                dblTimer.stop()
+                                                return
                                             }
                                             dblTimer.restart()
 
-                                            if (zynthian.session_dashboard.selectedTrack === track.id
-                                                && mixerActionBtn.checked) {
-                                                bottomStack.currentIndex = 0
-                                                mixerActionBtn.checked = false
-                                            } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
-                                                sceneActionBtn.checked = false;
+                                            // If Mixer is not open, open mixer first
+                                            if (bottomStack.currentIndex !== 1) {
+                                                bottomStack.currentIndex = 1
                                                 mixerActionBtn.checked = true;
-                                                bottomStack.currentIndex = 1;
-                                            }
+                                                sceneActionBtn.checked = false;
+                                                dblTimer.stop();
 
-                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                            zynthian.session_dashboard.selectedTrack = track.id;
-                                            zynthian.zynthiloops.selectedClipCol = model.clip.col
+                                                return;
+                                            }
                                         }
                                         Timer { //FIXME: why onDoubleClicked doesn't work
                                             id: dblTimer
                                             interval: 200
+                                            onTriggered: {
+                                                if (zynthian.session_dashboard.selectedTrack === track.id
+                                                    && mixerActionBtn.checked) {
+                                                    bottomStack.currentIndex = 0
+                                                    mixerActionBtn.checked = false
+                                                } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                                    sceneActionBtn.checked = false;
+                                                    mixerActionBtn.checked = true;
+                                                    bottomStack.currentIndex = 1;
+                                                }
+
+                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                                zynthian.session_dashboard.selectedTrack = track.id;
+                                                zynthian.zynthiloops.selectedClipCol = model.clip.col
+                                            }
                                         }
                                     }
                                 }

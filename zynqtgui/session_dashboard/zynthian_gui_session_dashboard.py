@@ -60,7 +60,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__change_track_sound_timer__ = QTimer()
         self.__change_track_sound_timer__.setInterval(250)
         self.__change_track_sound_timer__.setSingleShot(True)
-        self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound)
+        self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound, Qt.QueuedConnection)
         self.__selected_sound_row__ = 0
 
         if not self.restore():
@@ -170,7 +170,14 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         return self.__selected_track__
     def set_selected_track(self, track, force_set=False):
         if self.__selected_track__ != track or force_set is True:
+            logging.error(f"### Setting selected track : track({track})")
             self.__selected_track__ = track
+
+            # FIXME : A good way to implement this without explicitly calling set_selector would be to connect to
+            #         selected_track_changed signal on ZL side but it has a delay which resets the selectedTrack
+            #         to previous value
+            self.zyngui.zynthiloops.set_selector()
+
             self.selected_track_changed.emit()
             self.__change_track_sound_timer__.start()
     selected_track_changed = Signal()

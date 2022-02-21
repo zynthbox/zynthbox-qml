@@ -181,6 +181,7 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : 0
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
+        property string sceneName: zynthian.zynthiloops.song.scenesModel.selectedSceneName
         property QtObject associatedTrack;
         property int associatedTrackIndex;
 
@@ -645,7 +646,7 @@ Zynthian.BasePlayGrid {
                                     text: "copy\n"
                                     onClicked: {
                                         _private.copyRange(
-                                            (_private.activePattern + 1) + " pt." + _private.bankName + "/" + (_private.activeBar + 1),
+                                            (_private.activePattern + 1) + " " + _private.sceneName + "/" + (_private.activeBar + 1),
                                             _private.activeBarModel.parentModel,
                                             _private.activeBar + _private.bankOffset,
                                             _private.activeBar + _private.bankOffset
@@ -996,7 +997,7 @@ Zynthian.BasePlayGrid {
                                         enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                         onClicked: {
                                             _private.copyRange(
-                                                (patternsMenuItem.thisPatternIndex + 1) + " pt." + patternsMenuItem.thisPattern.bank,
+                                                (patternsMenuItem.thisPatternIndex + 1) + " " + _private.sceneName,
                                                 patternsMenuItem.thisPattern,
                                                 patternsMenuItem.thisPattern.bankOffset,
                                                 patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.bankLength
@@ -1128,8 +1129,8 @@ Zynthian.BasePlayGrid {
 
                 Zynthian.PlayGridButton {
                     text: _private.sequence && _private.sequence.soloPattern > -1
-                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + " pt." + _private.sequence.get(_private.sequence.soloPattern).bank + "\nSOLO"
-                        : "Pattern:\n" + (_private.activePattern + 1) + " pt." + _private.bankName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)");
+                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + " " + _private.sceneName + "\nSOLO"
+                        : "Pattern:\n" + (_private.activePattern + 1) + " " + _private.sceneName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)");
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         component.showPatternsMenu = !component.showPatternsMenu;

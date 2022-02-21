@@ -77,6 +77,16 @@ Zynthian.Card {
     }
 
     Connections {
+        target: zynthian.fixed_layers
+        onList_updated: {
+            // Update sound / preset /synth labels on change
+            for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
+                chainedSoundsRepeater.itemAt(i).update();
+            }
+        }
+    }
+
+    Connections {
         id: currentScreenConnection
         property string oldScreen: "session_dashboard"
         target: zynthian

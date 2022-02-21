@@ -985,7 +985,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Preset: %1").arg(infoBar.presetName)
+                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

@@ -318,6 +318,7 @@ QQC2.Dialog {
                             filePath: model.filePath
                         }
 
+                        id: fileListDelegate
                         width: ListView.view.width
                         height: Kirigami.Units.gridUnit*2
                         color: ListView.isCurrentItem ? Kirigami.Theme.highlightColor : "transparent"
@@ -329,7 +330,7 @@ QQC2.Dialog {
                         }
 
                         function selectItem() {
-                            mouseArea.clicked();
+                            filesListView.selectItem(model)
                         }
 
                         ColumnLayout {
@@ -387,7 +388,7 @@ QQC2.Dialog {
                         MouseArea {
                             id: mouseArea
                             anchors.fill: parent
-                            onClicked: filesListView.selectItem(model)
+                            onClicked: fileListDelegate.selectItem()
                         }
                     }
                 }
@@ -507,6 +508,7 @@ QQC2.Dialog {
             case "SWITCH_SELECT_LONG":
                 if (root.filesListView.currentIndex >= 0 &&
                     root.filesListView.currentIndex < root.filesListView.count) {
+                    console.log("ZL Filepicker SELECT :", root.filesListView.currentItem, root.filesListView.currentItem.selectItem)
                     root.filesListView.currentItem.selectItem();
                 }
 

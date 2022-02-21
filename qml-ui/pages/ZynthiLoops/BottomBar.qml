@@ -385,29 +385,6 @@ Zynthian.Card {
         }
     }
 
-    Connections {
-        target: zlScreen
-        onCuiaNavUp: {
-            pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex > 0
-                                                        ? pickerDialog.filesListView.currentIndex - 1
-                                                        : 0
-        }
-        onCuiaNavDown: {
-            pickerDialog.filesListView.currentIndex = pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count-1
-                                                        ? pickerDialog.filesListView.currentIndex + 1
-                                                        : pickerDialog.filesListView.count-1
-        }
-        onCuiaNavBack: {
-            pickerDialog.goBack();
-        }
-        onCuiaSelect: {
-            if (pickerDialog.filesListView.currentIndex >= 0 &&
-                pickerDialog.filesListView.currentIndex < pickerDialog.filesListView.count) {
-                pickerDialog.filesListView.currentItem.clicked();
-            }
-        }
-    }
-
     Zynthian.FilePickerDialog {
         id: pickerDialog
         parent: zlScreen.parent

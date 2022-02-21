@@ -328,6 +328,10 @@ QQC2.Dialog {
                             }
                         }
 
+                        function selectItem() {
+                            mouseArea.clicked();
+                        }
+
                         ColumnLayout {
                             spacing: 0
                             anchors.fill: parent
@@ -381,6 +385,7 @@ QQC2.Dialog {
                         }
 
                         MouseArea {
+                            id: mouseArea
                             anchors.fill: parent
                             onClicked: filesListView.selectItem(model)
                         }
@@ -502,7 +507,7 @@ QQC2.Dialog {
             case "SWITCH_SELECT_LONG":
                 if (root.filesListView.currentIndex >= 0 &&
                     root.filesListView.currentIndex < root.filesListView.count) {
-                    root.filesListView.currentItem.clicked();
+                    root.filesListView.currentItem.selectItem();
                 }
 
                 return true;

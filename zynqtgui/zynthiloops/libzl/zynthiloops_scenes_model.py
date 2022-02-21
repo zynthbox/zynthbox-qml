@@ -65,7 +65,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
                     "row": clip.row,
                     "col": clip.col
                 }
-        logging.error(f"{self.__scenes__}")
+        # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
             "selectedIndex": self.__selected_scene_index__

@@ -157,14 +157,46 @@ Kirigami.AbstractApplicationWindow {
                     zynthian.session_dashboard.visibleTracksEnd = 11;
                 }
             }*/
-            /*Zynthian.BreadcrumbButton {
+            Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Scene %2")
+                text: qsTr("Scene %2 ˬ")
                         .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 14
                 rightPadding: Kirigami.Units.largeSpacing*2
-            }*/
+                onClicked: scenesMenu.visible = true
+
+                Timer {
+                    id: switchTimer
+
+                    property int index
+
+                    interval: 100
+                    repeat: false
+                    onTriggered: Zynthian.CommonUtils.switchToScene(index)
+                }
+
+                QQC2.Menu {
+                    id: scenesMenu
+                    y: parent.height
+                    modal: true
+                    dim: false
+                    Repeater {
+                        model: zynthian.zynthiloops.song.scenesModel
+                        delegate: QQC2.MenuItem {
+                            text: qsTr("Scene %1").arg(model.scene.name)
+                            width: parent.width
+                            onClicked: {
+                                scenesMenu.close();
+                                switchTimer.index = index;
+                                switchTimer.restart();
+                            }
+                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
+                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+                        }
+                    }
+                }
+            }
             Zynthian.BreadcrumbButton {
                 id: trackButton
                 icon.color: customTheme.Kirigami.Theme.textColor

@@ -29,6 +29,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import '../../Zynthian' 1.0 as Zynthian
 //import Zynthian 1.0 as Zynthian
 
 Rectangle {
@@ -87,8 +88,9 @@ Rectangle {
                         checkable: true
                         checked: index === scenesModel.selectedSceneIndex
                         onClicked: {
-                            scenesModel.stopScene(scenesModel.selectedSceneIndex);
-                            scenesModel.selectedSceneIndex = index;
+//                            scenesModel.stopScene(scenesModel.selectedSceneIndex);
+//                            scenesModel.selectedSceneIndex = index;
+                            Zynthian.CommonUtils.switchToScene(index);
                         }
                         background: Rectangle {
                             Kirigami.Theme.inherit: false

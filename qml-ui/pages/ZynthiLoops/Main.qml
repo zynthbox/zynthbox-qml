@@ -572,11 +572,14 @@ Zynthian.ScreenPage {
                             highlighted: index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
-                                // If Mixer is not open, open mixer first
+                                // If Mixer is not open, open mixer first and switch to track
                                 if (bottomStack.currentIndex !== 1) {
                                     bottomStack.currentIndex = 1
                                     mixerActionBtn.checked = true;
                                     sceneActionBtn.checked = false;
+
+                                    zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                    zynthian.session_dashboard.selectedTrack = index;
 
                                     return;
                                 }
@@ -769,12 +772,15 @@ Zynthian.ScreenPage {
                                             }
                                             dblTimer.restart()
 
-                                            // If Mixer is not open, open mixer first
+                                            // If Mixer is not open, open mixer first and switch to track
                                             if (bottomStack.currentIndex !== 1) {
                                                 bottomStack.currentIndex = 1
                                                 mixerActionBtn.checked = true;
                                                 sceneActionBtn.checked = false;
                                                 dblTimer.stop();
+
+                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                                zynthian.session_dashboard.selectedTrack = rowIndex;
 
                                                 return;
                                             }

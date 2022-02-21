@@ -948,12 +948,38 @@ Zynthian.ScreenPage {
                         text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
                     }
                     QQC2.Label {
-                        property int layerIndex: infoBar.clip.clipTrack.connectedSound
+                        property int layerIndex: {
+                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
+                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
+                                    infoBar.clip.clipTrack.checkIfLayerExists(i)) {
+                                    return i;
+                                }
+                            }
+                            return -1;
+                        }
+                        property int layerCount: {
+                            var count = 0;
+
+                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
+                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
+                                    infoBar.clip.clipTrack.checkIfLayerExists(i)) {
+                                    count++;
+                                }
+                            }
+
+                            return count;
+                        }
 
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Layer %1").arg(layerIndex >=0 ? layerIndex+1 : "<none>")
+                        text: qsTr("Layer %1 %2")
+                                .arg(layerIndex >= 0 ? layerIndex+1 : "<none>")
+                                .arg(layerIndex >= 0
+                                        ? layerCount > 0
+                                            ? "(+" + (layerCount-1) + ")"
+                                            : 0
+                                        : "")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

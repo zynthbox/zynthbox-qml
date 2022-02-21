@@ -120,7 +120,7 @@ Zynthian.BasePlayGrid {
             _private.channel = 15;
         }
         fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
-        fillModel(_private.miniGridModel, _private.startingNote + 12, _private.scale, 2, _private.columns, _private.positionalVelocity)
+        fillModel(_private.miniGridModel, _private.startingNote + 12, _private.scale, 4, _private.columns, _private.positionalVelocity)
     }
 
     onInitialize: {

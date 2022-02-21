@@ -525,8 +525,7 @@ Zynthian.ScreenPage {
 
                             Rectangle {
                                 anchors.fill: parent
-                                color: "white"
-                                opacity: 0.5
+                                color: "#2affffff"
                                 visible: root.song.scenesModel.selectedSceneIndex === index
                             }
                         }
@@ -721,10 +720,12 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        highlightColor: !highlighted && model.clip.inCurrentScene
+                                        highlightColor: !highlighted && model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0
                                                             ? Qt.rgba(255,255,255,0.6)
                                                             : highlighted
-                                                                ? Kirigami.Theme.highlightColor
+                                                                ? model.clip.inCurrentScene
+                                                                    ? Kirigami.Theme.highlightColor
+                                                                    : "#aaf44336"
                                                                 : "transparent"
                                         highlighted: model.clip.row === zynthian.session_dashboard.selectedTrack && model.clip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === model.clip
                                         onHighlightedChanged: {
@@ -749,8 +750,12 @@ Zynthian.ScreenPage {
                                                 hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
                                             } catch(err) {}
 
-                                            if (model.clip.inCurrentScene) {
+                                            if (model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0) {
+                                                // In scene
                                                 return "#3381d4fa";
+                                            } else if (!model.clip.inCurrentScene) {
+                                                // Not in scene
+                                                return "#33f44336";
                                             } else if ((track.connectedPattern >= 0 && hasNotes)
                                                 || (model.clip.path && model.clip.path.length > 0)) {
                                                 return Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)

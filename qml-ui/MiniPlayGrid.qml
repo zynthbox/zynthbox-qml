@@ -193,6 +193,41 @@ RowLayout {
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
 
         Zynthian.PlayGridButton {
+            icon.name: "arrow-up"
+            Layout.preferredHeight: width
+            Layout.maximumHeight: width
+            enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+            onClicked: {
+                if (playGridsRepeater.currentItem.octave + 1 < 11){
+                    playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
+                } else {
+                    playGridsRepeater.currentItem.octave =  10;
+                }
+            }
+        }
+
+        QQC2.Label {
+            text: "Octave"
+            Layout.alignment: Qt.AlignHCenter
+        }
+
+        Zynthian.PlayGridButton {
+            icon.name: "arrow-down"
+            Layout.preferredHeight: width
+            Layout.maximumHeight: width
+            enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+            onClicked: {
+                if (playGridsRepeater.currentItem.octave - 1 > 0) {
+                    playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
+                } else {
+                    playGridsRepeater.currentItem.octave = 0;
+                }
+            }
+        }
+
+        Item { Layout.fillWidth: true; Layout.fillHeight: true; }
+
+        Zynthian.PlayGridButton {
             text: "Hide"
             Layout.preferredHeight: width
             Layout.maximumHeight: width

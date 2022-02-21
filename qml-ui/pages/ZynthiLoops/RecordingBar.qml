@@ -45,11 +45,19 @@ GridLayout {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
+            case "SWITCH_SELECT_SHORT":
+                bottomBar.filePickerDialog.folderModel.folder = bottomBar.controlObj.recordingDir;
+                bottomBar.filePickerDialog.open();
+                return true;
+
             case "SWITCH_BACK_SHORT":
                 sceneActionBtn.checked = false;
                 mixerActionBtn.checked = true;
                 bottomStack.currentIndex = 1;
+                return true;
         }
+
+        return false;
     }
 
     ColumnLayout {

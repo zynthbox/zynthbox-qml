@@ -41,11 +41,6 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
-    signal cuiaNavUp();
-    signal cuiaNavDown();
-    signal cuiaNavBack();
-    signal cuiaSelect();
-
     title: qsTr("Zynthiloops")
     screenId: "zynthiloops"
     leftPadding: 8

@@ -47,7 +47,10 @@ GridLayout {
                 sceneActionBtn.checked = false;
                 mixerActionBtn.checked = true;
                 bottomStack.currentIndex = 1;
+                return true;
         }
+
+        return false;
     }
 
     Zynthian.ZynthiloopsDial {

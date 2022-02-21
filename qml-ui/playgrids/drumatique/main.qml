@@ -670,6 +670,22 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
+                                ColumnLayout {
+                                    Layout.fillHeight: true
+                                    Zynthian.PlayGridButton {
+                                        text: "SAMPLE"
+                                        checked: _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                        onClicked: {
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination)
+                                        }
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        text: "SYNTH"
+                                        checked: _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                        onClicked: {
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
+                                        }
+                                    }
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
                                     //Zynthian.PlayGridButton {
@@ -937,7 +953,7 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: parent.height / 2
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
                                             opacity: enabled ? 1 : 0.7
                                             property string soundName
                                             Component.onCompleted: {
@@ -1003,6 +1019,25 @@ Zynthian.BasePlayGrid {
                                             //}
                                         //}
                                     //}
+                                    ColumnLayout {
+                                        Layout.fillHeight: true
+                                        Zynthian.PlayGridButton {
+                                            text: "SAMPLE"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            checked: patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                            onClicked: {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination, patternsMenuItem.thisPatternIndex)
+                                            }
+                                        }
+                                        Zynthian.PlayGridButton {
+                                            text: "SYNTH"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            checked: patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                            onClicked: {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
+                                            }
+                                        }
+                                    }
                                     Zynthian.PlayGridButton {
                                         text: "copy\n"
                                         enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex

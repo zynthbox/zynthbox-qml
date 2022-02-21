@@ -89,6 +89,13 @@ QQC2.AbstractButton {
             source: "media-playback-start"
             visible: root.isPlaying
         }
+
+        QQC2.Label {
+            anchors.centerIn: parent
+            color: "#f44336"
+            text: qsTr("Mute")
+            visible: !model.clip.inCurrentScene
+        }
     }
 
     background: Rectangle {

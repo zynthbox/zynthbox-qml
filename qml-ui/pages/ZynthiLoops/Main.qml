@@ -477,7 +477,6 @@ Zynthian.ScreenPage {
                             id: sceneHeaderDelegate
                             text: model.scene.name
                             color: Kirigami.Theme.backgroundColor
-                            opacity: root.song.scenesModel.clipCountInScene(index) > 0 ? 1 : 0.5
 
                             Layout.fillWidth: false
                             Layout.fillHeight: true
@@ -522,6 +521,13 @@ Zynthian.ScreenPage {
                                                         ? 1
                                                         : 0.5
                                 }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                color: "white"
+                                opacity: 0.5
+                                visible: root.song.scenesModel.selectedSceneIndex === index
                             }
                         }
                     }

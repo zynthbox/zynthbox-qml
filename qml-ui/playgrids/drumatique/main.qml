@@ -848,16 +848,27 @@ Zynthian.BasePlayGrid {
                                         Layout.fillHeight: true
                                         Layout.minimumWidth: height
                                         Layout.maximumWidth: height
-                                        Zynthian.PlayGridButton {
+                                        Item {
                                             Layout.fillHeight: true
                                             Layout.fillWidth: true
                                             Layout.margins: Kirigami.Units.largeSpacing
-                                            opacity: _private.sequence.soloPattern === -1 ? 1 : 0.5
-                                            icon.name: patternsMenuItem.thisPattern.enabled ? "player-volume" : ""
-                                            onClicked: {
-                                                if (_private.sequence.soloPattern === -1) {
-                                                    patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                            Zynthian.PlayGridButton {
+                                                anchors.fill: parent
+                                                opacity: _private.sequence.soloPattern === -1 ? 1 : 0.5
+                                                icon.name: "player-volume"
+                                                onClicked: {
+                                                    if (_private.sequence.soloPattern === -1) {
+                                                        patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                    }
                                                 }
+                                            }
+                                            Rectangle {
+                                                visible: !patternsMenuItem.thisPattern.enabled
+                                                anchors.centerIn: parent
+                                                rotation: 45
+                                                width: parent.width
+                                                height: Kirigami.Units.smallSpacing
+                                                color: "red"
                                             }
                                         }
                                     }

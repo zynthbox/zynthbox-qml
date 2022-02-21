@@ -580,11 +580,14 @@ Zynthian.ScreenPage {
 
                                     zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                     zynthian.session_dashboard.selectedTrack = index;
+                                    bottomBar.controlType = BottomBar.ControlType.Track;
+                                    bottomBar.controlObj = model.track;
 
                                     return;
                                 }
 
-                                if (bottomBar.controlObj !== model.track) {
+                                if (index !== zynthian.session_dashboard.selectedTrack &&
+                                    bottomBar.controlObj !== model.track) {
                                     // Set current selected track
                                     bottomBar.controlType = BottomBar.ControlType.Track;
                                     bottomBar.controlObj = model.track;
@@ -597,6 +600,9 @@ Zynthian.ScreenPage {
                                     bottomStack.currentIndex = 1;
                                 } else {
                                     // Current selected track is already set. open sounds dialog
+
+                                    bottomBar.controlType = BottomBar.ControlType.Track;
+                                    bottomBar.controlObj = model.track;
 
                                     if (bottomBar.tabbedView.activeItem.resetModel) {
                                         // Reset model to load new changes if any

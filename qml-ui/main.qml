@@ -580,7 +580,7 @@ Kirigami.AbstractApplicationWindow {
     QQC2.Drawer {
         id: miniPlayGridDrawer
         width: root.width
-        height: Kirigami.Units.gridUnit * 10
+        height: root.height * 0.66
         edge: Qt.BottomEdge
         modal: false
 

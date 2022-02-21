@@ -121,6 +121,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
+        self.select_preset_index = 1
+        self.select_preset_timer = QTimer()
+        self.select_preset_timer.setInterval(100)
+        self.select_preset_timer.setSingleShot(True)
+        self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.select_preset_index))
+
+    def update_select_preset_index(self):
+        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+        selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+        self.select_preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
+
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
@@ -138,6 +149,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
             self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+            self.zyngui.session_dashboard.selected_track_changed.connect(self.update_select_preset_index)
+            self.update_select_preset_index()
 
             if cb is not None:
                 cb()
@@ -162,23 +175,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def zyncoder_set_preset(self):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-        if self.zyngui.preset.current_index < self.__zselector.value:
-            if track.checkIfLayerExists(selected_channel):
-                logging.error(f"Selecting Next preset")
-                self.zyngui.layer.selectNextPreset(selected_channel)
-        else:
-            if track.checkIfLayerExists(selected_channel):
-                logging.error(f"Selecting Prev preset")
-                self.zyngui.layer.selectPrevPreset(selected_channel)
 
-        self.set_selector()
+        if track.checkIfLayerExists(selected_channel) and self.select_preset_index != self.__zselector.value:
+            logging.error(f"Selecting preset : {self.__zselector.value}")
+            self.zyngui.preset.select(self.__zselector.value)
+            self.select_preset_index = self.__zselector.value
+            self.selected_preset_name_changed.emit()
+            self.select_preset_timer.start()
+
 
     def zyncoder_read(self):
         if self.__zselector and self.__song__:
             self.__zselector.read_zyncoder()
 
             if self.zyngui.sound_combinator_active:
-                if self.zyngui.preset.current_index != self.__zselector.value:
+                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+                if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector.value:
                     QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
             else:
                 if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
@@ -192,11 +205,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.__zselector:
             if self.zyngui.sound_combinator_active:
+                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+
                 self.__zselector_ctrl.set_options(
                     {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                     'value_max': self.zyngui.preset.selector_list.get_count(), 'value': self.zyngui.preset.current_index})
+                     'value_max': self.zyngui.preset.selector_list.get_count(), 'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
                 self.__zselector.config(self.__zselector_ctrl)
-                self.__zselector.custom_encoder_speed = 0
+                self.__zselector.custom_encoder_speed = 4
             else:
                 self.__zselector_ctrl.set_options(
                     {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
@@ -209,8 +225,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector.hide()
         else:
             if self.zyngui.sound_combinator_active:
+                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
                 self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                   'value': self.zyngui.preset.current_index})
+                                                                                                   'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
             else:
                 self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
@@ -936,6 +954,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def end_long_task(self):
         self.longTaskEnded.emit()
+
+    ### Property selectedPresetName
+    def get_selected_preset_name(self):
+        return self.zyngui.preset.selector_list.getDisplayValue(self.select_preset_index)
+
+    selected_preset_name_changed = Signal()
+
+    selectedPresetName = Property(str, get_selected_preset_name, notify=selected_preset_name_changed)
+    ### END Property selectedPresetName
 
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)

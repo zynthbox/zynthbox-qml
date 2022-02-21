@@ -202,7 +202,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
                      'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track()})
                 self.__zselector.config(self.__zselector_ctrl)
-                self.__zselector.custom_encoder_speed = 4
+                self.__zselector.custom_encoder_speed = 7
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
                 self.__zselector.show()
             else:

@@ -43,6 +43,15 @@ GridLayout {
 
     property QtObject bottomBar: null
 
+    function cuiaCallback(cuia) {
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+                sceneActionBtn.checked = false;
+                mixerActionBtn.checked = true;
+                bottomStack.currentIndex = 1;
+        }
+    }
+
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false

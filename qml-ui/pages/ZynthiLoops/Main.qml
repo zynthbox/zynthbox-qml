@@ -1005,6 +1005,14 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
                     }
 
+                    QQC2.Button {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                        Layout.alignment: Qt.AlignVCenter
+                        icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                        checkable: true
+                    }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false

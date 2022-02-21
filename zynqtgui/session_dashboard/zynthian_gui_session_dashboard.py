@@ -58,7 +58,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__visible_tracks_end__ = 5
         self.__last_selected_sketch__ = None
         self.__change_track_sound_timer__ = QTimer()
-        self.__change_track_sound_timer__.setInterval(250)
+        self.__change_track_sound_timer__.setInterval(1000)
         self.__change_track_sound_timer__.setSingleShot(True)
         self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound, Qt.QueuedConnection)
         self.__selected_sound_row__ = 0
@@ -164,7 +164,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.zyngui.screens["layers_for_track"].update_track_sounds()
 
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
-        self.__change_track_sound_timer__.setInterval(250)
+        self.__change_track_sound_timer__.setInterval(1000)
 
         self.schedule_save()
     def get_selected_track(self):

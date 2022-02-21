@@ -85,7 +85,7 @@ class zynthiloops_song(QObject):
                 for i in range(0, 10):
                     clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
                     track.clipsModel.add_clip(clip)
-
+                    self.__scenes_model__.addClipToScene(clip, i)
         self.bpm_changed.emit()
 
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)

@@ -490,23 +490,7 @@ Zynthian.ScreenPage {
                                     return;
                                 }
 
-                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                if (sequence) {
-                                    sequence.disconnectSequencePlayback();
-                                } else {
-                                    console.log("Sequence could not be fetched, and playback could not be stopped");
-                                }
-
-                                root.song.scenesModel.stopScene(root.song.scenesModel.selectedSceneIndex);
-                                root.song.scenesModel.selectedSceneIndex = index;
-                                zynthian.zynthiloops.selectedClipCol = index;
-
-                                sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                if (sequence) {
-                                    sequence.prepareSequencePlayback();
-                                } else {
-                                    console.log("Sequence could not be fetched, and playback could not be stopped");
-                                }
+                                Zynthian.CommonUtils.switchToScene(index);
                             }
 
                             Rectangle {

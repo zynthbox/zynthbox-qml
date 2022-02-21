@@ -56,3 +56,27 @@ function toggleLayerChaining(layer) {
     zynthian.layer.ensure_contiguous_cloned_layers();
     zynthian.fixed_layers.show();
 }
+
+function switchToScene(index) {
+    zynthian.start_loading()
+
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    if (sequence) {
+        sequence.disconnectSequencePlayback();
+    } else {
+        console.log("Sequence could not be fetched, and playback could not be stopped");
+    }
+
+    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+    zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
+    zynthian.zynthiloops.selectedClipCol = index;
+
+    sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    if (sequence) {
+        sequence.prepareSequencePlayback();
+    } else {
+        console.log("Sequence could not be fetched, and playback could not be stopped");
+    }
+
+    zynthian.stop_loading()
+}

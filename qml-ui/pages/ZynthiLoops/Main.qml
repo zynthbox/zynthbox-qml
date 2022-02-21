@@ -514,15 +514,6 @@ Zynthian.ScreenPage {
                                 }
                             }
 
-                            Connections {
-                                target: root.song.scenesModel
-                                onClipCountChanged: {
-                                    sceneHeaderDelegate.opacity = root.song.scenesModel.clipCountInScene(index) > 0
-                                                        ? 1
-                                                        : 0.5
-                                }
-                            }
-
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"

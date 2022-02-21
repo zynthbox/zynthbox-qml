@@ -127,7 +127,7 @@ don't want to have to dig too far...
 
     Connections {
         target: ZynQuick.PlayGridManager
-        property string currentPlaygrid
+        property int currentPlaygrid: -1
         function updatePlaygrid() {
             if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
                 var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
@@ -136,6 +136,7 @@ don't want to have to dig too far...
                 placeholderAction.children = playgrid.additionalActions;
             }
         }
+        Component.onCompleted: updatePlaygrid();
         onPlaygridsChanged: updatePlaygrid();
         onCurrentPlaygridsChanged: updatePlaygrid();
     }

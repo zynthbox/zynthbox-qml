@@ -321,7 +321,7 @@ Zynthian.Card {
                 },
                 Zynthian.TabbedControlViewAction {
                     id: recordingAction
-                    text: qsTr("Record")
+                    text: qsTr("Audio")
                     page: Qt.resolvedUrl("RecordingBar.qml")
                     visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.recordable && !controlObj.path
                     initialProperties: {"bottomBar": root}
@@ -338,20 +338,20 @@ Zynthian.Card {
                     id: editorAction
                     text: qsTr("Wave Editor")
                     page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     id: metadataSoundsAction
                     text: qsTr("Sounds")
                     page: Qt.resolvedUrl("MetadataSoundsBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Info")
                     page: Qt.resolvedUrl("InfoBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

@@ -79,7 +79,8 @@ Zynthian.Card {
             header: RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                Layout.topMargin: Kirigami.Units.gridUnit * 0.5
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 2
+                Layout.margins: Kirigami.Units.gridUnit * 0.5
 
                 EditableHeader {
                     text: {
@@ -162,13 +163,15 @@ Zynthian.Card {
                             var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
 
                             pattern.clear()
+                            patternAction.trigger()
                         } else {
                             controlObj.clear()
+                            recordingAction.trigger()
                         }
 
-                        if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
-                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
-                        }
+//                        if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
+//                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+//                        }
                     }
                 }
 

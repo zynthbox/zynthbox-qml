@@ -135,6 +135,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except:
             self.select_preset_index = 0
 
+        self.selected_preset_name_changed.emit()
+
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
@@ -152,7 +154,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
             self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
-            self.zyngui.session_dashboard.selected_track_changed.connect(self.update_select_preset_index)
             self.update_select_preset_index()
 
             if cb is not None:

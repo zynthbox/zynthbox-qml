@@ -128,9 +128,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.select_preset_index))
 
     def update_select_preset_index(self):
-        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-        selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-        self.select_preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
+        try:
+            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+            self.select_preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
+        except:
+            self.select_preset_index = 0
 
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:

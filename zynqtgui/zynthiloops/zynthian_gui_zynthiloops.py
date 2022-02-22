@@ -227,7 +227,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                          'value': 0})
 
                 self.__zselector.config(self.__zselector_ctrl)
-                self.__zselector.custom_encoder_speed = 4
+                self.__zselector.custom_encoder_speed = 0
             else:
                 self.__zselector_ctrl.set_options(
                     {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
@@ -249,10 +249,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
                                                                                                        'value': 0})
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
+                self.__zselector.custom_encoder_speed = 0
             else:
                 self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
                                                                                                    'value': self.zyngui.session_dashboard.selectedTrack})
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
+                self.__zselector.custom_encoder_speed = 7
 
 
     def switch_select(self, t):

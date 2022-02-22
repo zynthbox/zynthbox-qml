@@ -365,8 +365,8 @@ Zynthian.BasePlayGrid {
     // on component completed
     onInitialize: {
         _private.adoptSequence();
-        if (_private.gridModel.rows === 0) {
-            for (var i = 0; i < 5; ++i) {
+        if (_private.gridModel.rows === 0 && _private.sequence != null) {
+            for (var i = 0; i < _private.sequence.rowCount(); ++i) {
                 component.populateGrid(component.getModel("pattern grid model " + i), i);
             }
         }
@@ -674,18 +674,19 @@ Zynthian.BasePlayGrid {
                                     Layout.fillHeight: true
                                     Zynthian.PlayGridButton {
                                         text: "SAMPLE"
-                                        checked: _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleDestination
                                         onClicked: {
                                             component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination)
                                         }
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "SYNTH"
-                                        checked: _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
                                         onClicked: {
                                             component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
                                         }
                                     }
+                                }
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
                                     //Zynthian.PlayGridButton {
@@ -746,17 +747,27 @@ Zynthian.BasePlayGrid {
                         component.showPatternsMenu = false;
                     }
                 }
-                ColumnLayout {
+                QQC2.ScrollView {
                     id:patternsMenuList
                     anchors {
                         fill: parent
                         margins: Kirigami.Units.smallSpacing
                     }
-                    Repeater {
+                    QQC2.ScrollBar.horizontal.visible: false
+                    QQC2.ScrollBar.vertical.x: patternsMenuListView.x + patternsMenuListView.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
+                    contentItem: ListView {
+                        id: patternsMenuListView
+                        clip: true
                         model: _private.sequence
+                        Connections {
+                            target: _private
+                            onActivePatternChanged: {
+                                patternsMenuListView.positionViewAtIndex(_private.activePattern, ListView.Contain);
+                            }
+                        }
 
                         delegate: Rectangle {
-                            id:patternsMenuItem
+                            id: patternsMenuItem
                             property QtObject thisPattern: model.pattern
                             property int thisPatternIndex: model.index
                             property int bankIndex: thisPattern.bankOffset / 8;
@@ -764,8 +775,8 @@ Zynthian.BasePlayGrid {
                             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
                             property QtObject associatedTrack: null
                             property int associatedTrackIndex: -1
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
+                            height: ListView.view.height * 0.19
+                            width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
                             Kirigami.Theme.inherit: false
                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
                             color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor

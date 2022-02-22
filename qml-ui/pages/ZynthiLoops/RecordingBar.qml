@@ -265,6 +265,7 @@ GridLayout {
                 } else {
                     controlObj.stopRecording();
                     zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(controlObj);
+                    bottomBar.tabbedView.initialAction.trigger()
                 }
             }
         }

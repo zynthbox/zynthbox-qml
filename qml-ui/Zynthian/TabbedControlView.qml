@@ -42,8 +42,6 @@ Item {
     property Zynthian.TabbedControlViewAction initialAction: tabActions[0]
     readonly property Zynthian.TabbedControlViewAction activeAction: internalStack.activeAction
     readonly property QtObject activeItem: internalStack.currentItem
-    property bool headerVisible: true
-    property alias header: headerItem.contentItem
     property alias initialHeaderItem: initialItem.contentItem
     property alias finalHeaderItem: finalItem.contentItem
 
@@ -369,16 +367,6 @@ Item {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Kirigami.Units.gridUnit * 0.5
-
-            QQC2.Control {
-                id: headerItem
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                clip: true
-                visible: contentItem && headerVisible
-            }
-
             Zynthian.Stack {
                 id: internalStack
                 property Zynthian.TabbedControlViewAction activeAction: root.initialAction

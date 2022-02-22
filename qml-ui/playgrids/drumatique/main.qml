@@ -79,6 +79,18 @@ Zynthian.BasePlayGrid {
                     returnValue = true;
                 }
                 break;
+            case "SELECT_UP":
+                if (_private.sequence && _private.sequence.activePattern > 0) {
+                    component.pickPattern(_private.sequence.activePattern - 1);
+                    returnValue = true;
+                }
+                break;
+            case "SELECT_DOWN":
+                if (_private.sequence && _private.sequence.activePattern < _private.sequence.rowCount()) {
+                    component.pickPattern(_private.sequence.activePattern + 1);
+                    returnValue = true;
+                }
+                break;
             default:
                 break;
         }
@@ -136,6 +148,16 @@ Zynthian.BasePlayGrid {
         //_private.sequence.activePattern = activePattern;
     }
 
+    function pickPattern(patternIndex) {
+        for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+            if (track && track.connectedPattern === patternIndex) {
+                zynthian.session_dashboard.selectedTrack = i;
+                break;
+            }
+        }
+        _private.sequence.activePattern = patternIndex
+    }
     property var noteSpecificColor: {
         "C":"#f08080", 
         "C#":"#4b0082",
@@ -782,15 +804,7 @@ Zynthian.BasePlayGrid {
                             color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
                             border.color: Kirigami.Theme.textColor
                             function pickThisPattern() {
-                                console.log(patternsMenuItem.thisPatternIndex, "index");
-                                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                                    if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
-                                        zynthian.session_dashboard.selectedTrack = i;
-                                        break;
-                                    }
-                                }
-                                _private.sequence.activePattern = patternsMenuItem.thisPatternIndex
+                                component.pickPattern(patternsMenuItem.thisPatternIndex)
                             }
                             function adoptTrackLayer() {
                                 trackAdopterTimer.restart();

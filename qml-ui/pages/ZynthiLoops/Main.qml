@@ -535,9 +535,11 @@ Zynthian.ScreenPage {
 
                         delegate: TableHeader {
                             text: model.track.name
-                            subText: model.track.connectedPattern >= 0
-                                      ? "Pat. " + (model.track.connectedPattern+1)
-                                      : ""
+
+                            // hide "Pat.1" info in the track header cells, as Track 1 will be Pat.1, to T10 - Pat.10
+//                            subText: model.track.connectedPattern >= 0
+//                                      ? "Pat. " + (model.track.connectedPattern+1)
+//                                      : ""
                             color: Kirigami.Theme.backgroundColor
 
                             width: privateProps.headerWidth
@@ -686,7 +688,7 @@ Zynthian.ScreenPage {
                                                         patternIsPlaying = pattern.enabled
                                                     }
                                                 }
-                                                return patternIsPlaying && model.clip.inCurrentScene;
+                                                return patternIsPlaying && model.clip.inCurrentScene && zynthian.zynthiloops.isMetronomeRunning;
                                             }
                                         }
 

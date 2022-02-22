@@ -888,42 +888,61 @@ Zynthian.ScreenPage {
 
                     property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
                     property string synthName: ""
-                    property string presetName: ""
 
                     width: parent.width - Kirigami.Units.gridUnit
                     anchors.centerIn: parent
                     spacing: Kirigami.Units.gridUnit
 
-                    onClipChanged: infoBar.updateSoundName()
+                    onClipChanged: updateSoundNameTimer.restart()
 
                     function updateSoundName() {
+                        var layerIndex = -1;
+                        var count = 0;
+                        for (var i in infoBar.clip.clipTrack.chainedSounds) {
+                            if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
+                                infoBar.clip.clipTrack.checkIfLayerExists(i)) {
+                                if (layerIndex < 0) {
+                                    layerIndex = i
+                                }
+
+                                count++;
+                            }
+                        }
+
+                        layerLabel.layerIndex = layerIndex
+                        layerLabel.layerCount = count
+
                         for (var id in infoBar.clip.clipTrack.chainedSounds) {
                             if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
                                 infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
                                 var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
                                 infoBar.synthName = soundName[0] ? soundName[0].trim() : "";
-                                infoBar.presetName = soundName[1] ? soundName[1].trim() : "";
                                 break;
                             }
 
                             // If sound not connected, set text to none
                             infoBar.synthName = "<none>"
-                            infoBar.presetName = "<none>"
-
                         }
+                    }
+
+                    Timer {
+                        id: updateSoundNameTimer
+                        repeat: false
+                        interval: 1000
+                        onTriggered: infoBar.updateSoundName()
                     }
 
                     Connections {
                         target: zynthian.fixed_layers
                         onList_updated: {
-                            infoBar.updateSoundName();
+                            updateSoundNameTimer.restart()
                         }
                     }
 
                     Connections {
                         target: infoBar.clip.clipTrack
                         onChainedSoundsChanged: {
-                            infoBar.updateSoundName();
+                            updateSoundNameTimer.restart()
                         }
                     }
 
@@ -934,27 +953,10 @@ Zynthian.ScreenPage {
                         text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
                     }
                     QQC2.Label {
-                        property int layerIndex: {
-                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
-                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
-                                    infoBar.clip.clipTrack.checkIfLayerExists(i)) {
-                                    return i;
-                                }
-                            }
-                            return -1;
-                        }
-                        property int layerCount: {
-                            var count = 0;
+                        id: layerLabel
 
-                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
-                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
-                                    infoBar.clip.clipTrack.checkIfLayerExists(i)) {
-                                    count++;
-                                }
-                            }
-
-                            return count;
-                        }
+                        property int layerIndex: -1
+                        property int layerCount: 0
 
                         Layout.fillWidth: false
                         Layout.fillHeight: false
@@ -971,7 +973,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName)
+                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName === "-" ? "<none>" : zynthian.zynthiloops.selectedPresetName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

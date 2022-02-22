@@ -67,154 +67,6 @@ Zynthian.Card {
     }
 
     contentItem: ColumnLayout {
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-            visible: root.controlType !== BottomBar.ControlType.Track
-
-            EditableHeader {
-                text: {
-                    let text = root.controlObj ? root.controlObj.name : "";
-                    switch (root.controlType) {
-                    case BottomBar.ControlType.Song:
-                        return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
-                    case BottomBar.ControlType.Clip:
-                        return qsTr("CLIP: %1").arg(text);
-                    case BottomBar.ControlType.Track:
-                        return qsTr("TRACK: %1").arg(text);
-                    case BottomBar.ControlType.Part:
-                        return qsTr("PART: %1").arg(text);
-                    case BottomBar.ControlType.Pattern:
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-                        return qsTr("PATTERN: %1, pt.%2")
-                                                .arg(pattern.objectName)
-                                                .arg(root.controlObj.col == 0 ? "I" : "II")
-                    default:
-                        return text;
-                    }
-                }
-            }
-
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            QQC2.Label {
-                visible: root.controlType === BottomBar.ControlType.Clip
-                text: {
-                    if (!controlObj || !controlObj.path) {
-                        return qsTr("No File Loaded");
-                    }
-                    var arr = controlObj.path.split('/');
-                    return qsTr("File: %1").arg(arr[arr.length - 1]);
-                }
-            }
-
-            SidebarButton {
-                icon.name: "document-save-symbolic"
-                visible: root.controlType === BottomBar.ControlType.Clip
-                         && controlObj.hasOwnProperty("path")
-                         && controlObj.path.length > 0
-
-                onClicked: {
-                    controlObj.saveMetadata();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "document-open"
-                visible: root.controlType === BottomBar.ControlType.Clip
-                enabled: controlObj ? !controlObj.isPlaying : false
-
-                onClicked: {
-                    pickerDialog.folderModel.folder = root.controlObj.recordingDir;
-                    pickerDialog.open();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "delete"
-                visible: (controlObj != null) && controlObj.deletable
-
-                onClicked: {
-                    controlObj.delete();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "edit-clear-all"
-                visible: (controlObj != null) && controlObj.clearable
-                enabled: controlObj ? !controlObj.isPlaying : false
-
-                onClicked: {
-                    if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-
-//                        pattern.clearBank(root.controlObj.col);
-                    } else {
-                        controlObj.clear()
-                    }
-
-                    if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
-                        zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
-                    }
-                }
-            }
-
-            SidebarButton {
-                icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                visible: root.controlType !== BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable && controlObj.path
-
-                onClicked: {
-                    if (controlObj.isPlaying) {
-                        console.log("Stopping Sound Loop")
-                        controlObj.stop();
-                    } else {
-                        console.log("Playing Sound Loop")
-                        controlObj.playSolo();
-                    }
-                }
-            }
-
-            SidebarButton {
-                icon.name: "media-playback-start"
-                visible: root.controlType === BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable
-
-                onClicked: {
-                    console.log("Starting Part")
-                    controlObj.play();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "media-playback-stop"
-                visible: root.controlType === BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable
-
-                onClicked: {
-                    console.log("Stopping Part")
-                    controlObj.stop();
-                }
-            }
-
-//            SidebarButton {
-//                icon.name: "media-record-symbolic"
-//                icon.color: "#f44336"
-//                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
-//                enabled: !controlObj.isRecording
-
-//                onClicked: {
-//                    controlObj.queueRecording();
-//                }
-//            }
-        }
-
-
         Zynthian.TabbedControlView {
             id: tabbedView
             Layout.fillWidth: true
@@ -223,6 +75,152 @@ Zynthian.Card {
             orientation: Qt.Vertical
             visibleFocusRects: false
 
+            headerVisible: root.controlType !== BottomBar.ControlType.Track
+            header: RowLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.topMargin: Kirigami.Units.gridUnit * 0.5
+
+                EditableHeader {
+                    text: {
+                        let text = root.controlObj ? root.controlObj.name : "";
+                        switch (root.controlType) {
+                        case BottomBar.ControlType.Song:
+                            return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                        case BottomBar.ControlType.Clip:
+                            return qsTr("CLIP: %1").arg(text);
+                        case BottomBar.ControlType.Track:
+                            return qsTr("TRACK: %1").arg(text);
+                        case BottomBar.ControlType.Part:
+                            return qsTr("PART: %1").arg(text);
+                        case BottomBar.ControlType.Pattern:
+                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                            var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+                            return qsTr("PATTERN: %1, pt.%2")
+                                                    .arg(pattern.objectName)
+                                                    .arg(root.controlObj.col == 0 ? "I" : "II")
+                        default:
+                            return text;
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                QQC2.Label {
+                    visible: root.controlType === BottomBar.ControlType.Clip
+                    text: {
+                        if (!controlObj || !controlObj.path) {
+                            return qsTr("No File Loaded");
+                        }
+                        var arr = controlObj.path.split('/');
+                        return qsTr("File: %1").arg(arr[arr.length - 1]);
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "document-save-symbolic"
+                    visible: root.controlType === BottomBar.ControlType.Clip
+                             && controlObj.hasOwnProperty("path")
+                             && controlObj.path.length > 0
+
+                    onClicked: {
+                        controlObj.saveMetadata();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "document-open"
+                    visible: root.controlType === BottomBar.ControlType.Clip
+                    enabled: controlObj ? !controlObj.isPlaying : false
+
+                    onClicked: {
+                        pickerDialog.folderModel.folder = root.controlObj.recordingDir;
+                        pickerDialog.open();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "delete"
+                    visible: (controlObj != null) && controlObj.deletable
+
+                    onClicked: {
+                        controlObj.delete();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "edit-clear-all"
+                    visible: (controlObj != null) && controlObj.clearable
+                    enabled: controlObj ? !controlObj.isPlaying : false
+
+                    onClicked: {
+                        if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
+                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                            var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+
+    //                        pattern.clearBank(root.controlObj.col);
+                        } else {
+                            controlObj.clear()
+                        }
+
+                        if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
+                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                        }
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    visible: root.controlType !== BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable && controlObj.path
+
+                    onClicked: {
+                        if (controlObj.isPlaying) {
+                            console.log("Stopping Sound Loop")
+                            controlObj.stop();
+                        } else {
+                            console.log("Playing Sound Loop")
+                            controlObj.playSolo();
+                        }
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-start"
+                    visible: root.controlType === BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        console.log("Starting Part")
+                        controlObj.play();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-stop"
+                    visible: root.controlType === BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        console.log("Stopping Part")
+                        controlObj.stop();
+                    }
+                }
+
+    //            SidebarButton {
+    //                icon.name: "media-record-symbolic"
+    //                icon.color: "#f44336"
+    //                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
+    //                enabled: !controlObj.isRecording
+
+    //                onClicked: {
+    //                    controlObj.queueRecording();
+    //                }
+    //            }
+            }
             initialHeaderItem: RowLayout {
                 visible: root.controlType === BottomBar.ControlType.Track
                 EditableHeader {

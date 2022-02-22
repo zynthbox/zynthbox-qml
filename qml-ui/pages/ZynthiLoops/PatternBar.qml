@@ -57,6 +57,7 @@ GridLayout {
         id: patternVisualiser
         Layout.fillWidth: true
         Layout.fillHeight: true
+        Layout.margins: Kirigami.Units.gridUnit * 0.5
         smooth: false
 
         visible: controlObj.clipTrack.connectedPattern >= 0

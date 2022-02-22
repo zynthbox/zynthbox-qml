@@ -152,16 +152,16 @@ Zynthian.Card {
                 }
 
                 SidebarButton {
-                    icon.name: "edit-clear-all"
+                    icon.name: "user-trash-symbolic"
                     visible: (controlObj != null) && controlObj.clearable
                     enabled: controlObj ? !controlObj.isPlaying : false
 
                     onClicked: {
-                        if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
+                        if (root.controlType === BottomBar.ControlType.Pattern && tabbedView.activeAction === patternAction) {
                             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                             var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
 
-    //                        pattern.clearBank(root.controlObj.col);
+                            pattern.clear()
                         } else {
                             controlObj.clear()
                         }

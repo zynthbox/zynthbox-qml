@@ -195,8 +195,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.zyngui.sound_combinator_active:
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-                if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector.value:
-                    QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+                try:
+                    if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector.value:
+                        QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+                except:
+                    pass
             else:
                 if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
                     QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
@@ -212,9 +215,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-                self.__zselector_ctrl.set_options(
-                    {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                     'value_max': self.zyngui.preset.selector_list.get_count(), 'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
+                try:
+                    self.__zselector_ctrl.set_options(
+                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                         'value_max': self.zyngui.preset.selector_list.get_count(),
+                         'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
+                except:
+                    self.__zselector_ctrl.set_options(
+                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                         'value_max': self.zyngui.preset.selector_list.get_count(),
+                         'value': 0})
+
                 self.__zselector.config(self.__zselector_ctrl)
                 self.__zselector.custom_encoder_speed = 4
             else:
@@ -231,8 +242,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.zyngui.sound_combinator_active:
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-                self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                   'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
+                try:
+                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                       'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
+                except:
+                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                       'value': 0})
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
             else:
                 self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,

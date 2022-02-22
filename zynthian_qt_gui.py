@@ -382,8 +382,8 @@ class zynthian_gui(QObject):
         self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
         self.wscolor_light = rpi_ws281x.Color(0, 50, 200)
         self.wscolor_active = rpi_ws281x.Color(0, 255, 0)
-        self.wscolor_admin = rpi_ws281x.Color(120, 0, 0)
-        self.wscolor_red = rpi_ws281x.Color(120, 0, 0)
+        self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
+        self.wscolor_admin = self.wscolor_red
         self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
 
         self.wsleds_num = 25

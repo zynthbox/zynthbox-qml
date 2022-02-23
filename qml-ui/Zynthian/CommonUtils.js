@@ -2,7 +2,7 @@
 
 function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
         // First, explicitly turn off any Patterns which are not assigned a Track - otherwise
         // we'll end up confusing people by playing back stuff where we don't know where the
@@ -31,7 +31,7 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     console.log("Stopping Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
         sequence.stopSequencePlayback();
     } else {
@@ -60,7 +60,7 @@ function toggleLayerChaining(layer) {
 function switchToScene(index) {
     zynthian.start_loading()
 
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
         sequence.disconnectSequencePlayback();
     } else {
@@ -71,7 +71,7 @@ function switchToScene(index) {
     zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
     zynthian.zynthiloops.selectedClipCol = index;
 
-    sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
         sequence.prepareSequencePlayback();
     } else {

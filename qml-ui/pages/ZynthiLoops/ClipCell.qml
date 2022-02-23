@@ -39,6 +39,9 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property color highlightColor
+    property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+
 
     onPressed: forceActiveFocus()
 
@@ -60,10 +63,15 @@ QQC2.AbstractButton {
             Connections {
                 target: model.clip
                 onPathChanged: textTimer.restart()
+                onIsPlayingChanged: textTimer.restart()
             }
             Connections {
                 target: track
                 onConnectedPatternChanged: textTimer.restart()
+            }
+            Connections {
+                target: sequence
+                onIsPlayingChanged: textTimer.restart()
             }
             Connections {
                 target: pattern
@@ -80,9 +88,7 @@ QQC2.AbstractButton {
                             label.text = model.clip.length
                         }
                     } else if (track.connectedPattern >= 0) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                        var pattern = sequence.get(track.connectedPattern);
-                        var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+                        var hasNotes = pattern.bankHasNotes(0)
 
                         label.text = hasNotes
                                 ? sequence && sequence.isPlaying
@@ -136,14 +142,8 @@ QQC2.AbstractButton {
         Rectangle {
             id: patternProgressRect
 
-            property var sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-            property var pattern: sequence.get(track.connectedPattern)
-
-            property var isPlaying: ((pattern && pattern.bank === "I" && model.clip.col === 0 && sequence.isPlaying)
-                                    || (pattern && pattern.bank === "II" && model.clip.col === 1 && sequence.isPlaying)) ? true : false
-
             anchors.bottom: parent.bottom
-            visible: track.connectedPattern >= 0 && isPlaying
+            visible: track.connectedPattern >= 0 && sequence.isPlaying
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0

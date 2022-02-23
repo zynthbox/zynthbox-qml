@@ -717,10 +717,7 @@ Zynthian.ScreenPage {
                                         Connections {
                                             target: model.clip
                                             onInCurrentSceneChanged: colorTimer.restart()
-                                        }
-                                        Connections {
-                                            target: model.clip.path
-                                            onLengthChanged: colorTimer.restart()
+                                            onPathChanged: colorTimer.restart()
                                         }
                                         Connections {
                                             target: track

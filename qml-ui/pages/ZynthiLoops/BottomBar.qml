@@ -70,7 +70,8 @@ Zynthian.Card {
         RowLayout {
             Layout.fillWidth: true
             Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-            visible: root.controlType !== BottomBar.ControlType.Track
+            visible: root.controlType !== BottomBar.ControlType.Track &&
+                     !(root.controlType === BottomBar.ControlType.Pattern && tabbedView.activeAction === patternAction)
 
             EditableHeader {
                 text: {
@@ -79,15 +80,16 @@ Zynthian.Card {
                     case BottomBar.ControlType.Song:
                         return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
                     case BottomBar.ControlType.Clip:
+                    case BottomBar.ControlType.Pattern:
                         return qsTr("CLIP: %1").arg(text);
                     case BottomBar.ControlType.Track:
                         return qsTr("TRACK: %1").arg(text);
                     case BottomBar.ControlType.Part:
                         return qsTr("PART: %1").arg(text);
-                    case BottomBar.ControlType.Pattern:
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-                        return qsTr("PATTERN: %1").arg(pattern.objectName)
+//                    case BottomBar.ControlType.Pattern:
+//                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+//                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+//                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                     default:
                         return text;
                     }
@@ -100,7 +102,7 @@ Zynthian.Card {
             }
 
             QQC2.Label {
-                visible: root.controlType === BottomBar.ControlType.Clip
+                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                 text: {
                     if (!controlObj || !controlObj.path) {
                         return qsTr("No File Loaded");
@@ -112,7 +114,7 @@ Zynthian.Card {
 
             SidebarButton {
                 icon.name: "document-save-symbolic"
-                visible: root.controlType === BottomBar.ControlType.Clip
+                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                          && controlObj.hasOwnProperty("path")
                          && controlObj.path.length > 0
 
@@ -123,7 +125,7 @@ Zynthian.Card {
 
             SidebarButton {
                 icon.name: "document-open"
-                visible: root.controlType === BottomBar.ControlType.Clip
+                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                 enabled: controlObj ? !controlObj.isPlaying : false
 
                 onClicked: {
@@ -230,13 +232,14 @@ Zynthian.Card {
                         case BottomBar.ControlType.Song:
                             return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
                         case BottomBar.ControlType.Clip:
+                        case BottomBar.ControlType.Pattern:
                             return qsTr("CLIP: %1").arg(text);
                         case BottomBar.ControlType.Track:
                             return qsTr("TRACK: %1").arg(text);
                         case BottomBar.ControlType.Part:
                             return qsTr("PART: %1").arg(text);
-                        case BottomBar.ControlType.Pattern:
-                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+//                        case BottomBar.ControlType.Pattern:
+//                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
                         default:
                             return text;
                         }

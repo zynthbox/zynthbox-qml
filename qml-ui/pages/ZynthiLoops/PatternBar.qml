@@ -39,6 +39,9 @@ GridLayout {
     id: root
     rows: 1
     Layout.fillWidth: true
+
+    property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject pattern: root.sequence ? root.sequence.get(controlObj.clipTrack.connectedPattern) : null
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
@@ -53,40 +56,71 @@ GridLayout {
         return false;
     }
 
-    Image {
-        id: patternVisualiser
+    ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        smooth: false
+        Layout.margins: Kirigami.Units.gridUnit * 0.5
+        spacing: Kirigami.Units.gridUnit * 0.5
 
-        visible: controlObj.clipTrack.connectedPattern >= 0
-        property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-        property QtObject pattern: sequence ? sequence.get(controlObj.clipTrack.connectedPattern) : null
-        source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
-        Rectangle { // Progress
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: false
+
+            Kirigami.Heading {
+                Layout.fillWidth: false
+                Layout.fillHeight: false
+                text: qsTr("PATTERN: %1").arg(root.pattern ? root.pattern.objectName : "")
             }
-            visible: patternVisualiser.sequence &&
-                     patternVisualiser.sequence.isPlaying &&
-                     patternVisualiser.pattern &&
-                     patternVisualiser.pattern.enabled &&
-                     ((controlObj.col === 0 && patternVisualiser.pattern.bank === "I") || (controlObj.col === 1 && patternVisualiser.pattern.bank === "II"))
-            color: Kirigami.Theme.highlightColor
-            width: widthFactor // this way the progress rect is the same width as a step
-            property double widthFactor: patternVisualiser.pattern ? parent.width / (patternVisualiser.pattern.width * patternVisualiser.pattern.bankLength) : 1
-            x: patternVisualiser.pattern ? patternVisualiser.pattern.bankPlaybackPosition * widthFactor : 0
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            SidebarButton {
+                icon.name: "edit-clear-all"
+
+                onClicked: {
+                    if (root.pattern) {
+                        root.pattern.clear();
+                    }
+                }
+            }
         }
-        MouseArea {
-            anchors.fill:parent
-            onClicked: {
-                var screenBack = zynthian.current_screen_id;
-                zynthian.current_modal_screen_id = "playgrid";
-                zynthian.forced_screen_back = "zynthiloops";
-                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                sequence.activePattern = controlObj.clipTrack.connectedPattern;
+
+        Image {
+            id: patternVisualiser
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            smooth: false
+
+            visible: controlObj.clipTrack.connectedPattern >= 0
+            source: root.pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+            Rectangle { // Progress
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                visible: root.sequence &&
+                         root.sequence.isPlaying &&
+                         root.pattern &&
+                         root.pattern.enabled &&
+                         ((controlObj.col === 0 && root.pattern.bank === "I") || (controlObj.col === 1 && root.pattern.bank === "II"))
+                color: Kirigami.Theme.highlightColor
+                width: widthFactor // this way the progress rect is the same width as a step
+                property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
+            }
+            MouseArea {
+                anchors.fill:parent
+                onClicked: {
+                    var screenBack = zynthian.current_screen_id;
+                    zynthian.current_modal_screen_id = "playgrid";
+                    zynthian.forced_screen_back = "zynthiloops";
+                    ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                    sequence.activePattern = controlObj.clipTrack.connectedPattern;
+                }
             }
         }
     }

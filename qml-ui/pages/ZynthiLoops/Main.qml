@@ -714,25 +714,65 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        backgroundColor: {
-                                            var pattern = null;
-                                            var hasNotes = false;
-                                            try {
-                                                pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
-                                                hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
-                                            } catch(err) {}
+                                        Connections {
+                                            target: model.clip
+                                            onInCurrentSceneChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: model.clip.path
+                                            onLengthChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: track
+                                            onConnectedPatternChanged: colorTimer.restart()
+                                        }
+                                        Timer {
+                                            id: colorTimer
+                                            interval: 250
+                                            onTriggered: {
+                                                print("BBB BACKGROUNDCOLOR")
+                                                // update color
+                                                var pattern = null;
+                                                var hasNotes = false;
+                                                try {
+                                                    pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
+                                                    hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+                                                } catch(err) {}
 
-                                            if (model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0) {
-                                                // In scene
-                                                return "#3381d4fa";
-                                            } else if (!model.clip.inCurrentScene) {
-                                                // Not in scene
-                                                return "#33f44336";
-                                            } else if ((track.connectedPattern >= 0 && hasNotes)
-                                                || (model.clip.path && model.clip.path.length > 0)) {
-                                                return Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-                                            } else {
-                                                return Qt.rgba(0, 0, 0, 1);
+                                                if (model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0) {
+                                                    // In scene
+                                                    clipCell.color = "#3381d4fa";
+                                                } else if (!model.clip.inCurrentScene) {
+                                                    // Not in scene
+                                                    clipCell.color = "#33f44336";
+                                                } else if ((track.connectedPattern >= 0 && hasNotes)
+                                                    || (model.clip.path && model.clip.path.length > 0)) {
+                                                    clipCell.color =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
+                                                } else {
+                                                    clipCell.color =  Qt.rgba(0, 0, 0, 1);
+                                                }
+
+                                                // update isPlaying
+                                                if (track.connectedPattern < 0) {
+                                                    clipCell.isPlaying = model.clip.isPlaying;
+                                                } else {
+                                                    var patternIsPlaying = false;
+                                                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                                    if (sequence && sequence.isPlaying) {
+                                                        var pattern = sequence.get(track.connectedPattern);
+                                                        /*if (pattern.isEmpty) {
+                                                            return false
+                                                        } else */if ((model.clip.col === 0 && pattern.bank !== "I")
+                                                            || (model.clip.col === 1 && pattern.bank !== "II")) {
+                                                            clipCell.isPlaying = false
+                                                        } else if (sequence.soloPattern > -1) {
+                                                            patternIsPlaying = (sequence.soloPattern == track.connectedPattern)
+                                                        } else if (pattern) {
+                                                            patternIsPlaying = pattern.enabled
+                                                        }
+                                                    }
+                                                    clipCell.isPlaying = patternIsPlaying && model.clip.inCurrentScene && zynthian.zynthiloops.isMetronomeRunning;
+                                                }
                                             }
                                         }
 

@@ -58,8 +58,6 @@ function toggleLayerChaining(layer) {
 }
 
 function switchToScene(index) {
-    zynthian.start_loading()
-
     var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
         sequence.disconnectSequencePlayback();
@@ -77,6 +75,4 @@ function switchToScene(index) {
     } else {
         console.log("Sequence could not be fetched, and playback could not be stopped");
     }
-
-    zynthian.stop_loading()
 }

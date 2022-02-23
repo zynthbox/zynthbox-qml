@@ -1018,11 +1018,15 @@ Zynthian.BasePlayGrid {
 
                                                 soundName = text;
                                             }
-                                            text: patternsMenuItem.associatedTrack
-                                                ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
-                                                    ? "Sound: " + soundName
-                                                    : "No sound assigned - tap to select one"
-                                                : "Unassigned - playing to: " + _private.currentSoundName
+                                            text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                                ? patternsMenuItem.thisPattern.sampleFilename === ""
+                                                    ? "No sample chosen - tap to select one"
+                                                    : patternsMenuItem.thisPattern.sampleFilename.split("/").pop()
+                                                : patternsMenuItem.associatedTrack
+                                                    ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                        ? "Sound: " + soundName
+                                                        : "No sound assigned - tap to select one"
+                                                    : "Unassigned - playing to: " + _private.currentSoundName
                                             onClicked: {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;

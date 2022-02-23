@@ -39,7 +39,7 @@ QQC2.Button {
     property int activeBar
     property int padNoteNumber
     property QtObject note
-    property int padNoteRow: activeBar + component.patternModel.bankOffset
+    property int padNoteRow: component.patternModel ? activeBar + component.patternModel.bankOffset : 0
     property int padNoteIndex
     property var mostRecentlyPlayedNote
 
@@ -169,7 +169,7 @@ QQC2.Button {
             QQC2.Label {
                 id: padNoteLabel
                 anchors.centerIn: parent
-                text: (component.padNoteNumber - component.patternModel.bankOffset * component.patternModel.width) + 1
+                text: component.patternModel ? (component.padNoteNumber - component.patternModel.bankOffset * component.patternModel.width) + 1 : ""
                 color: component.foregroundColor
             }
         }
@@ -183,13 +183,15 @@ QQC2.Button {
                 margins: 1
             }
             height:9
-            color: component.patternModel.sequence.isPlaying
-                ? component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex
-                    ? "yellow"
-                    : component.backgroundColor
-                : component.padNoteRow === component.patternModel.bankOffset && component.padNoteIndex === 0 && ((component.patternModel.sequence.soloPattern > -1 && component.patternModel.sequence.soloPatternObject === component.patternModel) || (component.patternModel.sequence.soloPattern === -1 && component.patternModel.enabled))
-                    ? "yellow"
-                    : component.backgroundColor
+            color: component.patternModel
+                ? component.patternModel.sequence.isPlaying
+                    ? component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex
+                        ? "yellow"
+                        : component.backgroundColor
+                    : component.padNoteRow === component.patternModel.bankOffset && component.padNoteIndex === 0 && ((component.patternModel.sequence.soloPattern > -1 && component.patternModel.sequence.soloPatternObject === component.patternModel) || (component.patternModel.sequence.soloPattern === -1 && component.patternModel.enabled))
+                        ? "yellow"
+                        : component.backgroundColor
+                : "white"
         }
     }
 }

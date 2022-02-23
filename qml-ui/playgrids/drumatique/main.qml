@@ -182,11 +182,14 @@ Zynthian.BasePlayGrid {
 
     QtObject {
         id:_private;
+        // Yes, this is a hack - if we don't do this, we'll forever be rebuilding the patterns popup etc when the sequence and pattern changes, which is all manner of expensive
+        property int sequencePatternCount: 10
+        property int activeBarModelWidth: 16
         property QtObject sequence
         property QtObject gridModel: sequence && activePattern > -1 ? component.getModel("pattern grid model " + activePattern) : null;
         property int activePattern: sequence ? sequence.activePattern : -1
         property QtObject activePatternModel: sequence ? sequence.activePatternObject : null;
-        property QtObject activeBarModel:activePatternModel && activeBar > -1 ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"]) : null;
+        property QtObject activeBarModel: activePatternModel && activeBar > -1 ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"]) : null;
 
         property bool patternHasUnsavedChanged: false
         property bool positionalVelocity: true
@@ -200,7 +203,7 @@ Zynthian.BasePlayGrid {
         property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
         property int layer: sequence && sequence.activePatternObject ? sequence.activePatternObject.layer : 0
         property var availableBars: sequence && sequence.activePatternObject ? sequence.activePatternObject.availableBars : 0
-        property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : 0
+        property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
         property string sceneName: zynthian.zynthiloops.song.scenesModel.selectedSceneName
@@ -525,7 +528,7 @@ Zynthian.BasePlayGrid {
                         anchors.margins: 5
                         Repeater {
                             id:drumPadRepeater
-                            model: _private.activeBarModel
+                            model: _private.activeBarModelWidth
                             PadNoteButton {
                                 id: sequencerPad
                                 Layout.fillHeight: true
@@ -536,7 +539,7 @@ Zynthian.BasePlayGrid {
                                 mostRecentlyPlayedNote: component.mostRecentlyPlayedNote
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
-                                note: _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                note: _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 Timer {
                                     id: sequenderPadNoteApplicator
                                     repeat: false; running: false; interval: 1
@@ -780,7 +783,7 @@ Zynthian.BasePlayGrid {
                     contentItem: ListView {
                         id: patternsMenuListView
                         clip: true
-                        model: _private.sequence
+                        model: _private.sequencePatternCount
                         Connections {
                             target: _private
                             onActivePatternChanged: {
@@ -790,9 +793,9 @@ Zynthian.BasePlayGrid {
 
                         delegate: Rectangle {
                             id: patternsMenuItem
-                            property QtObject thisPattern: model.pattern
+                            property QtObject thisPattern: _private.sequence ? _private.sequence.get(model.index) : null
                             property int thisPatternIndex: model.index
-                            property int bankIndex: thisPattern.bankOffset / 8;
+                            property int bankIndex: thisPattern ? thisPattern.bankOffset / 8 : 0
                             property int activePattern: _private.activePattern
                             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
                             property QtObject associatedTrack: null
@@ -828,7 +831,10 @@ Zynthian.BasePlayGrid {
                             }
                             Connections {
                                 target: patternsMenuItem.thisPattern
-                                onLayerChanged: patternsMenuItem.adoptTrackLayer()
+                                onLayerChanged: {
+                                    patternsMenuItem.adoptTrackLayer();
+                                    patternGridUpdater.restart();
+                                }
                             }
                             Connections {
                                 target: zynthian.zynthiloops.song.tracksModel
@@ -846,10 +852,6 @@ Zynthian.BasePlayGrid {
                             }
                             Component.onCompleted: {
                                 adoptTrackLayer();
-                            }
-                            Connections {
-                                target: thisPattern;
-                                onLayerChanged: patternGridUpdater.restart();
                             }
                             Timer {
                                 id: patternGridUpdater;  interval: 1; repeat: false; running: false
@@ -895,16 +897,16 @@ Zynthian.BasePlayGrid {
                                             Layout.margins: Kirigami.Units.largeSpacing
                                             Zynthian.PlayGridButton {
                                                 anchors.fill: parent
-                                                opacity: _private.sequence.soloPattern === -1 ? 1 : 0.5
+                                                opacity: _private.sequence && _private.sequence.soloPattern === -1 ? 1 : 0.5
                                                 icon.name: "player-volume"
                                                 onClicked: {
-                                                    if (_private.sequence.soloPattern === -1) {
+                                                    if (_private.sequence && _private.sequence.soloPattern === -1) {
                                                         patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
                                                     }
                                                 }
                                             }
                                             Rectangle {
-                                                visible: !patternsMenuItem.thisPattern.enabled
+                                                visible: patternsMenuItem.thisPattern ? !patternsMenuItem.thisPattern.enabled : false
                                                 anchors.centerIn: parent
                                                 rotation: 45
                                                 width: parent.width
@@ -919,7 +921,7 @@ Zynthian.BasePlayGrid {
                                         Layout.maximumWidth: (parent.width / 7);
                                         QQC2.Label {
                                             Layout.fillHeight: true
-                                            Layout.preferredHeight: parent.height / 2
+                                            Layout.preferredHeight: patternsMenuItem.height / 2
                                             Layout.fillWidth: true
                                             text: "Track:"
                                             font.pixelSize: 15
@@ -930,7 +932,7 @@ Zynthian.BasePlayGrid {
                                         }
                                         Zynthian.PlayGridButton {
                                             Layout.fillHeight: true
-                                            Layout.preferredHeight: parent.height / 2
+                                            Layout.preferredHeight: patternsMenuItem.height / 2
                                             text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             onClicked: {
@@ -945,21 +947,21 @@ Zynthian.BasePlayGrid {
 
                                         RowLayout {
                                             Layout.fillWidth: true
-                                            Layout.preferredHeight: parent.height / 2
+                                            Layout.preferredHeight: patternsMenuItem.height / 2
                                             Image {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
-                                                source: "image://pattern/" + _private.sequence.objectName + "/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified
+                                                source: _private.sequence ? "image://pattern/" + _private.sequence.objectName + "/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified : ""
                                                 Rectangle {
                                                     anchors {
                                                         top: parent.top
                                                         bottom: parent.bottom
                                                     }
-                                                    visible: patternsMenuItem.thisPattern.isPlaying
+                                                    visible: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
                                                     color: Kirigami.Theme.highlightColor
                                                     width: Math.max(1, Math.floor(widthFactor))
-                                                    property double widthFactor: parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength)
-                                                    x: patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor
+                                                    property double widthFactor: patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
+                                                    x: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
                                                 }
                                                 Kirigami.Heading {
                                                     anchors {
@@ -969,7 +971,7 @@ Zynthian.BasePlayGrid {
                                                     horizontalAlignment: Text.AlignRight
                                                     verticalAlignment: Text.AlignBottom
                                                     level: 4
-                                                    text: model.name + (model.unsavedChanges === true ? " *" : "")
+                                                    text: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.name + (patternsMenuItem.thisPattern.unsavedChanges === true ? " *" : "") : ""
                                                 }
                                             }
                                         }
@@ -977,7 +979,7 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             id: soundButton
                                             Layout.fillWidth: true
-                                            Layout.preferredHeight: parent.height / 2
+                                            Layout.preferredHeight: patternsMenuItem.height / 2
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
                                             opacity: enabled ? 1 : 0.7
                                             property string soundName
@@ -1049,7 +1051,7 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             text: "SAMPLE"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination : false
                                             onClicked: {
                                                 component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination, patternsMenuItem.thisPatternIndex)
                                             }
@@ -1057,7 +1059,7 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             text: "SYNTH"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
                                             onClicked: {
                                                 component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
                                             }

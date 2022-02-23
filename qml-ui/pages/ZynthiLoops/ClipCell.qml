@@ -51,30 +51,47 @@ QQC2.AbstractButton {
 //        }
         // FIXME: why TableHeaderLabel has a size of 0?
         QQC2.Label {
+            id: label
             anchors {
                 right: parent.right
                 bottom: parent.bottom
             }
 
-            text: {
-                if (model.clip.path.length > 0) {
-                    if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
-                        return (model.clip.currentBeat+1) + "/" + model.clip.length
-                    } else {
-                        return model.clip.length
-                    }
-                } else if (track.connectedPattern >= 0) {
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                    var pattern = sequence.get(track.connectedPattern);
-                    var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
+            Connections {
+                target: model.clip.path
+                onLengthChanged: textTimer.restart()
+            }
+            Connections {
+                target: track
+                onConnectedPatternChanged: textTimer.restart()
+            }
+            Connections {
+                target: pattern
+                onLastModifiedChanged: textTimer.restart()
+            }
+            Timer {
+                id: textTimer
+                interval: 250
+                onTriggered: {
+                    if (model.clip.path.length > 0) {
+                        if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
+                            label.text = (model.clip.currentBeat+1) + "/" + model.clip.length
+                        } else {
+                            label.text = model.clip.length
+                        }
+                    } else if (track.connectedPattern >= 0) {
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                        var pattern = sequence.get(track.connectedPattern);
+                        var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
 
-                    return hasNotes
-                            ? sequence && sequence.isPlaying
-                              ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
-                              : (pattern.availableBars*4)
-                            : ""
-                } else {
-                    return ""
+                        label.text = hasNotes
+                                ? sequence && sequence.isPlaying
+                                ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
+                                : (pattern.availableBars*4)
+                                : ""
+                    } else {
+                        label.text =  ""
+                    }
                 }
             }
         }

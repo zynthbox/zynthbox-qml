@@ -795,6 +795,7 @@ don't want to have to dig too far...
                     for(var i = 0; i < trackClipsRepeater.count; ++i) {
                         var clipItem = trackClipsRepeater.itemAt(i);
                         if (clipItem.clipInScene) {
+                            patternObject.thisPattern.sampleFilename = clipItem.clip.path;
                             enabledBank = i;
                             break;
                         }

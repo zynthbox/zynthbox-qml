@@ -552,6 +552,7 @@ Zynthian.BasePlayGrid {
                                 Connections {
                                     target: _private
                                     onSequenceChanged: sequenderPadNoteApplicator.restart();
+                                    onActivePatternChanged: sequenderPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.sequence

@@ -189,7 +189,9 @@ Zynthian.BasePlayGrid {
         property QtObject gridModel: sequence && activePattern > -1 ? component.getModel("pattern grid model " + activePattern) : null;
         property int activePattern: sequence ? sequence.activePattern : -1
         property QtObject activePatternModel: sequence ? sequence.activePatternObject : null;
-        property QtObject activeBarModel: activePatternModel && activeBar > -1 ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"]) : null;
+        property QtObject activeBarModel: activePatternModel && activeBar > -1 && activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
+            ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
+            : null;
 
         property bool patternHasUnsavedChanged: false
         property bool positionalVelocity: true
@@ -783,6 +785,7 @@ Zynthian.BasePlayGrid {
                     contentItem: ListView {
                         id: patternsMenuListView
                         clip: true
+                        cacheBuffer: height * 2 // a little brutish, but it means all our delegates always exist, which is what we're actually after here
                         model: _private.sequencePatternCount
                         Connections {
                             target: _private

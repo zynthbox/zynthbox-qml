@@ -192,17 +192,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector and self.__song__:
             self.__zselector.read_zyncoder()
 
-            if self.zyngui.sound_combinator_active:
-                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-                try:
+            try:
+                if self.zyngui.sound_combinator_active:
+                    track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                    selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+
                     if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector.value:
                         QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
-                except:
-                    pass
-            else:
-                if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
-                    QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+
+                else:
+                    if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
+                        QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+            except:
+                pass
 
         return [0, 1, 2]
 
@@ -229,9 +231,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector.config(self.__zselector_ctrl)
                 self.__zselector.custom_encoder_speed = 0
             else:
-                self.__zselector_ctrl.set_options(
-                    {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                     'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track()})
+                try:
+                    self.__zselector_ctrl.set_options(
+                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                         'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track()})
+                except:
+                    self.__zselector_ctrl.set_options(
+                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                         'value_max': 10, 'value': 0})
                 self.__zselector.config(self.__zselector_ctrl)
                 self.__zselector.custom_encoder_speed = 7
             if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
@@ -251,8 +258,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
                 self.__zselector.custom_encoder_speed = 0
             else:
-                self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                   'value': self.zyngui.session_dashboard.selectedTrack})
+                try:
+                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                       'value': self.zyngui.session_dashboard.selectedTrack})
+                except:
+                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
+                                                                                                       'value': 0})
                 self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
                 self.__zselector.custom_encoder_speed = 7
 

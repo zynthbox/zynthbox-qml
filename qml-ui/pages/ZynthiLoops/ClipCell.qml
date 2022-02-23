@@ -58,8 +58,8 @@ QQC2.AbstractButton {
             }
 
             Connections {
-                target: model.clip.path
-                onLengthChanged: textTimer.restart()
+                target: model.clip
+                onPathChanged: textTimer.restart()
             }
             Connections {
                 target: track

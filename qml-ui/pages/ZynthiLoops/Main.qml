@@ -670,6 +670,7 @@ Zynthian.ScreenPage {
                                     delegate: ClipCell {
                                         id: clipCell
 
+                                        backgroundColor: "#000000"
                                         highlightColor: !highlighted && model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0
                                                             ? Qt.rgba(255,255,255,0.6)
                                                             : highlighted
@@ -718,7 +719,7 @@ Zynthian.ScreenPage {
 
                                         Timer {
                                             id: colorTimer
-                                            interval: 250
+                                            interval: 50
                                             onTriggered: {
                                                 // update color
                                                 var hasNotes = false;

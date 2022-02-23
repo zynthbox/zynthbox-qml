@@ -784,6 +784,15 @@ class zynthiloops_clip(QObject):
             self.pitch = clip.pitch
             self.gain = clip.gain
 
+    @Slot()
+    def deleteClip(self):
+        def cb(params=None):
+            if (self.wav_path / self.__path__).exists():
+                (self.wav_path / self.__path__).unlink()
+                self.clear()
+
+        self.__song__.get_metronome_manager().zyngui.show_confirm("Do you really want to delete this clip? This action is irreversible.", cb)
+
     ### Property metadataAudioType
     def get_metadata_audio_type(self):
         try:

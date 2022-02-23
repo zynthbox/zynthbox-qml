@@ -149,18 +149,20 @@ Zynthian.Card {
                 enabled: controlObj ? !controlObj.isPlaying : false
 
                 onClicked: {
-                    if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-
-//                        pattern.clearBank(root.controlObj.col);
-                    } else {
-                        controlObj.clear()
-                    }
+                    controlObj.clear()
 
                     if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
                         zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
                     }
+                }
+            }
+
+            SidebarButton {
+                icon.name: "user-trash-symbolic"
+                visible: controlObj && controlObj.path && controlObj.path.length > 0
+
+                onClicked: {
+                    controlObj.deleteClip()
                 }
             }
 

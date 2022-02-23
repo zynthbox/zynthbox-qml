@@ -980,11 +980,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return False
 
     def do_long_task(self, cb):
+        logging.error("### Start long task")
         self.longTaskStarted.emit()
 
         QTimer.singleShot(2000, cb)
 
     def end_long_task(self):
+        logging.error("### End long task")
         self.longTaskEnded.emit()
 
     ### Property selectedPresetName

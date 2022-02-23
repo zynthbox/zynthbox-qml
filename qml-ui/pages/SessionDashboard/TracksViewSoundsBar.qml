@@ -595,10 +595,11 @@ Zynthian.Card {
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
                         enabled: zynthian.session_dashboard.selectedSoundRow === index && soundDelegate.chainedSound >= 0 && root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)
-                        value: zynthian.layers_for_track.volume_controls[index].value
-                        stepSize: zynthian.layers_for_track.volume_controls[index].step_size
-                        from: zynthian.layers_for_track.volume_controls[index].value_min
-                        to: zynthian.layers_for_track.volume_controls[index].value_max
+                        property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
+                        value: volumeControlObject ? volumeControlObject.value : 0
+                        stepSize: volumeControlObject ? volumeControlObject.step_size : 1
+                        from: volumeControlObject ? volumeControlObject.value_min : 0
+                        to: volumeControlObject ? volumeControlObject.value_max : 1
                         onMoved: {
                             zynthian.layers_for_track.volume_controls[index].value = value;
                         }

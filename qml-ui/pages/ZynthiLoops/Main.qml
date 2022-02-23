@@ -674,7 +674,7 @@ Zynthian.ScreenPage {
                                                 return model.clip.isPlaying;
                                             } else {
                                                 var patternIsPlaying = false;
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
                                                 if (sequence && sequence.isPlaying) {
                                                     var pattern = sequence.get(track.connectedPattern);
                                                     /*if (pattern.isEmpty) {
@@ -718,7 +718,7 @@ Zynthian.ScreenPage {
                                             var pattern = null;
                                             var hasNotes = false;
                                             try {
-                                                pattern = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
+                                                pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
                                                 hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
                                             } catch(err) {}
 
@@ -736,7 +736,7 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+                                        property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
                                         property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
 
                                         visible: model.clip.col === zynthian.zynthiloops.selectedClipCol
@@ -750,7 +750,7 @@ Zynthian.ScreenPage {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);
 
                                                 if (track.connectedPattern >= 0) {
-                                                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
+                                                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
                                                     seq.bank = model.clip.col === 0 ? "A" : "B";
                                                     seq.enabled = model.clip.inCurrentScene;
 

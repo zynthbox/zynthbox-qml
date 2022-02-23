@@ -642,7 +642,7 @@ don't want to have to dig too far...
         onTriggered: {
             var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
             for (var i = 0; i < 10; ++i) {
-                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global " + sceneNames[i]);
+                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
                 if (sequence) {
                     // This operation is potentially a bit pricy, as setting the song
                     // to something new will cause the global sequence to be reloaded
@@ -687,7 +687,7 @@ don't want to have to dig too far...
         model: zynthian.zynthiloops.song.scenesModel
         delegate: Item {
             id: sceneObject
-            property string connectedSequenceName: "Global " + model.scene.name
+            property string connectedSequenceName: "Scene " + model.scene.name
             property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName)
             Connections {
                 target: zynthian.zynthiloops.song
@@ -718,7 +718,7 @@ don't want to have to dig too far...
         }
     }
     Repeater {
-        model: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+        model: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
         delegate: Item {
             id: patternObject
             property QtObject thisPattern: model.pattern

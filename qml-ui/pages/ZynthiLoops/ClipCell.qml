@@ -64,7 +64,7 @@ QQC2.AbstractButton {
                         return model.clip.length
                     }
                 } else if (track.connectedPattern >= 0) {
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                     var pattern = sequence.get(track.connectedPattern);
                     var hasNotes = pattern.lastModified > -1 ? pattern.bankHasNotes(model.clip.col) : pattern.bankHasNotes(model.clip.col)
 
@@ -119,7 +119,7 @@ QQC2.AbstractButton {
         Rectangle {
             id: patternProgressRect
 
-            property var sequence: ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+            property var sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
             property var pattern: sequence.get(track.connectedPattern)
 
             property var isPlaying: ((pattern && pattern.bank === "I" && model.clip.col === 0 && sequence.isPlaying)

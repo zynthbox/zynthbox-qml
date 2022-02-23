@@ -85,11 +85,9 @@ Zynthian.Card {
                     case BottomBar.ControlType.Part:
                         return qsTr("PART: %1").arg(text);
                     case BottomBar.ControlType.Pattern:
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                         var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-                        return qsTr("PATTERN: %1, pt.%2")
-                                                .arg(pattern.objectName)
-                                                .arg(root.controlObj.col == 0 ? "I" : "II")
+                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                     default:
                         return text;
                     }
@@ -150,7 +148,7 @@ Zynthian.Card {
 
                 onClicked: {
                     if (root.controlType === BottomBar.ControlType.Pattern && patternAction.checked) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                         var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
 
 //                        pattern.clearBank(root.controlObj.col);
@@ -255,7 +253,7 @@ Zynthian.Card {
                 }
                 QQC2.Label {
                     visible: controlObj.connectedPattern >= 0
-                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
                     property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
                     text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
                 }
@@ -278,7 +276,7 @@ Zynthian.Card {
                     onClicked: {
                         controlObj.clear()
 
-                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Global "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
+                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
                         seq.enabled = false;
                         controlObj.connectedPattern = -1;
                     }

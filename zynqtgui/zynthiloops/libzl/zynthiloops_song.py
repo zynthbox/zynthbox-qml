@@ -183,9 +183,9 @@ class zynthiloops_song(QObject):
 
                     comparing_obj.pop("history", None)
 
-                    logging.error(f"Comparing cache and saved dicts : {self.serialize()}")
-                    logging.error(f"Comparing cache and saved dicts : {comparing_obj}")
-                    logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
+                    # logging.error(f"Comparing cache and saved dicts : {self.serialize()}")
+                    # logging.error(f"Comparing cache and saved dicts : {comparing_obj}")
+                    # logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
 
                     if self.serialize() != comparing_obj:
                         with open(cache_dir / (cache_id + ".sketch.json"), "w") as f_cache:

@@ -293,7 +293,7 @@ Zynthian.Card {
                         ListElement { text: "SYNTH"; value: "synth" }
                     }
                     textRole: "text"
-                    currentIndex: find(controlObj.trackAudioType)
+                    currentIndex: find(controlObj.trackAudioType.toUpperCase())
                     onCurrentIndexChanged: {
                         controlObj.trackAudioType = trackAudioTypeDropdown.model.get(currentIndex).value;
                     }

@@ -746,6 +746,11 @@ don't want to have to dig too far...
                     patternObject.associatedTrackIndex = foundIndex;
 
                     if (patternObject.associatedTrackIndex > -1) {
+                        if (patternObject.associatedTrack.trackAudioType === "sample") {
+                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
+                        } else {
+                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
+                        }
                         var connectedSound = patternObject.associatedTrack.connectedSound;
                         if (connectedSound === -1) {
                             // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
@@ -770,6 +775,19 @@ don't want to have to dig too far...
                 onLayerChanged: patternObject.adoptTrackLayer()
                 onEnabledChanged: trackClipsRepeater.updateClipsFromEnabled()
                 onBankOffsetChanged: trackClipsRepeater.updateClipsFromEnabled()
+                onNoteDestinationChanged: {
+                    if (patternObject.associatedTrack) {
+                        switch (patternObject.thisPattern.noteDestination) {
+                            case ZynQuick.PatternModel.SampleDestination:
+                                patternObject.associatedTrack.trackAudioType = "sample";
+                                break;
+                            case ZynQuick.PatternModel.SynthDestination:
+                            default:
+                                patternObject.associatedTrack.trackAudioType = "synth";
+                                break;
+                        }
+                    }
+                }
             }
             Connections {
                 target: zynthian.zynthiloops.song.tracksModel
@@ -784,6 +802,13 @@ don't want to have to dig too far...
                 target: patternObject.associatedTrack
                 onConnectedPatternChanged: patternObject.adoptTrackLayer()
                 onConnectedSoundChanged: patternObject.adoptTrackLayer()
+                onTrackAudioTypeChanged: {
+                    if (patternObject.associatedTrack.trackAudioType === "sample") {
+                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
+                    } else {
+                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
+                    }
+                }
             }
             Component.onCompleted: {
                 adoptTrackLayer();

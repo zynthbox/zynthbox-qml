@@ -438,13 +438,13 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
 
                         text: root.song.name
-                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
+//                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
                         // subText: "BPM: " + root.song.bpm
                         // subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
 
                         textSize: 11
-                        subTextSize: 9
-                        subSubTextSize: 0
+//                        subTextSize: 9
+//                        subSubTextSize: 0
 
                         onPressed: {
                             // If Mixer is not open, open mixer first
@@ -516,7 +516,7 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
-                        text: "Tracks"
+                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
 
                         textSize: 11
                         subTextSize: 9

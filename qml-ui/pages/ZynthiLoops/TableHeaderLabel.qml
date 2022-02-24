@@ -17,9 +17,10 @@ ColumnLayout {
         visible: text && text.length > 0
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: parent.width
-        elide: "ElideRight"
+//        elide: "ElideRight"
         color: Kirigami.Theme.textColor
         font.pointSize: 12
+        wrapMode: "WrapAnywhere"
     }
 
     QQC2.Label {

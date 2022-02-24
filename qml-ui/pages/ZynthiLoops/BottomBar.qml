@@ -256,12 +256,12 @@ Zynthian.Card {
                 Item {
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                 }
-                QQC2.Label {
-                    visible: controlObj.connectedPattern >= 0
-                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
-                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
-                }
+//                QQC2.Label {
+//                    visible: controlObj.connectedPattern >= 0
+//                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+//                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
+//                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
+//                }
                 QQC2.Button {
                     visible: controlObj.connectedPattern < 0
                     Layout.fillHeight: true
@@ -273,17 +273,29 @@ Zynthian.Card {
                         zynthian.session_dashboard.midiSelectionRequested();
                     }
                 }
-                SidebarButton {
-                    icon.name: "edit-clear-all"
-                    visible: (controlObj != null) && controlObj.clearable
-                    enabled: controlObj ? !controlObj.isPlaying : false
+//                SidebarButton {
+//                    icon.name: "edit-clear-all"
+//                    visible: (controlObj != null) && controlObj.clearable
+//                    enabled: controlObj ? !controlObj.isPlaying : false
 
-                    onClicked: {
-                        controlObj.clear()
+//                    onClicked: {
+//                        controlObj.clear()
 
-                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
-                        seq.enabled = false;
-                        controlObj.connectedPattern = -1;
+//                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
+//                        seq.enabled = false;
+//                        controlObj.connectedPattern = -1;
+//                    }
+//                }
+                QQC2.ComboBox {
+                    id: trackAudioTypeDropdown
+                    model: ListModel {
+                        ListElement { text: "SAMPLE"; value: "sample" }
+                        ListElement { text: "SYNTH"; value: "synth" }
+                    }
+                    textRole: "text"
+                    currentIndex: find(controlObj.trackAudioType)
+                    onCurrentIndexChanged: {
+                        controlObj.trackAudioType = trackAudioTypeDropdown.model.get(currentIndex).value;
                     }
                 }
             }

@@ -540,6 +540,7 @@ Zynthian.ScreenPage {
 //                            subText: model.track.connectedPattern >= 0
 //                                      ? "Pat. " + (model.track.connectedPattern+1)
 //                                      : ""
+                            subSubText: model.track.trackAudioType.toUpperCase()
                             color: Kirigami.Theme.backgroundColor
 
                             width: privateProps.headerWidth

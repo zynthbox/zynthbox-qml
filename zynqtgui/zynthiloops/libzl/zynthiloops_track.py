@@ -55,6 +55,10 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
+
+        # Audio type cal be either "synth" or "sample"
+        self.__track_audio_type__ = "synth"
+
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
         if self.__id__ < 5:
@@ -91,6 +95,7 @@ class zynthiloops_track(QObject):
                 "connectedPattern": self.__connected_pattern__,
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
+                "trackAudioType": self.__track_audio_type__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -109,6 +114,9 @@ class zynthiloops_track(QObject):
         if "chainedSounds" in obj:
             self.__chained_sounds__ = obj["chainedSounds"]
             self.set_chained_sounds(self.__chained_sounds__)
+        if "trackAudioType" in obj:
+            self.__track_audio_type__ = obj["trackAudioType"]
+            self.set_track_audio_type(self.__track_audio_type__)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -485,3 +493,20 @@ class zynthiloops_track(QObject):
     isMutedChanged = Signal()
     muted = Property(bool, get_muted, set_muted, notify=isMutedChanged)
     ### End Property muted
+
+    ### Property trackAudioType
+    def get_track_audio_type(self):
+        return self.__track_audio_type__
+
+    def set_track_audio_type(self, type):
+        logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
+        if type != self.__track_audio_type__:
+            self.__track_audio_type__ = type
+            self.track_audio_type_changed.emit()
+            self.__song__.schedule_save()
+
+    track_audio_type_changed = Signal()
+
+    trackAudioType = Property(str, get_track_audio_type, set_track_audio_type, notify=track_audio_type_changed)
+    ### END Property trackAudioType
+

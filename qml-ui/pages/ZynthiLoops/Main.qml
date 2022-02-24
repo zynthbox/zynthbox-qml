@@ -48,14 +48,6 @@ Zynthian.ScreenPage {
     topPadding: 8
     bottomPadding: 8
     backAction.visible: false
-    onSongChanged: {
-        console.log("Song Changed :", song)
-
-        // Reset focus to song cell
-        songCell.focus = true
-        bottomBar.controlType = BottomBar.ControlType.Song;
-        bottomBar.controlObj = root.song;
-    }
 
     contextualActions: [
         Kirigami.Action {
@@ -269,6 +261,18 @@ Zynthian.ScreenPage {
         }
         onLongTaskEnded: {
             longTaskOverlay.open = false;
+        }
+        onSong_changed: {
+            console.log("$$$ Song Changed :", song)
+
+            // Reset focus to song cell
+            songCell.focus = true
+            songCell.focus = false
+            bottomBar.controlType = BottomBar.ControlType.Song;
+            bottomBar.controlObj = root.song;
+            mixerActionBtn.checked = true;
+            sceneActionBtn.checked = false;
+            bottomStack.currentIndex = 1;
         }
     }
 

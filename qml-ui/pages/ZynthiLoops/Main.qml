@@ -670,6 +670,13 @@ Zynthian.ScreenPage {
                                     delegate: ClipCell {
                                         id: clipCell
 
+                                        Component.onCompleted: {
+                                            console.log("^^^ Clip Cell Created :", rowIndex, index)
+                                        }
+                                        Component.onDestruction: {
+                                            console.log("$$$ Clip Cell Destroyed :", rowIndex, index)
+                                        }
+
                                         backgroundColor: "#000000"
                                         highlightColor: !highlighted && model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0
                                                             ? Qt.rgba(255,255,255,0.6)
@@ -730,7 +737,7 @@ Zynthian.ScreenPage {
                                                 if (model.clip.inCurrentScene && model.clip.path && model.clip.path.length > 0) {
                                                     // In scene
                                                     clipCell.backgroundColor = "#3381d4fa";
-                                                } else if (!model.clip.inCurrentScene) {
+                                                } else if (!model.clip.inCurrentScene && !root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) {
                                                     // Not in scene
                                                     clipCell.backgroundColor = "#33f44336";
                                                 } else if ((track.connectedPattern >= 0 && hasNotes)
@@ -757,7 +764,7 @@ Zynthian.ScreenPage {
                                                             patternIsPlaying = clipCell.pattern.enabled
                                                         }
                                                     }
-                                                    clipCell.isPlaying = patternIsPlaying && model.clip.inCurrentScene && zynthian.zynthiloops.isMetronomeRunning;
+                                                    clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(model.clip, model.clip.col) && zynthian.zynthiloops.isMetronomeRunning;
                                                 }
                                             }
                                         }

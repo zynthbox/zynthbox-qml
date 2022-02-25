@@ -786,7 +786,7 @@ Zynthian.ScreenPage {
                                         Layout.maximumHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
 
                                         onPressed: {
-//                                            console.log("@@@ CLIP : ", model.clip.cppObj)
+                                            console.log("@@@ CLIP : ", model.clip.cppObjAddress)
 
                                             if (dblTimer.running || sceneActionBtn.checked) {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);

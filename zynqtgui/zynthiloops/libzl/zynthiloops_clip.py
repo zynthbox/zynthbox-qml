@@ -512,7 +512,7 @@ class zynthiloops_clip(QObject):
 
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         self.clipTrack.trackAudioType = "sample-loop"
-        # self.cpp_obj_changed.emit()
+        self.cpp_obj_changed.emit()
         print(path)
 
         self.__read_metadata__()
@@ -591,7 +591,7 @@ class zynthiloops_clip(QObject):
         if self.audioSource is not None:
             self.audioSource.destroy()
             self.audioSource = None
-            # self.cpp_obj_changed.emit()
+            self.cpp_obj_changed.emit()
 
         self.__path__ = None
         self.path_changed.emit()
@@ -823,14 +823,14 @@ class zynthiloops_clip(QObject):
     inCurrentScene = Property(bool, get_in_current_scene, notify=in_current_scene_changed)
     ### END Property inCurrentScene
 
-    ### Property cppObj
-    # def get_cpp_obj(self):
-    #     if self.audioSource is not None:
-    #         return self.audioSource.cppObj
-    #     else:
-    #         return None
-    #
-    # cpp_obj_changed = Signal()
-    #
-    # cppObj = Property(QObject, get_cpp_obj, notify=cpp_obj_changed)
-    ### END Property cppObj
+    ### Property cppObjAddress
+    def get_cpp_obj_address(self):
+        if self.audioSource is not None:
+            return str(int(self.audioSource.get_cpp_obj()))
+        else:
+            return "-1"
+
+    cpp_obj_changed = Signal()
+
+    cppObjAddress = Property(str, get_cpp_obj_address, notify=cpp_obj_changed)
+    ### END Property cppObjAddress

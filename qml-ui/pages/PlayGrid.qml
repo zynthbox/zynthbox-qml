@@ -827,7 +827,7 @@ don't want to have to dig too far...
                     for(var i = 0; i < trackClipsRepeater.count; ++i) {
                         var clipItem = trackClipsRepeater.itemAt(i);
                         if (clipItem.clipInScene) {
-                            patternObject.thisPattern.sampleFilename = clipItem.clip.path;
+                            patternObject.thisPattern.clipId = clipItem.clip.cppObjId;
                             enabledBank = i;
                             break;
                         }
@@ -877,6 +877,9 @@ don't want to have to dig too far...
                     property bool clipInScene: model.clip.inCurrentScene
                     Connections {
                         target: clipProxyDelegate.clip
+                        onCppObjIdChanged: {
+                            trackClipsRepeater.updateEnabledFromClips();
+                        }
                         onInCurrentSceneChanged: {
                             trackClipsRepeater.updateEnabledFromClips();
                         }

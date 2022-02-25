@@ -496,6 +496,7 @@ class zynthiloops_track(QObject):
     ### Property trackAudioType
     # Possible values : "synth", "sample-loop", "sample-trig"
     # For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
+    # TODO : Later implement it properly with model and enums
     def get_track_audio_type(self):
         return self.__track_audio_type__
 

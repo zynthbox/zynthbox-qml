@@ -93,6 +93,9 @@ def init():
 
             libzl.ClipAudioSource_setAudioLevelChangedCallback.argtypes = [ctypes.c_void_p, AudioLevelChangedCallback]
 
+            libzl.ClipAudioSource_id.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_id.restypes = ctypes.c_int
+
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
             ### END Type Definition
 
@@ -184,6 +187,10 @@ class ClipAudioSource(QObject):
 
         if libzl:
             libzl.ClipAudioSource_stop(self.obj)
+
+    def get_id(self):
+        if libzl:
+            return libzl.ClipAudioSource_id(self.obj)
 
     def get_duration(self):
         if libzl:

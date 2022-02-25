@@ -27,7 +27,7 @@ import ctypes
 import logging
 from os.path import dirname, realpath
 
-from PySide2.QtCore import QObject, QProcess, Signal
+from PySide2.QtCore import Property, QObject, QProcess, Signal
 
 libzl = None
 AudioLevelChangedCallback = ctypes.CFUNCTYPE(None, ctypes.c_float)
@@ -225,6 +225,13 @@ class ClipAudioSource(QObject):
     def destroy(self):
         if libzl:
             libzl.ClipAudioSource_destroy(self.obj)
+
+    ### Property cppObj
+    def get_cpp_obj(self):
+        return self.obj
+
+    cppObj = Property(QObject, get_cpp_obj, constant=True)
+    ### END Property cppObj
 
     # def start_recording(self):
     #     if self.can_record:

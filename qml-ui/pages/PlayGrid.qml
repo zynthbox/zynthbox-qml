@@ -746,7 +746,7 @@ don't want to have to dig too far...
                     patternObject.associatedTrackIndex = foundIndex;
 
                     if (patternObject.associatedTrackIndex > -1) {
-                        if (patternObject.associatedTrack.trackAudioType === "sample") {
+                        if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
                         } else {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
@@ -779,7 +779,7 @@ don't want to have to dig too far...
                     if (patternObject.associatedTrack) {
                         switch (patternObject.thisPattern.noteDestination) {
                             case ZynQuick.PatternModel.SampleDestination:
-                                patternObject.associatedTrack.trackAudioType = "sample";
+                                patternObject.associatedTrack.trackAudioType = "sample-trig";
                                 break;
                             case ZynQuick.PatternModel.SynthDestination:
                             default:
@@ -803,7 +803,7 @@ don't want to have to dig too far...
                 onConnectedPatternChanged: patternObject.adoptTrackLayer()
                 onConnectedSoundChanged: patternObject.adoptTrackLayer()
                 onTrackAudioTypeChanged: {
-                    if (patternObject.associatedTrack.trackAudioType === "sample") {
+                    if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
                     } else {
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;

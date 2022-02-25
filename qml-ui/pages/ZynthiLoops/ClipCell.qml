@@ -1,4 +1,4 @@
-/* -*- coding: utf-8 -*-
+/* -*- coding: utf-8 -*-7
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
@@ -33,6 +33,8 @@ import Zynthian 1.0 as Zynthian
 
 QQC2.AbstractButton {
     id: root
+
+    readonly property QtObject song: zynthian.zynthiloops.song
     readonly property int colIndex: index
     property bool isPlaying
     property bool highlighted: false
@@ -53,71 +55,115 @@ QQC2.AbstractButton {
 //            // text2: clip.length + " Bar"
 //        }
         // FIXME: why TableHeaderLabel has a size of 0?
+//        QQC2.Label {
+//            id: label
+//            anchors {
+//                right: parent.right
+//                bottom: parent.bottom
+//            }
+
+//            Connections {
+//                target: model.clip
+//                onPathChanged: textTimer.restart()
+//                onIsPlayingChanged: textTimer.restart()
+//            }
+//            Connections {
+//                target: track
+//                onConnectedPatternChanged: textTimer.restart()
+//            }
+//            Connections {
+//                target: sequence
+//                onIsPlayingChanged: textTimer.restart()
+//            }
+//            Connections {
+//                target: pattern
+//                onLastModifiedChanged: textTimer.restart()
+//            }
+//            Timer {
+//                id: textTimer
+//                interval: 250
+//                onTriggered: {
+//                    if (model.clip.path.length > 0) {
+//                        if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
+//                            label.text = (model.clip.currentBeat+1) + "/" + model.clip.length
+//                        } else {
+//                            label.text = model.clip.length
+//                        }
+//                    } else if (track.connectedPattern >= 0) {
+//                        var hasNotes = pattern.bankHasNotes(0)
+
+//                        label.text = hasNotes
+//                                ? sequence && sequence.isPlaying
+//                                ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
+//                                : (pattern.availableBars*4)
+//                                : ""
+//                    } else {
+//                        label.text =  ""
+//                    }
+//                }
+//            }
+//        }
+
         QQC2.Label {
-            id: label
             anchors {
                 right: parent.right
                 bottom: parent.bottom
             }
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
+                     model.clip.path &&
+                     model.clip.path.length > 0
+            text: qsTr("%1%2")
+                    .arg(model.clip.isPlaying &&
+                         model.clip.currentBeat >= 0
+                            ? (model.clip.currentBeat+1) + "/"
+                            : "")
+                    .arg(model.clip.length)
+        }
 
-            Connections {
-                target: model.clip
-                onPathChanged: textTimer.restart()
-                onIsPlayingChanged: textTimer.restart()
+        QQC2.Label {
+            anchors {
+                right: parent.right
+                bottom: parent.bottom
             }
-            Connections {
-                target: track
-                onConnectedPatternChanged: textTimer.restart()
-            }
-            Connections {
-                target: sequence
-                onIsPlayingChanged: textTimer.restart()
-            }
-            Connections {
-                target: pattern
-                onLastModifiedChanged: textTimer.restart()
-            }
-            Timer {
-                id: textTimer
-                interval: 250
-                onTriggered: {
-                    if (model.clip.path.length > 0) {
-                        if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
-                            label.text = (model.clip.currentBeat+1) + "/" + model.clip.length
-                        } else {
-                            label.text = model.clip.length
-                        }
-                    } else if (track.connectedPattern >= 0) {
-                        var hasNotes = pattern.bankHasNotes(0)
-
-                        label.text = hasNotes
-                                ? sequence && sequence.isPlaying
-                                ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
-                                : (pattern.availableBars*4)
-                                : ""
-                    } else {
-                        label.text =  ""
-                    }
-                }
-            }
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.connectedPattern >= 0 &&
+                     pattern.bankHasNotes(0) &&
+                     pattern.lastModified
+            text: qsTr("%1%2")
+                    .arg(pattern.lastModified && pattern.bankHasNotes(0) && sequence && sequence.isPlaying
+                            ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/"
+                            : "")
+                    .arg(pattern.availableBars*4)
         }
 
 
-        Kirigami.Icon {
-            width: 24
-            height: 24
-            color: "white"
-            anchors.centerIn: parent
+//        Kirigami.Icon {
+//            width: 24
+//            height: 24
+//            color: "white"
+//            anchors.centerIn: parent
 
-            source: "media-playback-start"
-            visible: root.isPlaying
-        }
+//            source: "media-playback-start"
+//            visible: root.isPlaying
+//        }
 
         QQC2.Label {
             anchors.centerIn: parent
             color: "#f44336"
             text: qsTr("Mute")
-            visible: !model.clip.inCurrentScene
+            visible: !(model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col))
+        }
+
+        QQC2.Label {
+            anchors.centerIn: parent
+            color: "#ffffff"
+            text: qsTr("Loop")
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
+                     model.clip.path &&
+                     model.clip.path.length > 0
         }
     }
 
@@ -134,7 +180,11 @@ QQC2.AbstractButton {
         Rectangle {
             id: progressRect
             anchors.bottom: parent.bottom
-            visible: model.clip.isPlaying && track.connectedPattern < 0
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
+                     model.clip.path &&
+                     model.clip.path.length > 0 &&
+                     model.clip.isPlaying
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width);
@@ -143,7 +193,12 @@ QQC2.AbstractButton {
             id: patternProgressRect
 
             anchors.bottom: parent.bottom
-            visible: track.connectedPattern >= 0 && sequence.isPlaying
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.connectedPattern >= 0 &&
+                     sequence.isPlaying &&
+                     pattern.bankHasNotes(0) &&
+                     pattern.lastModified
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0

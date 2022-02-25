@@ -702,9 +702,9 @@ Zynthian.BasePlayGrid {
                                     Layout.fillHeight: true
                                     Zynthian.PlayGridButton {
                                         text: "SAMPLE"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
                                         onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination)
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
                                         }
                                     }
                                     Zynthian.PlayGridButton {
@@ -1018,7 +1018,7 @@ Zynthian.BasePlayGrid {
 
                                                 soundName = text;
                                             }
-                                            text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination
+                                            text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
                                                 ? patternsMenuItem.thisPattern.sampleFilename === ""
                                                     ? "No sample chosen - tap to select one"
                                                     : patternsMenuItem.thisPattern.sampleFilename.split("/").pop()
@@ -1059,9 +1059,9 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             text: "SAMPLE"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleDestination : false
+                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
                                             onClicked: {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleDestination, patternsMenuItem.thisPatternIndex)
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination, patternsMenuItem.thisPatternIndex)
                                             }
                                         }
                                         Zynthian.PlayGridButton {

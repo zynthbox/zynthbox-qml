@@ -104,6 +104,19 @@ QQC2.AbstractButton {
 //            }
 //        }
 
+        Image {
+            id: patternVisualiser
+            anchors.fill: parent
+            smooth: false
+
+            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.connectedPattern >= 0 &&
+                     pattern.bankHasNotes(0) &&
+                     pattern.lastModified
+            source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + model.clip.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
+        }
+
         QQC2.Label {
             anchors {
                 right: parent.right

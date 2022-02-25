@@ -544,7 +544,9 @@ Zynthian.ScreenPage {
 //                            subText: model.track.connectedPattern >= 0
 //                                      ? "Pat. " + (model.track.connectedPattern+1)
 //                                      : ""
-                            subSubText: model.track.trackAudioType.toUpperCase()
+                            subSubText: model.track.trackAudioType.toUpperCase().replace("SAMPLE-", "")
+                            subSubTextSize: 7
+
                             color: Kirigami.Theme.backgroundColor
 
                             width: privateProps.headerWidth
@@ -784,6 +786,8 @@ Zynthian.ScreenPage {
                                         Layout.maximumHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
 
                                         onPressed: {
+//                                            console.log("@@@ CLIP : ", model.clip.cppObj)
+
                                             if (dblTimer.running || sceneActionBtn.checked) {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);
 

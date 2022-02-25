@@ -834,3 +834,13 @@ class zynthiloops_clip(QObject):
 
     cppObjAddress = Property(str, get_cpp_obj_address, notify=cpp_obj_changed)
     ### END Property cppObjAddress
+
+    ### Property cppObjId
+    def get_cpp_obj_id(self):
+        if self.audioSource is not None:
+            return self.audioSource.get_id()
+        else:
+            return -1
+
+    cppObjId = Property(int, get_cpp_obj_id, notify=cpp_obj_changed)
+    ### END Property cppObjId

@@ -786,7 +786,7 @@ Zynthian.ScreenPage {
                                         Layout.maximumHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
 
                                         onPressed: {
-                                            console.log("@@@ CLIP : ", model.clip.cppObjAddress)
+                                            console.log("@@@ CLIP : ", model.clip.cppObjAddress, model.clip.cppObjId)
 
                                             if (dblTimer.running || sceneActionBtn.checked) {
                                                 root.song.scenesModel.toggleClipInCurrentScene(model.clip);
@@ -963,7 +963,7 @@ Zynthian.ScreenPage {
                             }
 
                             // If sound not connected, set text to none
-                            infoBar.synthName = "<none>"
+                            infoBar.synthName = "--"
                         }
                     }
 
@@ -976,6 +976,20 @@ Zynthian.ScreenPage {
 
                     Connections {
                         target: zynthian.fixed_layers
+                        onList_updated: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    Connections {
+                        target: zynthian.preset
+                        onList_updated: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    Connections {
+                        target: zynthian.bank
                         onList_updated: {
                             updateSoundNameTimer.restart()
                         }
@@ -1004,7 +1018,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("Layer %1 %2")
-                                .arg(layerIndex >= 0 ? layerIndex+1 : "<none>")
+                                .arg(layerIndex >= 0 ? layerIndex+1 : "--")
                                 .arg(layerIndex >= 0
                                         ? layerCount > 0
                                             ? "(+" + (layerCount-1) + ")"
@@ -1015,7 +1029,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName === "-" ? "<none>" : zynthian.zynthiloops.selectedPresetName)
+                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName === "-" ? "--" : zynthian.zynthiloops.selectedPresetName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

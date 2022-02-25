@@ -512,6 +512,7 @@ class zynthiloops_clip(QObject):
 
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         self.clipTrack.trackAudioType = "sample-loop"
+        self.__song__.scenesModel.addClipToCurrentScene(self)
         self.cpp_obj_changed.emit()
         print(path)
 

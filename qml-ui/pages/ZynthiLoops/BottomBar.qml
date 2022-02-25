@@ -288,14 +288,17 @@ Zynthian.Card {
 //                }
                 QQC2.ComboBox {
                     id: trackAudioTypeDropdown
+
+                    // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
                     model: ListModel {
-                        ListElement { text: "SAMPLE"; value: "sample" }
+                        ListElement { text: "SAMPLE LOOP"; value: "sample-loop" }
+                        ListElement { text: "SAMPLE TRIG"; value: "sample-trig" }
                         ListElement { text: "SYNTH"; value: "synth" }
                     }
                     textRole: "text"
-                    currentIndex: find(controlObj.trackAudioType.toUpperCase())
-                    onCurrentIndexChanged: {
-                        controlObj.trackAudioType = trackAudioTypeDropdown.model.get(currentIndex).value;
+                    currentIndex: find(controlObj.trackAudioType.toUpperCase().replace("-", " "))
+                    onActivated: {
+                        controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                     }
                 }
             }

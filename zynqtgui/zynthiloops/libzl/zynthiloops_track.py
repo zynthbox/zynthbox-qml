@@ -56,7 +56,6 @@ class zynthiloops_track(QObject):
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
 
-        # Audio type cal be either "synth" or "sample"
         self.__track_audio_type__ = "synth"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
@@ -495,6 +494,8 @@ class zynthiloops_track(QObject):
     ### End Property muted
 
     ### Property trackAudioType
+    # Possible values : "synth", "sample-loop", "sample-trig"
+    # For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
     def get_track_audio_type(self):
         return self.__track_audio_type__
 

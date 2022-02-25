@@ -70,8 +70,7 @@ Zynthian.Card {
         RowLayout {
             Layout.fillWidth: true
             Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-            visible: root.controlType !== BottomBar.ControlType.Track &&
-                     !(root.controlType === BottomBar.ControlType.Pattern && tabbedView.activeAction === patternAction)
+            visible: root.controlType !== BottomBar.ControlType.Track
 
             EditableHeader {
                 text: {
@@ -361,7 +360,7 @@ Zynthian.Card {
                 },
                 Zynthian.TabbedControlViewAction {
                     id: metadataSoundsAction
-                    text: qsTr("Sounds")
+                    text: qsTr("Clip Sounds")
                     page: Qt.resolvedUrl("MetadataSoundsBar.qml")
                     visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
@@ -373,16 +372,16 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    id: trackSoundsAction
-                    text: qsTr("Sounds")
-                    page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                    id: trackAction
+                    text: qsTr("Track")
+                    page: Qt.resolvedUrl("TrackBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    id: trackAction
-                    text: qsTr("Track")
-                    page: Qt.resolvedUrl("TrackBar.qml")
+                    id: trackSoundsAction
+                    text: qsTr("Sounds")
+                    page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },

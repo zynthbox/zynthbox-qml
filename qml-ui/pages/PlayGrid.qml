@@ -747,7 +747,9 @@ don't want to have to dig too far...
 
                     if (patternObject.associatedTrackIndex > -1) {
                         if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
+                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
+                        } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
+                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
                         } else {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                         }
@@ -778,8 +780,11 @@ don't want to have to dig too far...
                 onNoteDestinationChanged: {
                     if (patternObject.associatedTrack) {
                         switch (patternObject.thisPattern.noteDestination) {
-                            case ZynQuick.PatternModel.SampleDestination:
+                            case ZynQuick.PatternModel.SampleTriggerDestination:
                                 patternObject.associatedTrack.trackAudioType = "sample-trig";
+                                break;
+                            case ZynQuick.PatternModel.SampleLoopedDestination:
+                                patternObject.associatedTrack.trackAudioType = "sample-loop";
                                 break;
                             case ZynQuick.PatternModel.SynthDestination:
                             default:
@@ -804,7 +809,9 @@ don't want to have to dig too far...
                 onConnectedSoundChanged: patternObject.adoptTrackLayer()
                 onTrackAudioTypeChanged: {
                     if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleDestination;
+                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
+                    } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
+                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
                     } else {
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                     }

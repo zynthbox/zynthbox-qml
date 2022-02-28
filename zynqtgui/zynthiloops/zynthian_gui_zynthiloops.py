@@ -828,8 +828,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
             self.update_recorder_jack_port()
-            self.set_clip_to_record(clip)
-            (Path(self.clip_to_record.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
+            (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
             if source == 'internal':
                 try:
@@ -840,7 +839,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 preset_name = "external"
 
             count=0
-            base_recording_dir = f"{self.clip_to_record.recording_basepath}/wav"
+            base_recording_dir = f"{clip.recording_basepath}/wav"
             base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{self.__song__.bpm}-BPM"
 
             # Check if file exists otherwise append count
@@ -853,8 +852,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
-            self.clip_to_record.isRecording = True
-
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
@@ -866,6 +863,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
+
+            self.set_clip_to_record(clip)
+            self.clip_to_record.isRecording = True
         else:
             logging.error("Empty layer selected. Cannot record.")
             self.cannotRecordEmptyLayer.emit()

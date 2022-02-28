@@ -1056,6 +1056,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
+                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
                         text: infoBar.topLayer >= 0
                                   ? qsTr("Preset (%2/%3): %1")
                                       .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
@@ -1067,6 +1068,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
+                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
                         text: qsTr("Bank: %1")
                                 .arg(infoBar.bankName === "-" || infoBar.bankName === "None" ? "--" : infoBar.bankName)
                     }
@@ -1074,7 +1076,15 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
+                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
                         text: qsTr("Synth: %1").arg(infoBar.synthName)
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
+                        text: qsTr("Clip: %1").arg(infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
                     }
 
                     Item {

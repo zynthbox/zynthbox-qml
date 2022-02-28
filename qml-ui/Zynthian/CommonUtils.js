@@ -65,31 +65,21 @@ function toggleLayerChaining(layer) {
 }
 
 function switchToScene(index) {
-    var sceneTimer = new Timer();
-    sceneTimer.interval = 0;
-    sceneTimer.repeat = false;
-    sceneTimer.triggered.connect(function () {
-        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-        if (sequence) {
-            sequence.disconnectSequencePlayback();
-        } else {
-            console.log("Sequence could not be fetched, and playback could not be stopped");
-        }
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    if (sequence) {
+        sequence.disconnectSequencePlayback();
+    } else {
+        console.log("Sequence could not be fetched, and playback could not be stopped");
+    }
 
-        zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
-        zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
-        zynthian.zynthiloops.selectedClipCol = index;
+//    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+    zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
+    zynthian.zynthiloops.selectedClipCol = index;
 
-        sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-        if (sequence) {
-            sequence.prepareSequencePlayback();
-        } else {
-            console.log("Sequence could not be fetched, and playback could not be stopped");
-        }
-    })
-    sceneTimer.start();
-}
-
-function Timer() {
-    return Qt.createQmlObject("import QtQuick 2.0; Timer {}", root);
+    sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    if (sequence) {
+        sequence.prepareSequencePlayback();
+    } else {
+        console.log("Sequence could not be fetched, and playback could not be stopped");
+    }
 }

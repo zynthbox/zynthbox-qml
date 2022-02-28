@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
+from PySide2.QtCore import QAbstractListModel, QObject, QTimer, Qt, Property, Signal, Slot
 
 from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
 
@@ -119,13 +119,19 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def get_selected_scene_index(self):
         return self.__selected_scene_index__
     def set_selected_scene_index(self, index):
+        def task():
+            if self.__song__.get_metronome_manager().isMetronomeRunning:
+                self.stopScene(oldSceneIndex)
+                self.playScene(index)
+
+            self.__song__.schedule_save()
+
+        oldSceneIndex = self.__selected_scene_index__
         self.__selected_scene_index__ = index
         self.selected_scene_index_changed.emit()
 
-        if self.__song__.get_metronome_manager().isMetronomeRunning:
-            self.playScene(index)
+        QTimer.singleShot(10, task)
 
-        self.__song__.schedule_save()
     selected_scene_index_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex

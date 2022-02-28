@@ -290,12 +290,13 @@ Zynthian.Card {
 
                     // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
                     model: ListModel {
-                        ListElement { text: "SAMPLE LOOP"; value: "sample-loop" }
-                        ListElement { text: "SAMPLE TRIG"; value: "sample-trig" }
                         ListElement { text: "SYNTH"; value: "synth" }
+                        ListElement { text: "LOOP"; value: "sample-loop" }
+                        ListElement { text: "TRIG"; value: "sample-trig" }
+                        ListElement { text: "SLICE"; value: "sample-slice" }
                     }
                     textRole: "text"
-                    currentIndex: find(controlObj.trackAudioType.toUpperCase().replace("-", " "))
+                    currentIndex: find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", ""))
                     onActivated: {
                         controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                     }

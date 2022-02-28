@@ -168,6 +168,8 @@ while true; do
 	#HACK 2
 	mkdir -p /root/.local/share/plasma/desktoptheme/zynthian
 	cp -auR zynthian-plasma-theme/* /root/.local/share/plasma/desktoptheme/zynthian/
+	mkdir -p /root/.local/share/plasma/desktoptheme/zynthbox-new-theme
+	cp -auR zynthbox-new-theme/* /root/.local/share/plasma/desktoptheme/zynthbox-new-theme/
 	#cp zynthian_envars.sh ../config
 
 	export QSG_RENDER_LOOP=threaded

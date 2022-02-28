@@ -180,6 +180,7 @@ Zynthian.ScreenPage {
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectPrevPreset(selectedMidiChannel);
+                    updateSoundNameTimer.restart();
                 }
                 return true;
 
@@ -187,6 +188,7 @@ Zynthian.ScreenPage {
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectNextPreset(selectedMidiChannel);
+                    updateSoundNameTimer.restart();
                 }
                 return true;
 
@@ -930,6 +932,14 @@ Zynthian.ScreenPage {
 
                     property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
                     property string synthName: ""
+                    property int topLayer: -1
+
+                    property int presetIndex: -1
+                    property int presetCount: 0
+                    property string presetName: "--"
+
+                    property int bankIndex: -1
+                    property string bankName: "--"
 
                     width: parent.width - Kirigami.Units.gridUnit
                     anchors.centerIn: parent
@@ -937,12 +947,21 @@ Zynthian.ScreenPage {
 
                     onClipChanged: updateSoundNameTimer.restart()
 
-                    function updateSoundName() {
+                    function updateInfoBar() {
+                        console.log("### Updating info bar :", Date.now())
+
                         var layerIndex = -1;
                         var count = 0;
+                        var synthName = "--"
+                        var presetName = "--"
+
+                        infoBar.synthName = "--"
+                        infoBar.bankName = "--"
+                        infoBar.presetName = "--"
+
                         for (var i in infoBar.clip.clipTrack.chainedSounds) {
                             if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
-                                infoBar.clip.clipTrack.checkIfLayerExists(i)) {
+                                infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[i])) {
                                 if (layerIndex < 0) {
                                     layerIndex = i
                                 }
@@ -951,27 +970,35 @@ Zynthian.ScreenPage {
                             }
                         }
 
-                        layerLabel.layerIndex = layerIndex
-                        layerLabel.layerCount = count
-
                         for (var id in infoBar.clip.clipTrack.chainedSounds) {
                             if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
                                 infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
                                 var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
-                                infoBar.synthName = soundName[0] ? soundName[0].trim() : "";
+                                synthName = soundName[0] ? soundName[0].trim() : "--";
+                                presetName = soundName[1] ? soundName[1].trim() : "--";
                                 break;
                             }
-
-                            // If sound not connected, set text to none
-                            infoBar.synthName = "--"
                         }
+
+                        layerLabel.layerIndex = layerIndex
+                        infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipTrack.chainedSounds[layerIndex]
+                        layerLabel.layerCount = count
+
+                        infoBar.presetIndex = zynthian.preset.current_index
+                        infoBar.presetCount = zynthian.preset.effective_count
+                        infoBar.presetName = presetName
+
+                        infoBar.bankIndex = zynthian.bank.current_index
+                        infoBar.bankName = infoBar.topLayer >= 0 ? zynthian.bank.selector_list.getDisplayValue(infoBar.bankIndex) : "--"
+
+                        infoBar.synthName = synthName
                     }
 
                     Timer {
                         id: updateSoundNameTimer
                         repeat: false
                         interval: 1000
-                        onTriggered: infoBar.updateSoundName()
+                        onTriggered: infoBar.updateInfoBar()
                     }
 
                     Connections {
@@ -982,18 +1009,18 @@ Zynthian.ScreenPage {
                     }
 
                     Connections {
-                        target: zynthian.preset
-                        onList_updated: {
+                        target: zynthian.session_dashboard
+                        onSelectedTrackChanged: {
                             updateSoundNameTimer.restart()
                         }
                     }
 
-                    Connections {
-                        target: zynthian.bank
-                        onList_updated: {
-                            updateSoundNameTimer.restart()
-                        }
-                    }
+//                    Connections {
+//                        target: zynthian.bank
+//                        onList_updated: {
+//                            updateSoundNameTimer.restart()
+//                        }
+//                    }
 
                     Connections {
                         target: infoBar.clip.clipTrack
@@ -1029,13 +1056,19 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Preset: %1").arg(zynthian.zynthiloops.selectedPresetName === "-" ? "--" : zynthian.zynthiloops.selectedPresetName)
+                        text: infoBar.topLayer >= 0
+                                  ? qsTr("Preset (%2/%3): %1")
+                                      .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
+                                      .arg(zynthian.zynthiloops.selectedPresetIndex+1)
+                                      .arg(infoBar.presetCount)
+                                  : qsTr("Preset: --")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Bank: %1").arg(zynthian.bank.selector_list.getDisplayValue(zynthian.bank.current_index))
+                        text: qsTr("Bank: %1")
+                                .arg(infoBar.bankName === "-" || infoBar.bankName === "None" ? "--" : infoBar.bankName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

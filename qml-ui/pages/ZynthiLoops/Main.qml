@@ -778,8 +778,8 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                        property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                        sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+                                        pattern: sequence ? sequence.get(track.connectedPattern) : null
 
                                         visible: model.clip.col === zynthian.zynthiloops.selectedClipCol
                                         Layout.preferredWidth: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellWidth

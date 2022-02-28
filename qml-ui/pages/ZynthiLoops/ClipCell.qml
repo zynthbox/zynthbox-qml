@@ -41,9 +41,11 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property color highlightColor
-    property QtObject sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+    property bool isInScene: model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)
+    property bool patternHasNotes: pattern.bankHasNotes(0) && pattern.lastModified
 
+    property QtObject sequence
+    property QtObject pattern
 
     onPressed: forceActiveFocus()
 
@@ -109,11 +111,10 @@ QQC2.AbstractButton {
             anchors.fill: parent
             smooth: false
 
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
-                     pattern.bankHasNotes(0) &&
-                     pattern.lastModified
+                     root.patternHasNotes
             source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + model.clip.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
         }
 
@@ -122,7 +123,7 @@ QQC2.AbstractButton {
                 right: parent.right
                 bottom: parent.bottom
             }
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType === "sample-loop" &&
                      model.clip.path &&
                      model.clip.path.length > 0
@@ -139,13 +140,12 @@ QQC2.AbstractButton {
                 right: parent.right
                 bottom: parent.bottom
             }
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
-                     pattern.bankHasNotes(0) &&
-                     pattern.lastModified
+                     root.patternHasNotes
             text: qsTr("%1%2")
-                    .arg(pattern.lastModified && pattern.bankHasNotes(0) && sequence && sequence.isPlaying
+                    .arg(root.patternHasNotes && sequence && sequence.isPlaying
                             ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/"
                             : "")
                     .arg(pattern.availableBars*4)
@@ -166,14 +166,14 @@ QQC2.AbstractButton {
             anchors.centerIn: parent
             color: "#f44336"
             text: qsTr("Mute")
-            visible: !(model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col))
+            visible: !root.isInScene
         }
 
         QQC2.Label {
             anchors.centerIn: parent
             color: "#ffffff"
             text: qsTr("Loop")
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType === "sample-loop" &&
                      model.clip.path &&
                      model.clip.path.length > 0
@@ -193,7 +193,7 @@ QQC2.AbstractButton {
         Rectangle {
             id: progressRect
             anchors.bottom: parent.bottom
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType === "sample-loop" &&
                      model.clip.path &&
                      model.clip.path.length > 0 &&
@@ -206,12 +206,11 @@ QQC2.AbstractButton {
             id: patternProgressRect
 
             anchors.bottom: parent.bottom
-            visible: (model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)) &&
+            visible: root.isInScene &&
                      model.clip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      sequence.isPlaying &&
-                     pattern.bankHasNotes(0) &&
-                     pattern.lastModified
+                     root.patternHasNotes
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0

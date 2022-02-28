@@ -263,8 +263,7 @@ GridLayout {
                     );
                     Zynthian.CommonUtils.startMetronomeAndPlayback();
                 } else {
-                    controlObj.stopRecording();
-                    zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(controlObj);
+                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
                     bottomBar.tabbedView.initialAction.trigger()
                 }
             }

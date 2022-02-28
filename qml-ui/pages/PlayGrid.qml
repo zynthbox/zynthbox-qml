@@ -648,6 +648,7 @@ don't want to have to dig too far...
                     // to something new will cause the global sequence to be reloaded
                     // to match what is in that song
                     sequence.song = zynthian.zynthiloops.song;
+                    sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == i);
                 }
             }
         }
@@ -688,6 +689,7 @@ don't want to have to dig too far...
         delegate: Item {
             id: sceneObject
             property string connectedSequenceName: "Scene " + model.scene.name
+            property int thisIndex: model.index
             property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName)
             Connections {
                 target: zynthian.zynthiloops.song
@@ -713,6 +715,12 @@ don't want to have to dig too far...
                 id: sequenceSaverThrottle; repeat: false; running: false; interval: 100
                 onTriggered: {
                     sceneObject.sequence.save();
+                }
+            }
+            Connections {
+                target: zynthian.zynthiloops.song.scenesModel
+                onSelectedSceneIndexChanged: {
+                    sceneObject.sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == sceneObject.thisIndex);
                 }
             }
         }

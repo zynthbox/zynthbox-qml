@@ -1623,6 +1623,7 @@ class zynthian_gui(QObject):
                 clip = zl.clipToRecord
                 clip.stopRecording()
                 zl.song.scenesModel.addClipToCurrentScene(clip)
+                self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "STOP_RECORD":
             zl = self.screens["zynthiloops"]
@@ -1636,6 +1637,8 @@ class zynthian_gui(QObject):
             else:
                 # No Clip is currently being recorded
                 logging.error("No clip is being recorded")
+
+            self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":
             # Switch between track and sound mode

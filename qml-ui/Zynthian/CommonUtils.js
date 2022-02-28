@@ -37,8 +37,15 @@ function stopMetronomeAndPlayback() {
     } else {
         console.log("Sequence could not be fetched, and playback could not be stopped");
     }
+
+    if (zynthian.zynthiloops.clipToRecord) {
+        var clip = zynthian.zynthiloops.clipToRecord
+        clip.stopRecording()
+        zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)
+    }
+
     zynthian.zynthiloops.stopAllPlayback();
-    zynthian.zynthiloops.stopRecording();
+//    zynthian.zynthiloops.stopRecording();
     zynthian.playgrid.stopMetronomeRequest();
     zynthian.song_arranger.stop();
     zynthian.zynthiloops.resetMetronome();

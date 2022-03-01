@@ -81,7 +81,7 @@ def init():
 
             libzl.ClipAudioSource_setStartPosition.argtypes = [ctypes.c_void_p, ctypes.c_float]
 
-            libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+            libzl.ClipAudioSource_setLength.argtypes = [ctypes.c_void_p, ctypes.c_float, ctypes.c_int]
 
             libzl.ClipAudioSource_setSpeedRatio.argtypes = [ctypes.c_void_p, ctypes.c_float]
 

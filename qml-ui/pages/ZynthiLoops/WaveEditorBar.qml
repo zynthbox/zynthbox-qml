@@ -203,11 +203,19 @@ GridLayout {
                     if (endHandleDragHandler.active) {
                         // Calculate amount of pixels represented by 1 second
                         let pixelsPerSecond = parent.width / (wav.end - wav.start)
-                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) * pixelsPerSecond
-                        let length = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/pixelsPerBeat))
 
-                        if (length > 0 || waveBar.bottomBar.controlObj.length !== length) {
-                            waveBar.bottomBar.controlObj.length = length;
+                        // Calculate amount of pixels represented by 1 beat
+                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) * pixelsPerSecond
+                        let calculatedLength
+
+                        if (waveBar.bottomBar.controlObj.snapLengthToBeat) {
+                            calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/pixelsPerBeat))
+                        } else {
+                            calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/pixelsPerBeat);
+                        }
+
+                        if (calculatedLength > 0 || waveBar.bottomBar.controlObj.length !== calculatedLength) {
+                            waveBar.bottomBar.controlObj.length = calculatedLength;
                         }
                     }
                 }

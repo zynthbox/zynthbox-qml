@@ -68,6 +68,7 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
+        self.__snap_length_to_beat__ = True
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
@@ -175,6 +176,7 @@ class zynthiloops_clip(QObject):
                 "time": self.__time__,
                 "bpm": self.__bpm__,
                 "shouldSync": self.__should_sync__,
+                "snapLengthToBeat": self.__snap_length_to_beat__,
                 "arrangerBarPositions": self.__arranger_bar_positions__}
 
     def deserialize(self, obj):
@@ -204,6 +206,9 @@ class zynthiloops_clip(QObject):
         if "shouldSync" in obj:
             self.__should_sync__ = obj["shouldSync"]
             self.set_shouldSync(self.__should_sync__, True)
+        if "snapLengthToBeat" in obj:
+            self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
+            self.set_snap_length_to_beat(self.__should_sync__, True)
         if "arrangerBarPositions" in obj:
             self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
             self.arranger_bar_positions_changed.emit()
@@ -350,16 +355,16 @@ class zynthiloops_clip(QObject):
     def length(self):
         return self.__length__
 
-    def set_length(self, length: int, force_set=False):
-        if self.__length__ != math.floor(length) or force_set is True:
-            self.__length__ = math.floor(length)
+    def set_length(self, length: float, force_set=False):
+        if self.__length__ != length or force_set is True:
+            self.__length__ = length
             self.length_changed.emit()
             self.__song__.schedule_save()
 
             if self.audioSource is not None:
                 self.audioSource.set_length(self.__length__, self.__song__.bpm)
             self.reset_beat_count()
-    length = Property(int, length, set_length, notify=length_changed)
+    length = Property(float, length, set_length, notify=length_changed)
 
 
     def row(self):
@@ -528,6 +533,7 @@ class zynthiloops_clip(QObject):
         self.__bpm__ = 0
         self.__progress__ = 0.0
         self.__audio_level__ = -200
+        self.__snap_length_to_beat__ = True
 
         self.reset_beat_count()
         self.track_volume_changed()
@@ -556,6 +562,7 @@ class zynthiloops_clip(QObject):
         self.set_time(self.__time__, True)
         self.set_pitch(self.__pitch__, True)
         self.set_gain(self.__gain__, True)
+        self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
 
         # self.audioSource.set_start_position(self.__start_position__)
         self.path_changed.emit()
@@ -845,3 +852,18 @@ class zynthiloops_clip(QObject):
 
     cppObjId = Property(int, get_cpp_obj_id, notify=cpp_obj_changed)
     ### END Property cppObjId
+
+    ### Property snapLengthToBeat
+    def get_snap_length_to_beat(self):
+        return self.__snap_length_to_beat__
+
+    def set_snap_length_to_beat(self, val, force_set=False):
+        if self.__snap_length_to_beat__ != val or force_set is True:
+            self.__snap_length_to_beat__ = val
+            self.snap_length_to_beat_changed.emit()
+            self.__song__.schedule_save()
+
+    snap_length_to_beat_changed = Signal()
+
+    snapLengthToBeat = Property(bool, get_snap_length_to_beat, set_snap_length_to_beat, notify=snap_length_to_beat_changed)
+    ### END Property snapLengthToBeat

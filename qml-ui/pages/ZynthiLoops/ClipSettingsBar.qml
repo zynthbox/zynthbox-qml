@@ -77,6 +77,7 @@ GridLayout {
         text: qsTr("Length (beats)")
         controlObj: root.bottomBar.controlObj
         controlProperty: "length"
+        valueString: dial.value.toFixed(2)
 
         dial {
             stepSize: 1
@@ -234,6 +235,28 @@ GridLayout {
                 bottomBar.controlObj.copyFrom(bottomBar.clipCopySource);
                 bottomBar.clipCopySource = null;
             }
+        }
+    }
+
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+
+        QQC2.Switch {
+            id: snapLengthToBeatSwitch
+            Layout.alignment: Qt.AlignCenter
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            checked: root.bottomBar.controlObj && root.bottomBar.controlObj.hasOwnProperty("snapLengthToBeat") ? root.bottomBar.controlObj.snapLengthToBeat : true
+            onToggled: {
+                root.bottomBar.controlObj.snapLengthToBeat = checked
+            }
+        }
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignCenter
+            text: qsTr("Snap Length to beat")
         }
     }
 

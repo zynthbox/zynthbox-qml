@@ -30,6 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
+import Qt.labs.handlers 1.0
 
 import Zynthian 1.0 as Zynthian
 import JuceGraphics 1.0
@@ -57,6 +58,7 @@ GridLayout {
         id: wav
         Layout.fillWidth: true
         Layout.fillHeight: true
+        Layout.margins: Kirigami.Units.gridUnit
         color: Kirigami.Theme.textColor
         source: waveBar.bottomBar.controlObj.path
         PinchArea {
@@ -77,31 +79,64 @@ GridLayout {
                 scale = pinch.scale
                 print ("scale"+scale)
             }
-            MouseArea {
-                anchors.fill: parent
-                property int lastX
-                onPressed: {
-                    lastX = mouse.x
+
+            // Mask for wave part before start
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: startLoopLine.left
                 }
-                onPositionChanged: {
-                    let pixelToSecs = (wav.end - wav.start) / width
-                    let delta = pixelToSecs * (mouse.x - lastX)
+                color: "#99000000"
+            }
 
-//                    if ((wav.start - delta) < 0) {
-//                        delta = wav.start;
-//                    } else if (wav.end - delta > wav.length) {
-//                        delta = wav.length - wav.end;
-//                    }
-//                    wav.start -= delta;
-//                    wav.end -= delta;
+            QQC2.Button {
+                id: startHandle
 
-                    // Set startposition on swipe
-                    waveBar.bottomBar.controlObj.startPosition += delta
+                x: startLoopLine.x
+                y: 0
+                padding: Kirigami.Units.largeSpacing * 1.5
+                background: Item {
+                    Image {
+                        id: startHandleSeparator
+                        anchors {
+                            right: parent.right
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        source: "../../Zynthian/img/breadcrumb-separator.svg"
+                    }
+                }
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
+                opacity: 1
+                text: qsTr("S", "Start")
 
-                    lastX = mouse.x;
+                onXChanged: {
+                    if (startHandleDragHandler.active) {
+                        // Calculate amount of seconds represented by each pixel
+                        let pixelToSecs = (wav.end - wav.start) / parent.width
+
+                        // Set startposition on swipe
+                        waveBar.bottomBar.controlObj.startPosition = pixelToSecs * x
+                    }
+                }
+
+                DragHandler {
+                    id: startHandleDragHandler
+                    xAxis {
+                        minimum: 0
+                        maximum: parent.parent.width
+                        // Set maximum value such that endLine never goes out of view
+                        // maximum: parent.parent.width - (endLoopLine.x - startLoopLine.x)
+                    }
+
+                    yAxis.enabled: false
                 }
             }
+
             Rectangle {  //Start loop
+                id: startLoopLine
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -111,6 +146,7 @@ GridLayout {
                 width: Kirigami.Units.smallSpacing
                 x: (waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width
             }
+
             Repeater {
                 model: 50
                 delegate: Rectangle {
@@ -124,7 +160,9 @@ GridLayout {
                     x: ((waveBar.bottomBar.controlObj.startPosition+waveBar.bottomBar.controlObj.secPerBeat*modelData) / waveBar.bottomBar.controlObj.duration) * parent.width
                 }
             }
+
             Rectangle {  // End loop
+                id: endLoopLine
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -133,7 +171,81 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.bottomBar.controlObj.length) / waveBar.bottomBar.controlObj.duration) * parent.width) + ((waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width)
+                onXChanged: {
+                    if (!endHandleDragHandler.active) {
+                       endHandle.x = endLoopLine.x - endHandle.width
+                    }
+                }
             }
+
+            QQC2.Button {
+                id: endHandle
+
+                anchors.bottom: parent.bottom
+                padding: Kirigami.Units.largeSpacing * 1.5
+                background: Item {
+                    Image {
+                        id: endHandleSeparator
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        mirror: true
+                        source: "../../Zynthian/img/breadcrumb-separator.svg"
+                    }
+                }
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
+                opacity: 1
+                text: qsTr("E", "End")
+
+                onXChanged: {
+                    if (endHandleDragHandler.active) {
+                        // Calculate amount of pixels represented by 1 second
+                        let pixelsPerSecond = parent.width / (wav.end - wav.start)
+
+                        // Calculate amount of pixels represented by 1 beat
+                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) * pixelsPerSecond
+                        let calculatedLength
+
+                        if (waveBar.bottomBar.controlObj.snapLengthToBeat) {
+                            calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/pixelsPerBeat))
+                        } else {
+                            calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/pixelsPerBeat);
+                        }
+
+                        if (calculatedLength > 0 || waveBar.bottomBar.controlObj.length !== calculatedLength) {
+                            waveBar.bottomBar.controlObj.length = calculatedLength;
+                        }
+                    }
+                }
+                DragHandler {
+                    id: endHandleDragHandler
+                    xAxis {
+                        minimum: startLoopLine.x - width
+                        maximum: parent.parent.width
+                    }
+
+                    yAxis.enabled: false
+                    onGrabChanged: {
+                        if (!active) {
+                            endHandle.x = endLoopLine.x - endHandle.width
+                        }
+                    }
+                }
+            }
+
+            // Mask for wave part after
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: endLoopLine.right
+                    right: parent.right
+                }
+                color: "#99000000"
+            }
+
             Rectangle { // Progress
                 anchors {
                     top: parent.top

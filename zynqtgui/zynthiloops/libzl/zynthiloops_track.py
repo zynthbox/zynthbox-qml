@@ -56,6 +56,7 @@ class zynthiloops_track(QObject):
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
 
+        self.__previous_midi_out = []
         self.__track_audio_type__ = "synth"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
@@ -503,6 +504,23 @@ class zynthiloops_track(QObject):
     def set_track_audio_type(self, type):
         logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
         if type != self.__track_audio_type__:
+            if self.get_connected_sound() > -1:
+                layer  = self.zyngui.screens['layer'].get_midichain_root_by_chan(self.get_connected_sound())
+                if layer is not None:
+                    if type == "synth" or type == "sample-loop":
+                        # Touch of heuristic nonsense:
+                        # If we've explicitly set other midi out stuff on this layer, don't change it here
+                        if layer.get_midi_out() == []:
+                            layer.set_midi_out(self.__previous_midi_out)
+                        self.__previous_midi_out = []
+                        layer.reset_audio_out()
+                    else:
+                        # Touch of heuristic nonsense:
+                        # If we've already saved something in there and not cleared it, don't overwrite what's there
+                        if (self.__previous_midi_out == []):
+                            self.__previous_midi_out = layer.get_midi_out()
+                        layer.mute_midi_out()
+                        layer.mute_audio_out()
             self.__track_audio_type__ = type
             self.track_audio_type_changed.emit()
             self.__song__.schedule_save()

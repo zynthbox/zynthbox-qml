@@ -132,7 +132,7 @@ QQC2.AbstractButton {
                          model.clip.currentBeat >= 0
                             ? (model.clip.currentBeat+1) + "/"
                             : "")
-                    .arg(model.clip.length)
+                    .arg(model.clip.length.toFixed(2))
         }
 
         QQC2.Label {

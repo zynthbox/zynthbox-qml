@@ -102,13 +102,9 @@ Zynthian.Card {
 
             QQC2.Label {
                 visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
-                text: {
-                    if (!controlObj || !controlObj.path) {
-                        return qsTr("No File Loaded");
-                    }
-                    var arr = controlObj.path.split('/');
-                    return qsTr("File: %1").arg(arr[arr.length - 1]);
-                }
+                text: controlObj && controlObj.path
+                        ? qsTr("Sample (0): %1").arg(controlObj.path.split('/').pop())
+                        : qsTr("No File Loaded")
             }
 
             SidebarButton {
@@ -324,6 +320,13 @@ Zynthian.Card {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
+                    id: sampleSoundsAction
+                    text: qsTr("Sample Sounds")
+                    page: Qt.resolvedUrl("SampleSoundsBar.qml")
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
                     id: songAction
                     text: qsTr("Song")
                     page: Qt.resolvedUrl("SongBar.qml")
@@ -360,15 +363,8 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    id: metadataSoundsAction
-                    text: qsTr("Clip Sounds")
-                    page: Qt.resolvedUrl("MetadataSoundsBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Info")
-                    page: Qt.resolvedUrl("InfoBar.qml")
+                    text: qsTr("Sample Info")
+                    page: Qt.resolvedUrl("SampleInfoBar.qml")
                     visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },

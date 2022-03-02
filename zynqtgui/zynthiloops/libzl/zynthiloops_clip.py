@@ -70,6 +70,7 @@ class zynthiloops_clip(QObject):
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
         self.__snap_length_to_beat__ = True
+        self.__slices__ = 16
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
@@ -889,3 +890,17 @@ class zynthiloops_clip(QObject):
 
     loopDelta = Property(float, get_loop_delta, set_loop_delta, notify=loop_delta_changed)
     ### END Property loopDelta
+
+    ### Property slices
+    def get_slices(self):
+        return self.__slices__
+
+    def set_slices(self, val):
+        if self.__slices__ != val:
+            self.__slices__ = val
+            self.slices_changed.emit()
+
+    slices_changed = Signal()
+
+    slices = Property(int, get_slices, set_slices, notify=slices_changed)
+    ### END Property slices

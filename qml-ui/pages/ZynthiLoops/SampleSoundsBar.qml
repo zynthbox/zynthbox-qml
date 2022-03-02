@@ -35,7 +35,7 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: waveBar
+    id: metadataSoundsBar
     rows: 1
     Layout.fillWidth: true
     property QtObject bottomBar: null
@@ -52,9 +52,13 @@ GridLayout {
         return false;
     }
 
-    QQC2.Label {
-        Layout.alignment: Qt.alignCenter
-        text: "Info"
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+
+        QQC2.Label {
+            text: qsTr("Sample Sounds")
+        }
     }
 }
-

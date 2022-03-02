@@ -35,7 +35,7 @@ import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
 GridLayout {
-    id: metadataSoundsBar
+    id: waveBar
     rows: 1
     Layout.fillWidth: true
     property QtObject bottomBar: null
@@ -76,3 +76,4 @@ GridLayout {
         }
     }
 }
+

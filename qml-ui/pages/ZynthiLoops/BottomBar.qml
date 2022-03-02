@@ -101,6 +101,20 @@ Zynthian.Card {
             }
 
             QQC2.Label {
+                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+                         controlObj.clipTrack.trackAudioType === "sample-slice"
+                text: qsTr("Slices")
+            }
+
+            QQC2.ComboBox {
+                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+                         controlObj.clipTrack.trackAudioType === "sample-slice"
+                model: [4, 8, 12, 16]
+                currentIndex: find(controlObj.slices)
+                onActivated: controlObj.slices = model[index]
+            }
+
+            QQC2.Label {
                 visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                 text: controlObj && controlObj.path
                         ? qsTr("Sample (0): %1").arg(controlObj.path.split('/').pop())

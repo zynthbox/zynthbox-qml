@@ -143,6 +143,7 @@ GridLayout {
                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
                 text: qsTr("S", "Start")
+                z: 100
 
                 onXChanged: {
                     if (startHandleDragHandler.active) {
@@ -167,6 +168,7 @@ GridLayout {
             QQC2.Button {
                 id: loopHandle
 
+                visible: waveBar.bottomBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
                 anchors.verticalCenter: startLoopLine.verticalCenter
                 padding: Kirigami.Units.largeSpacing * 1.5
                 background: Item {
@@ -183,6 +185,7 @@ GridLayout {
                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
                 text: qsTr("L", "Loop")
+                z: 100
 
                 onXChanged: {
                     if (loopHandleDragHandler.active) {
@@ -215,6 +218,7 @@ GridLayout {
 
             Rectangle {  // Loop line
                 id: loopLine
+                visible: waveBar.bottomBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -232,7 +236,9 @@ GridLayout {
 
             Repeater {
                 // Count number of beat lines to be shown as per beat and visible width
-                model: Math.ceil(wav.width / wav.pixelsPerBeat)
+                model: waveBar.bottomBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
+                        ? Math.ceil(wav.width / wav.pixelsPerBeat)
+                        : 0
                 delegate: Rectangle {
                     anchors {
                         top: parent.top
@@ -243,6 +249,45 @@ GridLayout {
                     width: 1
                     // Calculate position of each beat line taking startposition into consideration
                     x: wav.pixelsPerBeat*modelData + (startLoopLine.x % wav.pixelsPerBeat)
+                }
+            }
+
+            Repeater {
+                // Count number of slice lines to be shown
+                model: waveBar.bottomBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
+                       ? 0
+                       : waveBar.bottomBar.controlObj.slices
+                delegate: Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    color: Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                   Kirigami.Theme.highlightColor.g,
+                                   Kirigami.Theme.highlightColor.b,
+                                   index === 0 ? 0 : 0.8)
+                    width: 2
+                    // Calculate position of each beat line taking startposition into consideration
+                    x: startLoopLine.x + (endLoopLine.x - startLoopLine.x)*modelData/waveBar.bottomBar.controlObj.slices
+
+                    Rectangle {
+                        width: Math.min(Kirigami.Units.gridUnit, (endLoopLine.x - startLoopLine.x)/waveBar.bottomBar.controlObj.slices - 4)
+                        height: width
+                        anchors {
+                            left: parent.right
+                            bottom: parent.bottom
+                        }
+
+                        border.width: 1
+                        border.color: "#99ffffff"
+                        color: Kirigami.Theme.backgroundColor
+
+                        QQC2.Label {
+                            anchors.centerIn: parent
+                            text: qsTr("%L1").arg(index+1)
+                            font.pointSize: Math.min(8, parent.width)
+                        }
+                    }
                 }
             }
 
@@ -283,6 +328,7 @@ GridLayout {
                 font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
                 opacity: 1
                 text: qsTr("E", "End")
+                z: 100
 
                 onXChanged: {
                     if (endHandleDragHandler.active) {

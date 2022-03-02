@@ -56,6 +56,9 @@ GridLayout {
 
     WaveFormItem {
         id: wav
+
+        property real pixelToSecs: (wav.end - wav.start) / width
+
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.gridUnit
@@ -91,6 +94,31 @@ GridLayout {
                 color: "#99000000"
             }
 
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: startHandle.right
+                    right: endHandle.left
+                }
+                color: "transparent"
+                border.width: 0
+                border.color: "white"
+                MouseArea {
+                    property int lastX
+                    anchors.fill: parent
+                    onPressed: {
+                        lastX = mouse.x
+                    }
+                    onPositionChanged: {
+                        let delta = wav.pixelToSecs * (mouse.x - lastX)
+
+                        // Set startposition on swipe
+                        waveBar.bottomBar.controlObj.startPosition += delta
+                    }
+                }
+            }
+
             QQC2.Button {
                 id: startHandle
 
@@ -114,11 +142,8 @@ GridLayout {
 
                 onXChanged: {
                     if (startHandleDragHandler.active) {
-                        // Calculate amount of seconds represented by each pixel
-                        let pixelToSecs = (wav.end - wav.start) / parent.width
-
                         // Set startposition on swipe
-                        waveBar.bottomBar.controlObj.startPosition = pixelToSecs * x
+                        waveBar.bottomBar.controlObj.startPosition = wav.pixelToSecs * x
                     }
                 }
 
@@ -135,6 +160,43 @@ GridLayout {
                 }
             }
 
+            QQC2.Button {
+                id: loopHandle
+
+                anchors.verticalCenter: startLoopLine.verticalCenter
+                padding: Kirigami.Units.largeSpacing * 1.5
+                background: Item {
+                    Image {
+                        id: loopHandleSeparator
+                        anchors {
+                            right: parent.right
+                            top: parent.top
+                            bottom: parent.bottom
+                        }
+                        source: "../../Zynthian/img/breadcrumb-separator.svg"
+                    }
+                }
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.2
+                opacity: 1
+                text: qsTr("L", "Loop")
+
+                onXChanged: {
+                    if (loopHandleDragHandler.active) {
+                        waveBar.bottomBar.controlObj.loopDelta = (loopHandle.x - startLoopLine.x) * wav.pixelToSecs
+                    }
+                }
+
+                DragHandler {
+                    id: loopHandleDragHandler
+                    xAxis {
+                        minimum: startLoopLine.x
+                        maximum: endLoopLine.x
+                    }
+
+                    yAxis.enabled: false
+                }
+            }
+
             Rectangle {  //Start loop
                 id: startLoopLine
                 anchors {
@@ -145,6 +207,23 @@ GridLayout {
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
                 x: (waveBar.bottomBar.controlObj.startPosition / waveBar.bottomBar.controlObj.duration) * parent.width
+            }
+
+            Rectangle {  // Loop line
+                id: loopLine
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                x: startLoopLine.x + waveBar.bottomBar.controlObj.loopDelta/wav.pixelToSecs
+                color: Kirigami.Theme.highlightColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                onXChanged: {
+                    if (!loopHandleDragHandler.active) {
+                        loopHandle.x = loopLine.x
+                    }
+                }
             }
 
             Repeater {
@@ -202,10 +281,10 @@ GridLayout {
                 onXChanged: {
                     if (endHandleDragHandler.active) {
                         // Calculate amount of pixels represented by 1 second
-                        let pixelsPerSecond = parent.width / (wav.end - wav.start)
+//                        let pixelsPerSecond = parent.width / (wav.end - wav.start)
 
                         // Calculate amount of pixels represented by 1 beat
-                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) * pixelsPerSecond
+                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) / wav.pixelToSecs
                         let calculatedLength
 
                         if (waveBar.bottomBar.controlObj.snapLengthToBeat) {
@@ -216,6 +295,11 @@ GridLayout {
 
                         if (calculatedLength > 0 || waveBar.bottomBar.controlObj.length !== calculatedLength) {
                             waveBar.bottomBar.controlObj.length = calculatedLength;
+                        }
+
+                        // When dragging end handle, check and set loop handle to be not greater than end
+                        if (loopLine.x > endLoopLine.x) {
+                            waveBar.bottomBar.controlObj.loopDelta = (endLoopLine.x - startLoopLine.x) * wav.pixelToSecs
                         }
                     }
                 }

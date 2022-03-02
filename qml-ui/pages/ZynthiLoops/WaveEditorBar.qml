@@ -57,26 +57,30 @@ GridLayout {
     WaveFormItem {
         id: wav
 
+        // Calculate amount of pixels represented by 1 second
         property real pixelToSecs: (wav.end - wav.start) / width
+
+        // Calculate amount of pixels represented by 1 beat
+        property real pixelsPerBeat: (60/zynthian.zynthiloops.song.bpm) / wav.pixelToSecs
 
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.gridUnit
         color: Kirigami.Theme.textColor
         source: waveBar.bottomBar.controlObj.path
+//        clip: true
         PinchArea {
             anchors.fill: parent
             property real scale: 1
             onPinchUpdated: {
                 //FIXME: buggy, disable for now
-                return
-                let actualScale = Math.min(1.2, Math.max(1, scale + pinch.scale - 1));
+                /* let actualScale = Math.min(1.2, Math.max(1, scale + pinch.scale - 1));
                 print(actualScale)
                 let ratio = pinch.center.x / width;
                 let newLength = wav.length / actualScale;
                 let remaining = wav.length - newLength;
                 wav.start = remaining/(1-ratio);
-                wav.end = newLength - remaining/(ratio);
+                wav.end = newLength - remaining/(ratio); */
             }
             onPinchFinished: {
                 scale = pinch.scale
@@ -227,7 +231,8 @@ GridLayout {
             }
 
             Repeater {
-                model: 50
+                // Count number of beat lines to be shown as per beat and visible width
+                model: Math.ceil(wav.width / wav.pixelsPerBeat)
                 delegate: Rectangle {
                     anchors {
                         top: parent.top
@@ -236,7 +241,8 @@ GridLayout {
                     color: "#ffffff"
                     opacity: 0.1
                     width: 1
-                    x: ((waveBar.bottomBar.controlObj.startPosition+waveBar.bottomBar.controlObj.secPerBeat*modelData) / waveBar.bottomBar.controlObj.duration) * parent.width
+                    // Calculate position of each beat line taking startposition into consideration
+                    x: wav.pixelsPerBeat*modelData + (startLoopLine.x % wav.pixelsPerBeat)
                 }
             }
 
@@ -280,17 +286,12 @@ GridLayout {
 
                 onXChanged: {
                     if (endHandleDragHandler.active) {
-                        // Calculate amount of pixels represented by 1 second
-//                        let pixelsPerSecond = parent.width / (wav.end - wav.start)
-
-                        // Calculate amount of pixels represented by 1 beat
-                        let pixelsPerBeat = (60/zynthian.zynthiloops.song.bpm) / wav.pixelToSecs
                         let calculatedLength
 
                         if (waveBar.bottomBar.controlObj.snapLengthToBeat) {
-                            calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/pixelsPerBeat))
+                            calculatedLength = Math.abs(Math.floor((endHandle.x - startLoopLine.x + endHandle.width)/wav.pixelsPerBeat))
                         } else {
-                            calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/pixelsPerBeat);
+                            calculatedLength = Math.abs((endHandle.x + endHandle.width - startLoopLine.x)/wav.pixelsPerBeat);
                         }
 
                         if (calculatedLength > 0 || waveBar.bottomBar.controlObj.length !== calculatedLength) {

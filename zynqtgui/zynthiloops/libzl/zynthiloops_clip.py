@@ -46,6 +46,7 @@ class zynthiloops_clip(QObject):
         self.__length__ = self.__initial_length__
         self.__initial_start_position__ = 0.0
         self.__start_position__ = self.__initial_start_position__
+        self.__loop_delta__ = 0.0
         # self.__start_position_before_sync__ = None
         self.__path__ = None
         self.__song__ = song
@@ -171,6 +172,7 @@ class zynthiloops_clip(QObject):
     def serialize(self):
         return {"path": self.__path__,
                 "start": self.__start_position__,
+                "loopDelta": self.__loop_delta__,
                 "length": self.__length__,
                 "pitch": self.__pitch__,
                 "time": self.__time__,
@@ -188,6 +190,9 @@ class zynthiloops_clip(QObject):
         if "start" in obj:
             self.__start_position__ = obj["start"]
             self.set_start_position(self.__start_position__, True)
+        if "loopDelta" in obj:
+            self.__loop_delta__ = obj["loopDelta"]
+            self.set_loop_delta(self.__loop_delta__, True)
         if "length" in obj:
             self.__length__ = obj["length"]
             self.set_length(self.__length__, True)
@@ -527,6 +532,7 @@ class zynthiloops_clip(QObject):
         self.__is_playing__ = False
         self.__is_recording__ = False
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
+        self.__loop_delta__ = 0.0
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
@@ -559,6 +565,7 @@ class zynthiloops_clip(QObject):
         # self.time = self.__time__
         self.set_length(self.__length__, True)
         self.set_start_position(self.__start_position__, True)
+        self.set_loop_delta(self.__loop_delta__, True)
         self.set_time(self.__time__, True)
         self.set_pitch(self.__pitch__, True)
         self.set_gain(self.__gain__, True)
@@ -867,3 +874,18 @@ class zynthiloops_clip(QObject):
 
     snapLengthToBeat = Property(bool, get_snap_length_to_beat, set_snap_length_to_beat, notify=snap_length_to_beat_changed)
     ### END Property snapLengthToBeat
+
+    ### Property loopDelta
+    def get_loop_delta(self):
+        return self.__loop_delta__
+
+    def set_loop_delta(self, val, force_set=False):
+        if self.__loop_delta__ != val or force_set is True:
+            self.__loop_delta__ = val
+            self.loop_delta_changed.emit()
+            self.__song__.schedule_save()
+
+    loop_delta_changed = Signal()
+
+    loopDelta = Property(float, get_loop_delta, set_loop_delta, notify=loop_delta_changed)
+    ### END Property loopDelta

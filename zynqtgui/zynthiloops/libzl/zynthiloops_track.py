@@ -56,7 +56,11 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
-        self.__samples__ = [None, None, None, None, None]
+        self.__samples__ = []
+
+        # Create 5 clip objects for 5 samples per track
+        for i in range(0, 5):
+            self.__samples__.append(zynthiloops_clip(-1, -1, self.__song__))
 
         self.__previous_midi_out = []
         self.__track_audio_type__ = "synth"
@@ -70,7 +74,7 @@ class zynthiloops_track(QObject):
         # Connect to default patterns on init
         # This will be overwritten by deserialize if user changed the value, so it is safe to always set the value
         if 0 <= self.__id__ <= 9:
-             self.__connected_pattern__ = self.__id__
+            self.__connected_pattern__ = self.__id__
 
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
@@ -98,7 +102,7 @@ class zynthiloops_track(QObject):
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
-                "samples": self.__samples__,
+                "samples": [x.serialize() for x in self.__samples__],
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -121,7 +125,8 @@ class zynthiloops_track(QObject):
             self.__track_audio_type__ = obj["trackAudioType"]
             self.set_track_audio_type(self.__track_audio_type__)
         if "samples" in obj:
-            self.__samples__ = obj["samples"]
+            for i, clip in enumerate(obj["samples"]):
+                self.__samples__[i].deserialize(clip)
             self.samples_changed.emit()
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
@@ -542,7 +547,7 @@ class zynthiloops_track(QObject):
 
     @Slot(str, int, result=None)
     def set_sample(self, path, index):
-        self.__samples__[index] = path
+        self.__samples__[index].set_path(path)
         self.samples_changed.emit()
         self.__song__.schedule_save()
 

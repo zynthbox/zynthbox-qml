@@ -126,15 +126,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.setSingleShot(True)
         self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
 
-    def update_select_preset_index(self):
-        logging.error(f"Update selected preset index changed")
-        try:
-            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-            selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-            self.selected_preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
-        except:
-            self.selected_preset_index = 0
-
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
@@ -152,7 +143,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
             self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
-            self.update_select_preset_index()
 
             if cb is not None:
                 cb()
@@ -178,7 +168,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if track.checkIfLayerExists(selected_channel) and self.selected_preset_index != self.__zselector.value:
+        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector.value:
             logging.error(f"Selecting preset : {self.__zselector.value}")
             self.zyngui.preset.select(self.__zselector.value)
             self.select_preset_timer.start()

@@ -162,7 +162,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     ### Property selectedTrack
     def change_to_track_sound(self):
         self.zyngui.screens["layers_for_track"].update_track_sounds()
-        self.zyngui.zynthiloops.update_select_preset_index()
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
         self.__change_track_sound_timer__.setInterval(1000)

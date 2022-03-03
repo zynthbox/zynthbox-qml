@@ -179,7 +179,7 @@ Zynthian.ScreenPage {
             case "SELECT_UP":
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
-                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
+                    zynthian.layer.selectNextPreset(selectedMidiChannel);
                     updateSoundNameTimer.restart();
                 }
                 return true;
@@ -187,7 +187,7 @@ Zynthian.ScreenPage {
             case "SELECT_DOWN":
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
-                    zynthian.layer.selectNextPreset(selectedMidiChannel);
+                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
                     updateSoundNameTimer.restart();
                 }
                 return true;
@@ -1066,8 +1066,8 @@ Zynthian.ScreenPage {
                         text: infoBar.topLayer >= 0
                                   ? qsTr("Preset (%2/%3): %1")
                                       .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
-                                      .arg(zynthian.zynthiloops.selectedPresetIndex+1)
-                                      .arg(infoBar.presetCount)
+                                        .arg(zynthian.preset.current_index+1)
+                                        .arg(infoBar.presetCount)
                                   : qsTr("Preset: --")
                     }
                     QQC2.Label {
@@ -1105,6 +1105,11 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
                         checkable: true
+                        // Bind to current index to properly update when preset changed from other screen
+                        checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
+                        onToggled: {
+                            zynthian.preset.current_is_favorite = checked
+                        }
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

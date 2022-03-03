@@ -71,10 +71,14 @@ class zynthiloops_clip(QObject):
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
+        self.track = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
 
-        self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        try:
+            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        except:
+            pass
 
         if self.track is not None:
             self.track.volume_changed.connect(lambda: self.track_volume_changed())
@@ -129,15 +133,19 @@ class zynthiloops_clip(QObject):
 
     def set_row_index(self, new_index):
         self.__row_index__ = new_index
-        self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        try:
+            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+        except:
+            pass
         self.row_index_changed.emit()
 
     def track_volume_changed(self):
-        self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
-        logging.error(f"Track volume changed : {self.track.volume}")
+        if self.track is not None:
+            self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
+            logging.error(f"Track volume changed : {self.track.volume}")
 
-        if self.audioSource is not None:
-            self.audioSource.set_volume(self.track.volume)
+            if self.audioSource is not None:
+                self.audioSource.set_volume(self.track.volume)
 
     @Slot(int)
     def setVolume(self, vol):
@@ -219,9 +227,12 @@ class zynthiloops_clip(QObject):
             self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
             self.arranger_bar_positions_changed.emit()
 
-        self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        self.track.volume_changed.connect(lambda: self.track_volume_changed())
-        self.track_volume_changed()
+        try:
+            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+            self.track.volume_changed.connect(lambda: self.track_volume_changed())
+            self.track_volume_changed()
+        except:
+            pass
 
     @Signal
     def length_changed(self):
@@ -522,8 +533,9 @@ class zynthiloops_clip(QObject):
             self.audioSource.destroy()
 
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
-        self.clipTrack.trackAudioType = "sample-loop"
-        self.__song__.scenesModel.addClipToCurrentScene(self)
+        if self.clipTrack is not None:
+            self.clipTrack.trackAudioType = "sample-loop"
+            self.__song__.scenesModel.addClipToCurrentScene(self)
         self.cpp_obj_changed.emit()
         print(path)
 
@@ -582,7 +594,8 @@ class zynthiloops_clip(QObject):
     def audio_level_changed_cb(self, leveldB):
         self.__audio_level__ = leveldB
         self.audioLevelChanged.emit()
-        self.track.audioLevel = leveldB
+        if self.track is not None:
+            self.track.audioLevel = leveldB
 
     def progress_changed_cb(self, progress):
         self.__progress__ = progress
@@ -618,15 +631,15 @@ class zynthiloops_clip(QObject):
         if not self.__is_playing__:
             logging.error(f"Playing Clip {self}")
 
-            track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            clipsModel = track.clipsModel
+            if self.track is not None:
+                clipsModel = self.track.clipsModel
 
-            for clip_index in range(0, clipsModel.count):
-                clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-                logging.error(f"Track({track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+                for clip_index in range(0, clipsModel.count):
+                    clip: zynthiloops_clip = clipsModel.getClip(clip_index)
+                    logging.error(f"Track({self.track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
 
-                if clip.__is_playing__:
-                    clip.stop()
+                    if clip.__is_playing__:
+                        clip.stop()
 
             if self.audioSource is None:
                 return
@@ -636,7 +649,7 @@ class zynthiloops_clip(QObject):
             self.__is_playing__ = True
             self.__is_playing_changed__.emit()
 
-            if self.clipTrack.trackAudioType == "sample-loop":
+            if self.clipTrack is not None and self.clipTrack.trackAudioType == "sample-loop":
                 self.audioSource.queueClipToStart()
 
     @Slot(None)

@@ -40,6 +40,9 @@ GridLayout {
     Layout.fillWidth: true
 
     property QtObject bottomBar: null
+    property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
+                                    ? bottomBar.controlObj // selected bottomBar object is clip/pattern
+                                    : bottomBar.controlObj.samples[bottomBar.controlObj.selectedSampleRow] // selected bottomBar object is not clip/pattern and hence it is a track
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -56,26 +59,26 @@ GridLayout {
     Zynthian.ZynthiloopsDial {
         id: startDial
         text: qsTr("Start (secs)")
-        controlObj: root.bottomBar.controlObj
+        controlObj: root.controlObj
         controlProperty: "startPosition"
         valueString: dial.value.toFixed(2)
         buttonStepSize: 0.01
 
         dial {
-            stepSize: controlObj && controlObj.hasOwnProperty("secPerBeat") ? controlObj.secPerBeat : 0.01
+            stepSize: root.controlObj && root.controlObj.hasOwnProperty("secPerBeat") ? root.controlObj.secPerBeat : 0.01
             from: 0
-            to: controlObj && controlObj.hasOwnProperty("duration") ? controlObj.duration : 0
+            to: root.controlObj && root.controlObj.hasOwnProperty("duration") ? root.controlObj.duration : 0
         }
 
         onDoubleClicked: {
-            controlObj.startPosition = controlObj.initialStartPosition;
+            root.controlObj.startPosition = root.controlObj.initialStartPosition;
         }
     }
 
     Zynthian.ZynthiloopsDial {
         id: lengthDial
         text: qsTr("Length (beats)")
-        controlObj: root.bottomBar.controlObj
+        controlObj: root.controlObj
         controlProperty: "length"
         valueString: dial.value.toFixed(2)
 
@@ -86,14 +89,14 @@ GridLayout {
         }
 
         onDoubleClicked: {
-            controlObj.length = controlObj.initialLength;
+            root.controlObj.length = root.controlObj.initialLength;
         }
     }
 
     Zynthian.ZynthiloopsDial {
         id: pitchDial
         text: qsTr("Pitch")
-        controlObj: root.bottomBar.controlObj
+        controlObj: root.controlObj
         controlProperty: "pitch"
 
         dial {
@@ -103,17 +106,17 @@ GridLayout {
         }
 
         onDoubleClicked: {
-            controlObj.pitch = controlObj.initialPitch;
+            root.controlObj.pitch = root.controlObj.initialPitch;
         }
     }
 
     Zynthian.ZynthiloopsDial {
         id: timeDial
         text: qsTr("Speed Ratio")
-        controlObj: root.bottomBar.controlObj
+        controlObj: root.controlObj
         controlProperty: "time"
         valueString: dial.value.toFixed(2)
-        enabled: root.bottomBar.controlObj ? !root.bottomBar.controlObj.shouldSync : false
+        enabled: root.controlObj ? !root.controlObj.shouldSync : false
 
         dial {
             stepSize: 0.1
@@ -122,14 +125,14 @@ GridLayout {
         }
 
         onDoubleClicked: {
-            controlObj.time = controlObj.initialTime;
+            root.controlObj.time = root.controlObj.initialTime;
         }
     }
 
     Zynthian.ZynthiloopsDial {
         id: gainDial
         text: qsTr("Loudness (dB)")
-        controlObj: root.bottomBar.controlObj
+        controlObj: root.controlObj
         controlProperty: "gain"
         valueString: dial.value.toFixed(1)
 
@@ -140,7 +143,7 @@ GridLayout {
         }
 
         onDoubleClicked: {
-            controlObj.gain = controlObj.initialGain;
+            root.controlObj.gain = root.controlObj.initialGain;
         }
     }
 
@@ -156,8 +159,8 @@ GridLayout {
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
-            visible: controlObj && controlObj.metadataBPM ? true : false
-            text: controlObj && controlObj.hasOwnProperty("metadataBPM") ? controlObj.metadataBPM : ""
+            visible: root.controlObj && root.controlObj.metadataBPM ? true : false
+            text: root.controlObj && root.controlObj.hasOwnProperty("metadataBPM") ? root.controlObj.metadataBPM : ""
             font.pointSize: 9
         }
 
@@ -168,7 +171,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
             focus: false
-            text: root.bottomBar.controlObj && root.bottomBar.controlObj.bpm ? (root.bottomBar.controlObj.bpm <= 0 ? "" : root.bottomBar.controlObj.bpm.toFixed(2)) : ""
+            text: root.controlObj && root.controlObj.bpm ? (root.controlObj.bpm <= 0 ? "" : root.controlObj.bpm.toFixed(2)) : ""
             // validator: DoubleValidator {bottom: 1; top: 250; decimals: 2}
 
             /** Float Matching : Matches exactly one '0' after decimal point
@@ -176,9 +179,9 @@ GridLayout {
               */
             validator: RegExpValidator { regExp: /^[0-9]*(\.(0{0}|0[1-9]{0,1}|[1-9]{0,2}))?$/ }
             inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
-            enabled: root.bottomBar.controlObj ? !root.bottomBar.controlObj.shouldSync : false
+            enabled: root.controlObj ? !root.controlObj.shouldSync : false
             onAccepted: {
-                root.bottomBar.controlObj.bpm = parseFloat(text);
+                root.controlObj.bpm = parseFloat(text);
             }
             onPressed: {
                 forceActiveFocus()
@@ -198,9 +201,9 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-            checked: root.bottomBar.controlObj && root.bottomBar.controlObj.hasOwnProperty("shouldSync") ? root.bottomBar.controlObj.shouldSync : false
+            checked: root.controlObj && root.controlObj.hasOwnProperty("shouldSync") ? root.controlObj.shouldSync : false
             onToggled: {
-                root.bottomBar.controlObj.shouldSync = checked
+                root.controlObj.shouldSync = checked
             }
         }
 
@@ -221,7 +224,7 @@ GridLayout {
             text: qsTr("Copy Clip")
             visible: bottomBar.clipCopySource == null
             onClicked: {
-                bottomBar.clipCopySource = bottomBar.controlObj;
+                bottomBar.clipCopySource = root.controlObj;
             }
         }
 
@@ -230,9 +233,9 @@ GridLayout {
 
             text: qsTr("Paste Clip")
             visible: bottomBar.clipCopySource != null
-            enabled: bottomBar.clipCopySource != bottomBar.controlObj
+            enabled: bottomBar.clipCopySource != root.controlObj
             onClicked: {
-                bottomBar.controlObj.copyFrom(bottomBar.clipCopySource);
+                root.controlObj.copyFrom(bottomBar.clipCopySource);
                 bottomBar.clipCopySource = null;
             }
         }
@@ -248,9 +251,9 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-            checked: root.bottomBar.controlObj && root.bottomBar.controlObj.hasOwnProperty("snapLengthToBeat") ? root.bottomBar.controlObj.snapLengthToBeat : true
+            checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
             onToggled: {
-                root.bottomBar.controlObj.snapLengthToBeat = checked
+                root.controlObj.snapLengthToBeat = checked
             }
         }
 
@@ -268,16 +271,16 @@ GridLayout {
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
 
         QQC2.Label {
-            visible: controlObj && controlObj.soundData ? controlObj.soundData.length <= 0 : false
+            visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false
             text: "<No Metadata>"
         }
         QQC2.Label {
-            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0 && controlObj.metadataAudioType
-            text: qsTr("Audio Type: %1").arg(controlObj && controlObj.metadataAudioType ? controlObj.metadataAudioType : "")
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && root.controlObj.path.length > 0 && root.controlObj.metadataAudioType
+            text: qsTr("Audio Type: %1").arg(root.controlObj && root.controlObj.metadataAudioType ? root.controlObj.metadataAudioType : "")
         }
         QQC2.Label {
-            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && controlObj.path.length > 0
-            text: qsTr("Duration: %1 secs").arg(controlObj && controlObj.duration ? controlObj.duration.toFixed(2) : 0.0)
+            visible: root.bottomBar.controlType === BottomBar.ControlType.Clip && root.controlObj.path.length > 0
+            text: qsTr("Duration: %1 secs").arg(root.controlObj && root.controlObj.duration ? root.controlObj.duration.toFixed(2) : 0.0)
         }
     }
 }

@@ -359,7 +359,8 @@ Zynthian.Card {
                     id: waveAction
                     text: qsTr("Clip Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    visible: ((root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0) ||
+                             root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                     preload: true
                 },
@@ -367,7 +368,8 @@ Zynthian.Card {
                     id: editorAction
                     text: qsTr("Wave Editor")
                     page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    visible: ((root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0) ||
+                             root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

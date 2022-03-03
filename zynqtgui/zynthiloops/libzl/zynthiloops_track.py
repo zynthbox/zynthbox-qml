@@ -25,6 +25,7 @@
 import logging
 import math
 import threading
+from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
 
@@ -55,6 +56,7 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
+        self.__samples__ = [None, None, None, None, None]
 
         self.__previous_midi_out = []
         self.__track_audio_type__ = "synth"
@@ -96,6 +98,7 @@ class zynthiloops_track(QObject):
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
+                "samples": self.__samples__,
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -117,6 +120,9 @@ class zynthiloops_track(QObject):
         if "trackAudioType" in obj:
             self.__track_audio_type__ = obj["trackAudioType"]
             self.set_track_audio_type(self.__track_audio_type__)
+        if "samples" in obj:
+            self.__samples__ = obj["samples"]
+            self.samples_changed.emit()
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -530,3 +536,28 @@ class zynthiloops_track(QObject):
     trackAudioType = Property(str, get_track_audio_type, set_track_audio_type, notify=track_audio_type_changed)
     ### END Property trackAudioType
 
+    ### Property samples
+    def get_samples(self):
+        return self.__samples__
+
+    @Slot(str, int, result=None)
+    def set_sample(self, path, index):
+        self.__samples__[index] = path
+        self.samples_changed.emit()
+        self.__song__.schedule_save()
+
+    samples_changed = Signal()
+
+    samples = Property('QVariantList', get_samples, notify=samples_changed)
+    ### END Property samples
+
+    ### Property recordingDir
+    def get_recording_dir(self):
+        wav_path = Path(self.__song__.sketch_folder) / 'wav'
+        if wav_path.exists():
+            return str(wav_path)
+        else:
+            return self.__song__.sketch_folder
+
+    recordingDir = Property(str, get_recording_dir, constant=True)
+    ### END Property recordingDir

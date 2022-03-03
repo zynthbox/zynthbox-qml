@@ -100,19 +100,20 @@ Zynthian.Card {
                 Layout.fillWidth: true
             }
 
-            QQC2.Label {
-                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-                         controlObj.clipTrack.trackAudioType === "sample-slice"
-                text: qsTr("Slices")
-            }
+            // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
+//            QQC2.Label {
+//                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+//                         controlObj.clipTrack.trackAudioType === "sample-slice"
+//                text: qsTr("Slices")
+//            }
 
-            QQC2.ComboBox {
-                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-                         controlObj.clipTrack.trackAudioType === "sample-slice"
-                model: [4, 8, 12, 16]
-                currentIndex: find(controlObj.slices)
-                onActivated: controlObj.slices = model[index]
-            }
+//            QQC2.ComboBox {
+//                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+//                         controlObj.clipTrack.trackAudioType === "sample-slice"
+//                model: [4, 8, 12, 16]
+//                currentIndex: find(controlObj.slices)
+//                onActivated: controlObj.slices = model[index]
+//            }
 
             QQC2.Label {
                 visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
@@ -334,13 +335,6 @@ Zynthian.Card {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    id: sampleSoundsAction
-                    text: qsTr("Sample Sounds")
-                    page: Qt.resolvedUrl("SampleSoundsBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
                     id: songAction
                     text: qsTr("Song")
                     page: Qt.resolvedUrl("SongBar.qml")
@@ -393,6 +387,13 @@ Zynthian.Card {
                     id: trackSoundsAction
                     text: qsTr("Sounds")
                     page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
+                    id: sampleSoundsAction
+                    text: qsTr("Clip samples")
+                    page: Qt.resolvedUrl("ClipSamplesBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },

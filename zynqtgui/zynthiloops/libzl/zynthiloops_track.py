@@ -56,6 +56,7 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
+        self.__selected_sample_row__ = 0
         self.__samples__ = []
 
         # Create 5 clip objects for 5 samples per track
@@ -566,3 +567,16 @@ class zynthiloops_track(QObject):
 
     recordingDir = Property(str, get_recording_dir, constant=True)
     ### END Property recordingDir
+
+    ### Property selectedSampleRow
+    def get_selected_sample_row(self):
+        return self.__selected_sample_row__
+
+    def set_selected_sample_row(self, row):
+        self.__selected_sample_row__ = row
+        self.selected_sample_row_changed.emit()
+
+    selected_sample_row_changed = Signal()
+
+    selectedSampleRow = Property(int, get_selected_sample_row, set_selected_sample_row, notify=selected_sample_row_changed)
+    ### END Property selectedSampleRow

@@ -87,6 +87,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
         zynthian_gui_zynthiloops.__instance__ = self
         libzl.registerGraphicTypes()
+        self.is_set_selector_running = False
         self.recorder_process = None
         self.clip_to_record = None
         self.clip_to_record_path = None
@@ -111,7 +112,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__capture_audio_level_right__ = -400
         self.__recording_audio_level__ = -100
         self.__song__ = None
-        self.__zselector = None
+        self.__zselector = [None, None, None, None]
+        self.__zselector_ctrl = [None, None, None, None]
         self.__zselector_track = -1
         self.__selected_clip_col__ = 0
 
@@ -129,10 +131,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
             self.set_selector()
-            if self.__zselector:
-                self.__zselector.show()
-        elif self.__zselector:
-            self.__zselector.hide()
+            if self.__zselector[0]:
+                self.__zselector[0].show()
+        elif self.__zselector[0]:
+            self.__zselector[0].hide()
 
     def init_sketch(self, sketch, cb=None):
         def _cb():
@@ -161,35 +163,63 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_track(self):
-        self.zyngui.session_dashboard.set_selected_track(self.__zselector.value)
+        if self.is_set_selector_running:
+            logging.error(f"Set selector in progress. Not setting value with encoder")
+            return
+
+        self.zyngui.session_dashboard.set_selected_track(self.__zselector[0].value)
 
     @Slot(None)
     def zyncoder_set_preset(self):
+        if self.is_set_selector_running:
+            logging.error(f"Set selector in progress. Not setting value with encoder")
+            return
+
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector.value:
-            logging.error(f"Selecting preset : {self.__zselector.value}")
-            self.zyngui.preset.select(self.__zselector.value)
+        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector[0].value:
+            logging.error(f"Selecting preset : {self.__zselector[0].value}")
+            self.zyngui.preset.select(self.__zselector[0].value)
             self.select_preset_timer.start()
 
+    @Slot(None)
+    def zyncoder_update_clip_start_position(self):
+        if self.is_set_selector_running:
+            logging.error(f"Set selector in progress. Not setting value with encoder")
+            return
+
+        if self.zyngui.trackWaveEditorBarActive:
+            selected_track_obj = self.__song__.tracksModel.getTrack(
+                self.zyngui.session_dashboard.get_selected_track())
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+
+            if selected_clip.startPosition != (self.__zselector[1].value / 100):
+                selected_clip.startPosition = self.__zselector[1].value / 100
+                logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
+
     def zyncoder_read(self):
-        if self.__zselector and self.__song__:
-            self.__zselector.read_zyncoder()
+        if self.__zselector[0] and self.__song__:
+            self.__zselector[0].read_zyncoder()
 
             try:
                 if self.zyngui.sound_combinator_active:
                     track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                     selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-                    if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector.value:
+                    if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector[0].value:
                         QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
 
                 else:
-                    if self.zyngui.session_dashboard.selectedTrack != self.__zselector.value:
+                    if self.zyngui.session_dashboard.selectedTrack != self.__zselector[0].value:
                         QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
             except:
                 pass
+
+        # Update clip startposition when required with small knob 0
+        if self.__zselector[1] and self.__song__:
+            self.__zselector[1].read_zyncoder()
+            QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
 
         return [0, 1, 2]
 
@@ -197,61 +227,112 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__song__ is None:
             return
 
-        if self.__zselector:
-            if self.zyngui.sound_combinator_active:
-                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+        self.is_set_selector_running = True
 
-                try:
-                    self.__zselector_ctrl.set_options(
-                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                         'value_max': self.zyngui.preset.selector_list.get_count(),
-                         'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
-                except:
-                    self.__zselector_ctrl.set_options(
-                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                         'value_max': self.zyngui.preset.selector_list.get_count(),
-                         'value': 0})
+        # Configure Big Knob
+        if self.zyngui.sound_combinator_active:
+            # If sound combinator is active, Use Big knob to control preset
 
-                self.__zselector.config(self.__zselector_ctrl)
-                self.__zselector.custom_encoder_speed = 0
-            else:
-                try:
-                    self.__zselector_ctrl.set_options(
-                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                         'value_max': 10, 'value': self.zyngui.session_dashboard.get_selected_track()})
-                except:
-                    self.__zselector_ctrl.set_options(
-                        {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                         'value_max': 10, 'value': 0})
-                self.__zselector.config(self.__zselector_ctrl)
-                self.__zselector.custom_encoder_speed = 7
-            if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-                self.__zselector.show()
-            else:
-                self.__zselector.hide()
+            logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
+
+            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+
+            try:
+                preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
+            except:
+                preset_index = 0
+
+            if self.__zselector[0] is None:
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'track_volume', 'track_volume',
+                                                            {'midi_cc': 0, 'value': preset_index})
+
+                self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+                                                              self.__zselector_ctrl[0], self)
+
+            self.__zselector_ctrl[0].set_options(
+                {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                 'value_max': self.zyngui.preset.selector_list.get_count(),
+                 'value': preset_index})
+
+            self.__zselector[0].config(self.__zselector_ctrl[0])
+            self.__zselector[0].custom_encoder_speed = 0
         else:
-            if self.zyngui.sound_combinator_active:
-                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-                try:
-                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                       'value': self.zyngui.layer.layer_midi_map[selected_channel].preset_index})
-                except:
-                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                       'value': 0})
-                self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
-                self.__zselector.custom_encoder_speed = 0
-            else:
-                try:
-                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                       'value': self.zyngui.session_dashboard.selectedTrack})
-                except:
-                    self.__zselector_ctrl = zynthian_controller(None, 'track_volume', 'track_volume', {'midi_cc': 0,
-                                                                                                       'value': 0})
-                self.__zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl, self)
-                self.__zselector.custom_encoder_speed = 7
+            # If sound combinator is not active, Use Big knob to control selected track
 
+            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active.")
+
+            try:
+                selected_track = self.zyngui.session_dashboard.get_selected_track()
+            except:
+                selected_track = 0
+
+            if self.__zselector[0] is None:
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'track_volume', 'track_volume',
+                                                            {'midi_cc': 0, 'value': selected_track})
+
+                self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
+                                                              self)
+
+            self.__zselector_ctrl[0].set_options(
+                {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                 'value_max': 10, 'value': selected_track})
+
+            self.__zselector[0].config(self.__zselector_ctrl[0])
+            self.__zselector[0].custom_encoder_speed = 7
+
+        ### Configure small knob 0
+        start_position = 0
+        max_value = 0
+        selected_clip = None
+
+        try:
+            if self.zyngui.trackWaveEditorBarActive:
+                logging.error(f"### set_selector : Configuring small knob 0, trackWaveEditorBarActive is active.")
+
+                selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+                selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+
+                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+                    start_position = int(selected_clip.startPosition * 100)
+                    max_value = int(selected_clip.duration * 100)
+        except:
+            pass
+
+        if self.__zselector[1] is None:
+            self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_startposition', 'zynthiloops_startposition',
+                                                        {'midi_cc': 0, 'value': start_position})
+
+            self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1], self)
+            self.__zselector[1].index = 0
+
+        logging.error(f"### set_selector : Configuring small knob 0, value({start_position}), max_value({max_value})")
+
+        self.__zselector_ctrl[1].set_options(
+            {'symbol': 'zynthiloops_startposition', 'name': 'Zynthiloops Startposition', 'short_name': 'Startposition',
+             'midi_cc': 0, 'value_max': max_value, 'value': start_position})
+
+        self.__zselector[1].config(self.__zselector_ctrl[1])
+        self.__zselector[1].custom_encoder_speed = 0
+
+        if self.zyngui.get_current_screen_id() is not None and \
+           self.zyngui.get_current_screen() == self and \
+           self.zyngui.trackWaveEditorBarActive and \
+           selected_clip is not None and \
+           selected_clip.path is not None and \
+           len(selected_clip.path) > 0:
+            logging.error(
+                f"### set_selector : Configuring small knob 0, showing")
+
+            self.__zselector[1].show()
+        else:
+            logging.error(
+                f"### set_selector : Configuring small knob 0, hiding")
+
+            self.__zselector[1].hide()
+        ### END Configure small knob 0
+
+        self.is_set_selector_running = False
 
     def switch_select(self, t):
         pass

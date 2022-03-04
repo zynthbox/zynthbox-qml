@@ -391,6 +391,7 @@ class zynthian_gui(QObject):
         self.wsleds_blink_count = 0
 
         self.sound_combinator_active = False
+        self.track_wave_editor_bar_active = False
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
@@ -529,6 +530,20 @@ class zynthian_gui(QObject):
 
     soundCombinatorActive = Property(bool, get_sound_combinator_active, set_sound_combinator_active,
                                      notify=soundCombinatorActiveChanged)
+
+    def get_track_wave_editor_bar_active(self):
+        return self.track_wave_editor_bar_active
+
+    def set_track_wave_editor_bar_active(self, isActive):
+        if self.track_wave_editor_bar_active != isActive:
+            self.track_wave_editor_bar_active = isActive
+            self.screens["zynthiloops"].set_selector()
+            self.trackWaveEditorBarActiveChanged.emit()
+
+    trackWaveEditorBarActiveChanged = Signal()
+
+    trackWaveEditorBarActive = Property(bool, get_track_wave_editor_bar_active, set_track_wave_editor_bar_active,
+                                     notify=trackWaveEditorBarActiveChanged)
     ###
 
     def init_wsleds(self):

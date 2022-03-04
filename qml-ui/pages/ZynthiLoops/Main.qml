@@ -212,6 +212,11 @@ Zynthian.ScreenPage {
         return false;
     }
 
+    Connections {
+        target: bottomBar.tabbedView
+        onActiveActionChanged: updateLedVariablesTimer.restart()
+    }
+
     Timer {
         id: updateLedVariablesTimer
         interval: 100
@@ -228,6 +233,18 @@ Zynthian.ScreenPage {
                 zynthian.soundCombinatorActive = true;
             } else {
                 zynthian.soundCombinatorActive = false;
+            }
+
+            // Check if track wave editor bar is active
+            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+                bottomBar.controlType === BottomBar.ControlType.Track && // Checks if track is selected
+                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 && // Checks if current active page is wave editor or not
+                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
+                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
+            {
+                zynthian.trackWaveEditorBarActive = true;
+            } else {
+                zynthian.trackWaveEditorBarActive = false;
             }
         }
     }

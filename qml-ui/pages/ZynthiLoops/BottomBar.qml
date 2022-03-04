@@ -359,8 +359,7 @@ Zynthian.Card {
                     id: waveAction
                     text: qsTr("Clip Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: ((root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0) ||
-                             root.controlType === BottomBar.ControlType.Track
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                     preload: true
                 },
@@ -368,13 +367,12 @@ Zynthian.Card {
                     id: editorAction
                     text: qsTr("Wave Editor")
                     page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: ((root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0) ||
-                             root.controlType === BottomBar.ControlType.Track
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Sample Info")
-                    page: Qt.resolvedUrl("SampleInfoBar.qml")
+                    text: qsTr("Clip Info")
+                    page: Qt.resolvedUrl("ClipInfoBar.qml")
                     visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
@@ -384,6 +382,7 @@ Zynthian.Card {
                     page: Qt.resolvedUrl("TrackBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
+
                 },
                 Zynthian.TabbedControlViewAction {
                     id: trackSoundsAction
@@ -394,10 +393,35 @@ Zynthian.Card {
                 },
                 Zynthian.TabbedControlViewAction {
                     id: sampleSoundsAction
-                    text: qsTr("Clip samples")
-                    page: Qt.resolvedUrl("ClipSamplesBar.qml")
+                    text: qsTr("Samples")
+                    page: Qt.resolvedUrl("SamplesBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
+                },
+                // Duplicate tab instance but for different placement and controlObj for track
+                Zynthian.TabbedControlViewAction {
+                    id: trackWaveEditorAction
+
+                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
+
+                    text: qsTr("Wave Editor")
+                    page: Qt.resolvedUrl("WaveEditorBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track &&
+                             clip && clip.path && clip.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                // Duplicate tab instance but for different placement and controlObj for track
+                Zynthian.TabbedControlViewAction {
+                    id: trackWaveAction
+
+                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
+
+                    text: qsTr("Smp. Settings")
+                    page: Qt.resolvedUrl("ClipSettingsBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track &&
+                             clip && clip.path && clip.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                    preload: true
                 },
                /* Zynthian.TabbedControlViewAction {
                     text: qsTr("FX")

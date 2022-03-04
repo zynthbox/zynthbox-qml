@@ -197,6 +197,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if selected_clip.startPosition != (self.__zselector[1].value / 100):
                 selected_clip.startPosition = self.__zselector[1].value / 100
                 logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
+                self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
@@ -212,6 +213,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if selected_clip.loopDelta != self.__zselector[2].value/100:
                 selected_clip.loopDelta = self.__zselector[2].value/100
                 logging.error(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
+                self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
@@ -227,6 +229,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if selected_clip.length != self.__zselector[3].value//10:
                 selected_clip.length = self.__zselector[3].value//10
                 logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                self.set_selector()
 
     def zyncoder_read(self):
         if self.__zselector[0] and self.__song__:

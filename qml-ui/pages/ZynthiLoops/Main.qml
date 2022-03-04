@@ -1062,7 +1062,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
+                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: infoBar.topLayer >= 0
                                   ? qsTr("Preset (%2/%3): %1")
                                       .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
@@ -1074,7 +1074,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
+                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: qsTr("Bank: %1")
                                 .arg(infoBar.bankName === "-" || infoBar.bankName === "None" ? "--" : infoBar.bankName)
                     }
@@ -1082,15 +1082,24 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: !infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
+                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: qsTr("Synth: %1").arg(infoBar.synthName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType.startsWith("sample-")
+                        visible: infoBar.clip.clipTrack.trackAudioType === "sample-loop"
                         text: qsTr("Clip: %1").arg(infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
+                    }
+                    QQC2.Label {
+                        property QtObject sample: infoBar.clip.clipTrack.samples[0]
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
+                                 infoBar.clip.clipTrack.trackAudioType === "sample-slice"
+                        text: qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--")
                     }
 
                     Item {
@@ -1105,6 +1114,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
                         checkable: true
+                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
                         // Bind to current index to properly update when preset changed from other screen
                         checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
                         onToggled: {

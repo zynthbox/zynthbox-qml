@@ -734,6 +734,21 @@ don't want to have to dig too far...
             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
             property QtObject associatedTrack: null
             property int associatedTrackIndex: -1
+            onAssociatedTrackChanged: {
+                adoptSample();
+            }
+            function adoptSample() {
+                if (patternObject.associatedTrack) {
+                    var firstSample = patternObject.associatedTrack.samples[0];
+                    if (firstSample) {
+                        patternObject.thisPattern.clipId = firstSample.cppObjId;
+                    } else {
+                        patternObject.thisPattern.clipId = -1;
+                    }
+                } else {
+                    patternObject.thisPattern.clipId = -1;
+                }
+            }
             function adoptTrackLayer() {
                 trackAdopterTimer.restart();
             }
@@ -831,6 +846,9 @@ don't want to have to dig too far...
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                     }
                 }
+                onSamplesChanged: {
+                    adoptSample();
+                }
             }
             Component.onCompleted: {
                 adoptTrackLayer();
@@ -842,7 +860,6 @@ don't want to have to dig too far...
                     for(var i = 0; i < trackClipsRepeater.count; ++i) {
                         var clipItem = trackClipsRepeater.itemAt(i);
                         if (clipItem.clipInScene) {
-                            patternObject.thisPattern.clipId = clipItem.clip.cppObjId;
                             enabledBank = i;
                             break;
                         }

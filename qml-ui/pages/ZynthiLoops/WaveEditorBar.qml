@@ -114,6 +114,8 @@ GridLayout {
                 color: "#99000000"
             }
 
+            // Area after start handle and before end handle to
+            // allow setting startposition with drag in between handles
             Rectangle {
                 anchors {
                     top: parent.top
@@ -135,6 +137,9 @@ GridLayout {
 
                         // Set startposition on swipe
                         waveBar.controlObj.startPosition += delta
+                    }
+                    onPressedChanged: {
+                        zynthian.zynthiloops.knobTouchUpdateInProgress = pressed
                     }
                 }
             }
@@ -178,6 +183,9 @@ GridLayout {
                     }
 
                     yAxis.enabled: false
+                    onGrabChanged: {
+                        zynthian.zynthiloops.knobTouchUpdateInProgress = startHandleDragHandler.active
+                    }
                 }
             }
 
@@ -217,6 +225,9 @@ GridLayout {
                     }
 
                     yAxis.enabled: false
+                    onGrabChanged: {
+                        zynthian.zynthiloops.knobTouchUpdateInProgress = loopHandleDragHandler.active
+                    }
                 }
             }
 
@@ -378,6 +389,8 @@ GridLayout {
                         if (!active) {
                             endHandle.x = endLoopLine.x - endHandle.width
                         }
+
+                        zynthian.zynthiloops.knobTouchUpdateInProgress = endHandleDragHandler.active
                     }
                 }
             }

@@ -96,6 +96,8 @@ def init():
             libzl.ClipAudioSource_id.argtypes = [ctypes.c_void_p]
             libzl.ClipAudioSource_id.restypes = ctypes.c_int
 
+            libzl.ClipAudioSource_setSlices.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
             ### END Type Definition
 
@@ -231,6 +233,10 @@ class ClipAudioSource(QObject):
     def queueClipToStop(self):
         if libzl:
             libzl.SyncTimer_queueClipToStop(self.obj)
+
+    def setSlices(self, slices : int):
+        if libzl:
+            libzl.ClipAudioSource_setSlices(self.obj, slices)
 
     def destroy(self):
         if libzl:

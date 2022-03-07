@@ -130,6 +130,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
 
         self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
+        self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
 
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
@@ -192,15 +193,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_track_obj = self.__song__.tracksModel.getTrack(
-                self.zyngui.session_dashboard.get_selected_track())
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_clip = None
 
-            if selected_clip.startPosition != (self.__zselector[1].value / 100):
-                selected_clip.startPosition = self.__zselector[1].value / 100
-                logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
-                self.set_selector()
+        if self.zyngui.trackWaveEditorBarActive:
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        elif self.zyngui.clipWaveEditorBarActive:
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+
+        if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 100):
+            selected_clip.startPosition = self.__zselector[1].value / 100
+            logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
@@ -208,15 +212,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_track_obj = self.__song__.tracksModel.getTrack(
-                self.zyngui.session_dashboard.get_selected_track())
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_clip = None
 
-            if selected_clip.loopDelta != self.__zselector[2].value/100:
-                selected_clip.loopDelta = self.__zselector[2].value/100
-                logging.error(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
-                self.set_selector()
+        if self.zyngui.trackWaveEditorBarActive:
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        elif self.zyngui.clipWaveEditorBarActive:
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+
+        if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/100:
+            selected_clip.loopDelta = self.__zselector[2].value/100
+            logging.error(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
@@ -224,21 +231,24 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_track_obj = self.__song__.tracksModel.getTrack(
-                self.zyngui.session_dashboard.get_selected_track())
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_clip = None
 
-            if selected_clip.snapLengthToBeat:
-                if selected_clip.length != self.__zselector[3].value//100:
-                    selected_clip.length = self.__zselector[3].value//100
-                    logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
-                    self.set_selector()
-            else:
-                if selected_clip.length != self.__zselector[3].value/100:
-                    selected_clip.length = self.__zselector[3].value/100
-                    logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
-                    self.set_selector()
+        if self.zyngui.trackWaveEditorBarActive:
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        elif self.zyngui.clipWaveEditorBarActive:
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+
+        if selected_clip is not None and selected_clip.snapLengthToBeat:
+            if selected_clip.length != self.__zselector[3].value//100:
+                selected_clip.length = self.__zselector[3].value//100
+                logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                self.set_selector()
+        elif selected_clip is not None and not selected_clip.snapLengthToBeat:
+            if selected_clip.length != self.__zselector[3].value/100:
+                selected_clip.length = self.__zselector[3].value/100
+                logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                self.set_selector()
 
     def zyncoder_read(self):
         if self.__knob_touch_update_in_progress__:
@@ -336,21 +346,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[0].config(self.__zselector_ctrl[0])
             self.__zselector[0].custom_encoder_speed = 7
 
+        ### Common vars for small knobs
+        selected_clip = None
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        ###
+
+        if self.zyngui.trackWaveEditorBarActive:
+            logging.error(f"### set_selector : trackWaveEditorBarActive is active.")
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        elif self.zyngui.clipWaveEditorBarActive:
+            logging.error(f"### set_selector : clipWaveEditorBarActive is active.")
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+
         ### Configure small knob 0
         start_position = 0
         max_value = 0
-        selected_clip = None
 
         try:
-            if self.zyngui.trackWaveEditorBarActive:
-                logging.error(f"### set_selector : Configuring small knob 0, trackWaveEditorBarActive is active.")
-
-                selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
-                selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
-
-                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    start_position = int(selected_clip.startPosition * 100)
-                    max_value = int(selected_clip.duration * 100)
+            if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+                start_position = int(selected_clip.startPosition * 100)
+                max_value = int(selected_clip.duration * 100)
         except:
             pass
 
@@ -372,7 +387,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.get_current_screen_id() is not None and \
            self.zyngui.get_current_screen() == self and \
-           self.zyngui.trackWaveEditorBarActive and \
+           (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
            selected_clip is not None and \
            selected_clip.path is not None and \
            len(selected_clip.path) > 0:
@@ -390,19 +405,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         ### Configure small knob 1
         loop = 0
         max_value = 0
-        selected_clip = None
 
         try:
-            if self.zyngui.trackWaveEditorBarActive:
-                logging.error(f"### set_selector : Configuring small knob 0, trackWaveEditorBarActive is active.")
-
-                selected_track_obj = self.__song__.tracksModel.getTrack(
-                    self.zyngui.session_dashboard.get_selected_track())
-                selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
-
-                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    loop = int(selected_clip.loopDelta * 100)
-                    max_value = int(selected_clip.secPerBeat * selected_clip.length * 100)
+            if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+                loop = int(selected_clip.loopDelta * 100)
+                max_value = int(selected_clip.secPerBeat * selected_clip.length * 100)
         except:
             pass
 
@@ -428,7 +435,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
-                self.zyngui.trackWaveEditorBarActive and \
+                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
@@ -446,18 +453,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         ### Configure small knob 2
         value = 0
         max_value = 64 * 100
-        selected_clip = None
 
         try:
-            if self.zyngui.trackWaveEditorBarActive:
-                logging.error(f"### set_selector : Configuring small knob 2, trackWaveEditorBarActive is active.")
-
-                selected_track_obj = self.__song__.tracksModel.getTrack(
-                    self.zyngui.session_dashboard.get_selected_track())
-                selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
-
-                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    value = selected_clip.length * 100
+            if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+                value = selected_clip.length * 100
         except:
             pass
 
@@ -482,7 +481,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
-                self.zyngui.trackWaveEditorBarActive and \
+                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
@@ -492,7 +491,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[3].show()
         else:
             logging.error(
-                f"### set_selector : Configuring small knob 0, hiding")
+                f"### set_selector : Configuring small knob 2, hiding")
 
             self.__zselector[3].hide()
         ### END Configure small knob 2

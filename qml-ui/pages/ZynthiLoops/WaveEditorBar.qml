@@ -44,6 +44,7 @@ GridLayout {
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
                                     : bottomBar.controlObj.samples[bottomBar.controlObj.selectedSampleRow] // selected bottomBar object is not clip/pattern and hence it is a track
+    property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     Connections {
         target: bottomBar
@@ -114,6 +115,17 @@ GridLayout {
                 color: "#99000000"
             }
 
+            // Mask for wave part after
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: endLoopLine.right
+                    right: parent.right
+                }
+                color: "#99000000"
+            }
+
             // Area after start handle and before end handle to
             // allow setting startposition with drag in between handles
             Rectangle {
@@ -144,6 +156,7 @@ GridLayout {
                 }
             }
 
+            // Handle for setting start position
             QQC2.Button {
                 id: startHandle
 
@@ -189,10 +202,11 @@ GridLayout {
                 }
             }
 
+            // Handle for setting loop point
             QQC2.Button {
                 id: loopHandle
 
-                visible: waveBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
+                visible: waveBar.track.trackAudioType !== "sample-slice"
                 anchors.verticalCenter: startLoopLine.verticalCenter
                 padding: Kirigami.Units.largeSpacing * 1.5
                 background: Item {
@@ -231,110 +245,7 @@ GridLayout {
                 }
             }
 
-            Rectangle {  //Start loop
-                id: startLoopLine
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                color: Kirigami.Theme.positiveTextColor
-                opacity: 0.6
-                width: Kirigami.Units.smallSpacing
-                x: (waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width
-            }
-
-            Rectangle {  // Loop line
-                id: loopLine
-                visible: waveBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                x: startLoopLine.x + waveBar.controlObj.loopDelta/wav.pixelToSecs
-                color: Kirigami.Theme.highlightColor
-                opacity: 0.6
-                width: Kirigami.Units.smallSpacing
-                onXChanged: {
-                    if (!loopHandleDragHandler.active) {
-                        loopHandle.x = loopLine.x
-                    }
-                }
-            }
-
-            Repeater {
-                // Count number of beat lines to be shown as per beat and visible width
-                model: waveBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
-                        ? Math.ceil(wav.width / wav.pixelsPerBeat)
-                        : 0
-                delegate: Rectangle {
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    color: "#ffffff"
-                    opacity: 0.1
-                    width: 1
-                    // Calculate position of each beat line taking startposition into consideration
-                    x: wav.pixelsPerBeat*modelData + (startLoopLine.x % wav.pixelsPerBeat)
-                }
-            }
-
-            Repeater {
-                // Count number of slice lines to be shown
-                model: waveBar.controlObj.clipTrack.trackAudioType !== "sample-slice"
-                       ? 0
-                       : waveBar.controlObj.slices
-                delegate: Rectangle {
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                    }
-                    color: Qt.rgba(Kirigami.Theme.highlightColor.r,
-                                   Kirigami.Theme.highlightColor.g,
-                                   Kirigami.Theme.highlightColor.b,
-                                   index === 0 ? 0 : 0.8)
-                    width: 2
-                    // Calculate position of each beat line taking startposition into consideration
-                    x: startLoopLine.x + (endLoopLine.x - startLoopLine.x)*modelData/waveBar.controlObj.slices
-
-                    Rectangle {
-                        width: Math.min(Kirigami.Units.gridUnit, (endLoopLine.x - startLoopLine.x)/waveBar.controlObj.slices - 4)
-                        height: width
-                        anchors {
-                            left: parent.right
-                            bottom: parent.bottom
-                        }
-
-                        border.width: 1
-                        border.color: "#99ffffff"
-                        color: Kirigami.Theme.backgroundColor
-
-                        QQC2.Label {
-                            anchors.centerIn: parent
-                            text: qsTr("%L1").arg(index+1)
-                            font.pointSize: Math.min(8, parent.width)
-                        }
-                    }
-                }
-            }
-
-            Rectangle {  // End loop
-                id: endLoopLine
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-                color: Kirigami.Theme.neutralTextColor
-                opacity: 0.6
-                width: Kirigami.Units.smallSpacing
-                x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
-                onXChanged: {
-                    if (!endHandleDragHandler.active) {
-                       endHandle.x = endLoopLine.x - endHandle.width
-                    }
-                }
-            }
-
+            // Handle for setting length
             QQC2.Button {
                 id: endHandle
 
@@ -395,18 +306,58 @@ GridLayout {
                 }
             }
 
-            // Mask for wave part after
+            // Start loop line
             Rectangle {
+                id: startLoopLine
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
-                    left: endLoopLine.right
-                    right: parent.right
                 }
-                color: "#99000000"
+                color: Kirigami.Theme.positiveTextColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                x: (waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width
             }
 
-            Rectangle { // Progress
+            // Loop line
+            Rectangle {
+                id: loopLine
+                visible: waveBar.track.trackAudioType !== "sample-slice"
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                x: startLoopLine.x + waveBar.controlObj.loopDelta/wav.pixelToSecs
+                color: Kirigami.Theme.highlightColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                onXChanged: {
+                    if (!loopHandleDragHandler.active) {
+                        loopHandle.x = loopLine.x
+                    }
+                }
+            }
+
+            // End loop line
+            Rectangle {
+                id: endLoopLine
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                color: Kirigami.Theme.neutralTextColor
+                opacity: 0.6
+                width: Kirigami.Units.smallSpacing
+                x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                onXChanged: {
+                    if (!endHandleDragHandler.active) {
+                       endHandle.x = endLoopLine.x - endHandle.width
+                    }
+                }
+            }
+
+            // Progress line
+            Rectangle {
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -415,6 +366,65 @@ GridLayout {
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj.progress/waveBar.controlObj.duration * parent.width
+            }
+
+            // Create and place beat lines when trackAudioType !== "sample-slice"
+            Repeater {
+                // Count number of beat lines to be shown as per beat and visible width
+                model: waveBar.track.trackAudioType !== "sample-slice"
+                        ? Math.ceil(wav.width / wav.pixelsPerBeat)
+                        : 0
+                delegate: Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    color: "#ffffff"
+                    opacity: 0.1
+                    width: 1
+                    // Calculate position of each beat line taking startposition into consideration
+                    x: wav.pixelsPerBeat*modelData + (startLoopLine.x % wav.pixelsPerBeat)
+                }
+            }
+
+            // Create and place slice lines when trackAudioType === "sample-slice"
+            Repeater {
+                // Count number of slice lines to be shown
+                model: waveBar.track.trackAudioType === "sample-slice"
+                       ? waveBar.controlObj.slices
+                       : 0
+                delegate: Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    color: Qt.rgba(Kirigami.Theme.highlightColor.r,
+                                   Kirigami.Theme.highlightColor.g,
+                                   Kirigami.Theme.highlightColor.b,
+                                   index === 0 ? 0 : 0.8)
+                    width: 2
+                    // Calculate position of each beat line taking startposition into consideration
+                    x: startLoopLine.x + (endLoopLine.x - startLoopLine.x)*modelData/waveBar.controlObj.slices
+
+                    Rectangle {
+                        width: Math.min(Kirigami.Units.gridUnit, (endLoopLine.x - startLoopLine.x)/waveBar.controlObj.slices - 4)
+                        height: width
+                        anchors {
+                            left: parent.right
+                            bottom: parent.bottom
+                        }
+
+                        border.width: 1
+                        border.color: "#99ffffff"
+                        color: Kirigami.Theme.backgroundColor
+
+                        QQC2.Label {
+                            anchors.centerIn: parent
+                            text: qsTr("%L1").arg(index+1)
+                            font.pointSize: Math.min(8, parent.width)
+                        }
+                    }
+                }
             }
         }
     }

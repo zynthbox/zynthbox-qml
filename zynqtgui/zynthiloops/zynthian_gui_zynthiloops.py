@@ -201,8 +201,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         elif self.zyngui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
 
-        if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 100):
-            selected_clip.startPosition = self.__zselector[1].value / 100
+        if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
+            selected_clip.startPosition = self.__zselector[1].value / 1000
             logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
             self.set_selector()
 
@@ -220,8 +220,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         elif self.zyngui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
 
-        if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/100:
-            selected_clip.loopDelta = self.__zselector[2].value/100
+        if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
+            selected_clip.loopDelta = self.__zselector[2].value/1000
             logging.error(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
             self.set_selector()
 
@@ -364,8 +364,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         try:
             if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                start_position = int(selected_clip.startPosition * 100)
-                max_value = int(selected_clip.duration * 100)
+                start_position = int(selected_clip.startPosition * 1000)
+                max_value = int(selected_clip.duration * 1000)
         except:
             pass
 
@@ -408,8 +408,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         try:
             if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                loop = int(selected_clip.loopDelta * 100)
-                max_value = int(selected_clip.secPerBeat * selected_clip.length * 100)
+                loop = int(selected_clip.loopDelta * 1000)
+                max_value = int(selected_clip.secPerBeat * selected_clip.length * 1000)
         except:
             pass
 

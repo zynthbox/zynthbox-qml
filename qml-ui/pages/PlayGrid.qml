@@ -735,19 +735,19 @@ don't want to have to dig too far...
             property QtObject associatedTrack: null
             property int associatedTrackIndex: -1
             onAssociatedTrackChanged: {
-                adoptSample();
+                adoptSamples();
             }
-            function adoptSample() {
+            function adoptSamples() {
+                var clipIds = [-1,-1,-1,-1,-1];
                 if (patternObject.associatedTrack) {
-                    var firstSample = patternObject.associatedTrack.samples[0];
-                    if (firstSample) {
-                        patternObject.thisPattern.clipId = firstSample.cppObjId;
-                    } else {
-                        patternObject.thisPattern.clipId = -1;
+                    for (var i = 0; i < patternObject.associatedTrack.samples.length; ++i) {
+                        var sample = patternObject.associatedTrack.samples[i];
+                        if (sample) {
+                            clipIds[i] = sample.cppObjId;
+                        }
                     }
-                } else {
-                    patternObject.thisPattern.clipId = -1;
                 }
+                patternObject.thisPattern.clipIds = clipIds;
             }
             function adoptTrackLayer() {
                 trackAdopterTimer.restart();
@@ -847,7 +847,7 @@ don't want to have to dig too far...
                     }
                 }
                 onSamplesChanged: {
-                    adoptSample();
+                    adoptSamples();
                 }
             }
             Component.onCompleted: {

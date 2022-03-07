@@ -646,7 +646,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return self.__knob_touch_update_in_progress__
 
     def set_knob_touch_update_in_progress(self, value):
-        self.__knob_touch_update_in_progress__ = value
+        if self.__knob_touch_update_in_progress__ != value:
+            self.__knob_touch_update_in_progress__ = value
+            self.knob_touch_update_in_progress_changed.emit()
 
     knob_touch_update_in_progress_changed = Signal()
 

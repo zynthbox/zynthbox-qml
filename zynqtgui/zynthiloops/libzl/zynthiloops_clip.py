@@ -927,6 +927,8 @@ class zynthiloops_clip(QObject):
         if self.__slices__ != val:
             self.__slices__ = val
             self.slices_changed.emit()
+            if self.audioSource is not None:
+                self.audioSource.setSlices(val)
 
     slices_changed = Signal()
 

@@ -115,6 +115,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
         self.__zselector_track = -1
+        self.__knob_touch_update_in_progress__ = False
         self.__selected_clip_col__ = 0
 
         self.__master_audio_level__ = -200
@@ -127,6 +128,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.setInterval(100)
         self.select_preset_timer.setSingleShot(True)
         self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
+
+        self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
 
     def sync_selector_visibility(self):
         if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
@@ -226,12 +229,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.session_dashboard.get_selected_track())
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
 
-            if selected_clip.length != self.__zselector[3].value//10:
-                selected_clip.length = self.__zselector[3].value//10
-                logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
-                self.set_selector()
+            if selected_clip.snapLengthToBeat:
+                if selected_clip.length != self.__zselector[3].value//100:
+                    selected_clip.length = self.__zselector[3].value//100
+                    logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                    self.set_selector()
+            else:
+                if selected_clip.length != self.__zselector[3].value/100:
+                    selected_clip.length = self.__zselector[3].value/100
+                    logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                    self.set_selector()
 
     def zyncoder_read(self):
+        if self.__knob_touch_update_in_progress__:
+            return
+
         if self.__zselector[0] and self.__song__:
             self.__zselector[0].read_zyncoder()
 
@@ -264,7 +276,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[3].read_zyncoder()
             QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
 
-        return [0, 1, 2]
+        return [0, 1, 2, 3]
 
     def set_selector(self, zs_hiden=False):
         if self.__song__ is None:
@@ -433,7 +445,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         ### Configure small knob 2
         value = 0
-        max_value = 640
+        max_value = 64 * 100
         selected_clip = None
 
         try:
@@ -445,7 +457,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
 
                 if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                    value = selected_clip.length * 10
+                    value = selected_clip.length * 100
         except:
             pass
 
@@ -628,6 +640,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     clipToRecord = Property(QObject, get_clip_to_record, set_clip_to_record, notify=clipToRecordChanged)
     ### END Property clipToRecord
+
+    ### Property knobTouchUpdateInProgress
+    def get_knob_touch_update_in_progress(self):
+        return self.__knob_touch_update_in_progress__
+
+    def set_knob_touch_update_in_progress(self, value):
+        self.__knob_touch_update_in_progress__ = value
+
+    knob_touch_update_in_progress_changed = Signal()
+
+    knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
+                                         notify=knob_touch_update_in_progress_changed)
+    ### END Property knobTouchUpdateInProgress
 
     @Signal
     def master_volume_changed(self):

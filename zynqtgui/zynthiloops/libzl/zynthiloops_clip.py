@@ -375,6 +375,11 @@ class zynthiloops_clip(QObject):
     def set_length(self, length: float, force_set=False):
         if self.__length__ != length or force_set is True:
             self.__length__ = length
+
+            # Make a call to set selector to update knob values so that on drag value doesn't
+            # flicker back to the knob values
+            self.__song__.get_metronome_manager().set_selector()
+
             self.length_changed.emit()
             self.__song__.schedule_save()
 
@@ -426,6 +431,11 @@ class zynthiloops_clip(QObject):
     def set_start_position(self, position: float, force_set=False):
         if self.__start_position__ != position or force_set is True:
             self.__start_position__ = position
+
+            # Make a call to set selector to update knob values so that on drag value doesn't
+            # flicker back to the knob values
+            self.__song__.get_metronome_manager().set_selector()
+
             self.start_position_changed.emit()
             self.__song__.schedule_save()
             if self.audioSource is None:
@@ -896,6 +906,11 @@ class zynthiloops_clip(QObject):
     def set_loop_delta(self, val, force_set=False):
         if self.__loop_delta__ != val or force_set is True:
             self.__loop_delta__ = val
+
+            # Make a call to set selector to update knob values so that on drag value doesn't
+            # flicker back to the knob values
+            self.__song__.get_metronome_manager().set_selector()
+
             self.loop_delta_changed.emit()
             self.__song__.schedule_save()
 

@@ -356,6 +356,12 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
+                    text: qsTr("Clip Info")
+                    page: Qt.resolvedUrl("ClipInfoBar.qml")
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                },
+                Zynthian.TabbedControlViewAction {
                     id: waveAction
                     text: qsTr("Clip Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
@@ -371,9 +377,10 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
-                    text: qsTr("Clip Info")
-                    page: Qt.resolvedUrl("ClipInfoBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    id: patternAction
+                    text: qsTr("Pattern")
+                    page: Qt.resolvedUrl("PatternBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Pattern
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
@@ -382,7 +389,6 @@ Zynthian.Card {
                     page: Qt.resolvedUrl("TrackBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
-
                 },
                 Zynthian.TabbedControlViewAction {
                     id: trackSoundsAction
@@ -400,18 +406,6 @@ Zynthian.Card {
                 },
                 // Duplicate tab instance but for different placement and controlObj for track
                 Zynthian.TabbedControlViewAction {
-                    id: trackWaveEditorAction
-
-                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
-
-                    text: qsTr("Wave Editor")
-                    page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track &&
-                             clip && clip.path && clip.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                },
-                // Duplicate tab instance but for different placement and controlObj for track
-                Zynthian.TabbedControlViewAction {
                     id: trackWaveAction
 
                     property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
@@ -423,19 +417,24 @@ Zynthian.Card {
                     initialProperties: {"bottomBar": root}
                     preload: true
                 },
+                // Duplicate tab instance but for different placement and controlObj for track
+                Zynthian.TabbedControlViewAction {
+                    id: trackWaveEditorAction
+
+                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
+
+                    text: qsTr("Wave Editor")
+                    page: Qt.resolvedUrl("WaveEditorBar.qml")
+                    visible: root.controlType === BottomBar.ControlType.Track &&
+                             clip && clip.path && clip.path.length > 0
+                    initialProperties: {"bottomBar": root}
+                }
                /* Zynthian.TabbedControlViewAction {
                     text: qsTr("FX")
                     page: Qt.resolvedUrl("FXBar.qml")
                     visible: root.controlType === BottomBar.ControlType.Track
                     initialProperties: {"bottomBar": root}
                 },*/
-                Zynthian.TabbedControlViewAction {
-                    id: patternAction
-                    text: qsTr("Pattern")
-                    page: Qt.resolvedUrl("PatternBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Pattern
-                    initialProperties: {"bottomBar": root}
-                }
             ]
         }
     }

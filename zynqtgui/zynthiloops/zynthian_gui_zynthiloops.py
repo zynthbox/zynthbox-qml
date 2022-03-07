@@ -182,9 +182,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector[0].value:
-            logging.error(f"Selecting preset : {self.__zselector[0].value}")
-            self.zyngui.preset.select(self.__zselector[0].value)
+        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector[0].value//1000:
+            logging.error(f"Selecting preset : {self.__zselector[0].value//1000}")
+            self.zyngui.preset.select(self.__zselector[0].value//1000)
             self.select_preset_timer.start()
 
     @Slot(None)
@@ -304,7 +304,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
             try:
-                preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index
+                preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
             except:
                 preset_index = 0
 
@@ -317,7 +317,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.__zselector_ctrl[0].set_options(
                 {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
-                 'value_max': self.zyngui.preset.selector_list.get_count(),
+                 'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
                  'value': preset_index})
 
             self.__zselector[0].config(self.__zselector_ctrl[0])

@@ -246,6 +246,18 @@ Zynthian.ScreenPage {
             } else {
                 zynthian.trackWaveEditorBarActive = false;
             }
+
+            // Check if clip wave editor bar is active
+            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+                (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern) && // Checks if clip/pattern is selected
+                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 && // Checks if current active page is wave editor or not
+                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
+                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
+            {
+                zynthian.clipWaveEditorBarActive = true;
+            } else {
+                zynthian.clipWaveEditorBarActive = false;
+            }
         }
     }
 

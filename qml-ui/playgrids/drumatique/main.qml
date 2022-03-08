@@ -512,7 +512,7 @@ Zynthian.BasePlayGrid {
                 anchors.fill: parent;
 
                 DrumsGrid {
-                    model: _private.gridModel
+                    model: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.gridModel
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
                 }

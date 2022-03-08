@@ -807,14 +807,14 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                        pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                        sequence: visible&&track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+                                        pattern: visible&&sequence ? sequence.get(track.connectedPattern) : null
 
                                         visible: model.clip.col === zynthian.zynthiloops.selectedClipCol
-                                        Layout.preferredWidth: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellWidth
-                                        Layout.maximumWidth: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellWidth
-                                        Layout.preferredHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
-                                        Layout.maximumHeight: model.clip.col !== zynthian.zynthiloops.selectedClipCol ? 0 : privateProps.cellHeight
+                                        Layout.preferredWidth: visible ? privateProps.cellWidth : 0
+                                        Layout.maximumWidth: visible ? privateProps.cellWidth : 0
+                                        Layout.preferredHeight: visible ? privateProps.cellHeight : 0
+                                        Layout.maximumHeight: visible ? privateProps.cellHeight : 0
 
                                         onPressed: {
                                             console.log("@@@ CLIP :", model.clip.cppObjAddress, model.clip.cppObjId)

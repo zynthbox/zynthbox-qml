@@ -50,6 +50,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
             # "10": {"name": "K", "clips": []},
             # "11": {"name": "L", "clips": []},
         }
+        self.__name_change_timer = QTimer(self)
+        self.__name_change_timer.setInterval(10)
+        self.__name_change_timer.setSingleShot(True)
+        self.__name_change_timer.timeout.connect(self.selected_scene_name_changed)
 
     def serialize(self):
         logging.error("### Serializing Scenes")
@@ -131,8 +135,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
         self.selected_scene_index_changed.emit()
 
         QTimer.singleShot(10, task)
+        self.__name_change_timer.start()
 
     selected_scene_index_changed = Signal()
+    selected_scene_name_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex
 
@@ -140,7 +146,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def get_selected_scene_name(self):
         return chr(self.__selected_scene_index__ + 65)
 
-    selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_index_changed)
+    selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_name_changed)
     ### END Property selectedSceneName
 
     @Slot(int)

@@ -617,7 +617,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def set_selected_clip_col(self, col):
         if self.__selected_clip_col__ != col:
-            logging.error(f"### Selected Clip Col Changed : {col}")
+            logging.debug(f"### Selected Clip Col Changed : {col}")
             self.__selected_clip_col__ = col
             self.selectedClipColChanged.emit()
 

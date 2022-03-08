@@ -307,7 +307,7 @@ Zynthian.Card {
                         ListElement { text: "SLICE"; value: "sample-slice" }
                     }
                     textRole: "text"
-                    currentIndex: find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", ""))
+                    currentIndex: controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
                     onActivated: {
                         controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                     }
@@ -408,7 +408,7 @@ Zynthian.Card {
                 Zynthian.TabbedControlViewAction {
                     id: trackWaveAction
 
-                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
+                    property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
 
                     text: qsTr("Smp. Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
@@ -421,7 +421,7 @@ Zynthian.Card {
                 Zynthian.TabbedControlViewAction {
                     id: trackWaveEditorAction
 
-                    property QtObject clip: root.controlObj.samples[root.controlObj.selectedSampleRow]
+                    property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
 
                     text: qsTr("Wave Editor")
                     page: Qt.resolvedUrl("WaveEditorBar.qml")

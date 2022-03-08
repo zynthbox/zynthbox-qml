@@ -79,6 +79,8 @@ class zynthiloops_track(QObject):
         if 0 <= self.__id__ <= 9:
             self.__connected_pattern__ = self.__id__
 
+        self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.scene_clip_changed.emit())
+
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
 
@@ -641,3 +643,12 @@ class zynthiloops_track(QObject):
 
     selectedSampleRow = Property(int, get_selected_sample_row, set_selected_sample_row, notify=selected_sample_row_changed)
     ### END Property selectedSampleRow
+
+    ### Property sceneClip
+    def get_scene_clip(self):
+        return self.__song__.getClip(self.id, self.__song__.scenesModel.selectedSceneIndex)
+
+    scene_clip_changed = Signal()
+
+    sceneClip = Property(QObject, get_scene_clip, notify=scene_clip_changed)
+    ### END Property sceneClip

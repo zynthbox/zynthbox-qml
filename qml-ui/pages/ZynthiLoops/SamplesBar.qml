@@ -121,7 +121,7 @@ Zynthian.Card {
                                 if (controlObj.selectedSampleRow !== index) {
                                     controlObj.selectedSampleRow = index
                                 } else {
-                                    samplePickerDialog.folderModel.folder = controlObj.recordingDir;
+                                    samplePickerDialog.folderModel.folder = controlObj.samplesetDir;
                                     samplePickerDialog.open();
                                 }
                             }

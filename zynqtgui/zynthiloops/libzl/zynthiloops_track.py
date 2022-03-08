@@ -63,7 +63,7 @@ class zynthiloops_track(QObject):
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
-            self.__samples__.append(zynthiloops_clip(-1, -1, self.__song__))
+            self.__samples__.append(zynthiloops_clip(self.id, -1, self.__song__, self, True))
 
         self.__previous_midi_out = []
         self.__track_audio_type__ = "synth"
@@ -101,7 +101,13 @@ class zynthiloops_track(QObject):
     def save_sampleset(self):
         sampleset_dir = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.id + 1}'
 
-        obj = [x.serialize() if x.path is not None and len(x.path) > 0 else None for x in self.__samples__]
+        obj = []
+        for sample in self.__samples__:
+            if sample.path is not None and len(sample.path) > 0:
+                sample.saveMetadata()
+                obj.append(sample.serialize())
+            else:
+                obj.append(None)
 
         # Create sampleset dir and write sampleset json only if track has some samples loaded
         for c in obj:
@@ -611,6 +617,17 @@ class zynthiloops_track(QObject):
 
     recordingDir = Property(str, get_recording_dir, constant=True)
     ### END Property recordingDir
+
+    ### Property samplesetDir
+    def get_sampleset_dir(self):
+        path = Path(self.__song__.sketch_folder) / 'samples' / f"sampleset.{self.id + 1}"
+        if path.exists():
+            return str(path)
+        else:
+            return str(Path(self.__song__.sketch_folder) / 'samples')
+
+    samplesetDir = Property(str, get_sampleset_dir, constant=True)
+    ### END Property samplesetDir
 
     ### Property selectedSampleRow
     def get_selected_sample_row(self):

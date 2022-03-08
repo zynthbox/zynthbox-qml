@@ -37,8 +37,9 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    def __init__(self, row_index: int, col_index: int, song: QObject, parent=None):
+    def __init__(self, row_index: int, col_index: int, song: QObject, parent=None, is_track_sample=False):
         super(zynthiloops_clip, self).__init__(parent)
+        self.is_track_sample = is_track_sample
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__is_playing__ = False
@@ -69,6 +70,7 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
+        self.sampleset_path = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.track = None
@@ -131,14 +133,6 @@ class zynthiloops_clip(QObject):
             self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
         self.current_beat_changed.emit()
 
-    def set_row_index(self, new_index):
-        self.__row_index__ = new_index
-        try:
-            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        except:
-            pass
-        self.row_index_changed.emit()
-
     def track_volume_changed(self):
         if self.track is not None:
             self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
@@ -195,7 +189,10 @@ class zynthiloops_clip(QObject):
             if obj["path"] is None:
                 self.__path__ = None
             else:
-                self.path = str(self.wav_path / obj["path"])
+                if self.is_track_sample:
+                    self.path = str(self.sampleset_path / obj["path"])
+                else:
+                    self.path = str(self.wav_path / obj["path"])
         if "start" in obj:
             self.__start_position__ = obj["start"]
             self.set_start_position(self.__start_position__, True)
@@ -392,8 +389,14 @@ class zynthiloops_clip(QObject):
     def row(self):
         return self.__row_index__
 
-    def set_row_index(self, index):
-        self.__row_index__ = index
+    def set_row_index(self, new_index):
+        self.__row_index__ = new_index
+
+        try:
+            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+            self.sampleset_path = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{new_index + 1}'
+        except:
+            pass
         self.row_index_changed.emit()
     
     row = Property(int, row, set_row_index, notify=row_index_changed)
@@ -525,16 +528,31 @@ class zynthiloops_clip(QObject):
 
 
     def path(self):
-        return None if self.__path__ is None else str(self.wav_path / self.__path__)
+        if self.__path__ is None:
+            return None
+        else:
+            if self.is_track_sample:
+                return str(self.sampleset_path / self.__path__)
+            else:
+                return str(self.wav_path / self.__path__)
 
     def set_path(self, path):
         selected_path = Path(path)
 
-        if selected_path.parent != self.wav_path:
-            logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
-            shutil.copy2(selected_path, self.wav_path / selected_path.name)
+        if self.is_track_sample:
+            if selected_path.parent != self.sampleset_path:
+                logging.error(
+                    f"Sample({path}) is not from same track/sketch. Copying into sampleset folder ({self.sampleset_path / selected_path.name})")
+                self.sampleset_path.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(selected_path, self.sampleset_path / selected_path.name)
+            else:
+                logging.error(f"Sample({self.sampleset_path / selected_path.name}) is from same sampleset")
         else:
-            logging.error(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
+            if selected_path.parent != self.wav_path:
+                logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
+                shutil.copy2(selected_path, self.wav_path / selected_path.name)
+            else:
+                logging.error(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
 
         self.__path__ = str(selected_path.name)
         self.stop()
@@ -717,7 +735,7 @@ class zynthiloops_clip(QObject):
 
     def __read_metadata__(self):
         try:
-            self.audio_metadata = taglib.File(str(self.wav_path / self.__path__)).tags
+            self.audio_metadata = taglib.File(self.path).tags
 
             try:
                 if self.__bpm__ <= 0:
@@ -746,7 +764,7 @@ class zynthiloops_clip(QObject):
     def write_metadata(self, key, value: list):
         if self.__path__ is not None:
             try:
-                file = taglib.File(str(self.wav_path / self.__path__))
+                file = taglib.File(self.path)
                 file.tags[key] = value
                 file.save()
             except Exception as e:

@@ -41,7 +41,7 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property color highlightColor
-    property bool isInScene: visible && model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)
+    property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
     property bool patternHasNotes: pattern.bankHasNotes(0) && pattern.lastModified
 
     property QtObject sequence
@@ -52,7 +52,7 @@ QQC2.AbstractButton {
     contentItem: Item {
 //        TableHeaderLabel {
 //            anchors.centerIn: parent
-//            text: model.clip.path.length > 0 ? "W" : ""
+//            text: track.sceneClip.path.length > 0 ? "W" : ""
 //            // text: "Clip " + (clip.col+1) // clip.name
 //            // text2: clip.length + " Bar"
 //        }
@@ -65,7 +65,7 @@ QQC2.AbstractButton {
 //            }
 
 //            Connections {
-//                target: model.clip
+//                target: track.sceneClip
 //                onPathChanged: textTimer.restart()
 //                onIsPlayingChanged: textTimer.restart()
 //            }
@@ -85,11 +85,11 @@ QQC2.AbstractButton {
 //                id: textTimer
 //                interval: 250
 //                onTriggered: {
-//                    if (model.clip.path.length > 0) {
-//                        if (model.clip.isPlaying && model.clip.currentBeat >= 0) {
-//                            label.text = (model.clip.currentBeat+1) + "/" + model.clip.length
+//                    if (track.sceneClip.path.length > 0) {
+//                        if (track.sceneClip.isPlaying && track.sceneClip.currentBeat >= 0) {
+//                            label.text = (track.sceneClip.currentBeat+1) + "/" + track.sceneClip.length
 //                        } else {
-//                            label.text = model.clip.length
+//                            label.text = track.sceneClip.length
 //                        }
 //                    } else if (track.connectedPattern >= 0) {
 //                        var hasNotes = pattern.bankHasNotes(0)
@@ -112,10 +112,10 @@ QQC2.AbstractButton {
             smooth: false
 
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      root.patternHasNotes
-            source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + model.clip.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
+            source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + track.sceneClip.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
         }
 
         QQC2.Label {
@@ -124,15 +124,15 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
-                     model.clip.path &&
-                     model.clip.path.length > 0
+                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.path &&
+                     track.sceneClip.path.length > 0
             text: qsTr("%1%2")
-                    .arg(model.clip.isPlaying &&
-                         model.clip.currentBeat >= 0
-                            ? (model.clip.currentBeat+1) + "/"
+                    .arg(track.sceneClip.isPlaying &&
+                         track.sceneClip.currentBeat >= 0
+                            ? (track.sceneClip.currentBeat+1) + "/"
                             : "")
-                    .arg(model.clip.length.toFixed(2))
+                    .arg(track.sceneClip.length.toFixed(2))
         }
 
         QQC2.Label {
@@ -141,7 +141,7 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      root.patternHasNotes
             text: qsTr("%1%2")
@@ -174,9 +174,9 @@ QQC2.AbstractButton {
             color: "#ffffff"
             text: qsTr("Loop")
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
-                     model.clip.path &&
-                     model.clip.path.length > 0
+                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.path &&
+                     track.sceneClip.path.length > 0
         }
     }
 
@@ -194,20 +194,20 @@ QQC2.AbstractButton {
             id: progressRect
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType === "sample-loop" &&
-                     model.clip.path &&
-                     model.clip.path.length > 0 &&
-                     model.clip.isPlaying
+                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.path &&
+                     track.sceneClip.path.length > 0 &&
+                     track.sceneClip.isPlaying
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: (model.clip.progress - model.clip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * model.clip.length) / parent.width);
+            width: (track.sceneClip.progress - track.sceneClip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * track.sceneClip.length) / parent.width);
         }
         Rectangle {
             id: patternProgressRect
 
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     model.clip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      sequence.isPlaying &&
                      root.patternHasNotes

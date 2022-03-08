@@ -241,72 +241,70 @@ ColumnLayout {
                                 Layout.fillHeight: false
                                 Layout.alignment: Qt.AlignVCenter
 
-                                Repeater {
-                                    model: track.clipsModel
-                                    delegate: QQC2.RoundButton {
-                                        id: control
-                                        Layout.fillWidth: false
-                                        Layout.fillHeight: false
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit*2
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                                        Layout.alignment: Qt.AlignVCenter
-                                        radius: 2
-                                        highlighted: trackDelegate.selectedClip === model.clip && model.clip.inCurrentScene
-                                        property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                        property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
-                                        Connections {
-                                            target: pattern
-                                            onEnabledChanged: {
-                                                if (model.clip.col === pattern.bankOffset / pattern.bankLength && ((pattern.enabled && !model.clip.inCurrentScene) || (!pattern.enabled && model.clip.inCurrentScene))) {
-                                                    zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
-                                                }
+                                QQC2.RoundButton {
+                                    id: control
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit*2
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                                    Layout.alignment: Qt.AlignVCenter
+                                    radius: 2
+                                    highlighted: trackDelegate.selectedClip === track.sceneClip && track.sceneClip.inCurrentScene
+                                    property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                    Connections {
+                                        target: pattern
+                                        onEnabledChanged: {
+                                            if (track.sceneClip.col === pattern.bankOffset / pattern.bankLength && ((pattern.enabled && !track.sceneClip.inCurrentScene) || (!pattern.enabled && track.sceneClip.inCurrentScene))) {
+                                                zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
                                             }
-                                        }
-                                        background: Rectangle { // Derived from znthian qtquick-controls-style
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: model.clip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
-                                            border.color: trackDelegate.selectedClip === model.clip
-                                                            ? Kirigami.Theme.highlightColor
-                                                            : Qt.rgba(
-                                                                  Kirigami.Theme.textColor.r,
-                                                                  Kirigami.Theme.textColor.g,
-                                                                  Kirigami.Theme.textColor.b,
-                                                                  0.4
-                                                              )
-                                            radius: control.radius
-
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                radius: parent.radius
-                                                gradient: Gradient {
-                                                    GradientStop { position: 0; color: control.pressed ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(1, 1, 1, 0.05)}
-                                                    GradientStop { position: 1; color: control.pressed ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.05)}
-                                                }
-                                            }
-                                        }
-
-                                        onClicked: {
-                                            trackDelegate.selectedClip = model.clip;
-
-                                            zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(model.clip);
-                                            if (control.pattern) {
-                                                pattern.bank = model.clip.col === 0 ? "A" : "B";
-
-                                                if (model.clip.inCurrentScene) {
-                                                    pattern.enabled = true;
-                                                } else {
-                                                    pattern.enabled = false;
-                                                }
-                                            }
-                                        }
-
-                                        QQC2.Label {
-                                            anchors.centerIn: parent
-                                            text: model.clip.partName
                                         }
                                     }
+                                    background: Rectangle { // Derived from znthian qtquick-controls-style
+                                        Kirigami.Theme.inherit: false
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                        color: track.sceneClip.inCurrentScene ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                                        border.color: trackDelegate.selectedClip === track.sceneClip
+                                                        ? Kirigami.Theme.highlightColor
+                                                        : Qt.rgba(
+                                                                Kirigami.Theme.textColor.r,
+                                                                Kirigami.Theme.textColor.g,
+                                                                Kirigami.Theme.textColor.b,
+                                                                0.4
+                                                            )
+                                        radius: control.radius
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: parent.radius
+                                            gradient: Gradient {
+                                                GradientStop { position: 0; color: control.pressed ? Qt.rgba(0, 0, 0, 0.05) : Qt.rgba(1, 1, 1, 0.05)}
+                                                GradientStop { position: 1; color: control.pressed ? Qt.rgba(1, 1, 1, 0.05) : Qt.rgba(0, 0, 0, 0.05)}
+                                            }
+                                        }
+                                    }
+
+                                    onClicked: {
+                                        trackDelegate.selectedClip = track.sceneClip;
+
+                                        zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
+                                        if (control.pattern) {
+                                            pattern.bank = track.sceneClip.col === 0 ? "A" : "B";
+
+                                            if (track.sceneClip.inCurrentScene) {
+                                                pattern.enabled = true;
+                                            } else {
+                                                pattern.enabled = false;
+                                            }
+                                        }
+                                    }
+
+                                    QQC2.Label {
+                                        anchors.centerIn: parent
+                                        text: track.sceneClip.partName
+                                    }
                                 }
+
                             }
                             Rectangle {
                                 Layout.fillWidth: true

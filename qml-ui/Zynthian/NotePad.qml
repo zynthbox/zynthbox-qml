@@ -35,6 +35,7 @@ Item {
     id: component
     property bool positionalVelocity
     property var note
+    property string text
     property bool highlightOctaveStart: true
     signal notePlayed(QtObject note, int velocity);
 
@@ -96,18 +97,23 @@ Item {
             return color;
         }
         QQC2.Label {
+            id: padLabel
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             color: component.foregroundColor
             text: {
                 var text = "";
-                if (component.note && component.note.name != "") {
-                    if (component.scale == "major") {
-                        text = component.note.name
-                    } else {
-                        text = component.note.name + (component.note.octave - 1)
+                if (component.text == "") {
+                    if (component.note && component.note.name != "") {
+                        if (component.scale == "major") {
+                            text = component.note.name
+                        } else {
+                            text = component.note.name + (component.note.octave - 1)
+                        }
                     }
+                } else {
+                    text = component.text;
                 }
                 return text;
             }

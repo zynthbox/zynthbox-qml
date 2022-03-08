@@ -22,8 +22,10 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import json
 import logging
 import math
+import os
 import threading
 from pathlib import Path
 
@@ -96,14 +98,57 @@ class zynthiloops_track(QObject):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         logging.error(f"Master Volume : {self.master_volume} dB")
 
+    def save_sampleset(self):
+        sampleset_dir = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.id + 1}'
+
+        obj = [x.serialize() if x.path is not None and len(x.path) > 0 else None for x in self.__samples__]
+
+        # Create sampleset dir and write sampleset json only if track has some samples loaded
+        for c in obj:
+            if c is not None:
+                sampleset_dir.mkdir(parents=True, exist_ok=True)
+                try:
+                    logging.error(f"Writing to sampleset.json {sampleset_dir}/sampleset.json")
+                    with open(sampleset_dir / 'sampleset.json', "w") as f:
+                        json.dump(obj, f)
+                        f.truncate()
+                        f.flush()
+                        os.fsync(f.fileno())
+                except Exception as e:
+                    logging.error(f"Error writing sampleset.json to {sampleset_dir} : {str(e)}")
+
+                break
+
+    def restore_sampleset(self):
+        sampleset_dir = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.id + 1}'
+
+        if not (sampleset_dir / 'sampleset.json').exists():
+            logging.error(f"sampleset.json does not exist for track {self.id + 1}. Skipping restoration")
+        else:
+            logging.error(f"Restoring sampleset.json for track {self.id + 1}")
+
+            try:
+                with open(sampleset_dir / 'sampleset.json', "r") as f:
+                    obj = json.loads(f.read())
+
+                    for i, clip in enumerate(obj):
+                        if clip is not None:
+                            self.__samples__[i].deserialize(clip)
+
+                    self.samples_changed.emit()
+            except Exception as e:
+                logging.error(f"Error reading sampleset.json from {sampleset_dir} : {str(e)}")
+
     def serialize(self):
+        # Save sampleset when serializing so that sampleset is saved everytime song is saved
+        self.save_sampleset()
+
         return {"name": self.__name__,
                 "volume": self.__volume__,
                 "connectedPattern": self.__connected_pattern__,
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
-                "samples": [x.serialize() for x in self.__samples__],
                 "clips": self.__clips_model__.serialize(),
                 "layers_snapshot": self.__layers_snapshot}
 
@@ -125,15 +170,14 @@ class zynthiloops_track(QObject):
         if "trackAudioType" in obj:
             self.__track_audio_type__ = obj["trackAudioType"]
             self.set_track_audio_type(self.__track_audio_type__)
-        if "samples" in obj:
-            for i, clip in enumerate(obj["samples"]):
-                self.__samples__[i].deserialize(clip)
-            self.samples_changed.emit()
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
             self.__layers_snapshot = obj["layers_snapshot"]
             self.sound_data_changed.emit()
+
+        # Restore sampleset after restoring track
+        self.restore_sampleset()
 
     def set_layers_snapshot(self, snapshot):
         self.__layers_snapshot = snapshot

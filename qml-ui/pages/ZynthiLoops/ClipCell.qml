@@ -41,7 +41,7 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property color highlightColor
-    property bool isInScene: model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)
+    property bool isInScene: visible && model.clip.inCurrentScene || root.song.scenesModel.isClipInScene(model.clip, model.clip.col)
     property bool patternHasNotes: pattern.bankHasNotes(0) && pattern.lastModified
 
     property QtObject sequence

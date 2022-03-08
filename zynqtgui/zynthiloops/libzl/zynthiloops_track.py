@@ -452,6 +452,8 @@ class zynthiloops_track(QObject):
     def get_connected_pattern(self):
         return self.__connected_pattern__
     def set_connected_pattern(self, pattern):
+        if self.__connected_pattern__ == pattern:
+            return
         self.__connected_pattern__ = pattern
         self.__song__.schedule_save()
         self.connected_pattern_changed.emit()

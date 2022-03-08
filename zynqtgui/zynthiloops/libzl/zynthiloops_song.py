@@ -88,7 +88,10 @@ class zynthiloops_song(QObject):
                     self.__scenes_model__.addClipToScene(clip, i)
         self.bpm_changed.emit()
 
+        # Create wav dir for recording
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
+        # Create root samples dir if not exists
+        (Path(self.sketch_folder) / 'samples').mkdir(parents=True, exist_ok=True)
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True

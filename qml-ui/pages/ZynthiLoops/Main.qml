@@ -720,17 +720,19 @@ Zynthian.ScreenPage {
                                                             : "transparent"
                                     highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack && track.sceneClip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === track.sceneClip
                                     onHighlightedChanged: {
-                                        console.log("Clip : (" + track.sceneClip.row+", "+track.sceneClip.col+")", "Selected Track :", zynthian.session_dashboard.selectedTrack)
+                                        Qt.callLater(function () {
+                                            console.log("Clip : (" + track.sceneClip.row+", "+track.sceneClip.col+")", "Selected Track :"+ zynthian.session_dashboard.selectedTrack)
 
-                                        if (highlighted) {
-                                            if (track.connectedPattern >= 0) {
-                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                bottomBar.controlObj = track.sceneClip;
-                                            } else {
-                                                bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                bottomBar.controlObj = track.sceneClip;
+                                            if (highlighted) {
+                                                if (track.connectedPattern >= 0) {
+                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                    bottomBar.controlObj = track.sceneClip;
+                                                } else {
+                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                    bottomBar.controlObj = track.sceneClip;
+                                                }
                                             }
-                                        }
+                                        });
                                     }
 
                                     Connections {

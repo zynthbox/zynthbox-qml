@@ -26,6 +26,7 @@ import json
 import logging
 import math
 import os
+import shutil
 import threading
 from pathlib import Path
 
@@ -60,6 +61,7 @@ class zynthiloops_track(QObject):
         self.__muted__ = False
         self.__selected_sample_row__ = 0
         self.__samples__ = []
+        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'samples'
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
@@ -81,6 +83,10 @@ class zynthiloops_track(QObject):
 
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.scene_clip_changed.emit())
 
+    @Property(str, constant=True)
+    def className(self):
+        return "zynthiloops_track"
+
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
 
@@ -101,7 +107,7 @@ class zynthiloops_track(QObject):
         logging.error(f"Master Volume : {self.master_volume} dB")
 
     def save_sampleset(self):
-        sampleset_dir = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.id + 1}'
+        sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
 
         obj = []
         for sample in self.__samples__:
@@ -128,7 +134,7 @@ class zynthiloops_track(QObject):
                 break
 
     def restore_sampleset(self):
-        sampleset_dir = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.id + 1}'
+        sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
 
         if not (sampleset_dir / 'sampleset.json').exists():
             logging.error(f"sampleset.json does not exist for track {self.id + 1}. Skipping restoration")
@@ -326,8 +332,21 @@ class zynthiloops_track(QObject):
 
     @Slot(QObject)
     def copyFrom(self, source):
+        # Copy all clips from source track to self
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
+
+        source_sampleset_dir = self.__base_samples_dir__ / f'sampleset.{source.id + 1}'
+        dest_sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
+
+        dest_sampleset_dir.mkdir(parents=True, exist_ok=True)
+
+        # Copy all samples from source track
+        for file in source_sampleset_dir.glob("*"):
+            shutil.copy2(file, dest_sampleset_dir / file.name)
+
+        # Restore sampleset after copying
+        self.restore_sampleset()
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
@@ -352,7 +371,7 @@ class zynthiloops_track(QObject):
             self.__chained_sounds__[index] = next_free_layer
             self.__song__.schedule_save()
             # self.chained_sounds_changed.emit()
-            
+
             return True
 
     @Slot(int, result=str)
@@ -624,11 +643,11 @@ class zynthiloops_track(QObject):
 
     ### Property samplesetDir
     def get_sampleset_dir(self):
-        path = Path(self.__song__.sketch_folder) / 'samples' / f"sampleset.{self.id + 1}"
+        path = self.__base_samples_dir__ / f"sampleset.{self.id + 1}"
         if path.exists():
             return str(path)
         else:
-            return str(Path(self.__song__.sketch_folder) / 'samples')
+            return str(self.__base_samples_dir__)
 
     samplesetDir = Property(str, get_sampleset_dir, constant=True)
     ### END Property samplesetDir

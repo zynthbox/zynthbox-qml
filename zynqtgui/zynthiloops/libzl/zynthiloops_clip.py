@@ -89,6 +89,10 @@ class zynthiloops_clip(QObject):
         self.__was_in_current_scene = self.get_in_current_scene()
         self.__song__.scenesModel.selected_scene_index_changed.connect(self.sync_in_current_scene)
 
+    @Property(str, constant=True)
+    def className(self):
+        return "zynthiloops_clip"
+
     def sync_in_current_scene(self):
         now_in_scene = self.get_in_current_scene()
         if now_in_scene != self.__was_in_current_scene:

@@ -51,7 +51,6 @@ ColumnLayout {
     }
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property int itemHeight: layersView.height / 15
     spacing: Kirigami.Units.largeSpacing
 
     function cuiaCallback(cuia) {
@@ -253,7 +252,7 @@ ColumnLayout {
                                     property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
                                     property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
                                     Connections {
-                                        target: pattern
+                                        target: control.pattern
                                         onEnabledChanged: {
                                             if (track.sceneClip.col === pattern.bankOffset / pattern.bankLength && ((pattern.enabled && !track.sceneClip.inCurrentScene) || (!pattern.enabled && track.sceneClip.inCurrentScene))) {
                                                 zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);

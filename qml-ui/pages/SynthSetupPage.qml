@@ -291,18 +291,18 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 id: mainLabel
                                 Layout.fillWidth: true
-                                text: model.metadata.midi_channel + 1 + " - " + model.display;
+                                text: model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "";
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {
                                 text: {
                                     let text = "";
-                                    if (model.metadata.note_high < 60) {
+                                    if (model.metadata && model.metadata.note_high < 60) {
                                         text = "L";
-                                    } else if (model.metadata.note_low >= 60) {
+                                    } else if (model.metadata && model.metadata.note_low >= 60) {
                                         text = "H";
                                     }
-                                    if (model.metadata.octave_transpose !== 0) {
+                                    if (model.metadata && model.metadata.octave_transpose !== 0) {
                                         if (model.metadata.octave_transpose > 0) {
                                             text += "+"
                                         }
@@ -392,7 +392,7 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 Layout.fillWidth: true
                                 font.pointSize: mainLabel.font.pointSize * 0.9
-                                text: model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
+                                text: model.metadata && model.metadata.effects_label.length > 0 ? model.metadata.effects_label : "- -"
                                 elide: Text.ElideRight
                             }
                         }

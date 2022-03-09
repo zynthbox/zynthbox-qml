@@ -11,7 +11,7 @@ Zynthian.Card {
     id: root
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property var chainedSounds: selectedTrack.chainedSounds
+    property var chainedSounds: selectedTrack ? selectedTrack.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
 
     function selectConnectedSound() {
@@ -308,7 +308,7 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                            text: chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1] : ""
 
                             elide: "ElideRight"
 
@@ -356,12 +356,12 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0]
+                            text: chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
 
                             elide: "ElideRight"
 
                             function updateName() {
-                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0]
+                                text = chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
                             }
                         }
 
@@ -531,9 +531,9 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: root.selectedTrack.getEffectsNameByMidiChannel(chainedSound)
+                            text: root.selectedTrack ? root.selectedTrack.getEffectsNameByMidiChannel(chainedSound) : ""
                             function updateName() {
-                                text = root.selectedTrack.getEffectsNameByMidiChannel(chainedSound)
+                                text = root.selectedTrack ? root.selectedTrack.getEffectsNameByMidiChannel(chainedSound) : ""
                             }
 
                             elide: "ElideRight"
@@ -594,7 +594,7 @@ Zynthian.Card {
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        enabled: zynthian.session_dashboard.selectedSoundRow === index && soundDelegate.chainedSound >= 0 && root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)
+                        enabled: zynthian.session_dashboard.selectedSoundRow === index && soundDelegate.chainedSound >= 0 && root.selectedTrack && root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)
                         property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
                         value: volumeControlObject ? volumeControlObject.value : 0
                         stepSize: volumeControlObject ? volumeControlObject.step_size : 1

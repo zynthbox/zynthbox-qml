@@ -130,14 +130,15 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         if not self.zyngui.screens["zynthiloops"].song:
             return
         track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].get_selected_track())
-        logging.error(f"Update Track Sounds : {track.connectedSound}")
-        if track.connectedSound >= 0:
-            self.zyngui.screens["layer"].activate_midichan_layer(track.connectedSound)
-        else:
-            self.select_action(0)
+        if track is not None:
+            logging.error(f"Update Track Sounds : {track.connectedSound}")
+            if track.connectedSound >= 0:
+                self.zyngui.screens["layer"].activate_midichan_layer(track.connectedSound)
+            else:
+                self.select_action(0)
 
-        # Force set chained sounds to ensure correct cloning
-        track.set_chained_sounds(track.chainedSounds)
+            # Force set chained sounds to ensure correct cloning
+            track.set_chained_sounds(track.chainedSounds)
 
     def select(self, index=None):
         super().select(index)

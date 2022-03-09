@@ -226,7 +226,7 @@ class zynthiloops_clip(QObject):
             self.set_shouldSync(self.__should_sync__, True)
         if "snapLengthToBeat" in obj:
             self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
-            self.set_snap_length_to_beat(self.__should_sync__, True)
+            self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
         if "arrangerBarPositions" in obj:
             self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
             self.arranger_bar_positions_changed.emit()
@@ -844,14 +844,7 @@ class zynthiloops_clip(QObject):
     @Slot(QObject)
     def copyFrom(self, clip):
         self.clear()
-
-        if clip.path is not None:
-            self.path = clip.path
-            self.length = clip.length
-            self.startPosition = clip.startPosition
-            self.time = clip.time
-            self.pitch = clip.pitch
-            self.gain = clip.gain
+        self.deserialize(clip.serialize())
 
     @Slot()
     def deleteClip(self):

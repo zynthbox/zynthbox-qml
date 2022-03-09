@@ -946,8 +946,8 @@ Zynthian.BasePlayGrid {
                                     }
                                     ColumnLayout {
                                         Layout.fillHeight: true
-                                        Layout.minimumWidth: (parent.width / 7) * 3;
-                                        Layout.maximumWidth: (parent.width / 7) * 3;
+                                        Layout.minimumWidth: (parent.width / 8) * 3;
+                                        Layout.maximumWidth: (parent.width / 8) * 3;
 
                                         RowLayout {
                                             Layout.fillWidth: true
@@ -1019,14 +1019,14 @@ Zynthian.BasePlayGrid {
                                                 soundName = text;
                                             }
                                             text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                                ? patternsMenuItem.thisPattern.sampleFilename === ""
-                                                    ? "No sample chosen - tap to select one"
-                                                    : patternsMenuItem.thisPattern.sampleFilename.split("/").pop()
-                                                : patternsMenuItem.associatedTrack
-                                                    ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
-                                                        ? "Sound: " + soundName
-                                                        : "No sound assigned - tap to select one"
-                                                    : "Unassigned - playing to: " + _private.currentSoundName
+                                                ? "Sample Trigger Mode"
+                                                : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+                                                    ? "Sample Slice Mode"
+                                                    : patternsMenuItem.associatedTrack
+                                                        ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                            ? "Sound: " + soundName
+                                                            : "No sound assigned - tap to select one"
+                                                        : "Unassigned - playing to: " + _private.currentSoundName
                                             onClicked: {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
@@ -1057,7 +1057,7 @@ Zynthian.BasePlayGrid {
                                     ColumnLayout {
                                         Layout.fillHeight: true
                                         Zynthian.PlayGridButton {
-                                            text: "SAMPLE"
+                                            text: "TRIG"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
                                             onClicked: {
@@ -1070,6 +1070,25 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
                                             onClicked: {
                                                 component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
+                                            }
+                                        }
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillHeight: true
+                                        Zynthian.PlayGridButton {
+                                            text: "SLICE"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
+                                            onClicked: {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination, patternsMenuItem.thisPatternIndex)
+                                            }
+                                        }
+                                        Zynthian.PlayGridButton {
+                                            text: "LOOP"
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
+                                            onClicked: {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination, patternsMenuItem.thisPatternIndex)
                                             }
                                         }
                                     }

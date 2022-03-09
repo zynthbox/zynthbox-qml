@@ -61,7 +61,7 @@ class zynthiloops_track(QObject):
         self.__muted__ = False
         self.__selected_sample_row__ = 0
         self.__samples__ = []
-        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'samples'
+        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'samples'
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
@@ -113,7 +113,7 @@ class zynthiloops_track(QObject):
         for sample in self.__samples__:
             if sample.path is not None and len(sample.path) > 0:
                 sample.saveMetadata()
-                obj.append(sample.serialize())
+                obj.append({"path": Path(sample.path).name})
             else:
                 obj.append(None)
 
@@ -147,7 +147,7 @@ class zynthiloops_track(QObject):
 
                     for i, clip in enumerate(obj):
                         if clip is not None:
-                            self.__samples__[i].deserialize(clip)
+                            self.__samples__[i].path = str(sampleset_dir / clip["path"])
 
                     self.samples_changed.emit()
             except Exception as e:

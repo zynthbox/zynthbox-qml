@@ -192,7 +192,7 @@ Kirigami.AbstractApplicationWindow {
                                 switchTimer.restart();
                             }
                             highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
-                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+//                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                         }
                     }
                 }
@@ -222,7 +222,7 @@ Kirigami.AbstractApplicationWindow {
                                 zynthian.session_dashboard.selectedTrack = index;
                             }
                             highlighted: zynthian.session_dashboard.selectedTrack === index
-                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
+//                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                         }
                     }
                 }
@@ -259,11 +259,13 @@ Kirigami.AbstractApplicationWindow {
                 function updateSoundName() {
                     var text = "";
 
-                    for (var id in root.selectedTrack.chainedSounds) {
-                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
-                            break;
+                    if (root.selectedTrack) {
+                        for (var id in root.selectedTrack.chainedSounds) {
+                            if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                                root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                                text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
+                                break;
+                            }
                         }
                     }
 
@@ -308,12 +310,14 @@ Kirigami.AbstractApplicationWindow {
                 function updateSoundName() {
                     var text = "";
 
-                    for (var id in root.selectedTrack.chainedSounds) {
-                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
-                            text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
-                            break;
+                    if (root.selectedTrack) {
+                        for (var id in root.selectedTrack.chainedSounds) {
+                            if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                                root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                                text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
+                                text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
+                                break;
+                            }
                         }
                     }
 

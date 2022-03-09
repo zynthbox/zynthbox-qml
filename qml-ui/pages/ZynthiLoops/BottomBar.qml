@@ -273,7 +273,7 @@ Zynthian.Card {
 //                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
 //                }
                 QQC2.Button {
-                    visible: controlObj.connectedPattern < 0
+                    visible: controlObj && controlObj.connectedPattern < 0
                     Layout.fillHeight: true
 
                     text: qsTr("Midi")
@@ -307,7 +307,7 @@ Zynthian.Card {
                         ListElement { text: "SLICE"; value: "sample-slice" }
                     }
                     textRole: "text"
-                    currentIndex: controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
+                    currentIndex: controlObj && controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
                     onActivated: {
                         controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                     }
@@ -358,14 +358,14 @@ Zynthian.Card {
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Clip Info")
                     page: Qt.resolvedUrl("ClipInfoBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {
                     id: waveAction
                     text: qsTr("Clip Settings")
                     page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                     preload: true
                 },
@@ -373,7 +373,7 @@ Zynthian.Card {
                     id: editorAction
                     text: qsTr("Wave Editor")
                     page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path.length > 0
+                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                     initialProperties: {"bottomBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

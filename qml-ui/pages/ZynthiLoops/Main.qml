@@ -1032,7 +1032,12 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                 }
 
-                ScenesBar {
+//                ScenesBar {
+//                    id: scenesBar
+//                    Layout.fillWidth: true
+//                    Layout.fillHeight: true
+//                }
+                SlotsBar {
                     id: scenesBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true

@@ -127,7 +127,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(None)
     def emit_chained_sounds_changed(self):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+        if selected_track is not None:
+            selected_track.set_chained_sounds(selected_track.get_chained_sounds())
         self.zyngui.screens['zynthiloops'].song.tracksModel.connected_sounds_count_changed.emit()
         # self.set_selected_track(self.selectedTrack, True)
 

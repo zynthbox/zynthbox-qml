@@ -591,9 +591,6 @@ Zynthian.ScreenPage {
 
                             color: root.copySourceObj === model.track ? "#2196f3" : Kirigami.Theme.backgroundColor
 
-                            width: privateProps.headerWidth
-                            height: ListView.view.height
-
                             highlightOnFocus: false
                             highlighted: index === zynthian.session_dashboard.selectedTrack
 
@@ -716,12 +713,12 @@ Zynthian.ScreenPage {
                                 delegate: ClipCell {
                                     id: clipCell
 
-                                    Component.onCompleted: {
-                                        console.log("^^^ Clip Cell Created :", rowIndex, index)
-                                    }
-                                    Component.onDestruction: {
-                                        console.log("$$$ Clip Cell Destroyed :", rowIndex, index)
-                                    }
+//                                     Component.onCompleted: {
+//                                         console.log("^^^ Clip Cell Created :", rowIndex, index)
+//                                     }
+//                                     Component.onDestruction: {
+//                                         console.log("$$$ Clip Cell Destroyed :", rowIndex, index)
+//                                     }
 
                                     backgroundColor: "#000000"
                                     highlightColor: !highlighted && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0
@@ -1082,24 +1079,26 @@ Zynthian.ScreenPage {
                         infoBar.bankName = "--"
                         infoBar.presetName = "--"
 
-                        for (var i in infoBar.clip.clipTrack.chainedSounds) {
-                            if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
-                                infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[i])) {
-                                if (layerIndex < 0) {
-                                    layerIndex = i
+                        if (infoBar.clip) {
+                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
+                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
+                                    infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[i])) {
+                                    if (layerIndex < 0) {
+                                        layerIndex = i
+                                    }
+
+                                    count++;
                                 }
-
-                                count++;
                             }
-                        }
 
-                        for (var id in infoBar.clip.clipTrack.chainedSounds) {
-                            if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
-                                infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
-                                var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
-                                synthName = soundName[0] ? soundName[0].trim() : "--";
-                                presetName = soundName[1] ? soundName[1].trim() : "--";
-                                break;
+                            for (var id in infoBar.clip.clipTrack.chainedSounds) {
+                                if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
+                                    infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
+                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
+                                    synthName = soundName[0] ? soundName[0].trim() : "--";
+                                    presetName = soundName[1] ? soundName[1].trim() : "--";
+                                    break;
+                                }
                             }
                         }
 
@@ -1146,7 +1145,7 @@ Zynthian.ScreenPage {
 //                    }
 
                     Connections {
-                        target: infoBar.clip.clipTrack
+                        target: infoBar.clip ? infoBar.clip.clipTrack : null
                         onChainedSoundsChanged: {
                             updateSoundNameTimer.restart()
                         }
@@ -1179,7 +1178,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: infoBar.topLayer >= 0
                                   ? qsTr("Preset (%2/%3): %1")
                                       .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
@@ -1191,7 +1190,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: qsTr("Bank: %1")
                                 .arg(infoBar.bankName === "-" || infoBar.bankName === "None" ? "--" : infoBar.bankName)
                     }
@@ -1199,23 +1198,23 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
                         text: qsTr("Synth: %1").arg(infoBar.synthName)
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType === "sample-loop"
-                        text: qsTr("Clip: %1").arg(infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
+                        text: qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
                     }
                     QQC2.Label {
-                        property QtObject sample: infoBar.clip.clipTrack.samples[0]
+                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[0]
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
-                                 infoBar.clip.clipTrack.trackAudioType === "sample-slice"
+                        visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
+                                 infoBar.clip.clipTrack.trackAudioType === "sample-slice")
                         text: qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--")
                     }
 
@@ -1231,7 +1230,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
                         checkable: true
-                        visible: infoBar.clip.clipTrack.trackAudioType === "synth"
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
                         // Bind to current index to properly update when preset changed from other screen
                         checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
                         onToggled: {
@@ -1243,8 +1242,8 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("%1 %2")
-                                .arg(infoBar.clip.name)
-                                .arg(infoBar.clip.inCurrentScene ? "(Active)" : "")
+                                .arg(infoBar.clip ? infoBar.clip.name : "")
+                                .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
                     }
                 }
             }

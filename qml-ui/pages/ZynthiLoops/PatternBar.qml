@@ -40,8 +40,8 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject sequence: controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-    property QtObject pattern: root.sequence ? root.sequence.get(controlObj.clipTrack.connectedPattern) : null
+    property QtObject sequence: controlObj.clipTrack && controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject pattern: root.sequence && controlObj.clipTrack ? root.sequence.get(controlObj.clipTrack.connectedPattern) : null
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
@@ -94,8 +94,8 @@ GridLayout {
             Layout.fillHeight: true
             smooth: false
 
-            visible: controlObj.clipTrack.connectedPattern >= 0
-            source: root.pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+            visible: controlObj.clipTrack && controlObj.clipTrack.connectedPattern >= 0
+            source: root.pattern && controlObj.clipTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
             Rectangle { // Progress
                 anchors {
                     top: parent.top

@@ -41,7 +41,7 @@ QQC2.Dialog {
     id: soundsDialog
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property var chainedSoundsArr: selectedTrack.chainedSounds.slice()
+    property var chainedSoundsArr: selectedTrack ? selectedTrack.chainedSounds.slice() : []
 //     property var chainColors: ({
 //         t1: "#e6194B",
 //         t2: "#3cb44b",
@@ -187,7 +187,7 @@ QQC2.Dialog {
                                     soundBtnDelegate.borderColor.b,
                                     enabled ? 1 : 0.5
                                 )
-                            } else if (soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
+                            } else if (soundsDialog.selectedTrack && soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
                                        soundsDialog.selectedTrack.checkIfLayerExists(index)) {
                                 return Qt.rgba(
                                     soundBtnDelegate.borderColor.r,
@@ -275,7 +275,7 @@ QQC2.Dialog {
                                     for (var k in track.chainedSounds) {
                                         // console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
 
-                                        if (soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
+                                        if (soundsDialog.selectedTrack && soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
 //                                            console.log("  > Setting color : "+chainColors["t"+(i+1)]);

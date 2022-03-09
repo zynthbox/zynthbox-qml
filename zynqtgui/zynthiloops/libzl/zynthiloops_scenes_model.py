@@ -233,4 +233,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def clipCountInScene(self, scene_index):
         return len(self.getScene(scene_index)["clips"])
 
+    @Slot(int, int, result=None)
+    def copyScene(self, from_scene, to_scene):
+        for i in range(0, self.__song__.tracksModel.count):
+            track = self.__song__.tracksModel.getTrack(i)
+            track.clipsModel.getClip(to_scene).copyFrom(track.clipsModel.getClip(from_scene))
+
     clipCountChanged = Signal()

@@ -40,8 +40,12 @@ Zynthian.ScreenPage {
     property alias zlScreen: root
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property QtObject copySourceObj: null
-    property QtObject lastSelectedObj: null
+
+    // Used to temporarily cache clip/track object to be copied
+    property var copySourceObj: null
+
+    // Used to temporarily store lsat clicked object by user
+    property var lastSelectedObj: null
 
     title: qsTr("Zynthiloops")
     screenId: "zynthiloops"
@@ -518,6 +522,11 @@ Zynthian.ScreenPage {
                             highlighted: root.song.scenesModel.selectedSceneIndex === index
 
                             onPressed: {
+                                root.lastSelectedObj = {
+                                    className: "zynthiloops_scene",
+                                    sceneIndex: index
+                                }
+
                                 // If Mixer is not open, open mixer first
                                 if (bottomStack.currentIndex !== 1) {
                                     bottomStack.currentIndex = 1
@@ -909,6 +918,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    enabled: root.lastSelectedObj && root.lastSelectedObj.className
                                     text: qsTr("Copy %1").arg(root.lastSelectedObj && root.lastSelectedObj.className
                                                               ? root.lastSelectedObj.className === "zynthiloops_clip"
                                                                 ? qsTr("Clip")
@@ -923,8 +933,8 @@ Zynthian.ScreenPage {
                                         // Check and set copy source object from bottombar as bottombar
                                         // controlObj is the current focused/selected object by user
 
-                                        console.log("Copy", root.copySourceObj)
                                         root.copySourceObj = root.lastSelectedObj
+                                        console.log("Copy", root.copySourceObj)
                                     }
                                 }
 
@@ -945,7 +955,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
-                                    enabled: root.copySourceObj != null
+                                    enabled: root.copySourceObj != null && root.copySourceObj && root.copySourceObj.className
                                     text: qsTr("Paste %1").arg(root.copySourceObj && root.copySourceObj.className
                                                                    ? root.copySourceObj.className === "zynthiloops_clip"
                                                                        ? qsTr("Clip")
@@ -966,6 +976,7 @@ Zynthian.ScreenPage {
                                             root.copySourceObj = null
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_scene") {
                                             // Copy Scene
+                                            root.song.scenesModel.copyScene(root.copySourceObj.sceneIndex, root.song.scenesModel.selectedSceneIndex)
                                             root.copySourceObj = null
                                         }
                                     }

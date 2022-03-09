@@ -791,7 +791,7 @@ Zynthian.BasePlayGrid {
                         Connections {
                             target: _private
                             onActivePatternChanged: {
-                                patternsMenuListView.positionViewAtIndex(_private.activePattern, ListView.Contain);
+                                patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePattern / 5), ListView.Beginning);
                             }
                         }
 
@@ -804,7 +804,7 @@ Zynthian.BasePlayGrid {
                             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
                             property QtObject associatedTrack: null
                             property int associatedTrackIndex: -1
-                            height: ListView.view.height * 0.19
+                            height: ListView.view.height * 0.2
                             width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
                             Kirigami.Theme.inherit: false
                             Kirigami.Theme.colorSet: Kirigami.Theme.Button

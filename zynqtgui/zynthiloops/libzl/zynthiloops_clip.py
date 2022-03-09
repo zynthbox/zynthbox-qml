@@ -70,7 +70,7 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
-        self.sampleset_path = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{self.row + 1}'
+        self.sampleset_path = Path(self.__song__.sketch_folder) / 'wav' / 'samples' / f'sampleset.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.track = None
@@ -405,7 +405,7 @@ class zynthiloops_clip(QObject):
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            self.sampleset_path = Path(self.__song__.sketch_folder) / 'samples' / f'sampleset.{new_index + 1}'
+            self.sampleset_path = Path(self.__song__.sketch_folder) / 'wav' / 'samples' / f'sampleset.{new_index + 1}'
         except:
             pass
         self.row_index_changed.emit()
@@ -580,18 +580,18 @@ class zynthiloops_clip(QObject):
 
         self.__read_metadata__()
 
-        self.__length__ = int(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
+        self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__is_playing__ = False
         self.__is_recording__ = False
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
-        self.__loop_delta__ = 0.0
+        self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))
         self.__time__ = float(self.__get_metadata_prop__("ZYNTHBOX_SPEED", self.__initial_time__))
         self.__gain__ = float(self.__get_metadata_prop__("ZYNTHBOX_GAIN", self.__initial_gain__))
         self.__bpm__ = 0
         self.__progress__ = 0.0
         self.__audio_level__ = -200
-        self.__snap_length_to_beat__ = True
+        self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
 
         self.reset_beat_count()
         self.track_volume_changed()
@@ -844,6 +844,8 @@ class zynthiloops_clip(QObject):
         self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
         self.write_metadata("ZYNTHBOX_SPEED", [str(self.__time__)])
         self.write_metadata("ZYNTHBOX_GAIN", [str(self.__gain__)])
+        self.write_metadata("ZYNTHBOX_LOOPDELTA", [str(self.__loop_delta__)])
+        self.write_metadata("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", [str(self.__snap_length_to_beat__)])
 
     @Slot(QObject)
     def copyFrom(self, clip):

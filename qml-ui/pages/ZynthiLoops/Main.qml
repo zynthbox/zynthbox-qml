@@ -955,7 +955,26 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
-                                    enabled: root.copySourceObj != null && root.copySourceObj && root.copySourceObj.className
+                                    enabled: {
+                                        if (root.copySourceObj != null &&
+                                            root.copySourceObj &&
+                                            root.copySourceObj.className) {
+
+                                            // Check if source and destination are same
+                                            if (root.copySourceObj.className === "zynthiloops_clip" &&
+                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)) {
+                                                return true
+                                            } else if (root.copySourceObj.className === "zynthiloops_track" &&
+                                                       root.copySourceObj.id !== zynthian.session_dashboard.selectedTrack) {
+                                                return true
+                                            } else if (root.copySourceObj.className === "zynthiloops_scene" &&
+                                                       root.copySourceObj.sceneIndex !== root.song.scenesModel.selectedSceneIndex) {
+                                                return true
+                                            }
+                                        }
+
+                                        return false
+                                    }
                                     text: qsTr("Paste %1").arg(root.copySourceObj && root.copySourceObj.className
                                                                    ? root.copySourceObj.className === "zynthiloops_clip"
                                                                        ? qsTr("Clip")

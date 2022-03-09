@@ -188,7 +188,7 @@ QQC2.AbstractButton {
     }
 
     background: Rectangle {
-        color: clipToCopy === track.sceneClip ? "#2196f3" : root.backgroundColor
+        color: copySourceObj === track.sceneClip ? "#2196f3" : root.backgroundColor
 
         border.width: 1
         border.color: root.highlightColor

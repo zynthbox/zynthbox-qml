@@ -40,6 +40,9 @@ Zynthian.ScreenPage {
 
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject clipToCopy: null
+    property QtObject trackToCopy: null
+    property QtObject sceneToCopy: null
 
     title: qsTr("Zynthiloops")
     screenId: "zynthiloops"
@@ -899,18 +902,68 @@ Zynthian.ScreenPage {
                                 anchors.fill: parent
                                 spacing: 1
 
+                                // Common copy button to set the object to copy
                                 QQC2.Button {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
                                     text: qsTr("Copy")
+                                    visible: root.clipToCopy == null
+                                    onClicked: {
+                                        // Check and set copy source object from bottombar as bottombar
+                                        // controlObj is the current focused/selected object by user
+
+                                        if (bottomBar.controlType === BottomBar.ControlType.Clip ||
+                                            bottomBar.controlType === BottomBar.ControlType.Pattern) {
+                                            root.clipToCopy = bottomBar.controlObj
+                                            root.trackToCopy = null
+                                            root.sceneToCopy = null
+                                        } else if (bottomBar.controlType === BottomBar.ControlType.Track) {
+                                            root.clipToCopy = null
+                                            root.trackToCopy = bottomBar.controlObj
+                                            root.sceneToCopy = null
+                                        } /*else if () {
+                                            root.clipToCopy = null
+                                            root.trackToCopy = null
+                                            root.sceneToCopy = null
+                                        } */
+                                    }
                                 }
 
+                                // Common cancel button to cancel copy
                                 QQC2.Button {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    text: qsTr("Cancel Copy")
+                                    visible: root.clipToCopy != null
+                                    onClicked: {
+                                        root.clipToCopy = null
+                                        root.trackToCopy = null
+                                        root.sceneToCopy = null
+                                    }
+                                }
+
+                                // Common button to paste object
+                                QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    enabled: root.clipToCopy != null || root.trackToCopy != null || root.sceneToCopy != null
                                     text: qsTr("Paste")
+                                    onClicked: {
+                                        if (root.clipToCopy != null) {
+                                            // Copy Clip
+                                            root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol).copyFrom(root.clipToCopy)
+                                            root.clipToCopy = null
+                                        } else if (root.trackToCopy != null) {
+                                            // Copy Track
+                                            root.trackToCopy = null
+                                        } else if (root.sceneToCopy != null) {
+                                            // Copy Scene
+                                            root.sceneToCopy = null
+                                        }
+                                    }
                                 }
 
                                 QQC2.Button {

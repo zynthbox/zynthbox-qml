@@ -186,7 +186,6 @@ Zynthian.BasePlayGrid {
         property int sequencePatternCount: 10
         property int activeBarModelWidth: 16
         property QtObject sequence
-        property QtObject gridModel: sequence && activePattern > -1 ? component.getModel("pattern grid model " + activePattern) : null;
         property int activePattern: sequence ? sequence.activePattern : -1
         property QtObject activePatternModel: sequence ? sequence.activePatternObject : null;
         property QtObject activeBarModel: activePatternModel && activeBar > -1 && activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
@@ -199,7 +198,7 @@ Zynthian.BasePlayGrid {
         // This is the top bank we have available in any pattern (that is, the upper limit for any pattern's bankOffset value)
         property int bankLimit: 1
         property var clipBoard
-        property int octave: 3
+        property int octave: 4
 
         // Properties inherent to the active pattern (set these through component.setPatternProperty)
         property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
@@ -255,44 +254,24 @@ Zynthian.BasePlayGrid {
             //filterRowEnd: activeBar
         //}
 
-        function updateCurrentGrid() {
-            if (gridModel) {
-                if (gridModel.rows === 0) {
-                    populateGridTimer.restart();
-                } else {
-                    for (var i = 0; i < gridModel.rows; ++i) {
-                        var row = gridModel.getRow(i);
-                        for (var j = 0; j < row.length; ++j) {
-                            var note = row[j];
-                            if (note) {
-                                if (note.midiChannel !== activePattern.midiChannel) {
-                                    populateGridTimer.restart();
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         onOctaveChanged: {
-            updateCurrentGrid();
+            if (activePatternModel) {
+                activePatternModel.gridModelStartNote = _private.octave * 12;
+                activePatternModel.gridModelEndNote = activePatternModel.gridModelStartNote + 16;
+            }
         }
 
         onActivePatternChanged:{
             updateTrack();
-            updateCurrentGrid();
+        }
+        onActivePatternModelChanged: {
+            if (activePatternModel) {
+                _private.octave = activePatternModel.gridModelStartNote / 12;
+            }
         }
 
         onLayerChanged: {
             updateTrack();
-            updateCurrentGrid();
-        }
-
-        onGridModelChanged: {
-            updateTrack();
-            updateCurrentGrid();
         }
 
         /**
@@ -366,22 +345,12 @@ Zynthian.BasePlayGrid {
         onConnectedSoundChanged: _private.updateTrack()
     }
     Connections {
-        target: _private.sequence
-        onModelReset: _private.updateCurrentGrid();
-    }
-    Connections {
-        target: _private.activePatternModel
-        onLastModifiedChanged: _private.updateCurrentGrid();
-    }
-    Connections {
         target: ZynQuick.PlayGridManager
-        onCurrentMidiChannelChanged: _private.updateCurrentGrid();
     }
     Connections {
         target: zynthian.zynthiloops
         onSongChanged: {
             _private.adoptSequence();
-            _private.updateCurrentGrid();
             _private.updateTrack();
         }
     }
@@ -392,11 +361,6 @@ Zynthian.BasePlayGrid {
     // on component completed
     onInitialize: {
         _private.adoptSequence();
-        if (_private.gridModel.rows === 0 && _private.sequence != null) {
-            for (var i = 0; i < _private.sequence.rowCount(); ++i) {
-                component.populateGrid(component.getModel("pattern grid model " + i), i);
-            }
-        }
     }
     Connections {
         target: ZynQuick.PlayGridManager
@@ -450,49 +414,6 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    Timer {
-        id: populateGridTimer
-        repeat: false
-        interval: 10
-        onTriggered: {
-            component.populateGrid(_private.gridModel, _private.activePattern);
-        }
-    }
-
-    // this is where we populate the grid using the component settingsStore rows / columns propterties
-    function populateGrid(model, patternIndex){
-        model.clear()
-
-        var startingNote = _private.octave * 12;
-        var rows = 4;
-        var columns = 4;
-
-        if (_private.sequence) {
-            var pattern = _private.sequence.get(patternIndex);
-            if (pattern) {
-                var midiChannel = pattern.layer;
-                console.log("Populating grid for pattern " + patternIndex + " which has midi channel " + midiChannel);
-                for (var row = 0; row < rows; ++row){
-
-                    var rowStartingNote = startingNote + (row * columns);
-                    var rowEndingNote = rowStartingNote + columns;
-                    var notes = [];
-
-                    for(var col = rowStartingNote; col < rowEndingNote; ++col) {
-                        var note = component.getNote(col, midiChannel);
-                        notes.push(note);
-                    }
-
-                    model.addRow(notes);
-                }
-            } else {
-                console.debug("Attempted to populate grid for a nonexistent pattern, given index", patternIndex);
-            }
-        } else {
-            console.debug("Attempted to populate grid without a sequence loaded");
-        }
-    }
-
     Zynthian.SequenceLoader {
         id: sequenceLoader
     }
@@ -512,7 +433,7 @@ Zynthian.BasePlayGrid {
                 anchors.fill: parent;
 
                 DrumsGrid {
-                    model: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.gridModel
+                    model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
                 }
@@ -837,7 +758,6 @@ Zynthian.BasePlayGrid {
                                 target: patternsMenuItem.thisPattern
                                 onLayerChanged: {
                                     patternsMenuItem.adoptTrackLayer();
-                                    patternGridUpdater.restart();
                                 }
                             }
                             Connections {
@@ -856,13 +776,6 @@ Zynthian.BasePlayGrid {
                             }
                             Component.onCompleted: {
                                 adoptTrackLayer();
-                            }
-                            Timer {
-                                id: patternGridUpdater;  interval: 1; repeat: false; running: false
-                                onTriggered: {
-                                    var gridModel = component.getModel("pattern grid model " + patternsMenuItem.thisPatternIndex);
-                                    component.populateGrid(gridModel, patternsMenuItem.thisPatternIndex);
-                                }
                             }
                             MouseArea {
                                 anchors.fill: parent

@@ -75,7 +75,7 @@ QQC2.ScrollView {
         keyNavigationWraps: false
         clip: true
         currentIndex: root.selector.current_index
-        cacheBuffer: delegate.height*2
+        cacheBuffer: Kirigami.Units.gridUnit*2
         highlightMoveDuration: 0
         highlightMoveVelocity: -1
 

@@ -345,9 +345,6 @@ Zynthian.BasePlayGrid {
         onConnectedSoundChanged: _private.updateTrack()
     }
     Connections {
-        target: ZynQuick.PlayGridManager
-    }
-    Connections {
         target: zynthian.zynthiloops
         onSongChanged: {
             _private.adoptSequence();

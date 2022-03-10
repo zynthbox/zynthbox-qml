@@ -39,11 +39,19 @@ RowLayout {
     property Item playgrid
     property var row: index
     Layout.margins: 2.5
+    signal refetchNote()
     Repeater {
         model: component.model.columnCount(component.model.index(index, 0))
         delegate: Zynthian.NotePad {
+            id: noteDelegate;
             positionalVelocity: component.positionalVelocity
             note: component.model.data(component.model.index(row, index), component.model.roles['note'])
+            Connections {
+                target: component
+                onRefetchNote: {
+                    noteDelegate.note = component.model.data(component.model.index(row, index), component.model.roles['note'])
+                }
+            }
         }
     }
 }

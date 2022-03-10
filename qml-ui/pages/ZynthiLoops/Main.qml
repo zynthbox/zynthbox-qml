@@ -713,22 +713,7 @@ Zynthian.ScreenPage {
                                 delegate: ClipCell {
                                     id: clipCell
 
-//                                     Component.onCompleted: {
-//                                         console.log("^^^ Clip Cell Created :", rowIndex, index)
-//                                     }
-//                                     Component.onDestruction: {
-//                                         console.log("$$$ Clip Cell Destroyed :", rowIndex, index)
-//                                     }
-
                                     backgroundColor: "#000000"
-                                    highlightColor: !highlighted && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0
-                                                        ? Qt.rgba(255,255,255,0.6)
-                                                        : highlighted
-                                                            ? track.sceneClip.inCurrentScene
-                                                                ? Kirigami.Theme.highlightColor
-                                                                : "#aaf44336"
-                                                            : "transparent"
-                                    highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack && track.sceneClip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === track.sceneClip
                                     onHighlightedChanged: {
                                         Qt.callLater(function () {
                                             //console.log("Clip : (" + track.sceneClip.row+", "+track.sceneClip.col+")", "Selected Track :"+ zynthian.session_dashboard.selectedTrack)

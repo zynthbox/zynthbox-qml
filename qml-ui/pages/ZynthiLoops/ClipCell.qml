@@ -37,10 +37,18 @@ QQC2.AbstractButton {
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property int colIndex: index
     property bool isPlaying
-    property bool highlighted: false
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property color highlightColor
+    property bool highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack && track.sceneClip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === track.sceneClip
+    property color highlightColor: !highlighted &&
+                                   track.sceneClip.inCurrentScene &&
+                                   ((track.sceneClip.path && track.sceneClip.path.length > 0) || patternHasNotes)
+                                       ? Qt.rgba(255,255,255,0.6)
+                                       : highlighted
+                                           ? track.sceneClip.inCurrentScene
+                                               ? Kirigami.Theme.highlightColor
+                                               : "#aaf44336"
+                                           : "transparent"
     property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
 
     // Hack to bind to last modified
@@ -118,6 +126,7 @@ QQC2.AbstractButton {
         Image {
             id: patternVisualiser
             anchors.fill: parent
+            anchors.margins: 2
             smooth: false
 
             visible: root.isInScene &&

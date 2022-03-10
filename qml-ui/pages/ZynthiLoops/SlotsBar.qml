@@ -271,9 +271,11 @@ Rectangle {
 
                                                 QQC2.Label {
                                                     anchors {
-                                                        centerIn: parent
-                                                        left: parent.left + 10
-                                                        right: parent.right - 10
+                                                        verticalCenter: parent.verticalCenter
+                                                        left: parent.left
+                                                        leftMargin: 10
+                                                        right: parent.right
+                                                        rightMargin: 10
                                                     }
                                                     font.pointSize: 10
                                                     text: parent.display

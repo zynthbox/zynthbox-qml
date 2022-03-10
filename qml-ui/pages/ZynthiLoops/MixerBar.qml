@@ -354,7 +354,7 @@ Rectangle {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
                         Layout.leftMargin: 2
-                        Layout.preferredWidth: privateProps.cellWidth*2 - 2
+                        Layout.preferredWidth: privateProps.cellWidth*2 - 10
                         Layout.bottomMargin: 5
 
                         VolumeControl {

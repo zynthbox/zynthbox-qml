@@ -25,20 +25,6 @@ Zynthian.Card {
         }
     }
 
-    onChainedSoundsChanged: {
-        chainedSoundsRepeaterTimer.restart()
-    }
-
-    Timer {
-        id: chainedSoundsRepeaterTimer
-        interval: 500
-        repeat: false
-        onTriggered: {
-            chainedSoundsRepeater.model = [];
-            chainedSoundsRepeater.model = chainedSounds;
-        }
-    }
-
     // When enabled, listen for layer popup rejected to re-select connected sound if any
     Connections {
         id: layerPopupRejectedConnections
@@ -224,10 +210,15 @@ Zynthian.Card {
 
         Repeater {
             id: chainedSoundsRepeater
+            model: root.chainedSounds.length //performace optimization, this length never changes so we never recreate the items
             delegate: Rectangle {
                 id: soundDelegate
 
-                property int chainedSound: modelData
+                property int chainedSound: root.chainedSounds[index]
+                Connections {
+                    target: root
+                    onChainedSoundsChanged: soundDelegate.chainedSound = root.chainedSounds[index]
+                }
 
                 function openSynthPopupOrGotoLibrary() {
                     if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {

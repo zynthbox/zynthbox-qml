@@ -42,7 +42,9 @@ QQC2.AbstractButton {
     property real backgroundOpacity: 0.05
     property color highlightColor
     property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
-    property bool patternHasNotes: pattern.bankHasNotes(0) && pattern.lastModified
+
+    // Hack to bind to last modified
+    property bool patternHasNotes: pattern.lastModified > -1 ? pattern.bankHasNotes(0) : pattern.bankHasNotes(0)
 
     property QtObject sequence
     property QtObject pattern
@@ -152,7 +154,10 @@ QQC2.AbstractButton {
                      track.connectedPattern >= 0 &&
                      root.patternHasNotes
             text: qsTr("%1%2")
-                    .arg(root.patternHasNotes && sequence && sequence.isPlaying
+                    .arg(root.patternHasNotes &&
+                         sequence && sequence.isPlaying &&
+                         pattern.bankPlaybackPosition >= 0 &&
+                         zynthian.zynthiloops.isMetronomeRunning
                             ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/"
                             : "")
                     .arg(pattern.availableBars*4)

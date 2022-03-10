@@ -107,7 +107,7 @@ Zynthian.ScreenPage {
 
         Kirigami.Action {
             id: sceneActionBtn
-            text: qsTr("Scenes")
+            text: qsTr("Slots")
             checkable: true
             onCheckedChanged: updateLedVariablesTimer.restart()
             onTriggered: {
@@ -1035,7 +1035,7 @@ Zynthian.ScreenPage {
 //                    Layout.fillHeight: true
 //                }
                 SlotsBar {
-                    id: scenesBar
+                    id: slotsBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }

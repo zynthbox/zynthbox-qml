@@ -102,27 +102,39 @@ Rectangle {
                     Layout.fillHeight: true
                     spacing: 1
 
+                    QQC2.ButtonGroup {
+                        buttons: buttonsColumn.children
+                    }
+
                     ColumnLayout {
+                        id: buttonsColumn
                         Layout.preferredWidth: privateProps.cellWidth + 6
                         Layout.maximumWidth: privateProps.cellWidth + 6
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
 
                         QQC2.Button {
+                            id: synthsButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            checkable: true
+                            checked: true
                             text: qsTr("Synths")
                         }
 
                         QQC2.Button {
+                            id: samplesButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            checkable: true
                             text: qsTr("Samples")
                         }
 
                         QQC2.Button {
+                            id: fxButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            checkable: true
                             text: qsTr("FX")
                         }
                     }
@@ -158,11 +170,18 @@ Rectangle {
 
                                 bottomStack.currentIndex = 0
                                 mixerActionBtn.checked = false;
+                                sceneActionBtn.checked = false;
                             }
                         }
 
                         delegate: Rectangle {
+                            id: trackDelegate
+
                             property bool highlighted: index === zynthian.session_dashboard.selectedTrack
+                            property int selectedRow: 0
+                            property int trackIndex: index
+                            property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
+
                             width: privateProps.cellWidth
                             height: ListView.view.height
                             color: highlighted ? "#22ffffff" : "transparent"
@@ -185,6 +204,8 @@ Rectangle {
                                 ColumnLayout {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                    Layout.topMargin: Kirigami.Units.gridUnit * 0.7
+                                    Layout.bottomMargin: Kirigami.Units.gridUnit * 0.7
                                     spacing: Kirigami.Units.gridUnit * 0.7
 
                                     Repeater {
@@ -195,19 +216,68 @@ Rectangle {
                                             Layout.alignment: Qt.AlignVCenter
                                             Layout.leftMargin: 4
                                             Layout.rightMargin: 4
+                                            opacity: trackDelegate.highlighted && trackDelegate.selectedRow === index ? 1 : 0.3
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                    if (zynthian.session_dashboard.selectedTrack !== trackDelegate.trackIndex ||
+                                                        trackDelegate.selectedRow !== index) {
+                                                        trackDelegate.selectedRow = index
+                                                        zynthian.session_dashboard.selectedTrack = trackDelegate.trackIndex;
+                                                    } else {
+
+                                                    }
+                                                }
+                                                z: 10
+                                            }
 
                                             Rectangle {
+                                                property string text: trackDelegate.track.chainedSounds[index] > -1
+                                                                        ? synthsButton.checked
+                                                                            ? trackDelegate.track.getLayerNameByMidiChannel(trackDelegate.track.chainedSounds[index]).split(">")[0]
+                                                                            : fxButton.checked
+                                                                                ? trackDelegate.track.getEffectsNameByMidiChannel(trackDelegate.track.chainedSounds[index])
+                                                                                : samplesButton.checked
+                                                                                    ? trackDelegate.track.samples[index].path && trackDelegate.track.samples[index].path.length > 0
+                                                                                        ? trackDelegate.track.samples[index].path.split("/").pop()
+                                                                                        : ""
+                                                                                    : ""
+                                                                        : ""
+                                                property string spacing: "      "
+                                                property string combined: text + spacing
+                                                property string display: combined.substring(step) + combined.substring(0, step)
+                                                property int step: 0
+
+                                                clip: true
                                                 anchors.centerIn: parent
                                                 width: parent.width
-                                                height: Kirigami.Units.gridUnit * 2
+                                                height: Kirigami.Units.gridUnit * 1.5
 
                                                 Kirigami.Theme.inherit: false
                                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                                 color: Kirigami.Theme.backgroundColor
 
-                                                border.color: "#ff999999"
+                                                border.color: trackDelegate.highlighted && trackDelegate.selectedRow === index ? Kirigami.Theme.highlightColor : "#ff999999"
                                                 border.width: 1
                                                 radius: 4
+
+                                                Timer {
+                                                  interval: 200
+                                                  running: true
+                                                  repeat: true
+                                                  onTriggered: parent.step = (parent.step + 1) % parent.combined.length
+                                                }
+
+                                                QQC2.Label {
+                                                    anchors {
+                                                        centerIn: parent
+                                                        left: parent.left + 10
+                                                        right: parent.right - 10
+                                                    }
+                                                    font.pointSize: 10
+                                                    text: parent.display
+                                                }
                                             }
                                         }
                                     }

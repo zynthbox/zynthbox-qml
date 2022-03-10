@@ -33,6 +33,7 @@ import Qt.labs.folderlistmodel 2.11
 import Qt.labs.handlers 1.0
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 import JuceGraphics 1.0
 
 // GridLayout so TabbedControlView knows how to navigate it
@@ -366,6 +367,21 @@ GridLayout {
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
                 x: waveBar.controlObj.progress/waveBar.controlObj.duration * parent.width
+            }
+
+            // Slice progress lines
+            Repeater {
+                property QtObject cppClipObject: ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId);
+                model: (waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
+                    ? cppClipObject.playbackPositions
+                    : 0
+                delegate: Rectangle {
+                    anchors.bottom: parent.bottom
+                    color: Kirigami.Theme.highlightColor
+                    width: 2
+                    height: parent.height / 2
+                    x: model.positionProgress * parent.width
+                }
             }
 
             // Create and place beat lines when trackAudioType !== "sample-slice"

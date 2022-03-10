@@ -67,7 +67,11 @@ class zynthiloops_track(QObject):
         for i in range(0, 5):
             self.__samples__.append(zynthiloops_clip(self.id, -1, self.__song__, self, True))
 
-        self.__previous_midi_out = []
+        # Small array in which to keep any midi-outs that we might need to restore again
+        # when switching between track types. This is done per-chained-sound, so...
+        self.__previous_midi_out__ = []
+        for i in range(len(self.__chained_sounds__)):
+            self.__previous_midi_out__.append([])
         self.__track_audio_type__ = "synth"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
@@ -589,21 +593,17 @@ class zynthiloops_track(QObject):
     def set_track_audio_type(self, type):
         logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
         if type != self.__track_audio_type__:
-            if self.get_connected_sound() > -1:
-                layer  = self.zyngui.screens['layer'].get_midichain_root_by_chan(self.get_connected_sound())
+            for sound in self.__chained_sounds__:
+                layer = self.zyngui.screens['layer'].get_midichain_root_by_chan(sound)
                 if layer is not None:
                     if type == "synth" or type == "sample-loop":
-                        # Touch of heuristic nonsense:
-                        # If we've explicitly set other midi out stuff on this layer, don't change it here
                         if layer.get_midi_out() == []:
-                            layer.set_midi_out(self.__previous_midi_out)
-                        self.__previous_midi_out = []
+                            layer.set_midi_out(self.__previous_midi_out__[sound])
+                        self.__previous_midi_out__[sound] = []
                         layer.reset_audio_out()
                     else:
-                        # Touch of heuristic nonsense:
-                        # If we've already saved something in there and not cleared it, don't overwrite what's there
-                        if (self.__previous_midi_out == []):
-                            self.__previous_midi_out = layer.get_midi_out()
+                        if self.__previous_midi_out__[sound] == []:
+                            self.__previous_midi_out__[sound] = layer.get_midi_out()
                         layer.mute_midi_out()
                         layer.mute_audio_out()
             self.__track_audio_type__ = type

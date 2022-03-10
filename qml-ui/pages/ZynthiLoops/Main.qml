@@ -756,7 +756,7 @@ Zynthian.ScreenPage {
 
                                     Timer {
                                         id: colorTimer
-                                        interval: 50
+                                        interval: 0
                                         onTriggered: {
                                             // update color
                                             var hasNotes = false;
@@ -1071,7 +1071,6 @@ Zynthian.ScreenPage {
                                     if (layerIndex < 0) {
                                         layerIndex = i
                                     }
-
                                     count++;
                                 }
                             }

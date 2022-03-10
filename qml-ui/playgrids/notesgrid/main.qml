@@ -30,6 +30,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Zynthian.BasePlayGrid {
     id: component
@@ -160,8 +161,11 @@ Zynthian.BasePlayGrid {
     }
 
     Connections {
-        target: zynthian.fixed_layers
-        onList_updated: populateGridTimer.restart();
+        target: ZynQuick.PlayGridManager
+        onCurrentMidiChannelChanged: {
+            Qt.callLater(_private.model.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+            Qt.callLater(_private.miniGridModel.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+        }
     }
 
     Timer {
@@ -186,10 +190,17 @@ Zynthian.BasePlayGrid {
             Repeater {
                 model: _private.model
                 delegate: NotesGridDelegate {
+                    id: gridDelegate;
                     model: _private.model
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
+                    Connections {
+                        target: _private.model;
+                        onDataChanged: {
+                            gridDelegate.refetchNote();
+                        }
+                    }
                 }
             }
         }
@@ -204,10 +215,17 @@ Zynthian.BasePlayGrid {
                 id: miniGridRepeater
                 model: _private.miniGridModel
                 delegate: NotesGridDelegate {
+                    id: miniGridDelegate
                     model: _private.miniGridModel
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
+                    Connections {
+                        target: _private.miniGridModel;
+                        onDataChanged: {
+                            miniGridDelegate.refetchNote();
+                        }
+                    }
                 }
             }
         }

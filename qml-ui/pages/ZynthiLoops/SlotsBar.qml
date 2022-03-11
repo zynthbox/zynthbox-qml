@@ -27,7 +27,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
@@ -80,6 +80,7 @@ Rectangle {
         anchors.topMargin: Kirigami.Units.gridUnit*0.3
 
         readonly property QtObject song: zynthian.zynthiloops.song
+        property QtObject selectedSlotRowItem
 
         ColumnLayout {
             Layout.fillHeight: true
@@ -189,6 +190,12 @@ Rectangle {
                             border.width: 1
                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
+                            onHighlightedChanged: {
+                                if (highlighted) {
+                                    root.selectedSlotRowItem = trackDelegate
+                                }
+                            }
+
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
@@ -223,6 +230,7 @@ Rectangle {
                                                 onClicked: {
                                                     if (zynthian.session_dashboard.selectedTrack !== trackDelegate.trackIndex ||
                                                         trackDelegate.selectedRow !== index) {
+                                                        tracksSlotsRow.currentIndex = index
                                                         trackDelegate.selectedRow = index
                                                         zynthian.session_dashboard.selectedTrack = trackDelegate.trackIndex;
                                                     } else {
@@ -281,12 +289,97 @@ Rectangle {
                         }
                     }
 
-                    Item {
+                    ColumnLayout {
                         Layout.fillWidth: false
-                        Layout.fillHeight: true
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignTop
                         Layout.leftMargin: 2
                         Layout.preferredWidth: privateProps.cellWidth*2 - 10
                         Layout.bottomMargin: 5
+
+                        QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: synthsButton.checked
+                            font.pointSize: 14
+                            text: qsTr("Synth")
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            font.pointSize: 14
+                            visible: fxButton.checked
+                            text: qsTr("Fx")
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            font.pointSize: 14
+                            visible: samplesButton.checked
+                            text: qsTr("Sample")
+                        }
+
+                        Kirigami.Separator {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.preferredHeight: 1
+                        }
+
+                        QQC2.Label {
+                            id: detailsText
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            wrapMode: "WrapAnywhere"
+                        }
+
+                        Connections {
+                            target: zynthian.session_dashboard
+                            onSelectedTrackChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
+                            enabled: root.selectedSlotRowItem != null
+                            target: root.selectedSlotRowItem
+                            onSelectedRowChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
+                            enabled: root.selectedSlotRowItem != null
+                            target: root.selectedSlotRowItem.track
+                            onChainedSoundsChanged: detailsTextTimer.restart()
+                            onSamplesChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
+                            target: synthsButton
+                            onCheckedChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
+                            target: fxButton
+                            onCheckedChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
+                            target: samplesButton
+                            onCheckedChanged: detailsTextTimer.restart()
+                        }
+
+                        Timer {
+                            id: detailsTextTimer
+                            interval: 0
+                            repeat: false
+                            onTriggered: {
+                                detailsText.text = root.selectedSlotRowItem
+                                                    ? synthsButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow])
+                                                        ? root.selectedSlotRowItem.track.getLayerNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]).split(">")[0]
+                                                        : fxButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow])
+                                                            ? root.selectedSlotRowItem.track.getEffectsNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow])
+                                                            : samplesButton.checked && root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.selectedRow].path
+                                                                ? root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.selectedRow].path.split("/").pop()
+                                                                : ""
+                                                    : ""
+                            }
+                        }
                     }
 
                     Kirigami.Separator {

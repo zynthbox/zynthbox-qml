@@ -226,28 +226,20 @@ Rectangle {
                                                         trackDelegate.selectedRow = index
                                                         zynthian.session_dashboard.selectedTrack = trackDelegate.trackIndex;
                                                     } else {
-
+                                                        console.log(trackDelegate.track.samples[index].path, trackDelegate.track.samples[index].path.split("/").pop())
                                                     }
                                                 }
                                                 z: 10
                                             }
 
                                             Rectangle {
-                                                property string text: trackDelegate.track.chainedSounds[index] > -1
-                                                                        ? synthsButton.checked
-                                                                            ? trackDelegate.track.getLayerNameByMidiChannel(trackDelegate.track.chainedSounds[index]).split(">")[0]
-                                                                            : fxButton.checked
-                                                                                ? trackDelegate.track.getEffectsNameByMidiChannel(trackDelegate.track.chainedSounds[index])
-                                                                                : samplesButton.checked
-                                                                                    ? trackDelegate.track.samples[index].path && trackDelegate.track.samples[index].path.length > 0
-                                                                                        ? trackDelegate.track.samples[index].path.split("/").pop()
-                                                                                        : ""
-                                                                                    : ""
-                                                                        : ""
-                                                property string spacing: "      "
-                                                property string combined: text + spacing
-                                                property string display: combined.substring(step) + combined.substring(0, step)
-                                                property int step: 0
+                                                property string text: synthsButton.checked && trackDelegate.track.chainedSounds[index] > -1 && trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[index])
+                                                                        ? trackDelegate.track.getLayerNameByMidiChannel(trackDelegate.track.chainedSounds[index]).split(">")[0]
+                                                                        : fxButton.checked && trackDelegate.track.chainedSounds[index] > -1 && trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[index])
+                                                                            ? trackDelegate.track.getEffectsNameByMidiChannel(trackDelegate.track.chainedSounds[index])
+                                                                            : samplesButton.checked && trackDelegate.track.samples[index].path
+                                                                                ? trackDelegate.track.samples[index].path.split("/").pop()
+                                                                                : ""
 
                                                 clip: true
                                                 anchors.centerIn: parent
@@ -262,13 +254,6 @@ Rectangle {
                                                 border.width: 1
                                                 radius: 4
 
-                                                Timer {
-                                                  interval: 200
-                                                  running: true
-                                                  repeat: true
-                                                  onTriggered: parent.step = (parent.step + 1) % parent.combined.length
-                                                }
-
                                                 QQC2.Label {
                                                     anchors {
                                                         verticalCenter: parent.verticalCenter
@@ -278,7 +263,8 @@ Rectangle {
                                                         rightMargin: 10
                                                     }
                                                     font.pointSize: 10
-                                                    text: parent.display
+                                                    elide: "ElideRight"
+                                                    text: parent.text
                                                 }
                                             }
                                         }

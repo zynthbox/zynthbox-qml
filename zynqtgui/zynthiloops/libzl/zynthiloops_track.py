@@ -187,7 +187,7 @@ class zynthiloops_track(QObject):
             self.set_chained_sounds(self.__chained_sounds__)
         if "trackAudioType" in obj:
             self.__track_audio_type__ = obj["trackAudioType"]
-            self.set_track_audio_type(self.__track_audio_type__)
+            self.set_track_audio_type(self.__track_audio_type__, True)
         if "clips" in obj:
             self.__clips_model__.deserialize(obj["clips"])
         if "layers_snapshot" in obj:
@@ -590,9 +590,9 @@ class zynthiloops_track(QObject):
     def get_track_audio_type(self):
         return self.__track_audio_type__
 
-    def set_track_audio_type(self, type):
+    def set_track_audio_type(self, type:str, force_set=False):
         logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
-        if type != self.__track_audio_type__:
+        if force_set or type != self.__track_audio_type__:
             for sound in self.__chained_sounds__:
                 layer = self.zyngui.screens['layer'].get_midichain_root_by_chan(sound)
                 if layer is not None:
@@ -608,7 +608,8 @@ class zynthiloops_track(QObject):
                         layer.mute_audio_out()
             self.__track_audio_type__ = type
             self.track_audio_type_changed.emit()
-            self.__song__.schedule_save()
+            if not force_set:
+                self.__song__.schedule_save()
 
     track_audio_type_changed = Signal()
 

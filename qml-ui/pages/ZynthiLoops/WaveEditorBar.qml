@@ -375,12 +375,16 @@ GridLayout {
                 model: (waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
                     ? cppClipObject.playbackPositions
                     : 0
-                delegate: Rectangle {
-                    anchors.bottom: parent.bottom
-                    color: Kirigami.Theme.highlightColor
-                    width: 2
-                    height: parent.height / 2
-                    x: model.positionProgress * parent.width
+                delegate: Item {
+                    Rectangle {
+                        anchors.centerIn: parent
+                        rotation: 45
+                        color: Kirigami.Theme.highlightColor
+                        width: Kirigami.Units.largeSpacing
+                        height:  Kirigami.Units.largeSpacing
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Math.floor(model.positionProgress * parent.width)
                 }
             }
 

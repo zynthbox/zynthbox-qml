@@ -171,7 +171,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        self.zyngui.session_dashboard.set_selected_track(self.__zselector[0].value)
+        if self.zyngui.session_dashboard.get_selected_track() != self.__zselector[0].value:
+            logging.error(f"Setting track from zyncoder {self.__zselector[0].value}")
+            self.zyngui.session_dashboard.set_selected_track(self.__zselector[0].value)
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_set_preset(self):
@@ -309,14 +312,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 preset_index = 0
 
             if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'track_volume', 'track_volume',
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_preset', 'zynthiloops_preset',
                                                             {'midi_cc': 0, 'value': preset_index})
 
                 self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
                                                               self.__zselector_ctrl[0], self)
 
             self.__zselector_ctrl[0].set_options(
-                {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
                  'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
                  'value': preset_index})
 
@@ -325,26 +328,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             # If sound combinator is not active, Use Big knob to control selected track
 
-            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active.")
-
             try:
                 selected_track = self.zyngui.session_dashboard.get_selected_track()
             except:
                 selected_track = 0
 
+            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track})")
+
             if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'track_volume', 'track_volume',
+                self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
                                                             {'midi_cc': 0, 'value': selected_track})
 
                 self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
                                                               self)
 
             self.__zselector_ctrl[0].set_options(
-                {'symbol': 'track_volume', 'name': 'Track Volume', 'short_name': 'Volume', 'midi_cc': 0,
+                {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
                  'value_max': 10, 'value': selected_track})
 
             self.__zselector[0].config(self.__zselector_ctrl[0])
-            self.__zselector[0].custom_encoder_speed = 7
+            self.__zselector[0].custom_encoder_speed = 0
 
         ### Common vars for small knobs
         selected_clip = None

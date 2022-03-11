@@ -337,29 +337,33 @@ Rectangle {
                         }
 
                         Connections {
+                            enabled: bottomStack.currentIndex === 2
                             target: zynthian.session_dashboard
                             onSelectedTrackChanged: detailsTextTimer.restart()
                         }
                         Connections {
-                            enabled: root.selectedSlotRowItem != null
+                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null
                             target: root.selectedSlotRowItem
                             onSelectedRowChanged: detailsTextTimer.restart()
                         }
                         Connections {
-                            enabled: root.selectedSlotRowItem != null
+                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null
                             target: root.selectedSlotRowItem.track
                             onChainedSoundsChanged: detailsTextTimer.restart()
                             onSamplesChanged: detailsTextTimer.restart()
                         }
                         Connections {
+                            enabled: bottomStack.currentIndex === 2
                             target: synthsButton
                             onCheckedChanged: detailsTextTimer.restart()
                         }
                         Connections {
+                            enabled: bottomStack.currentIndex === 2
                             target: fxButton
                             onCheckedChanged: detailsTextTimer.restart()
                         }
                         Connections {
+                            enabled: bottomStack.currentIndex === 2
                             target: samplesButton
                             onCheckedChanged: detailsTextTimer.restart()
                         }

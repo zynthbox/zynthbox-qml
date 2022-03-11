@@ -1625,8 +1625,20 @@ class zynthian_gui(QObject):
             self.miniPlayGridToggle.emit()
 
         elif cuia == "ZL_PLAY":
-            self.run_start_metronome_and_playback.emit()
+            zl = self.screens["zynthiloops"]
 
+            # Toggle play/stop with play CUIA action
+            if not zl.isMetronomeRunning:
+                self.run_start_metronome_and_playback.emit()
+            else:
+                if zl.clipToRecord is not None:
+                    # A Clip is currently being recorded
+                    clip = zl.clipToRecord
+                    logging.error("CUIA Stop Recording")
+                    logging.error(f"Recording Clip : {clip}")
+                    clip.stopRecording()
+                    zl.song.scenesModel.addClipToCurrentScene(clip)
+                self.run_stop_metronome_and_playback.emit()
         elif cuia == "ZL_STOP":
             zl = self.screens["zynthiloops"]
             if zl.clipToRecord is not None:

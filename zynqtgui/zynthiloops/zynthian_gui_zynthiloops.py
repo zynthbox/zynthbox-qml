@@ -171,9 +171,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.zyngui.session_dashboard.get_selected_track() != self.__zselector[0].value:
-            logging.error(f"Setting track from zyncoder {self.__zselector[0].value}")
-            self.zyngui.session_dashboard.set_selected_track(self.__zselector[0].value)
+        if self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/10):
+            logging.error(f"Setting track from zyncoder {round(self.__zselector[0].value/10)}")
+            self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/10))
             self.set_selector()
 
     @Slot(None)
@@ -185,9 +185,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != self.__zselector[0].value//1000:
-            logging.error(f"Selecting preset : {self.__zselector[0].value//1000}")
-            self.zyngui.preset.select(self.__zselector[0].value//1000)
+        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != round(self.__zselector[0].value/1000):
+            logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
+            self.zyngui.preset.select(round(self.__zselector[0].value/1000))
             self.select_preset_timer.start()
 
     @Slot(None)
@@ -265,12 +265,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                     selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-                    if self.zyngui.layer.layer_midi_map[selected_channel].preset_index != self.__zselector[0].value:
-                        QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
 
                 else:
-                    if self.zyngui.session_dashboard.selectedTrack != self.__zselector[0].value:
-                        QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+                    QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
             except:
                 pass
 
@@ -329,11 +327,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # If sound combinator is not active, Use Big knob to control selected track
 
             try:
-                selected_track = self.zyngui.session_dashboard.get_selected_track()
+                selected_track = self.zyngui.session_dashboard.get_selected_track() * 10
             except:
                 selected_track = 0
 
-            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track})")
+            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
 
             if self.__zselector[0] is None:
                 self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
@@ -344,7 +342,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.__zselector_ctrl[0].set_options(
                 {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
-                 'value_max': 10, 'value': selected_track})
+                 'value_max': 100, 'value': selected_track})
 
             self.__zselector[0].config(self.__zselector_ctrl[0])
             self.__zselector[0].custom_encoder_speed = 0

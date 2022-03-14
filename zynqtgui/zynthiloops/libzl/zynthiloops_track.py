@@ -61,7 +61,8 @@ class zynthiloops_track(QObject):
         self.__muted__ = False
         self.__selected_sample_row__ = 0
         self.__samples__ = []
-        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'samples'
+        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
+        self.__color__ = "#000000"
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
@@ -110,8 +111,8 @@ class zynthiloops_track(QObject):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         logging.error(f"Master Volume : {self.master_volume} dB")
 
-    def save_sampleset(self):
-        sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
+    def save_bank(self):
+        bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
 
         obj = []
         for sample in self.__samples__:
@@ -121,47 +122,48 @@ class zynthiloops_track(QObject):
             else:
                 obj.append(None)
 
-        # Create sampleset dir and write sampleset json only if track has some samples loaded
+        # Create bank dir and write bank json only if track has some samples loaded
         for c in obj:
             if c is not None:
-                sampleset_dir.mkdir(parents=True, exist_ok=True)
+                bank_dir.mkdir(parents=True, exist_ok=True)
                 try:
-                    logging.error(f"Writing to sampleset.json {sampleset_dir}/sampleset.json")
-                    with open(sampleset_dir / 'sampleset.json', "w") as f:
+                    logging.error(f"Writing to bank.json {bank_dir}/bank.json")
+                    with open(bank_dir / 'bank.json', "w") as f:
                         json.dump(obj, f)
                         f.truncate()
                         f.flush()
                         os.fsync(f.fileno())
                 except Exception as e:
-                    logging.error(f"Error writing sampleset.json to {sampleset_dir} : {str(e)}")
+                    logging.error(f"Error writing bank.json to {bank_dir} : {str(e)}")
 
                 break
 
-    def restore_sampleset(self):
-        sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
+    def restore_bank(self):
+        bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
 
-        if not (sampleset_dir / 'sampleset.json').exists():
-            logging.error(f"sampleset.json does not exist for track {self.id + 1}. Skipping restoration")
+        if not (bank_dir / 'bank.json').exists():
+            logging.error(f"bank.json does not exist for track {self.id + 1}. Skipping restoration")
         else:
-            logging.error(f"Restoring sampleset.json for track {self.id + 1}")
+            logging.error(f"Restoring bank.json for track {self.id + 1}")
 
             try:
-                with open(sampleset_dir / 'sampleset.json', "r") as f:
+                with open(bank_dir / 'bank.json', "r") as f:
                     obj = json.loads(f.read())
 
                     for i, clip in enumerate(obj):
                         if clip is not None:
-                            self.__samples__[i].path = str(sampleset_dir / clip["path"])
+                            self.__samples__[i].path = str(bank_dir / clip["path"])
 
                     self.samples_changed.emit()
             except Exception as e:
-                logging.error(f"Error reading sampleset.json from {sampleset_dir} : {str(e)}")
+                logging.error(f"Error reading bank.json from {bank_dir} : {str(e)}")
 
     def serialize(self):
-        # Save sampleset when serializing so that sampleset is saved everytime song is saved
-        self.save_sampleset()
+        # Save bank when serializing so that bank is saved everytime song is saved
+        self.save_bank()
 
         return {"name": self.__name__,
+                "color": self.__color__,
                 "volume": self.__volume__,
                 "connectedPattern": self.__connected_pattern__,
                 # "connectedSound": self.__connected_sound__,
@@ -173,6 +175,8 @@ class zynthiloops_track(QObject):
     def deserialize(self, obj):
         if "name" in obj:
             self.__name__ = obj["name"]
+        if "color" in obj:
+            self.__color__ = obj["color"]
         if "volume" in obj:
             self.__volume__ = obj["volume"]
             self.set_volume(self.__volume__, True)
@@ -194,8 +198,8 @@ class zynthiloops_track(QObject):
             self.__layers_snapshot = obj["layers_snapshot"]
             self.sound_data_changed.emit()
 
-        # Restore sampleset after restoring track
-        self.restore_sampleset()
+        # Restore bank after restoring track
+        self.restore_bank()
 
     def set_layers_snapshot(self, snapshot):
         self.__layers_snapshot = snapshot
@@ -340,17 +344,17 @@ class zynthiloops_track(QObject):
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
 
-        source_sampleset_dir = self.__base_samples_dir__ / f'sampleset.{source.id + 1}'
-        dest_sampleset_dir = self.__base_samples_dir__ / f'sampleset.{self.id + 1}'
+        source_bank_dir = self.__base_samples_dir__ / f'bank.{source.id + 1}'
+        dest_bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
 
-        dest_sampleset_dir.mkdir(parents=True, exist_ok=True)
+        dest_bank_dir.mkdir(parents=True, exist_ok=True)
 
         # Copy all samples from source track
-        for file in source_sampleset_dir.glob("*"):
-            shutil.copy2(file, dest_sampleset_dir / file.name)
+        for file in source_bank_dir.glob("*"):
+            shutil.copy2(file, dest_bank_dir / file.name)
 
-        # Restore sampleset after copying
-        self.restore_sampleset()
+        # Restore bank after copying
+        self.restore_bank()
 
     @Slot(int, result=bool)
     def createChainedSoundInNextFreeLayer(self, index):
@@ -642,16 +646,16 @@ class zynthiloops_track(QObject):
     recordingDir = Property(str, get_recording_dir, constant=True)
     ### END Property recordingDir
 
-    ### Property samplesetDir
-    def get_sampleset_dir(self):
-        path = self.__base_samples_dir__ / f"sampleset.{self.id + 1}"
+    ### Property bankDir
+    def get_bank_dir(self):
+        path = self.__base_samples_dir__ / f"bank.{self.id + 1}"
         if path.exists():
             return str(path)
         else:
             return str(self.__base_samples_dir__)
 
-    samplesetDir = Property(str, get_sampleset_dir, constant=True)
-    ### END Property samplesetDir
+    bankDir = Property(str, get_bank_dir, constant=True)
+    ### END Property bankDir
 
     ### Property selectedSampleRow
     def get_selected_sample_row(self):

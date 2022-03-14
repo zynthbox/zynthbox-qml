@@ -70,7 +70,7 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
-        self.sampleset_path = Path(self.__song__.sketch_folder) / 'wav' / 'samples' / f'sampleset.{self.row + 1}'
+        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'bank.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.track = None
@@ -201,7 +201,7 @@ class zynthiloops_clip(QObject):
                 self.__path__ = None
             else:
                 if self.is_track_sample:
-                    self.path = str(self.sampleset_path / obj["path"])
+                    self.path = str(self.bank_path / obj["path"])
                 else:
                     self.path = str(self.wav_path / obj["path"])
         if "start" in obj:
@@ -405,7 +405,7 @@ class zynthiloops_clip(QObject):
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            self.sampleset_path = Path(self.__song__.sketch_folder) / 'wav' / 'samples' / f'sampleset.{new_index + 1}'
+            self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'bank.{new_index + 1}'
         except:
             pass
         self.row_index_changed.emit()
@@ -543,7 +543,7 @@ class zynthiloops_clip(QObject):
             return None
         else:
             if self.is_track_sample:
-                return str(self.sampleset_path / self.__path__)
+                return str(self.bank_path / self.__path__)
             else:
                 return str(self.wav_path / self.__path__)
 
@@ -551,13 +551,13 @@ class zynthiloops_clip(QObject):
         selected_path = Path(path)
 
         if self.is_track_sample:
-            if selected_path.parent != self.sampleset_path:
+            if selected_path.parent != self.bank_path:
                 logging.error(
-                    f"Sample({path}) is not from same track/sketch. Copying into sampleset folder ({self.sampleset_path / selected_path.name})")
-                self.sampleset_path.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(selected_path, self.sampleset_path / selected_path.name)
+                    f"Sample({path}) is not from same track/sketch. Copying into bank folder ({self.bank_path / selected_path.name})")
+                self.bank_path.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(selected_path, self.bank_path / selected_path.name)
             else:
-                logging.error(f"Sample({self.sampleset_path / selected_path.name}) is from same sampleset")
+                logging.error(f"Sample({self.bank_path / selected_path.name}) is from same bank")
         else:
             if selected_path.parent != self.wav_path:
                 logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")

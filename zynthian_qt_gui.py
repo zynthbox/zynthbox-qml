@@ -1690,6 +1690,9 @@ class zynthian_gui(QObject):
             self.tracks_mod_active = not self.tracks_mod_active
             logging.error(f'self.tracks_mod_active({self.tracks_mod_active})')
 
+        elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
+            self.screens["zynthiloops"].clickTrackEnabled = not self.screens["zynthiloops"].clickTrackEnabled
+
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:

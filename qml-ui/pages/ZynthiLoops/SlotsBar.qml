@@ -32,6 +32,7 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 //import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
     Layout.fillWidth: true
@@ -64,6 +65,99 @@ Rectangle {
         }
 
         return false;
+    }
+
+    function selectConnectedSound() {
+        if (root.selectedSlotRowItem.track.connectedSound >= 0) {
+            zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.track.connectedSound);
+
+            if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedSlotRowItem.track.connectedPattern);
+                pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
+            }
+        }
+    }
+
+    // When enabled, listen for layer popup rejected to re-select connected sound if any
+    Connections {
+        id: layerPopupRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onLayerSetupDialogRejected: {
+            console.log("Layer Popup Rejected");
+
+            selectConnectedSound();
+            layerPopupRejectedConnections.enabled = false;
+        }
+    }
+    //NOTE: enable this if shouldn't switch to library
+    Connections {
+        id: backToSelection
+        target: zynthian.layer
+        enabled: false
+        property string screenToGetBack: "session_dashboard"
+        onLayer_created: {
+            zynthian.current_modal_screen_id = screenToGetBack
+            backToSelection.enabled = false
+            backToSelectionTimer.restart()
+        }
+    }
+    Timer {
+        id: backToSelectionTimer
+        interval: 250
+        onTriggered: {
+            zynthian.current_modal_screen_id = backToSelection.screenToGetBack
+        }
+    }
+
+    Connections {
+        id: currentScreenConnection
+        property string oldScreen: "session_dashboard"
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            if (oldScreen === "engine") {
+                backToSelection.enabled = false
+            }
+            oldScreen = zynthian.current_screen_id
+        }
+    }
+
+    // When enabled, listen for sound dialog rejected to re-select connected sound if any
+    Connections {
+        id: soundsDialogRejectedConnections
+        enabled: false
+        target: applicationWindow()
+        onSoundsDialogAccepted: {
+            console.log("Sounds Dialog Accepted");
+            soundsDialogRejectedConnections.enabled = false;
+        }
+        onSoundsDialogRejected: {
+            console.log("Sounds Dialog Rejected");
+
+            selectConnectedSound();
+            soundsDialogRejectedConnections.enabled = false;
+        }
+    }
+
+    Connections {
+        target: applicationWindow()
+        onLayerSetupDialogLoadSoundClicked: {
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogNewSynthClicked: {
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
+        onLayerSetupDialogPickSoundClicked: {
+            console.log("Sound Dialog Opened");
+
+            // Enable Sounds dialog rejected handler to select sound if any on close
+            soundsDialogRejectedConnections.enabled = true;
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
     }
 
     QtObject {
@@ -157,22 +251,6 @@ Rectangle {
 
                         model: root.song.tracksModel
 
-                        function handleClick(track) {
-                            if (zynthian.session_dashboard.selectedTrack !== track.id) {
-                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                zynthian.session_dashboard.selectedTrack = track.id;
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-                            } else {
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-
-                                bottomStack.currentIndex = 0
-                                mixerActionBtn.checked = false;
-                                sceneActionBtn.checked = false;
-                            }
-                        }
-
                         delegate: Rectangle {
                             id: trackDelegate
 
@@ -223,8 +301,6 @@ Rectangle {
                                                         tracksSlotsRow.currentIndex = index
                                                         trackDelegate.selectedRow = index
                                                         zynthian.session_dashboard.selectedTrack = trackDelegate.trackIndex;
-                                                    } else {
-                                                        console.log(trackDelegate.track.samples[index].path, trackDelegate.track.samples[index].path.split("/").pop())
                                                     }
                                                 }
                                                 z: 10
@@ -354,6 +430,52 @@ Rectangle {
                                 wrapMode: "WrapAnywhere"
                                 font.pointSize: 10
                             }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (synthsButton.checked) {
+                                        // Clicked entry is synth
+
+                                        var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]
+
+                                        if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
+                                            // Handle Click
+                                            zynthian.layer.page_after_layer_creation = "layers_for_track";
+                                            zynthian.fixed_layers.activate_index(chainedSound);
+                                            zynthian.layer.select_engine(chainedSound);
+                                        } else if (!root.selectedSlotRowItem.track.createChainedSoundInNextFreeLayer(root.selectedSlotRowItem.selectedRow)) {
+                                            noFreeSlotsPopup.open();
+                                        } else {
+                                            // Enable layer popup rejected handler to re-select connected sound if any
+                                            layerPopupRejectedConnections.enabled = true;
+
+                                            zynthian.layer.page_after_layer_creation = "session_dashboard";
+                                            applicationWindow().requestOpenLayerSetupDialog();
+                                            //this depends on requirements
+                                            backToSelection.screenToGetBack = zynthian.current_screen_id;
+                                            backToSelection.enabled = true;
+
+                                            if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
+                                                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedSlotRowItem.track.connectedPattern);
+                                                pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
+                                            }
+                                        }
+                                    } else if (fxButton.checked) {
+                                        // Clicked entry is fx
+                                        var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]
+
+                                        zynthian.fixed_layers.activate_index(chainedSound)
+                                        zynthian.layer_options.show();
+                                        var screenBack = zynthian.current_screen_id;
+                                        zynthian.current_screen_id = "layer_effects";
+                                        root.openBottomDrawerOnLoad = true;
+                                        zynthian.forced_screen_back = screenBack;
+                                    } else if (samplesButton.checked) {
+                                        // Clicked entry is samples
+                                    }
+                                }
+                            }
                         }
 
                         Connections {
@@ -418,6 +540,24 @@ Rectangle {
                     }
                 }
             }
+        }
+    }
+
+    QQC2.Popup {
+        id: noFreeSlotsPopup
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit*12
+        height: Kirigami.Units.gridUnit*4
+        modal: true
+
+        QQC2.Label {
+            width: parent.width
+            height: parent.height
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            text: qsTr("No free slots remaining")
+            font.italic: true
         }
     }
 }

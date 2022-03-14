@@ -473,6 +473,7 @@ Rectangle {
                                         zynthian.forced_screen_back = screenBack;
                                     } else if (samplesButton.checked) {
                                         // Clicked entry is samples
+                                        samplePickerPopup.open()
                                     }
                                 }
                             }
@@ -558,6 +559,39 @@ Rectangle {
             verticalAlignment: "AlignVCenter"
             text: qsTr("No free slots remaining")
             font.italic: true
+        }
+    }
+
+    QQC2.Popup {
+        id: samplePickerPopup
+
+        x: Math.round(parent.width/2 - width/2)
+        y: Math.round(parent.height/2 - height/2)
+        width: Kirigami.Units.gridUnit*12
+        modal: true
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.alignment: Qt.AlignCenter
+                text: qsTr("Pick sample for slot")
+
+                onClicked: {
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.alignment: Qt.AlignCenter
+                text: qsTr("Pick bank for track")
+
+                onClicked: {
+                }
+            }
         }
     }
 }

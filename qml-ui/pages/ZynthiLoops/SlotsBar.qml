@@ -92,8 +92,6 @@ Rectangle {
             }
 
             ColumnLayout {
-                id: tableLayout
-
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 spacing: 1
@@ -196,13 +194,6 @@ Rectangle {
                                 }
                             }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    tracksSlotsRow.handleClick(track);
-                                }
-                            }
-
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.topMargin: 4
@@ -223,7 +214,6 @@ Rectangle {
                                             Layout.alignment: Qt.AlignVCenter
                                             Layout.leftMargin: 4
                                             Layout.rightMargin: 4
-                                            opacity: trackDelegate.highlighted && trackDelegate.selectedRow === index ? 1 : 0.3
 
                                             MouseArea {
                                                 anchors.fill: parent
@@ -301,15 +291,24 @@ Rectangle {
                             Layout.fillWidth: false
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
-                            visible: synthsButton.checked
                             font.pointSize: 14
+                            text: qsTr("T%1-Slot%2")
+                                    .arg(zynthian.session_dashboard.selectedTrack + 1)
+                                    .arg(root.selectedSlotRowItem.selectedRow + 1)
+                        }
+                        QQC2.Label {
+                            Layout.fillWidth: false
+                            Layout.fillHeight: false
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: synthsButton.checked
+                            font.pointSize: 12
                             text: qsTr("Synth")
                         }
                         QQC2.Label {
                             Layout.fillWidth: false
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
-                            font.pointSize: 14
+                            font.pointSize: 12
                             visible: fxButton.checked
                             text: qsTr("Fx")
                         }
@@ -317,7 +316,7 @@ Rectangle {
                             Layout.fillWidth: false
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
-                            font.pointSize: 14
+                            font.pointSize: 12
                             visible: samplesButton.checked
                             text: qsTr("Sample")
                         }
@@ -328,12 +327,33 @@ Rectangle {
                             Layout.preferredHeight: 1
                         }
 
-                        QQC2.Label {
-                            id: detailsText
+                        Rectangle {
+                            clip: true
                             Layout.fillWidth: true
                             Layout.fillHeight: false
+                            Layout.preferredHeight: detailsText.height + 20
                             Layout.alignment: Qt.AlignHCenter
-                            wrapMode: "WrapAnywhere"
+
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            color: Kirigami.Theme.backgroundColor
+
+                            border.color: "#ff999999"
+                            border.width: 1
+                            radius: 4
+
+                            QQC2.Label {
+                                id: detailsText
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    left: parent.left
+                                    leftMargin: 10
+                                    right: parent.right
+                                    rightMargin: 10
+                                }
+                                wrapMode: "WrapAnywhere"
+                                font.pointSize: 10
+                            }
                         }
 
                         Connections {
@@ -346,12 +366,12 @@ Rectangle {
                             onSelectedTrackChanged: detailsTextTimer.restart()
                         }
                         Connections {
-                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null
+                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
                             target: root.selectedSlotRowItem
                             onSelectedRowChanged: detailsTextTimer.restart()
                         }
                         Connections {
-                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null
+                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
                             target: root.selectedSlotRowItem.track
                             onChainedSoundsChanged: detailsTextTimer.restart()
                             onSamplesChanged: detailsTextTimer.restart()
@@ -377,6 +397,7 @@ Rectangle {
                             interval: 0
                             repeat: false
                             onTriggered: {
+                                console.log("### Updating details timer ")
                                 detailsText.text = root.selectedSlotRowItem
                                                     ? synthsButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow])
                                                         ? root.selectedSlotRowItem.track.getLayerNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]).split(">")[0]

@@ -337,6 +337,10 @@ Rectangle {
                         }
 
                         Connections {
+                            target: bottomStack
+                            onCurrentIndexChanged: detailsTextTimer.restart()
+                        }
+                        Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: zynthian.session_dashboard
                             onSelectedTrackChanged: detailsTextTimer.restart()

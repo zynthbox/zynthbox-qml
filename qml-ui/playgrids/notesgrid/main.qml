@@ -38,7 +38,7 @@ Zynthian.BasePlayGrid {
     miniGrid: notesMiniGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    octave: 2
+    octave: 3
     useOctaves: true
 
     defaults: {

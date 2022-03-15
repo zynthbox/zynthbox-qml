@@ -849,6 +849,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                                                                   base_sketch_path.stem.replace(".sketch", ""), self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
                     str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name))
+
+                if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                    logging.error(f"Loading default snapshot")
+                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
@@ -858,6 +863,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
                     str(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json'))
+
+                if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                    logging.error(f"Loading default snapshot")
+                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)

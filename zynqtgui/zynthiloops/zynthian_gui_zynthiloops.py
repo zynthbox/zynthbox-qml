@@ -308,6 +308,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         return [0, 1, 2, 3]
 
+    @Slot(None)
     def set_selector(self, zs_hiden=False):
         if self.__song__ is None:
             return

@@ -295,8 +295,8 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignCenter
                         checkable: true
                         checked: zynthian.zynthiloops.clickTrackEnabled
-                        onCheckedChanged: {
-                            zynthian.zynthiloops.clickTrackEnabled = checked;
+                        onToggled: {
+                            zynthian.zynthiloops.clickTrackEnabled = checked
                         }
                         
                         Kirigami.Icon {

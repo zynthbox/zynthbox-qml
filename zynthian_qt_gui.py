@@ -40,6 +40,7 @@ from datetime import datetime
 from threading import Thread, Lock
 from subprocess import check_output
 from ctypes import c_float, c_double, CDLL
+import xml.etree.ElementTree as ET
 
 # Qt modules
 from PySide2.QtCore import (
@@ -56,7 +57,7 @@ from PySide2.QtCore import (
 from PySide2.QtGui import QGuiApplication, QPalette, QColor, QIcon, QWindow, QCursor, QPixmap
 
 # from PySide2.QtWidgets import QApplication
-from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PySide2.QtQml import QQmlApplicationEngine, QQmlDebuggingEnabler, qmlRegisterType
 from soundfile import SoundFile
 
 from pynput.keyboard import Key, Controller
@@ -3332,7 +3333,39 @@ def delete_window():
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    ### Tracktion config file `/root/.config/libzl/Settings.xml` sometimes reconfigures and sets
+    ### the value <VALUE name="audiosettings_JACK"><AUDIODEVICE outEnabled="0" inEnabled="0" monoChansOut="0" stereoChansIn="0"/></VALUE>
+    ### which causes no audio output from libzl. To circumvent this isssue, always remove the following
+    ### three tags from the xml : <VALUE name="audiosettings_JACK">, <VALUE name="defaultWaveDevice_JACK">
+    ### and <VALUE name="defaultWaveInDevice_JACK"
+    ### Remove these above 3 tags from xml before initializing libzl
+    ### FIXME : Find the root cause of the issue instead of this workaround
+    try:
+        if Path("/root/.config/libzl/Settings.xml").exists():
+            logging.error(f"libzl settings file found. Removing elements")
+            tree = ET.parse('/root/.config/libzl/Settings.xml')
+            root = tree.getroot()
+
+            e1 = root.find(".//VALUE[@name='audiosettings_JACK']")
+            e2 = root.find(".//VALUE[@name='defaultWaveDevice_JACK']")
+            e3 = root.find(".//VALUE[@name='defaultWaveInDevice_JACK']")
+            if e1 is not None:
+                logging.error(f"Removing element audiosettings_JACK")
+                root.remove(e1)
+            if e2 is not None:
+                logging.error(f"Removing element defaultWaveDevice_JACK")
+                root.remove(e2)
+            if e3 is not None:
+                logging.error(f"Removing element defaultWaveInDevice_JACK")
+                root.remove(e3)
+
+            tree.write("/root/.config/libzl/Settings.xml")
+    except Exception as e:
+        logging.error(f"Error updating libzl Settings.xml : {str(e)}")
+
     libzl.init()
+    ###
+
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 

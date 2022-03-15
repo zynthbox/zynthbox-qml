@@ -117,6 +117,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__zselector_track = -1
         self.__knob_touch_update_in_progress__ = False
         self.__selected_clip_col__ = 0
+        self.__is_init_in_progress__ = True
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -133,15 +134,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
 
     def sync_selector_visibility(self):
-        if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-            self.set_selector()
-            if self.__zselector[0]:
-                self.__zselector[0].show()
-        elif self.__zselector[0]:
-            self.__zselector[0].hide()
+        pass
+        # if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+        #     if not self.__is_init_in_progress__:
+        #         self.set_selector()
+        # else:
+        #     if self.__zselector[0]:
+        #         self.__zselector[0].hide()
+        #     if self.__zselector[1]:
+        #         self.__zselector[1].hide()
+        #     if self.__zselector[2]:
+        #         self.__zselector[2].hide()
+        #     if self.__zselector[3]:
+        #         self.__zselector[3].hide()
 
     def init_sketch(self, sketch, cb=None):
         def _cb():
+            def timer_callback():
+                self.zyngui.zynthiloops.set_selector()
+                self.__is_init_in_progress__ = False
+
             libzl.registerTimerCallback(libzlCb)
             libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
@@ -152,6 +164,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if cb is not None:
                 cb()
+
+            # Call set_selector after a few seconds after loading sketch otherwise
+            # initial selected track value seems to be overwritten by big knob value
+            # no initial load to the maximum value which is 9. Calling set_selector
+            # after a timeout seems to mitigate the problem.
+            # Although (FIXME) a proper solution is required instead of the timer
+            QTimer.singleShot(5000, timer_callback)
 
         self.master_audio_level_timer.start()
 
@@ -342,7 +361,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.__zselector_ctrl[0].set_options(
                 {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
-                 'value_max': 100, 'value': selected_track})
+                 'value_max': 90, 'value': selected_track})
 
             self.__zselector[0].config(self.__zselector_ctrl[0])
             self.__zselector[0].custom_encoder_speed = 0

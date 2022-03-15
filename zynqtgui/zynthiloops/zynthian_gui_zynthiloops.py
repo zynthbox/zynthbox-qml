@@ -1103,7 +1103,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
             self.update_recorder_jack_port()
-            (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
+            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+
+            if clip.isTrackSample:
+                Path(track.bankDir).mkdir(parents=True, exist_ok=True)
+            else:
+                (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
             if source == 'internal':
                 try:
@@ -1113,11 +1118,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             else:
                 preset_name = "external"
 
-            count=0
-            base_recording_dir = f"{clip.recording_basepath}/wav"
+            count = 0
+
+            if clip.isTrackSample:
+                base_recording_dir = track.bankDir
+            else:
+                base_recording_dir = f"{clip.recording_basepath}/wav"
+
             base_filename = f"{datetime.now().strftime('%Y%m%d-%H%M')}_{preset_name}_{self.__song__.bpm}-BPM"
 
             # Check if file exists otherwise append count
+
             while Path(f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav").exists():
                 count += 1
 
@@ -1228,6 +1239,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+
+        if self.clip_to_record.isTrackSample:
+            logging.error(f"Recorded clip is a sample")
+            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            track.samples_changed.emit()
+
         self.set_clip_to_record(None)
         self.clip_to_record_path = None
         self.recorder_process = None

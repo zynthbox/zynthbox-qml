@@ -958,3 +958,10 @@ class zynthiloops_clip(QObject):
 
     slices = Property(int, get_slices, set_slices, notify=slices_changed)
     ### END Property slices
+
+    ### Property isTrackSample
+    def get_is_track_sample(self):
+        return self.is_track_sample
+
+    isTrackSample = Property(bool, get_is_track_sample, constant=True)
+    ### END Property isTrackSample

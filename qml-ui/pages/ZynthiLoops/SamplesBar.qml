@@ -89,6 +89,7 @@ Zynthian.Card {
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         Layout.leftMargin: Kirigami.Units.gridUnit
+                        Layout.rightMargin: Kirigami.Units.gridUnit
 
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -124,6 +125,27 @@ Zynthian.Card {
                                     samplePickerDialog.folderModel.folder = controlObj.bankDir;
                                     samplePickerDialog.open();
                                 }
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
+                        Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
+
+                        enabled: !controlObj.samples[index].isRecording && zynthian.zynthiloops.clipToRecord == null
+                        icon.name: controlObj.samples[index].isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        onClicked: {
+                            if (!controlObj.samples[index].isRecording) {
+                                controlObj.samples[index].queueRecording(
+                                    "internal",
+                                    "*"
+                                );
+                                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                            } else {
+                                Zynthian.CommonUtils.stopMetronomeAndPlayback();
                             }
                         }
                     }

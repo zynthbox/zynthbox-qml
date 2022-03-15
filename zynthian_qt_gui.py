@@ -393,6 +393,7 @@ class zynthian_gui(QObject):
 
         self.sound_combinator_active = False
         self.track_wave_editor_bar_active = False
+        self.track_samples_bar_active = False
         self.clip_wave_editor_bar_active = False
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
@@ -546,6 +547,19 @@ class zynthian_gui(QObject):
 
     trackWaveEditorBarActive = Property(bool, get_track_wave_editor_bar_active, set_track_wave_editor_bar_active,
                                      notify=trackWaveEditorBarActiveChanged)
+
+    def get_track_samples_bar_active(self):
+        return self.track_samples_bar_active
+
+    def set_track_samples_bar_active(self, isActive):
+        if self.track_samples_bar_active != isActive:
+            self.track_samples_bar_active = isActive
+            self.trackSamplesBarActiveChanged.emit()
+
+    trackSamplesBarActiveChanged = Signal()
+
+    trackSamplesBarActive = Property(bool, get_track_samples_bar_active, set_track_samples_bar_active,
+                                     notify=trackSamplesBarActiveChanged)
 
     def get_clip_wave_editor_bar_active(self):
         return self.clip_wave_editor_bar_active
@@ -1632,23 +1646,8 @@ class zynthian_gui(QObject):
             if not zl.isMetronomeRunning:
                 self.run_start_metronome_and_playback.emit()
             else:
-                if zl.clipToRecord is not None:
-                    # A Clip is currently being recorded
-                    clip = zl.clipToRecord
-                    logging.error("CUIA Stop Recording")
-                    logging.error(f"Recording Clip : {clip}")
-                    clip.stopRecording()
-                    zl.song.scenesModel.addClipToCurrentScene(clip)
                 self.run_stop_metronome_and_playback.emit()
         elif cuia == "ZL_STOP":
-            zl = self.screens["zynthiloops"]
-            if zl.clipToRecord is not None:
-                # A Clip is currently being recorded
-                clip = zl.clipToRecord
-                logging.error("CUIA Stop Recording")
-                logging.error(f"Recording Clip : {clip}")
-                clip.stopRecording()
-                zl.song.scenesModel.addClipToCurrentScene(clip)
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
@@ -1656,31 +1655,22 @@ class zynthian_gui(QObject):
             if zl.clipToRecord is None:
                 # No clips are currently being recorded
                 logging.error("CUIA Start Recording")
-                clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
+                if self.trackSamplesBarActive:
+                    logging.error(f"Clip is a track sample")
+                    track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                    clip = track.samples[track.selectedSampleRow]
+                else:
+                    logging.error(f"Clip is a not a track sample")
+                    clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
                 logging.error(f"Recording Clip : {clip}")
                 clip.queueRecording("internal", "*")
                 self.run_start_metronome_and_playback.emit()
             else:
                 # Some Clip is currently being recorded
-                logging.error("Cannot start recording until the current recording is stopped")
-                clip = zl.clipToRecord
-                clip.stopRecording()
-                zl.song.scenesModel.addClipToCurrentScene(clip)
+                logging.error("Some Clip is currently being recorded. Stopping record")
                 self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "STOP_RECORD":
-            zl = self.screens["zynthiloops"]
-            if zl.clipToRecord is not None:
-                # A Clip is currently being recorded
-                clip = zl.clipToRecord
-                logging.error("CUIA Stop Recording")
-                logging.error(f"Recording Clip : {clip}")
-                clip.stopRecording()
-                zl.song.scenesModel.addClipToCurrentScene(clip)
-            else:
-                # No Clip is currently being recorded
-                logging.error("No clip is being recorded")
-
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":

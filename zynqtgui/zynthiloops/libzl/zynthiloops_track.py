@@ -649,10 +649,7 @@ class zynthiloops_track(QObject):
     ### Property bankDir
     def get_bank_dir(self):
         path = self.__base_samples_dir__ / f"bank.{self.id + 1}"
-        if path.exists():
-            return str(path)
-        else:
-            return str(self.__base_samples_dir__)
+        return str(path)
 
     bankDir = Property(str, get_bank_dir, constant=True)
     ### END Property bankDir

@@ -241,6 +241,17 @@ Zynthian.ScreenPage {
                 zynthian.soundCombinatorActive = false;
             }
 
+            // Check if sound combinator is active
+            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("SamplesBar") >= 0 && // Checks if current active page is samples bar
+                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
+                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
+            {
+                zynthian.trackSamplesBarActive = true;
+            } else {
+                zynthian.trackSamplesBarActive = false;
+            }
+
             // Check if track wave editor bar is active
             if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
                 bottomBar.controlType === BottomBar.ControlType.Track && // Checks if track is selected

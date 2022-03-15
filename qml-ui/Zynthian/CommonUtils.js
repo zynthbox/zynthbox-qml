@@ -41,7 +41,10 @@ function stopMetronomeAndPlayback() {
     if (zynthian.zynthiloops.clipToRecord) {
         var clip = zynthian.zynthiloops.clipToRecord
         clip.stopRecording()
-        zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)
+
+        if (!clip.isTrackSample) {
+            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)
+        }
     }
 
     zynthian.zynthiloops.stopAllPlayback();

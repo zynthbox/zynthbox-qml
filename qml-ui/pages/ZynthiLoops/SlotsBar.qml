@@ -62,6 +62,20 @@ Rectangle {
                 }
 
                 return true;
+
+            case "SELECT_UP":
+                if (root.selectedSlotRowItem.selectedRow > 0) {
+                    root.selectedSlotRowItem.selectedRow -= 1
+                }
+
+                return true;
+
+            case "SELECT_DOWN":
+                if (root.selectedSlotRowItem.selectedRow < 4) {
+                    root.selectedSlotRowItem.selectedRow += 1
+                }
+
+                return true;
         }
 
         return false;
@@ -325,7 +339,7 @@ Rectangle {
                                                 color: Kirigami.Theme.backgroundColor
 
                                                 border.color: trackDelegate.highlighted && trackDelegate.selectedRow === index ? Kirigami.Theme.highlightColor : "#ff999999"
-                                                border.width: 1
+                                                border.width: 2
                                                 radius: 4
 
                                                 QQC2.Label {
@@ -479,48 +493,71 @@ Rectangle {
                             }
                         }
 
+                        QQC2.Slider {
+                            id: volumeSlider
+
+                            property QtObject volumeControlObject: null
+                            property int chainedSound: root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]
+
+                            orientation: Qt.Horizontal
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+
+                            visible: synthsButton.checked
+                            enabled: chainedSound >= 0 && root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)
+                            value: volumeControlObject ? volumeControlObject.value : 0
+                            stepSize: volumeControlObject ? volumeControlObject.step_size : 1
+                            from: volumeControlObject ? volumeControlObject.value_min : 0
+                            to: volumeControlObject ? volumeControlObject.value_max : 1
+                            onMoved: {
+                                volumeControlObject.value = value;
+                            }
+                        }
+
                         Connections {
                             target: bottomStack
-                            onCurrentIndexChanged: detailsTextTimer.restart()
+                            onCurrentIndexChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: zynthian.session_dashboard
-                            onSelectedTrackChanged: detailsTextTimer.restart()
+                            onSelectedTrackChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
                             target: root.selectedSlotRowItem
-                            onSelectedRowChanged: detailsTextTimer.restart()
+                            onSelectedRowChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
                             target: root.selectedSlotRowItem.track
-                            onChainedSoundsChanged: detailsTextTimer.restart()
-                            onSamplesChanged: detailsTextTimer.restart()
+                            onChainedSoundsChanged: sidebarUpdateTimer.restart()
+                            onSamplesChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: synthsButton
-                            onCheckedChanged: detailsTextTimer.restart()
+                            onCheckedChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: fxButton
-                            onCheckedChanged: detailsTextTimer.restart()
+                            onCheckedChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: samplesButton
-                            onCheckedChanged: detailsTextTimer.restart()
+                            onCheckedChanged: sidebarUpdateTimer.restart()
                         }
 
                         Timer {
-                            id: detailsTextTimer
+                            id: sidebarUpdateTimer
                             interval: 0
                             repeat: false
                             onTriggered: {
-                                console.log("### Updating details timer ")
+                                console.log("### Updating sidebar")
                                 detailsText.text = root.selectedSlotRowItem
                                                     ? synthsButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow])
                                                         ? root.selectedSlotRowItem.track.getLayerNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]).split(">")[0]
@@ -530,6 +567,10 @@ Rectangle {
                                                                 ? root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.selectedRow].path.split("/").pop()
                                                                 : ""
                                                     : ""
+
+                                volumeSlider.volumeControlObject = zynthian.layers_for_track.volume_controls[root.selectedSlotRowItem.selectedRow]
+                                                                    ? zynthian.layers_for_track.volume_controls[root.selectedSlotRowItem.selectedRow]
+                                                                    : null
                             }
                         }
                     }

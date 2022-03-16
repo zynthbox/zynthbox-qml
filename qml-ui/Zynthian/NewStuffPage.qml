@@ -36,6 +36,23 @@ import "private" as Private
 Zynthian.SelectorPage {
     id: component
 
+    cuiaCallback: function(cuia) {
+        switch (cuia) {
+            case "SELECT_UP":
+                if (mainView.currentIndex > 0) {
+                    mainView.currentIndex -= 1
+                }
+                return true;
+
+            case "SELECT_DOWN":
+                if (mainView.currentIndex < mainView.count - 1) {
+                    mainView.currentIndex += 1
+                }
+                return true;
+        }
+
+        return false;
+    }
     /**
      * The configuration file path - this requires the full path, which usually means
      * something like the following, if the file is in the same directory as the calling
@@ -106,7 +123,7 @@ Zynthian.SelectorPage {
             rightPadding: Kirigami.Units.largeSpacing
             highlighted: ListView.view.activeFocus
             onClicked: {
-                component.selector.current_index = index;
+                mainView.currentIndex = index;
             }
             background: Private.DelegateBackground {
                 delegate: nsDelegate
@@ -172,7 +189,6 @@ Zynthian.SelectorPage {
             model: newStuffModel
             delegate: newStuffDelegate
             clip: true
-            currentIndex: component.selector.current_index
             onCurrentIndexChanged: {
                 positionViewAtIndex(currentIndex, ListView.Contain);
             }
@@ -190,7 +206,7 @@ Zynthian.SelectorPage {
         pixelAligned: true
         clip: true
         model: newStuffModel
-        currentIndex: component.selector.current_index
+        currentIndex: mainView.currentIndex
         onCurrentIndexChanged: {
             positionViewAtIndex(currentIndex, ListView.Beginning);
         }

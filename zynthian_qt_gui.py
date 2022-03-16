@@ -3359,9 +3359,10 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
 
-    nullCursor = QPixmap(16, 16);
-    nullCursor.fill(Qt.transparent);
-    app.setOverrideCursor(QCursor(nullCursor));
+    if zynthian_gui_config.force_enable_cursor == False:
+        nullCursor = QPixmap(16, 16);
+        nullCursor.fill(Qt.transparent);
+        app.setOverrideCursor(QCursor(nullCursor));
 
     logging.info("REGISTERING QML TYPES")
     qmlRegisterType(file_properties_helper, "Helpers", 1, 0, "FilePropertiesHelper")

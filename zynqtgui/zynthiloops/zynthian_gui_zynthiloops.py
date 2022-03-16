@@ -130,9 +130,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.setSingleShot(True)
         self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
 
-        self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
-        self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
-
     def sync_selector_visibility(self):
         pass
         # if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
@@ -161,6 +158,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
             self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
+            self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
+            self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
+            self.zyngui.session_dashboard.selected_sound_row_changed.connect(self.set_selector)
 
             if cb is not None:
                 cb()
@@ -208,6 +208,25 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
             self.zyngui.preset.select(round(self.__zselector[0].value/1000))
             self.select_preset_timer.start()
+
+    @Slot(None)
+    def zyncoder_update_layer_volume(self):
+        if self.is_set_selector_running:
+            logging.error(f"Set selector in progress. Not setting value with encoder")
+            return
+
+        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        try:
+            volume_control_obj = self.zyngui.layers_for_track.volume_controls[self.zyngui.session_dashboard.selectedSoundRow]
+        except:
+            volume_control_obj = None
+
+        if volume_control_obj is not None and \
+           selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]) and \
+           volume_control_obj.value != self.__zselector[1].value / 1000:
+            volume_control_obj.value = self.__zselector[1].value / 1000
+            logging.error(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
@@ -279,43 +298,32 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[0] and self.__song__:
             self.__zselector[0].read_zyncoder()
 
-            try:
-                if self.zyngui.sound_combinator_active:
-                    track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                    selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+            if self.zyngui.sound_combinator_active:
+                QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+            else:
+                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
 
-                    QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
-
-                else:
-                    QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
-            except:
-                pass
-
-        # Update clip startposition when required with small knob 0
+        # Update clip startposition/layer volume when required with small knob 1
         if self.__zselector[1] and self.__song__:
             self.__zselector[1].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
+            if self.zyngui.sound_combinator_active:
+                QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
+            else:
+                QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
 
-        # Update clip length when required with small knob 1
+        # Update clip length when required with small knob 2
         if self.__zselector[2] and self.__song__:
             self.__zselector[2].read_zyncoder()
             QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
 
-        # Update clip length when required with small knob 2
+        # Update clip length when required with small knob 3
         if self.__zselector[3] and self.__song__:
             self.__zselector[3].read_zyncoder()
             QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
 
         return [0, 1, 2, 3]
 
-    @Slot(None)
-    def set_selector(self, zs_hiden=False):
-        if self.__song__ is None:
-            return
-
-        self.is_set_selector_running = True
-
-        # Configure Big Knob
+    def configure_big_knob(self):
         if self.zyngui.sound_combinator_active:
             # If sound combinator is active, Use Big knob to control preset
 
@@ -367,63 +375,92 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[0].config(self.__zselector_ctrl[0])
             self.__zselector[0].custom_encoder_speed = 0
 
-        ### Common vars for small knobs
-        selected_clip = None
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
-        ###
+    def configure_small_knob_1(self, selected_track, selected_clip):
+        if self.zyngui.sound_combinator_active:
+            volume = 0
+            min_value = 0
+            max_value = 0
 
-        if self.zyngui.trackWaveEditorBarActive:
-            logging.error(f"### set_selector : trackWaveEditorBarActive is active.")
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
-        elif self.zyngui.clipWaveEditorBarActive:
-            logging.error(f"### set_selector : clipWaveEditorBarActive is active.")
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+            try:
+                logging.error(f"layer({selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]}), layerExists({selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow])})")
+                if selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]):
+                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[self.zyngui.session_dashboard.selectedSoundRow]
+                    volume = volume_control_obj.value * 1000
+                    min_value = volume_control_obj.value_min * 1000
+                    max_value = volume_control_obj.value_max * 1000
+            except Exception as e:
+                logging.error(f"Error configuring knob 1 : {str(e)}")
 
-        ### Configure small knob 0
-        start_position = 0
-        max_value = 0
+            if self.__zselector[1] is None:
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
+                                                               'zynthiloops_knob1',
+                                                               {'midi_cc': 0, 'value': round(volume)})
 
-        try:
-            if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
-                start_position = int(selected_clip.startPosition * 1000)
-                max_value = int(selected_clip.duration * 1000)
-        except:
-            pass
+                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+                                                              self)
+                self.__zselector[1].index = 0
 
-        if self.__zselector[1] is None:
-            self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_startposition', 'zynthiloops_startposition',
-                                                        {'midi_cc': 0, 'value': start_position})
+            logging.error(
+                f"### set_selector : Configuring small knob 1, value({volume}), max_value({max_value}), min_value({min_value})")
 
-            self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1], self)
-            self.__zselector[1].index = 0
+            self.__zselector_ctrl[1].set_options(
+                {'symbol': 'zynthiloops_knob1', 'name': 'Zynthiloops Knob 1',
+                 'short_name': 'Knob1',
+                 'midi_cc': 0, 'value_max': round(max_value), 'value_min': round(min_value), 'value': round(volume)})
 
-        logging.error(f"### set_selector : Configuring small knob 0, value({start_position}), max_value({max_value})")
+            self.__zselector[1].config(self.__zselector_ctrl[1])
+            self.__zselector[1].custom_encoder_speed = 0
+        else:
+            start_position = 0
+            max_value = 0
 
-        self.__zselector_ctrl[1].set_options(
-            {'symbol': 'zynthiloops_startposition', 'name': 'Zynthiloops Startposition', 'short_name': 'Startposition',
-             'midi_cc': 0, 'value_max': max_value, 'value': start_position})
+            try:
+                if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
+                    start_position = int(selected_clip.startPosition * 1000)
+                    max_value = int(selected_clip.duration * 1000)
+            except Exception as e:
+                logging.error(f"Error configuring knob 1 : {str(e)}")
 
-        self.__zselector[1].config(self.__zselector_ctrl[1])
-        self.__zselector[1].custom_encoder_speed = 0
+            if self.__zselector[1] is None:
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
+                                                               'zynthiloops_knob1',
+                                                               {'midi_cc': 0, 'value': start_position})
+
+                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+                                                              self)
+                self.__zselector[1].index = 0
+
+            logging.error(f"### set_selector : Configuring small knob 1, value({start_position}), max_value({max_value})")
+
+            self.__zselector_ctrl[1].set_options(
+                {'symbol': 'zynthiloops_knob1', 'name': 'Zynthiloops Knob 1', 'short_name': 'Knob1',
+                 'midi_cc': 0, 'value_max': max_value, 'value': start_position})
+
+            self.__zselector[1].config(self.__zselector_ctrl[1])
+            self.__zselector[1].custom_encoder_speed = 0
 
         if self.zyngui.get_current_screen_id() is not None and \
-           self.zyngui.get_current_screen() == self and \
-           (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
-           selected_clip is not None and \
-           selected_clip.path is not None and \
-           len(selected_clip.path) > 0:
+                self.zyngui.get_current_screen() == self and \
+                (
+                    (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
+                    selected_clip is not None and
+                    selected_clip.path is not None and
+                    len(selected_clip.path) > 0
+                ) or (
+                    self.zyngui.sound_combinator_active and
+                    selected_track.checkIfLayerExists(self.zyngui.session_dashboard.selectedSoundRow)
+                ):
             logging.error(
-                f"### set_selector : Configuring small knob 0, showing")
+                f"### set_selector : Configuring small knob 1, showing")
 
             self.__zselector[1].show()
         else:
             logging.error(
-                f"### set_selector : Configuring small knob 0, hiding")
+                f"### set_selector : Configuring small knob 1, hiding")
 
             self.__zselector[1].hide()
-        ### END Configure small knob 0
 
-        ### Configure small knob 1
+    def configure_small_knob_2(self, selected_track, selected_clip):
         loop = 0
         max_value = 0
 
@@ -431,8 +468,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
                 loop = int(selected_clip.loopDelta * 1000)
                 max_value = int(selected_clip.secPerBeat * selected_clip.length * 1000)
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"Error configuring knob 2 : {str(e)}")
 
         if self.__zselector[2] is None:
             self.__zselector_ctrl[2] = zynthian_controller(None, 'zynthiloops_loop',
@@ -444,7 +481,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[2].index = 1
 
         logging.error(
-            f"### set_selector : Configuring small knob 1, value({loop}), max_value({max_value})")
+            f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
 
         self.__zselector_ctrl[2].set_options(
             {'symbol': 'zynthiloops_loop', 'name': 'Zynthiloops Loop',
@@ -461,25 +498,24 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
             logging.error(
-                f"### set_selector : Configuring small knob 1, showing")
+                f"### set_selector : Configuring small knob 2, showing")
 
             self.__zselector[2].show()
         else:
             logging.error(
-                f"### set_selector : Configuring small knob 1, hiding")
+                f"### set_selector : Configuring small knob 2, hiding")
 
             self.__zselector[2].hide()
-        ### END Configure small knob 1
 
-        ### Configure small knob 2
+    def configure_small_knob_3(self, selected_track, selected_clip):
         value = 0
         max_value = 64 * 100
 
         try:
             if selected_clip is not None and selected_clip.path is not None and len(selected_clip.path) > 0:
                 value = selected_clip.length * 100
-        except:
-            pass
+        except Exception as e:
+            logging.error(f"Error configuring knob 3 : {str(e)}")
 
         if self.__zselector[3] is None:
             self.__zselector_ctrl[3] = zynthian_controller(None, 'zynthiloops_length',
@@ -491,7 +527,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[3].index = 2
 
         logging.error(
-            f"### set_selector : Configuring small knob 2, value({value}), max_value({max_value})")
+            f"### set_selector : Configuring small knob 3, value({value}), max_value({max_value})")
 
         self.__zselector_ctrl[3].set_options(
             {'symbol': 'zynthiloops_length', 'name': 'Zynthiloops Length',
@@ -507,15 +543,45 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
             logging.error(
-                f"### set_selector : Configuring small knob 2, showing")
+                f"### set_selector : Configuring small knob 3, showing")
 
             self.__zselector[3].show()
         else:
             logging.error(
-                f"### set_selector : Configuring small knob 2, hiding")
+                f"### set_selector : Configuring small knob 3, hiding")
 
             self.__zselector[3].hide()
-        ### END Configure small knob 2
+
+    @Slot(None)
+    def set_selector(self, zs_hiden=False):
+        if self.__song__ is None:
+            return
+
+        self.is_set_selector_running = True
+
+        ### Common vars for small knobs
+        selected_clip = None
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+
+        if self.zyngui.trackWaveEditorBarActive:
+            logging.error(f"### set_selector : trackWaveEditorBarActive is active.")
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+        elif self.zyngui.clipWaveEditorBarActive:
+            logging.error(f"### set_selector : clipWaveEditorBarActive is active.")
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
+        ###
+
+        # Configure Big Knob
+        self.configure_big_knob()
+
+        # Configure small knob 1
+        self.configure_small_knob_1(selected_track_obj, selected_clip)
+
+        # Configure small knob 2
+        self.configure_small_knob_2(selected_track_obj, selected_clip)
+
+        # Configure small knob 3
+        self.configure_small_knob_3(selected_track_obj, selected_clip)
 
         self.is_set_selector_running = False
 

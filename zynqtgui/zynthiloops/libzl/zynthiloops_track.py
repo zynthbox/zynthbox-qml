@@ -152,7 +152,8 @@ class zynthiloops_track(QObject):
 
                     for i, clip in enumerate(obj):
                         if clip is not None:
-                            self.__samples__[i].path = str(bank_dir / clip["path"])
+                            if (bank_dir / clip["path"]).exists():
+                                self.__samples__[i].path = str(bank_dir / clip["path"])
 
                     self.samples_changed.emit()
             except Exception as e:

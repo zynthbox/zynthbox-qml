@@ -31,7 +31,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
-//import Zynthian 1.0 as Zynthian
+import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
@@ -603,6 +603,48 @@ Rectangle {
         }
     }
 
+    Zynthian.FilePickerDialog {
+        id: samplePickerDialog
+        parent: zlScreen.parent
+
+        width: parent.width
+        height: parent.height
+        x: parent.x
+        y: parent.y
+
+        headerText: qsTr("%1-S%2 : Pick a sample")
+                        .arg(root.selectedSlotRowItem.track.name)
+                        .arg(root.selectedSlotRowItem.selectedRow + 1)
+        rootFolder: "/zynthian/zynthian-my-data"
+        folderModel {
+            nameFilters: ["*.wav"]
+        }
+        onFileSelected: {
+            root.selectedSlotRowItem.track.set_sample(file.filePath, root.selectedSlotRowItem.selectedRow)
+        }
+    }
+
+    Zynthian.FilePickerDialog {
+        id: bankPickerDialog
+        parent: zlScreen.parent
+
+        width: parent.width
+        height: parent.height
+        x: parent.x
+        y: parent.y
+
+        headerText: qsTr("%1-S%2 : Pick a bank")
+                        .arg(root.selectedSlotRowItem.track.name)
+                        .arg(root.selectedSlotRowItem.selectedRow + 1)
+        rootFolder: "/zynthian/zynthian-my-data"
+        folderModel {
+            nameFilters: ["bank.json"]
+        }
+        onFileSelected: {
+            root.selectedSlotRowItem.track.setBank(file.filePath)
+        }
+    }
+
     QQC2.Popup {
         id: samplePickerPopup
 
@@ -621,6 +663,9 @@ Rectangle {
                 text: qsTr("Pick sample for slot")
 
                 onClicked: {
+                    samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.track.recordingDir
+                    samplePickerDialog.open()
+                    samplePickerPopup.close()
                 }
             }
 
@@ -631,6 +676,9 @@ Rectangle {
                 text: qsTr("Pick bank for track")
 
                 onClicked: {
+                    bankPickerDialog.folderModel.folder = root.selectedSlotRowItem.track.recordingDir + "/sampleset"
+                    bankPickerDialog.open()
+                    samplePickerPopup.close()
                 }
             }
         }

@@ -112,7 +112,7 @@ class zynthiloops_track(QObject):
         logging.error(f"Master Volume : {self.master_volume} dB")
 
     def save_bank(self):
-        bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
+        bank_dir = Path(self.bankDir)
 
         obj = []
         for sample in self.__samples__:
@@ -139,7 +139,7 @@ class zynthiloops_track(QObject):
                 break
 
     def restore_bank(self):
-        bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
+        bank_dir = Path(self.bankDir)
 
         if not (bank_dir / 'bank.json').exists():
             logging.error(f"bank.json does not exist for track {self.id + 1}. Skipping restoration")
@@ -344,8 +344,8 @@ class zynthiloops_track(QObject):
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
 
-        source_bank_dir = self.__base_samples_dir__ / f'bank.{source.id + 1}'
-        dest_bank_dir = self.__base_samples_dir__ / f'bank.{self.id + 1}'
+        source_bank_dir = Path(source.bankDir)
+        dest_bank_dir = Path(self.bankDir)
 
         dest_bank_dir.mkdir(parents=True, exist_ok=True)
 
@@ -671,7 +671,16 @@ class zynthiloops_track(QObject):
 
     ### Property bankDir
     def get_bank_dir(self):
-        path = self.__base_samples_dir__ / f"bank.{self.id + 1}"
+        try:
+            # Check if a dir named <somerandomname>.<track_id> exists.
+            # If exists, use that name as the bank dir name otherwise use default name `bank`
+            bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
+        except:
+            bank_name = "bank"
+        path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
+
+        logging.error(f"get_bank_dir track{self.id + 1} : bankDir({path})")
+
         return str(path)
 
     bankDir = Property(str, get_bank_dir, constant=True)

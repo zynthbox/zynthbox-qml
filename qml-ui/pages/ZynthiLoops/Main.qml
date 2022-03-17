@@ -981,7 +981,7 @@ Zynthian.ScreenPage {
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
                                             // Copy Clip
-                                            root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol).copyFrom(root.clipToCopy)
+                                            root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol).copyFrom(root.copySourceObj)
                                             root.copySourceObj = null
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_track") {
                                             // Copy Track

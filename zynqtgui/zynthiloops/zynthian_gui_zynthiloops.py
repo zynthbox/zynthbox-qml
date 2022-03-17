@@ -128,7 +128,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer = QTimer()
         self.select_preset_timer.setInterval(100)
         self.select_preset_timer.setSingleShot(True)
-        self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
+        # self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
 
     def sync_selector_visibility(self):
         pass
@@ -204,10 +204,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if track.checkIfLayerExists(selected_channel) and self.zyngui.preset.current_index != round(self.__zselector[0].value/1000):
-            logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
-            self.zyngui.preset.select(round(self.__zselector[0].value/1000))
-            self.select_preset_timer.start()
+        if selected_channel in self.zyngui.layer.layer_midi_map:
+            layer = self.zyngui.layer.layer_midi_map[selected_channel]
+
+            if track.checkIfLayerExists(selected_channel) and layer.preset_index != round(self.__zselector[0].value/1000):
+                logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
+                layer.set_preset(min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1), True)
+                # self.select_preset_timer.start()
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
@@ -335,8 +338,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 try:
                     preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
+                    max_value = (len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) - 1) * 1000
                 except:
                     preset_index = 0
+                    max_value = 0
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_preset', 'zynthiloops_preset',
@@ -347,7 +352,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
-                     'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
+                     'value_max': max_value,
                      'value': preset_index})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])

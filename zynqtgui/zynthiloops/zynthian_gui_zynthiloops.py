@@ -130,6 +130,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.select_preset_timer.setSingleShot(True)
         # self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
 
+        self.__volume_control_obj = None
+
+
+    def connect_control_objects(self):
+        if self.__volume_control_obj == self.zyngui.layers_for_track.get_volume_controls()[self.zyngui.session_dashboard.selectedSoundRow]:
+            return
+        if self.__volume_control_obj:
+            self.__volume_control_obj.value_changed.disconnect(self.set_selector)
+
+        self.__volume_control_obj = self.zyngui.layers_for_track.get_volume_controls()[self.zyngui.session_dashboard.selectedSoundRow]
+
+        if self.__volume_control_obj:
+            self.__volume_control_obj.value_changed.connect(self.set_selector)
+
+
     def sync_selector_visibility(self):
         pass
         # if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:

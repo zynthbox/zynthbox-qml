@@ -210,6 +210,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if track.checkIfLayerExists(selected_channel) and layer.preset_index != round(self.__zselector[0].value/1000):
                 logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
                 layer.set_preset(min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1), True)
+                self.zyngui.fixed_layers.fill_list()
+                self.presetUpdated.emit()
                 # self.select_preset_timer.start()
 
     @Slot(None)
@@ -1380,3 +1382,4 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     newSketchLoaded = Signal()
     longTaskStarted = Signal()
     longTaskEnded = Signal()
+    presetUpdated = Signal()

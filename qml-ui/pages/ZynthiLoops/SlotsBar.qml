@@ -351,12 +351,15 @@ Rectangle {
 
                                     Repeater {
                                         model: 5
-                                        delegate: Item {
+                                        delegate: Rectangle {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             Layout.alignment: Qt.AlignVCenter
                                             Layout.leftMargin: 4
                                             Layout.rightMargin: 4
+                                            color: "transparent"
+                                            border.width: 2
+                                            border.color: trackDelegate.highlighted && trackDelegate.selectedRow === index ? Kirigami.Theme.highlightColor : "transparent"
 
                                             MouseArea {
                                                 anchors.fill: parent
@@ -384,14 +387,14 @@ Rectangle {
 
                                                 clip: true
                                                 anchors.centerIn: parent
-                                                width: parent.width
+                                                width: parent.width - 4
                                                 height: Kirigami.Units.gridUnit * 1.5
 
                                                 Kirigami.Theme.inherit: false
                                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                                 color: Kirigami.Theme.backgroundColor
 
-                                                border.color: trackDelegate.highlighted && trackDelegate.selectedRow === index ? Kirigami.Theme.highlightColor : "#ff999999"
+                                                border.color: "#ff999999"
                                                 border.width: 2
                                                 radius: 4
 

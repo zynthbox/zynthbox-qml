@@ -622,18 +622,21 @@ class zynthiloops_track(QObject):
         logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
         if force_set or type != self.__track_audio_type__:
             for sound in self.__chained_sounds__:
-                layer = self.zyngui.screens['layer'].get_midichain_root_by_chan(sound)
-                if layer is not None:
-                    if type == "synth" or type == "sample-loop":
-                        if layer.get_midi_out() == []:
-                            layer.set_midi_out(self.__previous_midi_out__[sound])
-                        self.__previous_midi_out__[sound] = []
-                        layer.reset_audio_out()
-                    else:
-                        if self.__previous_midi_out__[sound] == []:
-                            self.__previous_midi_out__[sound] = layer.get_midi_out()
-                        layer.mute_midi_out()
-                        layer.mute_audio_out()
+                try:
+                    layer = self.zyngui.screens['layer'].get_midichain_root_by_chan(sound)
+                    if layer is not None:
+                        if type == "synth" or type == "sample-loop":
+                            if layer.get_midi_out() == []:
+                                layer.set_midi_out(self.__previous_midi_out__[sound])
+                            self.__previous_midi_out__[sound] = []
+                            layer.reset_audio_out()
+                        else:
+                            if self.__previous_midi_out__[sound] == []:
+                                self.__previous_midi_out__[sound] = layer.get_midi_out()
+                            layer.mute_midi_out()
+                            layer.mute_audio_out()
+                except:
+                    pass
             self.__track_audio_type__ = type
             self.track_audio_type_changed.emit()
             if not force_set:

@@ -330,8 +330,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                logging.error(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track})")
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+                logging.error(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({self.zyngui.session_dashboard.selectedSoundRow}), channel({selected_channel})")
 
                 try:
                     preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000

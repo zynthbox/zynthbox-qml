@@ -39,6 +39,17 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function cuiaCallback(cuia) {
+        if (samplePickerDialog.opened) {
+            if (samplePickerDialog.cuiaCallback(cuia)) {
+                return true;
+            }
+        }
+        if (bankPickerDialog.opened) {
+            if (bankPickerDialog.cuiaCallback(cuia)) {
+                return true;
+            }
+        }
+
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
                 bottomBar.controlType = BottomBar.ControlType.Track;

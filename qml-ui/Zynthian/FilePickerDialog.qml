@@ -48,6 +48,7 @@ QQC2.Dialog {
     property string autoExtension: "" // Set this to suggest what the file extension will be on a saved file (so the overwrite checking logic can be retained)
 
     modal: true
+    closePolicy: QQC2.Popup.CloseOnPressOutside
 
     y: root.parent.mapFromGlobal(0, saveMode && Qt.inputMethod.visible ? Kirigami.Units.gridUnit : Math.round(header.Window.height/2 - height/2)).y
     x: root.parent.mapFromGlobal(Math.round(header.Window.width/2 - width/2), 0).x

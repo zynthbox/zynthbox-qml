@@ -86,6 +86,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
                     #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
                     #used_empty_channels += 1
             self.volume_controls_changed.emit()
+            self.zyngui.screens["zynthiloops"].connect_control_objects()
         except Exception as e:
             logging.error(e)
             pass

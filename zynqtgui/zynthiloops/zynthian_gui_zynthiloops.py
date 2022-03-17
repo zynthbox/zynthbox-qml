@@ -324,56 +324,63 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return [0, 1, 2, 3]
 
     def configure_big_knob(self):
-        if self.zyngui.sound_combinator_active:
-            # If sound combinator is active, Use Big knob to control preset
+        try:
+            if self.zyngui.sound_combinator_active:
+                # If sound combinator is active, Use Big knob to control preset
 
-            logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
+                logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
+                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                logging.error(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track})")
+                selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-            selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
+                try:
+                    preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
+                except:
+                    preset_index = 0
 
-            try:
-                preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
-            except:
-                preset_index = 0
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_preset', 'zynthiloops_preset',
+                                                                {'midi_cc': 0, 'value': preset_index})
 
-            if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_preset', 'zynthiloops_preset',
-                                                            {'midi_cc': 0, 'value': preset_index})
+                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+                                                                  self.__zselector_ctrl[0], self)
 
-                self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                              self.__zselector_ctrl[0], self)
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
+                     'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
+                     'value': preset_index})
 
-            self.__zselector_ctrl[0].set_options(
-                {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
-                 'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
-                 'value': preset_index})
+                self.__zselector[0].config(self.__zselector_ctrl[0])
+                self.__zselector[0].custom_encoder_speed = 0
+            else:
+                # If sound combinator is not active, Use Big knob to control selected track
 
-            self.__zselector[0].config(self.__zselector_ctrl[0])
-            self.__zselector[0].custom_encoder_speed = 0
-        else:
-            # If sound combinator is not active, Use Big knob to control selected track
+                try:
+                    selected_track = self.zyngui.session_dashboard.get_selected_track() * 10
+                except:
+                    selected_track = 0
 
-            try:
-                selected_track = self.zyngui.session_dashboard.get_selected_track() * 10
-            except:
-                selected_track = 0
+                logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
 
-            logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
+                                                                {'midi_cc': 0, 'value': selected_track})
 
-            if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
-                                                            {'midi_cc': 0, 'value': selected_track})
+                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
+                                                                  self)
 
-                self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
-                                                              self)
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
+                     'value_max': 90, 'value': selected_track})
 
-            self.__zselector_ctrl[0].set_options(
-                {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
-                 'value_max': 90, 'value': selected_track})
+                self.__zselector[0].config(self.__zselector_ctrl[0])
+                self.__zselector[0].custom_encoder_speed = 0
 
-            self.__zselector[0].config(self.__zselector_ctrl[0])
-            self.__zselector[0].custom_encoder_speed = 0
+            if self.__zselector[0] is not None:
+                self.__zselector[0].show()
+        except:
+            if self.__zselector[0] is not None:
+                self.__zselector[0].hide()
 
     def configure_small_knob_1(self, selected_track, selected_clip):
         if self.zyngui.sound_combinator_active:
@@ -554,7 +561,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        if self.__song__ is None:
+        if self.__song__ is None or (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self):
+            if self.__zselector[0] is not None:
+                self.__zselector[0].hide()
+            if self.__zselector[1] is not None:
+                self.__zselector[1].hide()
+            if self.__zselector[2] is not None:
+                self.__zselector[2].hide()
+            if self.__zselector[3] is not None:
+                self.__zselector[3].hide()
+
             return
 
         self.is_set_selector_running = True

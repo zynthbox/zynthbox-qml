@@ -109,6 +109,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 					self.zyngui.show_screen("layer_effect_chooser")
 
 				self.zyngui.screens["fixed_layers"].fill_list()
+				self.zyngui.screens['snapshot'].save_last_state_snapshot()
 			except:
 				pass
 

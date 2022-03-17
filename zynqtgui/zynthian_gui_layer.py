@@ -94,7 +94,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(max(0, layer.preset_index - 1), True)
 			logging.error(layer.preset_index)
-			self.zyngui.preset.select(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 
@@ -105,7 +104,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(min(layer.preset_index + 1, len(layer.preset_list) -1), True)
 			logging.error(layer.preset_index)
-			self.zyngui.preset.select(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 

@@ -73,6 +73,18 @@ Zynthian.Card {
     }
 
     Connections {
+        target: zynthian.zynthiloops
+        onPresetUpdated: {
+            console.log("PRESET UPDATED", root.selectedTrack.getLayerNameByMidiChannel(1))
+            console.log("PRESET UPDATED", root.selectedTrack.getLayerNameByMidiChannel(5))
+            // Update sound / preset /synth labels on change
+            for (var i = 0; i < chainedSoundsRepeater.count; ++i ) {
+                chainedSoundsRepeater.itemAt(i).update();
+            }
+        }
+    }
+
+    Connections {
         id: currentScreenConnection
         property string oldScreen: "session_dashboard"
         target: zynthian

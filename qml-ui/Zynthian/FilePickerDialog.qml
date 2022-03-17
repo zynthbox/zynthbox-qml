@@ -481,7 +481,10 @@ QQC2.Dialog {
                         Kirigami.BasicListItem {
                             Layout.fillWidth: true
                             visible: filePropertiesColumn.filePropertiesHelperObj && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.isWav
-                            label: qsTr("Duration: %1 secs").arg(filePropertiesColumn.filePropertiesHelperObj ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1) : 0)
+                            label: qsTr("Duration: %1 secs")
+                                    .arg(filePropertiesColumn.filePropertiesHelperObj
+                                            ? filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration && filePropertiesColumn.filePropertiesHelperObj.fileMetadata.properties.duration.toFixed(1)
+                                            : 0)
                         }
                     }
                 }

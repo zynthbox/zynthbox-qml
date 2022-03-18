@@ -371,6 +371,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
                                                                   self.__zselector_ctrl[0], self)
 
+                self.__zselector[0].show()
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
                      'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
@@ -396,6 +397,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
                                                                   self)
 
+                self.__zselector[0].show()
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
                      'value_max': 90, 'value': selected_track})
@@ -410,6 +412,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector[0].hide()
 
     def configure_small_knob_1(self, selected_track, selected_clip):
+        if self.__zselector[1] is None:
+            self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
+                                                            'zynthiloops_knob1',
+                                                            {'midi_cc': 0, 'value': 0})
+
+            self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+                                                            self)
+            self.__zselector[1].index = 0
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
                 (
@@ -423,15 +433,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 ):
             logging.error(
                 f"### set_selector : Configuring small knob 1, showing")
-
-            if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
-                                                               'zynthiloops_knob1',
-                                                               {'midi_cc': 0, 'value': round(volume)})
-
-                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
-                                                              self)
-                self.__zselector[1].index = 0
 
             self.__zselector[1].show()
         else:
@@ -516,17 +517,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                                                           self)
             self.__zselector[2].index = 1
 
-        logging.error(
-            f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
-
-        self.__zselector_ctrl[2].set_options(
-            {'symbol': 'zynthiloops_loop', 'name': 'Zynthiloops Loop',
-             'short_name': 'Loop',
-             'midi_cc': 0, 'value_max': max_value, 'value': loop})
-
-        self.__zselector[2].config(self.__zselector_ctrl[2])
-        self.__zselector[2].custom_encoder_speed = 0
-
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
                 (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
@@ -540,8 +530,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             logging.error(
                 f"### set_selector : Configuring small knob 2, hiding")
-
             self.__zselector[2].hide()
+
+        logging.error(
+            f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
+
+        self.__zselector_ctrl[2].set_options(
+            {'symbol': 'zynthiloops_loop', 'name': 'Zynthiloops Loop',
+             'short_name': 'Loop',
+             'midi_cc': 0, 'value_max': max_value, 'value': loop})
+
+        self.__zselector[2].config(self.__zselector_ctrl[2])
+        self.__zselector[2].custom_encoder_speed = 0
+
 
     def configure_small_knob_3(self, selected_track, selected_clip):
         value = 0
@@ -562,6 +563,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                                                           self)
             self.__zselector[3].index = 2
 
+        if self.zyngui.get_current_screen_id() is not None and \
+                self.zyngui.get_current_screen() == self and \
+                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+                selected_clip is not None and \
+                selected_clip.path is not None and \
+                len(selected_clip.path) > 0:
+            logging.error(
+                f"### set_selector : Configuring small knob 3, showing")
+            self.__zselector[3].show()
+        else:
+            logging.error(
+                f"### set_selector : Configuring small knob 3, hiding")
+            self.__zselector[3].hide()
+
         logging.error(
             f"### set_selector : Configuring small knob 3, value({value}), max_value({max_value})")
 
@@ -572,21 +587,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.__zselector[3].config(self.__zselector_ctrl[3])
 
-        if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
-                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
-                selected_clip is not None and \
-                selected_clip.path is not None and \
-                len(selected_clip.path) > 0:
-            logging.error(
-                f"### set_selector : Configuring small knob 3, showing")
-
-            self.__zselector[3].show()
-        else:
-            logging.error(
-                f"### set_selector : Configuring small knob 3, hiding")
-
-            self.__zselector[3].hide()
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):

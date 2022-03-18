@@ -143,6 +143,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.connect(self.set_selector)
+            self.set_selector()
 
 
     def sync_selector_visibility(self):
@@ -228,6 +229,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.fixed_layers.fill_list()
                 self.presetUpdated.emit()
                 # self.select_preset_timer.start()
+
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
@@ -352,6 +354,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
                 logging.error(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({self.zyngui.session_dashboard.selectedSoundRow}), channel({selected_channel})")
+                preset_index = 0
+                max_value = 0
 
                 try:
                     preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
@@ -369,6 +373,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
+                     'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
                      'value_max': max_value,
                      'value': preset_index})
 
@@ -405,6 +410,37 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector[0].hide()
 
     def configure_small_knob_1(self, selected_track, selected_clip):
+        if self.zyngui.get_current_screen_id() is not None and \
+                self.zyngui.get_current_screen() == self and \
+                (
+                    (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
+                    selected_clip is not None and
+                    selected_clip.path is not None and
+                    len(selected_clip.path) > 0
+                ) or (
+                    self.zyngui.sound_combinator_active and
+                    selected_track.checkIfLayerExists(self.zyngui.session_dashboard.selectedSoundRow)
+                ):
+            logging.error(
+                f"### set_selector : Configuring small knob 1, showing")
+
+            if self.__zselector[1] is None:
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
+                                                               'zynthiloops_knob1',
+                                                               {'midi_cc': 0, 'value': round(volume)})
+
+                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+                                                              self)
+                self.__zselector[1].index = 0
+
+            self.__zselector[1].show()
+        else:
+            logging.error(
+                f"### set_selector : Configuring small knob 1, hiding")
+
+            if self.__zselector[1]:
+                self.__zselector[1].hide()
+
         if self.zyngui.sound_combinator_active:
             volume = 0
             min_value = 0
@@ -419,15 +455,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     max_value = volume_control_obj.value_max * 1000
             except Exception as e:
                 logging.error(f"Error configuring knob 1 : {str(e)}")
-
-            if self.__zselector[1] is None:
-                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
-                                                               'zynthiloops_knob1',
-                                                               {'midi_cc': 0, 'value': round(volume)})
-
-                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
-                                                              self)
-                self.__zselector[1].index = 0
 
             logging.error(
                 f"### set_selector : Configuring small knob 1, value({volume}), max_value({max_value}), min_value({min_value})")
@@ -468,26 +495,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[1].config(self.__zselector_ctrl[1])
             self.__zselector[1].custom_encoder_speed = 0
 
-        if self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
-                (
-                    (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
-                    selected_clip is not None and
-                    selected_clip.path is not None and
-                    len(selected_clip.path) > 0
-                ) or (
-                    self.zyngui.sound_combinator_active and
-                    selected_track.checkIfLayerExists(self.zyngui.session_dashboard.selectedSoundRow)
-                ):
-            logging.error(
-                f"### set_selector : Configuring small knob 1, showing")
-
-            self.__zselector[1].show()
-        else:
-            logging.error(
-                f"### set_selector : Configuring small knob 1, hiding")
-
-            self.__zselector[1].hide()
 
     def configure_small_knob_2(self, selected_track, selected_clip):
         loop = 0
@@ -1397,4 +1404,3 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     newSketchLoaded = Signal()
     longTaskStarted = Signal()
     longTaskEnded = Signal()
-    presetUpdated = Signal()

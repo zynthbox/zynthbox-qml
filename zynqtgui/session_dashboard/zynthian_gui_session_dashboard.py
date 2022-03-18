@@ -166,6 +166,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
         self.__change_track_sound_timer__.setInterval(1000)
+        self.zyngui.zynthiloops.set_selector()
 
         self.schedule_save()
     def get_selected_track(self):

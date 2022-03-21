@@ -588,7 +588,7 @@ Zynthian.Card {
                     }
 
                     QQC2.Slider {
-                        orientation: Qt.Horizontal
+                        property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
 
                         Layout.fillWidth: true
                         Layout.fillHeight: false
@@ -597,8 +597,12 @@ Zynthian.Card {
                         Layout.leftMargin: Kirigami.Units.gridUnit
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
-                        enabled: zynthian.session_dashboard.selectedSoundRow === index && soundDelegate.chainedSound >= 0 && root.selectedTrack && root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)
-                        property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
+                        orientation: Qt.Horizontal
+                        enabled: zynthian.session_dashboard.selectedSoundRow === index &&
+                                 soundDelegate.chainedSound >= 0 &&
+                                 root.selectedTrack &&
+                                 root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
+                                 volumeControlObject.controllable
                         value: volumeControlObject ? volumeControlObject.value : 0
                         stepSize: volumeControlObject ? volumeControlObject.step_size : 1
                         from: volumeControlObject ? volumeControlObject.value_min : 0

@@ -47,6 +47,7 @@ class MixerControl(QObject):
         if self.__zctrl == zctrl:
             return
         self.__zctrl = zctrl
+        self.controllable_changed.emit()
         self.refresh()
 
     @Slot(None)
@@ -55,6 +56,15 @@ class MixerControl(QObject):
         self.value_max_changed.emit()
         self.name_changed.emit()
         self.value_changed.emit()
+
+    @Signal
+    def controllable_changed(self):
+        pass
+
+    def get_controllable(self):
+        return self.__zctrl is not None
+
+    controllable = Property(bool, get_controllable, notify=controllable_changed)
 
     @Signal
     def value_changed(self):

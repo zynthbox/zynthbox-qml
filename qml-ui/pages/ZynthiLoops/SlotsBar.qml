@@ -522,7 +522,10 @@ Rectangle {
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
 
                             visible: synthsButton.checked
-                            enabled: chainedSound >= 0 && root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)
+                            enabled: chainedSound >= 0 &&
+                                     root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound) &&
+                                     volumeControlObject &&
+                                     volumeControlObject.controllable
                             value: volumeControlObject ? volumeControlObject.value : 0
                             stepSize: volumeControlObject ? volumeControlObject.step_size : 1
                             from: volumeControlObject ? volumeControlObject.value_min : 0

@@ -478,6 +478,7 @@ Zynthian.ScreenPage {
                                 QQC2.Slider {
                                     Layout.fillWidth: true
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
+                                    enabled: modelData.controllable
                                     onVisibleChanged: modelData.refresh()
                                     value: modelData.value
                                     orientation: Qt.Horizontal

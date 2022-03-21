@@ -427,6 +427,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     len(selected_clip.path) > 0
                 ) or (
                     self.zyngui.sound_combinator_active and
+                    selected_track is not None and
                     selected_track.checkIfLayerExists(self.zyngui.session_dashboard.selectedSoundRow)
                 ):
             logging.error(

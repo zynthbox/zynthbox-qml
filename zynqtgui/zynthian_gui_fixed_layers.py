@@ -123,10 +123,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__layers_count = 15
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
+
+        # Map all unorthodox zctrl name for synths not using a controller named `volume`
         self.__volume_zctrl_mapping__ = {
             'Jalv/synthv1': ['OUT1_VOLUME'],
-            '*': ["volume", "Volume"]
+            '*': ['volume', 'Volume']
         }
+
         self.show()
 
 

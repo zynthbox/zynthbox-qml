@@ -123,6 +123,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__layers_count = 15
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
+        self.__volume_zctrl_mapping__ = {
+            'Jalv/synthv1': ['OUT1_VOLUME'],
+            '*': ["volume", "Volume"]
+        }
         self.show()
 
 
@@ -164,10 +168,19 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     first = False
                     sl0 = sl
                 metadata["effects_label"] = effects_label
+
                 ctrl = None
+
+                # Find volume control as per self.__volume_zctrl_mapping__
                 for name in layer.controllers_dict:
-                    if name == "volume" or name == "Volume":
+                    # Check if engine has specific mapping of volume controller name
+                    # otherwise use global `*` controller mapping name from self.__volume_zctrl_mapping__
+                    if layer.engine.name in self.__volume_zctrl_mapping__ and \
+                       name in self.__volume_zctrl_mapping__[layer.engine.name]:
                         ctrl = layer.controllers_dict[name]
+                    elif name in self.__volume_zctrl_mapping__['*']:
+                        ctrl = layer.controllers_dict[name]
+
                 if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
                     gctrl = MixerControl(self)
                     gctrl.set_zctrl(ctrl)

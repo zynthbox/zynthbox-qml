@@ -361,8 +361,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     preset_index = self.zyngui.layer.layer_midi_map[selected_channel].preset_index * 1000
                     max_value = (len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) - 1) * 1000
                 except:
-                    preset_index = 0
-                    max_value = 0
+                    pass
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_preset', 'zynthiloops_preset',
@@ -374,7 +373,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector[0].show()
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
-                     'value_max': self.zyngui.preset.selector_list.get_count() * 1000,
                      'value_max': max_value,
                      'value': preset_index})
 
@@ -1404,3 +1402,4 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     newSketchLoaded = Signal()
     longTaskStarted = Signal()
     longTaskEnded = Signal()
+    presetUpdated = Signal()

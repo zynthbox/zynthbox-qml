@@ -97,7 +97,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 
-
 	@Slot(int)
 	def selectNextPreset(self, midi_chan):
 		if midi_chan in self.layer_midi_map:
@@ -106,6 +105,17 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.error(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
+
+	@Slot(int, int)
+	def selectPreset(self, midi_chan, preset_index):
+		if midi_chan in self.layer_midi_map:
+			layer = self.layer_midi_map[midi_chan]
+
+			if 0 <= preset_index < len(layer.preset_list):
+				layer.set_preset(preset_index, True)
+				logging.error(layer.preset_index)
+				self.zyngui.screens['control'].show()
+				self.fill_list()
 
 	def reset(self):
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
@@ -573,7 +583,6 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['fixed_layers'].select_action(midich)
 			if not self.zyngui.screens['bank'].get_show_top_sounds():
 				self.zyngui.screens['bank'].select_action(0)
-
 
 	def remove_layer(self, i, stop_unused_engines=True):
 		if i>=0 and i<len(self.layers):

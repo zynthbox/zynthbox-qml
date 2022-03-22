@@ -35,6 +35,11 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
+    property alias mixerButton: mixerButton
+    property alias synthsButton: synthsButton
+    property alias samplesButton: samplesButton
+    property alias fxButton: fxButton
+
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
@@ -272,12 +277,31 @@ Rectangle {
                         Layout.fillHeight: true
 
                         QQC2.Button {
+                            id: mixerButton
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: bottomStack.currentIndex === 1
+                            text: qsTr("Mixer")
+                            onCheckedChanged: {
+                                mixerActionBtn.checked = true
+                                sceneActionBtn.checked = false
+                                bottomStack.currentIndex = 1
+                            }
+                        }
+
+                        QQC2.Button {
                             id: synthsButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
                             checked: true
                             text: qsTr("Synths")
+                            onCheckedChanged: {
+                                mixerActionBtn.checked = false
+                                sceneActionBtn.checked = true
+                                bottomStack.currentIndex = 2
+                            }
                         }
 
                         QQC2.Button {
@@ -286,6 +310,11 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             text: qsTr("Samples")
+                            onCheckedChanged: {
+                                mixerActionBtn.checked = false
+                                sceneActionBtn.checked = true
+                                bottomStack.currentIndex = 2
+                            }
                         }
 
                         QQC2.Button {
@@ -294,6 +323,11 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             text: qsTr("FX")
+                            onCheckedChanged: {
+                                mixerActionBtn.checked = false
+                                sceneActionBtn.checked = true
+                                bottomStack.currentIndex = 2
+                            }
                         }
                     }
 

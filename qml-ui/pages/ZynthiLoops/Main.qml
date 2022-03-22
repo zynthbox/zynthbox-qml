@@ -104,41 +104,13 @@ Zynthian.ScreenPage {
                 }
             }
         },
-
         Kirigami.Action {
-            id: sceneActionBtn
-            text: qsTr("Slots")
-            checkable: true
-            onCheckedChanged: updateLedVariablesTimer.restart()
-            onTriggered: {
-                mixerActionBtn.checked = false;
-
-                if (!checked) {
-                    bottomStack.currentIndex = 2;
-                } else {
-                    bottomStack.currentIndex = 0;
-                }
-            }
+            enabled: false
         },
         Kirigami.Action {
-            id: mixerActionBtn
-            text: qsTr("Mixer")
-            checkable: true
-            onCheckedChanged: updateLedVariablesTimer.restart()
-            onTriggered: {
-                sceneActionBtn.checked = false;
-
-                if (!checked) {
-                    // Open Mixer
-                     zynthian.zynthiloops.startMonitorMasterAudioLevels();
-                    bottomStack.currentIndex = 1;
-                } else {
-                    // Close Mixer
-                     zynthian.zynthiloops.stopMonitorMasterAudioLevels();
-                    bottomStack.currentIndex = 0;
-                }
-            }
+            text: qsTr("Favorites")
         },
+
         Kirigami.Action {
             text: "Get New Sketches"
             onTriggered: {
@@ -332,6 +304,43 @@ Zynthian.ScreenPage {
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
+    }
+
+    Kirigami.Action {
+        id: sceneActionBtn
+        visible: false
+        text: qsTr("Slots")
+        checkable: true
+        onCheckedChanged: updateLedVariablesTimer.restart()
+        onTriggered: {
+            mixerActionBtn.checked = false;
+
+            if (!checked) {
+                bottomStack.currentIndex = 2;
+            } else {
+                bottomStack.currentIndex = 0;
+            }
+        }
+    }
+    Kirigami.Action {
+        id: mixerActionBtn
+        visible: false
+        text: qsTr("Mixer")
+        checkable: true
+        onCheckedChanged: updateLedVariablesTimer.restart()
+        onTriggered: {
+            sceneActionBtn.checked = false;
+
+            if (!checked) {
+                // Open Mixer
+                 zynthian.zynthiloops.startMonitorMasterAudioLevels();
+                bottomStack.currentIndex = 1;
+            } else {
+                // Close Mixer
+                 zynthian.zynthiloops.stopMonitorMasterAudioLevels();
+                bottomStack.currentIndex = 0;
+            }
+        }
     }
 
     QtObject {
@@ -1009,6 +1018,9 @@ Zynthian.ScreenPage {
 
             StackLayout {
                 id: bottomStack
+
+                property alias slotsBar: slotsBar
+
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 15
                 Layout.fillWidth: true
                 Layout.fillHeight: false

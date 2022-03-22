@@ -102,22 +102,58 @@ Rectangle {
                     Layout.fillHeight: true
                     spacing: 1
 
-                    VolumeControl {
-                        id: externalVolume
+                    QQC2.ButtonGroup {
+                        buttons: buttonsColumn.children
+                    }
+
+                    ColumnLayout {
+                        id: buttonsColumn
                         Layout.preferredWidth: privateProps.cellWidth + 6
                         Layout.maximumWidth: privateProps.cellWidth + 6
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
-                        footerText: "External"
-                        audioLeveldB: -200
-                        inputAudioLevelVisible: false
 
-                        slider {
-                            value: 0
-                            from: 0
-                            to: 100
-                            stepSize: 1
-                            onValueChanged: {
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: bottomStack.currentIndex === 1
+                            text: qsTr("Mixer")
+                            onClicked: {
+                                bottomStack.slotsBar.mixerButton.checked = true
+                            }
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: bottomStack.slotsBar.synthsButton.checked
+                            text: qsTr("Synths")
+                            onClicked: {
+                                bottomStack.slotsBar.synthsButton.checked = true
+                            }
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: bottomStack.slotsBar.samplesButton.checked
+                            text: qsTr("Samples")
+                            onClicked: {
+                                bottomStack.slotsBar.samplesButton.checked = true
+                            }
+                        }
+
+                        QQC2.Button {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: bottomStack.slotsBar.fxButton.checked
+                            text: qsTr("FX")
+                            onClicked: {
+                                bottomStack.slotsBar.fxButton.checked = true
                             }
                         }
                     }

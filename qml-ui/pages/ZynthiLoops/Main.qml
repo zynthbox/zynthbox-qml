@@ -817,7 +817,7 @@ Zynthian.ScreenPage {
                                             bottomStack.slotsBar.mixerButton.checked = true
                                             dblTimer.stop();
 
-                                            zynnthian.session_dashboard.disableNextSoundSwitchTimer();
+                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.sceneClip.row;
 
                                             return;

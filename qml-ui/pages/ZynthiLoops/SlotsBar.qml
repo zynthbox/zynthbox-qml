@@ -284,8 +284,7 @@ Rectangle {
                             checked: bottomStack.currentIndex === 1
                             text: qsTr("Mixer")
                             onCheckedChanged: {
-                                mixerActionBtn.checked = true
-                                sceneActionBtn.checked = false
+                                updateLedVariablesTimer.restart()
                                 bottomStack.currentIndex = 1
                             }
                         }
@@ -298,8 +297,7 @@ Rectangle {
                             checked: true
                             text: qsTr("Synths")
                             onCheckedChanged: {
-                                mixerActionBtn.checked = false
-                                sceneActionBtn.checked = true
+                                updateLedVariablesTimer.restart()
                                 bottomStack.currentIndex = 2
                             }
                         }
@@ -311,8 +309,7 @@ Rectangle {
                             checkable: true
                             text: qsTr("Samples")
                             onCheckedChanged: {
-                                mixerActionBtn.checked = false
-                                sceneActionBtn.checked = true
+                                updateLedVariablesTimer.restart()
                                 bottomStack.currentIndex = 2
                             }
                         }
@@ -324,8 +321,7 @@ Rectangle {
                             checkable: true
                             text: qsTr("FX")
                             onCheckedChanged: {
-                                mixerActionBtn.checked = false
-                                sceneActionBtn.checked = true
+                                updateLedVariablesTimer.restart()
                                 bottomStack.currentIndex = 2
                             }
                         }

@@ -381,11 +381,13 @@ class zynthian_gui(QObject):
 
         # Create variables for LED control
         self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
-        self.wscolor_light = rpi_ws281x.Color(0, 50, 200)
-        self.wscolor_active = rpi_ws281x.Color(0, 255, 0)
-        self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
-        self.wscolor_admin = self.wscolor_red
+        self.wscolor_blue = rpi_ws281x.Color(0, 50, 200)
         self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
+        self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
+        self.wscolor_yellow = rpi_ws281x.Color(255, 235, 59)
+        self.wscolor_light = self.wscolor_blue
+        self.wscolor_active = self.wscolor_green
+        self.wscolor_admin = self.wscolor_red
 
         self.wsleds_num = 25
         self.wsleds = None
@@ -395,6 +397,9 @@ class zynthian_gui(QObject):
         self.track_wave_editor_bar_active = False
         self.track_samples_bar_active = False
         self.clip_wave_editor_bar_active = False
+        self.slots_bar_synths_active = False
+        self.slots_bar_samples_active = False
+        self.slots_bar_fx_active = False
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
@@ -479,8 +484,6 @@ class zynthian_gui(QObject):
         self.jackd_options = zynconf.get_jackd_options()
 
         self.__fake_keys_pressed = set()
-        # When true 1-6 switch sounds instead of tracks
-        self.__layer_track_mode_switch = False
 
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
@@ -573,7 +576,46 @@ class zynthian_gui(QObject):
     clipWaveEditorBarActiveChanged = Signal()
 
     clipWaveEditorBarActive = Property(bool, get_clip_wave_editor_bar_active, set_clip_wave_editor_bar_active,
-                                     notify=clipWaveEditorBarActiveChanged)
+                                       notify=clipWaveEditorBarActiveChanged)
+
+    def get_slots_bar_synths_active(self):
+        return self.slots_bar_synths_active
+
+    def set_slots_bar_synths_active(self, isActive):
+        if self.slots_bar_synths_active != isActive:
+            self.slots_bar_synths_active = isActive
+            self.slotsBarSynthsActiveChanged.emit()
+
+    slotsBarSynthsActiveChanged = Signal()
+
+    slotsBarSynthsActive = Property(bool, get_slots_bar_synths_active, set_slots_bar_synths_active,
+                                    notify=slotsBarSynthsActiveChanged)
+
+    def get_slots_bar_samples_active(self):
+        return self.slots_bar_samples_active
+
+    def set_slots_bar_samples_active(self, isActive):
+        if self.slots_bar_samples_active != isActive:
+            self.slots_bar_samples_active = isActive
+            self.slotsBarSamplesActiveChanged.emit()
+
+    slotsBarSamplesActiveChanged = Signal()
+
+    slotsBarSamplesActive = Property(bool, get_slots_bar_samples_active, set_slots_bar_samples_active,
+                                     notify=slotsBarSamplesActiveChanged)
+
+    def get_slots_bar_fx_active(self):
+        return self.slots_bar_fx_active
+
+    def set_slots_bar_fx_active(self, isActive):
+        if self.slots_bar_fx_active != isActive:
+            self.slots_bar_fx_active = isActive
+            self.slotsBarFxActiveChanged.emit()
+
+    slotsBarFxActiveChanged = Signal()
+
+    slotsBarFxActive = Property(bool, get_slots_bar_fx_active, set_slots_bar_fx_active,
+                                notify=slotsBarFxActiveChanged)
     ###
 
     def init_wsleds(self):
@@ -639,7 +681,7 @@ class zynthian_gui(QObject):
                 # Set active color to selected sound row when combinator is open
                 self.wsleds.setPixelColor(1 + self.session_dashboard.selectedSoundRow, self.wscolor_active)
             else:
-                # Set active color to selected track when combinator is open
+                # Set active color to selected track when combinator is not open
                 i = self.screens['session_dashboard'].selectedTrack
                 if not self.tracks_mod_active and i < 5:
                     # If track mod is not active, light but 1-5 if track 1-5 is selected
@@ -649,15 +691,19 @@ class zynthian_gui(QObject):
                     self.wsleds.setPixelColor(i - 4, self.wscolor_active)
 
             # Button 6 will act as modifier key to select track 6-10 when active
-            if self.tracks_mod_active:
+            if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
+                self.wsleds.setPixelColor(6, self.wscolor_blue)
+            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
+                self.wsleds.setPixelColor(6, self.wscolor_red)
+            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+                self.wsleds.setPixelColor(6, self.wscolor_yellow)
+            elif self.active_screen == "zynthiloops" and self.tracks_mod_active:
                 self.wsleds.setPixelColor(6, self.wscolor_active)
+            else:
+                self.wsleds.setPixelColor(6, self.wscolor_off)
 
             # FX Button
-            # Set FX Button to active when __layer_track_mode_switch is active or soundCombinator is active when zynthiloops page is visible
-            if self.__layer_track_mode_switch or (self.active_screen == "zynthiloops" and self.soundCombinatorActive):
-                self.wsleds.setPixelColor(7,self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(7,self.wscolor_light)
+            self.wsleds.setPixelColor(7, self.wscolor_light)
 
             # Stepseq screen:
             if self.active_screen=="zynthiloops":
@@ -1586,35 +1632,17 @@ class zynthian_gui(QObject):
             self.toggle_modal("stepseq")
 
         elif cuia == "TRACK_1":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(0)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 0
+            self.screens["session_dashboard"].selectedTrack = 0
         elif cuia == "TRACK_2":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(1)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 1
+            self.screens["session_dashboard"].selectedTrack = 1
         elif cuia == "TRACK_3":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(2)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 2
+            self.screens["session_dashboard"].selectedTrack = 2
         elif cuia == "TRACK_4":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(3)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 3
+            self.screens["session_dashboard"].selectedTrack = 3
         elif cuia == "TRACK_5":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(4)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 4
+            self.screens["session_dashboard"].selectedTrack = 4
         elif cuia == "TRACK_6":
-            if self.__layer_track_mode_switch:
-                self.screens['layers_for_track'].select_action(5)
-            else:
-                self.screens["session_dashboard"].selectedTrack = 5
+            self.screens["session_dashboard"].selectedTrack = 5
         elif cuia == "TRACK_7":
             self.screens["session_dashboard"].selectedTrack = 6
         elif cuia == "TRACK_8":
@@ -1674,8 +1702,7 @@ class zynthian_gui(QObject):
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":
-            # Switch between track and sound mode
-            self.__layer_track_mode_switch = not self.__layer_track_mode_switch
+            pass
 
         elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
             self.tracks_mod_active = not self.tracks_mod_active

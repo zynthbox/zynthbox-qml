@@ -173,17 +173,17 @@ Zynthian.ScreenPage {
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":
-                if (mixerActionBtn.checked) {
-                    bottomBar.controlType = BottomBar.ControlType.Track;
-                    bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-                    
-                    bottomStack.currentIndex = 0;
-                    mixerActionBtn.checked = false;
-                } else {
-                    sceneActionBtn.checked = false;
-                    mixerActionBtn.checked = true;
-                    bottomStack.currentIndex = 1;
+                // Cycle between mixer, synths, samples, fx
+                if (bottomStack.slotsBar.mixerButton.checked) {
+                    bottomStack.slotsBar.synthsButton.checked = true
+                } else if (bottomStack.slotsBar.synthsButton.checked) {
+                    bottomStack.slotsBar.samplesButton.checked = true
+                } else if (bottomStack.slotsBar.samplesButton.checked) {
+                    bottomStack.slotsBar.fxButton.checked = true
+                } else if (bottomStack.slotsBar.fxButton.checked) {
+                    bottomStack.slotsBar.mixerButton.checked = true
                 }
+
                 return true;
         }
 
@@ -200,7 +200,6 @@ Zynthian.ScreenPage {
         interval: 100
         repeat: false
         onTriggered: {
-            // Check and set proper variables
 
             // Check if sound combinator is active
             if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
@@ -246,6 +245,24 @@ Zynthian.ScreenPage {
                 zynthian.clipWaveEditorBarActive = true;
             } else {
                 zynthian.clipWaveEditorBarActive = false;
+            }
+
+            if (bottomStack.slotsBar.synthsButton.checked) {
+                zynthian.slotsBarSynthsActive = true;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
+            } else if (bottomStack.slotsBar.samplesButton.checked) {
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = true;
+                zynthian.slotsBarFxActive = false;
+            } else if (bottomStack.slotsBar.fxButton.checked) {
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = true;
+            } else {
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
             }
         }
     }
@@ -856,8 +873,6 @@ Zynthian.ScreenPage {
                                         // If Mixer is not open, open mixer first and switch to track
                                         if (bottomStack.currentIndex !== 1) {
                                             bottomStack.currentIndex = 1
-                                            mixerActionBtn.checked = true;
-                                            sceneActionBtn.checked = false;
                                             dblTimer.stop();
 
                                             zynthian.session_dashboard.disableNextSoundSwitchTimer();
@@ -879,7 +894,6 @@ Zynthian.ScreenPage {
                                                 mixerActionBtn.checked = true;
                                                 bottomStack.currentIndex = 1;
                                             }
-
                                             zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.id;
                                             zynthian.zynthiloops.selectedClipCol = track.sceneClip.col

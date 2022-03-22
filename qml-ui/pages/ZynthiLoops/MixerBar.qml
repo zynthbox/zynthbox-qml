@@ -43,8 +43,7 @@ Rectangle {
                 bottomBar.controlType = BottomBar.ControlType.Track;
                 bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
 
-                bottomStack.currentIndex = 0;
-                mixerActionBtn.checked = false;
+                bottomStack.slotsBar.bottomBarButton.checked = true
 
                 return true;
 
@@ -188,7 +187,6 @@ Rectangle {
                                 bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
 
                                 bottomStack.currentIndex = 0
-                                mixerActionBtn.checked = false;
                             }
                         }
 

@@ -202,64 +202,60 @@ Zynthian.ScreenPage {
         onTriggered: {
 
             // Check if sound combinator is active
-            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
-                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 && // Checks if current active page is sound combinator or not
-                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
-                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
-            {
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
+            ) {
                 zynthian.soundCombinatorActive = true;
             } else {
                 zynthian.soundCombinatorActive = false;
             }
 
             // Check if sound combinator is active
-            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
-                bottomBar.tabbedView.activeAction.page.search("SamplesBar") >= 0 && // Checks if current active page is samples bar
-                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
-                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
-            {
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("SamplesBar") >= 0 // Checks if current active page is samples bar
+            ) {
                 zynthian.trackSamplesBarActive = true;
             } else {
                 zynthian.trackSamplesBarActive = false;
             }
 
             // Check if track wave editor bar is active
-            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
                 bottomBar.controlType === BottomBar.ControlType.Track && // Checks if track is selected
-                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 && // Checks if current active page is wave editor or not
-                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
-                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
-            {
+                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 // Checks if current active page is wave editor or not
+            ) {
                 zynthian.trackWaveEditorBarActive = true;
             } else {
                 zynthian.trackWaveEditorBarActive = false;
             }
 
             // Check if clip wave editor bar is active
-            if (bottomStack.currentIndex == 0 && // Checks if bottombar is visible
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
                 (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern) && // Checks if clip/pattern is selected
-                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 && // Checks if current active page is wave editor or not
-                sceneActionBtn.checked == false && // Checks if scenes button is unchecked
-                mixerActionBtn.checked == false) // Checks if mixer button is unchecked
-            {
+                bottomBar.tabbedView.activeAction.page.search("WaveEditorBar") >= 0 // Checks if current active page is wave editor or not
+            ) {
                 zynthian.clipWaveEditorBarActive = true;
             } else {
                 zynthian.clipWaveEditorBarActive = false;
             }
 
             if (bottomStack.slotsBar.synthsButton.checked) {
+                console.log("LED : Slots Synths Bar active")
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.samplesButton.checked) {
+                console.log("LED : Slots Samples Bar active")
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.fxButton.checked) {
+                console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = true;
             } else {
+                console.log("LED : No Slots Bar active")
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
@@ -273,10 +269,7 @@ Zynthian.ScreenPage {
             // Select connected sound of selected track if not already selected
             if (zynthian.current_screen_id === "zynthiloops"
                 && bottomBar.controlType !== BottomBar.ControlType.Track) {
-                sceneActionBtn.checked = false;
-                mixerActionBtn.checked = true;
-                bottomStack.currentIndex = 1;
-                bottomBar.controlObj = root.song;
+                bottomStack.slotsBar.mixerButton.checked = true
             }
         }
     }
@@ -307,9 +300,7 @@ Zynthian.ScreenPage {
             songCell.focus = false
             bottomBar.controlType = BottomBar.ControlType.Song;
             bottomBar.controlObj = root.song;
-            mixerActionBtn.checked = true;
-            sceneActionBtn.checked = false;
-            bottomStack.currentIndex = 1;
+            bottomStack.slotsBar.mixerButton.checked = true
         }
     }
 
@@ -321,43 +312,6 @@ Zynthian.ScreenPage {
 
     Component.onDestruction: {
         applicationWindow().controlsVisible = true;
-    }
-
-    Kirigami.Action {
-        id: sceneActionBtn
-        visible: false
-        text: qsTr("Slots")
-        checkable: true
-        onCheckedChanged: updateLedVariablesTimer.restart()
-        onTriggered: {
-            mixerActionBtn.checked = false;
-
-            if (!checked) {
-                bottomStack.currentIndex = 2;
-            } else {
-                bottomStack.currentIndex = 0;
-            }
-        }
-    }
-    Kirigami.Action {
-        id: mixerActionBtn
-        visible: false
-        text: qsTr("Mixer")
-        checkable: true
-        onCheckedChanged: updateLedVariablesTimer.restart()
-        onTriggered: {
-            sceneActionBtn.checked = false;
-
-            if (!checked) {
-                // Open Mixer
-                 zynthian.zynthiloops.startMonitorMasterAudioLevels();
-                bottomStack.currentIndex = 1;
-            } else {
-                // Close Mixer
-                 zynthian.zynthiloops.stopMonitorMasterAudioLevels();
-                bottomStack.currentIndex = 0;
-            }
-        }
     }
 
     QtObject {
@@ -527,10 +481,8 @@ Zynthian.ScreenPage {
 
                         onPressed: {
                             // If Mixer is not open, open mixer first
-                            if (bottomStack.currentIndex !== 1) {
-                                bottomStack.currentIndex = 1
-                                mixerActionBtn.checked = true;
-                                sceneActionBtn.checked = false;
+                            if (!bottomStack.slotsBar.mixerButton.checked) {
+                                bottomStack.slotsBar.mixerButton.checked = true
 
                                 return;
                             }
@@ -538,9 +490,8 @@ Zynthian.ScreenPage {
                             bottomBar.controlType = BottomBar.ControlType.Song;
                             bottomBar.controlObj = root.song;
 
-                            if (mixerActionBtn.checked) {
-                                bottomStack.currentIndex = 0
-                                mixerActionBtn.checked = false
+                            if (bottomStack.slotsBar.mixerButton.checked) {
+                                bottomStack.slotsBar.bottomBarButton.checked = true
                             }
                         }
                     }
@@ -566,10 +517,8 @@ Zynthian.ScreenPage {
                                 }
 
                                 // If Mixer is not open, open mixer first
-                                if (bottomStack.currentIndex !== 1) {
-                                    bottomStack.currentIndex = 1
-                                    mixerActionBtn.checked = true;
-                                    sceneActionBtn.checked = false;
+                                if (!bottomStack.slotsBar.mixerButton.checked) {
+                                    bottomStack.slotsBar.mixerButton.checked = true
 
                                     return;
                                 }
@@ -636,10 +585,8 @@ Zynthian.ScreenPage {
                                 root.lastSelectedObj = model.track
 
                                 // If Mixer is not open, open mixer first and switch to track
-                                if (bottomStack.currentIndex !== 1) {
-                                    bottomStack.currentIndex = 1
-                                    mixerActionBtn.checked = true;
-                                    sceneActionBtn.checked = false;
+                                if (!bottomStack.slotsBar.mixerButton.checked) {
+                                    bottomStack.slotsBar.mixerButton.checked = true
 
                                     zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                     zynthian.session_dashboard.selectedTrack = index;
@@ -658,9 +605,7 @@ Zynthian.ScreenPage {
                                     zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                     zynthian.session_dashboard.selectedTrack = index;
 
-                                    sceneActionBtn.checked = false;
-                                    mixerActionBtn.checked = true;
-                                    bottomStack.currentIndex = 1;
+                                    bottomStack.slotsBar.mixerButton.checked = true
                                 } else {
                                     // Current selected track is already set. open sounds dialog
 
@@ -674,13 +619,10 @@ Zynthian.ScreenPage {
                                         console.error("TrackViewSoundsBar is not loaded !!! Cannot reset model")
                                     }
 
-                                    if (mixerActionBtn.checked) {
-                                        bottomStack.currentIndex = 0
-                                        mixerActionBtn.checked = false
+                                    if (bottomStack.slotsBar.mixerButton.checked) {
+                                        bottomStack.slotsBar.bottomBarButton.checked = true
                                     } else {
-                                        sceneActionBtn.checked = false;
-                                        mixerActionBtn.checked = true;
-                                        bottomStack.currentIndex = 1;
+                                        bottomStack.slotsBar.mixerButton.checked = true
                                     }
                                 }
                             }
@@ -855,7 +797,7 @@ Zynthian.ScreenPage {
 //                                                console.error(e)
 //                                            }
 
-                                        if (dblTimer.running || sceneActionBtn.checked) {
+                                        if (dblTimer.running) {
                                             root.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
 
                                             if (track.connectedPattern >= 0) {
@@ -871,12 +813,12 @@ Zynthian.ScreenPage {
                                         dblTimer.restart()
 
                                         // If Mixer is not open, open mixer first and switch to track
-                                        if (bottomStack.currentIndex !== 1) {
-                                            bottomStack.currentIndex = 1
+                                        if (!bottomStack.slotsBar.mixerButton.checked) {
+                                            bottomStack.slotsBar.mixerButton.checked = true
                                             dblTimer.stop();
 
-                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                            zynthian.session_dashboard.selectedTrack = rowIndex;
+                                            zynnthian.session_dashboard.disableNextSoundSwitchTimer();
+                                            zynthian.session_dashboard.selectedTrack = track.sceneClip.row;
 
                                             return;
                                         }
@@ -886,13 +828,10 @@ Zynthian.ScreenPage {
                                         interval: 200
                                         onTriggered: {
                                             if (zynthian.session_dashboard.selectedTrack === track.id
-                                                && mixerActionBtn.checked) {
-                                                bottomStack.currentIndex = 0
-                                                mixerActionBtn.checked = false
+                                                && bottomStack.slotsBar.mixerButton.checked) {
+                                                bottomStack.slotsBar.bottomBarButton.checked = true
                                             } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
-                                                sceneActionBtn.checked = false;
-                                                mixerActionBtn.checked = true;
-                                                bottomStack.currentIndex = 1;
+                                                bottomStack.slotsBar.mixerButton.checked = true
                                             }
                                             zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.id;

@@ -198,6 +198,33 @@ Zynthian.ScreenPage {
                             horizontalAlignment: Text.AlignHCenter
                         }
                         background: Item {
+                            clip: true
+                            Image {
+                                id: synthImage
+                                visible: synthImage.status !== Image.Error
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                clip: true
+                                opacity: 0.4
+                                source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(" ", "-")  + ".png")
+                            }
+
+                            Image {
+                                visible: synthImage.status === Image.Error
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.smallSpacing
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                horizontalAlignment: Image.AlignHCenter
+                                verticalAlignment: Image.AlignVCenter
+                                clip: true
+                                opacity: 0.2
+                                source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
+                            }
                             Rectangle {
                                 id: colorBackground
                                 anchors {
@@ -205,12 +232,8 @@ Zynthian.ScreenPage {
                                     margins: Kirigami.Units.smallSpacing
                                 }
                                 readonly property bool isCurrent: view.currentIndex == index
-                                opacity: isCurrent ? 0.2 : 0.1
+                                opacity: 0.2
                                 color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor//root.stringToColor(model.display)
-                                //Image {
-                                    //anchors.fill: parent
-                                    //source: "../../img/noisebackground.png"
-                                //}
                             }
                             Rectangle {
                                 anchors.fill: colorBackground

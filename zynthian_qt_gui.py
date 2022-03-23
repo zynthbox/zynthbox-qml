@@ -673,22 +673,60 @@ class zynthian_gui(QObject):
             #self.wsled_blink(0,self.wscolor_active)
             # Active Track
 
-            # Set light color to all 1-6 buttons first
+            # Light up 1-6 buttons as per opened screen / bottomBar
             for i in range(6):
-                self.wsleds.setPixelColor(1+i,self.wscolor_light)
+                # If slots synths bar is active, light up filled cells otherwise turn off led
+                if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
+                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                    if track.chainedSounds[i-1] > -1 and \
+                            track.checkIfLayerExists(track.chainedSounds[i-1]):
+                        self.wsleds.setPixelColor(i, self.wscolor_blue)
+                    else:
+                        self.wsleds.setPixelColor(i, self.wscolor_off)
 
-            if self.active_screen == "zynthiloops" and self.soundCombinatorActive:
-                # Set active color to selected sound row when combinator is open
-                self.wsleds.setPixelColor(1 + self.session_dashboard.selectedSoundRow, self.wscolor_active)
-            else:
-                # Set active color to selected track when combinator is not open
-                i = self.screens['session_dashboard'].selectedTrack
-                if not self.tracks_mod_active and i < 5:
-                    # If track mod is not active, light but 1-5 if track 1-5 is selected
-                    self.wsleds.setPixelColor(1 + i, self.wscolor_active)
-                elif self.tracks_mod_active and 5 <= i <= 9:
-                    # If track mod is active, light but 1-5 if track 6-10 is selected
-                    self.wsleds.setPixelColor(i - 4, self.wscolor_active)
+                    continue
+
+                # If slots samples bar is active, light up filled cells otherwise turn off led
+                if self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
+                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                    if track.samples[i-1].path is not None:
+                        self.wsleds.setPixelColor(i, self.wscolor_red)
+                    else:
+                        self.wsleds.setPixelColor(i, self.wscolor_off)
+
+                    continue
+
+                # If slots fx bar is active, light up filled cells otherwise turn off led
+                if self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                    if track.chainedSounds[i-1] > -1 and \
+                            track.checkIfLayerExists(track.chainedSounds[i-1]) and \
+                            len(track.getEffectsNameByMidiChannel(track.chainedSounds[i-1])) > 0:
+                        self.wsleds.setPixelColor(i, self.wscolor_yellow)
+                    else:
+                        self.wsleds.setPixelColor(i, self.wscolor_off)
+
+                    continue
+
+                # If sound combinator is active, light up filled cells with green color otherwise display blue color
+                if self.active_screen == "zynthiloops" and self.soundCombinatorActive:
+                    if (i-1) == self.session_dashboard.selectedSoundRow:
+                        # Set active color to selected sound row when combinator is open
+                        self.wsleds.setPixelColor(i, self.wscolor_active)
+                    else:
+                        self.wsleds.setPixelColor(i, self.wscolor_light)
+
+                    continue
+
+                # If any other bottom bar is open, light up selected track with green color otherwise display blue color
+                if not self.tracks_mod_active and \
+                        self.screens['session_dashboard'].selectedTrack == (i - 1):
+                    self.wsleds.setPixelColor(i, self.wscolor_active)
+                elif self.tracks_mod_active and \
+                        self.screens['session_dashboard'].selectedTrack == (i + 4):
+                    self.wsleds.setPixelColor(i, self.wscolor_active)
+                else:
+                    self.wsleds.setPixelColor(i, self.wscolor_light)
 
             # Button 6 will act as modifier key to select track 6-10 when active
             if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
@@ -702,8 +740,15 @@ class zynthian_gui(QObject):
             else:
                 self.wsleds.setPixelColor(6, self.wscolor_off)
 
-            # FX Button
-            self.wsleds.setPixelColor(7, self.wscolor_light)
+            # 7 : FX Button
+            if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
+                self.wsleds.setPixelColor(7, self.wscolor_blue)
+            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
+                self.wsleds.setPixelColor(7, self.wscolor_red)
+            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+                self.wsleds.setPixelColor(7, self.wscolor_yellow)
+            else:
+                self.wsleds.setPixelColor(7, self.wscolor_off)
 
             # Stepseq screen:
             if self.active_screen=="zynthiloops":

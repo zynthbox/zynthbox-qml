@@ -25,6 +25,9 @@ function startMetronomeAndPlayback() {
     } else {
         console.debug("Sequence could not be fetched, and playback could not be prepared");
     }
+    if (zynthian.zynthiloops.clipToRecord) {
+        ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
+    }
     zynthian.zynthiloops.startPlayback();
     console.log("Metronome and Playback Started");
 }
@@ -39,8 +42,11 @@ function stopMetronomeAndPlayback() {
     }
 
     if (zynthian.zynthiloops.clipToRecord) {
+        ZynQuick.MidiRecorder.stopRecording()
         var clip = zynthian.zynthiloops.clipToRecord
         clip.stopRecording()
+        clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi()
+        ZynQuick.MidiRecorder.loadFromBase64Midi(clip.metadataMidiRecording)
 
         if (!clip.isTrackSample) {
             zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)

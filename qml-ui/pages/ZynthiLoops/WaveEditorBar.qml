@@ -445,6 +445,29 @@ GridLayout {
                 }
             }
         }
+        QQC2.Button {
+            anchors {
+                top: parent.top
+                right: parent.right
+            }
+            // Slightly odd check - sometimes this will return a longer string, but as it's a
+            // base64 encoding of a midi file, it'll be at least the header size of that if
+            // it's useful, so... just check for bigger than 10, that'll do
+            visible: waveBar.controlObj.metadataMidiRecording.length > 10
+            text: ZynQuick.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
+            onClicked: {
+                if (ZynQuick.MidiRecorder.isPlaying) {
+                    ZynQuick.MidiRecorder.stopPlayback();
+                } else {
+                    if (ZynQuick.MidiRecorder.loadFromBase64Midi(waveBar.controlObj.metadataMidiRecording)) {
+                        ZynQuick.MidiRecorder.forceToChannel(ZynQuick.PlayGridManager.currentMidiChannel);
+                        ZynQuick.MidiRecorder.playRecording();
+                    } else {
+                        console.log("Failed to load recording from clip data, which is:\n", waveBar.controlObj.metadataMidiRecording);
+                    }
+                }
+            }
+        }
     }
 }
 

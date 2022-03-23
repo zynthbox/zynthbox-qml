@@ -1,0 +1,9 @@
+{
+    "JV/synthv1": {
+        "volumeControl": ["OUT1_VOLUME"],
+        "description": "Synth V1 small description"
+    },
+    "default": {
+        "volumeControl": ["volume", "Volume"]
+    }
+}

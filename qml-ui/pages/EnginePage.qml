@@ -212,11 +212,30 @@ Zynthian.ScreenPage {
                             zynthian.engine.activate_index(index);
                             delegate.itemActivated(delegate.screenId, index);
                         }
-                        contentItem: Kirigami.Heading {
-                            text: model.display
-                            level: 2
-                            horizontalAlignment: Text.AlignHCenter
+                        contentItem: Item {
+                            ColumnLayout {
+                                anchors.centerIn: parent
+
+                                Kirigami.Heading {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: model.display
+                                    level: 2
+                                }
+                                Kirigami.Heading {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.alignment: Qt.AlignCenter
+                                    text: model.metadata.description ? model.metadata.description : ""
+                                    visible: text.length > 0
+                                    level: 5
+                                    opacity: 0.7
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                            }
                         }
+
                         background: Rectangle {
                             clip: true
                             color: "transparent"
@@ -247,7 +266,7 @@ Zynthian.ScreenPage {
                                 horizontalAlignment: Image.AlignHCenter
                                 verticalAlignment: Image.AlignVCenter
                                 clip: true
-                                opacity: 0.2
+                                opacity: 0.3
                                 source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
                             }
                             Rectangle {
@@ -257,7 +276,7 @@ Zynthian.ScreenPage {
                                     margins: Kirigami.Units.smallSpacing
                                 }
                                 readonly property bool isCurrent: view.currentIndex === index
-                                opacity: 0.3
+                                opacity: isCurrent ? 0.3 : 0
                                 color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                             }
                             Rectangle {

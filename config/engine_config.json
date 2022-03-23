@@ -3,6 +3,9 @@
         "volumeControl": ["OUT1_VOLUME"],
         "description": "Synth V1 small description"
     },
+    "JV/amsynth": {
+        "description": "A tiny custom description for amsynth"
+    },
     "default": {
         "volumeControl": ["volume", "Volume"]
     }

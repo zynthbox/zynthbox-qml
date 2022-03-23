@@ -193,15 +193,15 @@ Zynthian.ScreenPage {
                     id: view
                     clip: true
                     cellWidth: width / 3
-                    cellHeight: height / 2.5
+                    cellHeight: height / 2.2
                     currentIndex: zynthian.engine.current_index
                     onCurrentIndexChanged: zynthian.engine.current_index = currentIndex
 
                     model: zynthian.engine.selector_list
 
                     delegate: QQC2.AbstractButton {
-                        width: view.cellWidth
-                        height: view.cellHeight
+                        width: view.cellWidth - Kirigami.Units.gridUnit
+                        height: view.cellHeight - Kirigami.Units.gridUnit
                         enabled: model.action_id !== undefined
                         leftPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
@@ -212,87 +212,91 @@ Zynthian.ScreenPage {
                             zynthian.engine.activate_index(index);
                             delegate.itemActivated(delegate.screenId, index);
                         }
-                        contentItem: Item {
+
+                        contentItem: ColumnLayout {
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                clip: true
+                                color: "transparent"
+                                radius: 12
+                                border.width: view.currentIndex === index ? 4 : 0
+                                border.color: "#ffffff"
+
+                                Image {
+                                    id: synthImage
+                                    visible: synthImage.status !== Image.Error
+                                    anchors {
+                                        fill: parent
+                                        margins: Kirigami.Units.smallSpacing * 2
+                                    }
+                                    fillMode: Image.PreserveAspectCrop
+                                    clip: true
+                                    opacity: 0.5
+                                    source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(" ", "-")  + ".png")
+                                }
+
+                                Image {
+                                    visible: synthImage.status === Image.Error
+                                    anchors {
+                                        fill: parent
+                                        margins: Kirigami.Units.smallSpacing * 2
+                                    }
+                                    fillMode: Image.PreserveAspectCrop
+                                    horizontalAlignment: Image.AlignHCenter
+                                    verticalAlignment: Image.AlignVCenter
+                                    clip: true
+                                    opacity: 0.3
+                                    source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
+                                }
+                                Rectangle {
+                                    id: colorBackground
+                                    anchors {
+                                        fill: parent
+                                        margins: Kirigami.Units.smallSpacing
+                                    }
+                                    readonly property bool isCurrent: view.currentIndex === index
+                                    opacity: isCurrent ? 0.3 : 0
+                                    color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                }
+                                Rectangle {
+                                    anchors.fill: colorBackground
+                                    border.color: Qt.rgba(0, 0, 0, 0.6)
+                                    color: "transparent"
+                                    radius: 2
+                                    Rectangle {
+                                        anchors {
+                                            fill: parent
+                                            margins: 1
+                                        }
+                                        radius: 2
+                                        color: "transparent"
+                                        border.color: colorBackground.color
+                                        opacity: 0.4
+                                    }
+                                }
+                            }
                             ColumnLayout {
-                                anchors.centerIn: parent
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                Layout.rightMargin: Kirigami.Units.gridUnit
 
                                 Kirigami.Heading {
-                                    Layout.fillWidth: false
+                                    Layout.fillWidth: true
                                     Layout.fillHeight: false
-                                    Layout.alignment: Qt.AlignCenter
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.display
                                     level: 2
                                 }
                                 Kirigami.Heading {
-                                    Layout.fillWidth: false
+                                    Layout.fillWidth: true
                                     Layout.fillHeight: false
-                                    Layout.alignment: Qt.AlignCenter
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.metadata.description ? model.metadata.description : ""
-                                    visible: text.length > 0
+                                    elide: "ElideRight"
                                     level: 5
-                                    opacity: 0.7
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
-                            }
-                        }
-
-                        background: Rectangle {
-                            clip: true
-                            color: "transparent"
-                            radius: 4
-                            border.width: view.currentIndex === index ? 4 : 0
-                            border.color: "#ffffff"
-
-                            Image {
-                                id: synthImage
-                                visible: synthImage.status !== Image.Error
-                                anchors {
-                                    fill: parent
-                                    margins: Kirigami.Units.smallSpacing
-                                }
-                                fillMode: Image.PreserveAspectCrop
-                                clip: true
-                                opacity: 0.5
-                                source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(" ", "-")  + ".png")
-                            }
-
-                            Image {
-                                visible: synthImage.status === Image.Error
-                                anchors {
-                                    fill: parent
-                                    margins: Kirigami.Units.smallSpacing
-                                }
-                                fillMode: Image.PreserveAspectCrop
-                                horizontalAlignment: Image.AlignHCenter
-                                verticalAlignment: Image.AlignVCenter
-                                clip: true
-                                opacity: 0.3
-                                source: Qt.resolvedUrl("../../img/synths/zynth-default.png")
-                            }
-                            Rectangle {
-                                id: colorBackground
-                                anchors {
-                                    fill: parent
-                                    margins: Kirigami.Units.smallSpacing
-                                }
-                                readonly property bool isCurrent: view.currentIndex === index
-                                opacity: isCurrent ? 0.3 : 0
-                                color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                            }
-                            Rectangle {
-                                anchors.fill: colorBackground
-                                border.color: Qt.rgba(0, 0, 0, 0.6)
-                                color: "transparent"
-                                radius: 2
-                                Rectangle {
-                                    anchors {
-                                        fill: parent
-                                        margins: 1
-                                    }
-                                    radius: 2
-                                    color: "transparent"
-                                    border.color: colorBackground.color
-                                    opacity: 0.4
+                                    opacity: 0.6
                                 }
                             }
                         }

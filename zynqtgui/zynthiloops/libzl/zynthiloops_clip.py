@@ -757,6 +757,7 @@ class zynthiloops_clip(QObject):
             self.sound_data_changed.emit()
             self.metadata_bpm_changed.emit()
             self.metadata_audio_type_changed.emit()
+            self.metadata_midi_recording_changed.emit()
         except Exception as e:
             logging.error(f"Cannot read metadata : {str(e)}")
             self.audio_metadata = None
@@ -821,6 +822,25 @@ class zynthiloops_clip(QObject):
         return None
 
     metadataBPM = Property(int, get_metadataBPM, notify=metadata_bpm_changed)
+
+    @Signal
+    def metadata_midi_recording_changed(self):
+        pass
+
+    def get_metadata_midi_recording(self):
+        try:
+            return str(self.audio_metadata["ZYNTHBOX_MIDI_RECORDING"][0])
+        except Exception as e:
+            logging.error(f"Error retrieving from metadata : {str(e)}")
+
+        return None
+
+    @Slot(str)
+    def set_metadata_midi_recording(self, midi_recording_base64):
+        self.write_metadata("ZYNTHBOX_MIDI_RECORDING", [str(midi_recording_base64)])
+        self.metadata_midi_recording_changed.emit()
+
+    metadataMidiRecording = Property(str, get_metadata_midi_recording, set_metadata_midi_recording, notify=metadata_midi_recording_changed)
 
     @Property(str, constant=True)
     def recordingDir(self):

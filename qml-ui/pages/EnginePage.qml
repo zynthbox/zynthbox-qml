@@ -170,15 +170,35 @@ Zynthian.ScreenPage {
             Layout.fillHeight: true
             highlighted: view.activeFocus
             contentItem: QQC2.ScrollView {
+                id: scrollView
+
+                QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                    id: scrollBar
+                    parent: scrollView.parent
+                    policy: QQC2.ScrollBar.AlwaysOn
+                    x: scrollView.mirrored ? 0 : scrollView.width - width
+                    y: scrollView.topPadding
+                    height: scrollView.availableHeight
+                    active: scrollView.ScrollBar.horizontal.active
+                    contentItem: Rectangle {
+                        implicitWidth: Kirigami.Units.gridUnit
+                        implicitHeight: 150
+                        radius: width/2
+                        color: Kirigami.Theme.textColor
+                        opacity: 0.5
+                    }
+                }
+
                 GridView {
                     id: view
                     clip: true
                     cellWidth: width / 3
-                    cellHeight: height / 4
+                    cellHeight: height / 2.5
                     currentIndex: zynthian.engine.current_index
                     onCurrentIndexChanged: zynthian.engine.current_index = currentIndex
 
                     model: zynthian.engine.selector_list
+
                     delegate: QQC2.AbstractButton {
                         width: view.cellWidth
                         height: view.cellHeight
@@ -197,8 +217,13 @@ Zynthian.ScreenPage {
                             level: 2
                             horizontalAlignment: Text.AlignHCenter
                         }
-                        background: Item {
+                        background: Rectangle {
                             clip: true
+                            color: "transparent"
+                            radius: 4
+                            border.width: view.currentIndex === index ? 4 : 0
+                            border.color: "#ffffff"
+
                             Image {
                                 id: synthImage
                                 visible: synthImage.status !== Image.Error
@@ -208,7 +233,7 @@ Zynthian.ScreenPage {
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 clip: true
-                                opacity: 0.4
+                                opacity: 0.5
                                 source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(" ", "-")  + ".png")
                             }
 
@@ -231,9 +256,9 @@ Zynthian.ScreenPage {
                                     fill: parent
                                     margins: Kirigami.Units.smallSpacing
                                 }
-                                readonly property bool isCurrent: view.currentIndex == index
-                                opacity: 0.2
-                                color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor//root.stringToColor(model.display)
+                                readonly property bool isCurrent: view.currentIndex === index
+                                opacity: 0.3
+                                color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                             }
                             Rectangle {
                                 anchors.fill: colorBackground

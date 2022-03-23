@@ -102,6 +102,15 @@ class zynthian_gui_engine(zynthian_gui_selector):
 		self.only_categories = False
 		self.single_category = None
 
+		# Load engine config
+		try:
+			with open("/zynthian/zynthian-ui/config/engine_config.json", "r") as f:
+				self.__engine_config__ = json.load(f)
+		except Exception as e:
+			logging.error(f"Error loading engine config from /zynthian/zynthian-ui/config/engine_config.json : {str(e)}")
+			self.__engine_config__ = {}
+
+
 	def set_midi_channel(self, chan):
 		self.midi_chan = chan
 		self.midi_channel_changed.emit()
@@ -156,6 +165,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 	def fill_list(self):
 		self.init_engine_info()
 		self.list_data=[]
+		self.list_metadata = []
 
 		# Sort category headings, but headings starting with "Zynthian" are shown first
 
@@ -173,15 +183,34 @@ class zynthian_gui_engine(zynthian_gui_selector):
 					else:
 						self.list_data.append((None,len(self.list_data),"> {}".format(cat)))
 
+				self.list_metadata.append({})
+
 			cat_entries = []
+			# Metadata entries have to be a set of 3 items in the format (<metadata>, None, info[1])
+			# This is because the customSort method sorts the cat_entries by the value at index `2` and hence
+			# metadata_entries has to have the info[1] enter at index 2, so it sorts correctly along with cat_entries
+			metadata_entries = []
+
 			if not self.only_categories and (self.single_category == None or self.single_category == cat or (cat == None and self.single_category == "None")): # Treat the string None as "we only want engines of None category
 				# Add engines on this category...
 				for eng, info in infos.items():
+					metadata = {}
 					# For some engines, check if needed channels are free ...
 					if eng not in self.check_channels_engines or all(chan in self.zyngui.screens['layer'].get_free_midi_chans() for chan in info[4].get_needed_channels()):
 						cat_entries.append((eng,len(self.list_data),info[1],info[0]))
+
+						if eng in self.__engine_config__ and \
+							"description" in self.__engine_config__[eng]:
+							metadata["description"] = self.__engine_config__[eng]["description"]
+
+					metadata_entries.append((metadata, None, info[1]))
+
 			cat_entries = sorted(cat_entries, key=cmp_to_key(customSort))
+			metadata_entries = sorted(metadata_entries, key=cmp_to_key(customSort))
+
 			self.list_data.extend(cat_entries)
+			# Append only the metadata after sorting metadata_entries
+			self.list_metadata.extend([x[0] for x in metadata_entries])
 
 		# Display help if no engines are enabled ...
 		if len(self.list_data)==0:

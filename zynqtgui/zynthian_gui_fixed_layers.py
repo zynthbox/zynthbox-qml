@@ -22,7 +22,7 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 # 
 #******************************************************************************
-
+import json
 import sys
 import logging
 import math
@@ -134,11 +134,13 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
 
-        # Map all unorthodox zctrl name for synths not using a controller named `volume`
-        self.__volume_zctrl_mapping__ = {
-            'Jalv/synthv1': ['OUT1_VOLUME'],
-            '*': ['volume', 'Volume']
-        }
+        # Load engine config
+        try:
+            with open("/zynthian/zynthian-ui/config/engine_config.json", "r") as f:
+                self.__engine_config__ = json.load(f)
+        except Exception as e:
+            logging.error(f"Error loading engine config from /zynthian/zynthian-ui/config/engine_config.json : {str(e)}")
+            self.__engine_config__ = {}
 
         self.show()
 
@@ -184,15 +186,28 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
                 ctrl = None
 
-                # Find volume control as per self.__volume_zctrl_mapping__
+                # Find volume control as per self.__engine_config__
                 for name in layer.controllers_dict:
                     # Check if engine has specific mapping of volume controller name
-                    # otherwise use global `*` controller mapping name from self.__volume_zctrl_mapping__
-                    if layer.engine.name in self.__volume_zctrl_mapping__ and \
-                       name in self.__volume_zctrl_mapping__[layer.engine.name]:
+                    # otherwise use global `*` controller mapping name from self.__engine_config__
+                    if layer.engine.nickname in self.__engine_config__ and \
+                       "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
+                       name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
+                        # Check if config has engine specific volume controller name
+                        logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
                         ctrl = layer.controllers_dict[name]
-                    elif name in self.__volume_zctrl_mapping__['*']:
+                    elif "default" in self.__engine_config__ and \
+                         "volumeControl" in self.__engine_config__['default'] and \
+                         name in self.__engine_config__['default']['volumeControl']:
+                        # Check if config has global volume controller name
+                        logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
                         ctrl = layer.controllers_dict[name]
+                    elif name in ['volume', 'Volume']:
+                        logging.debug(f"### VOLUME : Default config not found. Using fallback config for '{layer.engine.nickname}'")
+                        # Fallback when config does not have global volume controller name
+                        ctrl = layer.controllers_dict[name]
+                    else:
+                        logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
 
                 if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
                     gctrl = MixerControl(self)

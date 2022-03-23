@@ -201,7 +201,7 @@ Zynthian.ScreenPage {
 
                     delegate: QQC2.AbstractButton {
                         width: view.cellWidth - Kirigami.Units.gridUnit
-                        height: view.cellHeight - Kirigami.Units.gridUnit
+                        height: view.cellHeight
                         enabled: model.action_id !== undefined
                         leftPadding: Kirigami.Units.largeSpacing
                         topPadding: Kirigami.Units.largeSpacing
@@ -288,6 +288,7 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.display
                                     level: 2
+                                    horizontalAlignment: "AlignHCenter"
                                 }
                                 Kirigami.Heading {
                                     Layout.fillWidth: true
@@ -295,8 +296,9 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.metadata.description ? model.metadata.description : ""
                                     elide: "ElideRight"
-                                    level: 5
+                                    font.pointSize: 8
                                     opacity: 0.6
+                                    horizontalAlignment: "AlignHCenter"
                                 }
                             }
                         }

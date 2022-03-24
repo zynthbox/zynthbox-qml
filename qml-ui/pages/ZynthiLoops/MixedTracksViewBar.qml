@@ -44,6 +44,13 @@ Rectangle {
         return false;
     }
 
+    QtObject {
+        id: privateProps
+
+        //Try to fit exactly 12 mixers + a master mixer
+        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
+    }
+
     GridLayout {
         id: root
         rows: 1
@@ -102,29 +109,33 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: selectedTrack.trackAudioType === "synth"
+                                checked: root.selectedTrack.trackAudioType === "synth"
                                 text: qsTr("Synth")
+                                onClicked: root.selectedTrack.trackAudioType = "synth"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: selectedTrack.trackAudioType === "sample-loop"
+                                checked: root.selectedTrack.trackAudioType === "sample-loop"
                                 text: qsTr("Loop")
+                                onClicked: root.selectedTrack.trackAudioType = "sample-loop"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: selectedTrack.trackAudioType === "sample-trig"
+                                checked: root.selectedTrack.trackAudioType === "sample-trig"
                                 text: qsTr("Trig")
+                                onClicked: root.selectedTrack.trackAudioType = "sample-trig"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: selectedTrack.trackAudioType === "sample-slice"
+                                checked: root.selectedTrack.trackAudioType === "sample-slice"
                                 text: qsTr("Slice")
+                                onClicked: root.selectedTrack.trackAudioType = "sample-slice"
                             }
                         }
 

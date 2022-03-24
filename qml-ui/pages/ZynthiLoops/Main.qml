@@ -212,7 +212,7 @@ Zynthian.ScreenPage {
 
     Timer {
         id: updateLedVariablesTimer
-        interval: 100
+        interval: 30
         repeat: false
         onTriggered: {
 
@@ -254,23 +254,33 @@ Zynthian.ScreenPage {
                 zynthian.clipWaveEditorBarActive = false;
             }
 
-            if (bottomStack.slotsBar.synthsButton.checked) {
+            if (bottomStack.slotsBar.trackButton.checked) {
+                console.log("LED : Slots Track Bar active")
+                zynthian.slotsBarTrackActive = true;
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
+            } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
+                zynthian.slotsBarTrackActive = false;
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
+                zynthian.slotsBarTrackActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
+                zynthian.slotsBarTrackActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = true;
             } else {
                 console.log("LED : No Slots Bar active")
+                zynthian.slotsBarTrackActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;

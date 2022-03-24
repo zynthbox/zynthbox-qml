@@ -398,6 +398,7 @@ class zynthian_gui(QObject):
         self.track_wave_editor_bar_active = False
         self.track_samples_bar_active = False
         self.clip_wave_editor_bar_active = False
+        self.slots_bar_track_active = False
         self.slots_bar_synths_active = False
         self.slots_bar_samples_active = False
         self.slots_bar_fx_active = False
@@ -579,6 +580,19 @@ class zynthian_gui(QObject):
     clipWaveEditorBarActive = Property(bool, get_clip_wave_editor_bar_active, set_clip_wave_editor_bar_active,
                                        notify=clipWaveEditorBarActiveChanged)
 
+    def get_slots_bar_track_active(self):
+        return self.slots_bar_track_active
+
+    def set_slots_bar_track_active(self, isActive):
+        if self.slots_bar_track_active != isActive:
+            self.slots_bar_track_active = isActive
+            self.slotsBarTrackActiveChanged.emit()
+
+    slotsBarTrackActiveChanged = Signal()
+
+    slotsBarTrackActive = Property(bool, get_slots_bar_track_active, set_slots_bar_track_active,
+                                   notify=slotsBarTrackActiveChanged)
+
     def get_slots_bar_synths_active(self):
         return self.slots_bar_synths_active
 
@@ -664,6 +678,8 @@ class zynthian_gui(QObject):
             self.wsleds_blink = False
 
         try:
+            track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+
             # Menu
             if self.modal_screen==None and self.active_screen=="main":
                 self.wsleds.setPixelColor(0,self.wscolor_active)
@@ -677,8 +693,7 @@ class zynthian_gui(QObject):
             # Light up 1-6 buttons as per opened screen / bottomBar
             for i in range(6):
                 # If slots synths bar is active, light up filled cells otherwise turn off led
-                if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
-                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                if (self.active_screen == "zynthiloops" and self.slotsBarSynthsActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "synth"):
                     if track.chainedSounds[i-1] > -1 and \
                             track.checkIfLayerExists(track.chainedSounds[i-1]):
                         self.wsleds.setPixelColor(i, self.wscolor_blue)
@@ -688,8 +703,7 @@ class zynthian_gui(QObject):
                     continue
 
                 # If slots samples bar is active, light up filled cells otherwise turn off led
-                if self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
-                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                if (self.active_screen == "zynthiloops" and self.slotsBarSamplesActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice")):
                     if track.samples[i-1].path is not None:
                         self.wsleds.setPixelColor(i, self.wscolor_red)
                     else:
@@ -699,7 +713,6 @@ class zynthian_gui(QObject):
 
                 # If slots fx bar is active, light up filled cells otherwise turn off led
                 if self.active_screen == "zynthiloops" and self.slotsBarFxActive:
-                    track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
                     if track.chainedSounds[i-1] > -1 and \
                             track.checkIfLayerExists(track.chainedSounds[i-1]) and \
                             len(track.getEffectsNameByMidiChannel(track.chainedSounds[i-1])) > 0:

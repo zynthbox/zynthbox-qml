@@ -173,15 +173,17 @@ Zynthian.ScreenPage {
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":
-                // Cycle between mixer, synths, samples, fx
-                if (bottomStack.slotsBar.mixerButton.checked) {
+                // Cycle between track, mixer, synths, samples, fx
+                if (bottomStack.slotsBar.trackButton.checked) {
+                    bottomStack.slotsBar.mixerButton.checked = true
+                } else if (bottomStack.slotsBar.mixerButton.checked) {
                     bottomStack.slotsBar.synthsButton.checked = true
                 } else if (bottomStack.slotsBar.synthsButton.checked) {
                     bottomStack.slotsBar.samplesButton.checked = true
                 } else if (bottomStack.slotsBar.samplesButton.checked) {
                     bottomStack.slotsBar.fxButton.checked = true
                 } else if (bottomStack.slotsBar.fxButton.checked) {
-                    bottomStack.slotsBar.mixerButton.checked = true
+                    bottomStack.slotsBar.trackButton.checked = true
                 }
 
                 return true;
@@ -991,13 +993,14 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                 }
 
-//                ScenesBar {
-//                    id: scenesBar
-//                    Layout.fillWidth: true
-//                    Layout.fillHeight: true
-//                }
                 SlotsBar {
                     id: slotsBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                MixedTracksViewBar {
+                    id: mixedTracksViewBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }

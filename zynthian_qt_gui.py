@@ -1866,22 +1866,21 @@ class zynthian_gui(QObject):
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
 
-            # Handle alt button
-            if i == 17:
-                if dtus < 0:
-                    self.altButtonPressed = False
-                else:
-                    self.altButtonPressed = True
-
-                return
-
             if dtus == 0:
                 logging.error("key press: {} {}".format(i, dtus))
+
+                # Handle alt button
+                if i == 17:
+                    self.altButtonPressed = True
 
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
             elif dtus > 0:
                 logging.error("key release: {} {}".format(i, dtus))
+
+                # Handle alt button
+                if i == 17:
+                    self.altButtonPressed = False
 
                 if self.fake_key_event_for_zynswitch(i, False):
                     return

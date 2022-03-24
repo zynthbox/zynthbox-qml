@@ -35,12 +35,17 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
+    id: root
+
     property alias bottomBarButton: bottomBarButton
     property alias trackButton: trackButton
     property alias mixerButton: mixerButton
     property alias synthsButton: synthsButton
     property alias samplesButton: samplesButton
-    property alias fxButton: fxButton
+    property alias fxButton: fxButton    
+
+    readonly property QtObject song: zynthian.zynthiloops.song
+    property QtObject selectedSlotRowItem
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -137,8 +142,16 @@ Rectangle {
         }
     }
 
-    function handleItemClick() {
-        if (synthsButton.checked) {
+    function handleItemClick(type) {
+        // Type will be used to invoke the respective handler when
+        // required from MixedTracksViewBar or something else in future
+        // This allows us to invoke specific handler frmo other page
+        // when when the buttons are not checked
+        if (!type) {
+            type = ""
+        }
+
+        if (synthsButton.checked || type === "synth") {
             // Clicked entry is synth
 
             var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]
@@ -175,7 +188,7 @@ Rectangle {
             zynthian.current_screen_id = "layer_effects";
             root.openBottomDrawerOnLoad = true;
             zynthian.forced_screen_back = screenBack;
-        } else if (samplesButton.checked) {
+        } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
             // Clicked entry is samples
             samplePickerPopup.open()
         }
@@ -271,13 +284,9 @@ Rectangle {
     }
 
     GridLayout {
-        id: root
         rows: 1
         anchors.fill: parent
         anchors.topMargin: Kirigami.Units.gridUnit*0.3
-
-        readonly property QtObject song: zynthian.zynthiloops.song
-        property QtObject selectedSlotRowItem
 
         ColumnLayout {
             Layout.fillHeight: true

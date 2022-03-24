@@ -173,17 +173,30 @@ Zynthian.ScreenPage {
             case "MODE_SWITCH_SHORT":
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":
-                // Cycle between track, mixer, synths, samples, fx
-                if (bottomStack.slotsBar.trackButton.checked) {
-                    bottomStack.slotsBar.mixerButton.checked = true
-                } else if (bottomStack.slotsBar.mixerButton.checked) {
-                    bottomStack.slotsBar.synthsButton.checked = true
-                } else if (bottomStack.slotsBar.synthsButton.checked) {
-                    bottomStack.slotsBar.samplesButton.checked = true
-                } else if (bottomStack.slotsBar.samplesButton.checked) {
-                    bottomStack.slotsBar.fxButton.checked = true
-                } else if (bottomStack.slotsBar.fxButton.checked) {
-                    bottomStack.slotsBar.trackButton.checked = true
+                if (zynthian.altButtonPressed) {
+                    // Cycle through the trackAudioTypes when alt button is pressed
+                    if (root.selectedTrack.trackAudioType === "synth") {
+                        root.selectedTrack.trackAudioType = "sample-loop"
+                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
+                        root.selectedTrack.trackAudioType = "sample-trig"
+                    } else if (root.selectedTrack.trackAudioType === "sample-trig") {
+                        root.selectedTrack.trackAudioType = "sample-slice"
+                    } else if (root.selectedTrack.trackAudioType === "sample-slice") {
+                        root.selectedTrack.trackAudioType = "synth"
+                    }
+                } else {
+                    // Cycle between track, mixer, synths, samples, fx when alt button is not pressed
+                    if (bottomStack.slotsBar.trackButton.checked) {
+                        bottomStack.slotsBar.mixerButton.checked = true
+                    } else if (bottomStack.slotsBar.mixerButton.checked) {
+                        bottomStack.slotsBar.synthsButton.checked = true
+                    } else if (bottomStack.slotsBar.synthsButton.checked) {
+                        bottomStack.slotsBar.samplesButton.checked = true
+                    } else if (bottomStack.slotsBar.samplesButton.checked) {
+                        bottomStack.slotsBar.fxButton.checked = true
+                    } else if (bottomStack.slotsBar.fxButton.checked) {
+                        bottomStack.slotsBar.trackButton.checked = true
+                    }
                 }
 
                 return true;
@@ -578,7 +591,20 @@ Zynthian.ScreenPage {
                             subSubText: model.track.trackAudioType.toUpperCase().replace("SAMPLE-", "")
                             subSubTextSize: 7
 
-                            color: root.copySourceObj === model.track ? "#2196f3" : Kirigami.Theme.backgroundColor
+                            color: {
+                                if (root.copySourceObj === model.track)
+                                    return "#2196f3"
+                                else if (model.track.trackAudioType === "synth")
+                                    return Qt.rgba(0, 50, 200, 0.2)
+                                else if (model.track.trackAudioType === "sample-loop")
+                                    return Qt.rgba(0, 255, 0, 0.2)
+                                else if (model.track.trackAudioType === "sample-trig")
+                                    return Qt.rgba(255, 0, 0, 0.2)
+                                else if (model.track.trackAudioType === "sample-slice")
+                                    return Qt.rgba(255, 0, 0, 0.2)
+                                else
+                                    return Kirigami.Theme.backgroundColor
+                            }
 
                             highlightOnFocus: false
                             highlighted: index === zynthian.session_dashboard.selectedTrack

@@ -375,6 +375,7 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+        self.__alt_button_pressed__ = False
 
         # When true, 1-5 buttons selects track 6-10
         self.tracks_mod_active = False
@@ -1851,12 +1852,24 @@ class zynthian_gui(QObject):
         i = 0
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
+
+            # Handle alt button
+            if i == 17:
+                if dtus < 0:
+                    self.altButtonPressed = False
+                else:
+                    self.altButtonPressed = True
+
+                return
+
             if dtus == 0:
-                # logging.error("key press: {} {}".format(i, dtus))
+                logging.error("key press: {} {}".format(i, dtus))
+
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
             elif dtus > 0:
-                # logging.error("key release: {} {}".format(i, dtus))
+                logging.error("key release: {} {}".format(i, dtus))
+
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 
@@ -1881,8 +1894,9 @@ class zynthian_gui(QObject):
         fake_key = None
 
         # ALT
-        if i == 17:
-            fake_key = Key.ctrl
+        # if i == 17:
+        #     fake_key = Key.ctrl
+
         # NAV CLUSTER
         if i == 23:
             fake_key = Key.up
@@ -1940,6 +1954,7 @@ class zynthian_gui(QObject):
 
                 self.__fake_keys_pressed.discard(fake_key)
                 self.fakeKeyboard.release(fake_key)
+
         return True
 
 
@@ -3185,6 +3200,21 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sketch_copier(self):
         return self.screens["sketch_copier"]
+
+    ### Property altButtonPressed
+    def get_alt_button_pressed(self):
+        return self.__alt_button_pressed__
+
+    def set_alt_button_pressed(self, pressed):
+        if self.__alt_button_pressed__ != pressed:
+            logging.error(f"Alt Button pressed : {pressed}")
+            self.__alt_button_pressed__ = pressed
+            self.alt_button_pressed_changed.emit()
+
+    alt_button_pressed_changed = Signal()
+
+    altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=alt_button_pressed_changed)
+    ### END Property altButtonPressed
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

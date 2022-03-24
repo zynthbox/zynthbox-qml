@@ -653,6 +653,16 @@ don't want to have to dig too far...
             }
         }
     }
+    function adoptTrack() {
+        var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+        var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+        for (var i = 0; i < 10; ++i) {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
+            if (sequence) {
+                sequence.activePattern = theTrack.connectedPattern;
+            }
+        }
+    }
     Connections {
         target: zynthian.zynthiloops
         onSongChanged: adoptSong()
@@ -673,7 +683,10 @@ don't want to have to dig too far...
     }
     Connections {
         target: zynthian.session_dashboard
-        onSelectedTrackChanged: adoptCurrentMidiChannel()
+        onSelectedTrackChanged: {
+            adoptTrack();
+            adoptCurrentMidiChannel();
+        }
     }
     Connections {
         target: zynthian.zynthiloops.song.tracksModel

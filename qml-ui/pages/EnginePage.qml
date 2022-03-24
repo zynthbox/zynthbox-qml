@@ -256,6 +256,7 @@ Zynthian.ScreenPage {
                                         margins: Kirigami.Units.smallSpacing
                                     }
                                     readonly property bool isCurrent: view.currentIndex === index
+                                    radius: parent.radius
                                     opacity: isCurrent ? 0.3 : 0
                                     color: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                                 }
@@ -263,17 +264,32 @@ Zynthian.ScreenPage {
                                     anchors.fill: colorBackground
                                     border.color: Qt.rgba(0, 0, 0, 0.6)
                                     color: "transparent"
-                                    radius: 2
+                                    radius: parent.radius
                                     Rectangle {
                                         anchors {
                                             fill: parent
                                             margins: 1
                                         }
-                                        radius: 2
+                                        radius: parent.radius
                                         color: "transparent"
                                         border.color: colorBackground.color
                                         opacity: 0.4
                                     }
+                                }
+
+                                Kirigami.Heading {
+                                    anchors {
+                                        left: parent.left
+                                        right: parent.right
+                                        bottom: parent.bottom
+                                        bottomMargin: Kirigami.Units.gridUnit
+                                    }
+
+                                    text: model.metadata.description ? model.metadata.description : ""
+                                    elide: "ElideRight"
+                                    font.pointSize: 8
+                                    visible: view.currentIndex === index
+                                    horizontalAlignment: "AlignHCenter"
                                 }
                             }
                             ColumnLayout {
@@ -288,16 +304,6 @@ Zynthian.ScreenPage {
                                     Layout.preferredHeight: Kirigami.Units.gridUnit
                                     text: model.display
                                     level: 2
-                                    horizontalAlignment: "AlignHCenter"
-                                }
-                                Kirigami.Heading {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                    Layout.preferredHeight: Kirigami.Units.gridUnit
-                                    text: model.metadata.description ? model.metadata.description : ""
-                                    elide: "ElideRight"
-                                    font.pointSize: 8
-                                    opacity: 0.6
                                     horizontalAlignment: "AlignHCenter"
                                 }
                             }

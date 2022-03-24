@@ -36,6 +36,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
     property alias bottomBarButton: bottomBarButton
+    property alias trackButton: trackButton
     property alias mixerButton: mixerButton
     property alias synthsButton: synthsButton
     property alias samplesButton: samplesButton
@@ -89,6 +90,37 @@ Rectangle {
                 }
 
                 return true;
+
+            // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
+            case "TRACK_1":
+            case "TRACK_6":
+                root.selectedSlotRowItem.selectedRow = 0
+                handleItemClick()
+                return true
+
+            case "TRACK_2":
+            case "TRACK_7":
+                root.selectedSlotRowItem.selectedRow = 1
+                handleItemClick()
+                return true
+
+            case "TRACK_3":
+            case "TRACK_8":
+                root.selectedSlotRowItem.selectedRow = 2
+                handleItemClick()
+                return true
+
+            case "TRACK_4":
+            case "TRACK_9":
+                root.selectedSlotRowItem.selectedRow = 3
+                handleItemClick()
+                return true
+
+            case "TRACK_5":
+            case "TRACK_10":
+                root.selectedSlotRowItem.selectedRow = 4
+                handleItemClick()
+                return true
         }
 
         return false;
@@ -287,11 +319,21 @@ Rectangle {
                             visible: false
                             onCheckedChanged: {
                                 if (checked) {
-                                    mixerButton.checked = false
-                                    synthsButton.checked = false
-                                    samplesButton.checked = false
-                                    fxButton.checked = false
                                     bottomStack.currentIndex = 0
+                                    updateLedVariablesTimer.restart()
+                                }
+                            }
+                        }
+
+                        QQC2.Button {
+                            id: trackButton
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            text: qsTr("Track")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    bottomStack.currentIndex = 3
                                     updateLedVariablesTimer.restart()
                                 }
                             }
@@ -302,14 +344,10 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            checked: bottomStack.currentIndex === 1
+                            checked: true
                             text: qsTr("Mixer")
                             onCheckedChanged: {
                                 if (checked) {
-                                    bottomBarButton.checked = false
-                                    synthsButton.checked = false
-                                    samplesButton.checked = false
-                                    fxButton.checked = false
                                     bottomStack.currentIndex = 1
                                     updateLedVariablesTimer.restart()
                                 }
@@ -321,14 +359,9 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            checked: true
                             text: qsTr("Synths")
                             onCheckedChanged: {
                                 if (checked) {
-                                    bottomBarButton.checked = false
-                                    mixerButton.checked = false
-                                    samplesButton.checked = false
-                                    fxButton.checked = false
                                     bottomStack.currentIndex = 2
                                     updateLedVariablesTimer.restart()
                                 }
@@ -343,10 +376,6 @@ Rectangle {
                             text: qsTr("Samples")
                             onCheckedChanged: {
                                 if (checked) {
-                                    bottomBarButton.checked = false
-                                    mixerButton.checked = false
-                                    synthsButton.checked = false
-                                    fxButton.checked = false
                                     bottomStack.currentIndex = 2
                                     updateLedVariablesTimer.restart()
                                 }
@@ -361,10 +390,6 @@ Rectangle {
                             text: qsTr("FX")
                             onCheckedChanged: {
                                 if (checked) {
-                                    bottomBarButton.checked = false
-                                    mixerButton.checked = false
-                                    synthsButton.checked = false
-                                    samplesButton.checked = false
                                     bottomStack.currentIndex = 2
                                     updateLedVariablesTimer.restart()
                                 }

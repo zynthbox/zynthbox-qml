@@ -74,6 +74,7 @@ Zynthian.BasePlayGrid {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
+                // TODO if parameters popup shown, hide that first
                 if (component.showPatternsMenu) {
                     component.showPatternsMenu = false;
                     returnValue = true;
@@ -90,6 +91,20 @@ Zynthian.BasePlayGrid {
                     component.pickPattern(_private.sequence.activePattern + 1);
                     returnValue = true;
                 }
+                break;
+            case "SELECT_LEFT":
+            case "NAVIGATE_LEFT":
+                _private.goLeft();
+                returnValue = true;
+                break;
+            case "SELECT_RIGHT":
+            case "NAVIGATE_RIGHT":
+                _private.goRight();
+                returnValue = true;
+                break;
+            case "SWITCH_SELECT_SHORT":
+                _private.activateSelectedItem();
+                returnValue = true;
                 break;
             default:
                 break;
@@ -276,6 +291,22 @@ Zynthian.BasePlayGrid {
             updateTrack();
         }
 
+        signal goLeft();
+        signal goRight();
+        function activateSelectedItem() {
+            console.log("Activate selected item");
+        }
+        function previousBar() {
+            if (sequence.activePatternObject.activeBar > -1) {
+                sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;
+            }
+        }
+        function nextBar() {
+            if (sequence.activePatternObject.activeBar < sequence.activePatternObject.availableBars - 1) {
+                _private.sequence.activePatternObject.activeBar = _private.sequence.activePatternObject.activeBar + 1;
+            }
+        }
+
         /**
          * \brief Copy the range from startRow to endRow (inclusive) from model into the clipboard
          * @param model The model you wish to copy notes and metadata out of
@@ -447,6 +478,11 @@ Zynthian.BasePlayGrid {
                     Layout.minimumHeight: parent.height / 5; 
                     Layout.maximumHeight: parent.height / 5;
                     color:"transparent"
+                    Connections {
+                        target: _private
+                        onGoLeft: drumPadRepeater.goPrevious();
+                        onGoRight: drumPadRepeater.goNext();
+                    }
 
                     RowLayout {
                         anchors.fill:parent
@@ -454,6 +490,56 @@ Zynthian.BasePlayGrid {
                         Repeater {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth
+                            property int selectedIndex: -1
+                            function goNext() {
+                                var changeStep = true;
+                                if (selectedIndex > -1) {
+                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    if (seqPad.currentSubNote < seqPad.subNoteCount - 1) {
+                                        seqPad.currentSubNote = seqPad.currentSubNote + 1;
+                                        changeStep = false;
+                                    } else {
+                                        seqPad.currentSubNote = -1;
+                                    }
+                                }
+                                if (changeStep) {
+                                    if (selectedIndex < _private.activeBarModelWidth - 1) {
+                                        selectedIndex = selectedIndex + 1;
+                                    } else {
+                                        // go next bar and reset - don't loop to the start, just block at the end
+                                        if (_private.sequence.activePatternObject.activeBar < _private.sequence.activePatternObject.availableBars - 1) {
+                                            _private.nextBar();
+                                            selectedIndex = 0;
+                                        }
+                                    }
+                                }
+                            }
+                            function goPrevious() {
+                                var changeStep = true;
+                                if (selectedIndex > -1) {
+                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    if (seqPad.currentSubNote > 0) {
+                                        seqPad.currentSubNote = seqPad.currentSubNote - 1;
+                                        changeStep = false;
+                                    } else {
+                                        seqPad.currentSubNote = -1;
+                                    }
+                                }
+                                if (changeStep) {
+                                    if (selectedIndex > 0) {
+                                        selectedIndex = selectedIndex - 1;
+                                    } else {
+                                        if (_private.sequence.activePatternObject.activeBar == 0) {
+                                            // if first bar, reset to no selection
+                                            selectedIndex = -1;
+                                        } else {
+                                            // otherwise go to the last step of the previous bar
+                                            _private.previousBar();
+                                            selectedIndex = _private.activeBarModelWidth - 1;
+                                        }
+                                    }
+                                }
+                            }
                             PadNoteButton {
                                 id: sequencerPad
                                 Layout.fillHeight: true
@@ -465,6 +551,7 @@ Zynthian.BasePlayGrid {
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                                 note: _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
+                                isCurrent: model.index == drumPadRepeater.selectedIndex
                                 Timer {
                                     id: sequenderPadNoteApplicator
                                     repeat: false; running: false; interval: 1
@@ -477,6 +564,8 @@ Zynthian.BasePlayGrid {
                                     target: _private
                                     onSequenceChanged: sequenderPadNoteApplicator.restart();
                                     onActivePatternChanged: sequenderPadNoteApplicator.restart();
+                                    onActiveBarChanged: sequenderPadNoteApplicator.restart();
+                                    onBankOffsetChanged: sequenderPadNoteApplicator.restart();
                                 }
                                 Connections {
                                     target: _private.sequence
@@ -1292,6 +1381,30 @@ Zynthian.BasePlayGrid {
                 checked: _private.positionalVelocity
                 onClicked: {
                     _private.positionalVelocity = !_private.positionalVelocity;
+                }
+                // TODO This wants to move to global when once the playground modules are created by pgm's instancing system
+                Connections {
+                    target: zynthian.playgrid
+                    onBigKnobValueChanged: {
+                        if (zynthian.playgrid.bigKnobValue < 0) {
+                            for (var i = zynthian.playgrid.bigKnobValue; i < 0; ++i) {
+                                _private.goLeft();
+                            }
+                        } else if (zynthian.playgrid.bigKnobValue > 0) {
+                            for (var i = zynthian.playgrid.bigKnobValue; i > 0; --i) {
+                                _private.goRight();
+                            }
+                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+                    }
+                    onKnob1ValueChanged: {
+                        console.log("Knob 1 value changed:", zynthian.playgrid.knob1Value);
+                    }
+                    onKnob2ValueChanged: {
+                        console.log("Knob 2 value changed:", zynthian.playgrid.knob2Value);
+                    }
+                    onKnob3ValueChanged: {
+                        console.log("Knob 3 value changed:", zynthian.playgrid.knob3Value);
+                    }
                 }
             }
         }

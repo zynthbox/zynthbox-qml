@@ -537,22 +537,30 @@ class zynthiloops_track(QObject):
     @Slot(int)
     def remove_and_unchain_sound(self, chan):
         zyngui = self.__song__.get_metronome_manager().zyngui
-        for i in range (16):
-            for j in range(16):
-                if i != j and i in self.__chained_sounds__ and j in self.__chained_sounds__ and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
-                    zyngui.screens['layer'].remove_clone_midi(i, j)
-                    zyngui.screens['layer'].remove_clone_midi(j, i)
 
-        for i, sound in enumerate(self.__chained_sounds__):
-            logging.error("AAAA {} {}".format(sound, chan))
-            if sound == chan:
-                self.__chained_sounds__[i] = -1
-        zyngui.screens['layers_for_track'].fill_list()
+        def task():
+            for i in range (16):
+                for j in range(16):
+                    if i != j and i in self.__chained_sounds__ and j in self.__chained_sounds__ and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
+                        zyngui.screens['layer'].remove_clone_midi(i, j)
+                        zyngui.screens['layer'].remove_clone_midi(j, i)
 
-        self.select_correct_layer()
+            for i, sound in enumerate(self.__chained_sounds__):
+                logging.error("AAAA {} {}".format(sound, chan))
+                if sound == chan:
+                    self.__chained_sounds__[i] = -1
+            zyngui.screens['layers_for_track'].fill_list()
 
-        self.chained_sounds_changed.emit()
-        self.connected_sound_changed.emit()
+            zyngui.layer.remove_root_layer(chan)
+
+            self.select_correct_layer()
+
+            self.chained_sounds_changed.emit()
+            self.connected_sound_changed.emit()
+
+            zyngui.zynthiloops.end_long_task()
+
+        zyngui.zynthiloops.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
         class Worker:

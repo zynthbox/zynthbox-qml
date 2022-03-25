@@ -696,7 +696,7 @@ class zynthian_gui(QObject):
                 if (self.active_screen == "zynthiloops" and self.slotsBarSynthsActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "synth"):
                     if track.chainedSounds[i-1] > -1 and \
                             track.checkIfLayerExists(track.chainedSounds[i-1]):
-                        self.wsleds.setPixelColor(i, self.wscolor_blue)
+                        self.wsleds.setPixelColor(i, self.wscolor_red)
                     else:
                         self.wsleds.setPixelColor(i, self.wscolor_off)
 
@@ -705,7 +705,7 @@ class zynthian_gui(QObject):
                 # If slots samples bar is active, light up filled cells otherwise turn off led
                 if (self.active_screen == "zynthiloops" and self.slotsBarSamplesActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice")):
                     if track.samples[i-1].path is not None:
-                        self.wsleds.setPixelColor(i, self.wscolor_red)
+                        self.wsleds.setPixelColor(i, self.wscolor_yellow)
                     else:
                         self.wsleds.setPixelColor(i, self.wscolor_off)
 
@@ -716,7 +716,7 @@ class zynthian_gui(QObject):
                     if track.chainedSounds[i-1] > -1 and \
                             track.checkIfLayerExists(track.chainedSounds[i-1]) and \
                             len(track.getEffectsNameByMidiChannel(track.chainedSounds[i-1])) > 0:
-                        self.wsleds.setPixelColor(i, self.wscolor_yellow)
+                        self.wsleds.setPixelColor(i, self.wscolor_blue)
                     else:
                         self.wsleds.setPixelColor(i, self.wscolor_off)
 
@@ -744,11 +744,11 @@ class zynthian_gui(QObject):
 
             # Button 6 will act as modifier key to select track 6-10 when active
             if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
-                self.wsleds.setPixelColor(6, self.wscolor_blue)
-            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
                 self.wsleds.setPixelColor(6, self.wscolor_red)
-            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
                 self.wsleds.setPixelColor(6, self.wscolor_yellow)
+            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+                self.wsleds.setPixelColor(6, self.wscolor_blue)
             elif self.active_screen == "zynthiloops" and self.tracks_mod_active:
                 self.wsleds.setPixelColor(6, self.wscolor_active)
             else:
@@ -756,11 +756,11 @@ class zynthian_gui(QObject):
 
             # 7 : FX Button
             if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
-                self.wsleds.setPixelColor(7, self.wscolor_blue)
-            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
                 self.wsleds.setPixelColor(7, self.wscolor_red)
-            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
                 self.wsleds.setPixelColor(7, self.wscolor_yellow)
+            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
+                self.wsleds.setPixelColor(7, self.wscolor_blue)
             else:
                 self.wsleds.setPixelColor(7, self.wscolor_off)
 

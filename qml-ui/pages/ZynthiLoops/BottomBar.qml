@@ -42,6 +42,8 @@ Zynthian.Card {
 
     leftPadding: 0
     rightPadding: 0
+    topPadding: 0
+    bottomPadding: 0
 
     id: root
     enum ControlType {
@@ -66,177 +68,33 @@ Zynthian.Card {
         y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 6 : 0
     }
 
-    contentItem: ColumnLayout {
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-            visible: root.controlType !== BottomBar.ControlType.Track
+    contentItem: RowLayout {
+        spacing: 1
 
-            EditableHeader {
-                text: {
-                    let text = root.controlObj ? root.controlObj.name : "";
-                    switch (root.controlType) {
-                    case BottomBar.ControlType.Song:
-                        return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
-                    case BottomBar.ControlType.Clip:
-                    case BottomBar.ControlType.Pattern:
-                        return qsTr("CLIP: %1").arg(text);
-                    case BottomBar.ControlType.Track:
-                        return qsTr("TRACK: %1").arg(text);
-                    case BottomBar.ControlType.Part:
-                        return qsTr("PART: %1").arg(text);
-//                    case BottomBar.ControlType.Pattern:
-//                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-//                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
-//                        return qsTr("PATTERN: %1").arg(pattern.objectName)
-                    default:
-                        return text;
-                    }
-                }
-            }
-
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
-//            QQC2.Label {
-//                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-//                         controlObj.clipTrack.trackAudioType === "sample-slice"
-//                text: qsTr("Slices")
-//            }
-
-//            QQC2.ComboBox {
-//                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-//                         controlObj.clipTrack.trackAudioType === "sample-slice"
-//                model: [4, 8, 12, 16]
-//                currentIndex: find(controlObj.slices)
-//                onActivated: controlObj.slices = model[index]
-//            }
-
-            QQC2.Label {
-                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
-                text: controlObj && controlObj.path
-                        ? qsTr("Sample (0): %1").arg(controlObj.path.split('/').pop())
-                        : qsTr("No File Loaded")
-            }
-
-            SidebarButton {
-                icon.name: "document-save-symbolic"
-                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
-                         && controlObj.hasOwnProperty("path")
-                         && controlObj.path.length > 0
-
-                onClicked: {
-                    controlObj.saveMetadata();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "document-open"
-                visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
-                enabled: controlObj ? !controlObj.isPlaying : false
-
-                onClicked: {
-                    pickerDialog.folderModel.folder = root.controlObj.recordingDir;
-                    pickerDialog.open();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "delete"
-                visible: (controlObj != null) && controlObj.deletable
-
-                onClicked: {
-                    controlObj.delete();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "edit-clear-all"
-                visible: (controlObj != null) && controlObj.clearable
-                enabled: controlObj ? !controlObj.isPlaying : false
-
-                onClicked: {
-                    controlObj.clear()
-
-                    if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
-                        zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
-                    }
-                }
-            }
-
-            SidebarButton {
-                icon.name: "user-trash-symbolic"
-                visible: controlObj && controlObj.path && controlObj.path.length > 0
-
-                onClicked: {
-                    controlObj.deleteClip()
-                }
-            }
-
-            SidebarButton {
-                icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                visible: root.controlType !== BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable && controlObj.path
-
-                onClicked: {
-                    if (controlObj.isPlaying) {
-                        console.log("Stopping Sound Loop")
-                        controlObj.stop();
-                    } else {
-                        console.log("Playing Sound Loop")
-                        controlObj.playSolo();
-                    }
-                }
-            }
-
-            SidebarButton {
-                icon.name: "media-playback-start"
-                visible: root.controlType === BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable
-
-                onClicked: {
-                    console.log("Starting Part")
-                    controlObj.play();
-                }
-            }
-
-            SidebarButton {
-                icon.name: "media-playback-stop"
-                visible: root.controlType === BottomBar.ControlType.Part &&
-                         (controlObj != null) && controlObj.playable
-
-                onClicked: {
-                    console.log("Stopping Part")
-                    controlObj.stop();
-                }
-            }
-
-//            SidebarButton {
-//                icon.name: "media-record-symbolic"
-//                icon.color: "#f44336"
-//                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
-//                enabled: !controlObj.isRecording
-
-//                onClicked: {
-//                    controlObj.queueRecording();
-//                }
-//            }
+        QQC2.ButtonGroup {
+            buttons: buttonsColumn.children
         }
 
-
-        Zynthian.TabbedControlView {
-            id: tabbedView
-            Layout.fillWidth: true
+        BottomStackTabs {
+            id: buttonsColumn
+            Layout.preferredWidth: privateProps.cellWidth + 6
+            Layout.maximumWidth: privateProps.cellWidth + 6
+            Layout.bottomMargin: 5
             Layout.fillHeight: true
-            minimumTabsCount: 4
-            orientation: Qt.Vertical
-            visibleFocusRects: false
+        }
 
-            initialHeaderItem: RowLayout {
-                visible: root.controlType === BottomBar.ControlType.Track
+        Kirigami.Separator {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 1
+            color: "#ff31363b"
+        }
+
+        ColumnLayout {
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 2
+                visible: root.controlType !== BottomBar.ControlType.Track
+
                 EditableHeader {
                     text: {
                         let text = root.controlObj ? root.controlObj.name : "";
@@ -250,192 +108,358 @@ Zynthian.Card {
                             return qsTr("TRACK: %1").arg(text);
                         case BottomBar.ControlType.Part:
                             return qsTr("PART: %1").arg(text);
-//                        case BottomBar.ControlType.Pattern:
-//                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+    //                    case BottomBar.ControlType.Pattern:
+    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    //                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+    //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
                             return text;
                         }
                     }
                 }
-                Item {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                }
-            }
-            finalHeaderItem: RowLayout {
-                visible: root.controlType === BottomBar.ControlType.Track
-                Item {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
-                }
-//                QQC2.Label {
-//                    visible: controlObj.connectedPattern >= 0
-//                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-//                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
-//                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
-//                }
-                QQC2.Button {
-                    visible: controlObj && controlObj.connectedPattern < 0
-                    Layout.fillHeight: true
 
-                    text: qsTr("Midi")
-                    //enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
+    //            QQC2.Label {
+    //                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+    //                         controlObj.clipTrack.trackAudioType === "sample-slice"
+    //                text: qsTr("Slices")
+    //            }
+
+    //            QQC2.ComboBox {
+    //                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
+    //                         controlObj.clipTrack.trackAudioType === "sample-slice"
+    //                model: [4, 8, 12, 16]
+    //                currentIndex: find(controlObj.slices)
+    //                onActivated: controlObj.slices = model[index]
+    //            }
+
+                QQC2.Label {
+                    visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
+                    text: controlObj && controlObj.path
+                            ? qsTr("Sample (0): %1").arg(controlObj.path.split('/').pop())
+                            : qsTr("No File Loaded")
+                }
+
+                SidebarButton {
+                    icon.name: "document-save-symbolic"
+                    visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
+                             && controlObj.hasOwnProperty("path")
+                             && controlObj.path.length > 0
 
                     onClicked: {
-                        zynthian.session_dashboard.midiSelectionRequested();
+                        controlObj.saveMetadata();
                     }
                 }
-//                SidebarButton {
-//                    icon.name: "edit-clear-all"
-//                    visible: (controlObj != null) && controlObj.clearable
-//                    enabled: controlObj ? !controlObj.isPlaying : false
 
-//                    onClicked: {
-//                        controlObj.clear()
+                SidebarButton {
+                    icon.name: "document-open"
+                    visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
+                    enabled: controlObj ? !controlObj.isPlaying : false
 
-//                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
-//                        seq.enabled = false;
-//                        controlObj.connectedPattern = -1;
-//                    }
-//                }
-                QQC2.ComboBox {
-                    id: trackAudioTypeDropdown
-
-                    // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
-                    model: ListModel {
-                        ListElement { text: "SYNTH"; value: "synth" }
-                        ListElement { text: "LOOP"; value: "sample-loop" }
-                        ListElement { text: "TRIG"; value: "sample-trig" }
-                        ListElement { text: "SLICE"; value: "sample-slice" }
-                    }
-                    textRole: "text"
-                    currentIndex: controlObj && controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
-                    onActivated: {
-                        controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
+                    onClicked: {
+                        pickerDialog.folderModel.folder = root.controlObj.recordingDir;
+                        pickerDialog.open();
                     }
                 }
+
+                SidebarButton {
+                    icon.name: "delete"
+                    visible: (controlObj != null) && controlObj.deletable
+
+                    onClicked: {
+                        controlObj.delete();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "edit-clear-all"
+                    visible: (controlObj != null) && controlObj.clearable
+                    enabled: controlObj ? !controlObj.isPlaying : false
+
+                    onClicked: {
+                        controlObj.clear()
+
+                        if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
+                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
+                        }
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "user-trash-symbolic"
+                    visible: controlObj && controlObj.path && controlObj.path.length > 0
+
+                    onClicked: {
+                        controlObj.deleteClip()
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
+                    visible: root.controlType !== BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable && controlObj.path
+
+                    onClicked: {
+                        if (controlObj.isPlaying) {
+                            console.log("Stopping Sound Loop")
+                            controlObj.stop();
+                        } else {
+                            console.log("Playing Sound Loop")
+                            controlObj.playSolo();
+                        }
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-start"
+                    visible: root.controlType === BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        console.log("Starting Part")
+                        controlObj.play();
+                    }
+                }
+
+                SidebarButton {
+                    icon.name: "media-playback-stop"
+                    visible: root.controlType === BottomBar.ControlType.Part &&
+                             (controlObj != null) && controlObj.playable
+
+                    onClicked: {
+                        console.log("Stopping Part")
+                        controlObj.stop();
+                    }
+                }
+
+    //            SidebarButton {
+    //                icon.name: "media-record-symbolic"
+    //                icon.color: "#f44336"
+    //                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
+    //                enabled: !controlObj.isRecording
+
+    //                onClicked: {
+    //                    controlObj.queueRecording();
+    //                }
+    //            }
             }
 
-            initialAction: {
-                switch (root.controlType) {
-                case BottomBar.ControlType.Song:
-                    return songAction;
-                case BottomBar.ControlType.Clip:
-                    return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
-                case BottomBar.ControlType.Track:
-                    return trackSoundsAction;
-                case BottomBar.ControlType.Part:
-                    return partAction;
-                case BottomBar.ControlType.Pattern:
-                    return patternAction;
-                default:
-                    return waveAction;
+
+            Zynthian.TabbedControlView {
+                id: tabbedView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                minimumTabsCount: 4
+                orientation: Qt.Vertical
+                visibleFocusRects: false
+
+                initialHeaderItem: RowLayout {
+                    visible: root.controlType === BottomBar.ControlType.Track
+                    EditableHeader {
+                        text: {
+                            let text = root.controlObj ? root.controlObj.name : "";
+                            switch (root.controlType) {
+                            case BottomBar.ControlType.Song:
+                                return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                            case BottomBar.ControlType.Clip:
+                            case BottomBar.ControlType.Pattern:
+                                return qsTr("CLIP: %1").arg(text);
+                            case BottomBar.ControlType.Track:
+                                return qsTr("TRACK: %1").arg(text);
+                            case BottomBar.ControlType.Part:
+                                return qsTr("PART: %1").arg(text);
+    //                        case BottomBar.ControlType.Pattern:
+    //                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+                            default:
+                                return text;
+                            }
+                        }
+                    }
+                    Item {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                    }
                 }
+                finalHeaderItem: RowLayout {
+                    visible: root.controlType === BottomBar.ControlType.Track
+                    Item {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                    }
+    //                QQC2.Label {
+    //                    visible: controlObj.connectedPattern >= 0
+    //                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    //                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
+    //                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
+    //                }
+                    QQC2.Button {
+                        visible: controlObj && controlObj.connectedPattern < 0
+                        Layout.fillHeight: true
+
+                        text: qsTr("Midi")
+                        //enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+
+                        onClicked: {
+                            zynthian.session_dashboard.midiSelectionRequested();
+                        }
+                    }
+    //                SidebarButton {
+    //                    icon.name: "edit-clear-all"
+    //                    visible: (controlObj != null) && controlObj.clearable
+    //                    enabled: controlObj ? !controlObj.isPlaying : false
+
+    //                    onClicked: {
+    //                        controlObj.clear()
+
+    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
+    //                        seq.enabled = false;
+    //                        controlObj.connectedPattern = -1;
+    //                    }
+    //                }
+                    QQC2.ComboBox {
+                        id: trackAudioTypeDropdown
+
+                        // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
+                        model: ListModel {
+                            ListElement { text: "SYNTH"; value: "synth" }
+                            ListElement { text: "LOOP"; value: "sample-loop" }
+                            ListElement { text: "TRIG"; value: "sample-trig" }
+                            ListElement { text: "SLICE"; value: "sample-slice" }
+                        }
+                        textRole: "text"
+                        currentIndex: controlObj && controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
+                        onActivated: {
+                            controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
+                        }
+                    }
+                }
+
+                initialAction: {
+                    switch (root.controlType) {
+                    case BottomBar.ControlType.Song:
+                        return songAction;
+                    case BottomBar.ControlType.Clip:
+                        return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
+                    case BottomBar.ControlType.Track:
+                        return trackSoundsAction;
+                    case BottomBar.ControlType.Part:
+                        return partAction;
+                    case BottomBar.ControlType.Pattern:
+                        return patternAction;
+                    default:
+                        return waveAction;
+                    }
+                }
+
+                onInitialActionChanged: initialAction.trigger()
+
+                tabActions: [
+                    Zynthian.TabbedControlViewAction {
+                        id: songAction
+                        text: qsTr("Song")
+                        page: Qt.resolvedUrl("SongBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Song
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: partAction
+                        text: qsTr("Part")
+                        page: Qt.resolvedUrl("PartBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Part
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: recordingAction
+                        text: qsTr("Audio")
+                        page: Qt.resolvedUrl("RecordingBar.qml")
+                        visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.recordable && !controlObj.path
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        text: qsTr("Clip Info")
+                        page: Qt.resolvedUrl("ClipInfoBar.qml")
+                        visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: waveAction
+                        text: qsTr("Clip Settings")
+                        page: Qt.resolvedUrl("ClipSettingsBar.qml")
+                        visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                        preload: true
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: editorAction
+                        text: qsTr("Wave Editor")
+                        page: Qt.resolvedUrl("WaveEditorBar.qml")
+                        visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: patternAction
+                        text: qsTr("Pattern")
+                        page: Qt.resolvedUrl("PatternBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Pattern
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: trackAction
+                        text: qsTr("Track")
+                        page: Qt.resolvedUrl("TrackBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: trackSoundsAction
+                        text: qsTr("Sounds")
+                        page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track
+                        initialProperties: {"bottomBar": root}
+                    },
+                    Zynthian.TabbedControlViewAction {
+                        id: sampleSoundsAction
+                        text: qsTr("Samples")
+                        page: Qt.resolvedUrl("SamplesBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track
+                        initialProperties: {"bottomBar": root}
+                    },
+                    // Duplicate tab instance but for different placement and controlObj for track
+                    Zynthian.TabbedControlViewAction {
+                        id: trackWaveAction
+
+                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
+
+                        text: qsTr("Smp. Settings")
+                        page: Qt.resolvedUrl("ClipSettingsBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track &&
+                                 clip && clip.path && clip.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                        preload: true
+                    },
+                    // Duplicate tab instance but for different placement and controlObj for track
+                    Zynthian.TabbedControlViewAction {
+                        id: trackWaveEditorAction
+
+                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
+
+                        text: qsTr("Wave Editor")
+                        page: Qt.resolvedUrl("WaveEditorBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track &&
+                                 clip && clip.path && clip.path.length > 0
+                        initialProperties: {"bottomBar": root}
+                    }
+                   /* Zynthian.TabbedControlViewAction {
+                        text: qsTr("FX")
+                        page: Qt.resolvedUrl("FXBar.qml")
+                        visible: root.controlType === BottomBar.ControlType.Track
+                        initialProperties: {"bottomBar": root}
+                    },*/
+                ]
             }
-
-            onInitialActionChanged: initialAction.trigger()
-
-            tabActions: [
-                Zynthian.TabbedControlViewAction {
-                    id: songAction
-                    text: qsTr("Song")
-                    page: Qt.resolvedUrl("SongBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Song
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: partAction
-                    text: qsTr("Part")
-                    page: Qt.resolvedUrl("PartBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Part
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: recordingAction
-                    text: qsTr("Audio")
-                    page: Qt.resolvedUrl("RecordingBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.recordable && !controlObj.path
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    text: qsTr("Clip Info")
-                    page: Qt.resolvedUrl("ClipInfoBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: waveAction
-                    text: qsTr("Clip Settings")
-                    page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                    preload: true
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: editorAction
-                    text: qsTr("Wave Editor")
-                    page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: patternAction
-                    text: qsTr("Pattern")
-                    page: Qt.resolvedUrl("PatternBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Pattern
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: trackAction
-                    text: qsTr("Track")
-                    page: Qt.resolvedUrl("TrackBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: trackSoundsAction
-                    text: qsTr("Sounds")
-                    page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track
-                    initialProperties: {"bottomBar": root}
-                },
-                Zynthian.TabbedControlViewAction {
-                    id: sampleSoundsAction
-                    text: qsTr("Samples")
-                    page: Qt.resolvedUrl("SamplesBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track
-                    initialProperties: {"bottomBar": root}
-                },
-                // Duplicate tab instance but for different placement and controlObj for track
-                Zynthian.TabbedControlViewAction {
-                    id: trackWaveAction
-
-                    property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
-
-                    text: qsTr("Smp. Settings")
-                    page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track &&
-                             clip && clip.path && clip.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                    preload: true
-                },
-                // Duplicate tab instance but for different placement and controlObj for track
-                Zynthian.TabbedControlViewAction {
-                    id: trackWaveEditorAction
-
-                    property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
-
-                    text: qsTr("Wave Editor")
-                    page: Qt.resolvedUrl("WaveEditorBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track &&
-                             clip && clip.path && clip.path.length > 0
-                    initialProperties: {"bottomBar": root}
-                }
-               /* Zynthian.TabbedControlViewAction {
-                    text: qsTr("FX")
-                    page: Qt.resolvedUrl("FXBar.qml")
-                    visible: root.controlType === BottomBar.ControlType.Track
-                    initialProperties: {"bottomBar": root}
-                },*/
-            ]
         }
     }
 

@@ -39,7 +39,7 @@ Rectangle {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.mixerButton.checked = true
+                bottomStack.slotsBar.trackButton.checked = true
                 return true;
         }
 

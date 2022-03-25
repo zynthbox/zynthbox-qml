@@ -339,6 +339,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            checked: true
                             text: qsTr("Track")
                             onCheckedChanged: {
                                 if (checked) {
@@ -353,7 +354,6 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            checked: true
                             text: qsTr("Mixer")
                             onCheckedChanged: {
                                 if (checked) {

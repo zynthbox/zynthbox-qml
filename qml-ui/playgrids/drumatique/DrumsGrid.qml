@@ -51,7 +51,9 @@ ColumnLayout {
                     text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
                     property color noteColor: component.playgrid.getNoteSpecificColor(note.name,note.octave)
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
-                    property bool weAreChosen: component.playgrid.mostRecentlyPlayedNote === note || component.playgrid.heardNotes.indexOf(note) > -1
+                    property bool weAreChosen: component.playgrid.mostRecentlyPlayedNote === note
+                        || component.playgrid.heardNotes.indexOf(note) > -1
+                        || (component.playgrid.mostRecentlyPlayedNote == undefined && component.playgrid.heardNotes.length === 0 && component.playgrid.currentRowUniqueNotes.indexOf(note) > -1)
                     backgroundColor: weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false

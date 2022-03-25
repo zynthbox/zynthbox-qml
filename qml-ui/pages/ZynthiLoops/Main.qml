@@ -604,15 +604,15 @@ Zynthian.ScreenPage {
 
                             color: {
                                 if (root.copySourceObj === model.track)
-                                    return "#2196f3"
+                                    return "#ff2196f3"
                                 else if (model.track.trackAudioType === "synth")
-                                    return Qt.rgba(0, 50, 200, 0.2)
+                                    return "#22ff0000"
                                 else if (model.track.trackAudioType === "sample-loop")
-                                    return Qt.rgba(0, 255, 0, 0.2)
+                                    return "#220000ff"
                                 else if (model.track.trackAudioType === "sample-trig")
-                                    return Qt.rgba(255, 0, 0, 0.2)
+                                    return "#22ffff00"
                                 else if (model.track.trackAudioType === "sample-slice")
-                                    return Qt.rgba(255, 0, 0, 0.2)
+                                    return "#22ffff00"
                                 else
                                     return Kirigami.Theme.backgroundColor
                             }

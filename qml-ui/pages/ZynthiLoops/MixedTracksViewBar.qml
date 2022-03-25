@@ -44,6 +44,20 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
+            case "NAVIGATE_LEFT":
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack -= 1;
+                }
+
+                return true;
+
+            case "NAVIGATE_RIGHT":
+                if (zynthian.session_dashboard.selectedTrack < 9) {
+                    zynthian.session_dashboard.selectedTrack += 1;
+                }
+
+                return true;
+
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
             // and invoke respective handler when trackAudioType is synth, trig or slice
             // Otherwise, when in loop mode, do not handle button to allow falling back to track
@@ -122,7 +136,6 @@ Rectangle {
     GridLayout {
         rows: 1
         anchors.fill: parent
-        anchors.topMargin: Kirigami.Units.gridUnit*0.3
 
         ColumnLayout {
             Layout.fillHeight: true

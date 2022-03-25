@@ -42,6 +42,9 @@ QQC2.Button {
     property int padNoteRow: component.patternModel ? activeBar + component.patternModel.bankOffset : 0
     property int padNoteIndex
     property var mostRecentlyPlayedNote
+    property bool isCurrent: false
+    property int currentSubNote: -1
+    property alias subNoteCount: padSubNoteRepeater.count
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -145,6 +148,18 @@ QQC2.Button {
                             }
                         ]
                     }
+                    Rectangle {
+                        anchors {
+                            fill: parent;
+                            margins: 1
+                        }
+                        border {
+                            width: 2
+                            color: Kirigami.Theme.highlightColor
+                        }
+                        color: "transparent"
+                        visible: component.currentSubNote == index
+                    }
                 }
             }
         }
@@ -192,6 +207,18 @@ QQC2.Button {
                         ? "yellow"
                         : component.backgroundColor
                 : "white"
+        }
+        Rectangle {
+            anchors {
+                fill: parent;
+                margins: 1
+            }
+            border {
+                width: 2
+                color: Kirigami.Theme.highlightColor
+            }
+            color: "transparent"
+            visible: component.isCurrent && component.currentSubNote === -1
         }
     }
 }

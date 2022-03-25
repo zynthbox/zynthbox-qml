@@ -105,6 +105,7 @@ Zynthian.BasePlayGrid {
     property bool listenForNotes: false
     property var heardNotes: []
     property var heardVelocities: []
+    property var currentRowUniqueNotes: []
 
     function setActiveBar(activeBar) {
         _private.sequence.activePatternObject.activeBar = activeBar;
@@ -158,6 +159,7 @@ Zynthian.BasePlayGrid {
         }
         _private.sequence.activePattern = patternIndex
     }
+
     property var noteSpecificColor: {
         "C":"#f08080", 
         "C#":"#4b0082",
@@ -333,6 +335,9 @@ Zynthian.BasePlayGrid {
                 _private.sequence = sequence;
             }
         }
+        function updateUniqueCurrentRowNotes() {
+            component.currentRowUniqueNotes = activePatternModel.uniqueRowNotes(activeBar + bankOffset);
+        }
     }
     Connections {
         target: zynthian.zynthiloops.song.tracksModel
@@ -465,6 +470,7 @@ Zynthian.BasePlayGrid {
                                     repeat: false; running: false; interval: 1
                                     onTriggered: {
                                         sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                        Qt.callLater(_private.updateUniqueCurrentRowNotes)
                                     }
                                 }
                                 Connections {

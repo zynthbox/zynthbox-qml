@@ -286,7 +286,6 @@ Rectangle {
     GridLayout {
         rows: 1
         anchors.fill: parent
-        anchors.topMargin: Kirigami.Units.gridUnit*0.3
 
         ColumnLayout {
             Layout.fillHeight: true

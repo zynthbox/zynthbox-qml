@@ -196,6 +196,8 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.fxButton.checked = true
                     } else if (bottomStack.slotsBar.fxButton.checked) {
                         bottomStack.slotsBar.trackButton.checked = true
+                    } else {
+                        bottomStack.slotsBar.trackButton.checked = true
                     }
                 }
 

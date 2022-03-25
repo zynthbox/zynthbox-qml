@@ -134,7 +134,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
                 self.__zselector_ctrl[0] = zynthian_controller(None, 'playgrid_bigknob', 'playgrid_bigknob', {'midi_cc': 0, 'value': 0})
                 self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0], self)
             self.__zselector[0].show()
-            self.__zselector_ctrl[0].set_options({'symbol': 'playgrid_bigknob', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0, 'value_max': 100, 'value_min': 0, 'value': 50})
+            self.__zselector_ctrl[0].set_options({'symbol': 'playgrid_bigknob', 'name': 'Playgrid Big Knob', 'short_name': 'Bigknob', 'midi_cc': 0, 'value_max': 100, 'value_min': 0, 'value': 50})
             self.__zselector[0].config(self.__zselector_ctrl[0])
             self.__zselector[0].custom_encoder_speed = 0
             if self.__zselector[0] is not None:

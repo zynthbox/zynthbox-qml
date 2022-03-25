@@ -162,7 +162,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[2] is None:
             self.__zselector_ctrl[2] = zynthian_controller(None, 'playgrid_knob2', 'playgrid_knob2', {'midi_cc': 0, 'value': 0})
             self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[2], self)
-            self.__zselector[2].index = 0
+            self.__zselector[2].index = 1
         if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
             self.__zselector[2].show()
         else:
@@ -177,7 +177,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[3] is None:
             self.__zselector_ctrl[3] = zynthian_controller(None, 'playgrid_knob3', 'playgrid_knob3', {'midi_cc': 0, 'value': 0})
             self.__zselector[3] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[3], self)
-            self.__zselector[3].index = 0
+            self.__zselector[3].index = 2
         if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
             self.__zselector[3].show()
         else:

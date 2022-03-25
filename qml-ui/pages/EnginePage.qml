@@ -46,7 +46,10 @@ Zynthian.ScreenPage {
 
             text: qsTr("Clear Slot")
             enabled: selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
-            onTriggered: selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+            onTriggered: {
+                selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+                zynthian.show_modal("zynthiloops")
+            }
         }
     ]
 

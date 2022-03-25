@@ -76,7 +76,6 @@ Rectangle {
         id: root
         rows: 1
         anchors.fill: parent
-        anchors.topMargin: Kirigami.Units.gridUnit*0.3
 
         readonly property QtObject song: zynthian.zynthiloops.song
 

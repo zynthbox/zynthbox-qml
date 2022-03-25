@@ -34,6 +34,21 @@ Zynthian.ScreenPage {
     id: root
 
     screenId: "engine"
+    contextualActions: [
+        Kirigami.Action {
+            enabled: false
+        },
+        Kirigami.Action {
+            enabled: false
+        },
+        Kirigami.Action {
+            readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
+            text: qsTr("Clear Slot")
+            enabled: selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+            onTriggered: selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+        }
+    ]
 
     cuiaCallback: function(cuia) {
         switch (cuia) {

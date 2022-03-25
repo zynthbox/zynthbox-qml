@@ -33,7 +33,7 @@ ColumnLayout {
         checkable: true
         checked: bottomStack.slotsBar.trackButton.checked
         text: qsTr("Track")
-        onCheckedChanged: {
+        onClicked: {
             bottomStack.slotsBar.trackButton.checked = true
         }
     }

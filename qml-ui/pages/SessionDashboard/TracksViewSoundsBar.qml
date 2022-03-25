@@ -414,10 +414,10 @@ Zynthian.Card {
 
 //                                zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
 //                                zynthian.layer.ask_remove_current_layer()
-                                var chainedSoundsCopy = selectedTrack.chainedSounds.slice();
-                                chainedSoundsCopy[index] = -1;
+//                                var chainedSoundsCopy = selectedTrack.chainedSounds.slice();
+//                                chainedSoundsCopy[index] = -1;
 
-                                console.log(chainedSoundsCopy);
+//                                console.log(chainedSoundsCopy);
                                 //selectedTrack.chainedSounds = chainedSoundsCopy;
                                 selectedTrack.remove_and_unchain_sound(soundDelegate.chainedSound);
                             }

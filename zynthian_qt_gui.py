@@ -66,6 +66,7 @@ from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
+from zynqtgui.zynthian_gui_synth_categories import zynthian_gui_synth_categories
 from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
@@ -1044,6 +1045,7 @@ class zynthian_gui(QObject):
         self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
+        self.screens["synth_categories"] = zynthian_gui_synth_categories(self)
 
         self.screens["network"] = zynthian_gui_network(self)
         self.screens["network_info"] = self.screens["network"]
@@ -3239,6 +3241,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sketch_copier(self):
         return self.screens["sketch_copier"]
+
+    @Property(QObject, constant=True)
+    def synth_categories(self):
+        return self.screens["synth_categories"]
 
     ### Property altButtonPressed
     def get_alt_button_pressed(self):

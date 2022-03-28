@@ -63,91 +63,125 @@ Zynthian.ScreenPage {
         return false;
     }
     
-    contentItem : RowLayout {
-        spacing: 1
-        ColumnLayout {
+    contentItem : GridLayout {
+        id: content
+
+        property real cellWidth: (width - columnSpacing * (columns-1))/columns
+
+        rows: 1
+        columns: 5
+
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: parent.spacing
+            color: Kirigami.Theme.backgroundColor
 
-            Zynthian.TableHeader {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                text: qsTr("Categories")
-            }
+            ColumnLayout {
+                anchors.fill: parent
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                Zynthian.TableHeader {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*3
+                    text: qsTr("Categories")
+                }
+
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredWidth: 1
+                }
+
+                ListView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: content.rowSpacing
+                    flickableDirection: Flickable.VerticalFlick
+                    orientation: ListView.Vertical
+                    clip: true
+                    model: 10
+
+                    delegate: Zynthian.TableHeader {
+                        width: ListView.view.width
+                        height: Kirigami.Units.gridUnit * 2
+                        text: "Tag"
+                    }
+                }
             }
         }
-        ColumnLayout {
-            Layout.fillWidth: true
+
+        Rectangle {
+            Layout.columnSpan: 3
+            Layout.fillWidth: false
             Layout.fillHeight: true
-            spacing: parent.spacing
+            Layout.preferredWidth: content.cellWidth * 3
 
-            Zynthian.TableHeader {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                text: qsTr("Column 1")
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
+            color: Kirigami.Theme.backgroundColor
         }
-        ColumnLayout {
+
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: parent.spacing
+            color: Kirigami.Theme.backgroundColor
 
-            Zynthian.TableHeader {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                text: qsTr("Column 2")
-            }
+            ColumnLayout {
+                anchors.fill: parent
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-        }
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: parent.spacing
+                Zynthian.TableHeader {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*3
+                    text: qsTr("Details")
+                }
 
-            Zynthian.TableHeader {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                text: qsTr("Column 3")
-            }
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredWidth: 1
+                }
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-        }
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: parent.spacing
+                ListView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: content.rowSpacing
+                    flickableDirection: Flickable.VerticalFlick
+                    orientation: ListView.Vertical
+                    clip: true
+                    model: 5
 
-            Zynthian.TableHeader {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                text: qsTr("Details")
-            }
+                    delegate: Item {
+                        width: ListView.view.width
+                        height: (ListView.view.height - ListView.view.spacing * 4) / 5
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: parent.width - Kirigami.Units.gridUnit * 2
+                            height: Kirigami.Units.gridUnit * 2
+
+                            Kirigami.Theme.inherit: false
+                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                            color: Kirigami.Theme.backgroundColor
+
+                            border.color: "#ff999999"
+                            border.width: 1
+                            radius: 4
+
+                            QQC2.Label {
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    left: parent.left
+                                    right: parent.right
+                                    leftMargin: Kirigami.Units.gridUnit*0.5
+                                    rightMargin: Kirigami.Units.gridUnit*0.5
+                                }
+                                horizontalAlignment: Text.AlignLeft
+                                text: ""
+
+                                elide: "ElideRight"
+                            }
+                        }
+                    }
+                }
             }
         }
     }

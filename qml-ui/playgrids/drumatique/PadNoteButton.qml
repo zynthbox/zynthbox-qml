@@ -125,6 +125,7 @@ QQC2.Button {
                     id:padSubNoteRect
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
+                    property var subNoteDuration: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "duration");
 
                     Layout.alignment: Qt.AlignBottom
                     Layout.fillWidth: true
@@ -147,6 +148,29 @@ QQC2.Button {
                                 }
                             }
                         ]
+                    }
+                    Item {
+                        anchors {
+                            bottom: parent.bottom
+                            left: parent.left
+                        }
+                        height: 3
+                        width: 2
+                        Text {
+                            anchors {
+                                top: parent.top
+                                left: parent.right
+                            }
+                            transformOrigin: Item.TopLeft
+                            width: 100
+                            height: 8
+                            rotation: -90
+                            visible: padSubNoteRect.subNoteDuration > 0
+                            text: padSubNoteRect.subNoteDuration + "/32 qn"
+                            font.pixelSize: 8
+                            verticalAlignment: Text.AlignTop
+                            horizontalAlignment: Text.AlignLeft
+                        }
                     }
                     Rectangle {
                         anchors {

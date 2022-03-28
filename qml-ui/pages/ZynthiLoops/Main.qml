@@ -109,6 +109,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Favorites")
+            onTriggered: zynthian.show_modal("synth_categories")
         },
 
         Kirigami.Action {

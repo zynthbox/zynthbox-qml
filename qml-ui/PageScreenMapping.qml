@@ -114,7 +114,8 @@ QtObject {
         "sequence_downloader": "SequenceDownloaderPage.qml",
         "sketch_downloader": "SketchDownloaderPage.qml",
         "network_info": "NetworkInfoPage.qml",
-        "guioptions" : "GuiOptionsPage.qml"
+        "guioptions" : "GuiOptionsPage.qml",
+        "synth_categories": "SynthCategories/Main.qml"
     }
 
     readonly property var dashboardScreens: {

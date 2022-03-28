@@ -296,6 +296,12 @@ Zynthian.BasePlayGrid {
             updateTrack();
         }
 
+        signal knob1Up();
+        signal knob1Down();
+        signal knob2Up();
+        signal knob2Down();
+        signal knob3Up();
+        signal knob3Down();
         signal goLeft();
         signal goRight();
         signal deselectSelectedItem()
@@ -489,6 +495,10 @@ Zynthian.BasePlayGrid {
                         onGoRight: drumPadRepeater.goNext();
                         onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
                         onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
+                        onKnob1Up: drumPadRepeater.velocityUp();
+                        onKnob1Down: drumPadRepeater.velocityDown();
+                        onKnob2Up: drumPadRepeater.durationUp();
+                        onKnob2Down: drumPadRepeater.durationDown();
                     }
 
                     RowLayout {
@@ -528,11 +538,14 @@ Zynthian.BasePlayGrid {
                                 var changeStep = true;
                                 if (selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                    if (seqPad.currentSubNote > 0) {
+                                    if (seqPad.currentSubNote > -1) {
                                         seqPad.currentSubNote = seqPad.currentSubNote - 1;
+                                        if (seqPad.currentSubNote > -1) {
+                                            changeStep = false;
+                                        }
+                                    } else if (seqPad.subNoteCount > 0 && seqPad.currentSubNote === -1) {
+                                        seqPad.currentSubNote = seqPad.subNoteCount - 1;
                                         changeStep = false;
-                                    } else {
-                                        seqPad.currentSubNote = -1;
                                     }
                                 }
                                 if (changeStep) {
@@ -572,6 +585,39 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
                             }
+                            function changeValue(valueName, howMuch, minValue, maxValue, defaultValue) {
+                                if (drumPadRepeater.selectedIndex > -1) {
+                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    if (seqPad.currentSubNote > -1) {
+                                        var currentValue = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, valueName);
+                                        if (currentValue === undefined) {
+                                            currentValue = defaultValue;
+                                        }
+                                        //console.log("Current", valueName, currentValue);
+                                        if (currentValue + howMuch >= minValue && currentValue + howMuch <= maxValue) {
+                                            _private.activePatternModel.setSubnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, valueName, currentValue + howMuch);
+                                        }
+                                    }
+                                }
+                            }
+                            function velocityUp() {
+                                changeValue("velocity", 1, 0, 127, 64);
+                            }
+                            function velocityDown() {
+                                changeValue("velocity", -1, 0, 127, 64);
+                            }
+                            // An arbitrary upper value here (2^32) - technically it can be just any
+                            // integer number, and we /could/ use Number.MAX_SAFE_INTEGER, but
+                            // also... that's a very, very big number, and this is a number of 32th
+                            // quarternotes, so even this "low" value is /really/ big... and input is
+                            // an encoder, and it will take a really long time to reach that number.
+                            // Default value should probably be the current note duration...
+                            function durationUp() {
+                                changeValue("duration", 1, 0, 2147483647, 0);
+                            }
+                            function durationDown() {
+                                changeValue("duration", -1, 0, 2147483647, 0);
+                            }
                             PadNoteButton {
                                 id: sequencerPad
                                 Layout.fillHeight: true
@@ -586,8 +632,9 @@ Zynthian.BasePlayGrid {
                                 isCurrent: model.index == drumPadRepeater.selectedIndex
                                 Timer {
                                     id: sequenderPadNoteApplicator
-                                    repeat: false; running: false; interval: 1
+                                    repeat: false; running: false; interval: 0
                                     onTriggered: {
+                                        sequencerPad.note = null;
                                         sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
                                         Qt.callLater(_private.updateUniqueCurrentRowNotes)
                                     }
@@ -1429,13 +1476,37 @@ Zynthian.BasePlayGrid {
                         } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
                     }
                     onKnob1ValueChanged: {
-                        console.log("Knob 1 value changed:", zynthian.playgrid.knob1Value);
+                        if (zynthian.playgrid.knob1Value < 0) {
+                            for (var i = zynthian.playgrid.knob1Value; i < 0; ++i) {
+                                _private.knob1Down();
+                            }
+                        } else if (zynthian.playgrid.knob1Value > 0) {
+                            for (var i = zynthian.playgrid.knob1Value; i > 0; --i) {
+                                _private.knob1Up();
+                            }
+                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
                     }
                     onKnob2ValueChanged: {
-                        console.log("Knob 2 value changed:", zynthian.playgrid.knob2Value);
+                        if (zynthian.playgrid.knob2Value < 0) {
+                            for (var i = zynthian.playgrid.knob2Value; i < 0; ++i) {
+                                _private.knob2Down();
+                            }
+                        } else if (zynthian.playgrid.knob2Value > 0) {
+                            for (var i = zynthian.playgrid.knob2Value; i > 0; --i) {
+                                _private.knob2Up();
+                            }
+                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
                     }
                     onKnob3ValueChanged: {
-                        console.log("Knob 3 value changed:", zynthian.playgrid.knob3Value);
+                        if (zynthian.playgrid.knob3Value < 0) {
+                            for (var i = zynthian.playgrid.knob3Value; i < 0; ++i) {
+                                _private.knob3Down();
+                            }
+                        } else if (zynthian.playgrid.knob3Value > 0) {
+                            for (var i = zynthian.playgrid.knob3Value; i > 0; --i) {
+                                _private.knob3Up();
+                            }
+                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
                     }
                 }
             }

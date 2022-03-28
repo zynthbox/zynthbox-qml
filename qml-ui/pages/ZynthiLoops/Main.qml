@@ -258,30 +258,42 @@ Zynthian.ScreenPage {
             if (bottomStack.slotsBar.trackButton.checked) {
                 console.log("LED : Slots Track Bar active")
                 zynthian.slotsBarTrackActive = true;
+                zynthian.slotsBarMixerActive = false;
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
+            } else if (bottomStack.slotsBar.mixerButton.checked) {
+                console.log("LED : Slots Mixer Bar active")
+                zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarMixerActive = true;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = true;
             } else {
                 console.log("LED : No Slots Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
@@ -1011,6 +1023,7 @@ Zynthian.ScreenPage {
             StackLayout {
                 id: bottomStack
 
+                property alias bottomBar: bottomBar
                 property alias slotsBar: slotsBar
 
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 15

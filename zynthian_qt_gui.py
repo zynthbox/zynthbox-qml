@@ -399,6 +399,7 @@ class zynthian_gui(QObject):
         self.track_samples_bar_active = False
         self.clip_wave_editor_bar_active = False
         self.slots_bar_track_active = False
+        self.slots_bar_mixer_active = False
         self.slots_bar_synths_active = False
         self.slots_bar_samples_active = False
         self.slots_bar_fx_active = False
@@ -593,6 +594,19 @@ class zynthian_gui(QObject):
     slotsBarTrackActive = Property(bool, get_slots_bar_track_active, set_slots_bar_track_active,
                                    notify=slotsBarTrackActiveChanged)
 
+    def get_slots_bar_mixer_active(self):
+        return self.slots_bar_mixer_active
+
+    def set_slots_bar_mixer_active(self, isActive):
+        if self.slots_bar_mixer_active != isActive:
+            self.slots_bar_mixer_active = isActive
+            self.slotsBarMixerActiveChanged.emit()
+
+    slotsBarMixerActiveChanged = Signal()
+
+    slotsBarMixerActive = Property(bool, get_slots_bar_mixer_active, set_slots_bar_mixer_active,
+                                   notify=slotsBarMixerActiveChanged)
+
     def get_slots_bar_synths_active(self):
         return self.slots_bar_synths_active
 
@@ -722,6 +736,17 @@ class zynthian_gui(QObject):
 
                     continue
 
+                # If slots synths bar is active, light up "1" Button green if clip has a wav otherwise turn off led
+                if self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "sample-loop":
+                    clip = track.clipsModel.getClip(0)
+
+                    if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
+                        self.wsleds.setPixelColor(i, self.wscolor_green)
+                    else:
+                        self.wsleds.setPixelColor(i, self.wscolor_off)
+
+                    continue
+
                 # If sound combinator is active, light up filled cells with green color otherwise display blue color
                 if self.active_screen == "zynthiloops" and self.soundCombinatorActive:
                     if (i-1) == self.session_dashboard.selectedSoundRow:
@@ -742,25 +767,27 @@ class zynthian_gui(QObject):
                 else:
                     self.wsleds.setPixelColor(i, self.wscolor_light)
 
-            # Button 6 will act as modifier key to select track 6-10 when active
-            if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
-                self.wsleds.setPixelColor(6, self.wscolor_red)
-            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
-                self.wsleds.setPixelColor(6, self.wscolor_yellow)
-            elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
-                self.wsleds.setPixelColor(6, self.wscolor_blue)
-            elif self.active_screen == "zynthiloops" and self.tracks_mod_active:
-                self.wsleds.setPixelColor(6, self.wscolor_active)
+            # Button 6 will act as modifier key to select track 6-10 when slots bar tabs other than mixer is not open
+            # Light up when self.tracks_mod_active is true and other tabs are not open except mixer
+            if self.active_screen == "zynthiloops" and \
+                    not self.slotsBarTrackActive and \
+                    not self.slotsBarSynthsActive and \
+                    not self.slotsBarSamplesActive and \
+                    not self.slotsBarFxActive and \
+                    self.tracks_mod_active:
+                self.wsleds.setPixelColor(6, self.wscolor_green)
             else:
                 self.wsleds.setPixelColor(6, self.wscolor_off)
 
             # 7 : FX Button
-            if self.active_screen == "zynthiloops" and self.slotsBarSynthsActive:
+            if (self.active_screen == "zynthiloops" and self.slotsBarSynthsActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "synth"):
                 self.wsleds.setPixelColor(7, self.wscolor_red)
-            elif self.active_screen == "zynthiloops" and self.slotsBarSamplesActive:
+            elif (self.active_screen == "zynthiloops" and self.slotsBarSamplesActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice")):
                 self.wsleds.setPixelColor(7, self.wscolor_yellow)
             elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
                 self.wsleds.setPixelColor(7, self.wscolor_blue)
+            elif self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "sample-loop":
+                self.wsleds.setPixelColor(7, self.wscolor_green)
             else:
                 self.wsleds.setPixelColor(7, self.wscolor_off)
 

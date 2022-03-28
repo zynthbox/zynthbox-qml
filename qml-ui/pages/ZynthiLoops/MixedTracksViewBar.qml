@@ -44,6 +44,9 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         switch (cuia) {
+            case "SWITCH_TRACKS_MOD_SHORT":
+                return true
+
             case "NAVIGATE_LEFT":
                 if (zynthian.session_dashboard.selectedTrack > 0) {
                     zynthian.session_dashboard.selectedTrack -= 1;
@@ -64,7 +67,11 @@ Rectangle {
             // selection
             case "TRACK_1":
             case "TRACK_6":
-                if (root.selectedTrack.trackAudioType === "synth" ||
+                if (root.selectedTrack.trackAudioType === "sample-loop") {
+                    bottomStack.bottomBar.filePickerDialog.folderModel.folder = bottomStack.bottomBar.controlObj.recordingDir;
+                    bottomStack.bottomBar.filePickerDialog.open();
+                    return true
+                } else if (root.selectedTrack.trackAudioType === "synth" ||
                     root.selectedTrack.trackAudioType === "sample-trig" ||
                     root.selectedTrack.trackAudioType === "sample-slice") {
                     bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 0
@@ -76,7 +83,9 @@ Rectangle {
 
             case "TRACK_2":
             case "TRACK_7":
-                if (root.selectedTrack.trackAudioType === "synth" ||
+                if (root.selectedTrack.trackAudioType === "sample-loop") {
+                    return true
+                } else if (root.selectedTrack.trackAudioType === "synth" ||
                     root.selectedTrack.trackAudioType === "sample-trig" ||
                     root.selectedTrack.trackAudioType === "sample-slice") {
                     bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 1
@@ -88,7 +97,9 @@ Rectangle {
 
             case "TRACK_3":
             case "TRACK_8":
-                if (root.selectedTrack.trackAudioType === "synth" ||
+                if (root.selectedTrack.trackAudioType === "sample-loop") {
+                    return true
+                } else if (root.selectedTrack.trackAudioType === "synth" ||
                     root.selectedTrack.trackAudioType === "sample-trig" ||
                     root.selectedTrack.trackAudioType === "sample-slice") {
                     bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 2
@@ -100,7 +111,9 @@ Rectangle {
 
             case "TRACK_4":
             case "TRACK_9":
-                if (root.selectedTrack.trackAudioType === "synth" ||
+                if (root.selectedTrack.trackAudioType === "sample-loop") {
+                    return true
+                } else if (root.selectedTrack.trackAudioType === "synth" ||
                     root.selectedTrack.trackAudioType === "sample-trig" ||
                     root.selectedTrack.trackAudioType === "sample-slice") {
                     bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 3
@@ -112,7 +125,9 @@ Rectangle {
 
             case "TRACK_5":
             case "TRACK_10":
-                if (root.selectedTrack.trackAudioType === "synth" ||
+                if (root.selectedTrack.trackAudioType === "sample-loop") {
+                    return true
+                } else if (root.selectedTrack.trackAudioType === "synth" ||
                     root.selectedTrack.trackAudioType === "sample-trig" ||
                     root.selectedTrack.trackAudioType === "sample-slice") {
                     bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 4

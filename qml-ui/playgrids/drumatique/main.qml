@@ -74,8 +74,10 @@ Zynthian.BasePlayGrid {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                // TODO if parameters popup shown, hide that first
-                if (component.showPatternsMenu) {
+                if (_private.hasSelection) {
+                    _private.deselectSelectedItem();
+                    returnValue = true;
+                } else if (component.showPatternsMenu) {
                     component.showPatternsMenu = false;
                     returnValue = true;
                 }
@@ -280,6 +282,9 @@ Zynthian.BasePlayGrid {
 
         onActivePatternChanged:{
             updateTrack();
+            while (hasSelection) {
+                deselectSelectedItem();
+            }
         }
         onActivePatternModelChanged: {
             if (activePatternModel) {
@@ -293,9 +298,9 @@ Zynthian.BasePlayGrid {
 
         signal goLeft();
         signal goRight();
-        function activateSelectedItem() {
-            console.log("Activate selected item");
-        }
+        signal deselectSelectedItem()
+        signal activateSelectedItem()
+        property bool hasSelection: false
         function previousBar() {
             if (sequence.activePatternObject.activeBar > -1) {
                 sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;
@@ -482,6 +487,8 @@ Zynthian.BasePlayGrid {
                         target: _private
                         onGoLeft: drumPadRepeater.goPrevious();
                         onGoRight: drumPadRepeater.goNext();
+                        onDeselectSelectedItem: drumPadRepeater.deselectSelectedItem();
+                        onActivateSelectedItem: drumPadRepeater.activateSelectedItem();
                     }
 
                     RowLayout {
@@ -491,6 +498,9 @@ Zynthian.BasePlayGrid {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth
                             property int selectedIndex: -1
+                            onSelectedIndexChanged: {
+                                _private.hasSelection = (drumPadRepeater.selectedIndex > -1);
+                            }
                             function goNext() {
                                 var changeStep = true;
                                 if (selectedIndex > -1) {
@@ -537,6 +547,28 @@ Zynthian.BasePlayGrid {
                                             _private.previousBar();
                                             selectedIndex = _private.activeBarModelWidth - 1;
                                         }
+                                    }
+                                }
+                            }
+                            function deselectSelectedItem() {
+                                if (drumPadRepeater.selectedIndex > -1) {
+                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    if (seqPad.currentSubNote > -1) {
+                                        seqPad.currentSubNote = -1;
+                                    } else {
+                                        drumPadRepeater.selectedIndex = -1;
+                                    }
+                                }
+                            }
+                            function activateSelectedItem() {
+                                var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                if (seqPad) {
+                                    if (seqPad.currentSubNote === -1) {
+                                        console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
+                                        // Then we're handling the position itself
+                                    } else {
+                                        console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
+                                        // Then we're handling the specific subnote
                                     }
                                 }
                             }

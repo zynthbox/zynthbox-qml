@@ -160,10 +160,14 @@ Rectangle {
             var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.selectedRow]
 
             if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
-                // Handle Click
-                zynthian.layer.page_after_layer_creation = "layers_for_track";
-                zynthian.fixed_layers.activate_index(chainedSound);
-                zynthian.layer.select_engine(chainedSound);
+                // Enable layer popup rejected handler to re-select connected sound if any
+                layerPopupRejectedConnections.enabled = true;
+
+                zynthian.layer.page_after_layer_creation = "session_dashboard";
+                applicationWindow().requestOpenLayerSetupDialog();
+                //this depends on requirements
+                backToSelection.screenToGetBack = zynthian.current_screen_id;
+                backToSelection.enabled = true;
             } else if (!root.selectedSlotRowItem.track.createChainedSoundInNextFreeLayer(root.selectedSlotRowItem.selectedRow)) {
                 noFreeSlotsPopup.open();
             } else {

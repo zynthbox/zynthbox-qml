@@ -608,7 +608,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        text: qsTr("New Synth...")
+                        text: qsTr("Pick a Synth")
                         onClicked: {
                             layerSetupDialog.accept();
                             newSynthWorkaroundTimer.restart();
@@ -618,7 +618,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        text: qsTr("Load A Sound...")
+                        text: qsTr("Load A Sound")
                         onClicked: {
                             pickerDialog.mode = "sound";
                             pickerDialog.open();

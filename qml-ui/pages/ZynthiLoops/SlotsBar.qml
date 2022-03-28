@@ -63,6 +63,9 @@ Rectangle {
         }
 
         switch (cuia) {
+            case "SWITCH_TRACKS_MOD_SHORT":
+                return true
+
             case "SWITCH_SELECT_SHORT":
                 handleItemClick()
 

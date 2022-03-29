@@ -511,6 +511,33 @@ Zynthian.BasePlayGrid {
                             onSelectedIndexChanged: {
                                 _private.hasSelection = (drumPadRepeater.selectedIndex > -1);
                             }
+                            function updateMostRecentFromSelection() {
+                                var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                var note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, selectedIndex);
+                                var stepNotes = [];
+                                var stepVelocities = [];
+                                if (seqPad && seqPad.currentSubNote > -1) {
+                                    if (note && seqPad.currentSubNote < note.subnotes.length) {
+                                        stepVelocities.push(_private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "velocity"));
+                                        stepNotes.push(note.subnotes[seqPad.currentSubNote]);
+                                    }
+                                } else if (note) {
+                                    for (var i = 0; i < note.subnotes.length; ++i) {
+                                        stepVelocities.push(_private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, i, "velocity"));
+                                        stepNotes.push(note.subnotes[i]);
+                                    }
+                                }
+                                component.heardNotes = stepNotes;
+                                component.heardVelocities = stepVelocities;
+                                if (component.heardNotes.length === 1) {
+                                    component.mostRecentlyPlayedNote = component.heardNotes[0];
+                                    component.mostRecentNoteVelocity = component.heardVelocities[0];
+                                    component.heardNotes = [];
+                                    component.heardVelocities = [];
+                                } else {
+                                    component.mostRecentlyPlayedNote = undefined;
+                                }
+                            }
                             function goNext() {
                                 var changeStep = true;
                                 if (selectedIndex > -1) {
@@ -533,6 +560,7 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
                                 }
+                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function goPrevious() {
                                 var changeStep = true;
@@ -562,6 +590,7 @@ Zynthian.BasePlayGrid {
                                         }
                                     }
                                 }
+                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function deselectSelectedItem() {
                                 if (drumPadRepeater.selectedIndex > -1) {
@@ -611,7 +640,7 @@ Zynthian.BasePlayGrid {
                             // also... that's a very, very big number, and this is a number of 32th
                             // quarternotes, so even this "low" value is /really/ big... and input is
                             // an encoder, and it will take a really long time to reach that number.
-                            // Default value should probably be the current note duration...
+                            // TODO Default value should probably be the current note duration... get that from PatternModel (which need it exposed)
                             function durationUp() {
                                 changeValue("duration", 1, 0, 2147483647, 0);
                             }
@@ -630,6 +659,15 @@ Zynthian.BasePlayGrid {
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                                 note: _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 isCurrent: model.index == drumPadRepeater.selectedIndex
+                                onTapped: {
+                                    if (drumPadRepeater.selectedIndex > -1) {
+                                        var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                        seqPad.currentSubNote = -1;
+                                    }
+                                    drumPadRepeater.selectedIndex = model.index;
+                                    sequencerPad.currentSubNote = subNoteIndex;
+                                    drumPadRepeater.updateMostRecentFromSelection();
+                                }
                                 Timer {
                                     id: sequenderPadNoteApplicator
                                     repeat: false; running: false; interval: 0

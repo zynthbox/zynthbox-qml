@@ -109,7 +109,7 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Favorites")
-            onTriggered: zynthian.show_modal("synth_categories")
+            onTriggered: zynthian.show_modal("sound_categories")
         },
 
         Kirigami.Action {

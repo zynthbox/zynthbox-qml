@@ -45,58 +45,13 @@ QQC2.Button {
     property bool isCurrent: false
     property int currentSubNote: -1
     property alias subNoteCount: padSubNoteRepeater.count
+    signal tapped(int subNoteIndex);
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
     property color foregroundColor: Kirigami.Theme.backgroundColor
     property color backgroundColor: Kirigami.Theme.textColor
     property color borderColor: foregroundColor
-
-    MultiPointTouchArea {
-        anchors.fill: parent
-
-        property var timeOnClick
-        property var timeOnRelease
-        enabled: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
-
-        onPressed: {
-            if (component.playgrid.heardNotes.length > 0) {
-                var removedAtLeastOne = false;
-                // First, let's see if any of the notes in our list are already on this position, and if so, remove them
-                for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                    var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
-                    if (subNoteIndex > -1) {
-                        component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
-                        removedAtLeastOne = true;
-                    }
-                }
-
-                // And then, only if we didn't remove anything should we be adding the notes
-                if (!removedAtLeastOne) {
-                    for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                        var subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
-                        component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
-                    }
-                }
-                component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
-            } else if (component.playgrid.mostRecentlyPlayedNote) {
-                var aNoteData = {
-                    velocity: component.playgrid.mostRecentNoteVelocity,
-                    note: component.playgrid.mostRecentlyPlayedNote.midiNote,
-                    channel: component.playgrid.mostRecentlyPlayedNote.midiChannel
-                }
-
-                var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, aNoteData["note"]);
-                if (subNoteIndex > -1) {
-                    component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
-                } else {
-                    subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
-                    component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
-                }
-                component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
-            }
-        }
-    }
 
     background: Rectangle {
         id:padNoteRect
@@ -105,6 +60,59 @@ QQC2.Button {
         border {
             color: component.borderColor
             width: 1
+        }
+        property bool shouldChange: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
+        MultiPointTouchArea {
+            anchors.fill: parent
+
+            property var timeOnClick
+            property var timeOnRelease
+
+            onPressed: {
+                if (padNoteRect.shouldChange) {
+                    if (component.playgrid.heardNotes.length > 0) {
+                        var removedAtLeastOne = false;
+                        // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+                        for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                            var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
+                            if (subNoteIndex > -1) {
+                                component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
+                                removedAtLeastOne = true;
+                            }
+                        }
+
+                        // And then, only if we didn't remove anything should we be adding the notes
+                        if (!removedAtLeastOne) {
+                            var subNoteIndex = -1;
+                            for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                                subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
+                                component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
+                            }
+                        }
+                        component.currentSubNote = -1;
+                        component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
+                    } else if (component.playgrid.mostRecentlyPlayedNote) {
+                        var aNoteData = {
+                            velocity: component.playgrid.mostRecentNoteVelocity,
+                            note: component.playgrid.mostRecentlyPlayedNote.midiNote,
+                            channel: component.playgrid.mostRecentlyPlayedNote.midiChannel
+                        }
+
+                        var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, aNoteData["note"]);
+                        if (subNoteIndex > -1) {
+                            component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
+                            subNoteIndex = subNoteIndex - 1;
+                        } else {
+                            subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
+                            component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
+                        }
+                        component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
+                        component.currentSubNote = subNoteIndex;
+                    }
+                } else {
+                    component.tapped(-1);
+                }
+            }
         }
 
         RowLayout {
@@ -130,17 +138,17 @@ QQC2.Button {
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
                     Layout.maximumHeight: Layout.minimumHeight
-                    visible: component.mostRecentlyPlayedNote == undefined || component.mostRecentlyPlayedNote == subNote
+                    property bool currentGlobalPick: component.mostRecentlyPlayedNote == undefined || component.mostRecentlyPlayedNote == subNote || (component.playgrid.heardNotes.length > 0 && component.playgrid.heardNotes.indexOf(subNote) > 0)
+                    opacity: currentGlobalPick ? 1 : 0.3
                     MultiPointTouchArea {
-                        enabled: component.playgrid.mostRecentlyPlayedNote ? false : true
+                        enabled: !padNoteRect.shouldChange
                         anchors.fill: parent
                         touchPoints: [
                             TouchPoint {
                                 onPressedChanged: {
                                     if (!pressed) {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
-                                            component.playgrid.mostRecentNoteVelocity = padSubNoteRect.subNoteVelocity;
-                                            component.playgrid.mostRecentlyPlayedNote = padSubNoteRect.subNote;
+                                            component.tapped(index);
                                         }
                                     }
                                 }

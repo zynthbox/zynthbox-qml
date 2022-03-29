@@ -121,18 +121,16 @@ QQC2.Button {
             Repeater {
                 id:padSubNoteRepeater
                 model: component.note ? component.note.subnotes : 0;
-                delegate:Rectangle {
+                delegate: Item {
                     id:padSubNoteRect
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
                     property var subNoteDuration: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "duration");
 
-                    Layout.alignment: Qt.AlignBottom
                     Layout.fillWidth: true
-                    Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
+                    Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
                     Layout.maximumHeight: Layout.minimumHeight
                     visible: component.mostRecentlyPlayedNote == undefined || component.mostRecentlyPlayedNote == subNote
-                    color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
                     MultiPointTouchArea {
                         enabled: component.playgrid.mostRecentlyPlayedNote ? false : true
                         anchors.fill: parent
@@ -149,34 +147,63 @@ QQC2.Button {
                             }
                         ]
                     }
+                    Rectangle {
+                        anchors.fill: parent;
+                        color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
+                        opacity: 0.3
+                    }
+                    Rectangle {
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.bottom
+                        }
+                        height: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
+                        color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
+                    }
                     Item {
                         anchors {
                             bottom: parent.bottom
                             left: parent.left
                         }
-                        height: 3
+                        height: 4
                         width: 2
-                        Text {
+                        visible: padSubNoteRect.subNoteDuration > 0
+                        Item {
                             anchors {
                                 top: parent.top
                                 left: parent.right
                             }
                             transformOrigin: Item.TopLeft
-                            width: 100
-                            height: 8
                             rotation: -90
-                            visible: padSubNoteRect.subNoteDuration > 0
-                            text: padSubNoteRect.subNoteDuration + "/32 qn"
-                            font.pixelSize: 8
-                            verticalAlignment: Text.AlignTop
-                            horizontalAlignment: Text.AlignLeft
+                            height: subnoteText.height
+                            width: subnoteText.width
+                            Rectangle {
+                                anchors {
+                                    fill: parent
+                                    margins: -1
+                                }
+                                color: component.backgroundColor
+                                opacity: 0.3
+                                radius: height / 2
+                            }
+                            Text {
+                                id: subnoteText
+                                anchors {
+                                    top: parent.top
+                                    left: parent.left
+                                }
+                                height: paintedHeight
+                                width: paintedWidth
+                                text: padSubNoteRect.subNoteDuration + "/32 qn"
+                                font.pixelSize: 8
+                                verticalAlignment: Text.AlignTop
+                                horizontalAlignment: Text.AlignLeft
+                            }
                         }
                     }
                     Rectangle {
-                        anchors {
-                            fill: parent;
-                            margins: 1
-                        }
+                        anchors.fill: parent;
                         border {
                             width: 2
                             color: Kirigami.Theme.highlightColor

@@ -108,7 +108,7 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            text: qsTr("Favorites")
+            text: qsTr("Sounds")
             onTriggered: zynthian.show_modal("sound_categories")
         },
 

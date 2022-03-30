@@ -248,7 +248,7 @@ Zynthian.ScreenPage {
         Rectangle {
             Layout.fillWidth: false
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 16
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 12
             color: Kirigami.Theme.backgroundColor
 
             ColumnLayout {

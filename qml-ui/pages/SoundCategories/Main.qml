@@ -206,33 +206,61 @@ Zynthian.ScreenPage {
             ColumnLayout {
                 anchors.fill: parent
 
-                QQC2.ComboBox {
-                    id: comboBox
-
-                    Layout.fillWidth: false
+                Item {
+                    Layout.fillWidth: true
                     Layout.fillHeight: false
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                    Layout.margins: Kirigami.Units.gridUnit
-                    Layout.alignment: Qt.AlignCenter
-                    model: ["community-sounds", "my-sounds"]
-                    onActivated: {
-                        zynthian.sound_categories.setSoundTypeFilter(model[index])
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+
+                    QQC2.ComboBox {
+                        id: comboBox
+
+                        width: Kirigami.Units.gridUnit * 10
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                            margins: Kirigami.Units.gridUnit
+                            centerIn: parent
+                        }
+
+                        model: ["community-sounds", "my-sounds"]
+                        onActivated: {
+                            zynthian.sound_categories.setSoundTypeFilter(model[index])
+                        }
+
+                        delegate: QQC2.ItemDelegate {
+                            id: itemDelegate
+                            width: parent.width
+                            text: comboBox.textRole ? (Array.isArray(comboBox.model) ? modelData[comboBox.textRole] : model[comboBox.textRole]) : modelData
+                            font.weight: comboBox.currentIndex === index ? Font.DemiBold : Font.Normal
+                            highlighted: comboBox.highlightedIndex === index
+                            hoverEnabled: comboBox.hoverEnabled
+
+                            contentItem: QQC2.Label {
+                                text: itemDelegate.text
+                                font: itemDelegate.font
+                                elide: QQC2.Label.ElideRight
+                                verticalAlignment: QQC2.Label.AlignVCenter
+                                horizontalAlignment: QQC2.Label.AlignHCenter
+                            }
+                        }
                     }
 
-                    delegate: QQC2.ItemDelegate {
-                        id: itemDelegate
-                        width: parent.width
-                        text: comboBox.textRole ? (Array.isArray(comboBox.model) ? modelData[comboBox.textRole] : model[comboBox.textRole]) : modelData
-                        font.weight: comboBox.currentIndex === index ? Font.DemiBold : Font.Normal
-                        highlighted: comboBox.highlightedIndex === index
-                        hoverEnabled: comboBox.hoverEnabled
+                    QQC2.Button {
+                        anchors {
+                            right: parent.right
+                            rightMargin: Kirigami.Units.gridUnit
+                            verticalCenter: parent.verticalCenter
+                        }
 
-                        contentItem: QQC2.Label {
-                            text: itemDelegate.text
-                            font: itemDelegate.font
-                            elide: QQC2.Label.ElideRight
-                            verticalAlignment: QQC2.Label.AlignVCenter
-                            horizontalAlignment: QQC2.Label.AlignHCenter
+                        width: Kirigami.Units.gridUnit * 2
+                        height: comboBox.height
+                        onClicked: zynthian.sound_categories.load_sounds_model()
+
+                        Kirigami.Icon {
+                            anchors.fill: parent
+                            anchors.margins: 4
+                            source: Qt.resolvedUrl("../../../img/refresh.svg")
+                            color: "#ffffffff"
                         }
                     }
                 }

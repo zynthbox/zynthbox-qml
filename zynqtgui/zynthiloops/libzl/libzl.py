@@ -98,6 +98,18 @@ def init():
 
             libzl.ClipAudioSource_setSlices.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
+            libzl.ClipAudioSource_keyZoneStart.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_keyZoneStart.restypes = ctypes.c_int
+            libzl.ClipAudioSource_setKeyZoneStart.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+            libzl.ClipAudioSource_keyZoneEnd.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_keyZoneEndrestypes = ctypes.c_int
+            libzl.ClipAudioSource_setKeyZoneEnd.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+            libzl.ClipAudioSource_rootNote.argtypes = [ctypes.c_void_p]
+            libzl.ClipAudioSource_rootNote.restypes = ctypes.c_int
+            libzl.ClipAudioSource_setRootNote.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
             ### END Type Definition
 
@@ -237,6 +249,30 @@ class ClipAudioSource(QObject):
     def setSlices(self, slices : int):
         if libzl:
             libzl.ClipAudioSource_setSlices(self.obj, slices)
+
+    def keyZoneStart(self):
+        if libzl:
+            return libzl.ClipAudioSource_keyZoneStart(self.obj)
+
+    def setKeyZoneStart(self, keyZoneStart):
+        if libzl:
+            libzl.ClipAudioSource_setKeyZoneStart(self.obj, keyZoneStart)
+
+    def keyZoneEnd(self):
+        if libzl:
+            return libzl.ClipAudioSource_keyZoneEnd(self.obj)
+
+    def setKeyZoneEnd(self, keyZoneEnd):
+        if libzl:
+            libzl.ClipAudioSource_setKeyZoneEnd(self.obj, keyZoneEnd)
+
+    def rootNote(self):
+        if libzl:
+            return libzl.ClipAudioSource_rootNote(self.obj)
+
+    def setRootNote(self, rootNote):
+        if libzl:
+            libzl.ClipAudioSource_setRootNote(self.obj, rootNote)
 
     def destroy(self):
         if libzl:

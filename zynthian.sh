@@ -143,6 +143,7 @@ while true; do
             cd /zynthian/zynthbox-z2-setup
             # Execute setup script
             bash /zynthian/zynthbox-z2-setup/setup_z2.sh
+            systemctl daemon-reload
         )
         
         #Load Config Environment

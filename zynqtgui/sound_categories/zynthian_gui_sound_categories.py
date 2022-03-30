@@ -96,6 +96,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 f.flush()
                 os.fsync(f.fileno())
 
+        # Read community-sounds categories
         try:
             with open(self.__community_sounds_path__ / "categories.json", "r+") as f:
                 self.__community_sounds__ = json.load(f)
@@ -103,6 +104,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
             traceback.print_stack()
 
+        # Read my-sounds categories
         try:
             with open(self.__my_sounds_path__ / "categories.json", "r+") as f:
                 self.__my_sounds__ = json.load(f)
@@ -110,11 +112,11 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
             traceback.print_stack()
 
-        # List community-sounds
+        # Fill community-sounds list
         for file in self.__community_sounds_path__.glob("**/*.sound"):
             self.__sounds_model__.add_sound(sounds_model_sound_dto(self, file.name, "community-sounds"))
 
-        # List my-sounds
+        # Fill my-sounds list
         for file in self.__my_sounds_path__.glob("**/*.sound"):
             self.__sounds_model__.add_sound(sounds_model_sound_dto(self, file.name, "my-sounds"))
 
@@ -130,15 +132,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             os.fsync(f.fileno())
 
     @Slot(str)
-    def setSoundTypeFilter(self, filter):
-        self.__sound_type_filter_proxy_model__.setFilterFixedString(filter)
+    def setSoundTypeFilter(self, _filter):
+        self.__sound_type_filter_proxy_model__.setFilterFixedString(_filter)
 
     @Slot(str)
-    def setCategoryFilter(self, filter):
+    def setCategoryFilter(self, _filter):
         if filter == "*":
             self.__sound_category_filter_proxy_model__.setFilterRegExp("")
         else:
-            self.__sound_category_filter_proxy_model__.setFilterFixedString(f"{filter}")
+            self.__sound_category_filter_proxy_model__.setFilterFixedString(f"{_filter}")
 
     ### Property soundsModel
     def get_sounds_model(self):

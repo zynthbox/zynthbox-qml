@@ -32,6 +32,7 @@ import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
     id: root
@@ -60,6 +61,22 @@ Rectangle {
                 }
 
                 return true;
+
+            case "SELECT_UP":
+                if (root.selectedTrack.trackAudioType == "sample-trig") {
+                    if (root.selectedTrack.selectedSampleRow > 0) {
+                        root.selectedTrack.selectedSampleRow -= 1;
+                    }
+                    return true;
+                }
+
+            case "SELECT_DOWN":
+                if (root.selectedTrack.trackAudioType == "sample-trig") {
+                    if (root.selectedTrack.selectedSampleRow < 4) {
+                        root.selectedTrack.selectedSampleRow += 1;
+                    }
+                    return true;
+                }
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
             // and invoke respective handler when trackAudioType is synth, trig or slice
@@ -234,6 +251,259 @@ Rectangle {
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+
+                            Item {
+                                anchors {
+                                    fill: parent
+                                    margins: Kirigami.Units.largeSpacing
+                                }
+                                visible: root.selectedTrack.trackAudioType == "sample-trig"
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 0
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Item {
+                                            Layout.fillWidth: true
+                                        }
+                                        Repeater {
+                                            model: 5
+                                            QQC2.Button {
+                                                property var trackSample: root.selectedTrack.samples && root.selectedTrack.samples[index]
+                                                property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
+                                                enabled: clipObj !== null
+                                                text: (index === 0 ? "Assign full width to sample " : "") + (index + 1)
+                                                onClicked: {
+                                                    // Reset all keyzones to 0-127
+                                                    if (root.selectedTrack) {
+                                                        for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
+                                                            var sample = root.selectedTrack.samples[i];
+                                                            if (sample) {
+                                                                var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                                                if (clip) {
+                                                                    // -1 is not a true midi key, but as this is "just" data storage,
+                                                                    // we can use it to effectively disable a sample entirely
+                                                                    clip.keyZoneStart = -1;
+                                                                    clip.keyZoneEnd = -1;
+                                                                    clip.rootNote = 60;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    clipObj.keyZoneStart = 0;
+                                                    clipObj.keyZoneEnd = 127;
+                                                    clipObj.rootNote = 60;
+                                                    root.selectedTrack.selectedSampleRow = index;
+                                                }
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            text: "Reset Keyzones"
+                                            onClicked: {
+                                                // Reset all keyzones to 0-127
+                                                if (root.selectedTrack) {
+                                                    for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
+                                                        var sample = root.selectedTrack.samples[i];
+                                                        if (sample) {
+                                                            var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                                            if (clip) {
+                                                                clip.keyZoneStart = 0;
+                                                                clip.keyZoneEnd = 127;
+                                                                clip.rootNote = 60;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            text: "Auto-generate Keyzones"
+                                            onClicked: {
+                                                // Do a bit of magic autolayouting, based on what we think things should do...
+                                                // auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
+                                                // root key transpose in semtitones: +48, +24 ,0 , -24, -48
+                                                var sampleSettings = [
+                                                    [60, 83, 0], // slot 1
+                                                    [36, 59, -24], // slot 2
+                                                    [84, 107, 24], // slot 3
+                                                    [12, 35, -48], // slot 4
+                                                    [108, 127, 48] // slot 5
+                                                ];
+                                                for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
+                                                    var sample = root.selectedTrack.samples[i];
+                                                    var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                                    if (clip) {
+                                                        clip.keyZoneStart = sampleSettings[i][0];
+                                                        clip.keyZoneEnd = sampleSettings[i][1];
+                                                        clip.rootNote = 60 - sampleSettings[i][2];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Item {
+                                        Layout.preferredHeight: parent.height * 2 / 3
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.topMargin: Math.floor(((parent.height / 6) - 5) / 2)
+                                        property double positioningHelp: width / 100
+                                        Repeater {
+                                            model: 5
+                                            delegate: Item {
+                                                id: sampleKeyzoneDelegate
+                                                property var trackSample: root.selectedTrack.samples && root.selectedTrack.samples[index]
+                                                property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
+                                                Connections {
+                                                    target: clipObj
+                                                    onKeyZoneStartChanged: zynthian.zynthiloops.song.schedule_save()
+                                                    onKeyZoneEndChanged: zynthian.zynthiloops.song.schedule_save()
+                                                    onRootNoteChanged: zynthian.zynthiloops.song.schedule_save()
+                                                }
+                                                height: parent.height;
+                                                width: 1
+                                                property bool isCurrent: root.selectedTrack.selectedSampleRow === index
+                                                z: isCurrent ? 99 : 0
+                                                property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                                                property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null
+                                                property Item pianoKeyEndItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneEnd) : null
+                                                x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : -Math.floor(pianoKeysRepeater.itemAt(0).width / 2)
+                                                opacity: clipObj ? 1 : 0.3
+                                                QQC2.Label {
+                                                    id: sampleLabel
+                                                    anchors {
+                                                        bottom: sampleHandle.verticalCenter
+                                                        bottomMargin: 1
+                                                        left: sampleHandle.right
+                                                        leftMargin: 1
+                                                    }
+                                                    text: "Sample " + (index + 1)
+                                                    width: paintedWidth
+                                                    height: paintedHeight
+                                                    font.pixelSize: Math.floor((parent.height / 6) - 5)
+                                                }
+                                                Rectangle {
+                                                    id: sampleHandle
+                                                    anchors {
+                                                        top: parent.top
+                                                        topMargin: index * (parent.height / 6)
+                                                        horizontalCenter: parent.horizontalCenter
+                                                    }
+                                                    height: Kirigami.Units.largeSpacing * 2
+                                                    width: height
+                                                    radius: height / 2
+                                                    color: Kirigami.Theme.backgroundColor
+                                                    border {
+                                                        width: 2
+                                                        color: sampleKeyzoneDelegate.lineColor
+                                                    }
+                                                }
+                                                Rectangle {
+                                                    anchors {
+                                                        top: sampleHandle.bottom;
+                                                        bottom: parent.bottom;
+                                                        horizontalCenter: sampleHandle.horizontalCenter
+                                                    }
+                                                    width: 2
+                                                    color: sampleKeyzoneDelegate.lineColor
+                                                }
+                                                Rectangle {
+                                                    id: sampleEndHandle
+                                                    anchors {
+                                                        top: parent.top
+                                                        topMargin: index * (parent.height / 6)
+                                                    }
+                                                    x: pianoKeyItem && pianoKeyEndItem ? pianoKeyEndItem.x - pianoKeyItem.x - (pianoKeyEndItem.width / 2) : sampleHandle.x
+                                                    height: Kirigami.Units.largeSpacing * 2
+                                                    width: height
+                                                    radius: height / 2
+                                                    color: Kirigami.Theme.backgroundColor
+                                                    border {
+                                                        width: 2
+                                                        color: sampleKeyzoneDelegate.lineColor
+                                                    }
+                                                }
+                                                Rectangle {
+                                                    anchors {
+                                                        top: sampleEndHandle.bottom
+                                                        bottom: parent.bottom
+                                                        horizontalCenter: sampleEndHandle.horizontalCenter
+                                                    }
+                                                    width: 2
+                                                    color: sampleKeyzoneDelegate.lineColor
+                                                }
+                                                Rectangle {
+                                                    anchors {
+                                                        top: sampleHandle.verticalCenter
+                                                        left: sampleHandle.right
+                                                        right: sampleEndHandle.left
+                                                    }
+                                                    height: 2
+                                                    color: sampleKeyzoneDelegate.lineColor
+                                                }
+                                                Row {
+                                                    anchors {
+                                                        top: sampleHandle.verticalCenter
+                                                        topMargin: 3
+                                                        left: sampleHandle.right
+                                                    }
+                                                    spacing: 1
+                                                    Repeater {
+                                                        model: clipObj ? clipObj.playbackPositions : 0
+                                                        delegate: Rectangle {
+                                                            height: 4
+                                                            width: 4
+                                                            radius: 2
+                                                            color: sampleKeyzoneDelegate.lineColor
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Item {
+                                        id: pianoKeysContainer
+                                        Layout.preferredHeight: parent.height / 3
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            color: "white"
+                                        }
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            spacing: 0
+                                            Repeater {
+                                                id: pianoKeysRepeater
+                                                model: 128
+                                                delegate: Item {
+                                                    property var sharpMidiNotes: [1, 3, 6, 8, 10];
+                                                    property bool isSharpKey: sharpMidiNotes.indexOf(index % 12) > -1;
+                                                    Layout.fillWidth: isSharpKey ? false : true
+                                                    Layout.fillHeight: true
+                                                    Rectangle {
+                                                        anchors {
+                                                            top: parent.top
+                                                            bottom: parent.bottom
+                                                        }
+                                                        width: 1
+                                                        color: "black"
+                                                    }
+                                                    Rectangle {
+                                                        visible: parent.isSharpKey
+                                                        anchors {
+                                                            top: parent.top
+                                                            horizontalCenter: parent.horizontalCenter
+                                                        }
+                                                        color: "black"
+                                                        width: pianoKeysContainer.width / 100
+                                                        height: parent.height * 3 / 5
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

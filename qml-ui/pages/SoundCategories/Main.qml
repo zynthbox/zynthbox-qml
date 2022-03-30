@@ -60,6 +60,16 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         return false;
     }
+
+    Connections {
+        target: zynthian
+        onCurrent_screen_idChanged: {
+            // Refresh sounds model on page open
+            if (zynthian.current_screen_id === root.screenId) {
+                zynthian.sound_categories.load_sounds_model()
+            }
+        }
+    }
     
     contentItem : GridLayout {
         id: content
@@ -239,7 +249,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                         Layout.topMargin: index === 0 ? 4 : 0
-                        label: model.sound.name
+                        label: model.display
                     }
                 }
             }

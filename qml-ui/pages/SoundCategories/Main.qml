@@ -204,6 +204,7 @@ Zynthian.ScreenPage {
             color: Kirigami.Theme.backgroundColor
 
             ColumnLayout {
+                id: middleColumn
                 anchors.fill: parent
 
                 Item {
@@ -265,19 +266,48 @@ Zynthian.ScreenPage {
                     }
                 }
 
-                ListView {
+                Flickable {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    model: zynthian.sound_categories.soundsModel
-                    orientation: ListView.Vertical
+                    contentWidth: gridContent.width
+                    contentHeight: gridContent.height
+                    flickableDirection: Flickable.AutoFlickDirection
                     clip: true
 
-                    delegate: Kirigami.BasicListItem {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-                        Layout.topMargin: index === 0 ? 4 : 0
-                        label: model.display
+                    Item {
+                        id: gridContent
+                        width: middleColumn.width
+
+                        GridLayout {
+                            anchors {
+                                top: parent.top
+                                left: parent.left
+                                right: parent.right
+                                margins: Kirigami.Units.gridUnit
+                            }
+
+                            columns: 3
+                            rowSpacing: Kirigami.Units.gridUnit
+                            columnSpacing: Kirigami.Units.gridUnit
+
+                            Repeater {
+                                model: zynthian.sound_categories.soundsModel
+                                delegate: QQC2.Button {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                    Layout.alignment: Qt.AlignTop
+
+                                    QQC2.Label {
+                                        anchors.fill: parent
+                                        text: model.display
+                                        wrapMode: "WrapAnywhere"
+                                        horizontalAlignment: QQC2.Label.AlignHCenter
+                                        verticalAlignment: QQC2.Label.AlignVCenter
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

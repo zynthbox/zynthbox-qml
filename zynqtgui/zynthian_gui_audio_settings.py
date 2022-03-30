@@ -77,6 +77,12 @@ class zynthian_gui_audio_settings(zynthian_qt_gui_base.ZynGui):
             #self.zctrls = self.zynthian_mixer.get_mixer_zctrls(device_name=soundcard_name, ctrl_list=self.ctrl_list)
         self.zctrls = self.zynthian_mixer.get_controllers_dict(None)
 
+        # Try setting Headphones initial value to 70% (approx 0dB mark in gui) when instantiating class
+        try:
+            self.zctrls["Headphones"].set_value(self.zctrls["Headphones"].value_max * 0.7)
+        except:
+            pass
+
         self.update_channels()
 
     def show(self):

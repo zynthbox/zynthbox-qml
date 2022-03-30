@@ -52,8 +52,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         self.__sound_category_filter_proxy_model__ = QSortFilterProxyModel()
         self.__sound_category_filter_proxy_model__.setSourceModel(self.__sound_type_filter_proxy_model__)
         self.__sound_category_filter_proxy_model__.setFilterRole(sound_categories_sounds_model.Roles.CategoryRole)
-        self.__sound_type_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.__sound_category_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
+        # Valid Sound category IDs
+        # 1: Drums
+        # 2: Bass
+        # 3: Leads
+        # 4: Keys/Pads
+        # 99: Other
         self.__my_sounds__ = {
             "1": [],
             "2": [],
@@ -77,6 +83,21 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     def refresh_loading(self):
         pass
+
+    # Returns the category index if found otherwise returns 0 for uncategorized entries
+    def get_category_for_sound(self, _sound, _type):
+        if _type == "community-sounds":
+            source_categories = self.__community_sounds__
+        elif _type == "my-sounds":
+            source_categories = self.__my_sounds__
+        else:
+            source_categories = {}
+
+        for category, sounds in source_categories.items():
+            if _sound in sounds:
+                return category
+
+        return 0
 
     @Slot()
     def load_sounds_model(self):
@@ -114,11 +135,25 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
         # Fill community-sounds list
         for file in self.__community_sounds_path__.glob("**/*.sound"):
-            self.__sounds_model__.add_sound(sounds_model_sound_dto(self, file.name, "community-sounds"))
+            self.__sounds_model__.add_sound(
+                sounds_model_sound_dto(
+                    self,
+                    file.name,
+                    "community-sounds",
+                    self.get_category_for_sound(file.name, "community-sounds")
+                )
+            )
 
         # Fill my-sounds list
         for file in self.__my_sounds_path__.glob("**/*.sound"):
-            self.__sounds_model__.add_sound(sounds_model_sound_dto(self, file.name, "my-sounds"))
+            self.__sounds_model__.add_sound(
+                sounds_model_sound_dto(
+                    self,
+                    file.name,
+                    "my-sounds",
+                    self.get_category_for_sound(file.name, "my-sounds")
+                )
+            )
 
     def save_categories(self):
         with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:
@@ -137,7 +172,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str)
     def setCategoryFilter(self, _filter):
-        if filter == "*":
+        # If qml sends category filter as `*`, clear any filtering and display all sounds
+        if _filter == "*":
             self.__sound_category_filter_proxy_model__.setFilterRegExp("")
         else:
             self.__sound_category_filter_proxy_model__.setFilterFixedString(f"{_filter}")

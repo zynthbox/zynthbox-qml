@@ -32,6 +32,14 @@ class sounds_model_sound_dto(QObject):
 
         self.__name__ = name
         self.__type__ = type
+
+        # Valid category values
+        # 0 : Uncategorized
+        # 1: Drums
+        # 2: Bass
+        # 3: Leads
+        # 4: Keys/Pads
+        # 99: Other
         self.__category__ = category
 
     ### Property name

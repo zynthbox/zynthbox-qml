@@ -57,7 +57,7 @@ class sound_categories_sounds_model(QAbstractListModel):
             return None
 
         if role == Qt.DisplayRole:
-            return self.sounds[index.row()].name
+            return self.sounds[index.row()].name.replace(".sound", "")
         elif role == self.Roles.SoundTypeRole:
             return self.sounds[index.row()].type
         elif role == self.Roles.CategoryRole:
@@ -81,6 +81,9 @@ class sound_categories_sounds_model(QAbstractListModel):
         return len(self.sounds)
 
     def add_sound(self, sound: sounds_model_sound_dto):
+        if sound.name.startswith("."):
+            return
+
         length = len(self.sounds)
 
         self.beginInsertRows(QModelIndex(), length, length)

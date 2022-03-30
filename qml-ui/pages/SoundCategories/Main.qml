@@ -34,6 +34,7 @@ Zynthian.ScreenPage {
     id: root
 
     property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject soundCopySource
 
     title: qsTr("Sound Categories")
     screenId: "sound_categories"
@@ -44,16 +45,48 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Move") // qsTr("Paste")
-            enabled: false
+            text: qsTr("Move/Paste")
+
+            Kirigami.Action {
+                enabled: root.soundCopySource == null && soundButtonGroup.checkedButton != null
+                text: qsTr("Move")
+                onTriggered: {
+                    root.soundCopySource = soundButtonGroup.checkedButton.soundObj
+                }
+            }
+            Kirigami.Action {
+                enabled: root.soundCopySource != null &&
+                         categoryButtonGroup.checkedButton &&
+                         categoryButtonGroup.checkedButton.category !== "*" &&
+                         categoryButtonGroup.checkedButton.category !== root.soundCopySource.category
+                text: qsTr("Paste")
+                onTriggered: {
+                    root.soundCopySource.category = categoryButtonGroup.checkedButton.category
+                    root.soundCopySource = null
+                }
+            }
+            Kirigami.Action {
+                enabled: root.soundCopySource != null
+                text: qsTr("Cancel")
+                onTriggered: {
+                    root.soundCopySource = null
+                }
+            }
+            Kirigami.Action {
+                enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.soundObj.category !== "0"
+                text: qsTr("Clear Category")
+                onTriggered: {
+                    soundButtonGroup.checkedButton.soundObj.category = "0"
+                }
+            }
         },
         Kirigami.Action {
+            enabled: root.soundCopySource == null
             text: qsTr("Save")
-            enabled: false
         },
         Kirigami.Action {
+            enabled: root.soundCopySource == null
             text: qsTr("Load")
-            enabled: false
         }
     ]
 
@@ -104,6 +137,7 @@ Zynthian.ScreenPage {
                 }
 
                 QQC2.ButtonGroup {
+                    id: categoryButtonGroup
                     buttons: categoryButtons.children
                 }
 
@@ -115,82 +149,47 @@ Zynthian.ScreenPage {
                     Layout.margins: spacing
                     spacing: content.rowSpacing
 
-                    QQC2.Button {
-                        id: categoryAllButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
+                        category: "*"
                         checked: true
-                        text: qsTr("All")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("*")
-                        }
                     }
 
-                    QQC2.Button {
-                        id: categoryUncategorizedButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Uncategorized")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("0")
-                        }
+                        category: "0"
                     }
 
-                    QQC2.Button {
-                        id: categoryDrumsButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Drums")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("1")
-                        }
+                        category: "1"
                     }
 
-                    QQC2.Button {
-                        id: categoryBassButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Bass")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("2")
-                        }
+                        category: "2"
                     }
 
-                    QQC2.Button {
-                        id: categoryLeadsButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Leads")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("3")
-                        }
+                        category: "3"
                     }
 
-                    QQC2.Button {
-                        id: categoryKeysButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Keys/Pads")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("4")
-                        }
+                        category: "4"
                     }
 
-                    QQC2.Button {
-                        id: categoryOthersButton
+                    CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        checkable: true
-                        text: qsTr("Others")
-                        onClicked: {
-                            zynthian.sound_categories.setCategoryFilter("99")
-                        }
+                        category: "99"
                     }
                 }
             }
@@ -269,16 +268,26 @@ Zynthian.ScreenPage {
                 Flickable {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    contentWidth: gridContent.width
-                    contentHeight: gridContent.height
+
+                    // Take into consideration the top and bottom margin of Kirigami.Units.gridUnit each
+                    contentHeight: soundGrid.height + Kirigami.Units.gridUnit * 2
+
                     flickableDirection: Flickable.AutoFlickDirection
                     clip: true
 
                     Item {
-                        id: gridContent
                         width: middleColumn.width
 
+                        QQC2.ButtonGroup {
+                            id: soundButtonGroup
+                            buttons: soundGrid.children
+                        }
+
                         GridLayout {
+                            id: soundGrid
+
+                            property real cellWidth: (width - columnSpacing * (columns-1))/columns
+
                             anchors {
                                 top: parent.top
                                 left: parent.left
@@ -291,12 +300,16 @@ Zynthian.ScreenPage {
                             columnSpacing: Kirigami.Units.gridUnit
 
                             Repeater {
+                                id: soundButtonsRepeater
                                 model: zynthian.sound_categories.soundsModel
                                 delegate: QQC2.Button {
-                                    Layout.fillWidth: true
+                                    property QtObject soundObj: model.sound
+
+                                    Layout.fillWidth: false
                                     Layout.fillHeight: false
+                                    Layout.preferredWidth: soundGrid.cellWidth
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                    Layout.alignment: Qt.AlignTop
+                                    checkable: true
 
                                     QQC2.Label {
                                         anchors.fill: parent
@@ -306,6 +319,18 @@ Zynthian.ScreenPage {
                                         verticalAlignment: QQC2.Label.AlignVCenter
                                     }
                                 }
+                            }
+
+                            /** When soundsModel has 2 columns, alignment issue occurs because of
+                              * less amount of items than columns. To mitigate, temporarily add a
+                              * empty component of same width and height
+                              */
+                            Item {
+                                Layout.fillWidth: false
+                                Layout.fillHeight: false
+                                Layout.preferredWidth: soundGrid.cellWidth
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                visible: soundButtonsRepeater.count < 3
                             }
                         }
                     }

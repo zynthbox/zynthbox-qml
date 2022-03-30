@@ -64,12 +64,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             "1": [],
             "2": [],
             "3": [],
+            "4": [],
             "99": [],
         }
         self.__community_sounds__ = {
             "1": [],
             "2": [],
             "3": [],
+            "4": [],
             "99": [],
         }
 
@@ -83,6 +85,28 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     def refresh_loading(self):
         pass
+
+    def move_sound_category(self, sound, toCategory):
+        if sound.type == "community-sounds":
+            try:
+                self.__community_sounds__[sound.category].remove(sound.name)
+            except: pass
+
+            try:
+                self.__community_sounds__[toCategory].append(sound.name)
+            except: pass
+
+        elif sound.type == "my-sounds":
+            try:
+                self.__my_sounds__[sound.category].remove(sound.name)
+            except: pass
+
+            try:
+                self.__my_sounds__[toCategory].append(sound.name)
+            except: pass
+
+        self.save_categories()
+        self.load_sounds_model()
 
     # Returns the category index if found otherwise returns 0 for uncategorized entries
     def get_category_for_sound(self, _sound, _type):
@@ -138,6 +162,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             self.__sounds_model__.add_sound(
                 sounds_model_sound_dto(
                     self,
+                    self.zyngui,
                     file.name,
                     "community-sounds",
                     self.get_category_for_sound(file.name, "community-sounds")
@@ -149,6 +174,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             self.__sounds_model__.add_sound(
                 sounds_model_sound_dto(
                     self,
+                    self.zyngui,
                     file.name,
                     "my-sounds",
                     self.get_category_for_sound(file.name, "my-sounds")

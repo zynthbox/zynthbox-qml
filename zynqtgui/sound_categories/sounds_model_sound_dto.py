@@ -27,9 +27,10 @@ from PySide2.QtCore import Property, QObject, Signal
 
 
 class sounds_model_sound_dto(QObject):
-    def __init__(self, parent, name, type, category="0"):
+    def __init__(self, parent, zyngui, name, type, category="0"):
         super().__init__(parent)
 
+        self.zyngui = zyngui
         self.__name__ = name
         self.__type__ = type
 
@@ -76,6 +77,7 @@ class sounds_model_sound_dto(QObject):
 
     def set_category(self, category):
         if self.__category__ != category:
+            self.zyngui.sound_categories.move_sound_category(self, category)
             self.__category__ = category
             self.category_changed.emit()
 

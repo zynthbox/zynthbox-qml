@@ -211,6 +211,7 @@ class zynthiloops_song(QObject):
             except Exception as e:
                 logging.error(e)
 
+    @Slot(None)
     def schedule_save(self):
         self.__save_timer__.start()
 

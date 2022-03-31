@@ -461,6 +461,7 @@ class zynthian_layer:
 		snapshot={
 			'engine_name': self.engine.name,
 			'engine_nick': self.engine.nickname,
+			'engine_type': self.engine.type,
 			'midi_chan': self.midi_chan,
 			'bank_index': self.bank_index,
 			'bank_name': self.bank_name,

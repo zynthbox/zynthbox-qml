@@ -52,6 +52,10 @@ Zynthian.BasePlayGrid {
 
     QtObject {
         id: _private
+        property QtObject currentSequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+        property QtObject alternativeModel: currentSequence && currentSequence.activePatternObject && currentSequence.activePatternObject.noteDestination == ZynQuick.PatternModel.SampleSlicedDestination
+            ? currentSequence.activePatternObject.clipSliceNotes
+            : null
         property QtObject model
         property QtObject miniGridModel
         property int channel: 15
@@ -188,15 +192,16 @@ Zynthian.BasePlayGrid {
             spacing: 0
             anchors.margins: 5
             Repeater {
-                model: _private.model
+                id: mainGridRepeater
+                model: _private.alternativeModel ? _private.alternativeModel : _private.model
                 delegate: NotesGridDelegate {
                     id: gridDelegate;
-                    model: _private.model
+                    model: mainGridRepeater.model
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
                     Connections {
-                        target: _private.model;
+                        target: mainGridRepeater.model;
                         onDataChanged: {
                             gridDelegate.refetchNote();
                         }
@@ -213,15 +218,15 @@ Zynthian.BasePlayGrid {
             anchors.margins: 5
             Repeater {
                 id: miniGridRepeater
-                model: _private.miniGridModel
+                model:  _private.alternativeModel ? _private.alternativeModel : _private.miniGridModel
                 delegate: NotesGridDelegate {
                     id: miniGridDelegate
-                    model: _private.miniGridModel
+                    model: miniGridRepeater.model
                     scale: _private.scale
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
                     Connections {
-                        target: _private.miniGridModel;
+                        target: miniGridRepeater.model;
                         onDataChanged: {
                             miniGridDelegate.refetchNote();
                         }

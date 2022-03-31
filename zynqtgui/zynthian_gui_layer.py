@@ -1803,6 +1803,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 					item["bank_name"] = layer_data["bank_name"]
 				if "preset_name" in layer_data:
 					item["preset_name"] = layer_data["preset_name"]
+				if "engine_type" in layer_data:
+					item["engine_type"] = layer_data["engine_type"]
 				data.append(item)
 			return data
 		except Exception as e:

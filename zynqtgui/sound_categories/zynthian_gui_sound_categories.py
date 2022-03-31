@@ -210,20 +210,20 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         metadata = self.zyngui.layer.sound_metadata_from_file(path)
         res = []
 
-        logging.error(f"getSoundNamesFromSoundFile : {metadata}")
-
         for layer in metadata:
             if "engine_type" in layer and layer["engine_type"] != "Audio Effect":
                 if "preset_name" in layer:
                     res.append(f"{layer['name']} > {layer['preset_name']}")
                 else:
                     res.append(layer['name'])
+            else:
+                res.append(layer['name'])
 
         if len(res) < 5:
             for i in range(5 - len(res)):
                 res.append("")
 
-        return res
+        return res[:5]
 
     # Return an array of 5 elements with sound name if available or empty string
     @Slot(QObject, result='QVariantList')
@@ -235,8 +235,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 res.append(track.getLayerNameByMidiChannel(sound))
             else:
                 res.append("")
-
-        logging.error(f"getSoundNamesFromChainedSounds : {track.chainedSounds}, {res}")
 
         return res
 

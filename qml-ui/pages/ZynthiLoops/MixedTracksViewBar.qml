@@ -285,7 +285,7 @@ Rectangle {
                                                                     // we can use it to effectively disable a sample entirely
                                                                     clip.keyZoneStart = -1;
                                                                     clip.keyZoneEnd = -1;
-                                                                    clip.rootNote = 60;
+                                                                    clip.rootNote = -1;
                                                                 }
                                                             }
                                                         }

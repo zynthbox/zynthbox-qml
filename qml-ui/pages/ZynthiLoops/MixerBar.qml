@@ -31,9 +31,14 @@ import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
-//import Zynthian 1.0 as Zynthian
+import Zynthian 1.0 as Zynthian
 
 Rectangle {
+    id: root
+
+    readonly property QtObject song: zynthian.zynthiloops.song
+    readonly property QtObject selectedTrack: song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
 
@@ -62,7 +67,8 @@ Rectangle {
                 return true;
         }
 
-        return false;
+        // If cuia is not handled in above switch block, call common cuia handler
+        return Zynthian.CommonUtils.cuiaHandler(cuia, root.selectedTrack, bottomStack)
     }
 
     QtObject {
@@ -73,11 +79,8 @@ Rectangle {
     }
 
     GridLayout {
-        id: root
         rows: 1
         anchors.fill: parent
-
-        readonly property QtObject song: zynthian.zynthiloops.song
 
         ColumnLayout {
             Layout.fillHeight: true

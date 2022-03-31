@@ -92,3 +92,85 @@ function switchToScene(index) {
         console.log("Sequence could not be fetched, and playback could not be stopped");
     }
 }
+
+function cuiaHandler(cuia, selectedTrack, bottomStack) {
+    switch (cuia) {
+        // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
+        // and invoke respective handler when trackAudioType is synth, trig or slice
+        // Otherwise, when in loop mode, do not handle button to allow falling back to track
+        // selection
+        case "TRACK_1":
+        case "TRACK_6":
+            if (selectedTrack.trackAudioType === "sample-loop") {
+                bottomStack.bottomBar.filePickerDialog.folderModel.folder = bottomStack.bottomBar.controlObj.recordingDir;
+                bottomStack.bottomBar.filePickerDialog.open();
+                return true
+            } else if (selectedTrack.trackAudioType === "synth" ||
+                selectedTrack.trackAudioType === "sample-trig" ||
+                selectedTrack.trackAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 0
+                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+                return true
+            }
+
+            return false
+
+        case "TRACK_2":
+        case "TRACK_7":
+            if (selectedTrack.trackAudioType === "sample-loop") {
+                return true
+            } else if (selectedTrack.trackAudioType === "synth" ||
+                selectedTrack.trackAudioType === "sample-trig" ||
+                selectedTrack.trackAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 1
+                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+                return true
+            }
+
+            return false
+
+        case "TRACK_3":
+        case "TRACK_8":
+            if (selectedTrack.trackAudioType === "sample-loop") {
+                return true
+            } else if (selectedTrack.trackAudioType === "synth" ||
+                selectedTrack.trackAudioType === "sample-trig" ||
+                selectedTrack.trackAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 2
+                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+                return true
+            }
+
+            return false
+
+        case "TRACK_4":
+        case "TRACK_9":
+            if (selectedTrack.trackAudioType === "sample-loop") {
+                return true
+            } else if (selectedTrack.trackAudioType === "synth" ||
+                selectedTrack.trackAudioType === "sample-trig" ||
+                selectedTrack.trackAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 3
+                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+                return true
+            }
+
+            return false
+
+        case "TRACK_5":
+        case "TRACK_10":
+            if (selectedTrack.trackAudioType === "sample-loop") {
+                return true
+            } else if (selectedTrack.trackAudioType === "synth" ||
+                selectedTrack.trackAudioType === "sample-trig" ||
+                selectedTrack.trackAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 4
+                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+                return true
+            }
+
+            return false
+    }
+
+    return false
+}

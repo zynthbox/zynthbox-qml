@@ -335,7 +335,7 @@ Rectangle {
                                                     if (clip) {
                                                         clip.keyZoneStart = sampleSettings[i][0];
                                                         clip.keyZoneEnd = sampleSettings[i][1];
-                                                        clip.rootNote = 60 - sampleSettings[i][2];
+                                                        clip.rootNote = 60 + sampleSettings[i][2];
                                                     }
                                                 }
                                             }
@@ -366,6 +366,7 @@ Rectangle {
                                                 property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                                                 property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null
                                                 property Item pianoKeyEndItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneEnd) : null
+                                                property Item pianoRootNoteItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.rootNote) : null
                                                 x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : -Math.floor(pianoKeysRepeater.itemAt(0).width / 2)
                                                 opacity: clipObj ? 1 : 0.3
                                                 QQC2.Label {
@@ -412,7 +413,7 @@ Rectangle {
                                                         top: parent.top
                                                         topMargin: index * (parent.height / 6)
                                                     }
-                                                    x: pianoKeyItem && pianoKeyEndItem ? pianoKeyEndItem.x - pianoKeyItem.x - (pianoKeyEndItem.width / 2) : sampleHandle.x
+                                                    x: pianoKeyItem && pianoKeyEndItem ? pianoKeyEndItem.x - pianoKeyItem.x - Kirigami.Units.largeSpacing: sampleHandle.x
                                                     height: Kirigami.Units.largeSpacing * 2
                                                     width: height
                                                     radius: height / 2
@@ -454,6 +455,32 @@ Rectangle {
                                                             width: 4
                                                             radius: 2
                                                             color: sampleKeyzoneDelegate.lineColor
+                                                        }
+                                                    }
+                                                }
+                                                Item {
+                                                    anchors {
+                                                        bottom: parent.bottom
+                                                        bottomMargin: Kirigami.Units.largeSpacing
+                                                    }
+                                                    height: 1
+                                                    width: 1
+                                                    x: pianoKeyItem && pianoRootNoteItem ? pianoRootNoteItem.x - pianoKeyItem.x: sampleHandle.x
+                                                    visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.clipObj
+                                                    Rectangle {
+                                                        anchors {
+                                                            topMargin: -height
+                                                            centerIn: parent
+                                                        }
+                                                        color: sampleKeyzoneDelegate.lineColor
+                                                        height: Kirigami.Units.largeSpacing * 2
+                                                        width: height
+                                                        radius: height / 2
+                                                        QQC2.Label {
+                                                            anchors.centerIn: parent
+                                                            font.pixelSize: Kirigami.Units.largeSpacing
+                                                            color: Kirigami.Theme.highlightedTextColor
+                                                            text: "C4"
                                                         }
                                                     }
                                                 }

@@ -204,6 +204,42 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         else:
             self.__sound_category_filter_proxy_model__.setFilterFixedString(f"{_filter}")
 
+    # Return an array of 5 elements with sound name if available or empty string
+    @Slot(str, result='QVariantList')
+    def getSoundNamesFromSoundFile(self, path):
+        metadata = self.zyngui.layer.sound_metadata_from_file(path)
+        res = []
+
+        logging.error(f"getSoundNamesFromSoundFile : {metadata}")
+
+        for layer in metadata:
+            if "engine_type" in layer and layer["engine_type"] != "Audio Effect":
+                if "preset_name" in layer:
+                    res.append(f"{layer['name']} > {layer['preset_name']}")
+                else:
+                    res.append(layer['name'])
+
+        if len(res) < 5:
+            for i in range(5 - len(res)):
+                res.append("")
+
+        return res
+
+    # Return an array of 5 elements with sound name if available or empty string
+    @Slot(QObject, result='QVariantList')
+    def getSoundNamesFromTrack(self, track):
+        res = []
+
+        for sound in track.chainedSounds:
+            if sound >= 0 and track.checkIfLayerExists(sound):
+                res.append(track.getLayerNameByMidiChannel(sound))
+            else:
+                res.append("")
+
+        logging.error(f"getSoundNamesFromChainedSounds : {track.chainedSounds}, {res}")
+
+        return res
+
     ### Property soundsModel
     def get_sounds_model(self):
         return self.__sound_category_filter_proxy_model__

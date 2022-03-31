@@ -46,6 +46,8 @@ RowLayout {
             id: noteDelegate;
             positionalVelocity: component.positionalVelocity
             note: component.model.data(component.model.index(row, index), component.model.roles['note'])
+            property var metadata: component.model.data(component.model.index(row, index), component.model.roles['metadata'])
+            text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
             Connections {
                 target: component
                 onRefetchNote: {

@@ -47,28 +47,14 @@ class sounds_model_sound_dto(QObject):
     def get_name(self):
         return self.__name__
 
-    def set_name(self, name):
-        if self.__name__ != name:
-            self.__name__ = name
-            self.name_changed.emit()
-
-    name_changed = Signal()
-
-    name = Property(str, get_name, set_name, notify=name_changed)
+    name = Property(str, get_name, constant=True)
     ### END Property name
 
     ### Property type
     def get_type(self):
         return self.__type__
 
-    def set_type(self, type):
-        if self.__type__ != type:
-            self.__type__ = type
-            self.type_changed.emit()
-
-    type_changed = Signal()
-
-    type = Property(str, get_type, set_type, notify=type_changed)
+    type = Property(str, get_type, constant=True)
     ### END Property type
 
     ### Property category
@@ -85,3 +71,15 @@ class sounds_model_sound_dto(QObject):
 
     category = Property(str, get_category, set_category, notify=category_changed)
     ### END Property category
+
+    ### Property path
+    def get_path(self):
+        if self.__type__ == "community-sounds":
+            return "/zynthian/zynthian-my-data/sounds/community-sounds/"+self.__name__
+        elif self.__type__ == "my-sounds":
+            return "/zynthian/zynthian-my-data/sounds/my-sounds/"+self.__name__
+        else:
+            return None
+
+    path = Property(str, get_path, constant=True)
+    ### END Property path

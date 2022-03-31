@@ -88,6 +88,10 @@ Zynthian.ScreenPage {
             enabled: root.soundCopySource == null &&
                      (soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked)
             text: qsTr("Save")
+            onTriggered: {
+                saveSoundDialog.fileName = ""
+                saveSoundDialog.open()
+            }
         },
         Kirigami.Action {
             enabled: root.soundCopySource == null &&
@@ -108,6 +112,30 @@ Zynthian.ScreenPage {
             if (zynthian.current_screen_id === root.screenId) {
                 zynthian.sound_categories.load_sounds_model()
             }
+        }
+    }
+
+    Zynthian.SaveFileDialog {
+        id: saveSoundDialog
+        visible: false
+
+        headerText: qsTr("Save Sound")
+        conflictText: qsTr("Sound file exists")
+        overwriteOnConflict: false
+
+        onFileNameChanged: {
+            fileCheckTimer.restart()
+        }
+        Timer {
+            id: fileCheckTimer
+            interval: 300
+            onTriggered: {
+                    fileNameDialog.conflict = false;
+            }
+        }
+
+        onAccepted: {
+            zynthian.layer.save_curlayer_to_file('/zynthian/zynthian-my-data/sounds/my-sounds/'+saveSoundDialog.fileName);
         }
     }
     
@@ -324,6 +352,12 @@ Zynthian.ScreenPage {
                                         // Toggle checked on click
                                         checked = !checked
                                     }
+                                    onCheckedChanged: {
+                                        if (checked) {
+                                            console.log(JSON.stringify(zynthian.layer.sound_metadata_from_file(model.sound.path), null, 2))
+
+                                        }
+                                    }
 
                                     QQC2.Label {
                                         anchors.fill: parent
@@ -366,10 +400,16 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
                     Layout.preferredHeight: Kirigami.Units.gridUnit*3
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+                    Layout.rightMargin: Kirigami.Units.gridUnit
                     horizontalAlignment: "AlignHCenter"
                     verticalAlignment: "AlignVCenter"
+                    elide: "ElideRight"
                     font.pointSize: 16
-                    text: qsTr("Current")
+                    text: soundButtonGroup.checkedButton != null &&
+                          soundButtonGroup.checkedButton.checked
+                            ? soundButtonGroup.checkedButton.soundObj.name.replace(".sound", "")
+                            : qsTr("Current")
                 }
 
                 Kirigami.Separator {
@@ -385,7 +425,10 @@ Zynthian.ScreenPage {
                     flickableDirection: Flickable.VerticalFlick
                     orientation: ListView.Vertical
                     clip: true
-                    model: root.track.chainedSounds
+                    model: soundButtonGroup.checkedButton != null &&
+                           soundButtonGroup.checkedButton.checked
+                            ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
+                            : zynthian.sound_categories.getSoundNamesFromTrack(root.track)
 
                     delegate: Item {
                         width: ListView.view.width
@@ -413,9 +456,7 @@ Zynthian.ScreenPage {
                                     rightMargin: Kirigami.Units.gridUnit*0.5
                                 }
                                 horizontalAlignment: Text.AlignLeft
-                                text: modelData >= 0 && root.track.checkIfLayerExists(modelData)
-                                        ? root.track.getLayerNameByMidiChannel(modelData)
-                                        : ""
+                                text: modelData
 
                                 elide: "ElideRight"
                             }

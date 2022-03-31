@@ -48,7 +48,9 @@ Zynthian.ScreenPage {
             text: qsTr("Move/Paste")
 
             Kirigami.Action {
-                enabled: root.soundCopySource == null && soundButtonGroup.checkedButton != null
+                enabled: root.soundCopySource == null &&
+                         soundButtonGroup.checkedButton != null &&
+                         soundButtonGroup.checkedButton.checked
                 text: qsTr("Move")
                 onTriggered: {
                     root.soundCopySource = soundButtonGroup.checkedButton.soundObj
@@ -73,7 +75,9 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
-                enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.soundObj.category !== "0"
+                enabled: soundButtonGroup.checkedButton != null &&
+                         soundButtonGroup.checkedButton.checked &&
+                         soundButtonGroup.checkedButton.soundObj.category !== "0"
                 text: qsTr("Clear Category")
                 onTriggered: {
                     soundButtonGroup.checkedButton.soundObj.category = "0"
@@ -81,11 +85,14 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            enabled: root.soundCopySource == null
+            enabled: root.soundCopySource == null &&
+                     (soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked)
             text: qsTr("Save")
         },
         Kirigami.Action {
-            enabled: root.soundCopySource == null
+            enabled: root.soundCopySource == null &&
+                     soundButtonGroup.checkedButton != null &&
+                     soundButtonGroup.checkedButton.checked
             text: qsTr("Load")
         }
     ]
@@ -309,12 +316,19 @@ Zynthian.ScreenPage {
                                     Layout.fillHeight: false
                                     Layout.preferredWidth: soundGrid.cellWidth
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                    checkable: true
+                                    onReleased: {
+                                        // Set checkable to false to prevent checkable getting set to true
+                                        // automatically when checked value changes
+                                        checkable = false
+
+                                        // Toggle checked on click
+                                        checked = !checked
+                                    }
 
                                     QQC2.Label {
                                         anchors.fill: parent
                                         text: model.display
-                                        wrapMode: "WrapAnywhere"
+                                        wrapMode: QQC2.Label.WrapAtWordBoundaryOrAnywhere
                                         horizontalAlignment: QQC2.Label.AlignHCenter
                                         verticalAlignment: QQC2.Label.AlignVCenter
                                     }

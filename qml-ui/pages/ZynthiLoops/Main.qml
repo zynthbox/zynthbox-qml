@@ -34,7 +34,6 @@ import org.zynthian.quick 1.0 as ZynQuick
 import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
-
     id: root
 
     property alias zlScreen: root
@@ -205,7 +204,9 @@ Zynthian.ScreenPage {
                 return true;
         }
 
-        return false;
+        // If cuia is not handled by any bottomBars or the switch block
+        // call the common cuiaHandler
+        return Zynthian.CommonUtils.cuiaHandler(cuia, root.selectedTrack, bottomStack)
     }
 
     Connections {

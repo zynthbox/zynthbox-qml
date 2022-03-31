@@ -466,7 +466,7 @@ Rectangle {
                                                     height: 1
                                                     width: 1
                                                     x: pianoKeyItem && pianoRootNoteItem ? pianoRootNoteItem.x - pianoKeyItem.x: sampleHandle.x
-                                                    visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.clipObj
+                                                    visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.clipObj && sampleKeyzoneDelegate.clipObj.rootNote > -1 && sampleKeyzoneDelegate.clipObj.rootNote < 128
                                                     Rectangle {
                                                         anchors {
                                                             topMargin: -height

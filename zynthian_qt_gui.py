@@ -382,6 +382,7 @@ class zynthian_gui(QObject):
         self.tracks_mod_active = False
 
         # Create variables for LED control
+        self.wsleds_blink = False
         self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
         self.wscolor_blue = rpi_ws281x.Color(0, 50, 200)
         self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
@@ -671,20 +672,19 @@ class zynthian_gui(QObject):
 
         return self.wsleds_num
 
-
     def end_wsleds(self):
         # Light-off all LEDs
         for i in range(0,25):
             self.wsleds.setPixelColor(i,self.wscolor_off)
         self.wsleds.show()
 
-
+    # To blink led call this method in update_wsleds
+    # self.wsled_blink(0, self.wscolor_active)
     def wsled_blink(self, i, color):
         if self.wsleds_blink:
             self.wsleds.setPixelColor(i, color)
         else:
             self.wsleds.setPixelColor(i, self.wscolor_light)
-
 
     def update_wsleds(self):
         if self.wsleds_blink_count % 6 > 2:
@@ -696,17 +696,13 @@ class zynthian_gui(QObject):
             track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
 
             # Menu
-            if self.modal_screen==None and self.active_screen=="main":
-                self.wsleds.setPixelColor(0,self.wscolor_active)
+            if self.modal_screen is None and self.active_screen == "main":
+                self.wsleds.setPixelColor(0, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(0,self.wscolor_light)
-
-            # To blink aled
-            #self.wsled_blink(0,self.wscolor_active)
-            # Active Track
+                self.wsleds.setPixelColor(0, self.wscolor_light)
 
             # Light up 1-6 buttons as per opened screen / bottomBar
-            for i in range(6):
+            for i in range(1, 6):
                 # If slots synths bar is active, light up filled cells otherwise turn off led
                 if (self.active_screen == "zynthiloops" and self.slotsBarSynthsActive) or (self.active_screen == "zynthiloops" and self.slotsBarTrackActive and track.trackAudioType == "synth"):
                     if track.chainedSounds[i-1] > -1 and \
@@ -794,95 +790,65 @@ class zynthian_gui(QObject):
 
             # Stepseq screen:
             if self.active_screen=="zynthiloops":
-                self.wsleds.setPixelColor(8,self.wscolor_active)
+                self.wsleds.setPixelColor(8, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(8,self.wscolor_light)
+                self.wsleds.setPixelColor(8, self.wscolor_light)
 
             # Audio Recorder screen:
             if self.modal_screen=="playgrid":
-                self.wsleds.setPixelColor(9,self.wscolor_active)
+                self.wsleds.setPixelColor(9, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(9,self.wscolor_light)
+                self.wsleds.setPixelColor(9, self.wscolor_light)
 
             # MIDI Recorder screen:
-            if self.modal_screen==None and (self.active_screen=="layers_for_track" or self.active_screen=="bank" or self.active_screen=="preset"):
-                self.wsleds.setPixelColor(10,self.wscolor_active)
+            if self.modal_screen is None and (self.active_screen == "layers_for_track" or self.active_screen == "bank" or self.active_screen == "preset"):
+                self.wsleds.setPixelColor(10, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(10,self.wscolor_light)
+                self.wsleds.setPixelColor(10, self.wscolor_light)
 
             # Snapshot screen:
-            if self.modal_screen=="song_arranger":
-                self.wsleds.setPixelColor(11,self.wscolor_active)
+            if self.modal_screen == "song_arranger":
+                self.wsleds.setPixelColor(11, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(11,self.wscolor_light)
+                self.wsleds.setPixelColor(11, self.wscolor_light)
 
             # Presets screen:
-            if self.modal_screen=="admin":
-                self.wsleds.setPixelColor(12,self.wscolor_active)
+            if self.modal_screen == "admin":
+                self.wsleds.setPixelColor(12, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(12,self.wscolor_light)
+                self.wsleds.setPixelColor(12, self.wscolor_light)
 
             # Light ALT button
-            self.wsleds.setPixelColor(13,self.wscolor_light)
+            self.wsleds.setPixelColor(13, self.wscolor_light)
 
             if self.screens["zynthiloops"].clipToRecord is None:
-                self.wsleds.setPixelColor(14,self.wscolor_light)
+                self.wsleds.setPixelColor(14, self.wscolor_light)
             else:
-                self.wsleds.setPixelColor(14,self.wscolor_red)
+                self.wsleds.setPixelColor(14, self.wscolor_red)
 
             if self.screens["zynthiloops"].isMetronomeRunning:
-                self.wsleds.setPixelColor(15,self.wscolor_active)
+                self.wsleds.setPixelColor(15, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(15,self.wscolor_light)
-
-            ## REC/PLAY Audio buttons:
-            #if self.status_info['audio_recorder']:
-                #if "REC" in self.status_info['audio_recorder']:
-                    #self.wsleds.setPixelColor(14,self.wscolor_red)
-                #else:
-                    #self.wsleds.setPixelColor(14,self.wscolor_light)
-
-                #if "PLAY" in self.status_info['audio_recorder']:
-                    #self.wsleds.setPixelColor(15,self.wscolor_active)
-                #else:
-                    #self.wsleds.setPixelColor(15,self.wscolor_light)
-            #else:
-                #self.wsleds.setPixelColor(14,self.wscolor_light)
-                #self.wsleds.setPixelColor(15,self.wscolor_light)
-
-            ## REC/PLAY MIDI buttons:
-            #if self.status_info['midi_recorder']:
-                #if "REC" in self.status_info['midi_recorder']:
-                    #self.wsleds.setPixelColor(16,self.wscolor_red)
-                #else:
-                    #self.wsleds.setPixelColor(16,self.wscolor_light)
-
-                #if "PLAY" in self.status_info['midi_recorder']:
-                    #self.wsleds.setPixelColor(17,self.wscolor_active)
-                #else:
-                    #self.wsleds.setPixelColor(17,self.wscolor_light)
-            #else:
-                #self.wsleds.setPixelColor(16,self.wscolor_light)
-                #self.wsleds.setPixelColor(17,self.wscolor_light)
+                self.wsleds.setPixelColor(15, self.wscolor_light)
 
             # Back/No button
-            self.wsleds.setPixelColor(18,self.wscolor_red)
+            self.wsleds.setPixelColor(18, self.wscolor_red)
 
             # Up button
-            self.wsleds.setPixelColor(19,self.wscolor_light)
+            self.wsleds.setPixelColor(19, self.wscolor_light)
 
             # Select/Yes button
-            self.wsleds.setPixelColor(20,self.wscolor_green)
+            self.wsleds.setPixelColor(20, self.wscolor_green)
 
             # Left, Bottom, Right button
             for i in range(3):
-                self.wsleds.setPixelColor(21+i,self.wscolor_light)
+                self.wsleds.setPixelColor(21+i, self.wscolor_light)
 
             # Audio Mixer/Levels screen
-            if self.modal_screen=="audio_settings":
-                self.wsleds.setPixelColor(24,self.wscolor_active)
+            if self.modal_screen == "audio_settings":
+                self.wsleds.setPixelColor(24, self.wscolor_active)
             else:
-                self.wsleds.setPixelColor(24,self.wscolor_light)
+                self.wsleds.setPixelColor(24, self.wscolor_light)
 
             # Refresh LEDs
             self.wsleds.show()

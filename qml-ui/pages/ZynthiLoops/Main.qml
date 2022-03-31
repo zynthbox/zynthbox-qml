@@ -175,17 +175,6 @@ Zynthian.ScreenPage {
             case "MODE_SWITCH_LONG":
             case "MODE_SWITCH_BOLD":
                 if (zynthian.altButtonPressed) {
-                    // Cycle through the trackAudioTypes when alt button is pressed
-                    if (root.selectedTrack.trackAudioType === "synth") {
-                        root.selectedTrack.trackAudioType = "sample-loop"
-                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
-                        root.selectedTrack.trackAudioType = "sample-trig"
-                    } else if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        root.selectedTrack.trackAudioType = "sample-slice"
-                    } else if (root.selectedTrack.trackAudioType === "sample-slice") {
-                        root.selectedTrack.trackAudioType = "synth"
-                    }
-                } else {
                     // Cycle between track, mixer, synths, samples, fx when alt button is not pressed
                     if (bottomStack.slotsBar.trackButton.checked) {
                         bottomStack.slotsBar.mixerButton.checked = true
@@ -199,6 +188,17 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.trackButton.checked = true
                     } else {
                         bottomStack.slotsBar.trackButton.checked = true
+                    }
+                } else {
+                    // Cycle through the trackAudioTypes when alt button is pressed
+                    if (root.selectedTrack.trackAudioType === "synth") {
+                        root.selectedTrack.trackAudioType = "sample-loop"
+                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
+                        root.selectedTrack.trackAudioType = "sample-trig"
+                    } else if (root.selectedTrack.trackAudioType === "sample-trig") {
+                        root.selectedTrack.trackAudioType = "sample-slice"
+                    } else if (root.selectedTrack.trackAudioType === "sample-slice") {
+                        root.selectedTrack.trackAudioType = "synth"
                     }
                 }
 

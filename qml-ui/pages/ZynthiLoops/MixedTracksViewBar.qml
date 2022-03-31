@@ -63,20 +63,24 @@ Rectangle {
                 return true;
 
             case "SELECT_UP":
-                if (root.selectedTrack.trackAudioType == "sample-trig") {
+                if (root.selectedTrack.trackAudioType === "sample-trig") {
                     if (root.selectedTrack.selectedSampleRow > 0) {
                         root.selectedTrack.selectedSampleRow -= 1;
                     }
                     return true;
                 }
 
+                return false;
+
             case "SELECT_DOWN":
-                if (root.selectedTrack.trackAudioType == "sample-trig") {
+                if (root.selectedTrack.trackAudioType === "sample-trig") {
                     if (root.selectedTrack.selectedSampleRow < 4) {
                         root.selectedTrack.selectedSampleRow += 1;
                     }
                     return true;
                 }
+
+                return false;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
             // and invoke respective handler when trackAudioType is synth, trig or slice

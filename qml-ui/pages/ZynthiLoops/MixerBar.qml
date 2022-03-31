@@ -66,9 +66,8 @@ Rectangle {
 
                 return true;
         }
-
-        // If cuia is not handled in above switch block, call common cuia handler
-        return Zynthian.CommonUtils.cuiaHandler(cuia, root.selectedTrack, bottomStack)
+        
+        return false;
     }
 
     QtObject {

@@ -44,10 +44,10 @@ Zynthian.Card {
                 samplePickerDialog.open();
 
                 return true;
-
-            default:
-                return false;
         }
+        
+        // If cuia is not handled in above switch block, call common cuia handler
+        return Zynthian.CommonUtils.cuiaHandler(cuia, root.selectedTrack, bottomStack)
     }
 
     padding: Kirigami.Units.gridUnit

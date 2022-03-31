@@ -211,11 +211,12 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         res = []
 
         for layer in metadata:
-            if "engine_type" in layer and layer["engine_type"] != "Audio Effect":
-                if "preset_name" in layer:
-                    res.append(f"{layer['name']} > {layer['preset_name']}")
-                else:
-                    res.append(layer['name'])
+            if "engine_type" in layer:
+                if layer["engine_type"] != "Audio Effect":
+                    if "preset_name" in layer:
+                        res.append(f"{layer['name']} > {layer['preset_name']}")
+                    else:
+                        res.append(layer['name'])
             else:
                 res.append(layer['name'])
 

@@ -75,6 +75,16 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             "99": [],
         }
 
+        self.__sound_category_name_mapping__ = {
+            "*": "All",
+            "0": "Uncategorized",
+            "1": "Drums",
+            "2": "Bass",
+            "3": "Leads",
+            "4": "Keys/Pads",
+            "99": "Others",
+        }
+
         self.load_sounds_model()
 
     def show(self):
@@ -122,6 +132,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 return category
 
         return 0
+
+    @Slot(str, result=str)
+    def getCategoryNameFromKey(self, key):
+        try:
+            return self.__sound_category_name_mapping__[key]
+        except Exception as e:
+            logging.error(f"Sound Category with key `{key}` not found : {str(e)}")
+            return ""
 
     @Slot()
     def load_sounds_model(self):
@@ -242,6 +260,19 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):
         return len(list(self.__my_sounds_path__.glob(f"**/{filename}.*.sound"))) > 0
+
+    @Slot(str, str)
+    def saveSound(self, filename, category):
+        final_name = self.zyngui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename))
+
+        if final_name is not None:
+            if category != "*" and category != "0":
+                self.__my_sounds__[category].append(final_name)
+                self.save_categories()
+
+            self.load_sounds_model()
+        else:
+            logging.error("Error saving sound file")
 
     ### Property soundsModel
     def get_sounds_model(self):

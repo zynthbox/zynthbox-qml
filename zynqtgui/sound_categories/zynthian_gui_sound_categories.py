@@ -239,6 +239,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
         return res
 
+    @Slot(str, result=bool)
+    def checkIfSoundFileExists(self, filename):
+        return len(list(self.__my_sounds_path__.glob(f"**/{filename}.*.sound"))) > 0
+
     ### Property soundsModel
     def get_sounds_model(self):
         return self.__sound_category_filter_proxy_model__

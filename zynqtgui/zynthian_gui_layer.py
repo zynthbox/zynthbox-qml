@@ -1965,7 +1965,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		return os.path.isfile(actualPath)
 
 
-	@Slot(str)
+	@Slot(str, result=str)
 	def save_curlayer_to_file(self, file_name):
 		try:
 			if self.zyngui.curlayer == None:
@@ -1987,8 +1987,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			f.flush()
 			os.fsync(f.fileno())
 			f.close()
+
+			return final_name
 		except Exception as e:
 			logging.error(e)
+			return None
 
 	@Slot(str)
 	def save_soundset_to_file(self, file_name):

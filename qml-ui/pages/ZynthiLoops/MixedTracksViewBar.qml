@@ -44,46 +44,45 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function cuiaCallback(cuia) {
+        var returnValue = false;
         switch (cuia) {
             case "SWITCH_TRACKS_MOD_SHORT":
-                return true
+                returnValue = true;
+                break;
 
             case "NAVIGATE_LEFT":
                 if (zynthian.session_dashboard.selectedTrack > 0) {
                     zynthian.session_dashboard.selectedTrack -= 1;
                 }
-
-                return true;
+                returnValue = true;
+                break;
 
             case "NAVIGATE_RIGHT":
                 if (zynthian.session_dashboard.selectedTrack < 9) {
                     zynthian.session_dashboard.selectedTrack += 1;
                 }
-
-                return true;
+                returnValue = true;
+                break;
 
             case "SELECT_UP":
                 if (root.selectedTrack.trackAudioType === "sample-trig") {
                     if (root.selectedTrack.selectedSampleRow > 0) {
                         root.selectedTrack.selectedSampleRow -= 1;
                     }
-                    return true;
+                    returnValue = true;
                 }
-
-                return false;
+                break;
 
             case "SELECT_DOWN":
                 if (root.selectedTrack.trackAudioType === "sample-trig") {
                     if (root.selectedTrack.selectedSampleRow < 4) {
                         root.selectedTrack.selectedSampleRow += 1;
                     }
-                    return true;
+                    returnValue = true;
                 }
-
-                return false;
+                break;
         }
-        
-        return false;
+        return returnValue;
     }
 
     QtObject {

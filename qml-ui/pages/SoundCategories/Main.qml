@@ -97,7 +97,7 @@ Zynthian.ScreenPage {
                     saveSoundDialog.fileName = zynthian.sound_categories.suggestedSoundFileName()
                     saveSoundDialog.open()
                 } else {
-
+                    zynthian.sound_categories.loadSound(soundButtonGroup.checkedButton.soundObj)
                 }
             }
         },

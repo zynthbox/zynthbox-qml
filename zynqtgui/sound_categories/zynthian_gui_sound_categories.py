@@ -274,6 +274,83 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         else:
             logging.error("Error saving sound file")
 
+    @Slot(QObject)
+    def loadSound(self, sound):
+        def task():
+            logging.error(f"### Loading sound : {sound.path}")
+
+            track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            source_channels = self.zyngui.layer.load_layer_channels_from_file(sound.path)
+            free_layers = track.getFreeLayers()
+            used_layers = []
+
+            for i in track.chainedSounds:
+                if i >= 0 and track.checkIfLayerExists(i):
+                    used_layers.append(i)
+
+            logging.error(f"### Before Removing")
+            logging.error(f"# Selected Track         : {self.zyngui.session_dashboard.selectedTrack}")
+            logging.error(f"# Source Channels        : {source_channels}")
+            logging.error(f"# Free Layers            : {free_layers}")
+            logging.error(f"# Used Layers            : {used_layers}")
+            logging.error(f"# Chained Sounds         : {track.chainedSounds}")
+            logging.error(f"# Source Channels Count  : {len(source_channels)}")
+            logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+
+            # Check if count of channels required to load sound is available or not
+            # Available count of channels : used layers by current track (will get replaced) + free layers
+            if (len(free_layers) + len(used_layers)) < len(source_channels):
+                logging.error(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from tracks to continue.")
+            else:
+                # Required free channel count condition satisfied. Continue loading.
+
+                # Remove all current sounds from track
+                for i in used_layers:
+                    track.remove_and_unchain_sound(i)
+
+                # Repopulate after removing current track layers
+                free_layers = track.getFreeLayers()
+                used_layers = []
+                for i in track.chainedSounds:
+                    if i >= 0 and track.checkIfLayerExists(i):
+                        used_layers.append(i)
+                new_channels_map = {}
+
+                logging.error(f"### After Removing")
+                logging.error(f"# Source Channels        : {source_channels}")
+                logging.error(f"# Free Layers            : {free_layers}")
+                logging.error(f"# Used Layers            : {used_layers}")
+                logging.error(f"# Chained Sounds         : {track.chainedSounds}")
+                logging.error(f"# Source Channels Count  : {len(source_channels)}")
+                logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+
+                for index, channel in enumerate(source_channels):
+                    new_channels_map[channel] = free_layers[index]
+
+                logging.error(f"# Channel map for loading sound : {new_channels_map}")
+
+                self.zyngui.layer.load_layer_from_file(sound.path, new_channels_map)
+
+                # Repopulate after loading sound
+                free_layers = track.getFreeLayers()
+                used_layers = []
+                for i in track.chainedSounds:
+                    if i >= 0 and track.checkIfLayerExists(i):
+                        used_layers.append(i)
+
+                logging.error(f"### After Loading")
+                logging.error(f"# Source Channels        : {source_channels}")
+                logging.error(f"# Free Layers            : {free_layers}")
+                logging.error(f"# Used Layers            : {used_layers}")
+                logging.error(f"# Chained Sounds         : {track.chainedSounds}")
+                logging.error(f"# Source Channels Count  : {len(source_channels)}")
+                logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+
+            self.zyngui.zynthiloops.end_long_task()
+
+        self.zyngui.zynthiloops.do_long_task(task)
+
+
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
         track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)

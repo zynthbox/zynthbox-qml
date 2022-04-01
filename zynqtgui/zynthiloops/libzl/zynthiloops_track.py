@@ -402,6 +402,17 @@ class zynthiloops_track(QObject):
 
             return True
 
+    def getFreeLayers(self):
+        zyngui = self.__song__.get_metronome_manager().zyngui
+        assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
+        free_layers = []
+
+        for x in range(0, 16):
+            if x not in assigned_layers:
+                free_layers.append(x)
+
+        return free_layers
+
     @Slot(int, result=str)
     def getLayerNameByMidiChannel(self, channel):
         if self.checkIfLayerExists(channel):

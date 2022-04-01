@@ -85,19 +85,28 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            enabled: root.soundCopySource == null &&
-                     (soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked)
-            text: qsTr("Save")
+            // True when action acts as save button, false when acts as load button
+            property bool isSaveBtn: soundButtonGroup.checkedButton == null || !soundButtonGroup.checkedButton.checked
+
+            enabled: root.soundCopySource == null
+            text: isSaveBtn
+                    ? qsTr("Save")
+                    : qsTr("Load")
             onTriggered: {
-                saveSoundDialog.fileName = ""
-                saveSoundDialog.open()
+                if (isSaveBtn) {
+                    saveSoundDialog.fileName = ""
+                    saveSoundDialog.open()
+                } else {
+
+                }
             }
         },
         Kirigami.Action {
-            enabled: root.soundCopySource == null &&
-                     soundButtonGroup.checkedButton != null &&
-                     soundButtonGroup.checkedButton.checked
-            text: qsTr("Load")
+            enabled: soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked
+            text: qsTr("Clear Selection")
+            onTriggered: {
+                soundButtonGroup.checkedButton.checked = false
+            }
         }
     ]
 
@@ -135,7 +144,7 @@ Zynthian.ScreenPage {
         }
 
         onAccepted: {
-            zynthian.layer.save_curlayer_to_file('/zynthian/zynthian-my-data/sounds/my-sounds/'+saveSoundDialog.fileName);
+            zynthian.sound_categories.saveSound(saveSoundDialog.fileName, categoryButtonGroup.checkedButton.category)
         }
     }
     
@@ -340,24 +349,11 @@ Zynthian.ScreenPage {
                                 delegate: QQC2.Button {
                                     property QtObject soundObj: model.sound
 
-                                    Layout.fillWidth: false
+                                    Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredWidth: soundGrid.cellWidth
                                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                    onReleased: {
-                                        // Set checkable to false to prevent checkable getting set to true
-                                        // automatically when checked value changes
-                                        checkable = false
-
-                                        // Toggle checked on click
-                                        checked = !checked
-                                    }
-                                    onCheckedChanged: {
-                                        if (checked) {
-                                            console.log(JSON.stringify(zynthian.layer.sound_metadata_from_file(model.sound.path), null, 2))
-
-                                        }
-                                    }
+                                    checkable: true
 
                                     QQC2.Label {
                                         anchors.fill: parent

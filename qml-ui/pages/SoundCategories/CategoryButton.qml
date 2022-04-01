@@ -28,17 +28,8 @@ import org.kde.kirigami 2.4 as Kirigami
 
 QQC2.Button {
     property string category: "*"
+
     checkable: true
-    text: {
-        if      (category === "*") return qsTr("All")
-        else if (category === "0") return qsTr("Uncategorized")
-        else if (category === "1") return qsTr("Drums")
-        else if (category === "2") return qsTr("Bass")
-        else if (category === "3") return qsTr("Leads")
-        else if (category === "4") return qsTr("Keys/Pads")
-        else if (category === "99") return qsTr("Others")
-    }
-    onClicked: {
-        zynthian.sound_categories.setCategoryFilter(category)
-    }
+    text: zynthian.sound_categories.getCategoryNameFromKey(category)
+    onClicked: zynthian.sound_categories.setCategoryFilter(category)
 }

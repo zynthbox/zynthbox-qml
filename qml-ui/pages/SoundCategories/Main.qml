@@ -365,16 +365,20 @@ Zynthian.ScreenPage {
                                 }
                             }
 
-                            /** When soundsModel has 2 columns, alignment issue occurs because of
-                              * less amount of items than columns. To mitigate, temporarily add a
-                              * empty component of same width and height
+                            /** When soundsModel has less than 3 columns, alignment issue occurs because of
+                              * less amount of items than columns. Add spacers of same width and height as elements
                               */
-                            Item {
-                                Layout.fillWidth: false
-                                Layout.fillHeight: false
-                                Layout.preferredWidth: soundGrid.cellWidth
-                                Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                                visible: soundButtonsRepeater.count < 3
+                            Repeater {
+                                model: soundButtonsRepeater.count < 3
+                                        ? 3 - soundButtonsRepeater.count
+                                        : 0
+                                delegate: Item {
+                                    id: spacer
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: soundGrid.cellWidth
+                                    Layout.preferredHeight: Kirigami.Units.gridUnit * 5
+                                }
                             }
                         }
                     }

@@ -128,9 +128,9 @@ Zynthian.ScreenPage {
         }
         Timer {
             id: fileCheckTimer
-            interval: 300
+            interval: 50
             onTriggered: {
-                    fileNameDialog.conflict = false;
+                saveSoundDialog.conflict = zynthian.sound_categories.checkIfSoundFileExists(saveSoundDialog.fileName);
             }
         }
 

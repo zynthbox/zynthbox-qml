@@ -94,7 +94,7 @@ Zynthian.ScreenPage {
                     : qsTr("Load")
             onTriggered: {
                 if (isSaveBtn) {
-                    saveSoundDialog.fileName = ""
+                    saveSoundDialog.fileName = zynthian.sound_categories.suggestedSoundFileName()
                     saveSoundDialog.open()
                 } else {
 

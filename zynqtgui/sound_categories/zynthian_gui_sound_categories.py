@@ -274,6 +274,25 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         else:
             logging.error("Error saving sound file")
 
+    @Slot(None, result=str)
+    def suggestedSoundFileName(self):
+        track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+        suggested = ""
+        try:
+            # Get preset name of connectedSound
+            layer_name = str(track.getLayerNameByMidiChannel(track.connectedSound).split(" > ")[1])
+
+            # All heuristics related to suggested sound file name goes below
+
+            if layer_name.find("/") >= 0:
+                # 1. If preset name contains /, then suggested name should be after last occurring /
+                suggested = layer_name.split("/").pop()
+            else:
+                suggested = layer_name
+        except: pass
+
+        return suggested
+
     ### Property soundsModel
     def get_sounds_model(self):
         return self.__sound_category_filter_proxy_model__

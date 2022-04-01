@@ -677,8 +677,7 @@ don't want to have to dig too far...
     Timer {
         id: adoptCurrentMidiChannelTimer; interval: 1; repeat: false; running: false
         onTriggered: {
-            var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-            ZynQuick.PlayGridManager.currentMidiChannel = (theTrack != null) ? theTrack.connectedSound : -1;
+            ZynQuick.PlayGridManager.currentMidiChannel = zynthian.session_dashboard.selectedTrack;
         }
     }
     Connections {
@@ -791,7 +790,7 @@ don't want to have to dig too far...
                         } else {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                         }
-                        var connectedSound = patternObject.associatedTrack.connectedSound;
+                        var connectedSound = patternObject.associatedTrackIndex;
                         if (connectedSound === -1) {
                             // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
                             patternObject.thisPattern.layer = 15;

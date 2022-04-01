@@ -250,11 +250,11 @@ Rectangle {
                                                 // auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
                                                 // root key transpose in semtitones: +48, +24 ,0 , -24, -48
                                                 var sampleSettings = [
-                                                    [60, 83, 0], // slot 1
-                                                    [36, 59, -24], // slot 2
-                                                    [84, 107, 24], // slot 3
-                                                    [12, 35, -48], // slot 4
-                                                    [108, 127, 48] // slot 5
+                                                    [48, 71, 0], // slot 1
+                                                    [24, 47, -24], // slot 2
+                                                    [72, 95, 24], // slot 3
+                                                    [0, 23, -48], // slot 4
+                                                    [96, 119, 48] // slot 5
                                                 ];
                                                 for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
                                                     var sample = root.selectedTrack.samples[i];

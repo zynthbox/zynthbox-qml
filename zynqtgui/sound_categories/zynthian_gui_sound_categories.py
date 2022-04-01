@@ -308,43 +308,44 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 for i in used_layers:
                     track.remove_and_unchain_sound(i)
 
+                # Reset chained sounds
+                track.chainedSounds = [-1, -1, -1, -1, -1]
+
                 # Repopulate after removing current track layers
                 free_layers = track.getFreeLayers()
-                used_layers = []
-                for i in track.chainedSounds:
-                    if i >= 0 and track.checkIfLayerExists(i):
-                        used_layers.append(i)
                 new_channels_map = {}
 
                 logging.error(f"### After Removing")
                 logging.error(f"# Source Channels        : {source_channels}")
                 logging.error(f"# Free Layers            : {free_layers}")
-                logging.error(f"# Used Layers            : {used_layers}")
                 logging.error(f"# Chained Sounds         : {track.chainedSounds}")
-                logging.error(f"# Source Channels Count  : {len(source_channels)}")
-                logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
 
                 for index, channel in enumerate(source_channels):
                     new_channels_map[channel] = free_layers[index]
 
                 logging.error(f"# Channel map for loading sound : {new_channels_map}")
 
+                # Populate new chained sounds and update track
+                new_chained_sounds = []
+
+                for key, val in new_channels_map.items():
+                    new_chained_sounds.append(int(val))
+
+                if len(new_chained_sounds) < 5:
+                    for i in range(5 - len(new_chained_sounds)):
+                        new_chained_sounds.append(-1)
+
                 self.zyngui.layer.load_layer_from_file(sound.path, new_channels_map)
+
+                track.chainedSounds = new_chained_sounds
 
                 # Repopulate after loading sound
                 free_layers = track.getFreeLayers()
-                used_layers = []
-                for i in track.chainedSounds:
-                    if i >= 0 and track.checkIfLayerExists(i):
-                        used_layers.append(i)
 
                 logging.error(f"### After Loading")
-                logging.error(f"# Source Channels        : {source_channels}")
                 logging.error(f"# Free Layers            : {free_layers}")
-                logging.error(f"# Used Layers            : {used_layers}")
+                logging.error(f"# New Chained Sounds     : {new_chained_sounds}")
                 logging.error(f"# Chained Sounds         : {track.chainedSounds}")
-                logging.error(f"# Source Channels Count  : {len(source_channels)}")
-                logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
 
             self.zyngui.zynthiloops.end_long_task()
 

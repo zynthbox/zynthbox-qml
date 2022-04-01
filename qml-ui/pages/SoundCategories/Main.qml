@@ -362,6 +362,28 @@ Zynthian.ScreenPage {
                                         horizontalAlignment: QQC2.Label.AlignHCenter
                                         verticalAlignment: QQC2.Label.AlignVCenter
                                     }
+
+                                    QQC2.Label {
+                                        anchors {
+                                            right: parent.right
+                                            bottom: parent.bottom
+                                            margins: Kirigami.Units.gridUnit * 0.5
+                                        }
+
+                                        text: zynthian.sound_categories.getCategoryNameFromKey(soundObj.category)
+                                        font.pointSize: 8
+                                    }
+
+                                    QQC2.Label {
+                                        anchors {
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                            margins: Kirigami.Units.gridUnit * 0.5
+                                        }
+
+                                        text: zynthian.layer.load_layer_channels_from_file(soundObj.path).length
+                                        font.pointSize: 8
+                                    }
                                 }
                             }
 

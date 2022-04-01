@@ -1629,11 +1629,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		restored_channels = []
 		restored_jacknames = []
 
-		for layer_data in snapshot["layers"]:
-			if "midi_chan" in layer_data and "engine_nick" in layer_data:
-				midi_chan = layer_data["midi_chan"]
-				if midi_chan in self.layer_midi_map:
-						self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
+		# for layer_data in snapshot["layers"]:
+		# 	if "midi_chan" in layer_data and "engine_nick" in layer_data:
+		# 		midi_chan = layer_data["midi_chan"]
+		# 		if midi_chan in self.layer_midi_map:
+		# 				self.remove_root_layer(self.root_layers.index(self.layer_midi_map[midi_chan]), True)
 		for layer_data in snapshot["layers"]:
 			if "midi_chan" in layer_data and "engine_nick" in layer_data:
 				midi_chan = layer_data["midi_chan"]

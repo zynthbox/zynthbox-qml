@@ -668,6 +668,15 @@ Zynthian.BasePlayGrid {
                                     sequencerPad.currentSubNote = subNoteIndex;
                                     drumPadRepeater.updateMostRecentFromSelection();
                                 }
+                                onCurrentSubNoteChanged: {
+                                    if (drumPadRepeater.selectedIndex != model.index) {
+                                        if (drumPadRepeater.selectedIndex > -1) {
+                                            var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                            seqPad.currentSubNote = -1;
+                                        }
+                                        drumPadRepeater.selectedIndex = model.index;
+                                    }
+                                }
                                 Timer {
                                     id: sequenderPadNoteApplicator
                                     repeat: false; running: false; interval: 0

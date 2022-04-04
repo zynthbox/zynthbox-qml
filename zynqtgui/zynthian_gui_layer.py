@@ -1645,6 +1645,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 						if i in self.layer_midi_map and midi_chan in self.layer_midi_map:
 							self.remove_clone_midi(i, midi_chan)
 							self.remove_clone_midi(midi_chan, i)
+
+					logging.error(f"### Restoring engine : {layer_data['engine_nick']}")
 					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
 					new_layer = zynthian_layer(engine, midi_chan, self.zyngui)
 					new_layer.restore_snapshot_1(layer_data)
@@ -1892,7 +1894,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				actualPath = Path(self.__sounds_basepath__ + file_name)
 			f = open(actualPath, "r")
-			self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
+			logging.error(f"### Loading layers from file")
+			layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
+			logging.error(f"### Loaded layers : {layers}")
+			for layer in layers:
+				logging.error(f"#### Loaded layer {layer.engine.name} on channel {layer.midi_chan}")
 			self.activate_index(self.index)
 		except Exception as e:
 			logging.error(e)

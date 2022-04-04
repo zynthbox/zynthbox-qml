@@ -42,6 +42,19 @@ Item {
             Item {
                 Layout.fillWidth: true
             }
+            QQC2.Label {
+                text: "Manual"
+                Rectangle {
+                    visible: component.selectedTrack && component.selectedTrack.keyZoneMode == "manual";
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                    height: 2
+                    color: Kirigami.Theme.highlightColor
+                }
+            }
             Repeater {
                 model: 5
                 QQC2.Button {
@@ -74,8 +87,18 @@ Item {
                     }
                 }
             }
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                Layout.margins: Kirigami.Units.smallSpacing
+                color: Kirigami.Theme.disabledTextColor
+            }
+            QQC2.Label {
+                text: "Auto"
+            }
             QQC2.Button {
-                text: "Auto Split Off"
+                text: "All Full"
+                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "all-full";
                 onClicked: {
                     if (component.selectedTrack) {
                         component.selectedTrack.keyZoneMode = "all-full";
@@ -83,7 +106,8 @@ Item {
                 }
             }
             QQC2.Button {
-                text: "Auto Split Full"
+                text: "Split Full"
+                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "split-full";
                 onClicked: {
                     if (component.selectedTrack) {
                         component.selectedTrack.keyZoneMode = "split-full";
@@ -91,7 +115,8 @@ Item {
                 }
             }
             QQC2.Button {
-                text: "Auto Split Narrow"
+                text: "Split Narrow"
+                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "split-narrow";
                 onClicked: {
                     if (component.selectedTrack) {
                         component.selectedTrack.keyZoneMode = "split-narrow";

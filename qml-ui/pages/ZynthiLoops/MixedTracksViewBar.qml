@@ -194,49 +194,52 @@ Rectangle {
                                     Item {
                                         Layout.fillWidth: true
                                     }
-                                    QQC2.Button {
-                                        text: "Show Keyzone Setup"
-                                        onClicked: {
-                                            trackKeyZoneSetup.open();
-                                        }
+                                    //QQC2.Button {
+                                        //text: "Show Keyzone Setup"
+                                        //onClicked: {
+                                            //trackKeyZoneSetup.open();
+                                        //}
+                                    //}
+                                    QQC2.Label {
+                                        text: "Auto Split:"
                                     }
                                     QQC2.Button {
-                                        text: "Auto Split Off"
+                                        text: "Off"
                                         checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
                                         onClicked: {
                                             root.selectedTrack.keyZoneMode = "all-full";
                                         }
                                     }
                                     QQC2.Button {
-                                        text: "Auto Split Full"
+                                        text: "Full"
                                         checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
                                         onClicked: {
                                             root.selectedTrack.keyZoneMode = "split-full";
                                         }
                                     }
                                     QQC2.Button {
-                                        text: "Auto Split Narrow"
+                                        text: "Narrow"
                                         checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
                                         onClicked: {
                                             root.selectedTrack.keyZoneMode = "split-narrow";
                                         }
                                     }
                                 }
-                                QQC2.Popup {
-                                    id: trackKeyZoneSetup
-                                    y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
-                                    x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
-                                    modal: true
-                                    focus: true
-                                    closePolicy: QQC2.Popup.CloseOnPressOutsideParent
-                                    TrackKeyZoneSetup {
-                                        anchors.fill: parent
-                                        implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
-                                        implicitHeight: root.height
-                                        readonly property QtObject song: zynthian.zynthiloops.song
-                                        selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
-                                    }
-                                }
+                                //QQC2.Popup {
+                                    //id: trackKeyZoneSetup
+                                    //y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
+                                    //x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
+                                    //modal: true
+                                    //focus: true
+                                    //closePolicy: QQC2.Popup.CloseOnPressOutsideParent
+                                    //TrackKeyZoneSetup {
+                                        //anchors.fill: parent
+                                        //implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
+                                        //implicitHeight: root.height
+                                        //readonly property QtObject song: zynthian.zynthiloops.song
+                                        //selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                                    //}
+                                //}
                             }
                         }
                     }

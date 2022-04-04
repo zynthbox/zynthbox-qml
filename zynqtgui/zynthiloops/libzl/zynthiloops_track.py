@@ -590,10 +590,10 @@ class zynthiloops_track(QObject):
             self.chained_sounds_changed.emit()
             self.connected_sound_changed.emit()
 
-            zyngui.zynthiloops.end_long_task()
-
             if cb is not None:
                 cb()
+
+            zyngui.zynthiloops.end_long_task()
 
         zyngui.zynthiloops.do_long_task(task)
 

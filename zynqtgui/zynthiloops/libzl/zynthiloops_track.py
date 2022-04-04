@@ -61,6 +61,7 @@ class zynthiloops_track(QObject):
         self.__muted__ = False
         self.__selected_sample_row__ = 0
         self.__samples__ = []
+        self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
 
@@ -190,7 +191,8 @@ class zynthiloops_track(QObject):
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
                 "clips": self.__clips_model__.serialize(),
-                "layers_snapshot": self.__layers_snapshot}
+                "layers_snapshot": self.__layers_snapshot,
+                "keyzone_mode": self.__keyzone_mode__}
 
     def deserialize(self, obj):
         if "name" in obj:
@@ -217,6 +219,9 @@ class zynthiloops_track(QObject):
         if "layers_snapshot" in obj:
             self.__layers_snapshot = obj["layers_snapshot"]
             self.sound_data_changed.emit()
+        if "keyzone_mode" in obj:
+            self.__keyzone_mode__ = obj["keyzone_mode"]
+            self.keyZoneModeChanged.emit();
 
         # Restore bank after restoring track
         self.restore_bank()
@@ -704,6 +709,27 @@ class zynthiloops_track(QObject):
 
     samples = Property('QVariantList', get_samples, notify=samples_changed)
     ### END Property samples
+
+    ### Property keyzoneMode
+    # Possible values : "manual", "all-full", "split-full", "split-narrow"
+    # manual will not apply any automatic stuff
+    # all-full will set all samples to full width, c4 at 60
+    # split-full will spread samples across the note range, in the order 4, 2, 1, 3, 5, starting at note 0, 24 for each, with c4 on the 12th note inside the sample's range
+    # split-narrow will set the samples to play only on the white keys from note 60 and up, with that note as root
+    def get_keyZoneMode(self):
+        return self.__keyzone_mode__
+
+    @Slot(str)
+    def set_keyZoneMode(self, keyZoneMode):
+        if self.__keyzone_mode__ != keyZoneMode:
+            self.__keyzone_mode__ = keyZoneMode
+            self.keyZoneModeChanged.emit()
+            self.__song__.schedule_save()
+
+    keyZoneModeChanged = Signal()
+
+    keyZoneMode = Property(str, get_keyZoneMode, set_keyZoneMode, notify=keyZoneModeChanged)
+    ### END Property keyzoneMode
 
     ### Property recordingDir
     def get_recording_dir(self):

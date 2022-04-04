@@ -194,12 +194,6 @@ Rectangle {
                                     Item {
                                         Layout.fillWidth: true
                                     }
-                                    //QQC2.Button {
-                                        //text: "Show Keyzone Setup"
-                                        //onClicked: {
-                                            //trackKeyZoneSetup.open();
-                                        //}
-                                    //}
                                     QQC2.Label {
                                         text: "Auto Split:"
                                     }
@@ -224,22 +218,28 @@ Rectangle {
                                             root.selectedTrack.keyZoneMode = "split-narrow";
                                         }
                                     }
-                                }
-                                //QQC2.Popup {
-                                    //id: trackKeyZoneSetup
-                                    //y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
-                                    //x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
-                                    //modal: true
-                                    //focus: true
-                                    //closePolicy: QQC2.Popup.CloseOnPressOutsideParent
-                                    //TrackKeyZoneSetup {
-                                        //anchors.fill: parent
-                                        //implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
-                                        //implicitHeight: root.height
-                                        //readonly property QtObject song: zynthian.zynthiloops.song
-                                        //selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                                    //QQC2.Button {
+                                        //icon.name: "configure"
+                                        //onClicked: {
+                                            //trackKeyZoneSetup.open();
+                                        //}
                                     //}
-                                //}
+                                }
+                                QQC2.Popup {
+                                    id: trackKeyZoneSetup
+                                    y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
+                                    x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
+                                    modal: true
+                                    focus: true
+                                    closePolicy: QQC2.Popup.CloseOnPressOutsideParent
+                                    TrackKeyZoneSetup {
+                                        anchors.fill: parent
+                                        implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
+                                        implicitHeight: root.height
+                                        readonly property QtObject song: zynthian.zynthiloops.song
+                                        selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                                    }
+                                }
                             }
                         }
                     }

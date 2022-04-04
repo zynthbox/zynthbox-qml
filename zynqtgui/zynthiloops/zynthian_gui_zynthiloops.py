@@ -118,6 +118,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__knob_touch_update_in_progress__ = False
         self.__selected_clip_col__ = 0
         self.__is_init_in_progress__ = True
+        self.__long_task_count__ = 0
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -1384,13 +1385,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def do_long_task(self, cb):
         logging.error("### Start long task")
-        self.longTaskStarted.emit()
+
+        # Emit long task started if no other long task is already running
+        if self.__long_task_count__ == 0:
+            self.longTaskStarted.emit()
+
+        self.__long_task_count__ += 1
 
         QTimer.singleShot(2000, cb)
 
     def end_long_task(self):
         logging.error("### End long task")
-        self.longTaskEnded.emit()
+        self.__long_task_count__ -= 1
+
+        # Emit long task ended only if all task has ended
+        if self.__long_task_count__ == 0:
+            self.longTaskEnded.emit()
 
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)

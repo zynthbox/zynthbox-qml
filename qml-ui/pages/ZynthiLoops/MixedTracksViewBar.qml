@@ -26,6 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
@@ -184,277 +185,56 @@ Rectangle {
                                     fill: parent
                                     margins: Kirigami.Units.largeSpacing
                                 }
-                                visible: root.selectedTrack.trackAudioType == "sample-trig"
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    spacing: 0
-                                    RowLayout {
-                                        Layout.fillWidth: true
-                                        Item {
-                                            Layout.fillWidth: true
-                                        }
-                                        Repeater {
-                                            model: 5
-                                            QQC2.Button {
-                                                property var trackSample: root.selectedTrack.samples && root.selectedTrack.samples[index]
-                                                property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
-                                                enabled: clipObj !== null
-                                                text: (index === 0 ? "Assign full width to sample " : "") + (index + 1)
-                                                onClicked: {
-                                                    // Reset all keyzones to 0-127
-                                                    if (root.selectedTrack) {
-                                                        for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
-                                                            var sample = root.selectedTrack.samples[i];
-                                                            if (sample) {
-                                                                var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
-                                                                if (clip) {
-                                                                    // -1 is not a true midi key, but as this is "just" data storage,
-                                                                    // we can use it to effectively disable a sample entirely
-                                                                    clip.keyZoneStart = -1;
-                                                                    clip.keyZoneEnd = -1;
-                                                                    clip.rootNote = -1;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    clipObj.keyZoneStart = 0;
-                                                    clipObj.keyZoneEnd = 127;
-                                                    clipObj.rootNote = 60;
-                                                    root.selectedTrack.selectedSampleRow = index;
-                                                }
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            text: "Reset Keyzones"
-                                            onClicked: {
-                                                // Reset all keyzones to 0-127
-                                                if (root.selectedTrack) {
-                                                    for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
-                                                        var sample = root.selectedTrack.samples[i];
-                                                        if (sample) {
-                                                            var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
-                                                            if (clip) {
-                                                                clip.keyZoneStart = 0;
-                                                                clip.keyZoneEnd = 127;
-                                                                clip.rootNote = 60;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            text: "Auto-generate Keyzones"
-                                            onClicked: {
-                                                // Do a bit of magic autolayouting, based on what we think things should do...
-                                                // auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
-                                                // root key transpose in semtitones: +48, +24 ,0 , -24, -48
-                                                var sampleSettings = [
-                                                    [48, 71, 0], // slot 1
-                                                    [24, 47, -24], // slot 2
-                                                    [72, 95, 24], // slot 3
-                                                    [0, 23, -48], // slot 4
-                                                    [96, 119, 48] // slot 5
-                                                ];
-                                                for (var i = 0; i < root.selectedTrack.samples.length; ++i) {
-                                                    var sample = root.selectedTrack.samples[i];
-                                                    var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
-                                                    if (clip) {
-                                                        clip.keyZoneStart = sampleSettings[i][0];
-                                                        clip.keyZoneEnd = sampleSettings[i][1];
-                                                        clip.rootNote = 60 + sampleSettings[i][2];
-                                                    }
-                                                }
-                                            }
-                                        }
+                                RowLayout {
+                                    visible: root.selectedTrack.trackAudioType == "sample-trig"
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.right
                                     }
                                     Item {
-                                        Layout.preferredHeight: parent.height * 2 / 3
                                         Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        Layout.topMargin: Math.floor(((parent.height / 6) - 5) / 2)
-                                        property double positioningHelp: width / 100
-                                        Repeater {
-                                            model: 5
-                                            delegate: Item {
-                                                id: sampleKeyzoneDelegate
-                                                property var trackSample: root.selectedTrack.samples && root.selectedTrack.samples[index]
-                                                property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
-                                                Connections {
-                                                    target: clipObj
-                                                    onKeyZoneStartChanged: zynthian.zynthiloops.song.schedule_save()
-                                                    onKeyZoneEndChanged: zynthian.zynthiloops.song.schedule_save()
-                                                    onRootNoteChanged: zynthian.zynthiloops.song.schedule_save()
-                                                }
-                                                height: parent.height;
-                                                width: 1
-                                                property bool isCurrent: root.selectedTrack.selectedSampleRow === index
-                                                z: isCurrent ? 99 : 0
-                                                property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-                                                property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null
-                                                property Item pianoKeyEndItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneEnd) : null
-                                                property Item pianoRootNoteItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.rootNote) : null
-                                                x: clipObj && pianoKeyItem ? pianoKeyItem.x + (pianoKeyItem.width / 2) : -Math.floor(pianoKeysRepeater.itemAt(0).width / 2)
-                                                opacity: clipObj ? 1 : 0.3
-                                                QQC2.Label {
-                                                    id: sampleLabel
-                                                    anchors {
-                                                        bottom: sampleHandle.verticalCenter
-                                                        bottomMargin: 1
-                                                        left: sampleHandle.right
-                                                        leftMargin: 1
-                                                    }
-                                                    text: "Sample " + (index + 1)
-                                                    width: paintedWidth
-                                                    height: paintedHeight
-                                                    font.pixelSize: Math.floor((parent.height / 6) - 5)
-                                                }
-                                                Rectangle {
-                                                    id: sampleHandle
-                                                    anchors {
-                                                        top: parent.top
-                                                        topMargin: index * (parent.height / 6)
-                                                        horizontalCenter: parent.horizontalCenter
-                                                    }
-                                                    height: Kirigami.Units.largeSpacing * 2
-                                                    width: height
-                                                    radius: height / 2
-                                                    color: Kirigami.Theme.backgroundColor
-                                                    border {
-                                                        width: 2
-                                                        color: sampleKeyzoneDelegate.lineColor
-                                                    }
-                                                }
-                                                Rectangle {
-                                                    anchors {
-                                                        top: sampleHandle.bottom;
-                                                        bottom: parent.bottom;
-                                                        horizontalCenter: sampleHandle.horizontalCenter
-                                                    }
-                                                    width: 2
-                                                    color: sampleKeyzoneDelegate.lineColor
-                                                }
-                                                Rectangle {
-                                                    id: sampleEndHandle
-                                                    anchors {
-                                                        top: parent.top
-                                                        topMargin: index * (parent.height / 6)
-                                                    }
-                                                    x: pianoKeyItem && pianoKeyEndItem ? pianoKeyEndItem.x - pianoKeyItem.x - Kirigami.Units.largeSpacing: sampleHandle.x
-                                                    height: Kirigami.Units.largeSpacing * 2
-                                                    width: height
-                                                    radius: height / 2
-                                                    color: Kirigami.Theme.backgroundColor
-                                                    border {
-                                                        width: 2
-                                                        color: sampleKeyzoneDelegate.lineColor
-                                                    }
-                                                }
-                                                Rectangle {
-                                                    anchors {
-                                                        top: sampleEndHandle.bottom
-                                                        bottom: parent.bottom
-                                                        horizontalCenter: sampleEndHandle.horizontalCenter
-                                                    }
-                                                    width: 2
-                                                    color: sampleKeyzoneDelegate.lineColor
-                                                }
-                                                Rectangle {
-                                                    anchors {
-                                                        top: sampleHandle.verticalCenter
-                                                        left: sampleHandle.right
-                                                        right: sampleEndHandle.left
-                                                    }
-                                                    height: 2
-                                                    color: sampleKeyzoneDelegate.lineColor
-                                                }
-                                                Row {
-                                                    anchors {
-                                                        top: sampleHandle.verticalCenter
-                                                        topMargin: 3
-                                                        left: sampleHandle.right
-                                                    }
-                                                    spacing: 1
-                                                    Repeater {
-                                                        model: clipObj ? clipObj.playbackPositions : 0
-                                                        delegate: Rectangle {
-                                                            height: 4
-                                                            width: 4
-                                                            radius: 2
-                                                            color: sampleKeyzoneDelegate.lineColor
-                                                        }
-                                                    }
-                                                }
-                                                Item {
-                                                    anchors {
-                                                        bottom: parent.bottom
-                                                        bottomMargin: Kirigami.Units.largeSpacing
-                                                    }
-                                                    height: 1
-                                                    width: 1
-                                                    x: pianoKeyItem && pianoRootNoteItem ? pianoRootNoteItem.x - pianoKeyItem.x: sampleHandle.x
-                                                    visible: sampleKeyzoneDelegate.isCurrent && sampleKeyzoneDelegate.clipObj && sampleKeyzoneDelegate.clipObj.rootNote > -1 && sampleKeyzoneDelegate.clipObj.rootNote < 128
-                                                    Rectangle {
-                                                        anchors {
-                                                            topMargin: -height
-                                                            centerIn: parent
-                                                        }
-                                                        color: sampleKeyzoneDelegate.lineColor
-                                                        height: Kirigami.Units.largeSpacing * 2
-                                                        width: height
-                                                        radius: height / 2
-                                                        QQC2.Label {
-                                                            anchors.centerIn: parent
-                                                            font.pixelSize: Kirigami.Units.largeSpacing
-                                                            color: Kirigami.Theme.highlightedTextColor
-                                                            text: "C4"
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                    }
+                                    QQC2.Button {
+                                        text: "Show Keyzone Setup"
+                                        onClicked: {
+                                            trackKeyZoneSetup.open();
                                         }
                                     }
-                                    Item {
-                                        id: pianoKeysContainer
-                                        Layout.preferredHeight: parent.height / 3
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            color: "white"
+                                    QQC2.Button {
+                                        text: "Auto Split Off"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "all-full";
                                         }
-                                        RowLayout {
-                                            anchors.fill: parent
-                                            spacing: 0
-                                            Repeater {
-                                                id: pianoKeysRepeater
-                                                model: 128
-                                                delegate: Item {
-                                                    property var sharpMidiNotes: [1, 3, 6, 8, 10];
-                                                    property bool isSharpKey: sharpMidiNotes.indexOf(index % 12) > -1;
-                                                    Layout.fillWidth: isSharpKey ? false : true
-                                                    Layout.fillHeight: true
-                                                    Rectangle {
-                                                        anchors {
-                                                            top: parent.top
-                                                            bottom: parent.bottom
-                                                        }
-                                                        width: 1
-                                                        color: "black"
-                                                    }
-                                                    Rectangle {
-                                                        visible: parent.isSharpKey
-                                                        anchors {
-                                                            top: parent.top
-                                                            horizontalCenter: parent.horizontalCenter
-                                                        }
-                                                        color: "black"
-                                                        width: pianoKeysContainer.width / 100
-                                                        height: parent.height * 3 / 5
-                                                    }
-                                                }
-                                            }
+                                    }
+                                    QQC2.Button {
+                                        text: "Auto Split Full"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "split-full";
                                         }
+                                    }
+                                    QQC2.Button {
+                                        text: "Auto Split Narrow"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "split-narrow";
+                                        }
+                                    }
+                                }
+                                QQC2.Popup {
+                                    id: trackKeyZoneSetup
+                                    y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
+                                    x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
+                                    modal: true
+                                    focus: true
+                                    closePolicy: QQC2.Popup.CloseOnPressOutsideParent
+                                    TrackKeyZoneSetup {
+                                        anchors.fill: parent
+                                        implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
+                                        implicitHeight: root.height
+                                        readonly property QtObject song: zynthian.zynthiloops.song
+                                        selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
                                     }
                                 }
                             }

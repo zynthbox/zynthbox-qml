@@ -565,7 +565,7 @@ class zynthiloops_track(QObject):
         return self.__chained_sounds__
 
     @Slot(int)
-    def remove_and_unchain_sound(self, chan):
+    def remove_and_unchain_sound(self, chan, cb=None):
         zyngui = self.__song__.get_metronome_manager().zyngui
 
         def task():
@@ -585,10 +585,15 @@ class zynthiloops_track(QObject):
 
             self.select_correct_layer()
 
+            self.__song__.schedule_save()
+
             self.chained_sounds_changed.emit()
             self.connected_sound_changed.emit()
 
             zyngui.zynthiloops.end_long_task()
+
+            if cb is not None:
+                cb()
 
         zyngui.zynthiloops.do_long_task(task)
 

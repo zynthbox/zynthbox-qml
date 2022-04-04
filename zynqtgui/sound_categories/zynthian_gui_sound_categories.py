@@ -320,6 +320,9 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                     else:
                         # Repopulate after removing current track layers
                         free_layers = track.getFreeLayers()
+
+                        # New channels map's both key and value should be string
+                        # That is how load_layer_from_file method expects the values
                         new_channels_map = {}
 
                         logging.error(f"### After Removing")
@@ -328,7 +331,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         logging.error(f"# Chained Sounds         : {track.chainedSounds}")
 
                         for index, channel in enumerate(source_channels):
-                            new_channels_map[channel] = free_layers[index]
+                            new_channels_map[f"{channel}"] = f"{free_layers[index]}"
 
                         logging.error(f"# Channel map for loading sound : {new_channels_map}")
 

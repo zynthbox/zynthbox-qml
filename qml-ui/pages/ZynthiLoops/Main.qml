@@ -609,6 +609,54 @@ Zynthian.ScreenPage {
                         delegate: TableHeader {
                             text: model.track.name
 
+                            Connections {
+                                target: model.track
+                                function updateKeyZones() {
+                                    // all-full is the default, but "manual" is an option and we should leave things alone in that case, so that's this function's default
+                                    var sampleSettings = [];
+                                    if (model.track.keyZoneMode == "all-full") {
+                                        sampleSettings = [
+                                            [0, 127, 0],
+                                            [0, 127, 0],
+                                            [0, 127, 0],
+                                            [0, 127, 0],
+                                            [0, 127, 0]
+                                        ];
+                                    } else if (model.track.keyZoneMode == "split-full") {
+                                        // auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
+                                        // root key transpose in semtitones: +48, +24 ,0 , -24, -48
+                                        sampleSettings = [
+                                            [48, 71, 0], // slot 1
+                                            [24, 47, -24], // slot 2
+                                            [72, 95, 24], // slot 3
+                                            [0, 23, -48], // slot 4
+                                            [96, 119, 48] // slot 5
+                                        ];
+                                    } else if (model.track.keyZoneMode == "split-narrow") {
+                                        // Narrow split puts the samples on the keys C4, D4, E4, F4, G4, and plays them as C4 on those notes
+                                        sampleSettings = [
+                                            [60, 60, 0], // slot 1
+                                            [62, 62, 2], // slot 2
+                                            [64, 64, 4], // slot 3
+                                            [65, 65, 5], // slot 4
+                                            [67, 67, 7] // slot 5
+                                        ];
+                                    }
+                                    if (sampleSettings.length > 0) {
+                                        for (var i = 0; i < model.track.samples.length; ++i) {
+                                            var sample = model.track.samples[i];
+                                            var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
+                                            if (clip && i < sampleSettings.length) {
+                                                clip.keyZoneStart = sampleSettings[i][0];
+                                                clip.keyZoneEnd = sampleSettings[i][1];
+                                                clip.rootNote = 60 + sampleSettings[i][2];
+                                            }
+                                        }
+                                    }
+                                }
+                                onKeyZoneModeChanged: updateKeyZones();
+                                onSamplesChanged: updateKeyZones();
+                            }
                             // hide "Pat.1" info in the track header cells, as Track 1 will be Pat.1, to T10 - Pat.10
 //                            subText: model.track.connectedPattern >= 0
 //                                      ? "Pat. " + (model.track.connectedPattern+1)

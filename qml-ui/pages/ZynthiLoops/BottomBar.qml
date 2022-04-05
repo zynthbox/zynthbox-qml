@@ -322,15 +322,28 @@ Zynthian.Card {
                     QQC2.ComboBox {
                         id: trackAudioTypeDropdown
 
+                        function findCurrentIndex(val) {
+                            for (var i = 0; i < model.count; i++) {
+                                if (model.get(i).value === val) {
+                                    return i
+                                }
+                            }
+
+                            return -1
+                        }
+
                         // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
                         model: ListModel {
-                            ListElement { text: "SYNTH"; value: "synth" }
-                            ListElement { text: "LOOP"; value: "sample-loop" }
-                            ListElement { text: "TRIG"; value: "sample-trig" }
-                            ListElement { text: "SLICE"; value: "sample-slice" }
+                            ListElement { text: "Synth"; value: "synth" }
+                            ListElement { text: "Loop"; value: "sample-loop" }
+                            ListElement { text: "Smp: Trig"; value: "sample-trig" }
+                            ListElement { text: "Smp: Slice"; value: "sample-slice" }
                         }
                         textRole: "text"
-                        currentIndex: controlObj && controlObj.trackAudioType ? find(controlObj.trackAudioType.toUpperCase().replace("SAMPLE-", "")) : -1
+                        currentIndex: controlObj &&
+                                      controlObj.trackAudioType
+                                        ? findCurrentIndex(controlObj.trackAudioType)
+                                        : -1
                         onActivated: {
                             controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                         }

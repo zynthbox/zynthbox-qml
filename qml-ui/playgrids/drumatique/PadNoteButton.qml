@@ -148,7 +148,11 @@ QQC2.Button {
                                 onPressedChanged: {
                                     if (!pressed) {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
-                                            component.tapped(index);
+                                            if (zynthian.altButtonPressed) {
+                                                component.tapped(-1);
+                                            } else {
+                                                component.tapped(index);
+                                            }
                                         }
                                     }
                                 }

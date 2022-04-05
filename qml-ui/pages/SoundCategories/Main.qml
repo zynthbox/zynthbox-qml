@@ -452,7 +452,7 @@ Zynthian.ScreenPage {
                     model: soundButtonGroup.checkedButton != null &&
                            soundButtonGroup.checkedButton.checked
                             ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                            : zynthian.sound_categories.getSoundNamesFromTrack(root.track)
+                            : root.track.getSoundNames()
 
                     delegate: Item {
                         width: ListView.view.width

@@ -37,6 +37,7 @@ ColumnLayout {
     property QtObject model
     property bool positionalVelocity
     property Item playgrid
+    signal removeNote(QtObject note)
 
     Repeater {
         model: component.model
@@ -59,10 +60,14 @@ ColumnLayout {
                     highlightOctaveStart: false
                     onNotePlayed: {
                         if (!component.playgrid.listenForNotes) {
-                            component.playgrid.heardNotes = [];
-                            component.playgrid.heardVelocities = [];
-                            component.playgrid.mostRecentNoteVelocity = velocity;
-                            component.playgrid.mostRecentlyPlayedNote = note;
+                            if (zynthian.backButtonPressed) {
+                                component.removeNote(note);
+                            } else {
+                                component.playgrid.heardNotes = [];
+                                component.playgrid.heardVelocities = [];
+                                component.playgrid.mostRecentNoteVelocity = velocity;
+                                component.playgrid.mostRecentlyPlayedNote = note;
+                            }
                         }
                     }
                 }

@@ -119,6 +119,8 @@ Zynthian.ScreenPage {
         onCurrent_screen_idChanged: {
             // Refresh sounds model on page open
             if (zynthian.current_screen_id === root.screenId) {
+                soundTypeComboBox.currentIndex = 0
+                zynthian.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
                 zynthian.sound_categories.load_sounds_model()
             }
         }
@@ -256,7 +258,7 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 3
 
                     QQC2.ComboBox {
-                        id: comboBox
+                        id: soundTypeComboBox
 
                         width: Kirigami.Units.gridUnit * 10
                         anchors {
@@ -266,7 +268,7 @@ Zynthian.ScreenPage {
                             centerIn: parent
                         }
 
-                        model: ["community-sounds", "my-sounds"]
+                        model: ["my-sounds", "community-sounds"]
                         onActivated: {
                             zynthian.sound_categories.setSoundTypeFilter(model[index])
                         }
@@ -274,10 +276,10 @@ Zynthian.ScreenPage {
                         delegate: QQC2.ItemDelegate {
                             id: itemDelegate
                             width: parent.width
-                            text: comboBox.textRole ? (Array.isArray(comboBox.model) ? modelData[comboBox.textRole] : model[comboBox.textRole]) : modelData
-                            font.weight: comboBox.currentIndex === index ? Font.DemiBold : Font.Normal
-                            highlighted: comboBox.highlightedIndex === index
-                            hoverEnabled: comboBox.hoverEnabled
+                            text: soundTypeComboBox.textRole ? (Array.isArray(soundTypeComboBox.model) ? modelData[soundTypeComboBox.textRole] : model[soundTypeComboBox.textRole]) : modelData
+                            font.weight: soundTypeComboBox.currentIndex === index ? Font.DemiBold : Font.Normal
+                            highlighted: soundTypeComboBox.highlightedIndex === index
+                            hoverEnabled: soundTypeComboBox.hoverEnabled
 
                             contentItem: QQC2.Label {
                                 text: itemDelegate.text
@@ -297,7 +299,7 @@ Zynthian.ScreenPage {
                         }
 
                         width: Kirigami.Units.gridUnit * 2
-                        height: comboBox.height
+                        height: soundTypeComboBox.height
                         onClicked: zynthian.sound_categories.load_sounds_model()
 
                         Kirigami.Icon {

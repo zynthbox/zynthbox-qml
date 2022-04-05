@@ -377,6 +377,16 @@ class zynthian_gui(QObject):
         self.screen_back = None
         self.__forced_screen_back = None
         self.__alt_button_pressed__ = False
+        self.__startRecord_button_pressed__ = False
+        self.__play_button_pressed__ = False
+        self.__metronome_button_pressed__ = False
+        self.__stop_button_pressed__ = False
+        self.__back_button_pressed__ = False
+        self.__up_button_pressed__ = False
+        self.__select_button_pressed__ = False
+        self.__left_button_pressed__ = False
+        self.__down_button_pressed__ = False
+        self.__right_button_pressed__ = False
 
         # When true, 1-5 buttons selects track 6-10
         self.tracks_mod_active = False
@@ -1868,6 +1878,26 @@ class zynthian_gui(QObject):
                 # Handle alt button
                 if i == 17:
                     self.altButtonPressed = True
+                elif i == 18:
+                    self.startRecordButtonPressed = True
+                elif i == 19:
+                    self.playButtonPressed = True
+                elif i == 20:
+                    self.metronomeButtonPressed = True
+                elif i == 21:
+                    self.stopButtonPressed = True
+                elif i == 22:
+                    self.backButtonPressed = True
+                elif i == 23:
+                    self.upButtonPressed = True
+                elif i == 24:
+                    self.selectButtonPressed = True
+                elif i == 25:
+                    self.leftButtonPressed = True
+                elif i == 26:
+                    self.downButtonPressed = True
+                elif i == 27:
+                    self.rightButtonPressed = True
 
                 if self.fake_key_event_for_zynswitch(i, True):
                     return
@@ -1877,6 +1907,26 @@ class zynthian_gui(QObject):
                 # Handle alt button
                 if i == 17:
                     self.altButtonPressed = False
+                elif i == 18:
+                    self.startRecordButtonPressed = False
+                elif i == 19:
+                    self.playButtonPressed = False
+                elif i == 20:
+                    self.metronomeButtonPressed = False
+                elif i == 21:
+                    self.stopButtonPressed = False
+                elif i == 22:
+                    self.backButtonPressed = False
+                elif i == 23:
+                    self.upButtonPressed = False
+                elif i == 24:
+                    self.selectButtonPressed = False
+                elif i == 25:
+                    self.leftButtonPressed = False
+                elif i == 26:
+                    self.downButtonPressed = False
+                elif i == 27:
+                    self.rightButtonPressed = False
 
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
@@ -3219,7 +3269,7 @@ class zynthian_gui(QObject):
 
     def set_alt_button_pressed(self, pressed):
         if self.__alt_button_pressed__ != pressed:
-            logging.error(f"Alt Button pressed : {pressed}")
+            logging.error(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
             self.alt_button_pressed_changed.emit()
 
@@ -3227,6 +3277,156 @@ class zynthian_gui(QObject):
 
     altButtonPressed = Property(bool, get_alt_button_pressed, set_alt_button_pressed, notify=alt_button_pressed_changed)
     ### END Property altButtonPressed
+
+    ### Property startRecordButtonPressed
+    def get_startRecord_button_pressed(self):
+        return self.__startRecord_button_pressed__
+
+    def set_startRecord_button_pressed(self, pressed):
+        if self.__startRecord_button_pressed__ != pressed:
+            logging.error(f"startRecord Button pressed : {pressed}")
+            self.__startRecord_button_pressed__ = pressed
+            self.startRecord_button_pressed_changed.emit()
+
+    startRecord_button_pressed_changed = Signal()
+
+    startRecordButtonPressed = Property(bool, get_startRecord_button_pressed, set_startRecord_button_pressed, notify=startRecord_button_pressed_changed)
+    ### END Property startRecordButtonPressed
+
+    ### Property playButtonPressed
+    def get_play_button_pressed(self):
+        return self.__play_button_pressed__
+
+    def set_play_button_pressed(self, pressed):
+        if self.__play_button_pressed__ != pressed:
+            logging.error(f"play Button pressed : {pressed}")
+            self.__play_button_pressed__ = pressed
+            self.play_button_pressed_changed.emit()
+
+    play_button_pressed_changed = Signal()
+
+    playButtonPressed = Property(bool, get_play_button_pressed, set_play_button_pressed, notify=play_button_pressed_changed)
+    ### END Property playButtonPressed
+
+    ### Property metronomeButtonPressed
+    def get_metronome_button_pressed(self):
+        return self.__metronome_button_pressed__
+
+    def set_metronome_button_pressed(self, pressed):
+        if self.__metronome_button_pressed__ != pressed:
+            logging.error(f"metronome Button pressed : {pressed}")
+            self.__metronome_button_pressed__ = pressed
+            self.metronome_button_pressed_changed.emit()
+
+    metronome_button_pressed_changed = Signal()
+
+    metronomeButtonPressed = Property(bool, get_metronome_button_pressed, set_metronome_button_pressed, notify=metronome_button_pressed_changed)
+    ### END Property metronomeButtonPressed
+
+    ### Property stopButtonPressed
+    def get_stop_button_pressed(self):
+        return self.__stop_button_pressed__
+
+    def set_stop_button_pressed(self, pressed):
+        if self.__stop_button_pressed__ != pressed:
+            logging.error(f"stop Button pressed : {pressed}")
+            self.__stop_button_pressed__ = pressed
+            self.stop_button_pressed_changed.emit()
+
+    stop_button_pressed_changed = Signal()
+
+    stopButtonPressed = Property(bool, get_stop_button_pressed, set_stop_button_pressed, notify=stop_button_pressed_changed)
+    ### END Property stopButtonPressed
+
+    ### Property backButtonPressed
+    def get_back_button_pressed(self):
+        return self.__back_button_pressed__
+
+    def set_back_button_pressed(self, pressed):
+        if self.__back_button_pressed__ != pressed:
+            logging.error(f"back Button pressed : {pressed}")
+            self.__back_button_pressed__ = pressed
+            self.back_button_pressed_changed.emit()
+
+    back_button_pressed_changed = Signal()
+
+    backButtonPressed = Property(bool, get_back_button_pressed, set_back_button_pressed, notify=back_button_pressed_changed)
+    ### END Property backButtonPressed
+
+    ### Property upButtonPressed
+    def get_up_button_pressed(self):
+        return self.__up_button_pressed__
+
+    def set_up_button_pressed(self, pressed):
+        if self.__up_button_pressed__ != pressed:
+            logging.error(f"up Button pressed : {pressed}")
+            self.__up_button_pressed__ = pressed
+            self.up_button_pressed_changed.emit()
+
+    up_button_pressed_changed = Signal()
+
+    upButtonPressed = Property(bool, get_up_button_pressed, set_up_button_pressed, notify=up_button_pressed_changed)
+    ### END Property upButtonPressed
+
+    ### Property selectButtonPressed
+    def get_select_button_pressed(self):
+        return self.__select_button_pressed__
+
+    def set_select_button_pressed(self, pressed):
+        if self.__select_button_pressed__ != pressed:
+            logging.error(f"select Button pressed : {pressed}")
+            self.__select_button_pressed__ = pressed
+            self.select_button_pressed_changed.emit()
+
+    select_button_pressed_changed = Signal()
+
+    selectButtonPressed = Property(bool, get_select_button_pressed, set_select_button_pressed, notify=select_button_pressed_changed)
+    ### END Property selectButtonPressed
+
+    ### Property leftButtonPressed
+    def get_left_button_pressed(self):
+        return self.__left_button_pressed__
+
+    def set_left_button_pressed(self, pressed):
+        if self.__left_button_pressed__ != pressed:
+            logging.error(f"left Button pressed : {pressed}")
+            self.__left_button_pressed__ = pressed
+            self.left_button_pressed_changed.emit()
+
+    left_button_pressed_changed = Signal()
+
+    leftButtonPressed = Property(bool, get_left_button_pressed, set_left_button_pressed, notify=left_button_pressed_changed)
+    ### END Property leftButtonPressed
+
+    ### Property downButtonPressed
+    def get_down_button_pressed(self):
+        return self.__down_button_pressed__
+
+    def set_down_button_pressed(self, pressed):
+        if self.__down_button_pressed__ != pressed:
+            logging.error(f"down Button pressed : {pressed}")
+            self.__down_button_pressed__ = pressed
+            self.down_button_pressed_changed.emit()
+
+    down_button_pressed_changed = Signal()
+
+    downButtonPressed = Property(bool, get_down_button_pressed, set_down_button_pressed, notify=down_button_pressed_changed)
+    ### END Property downButtonPressed
+
+    ### Property rightButtonPressed
+    def get_right_button_pressed(self):
+        return self.__right_button_pressed__
+
+    def set_right_button_pressed(self, pressed):
+        if self.__right_button_pressed__ != pressed:
+            logging.error(f"right Button pressed : {pressed}")
+            self.__right_button_pressed__ = pressed
+            self.right_button_pressed_changed.emit()
+
+    right_button_pressed_changed = Signal()
+
+    rightButtonPressed = Property(bool, get_right_button_pressed, set_right_button_pressed, notify=right_button_pressed_changed)
+    ### END Property rightButtonPressed
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

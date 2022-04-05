@@ -534,6 +534,19 @@ class zynthiloops_track(QObject):
         # Populate samples
         self.restore_bank()
 
+    # Return an array of 5 elements with sound name if available or empty string
+    @Slot(None, result='QVariantList')
+    def getSoundNames(self):
+        res = []
+
+        for sound in self.chainedSounds:
+            if sound >= 0 and self.checkIfLayerExists(sound):
+                res.append(self.getLayerNameByMidiChannel(sound))
+            else:
+                res.append("")
+
+        return res
+
     ### Property connectedPattern
     def get_connected_pattern(self):
         return self.__connected_pattern__

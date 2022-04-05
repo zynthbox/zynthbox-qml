@@ -68,19 +68,37 @@ Zynthian.BasePlayGrid {
             }
         }
     ]
+
+    property bool ignoreNextBack: false
     cuiaCallback: function(cuia) {
+        var backButtonClearPatternHelper = function(patternIndex) {
+            if (zynthian.backButtonPressed) {
+                component.ignoreNextBack = true;
+                var pattern = _private.sequence.get(patternIndex);
+                if (pattern) {
+                    pattern.clear();
+                }
+                return true;
+            }
+            return false;
+        }
         var returnValue = false;
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
             case "SWITCH_BACK_BOLD":
             case "SWITCH_BACK_LONG":
-                if (_private.hasSelection) {
-                    _private.deselectSelectedItem();
-                    returnValue = true;
-                } else if (component.showPatternsMenu) {
-                    component.showPatternsMenu = false;
-                    returnValue = true;
+                if (ignoreNextBack) {
+                    // When back button's been used for interaction elsewhere, ignore it here...
+                    // Remember to set this, or things will look a bit weird
+                    ignoreNextBack = false;
+                } else {
+                    if (_private.hasSelection) {
+                        _private.deselectSelectedItem();
+                    } else if (component.showPatternsMenu) {
+                        component.showPatternsMenu = false;
+                    }
                 }
+                returnValue = true;
                 break;
             case "SELECT_UP":
                 if (_private.sequence && _private.sequence.activePattern > 0) {
@@ -107,6 +125,42 @@ Zynthian.BasePlayGrid {
             case "SWITCH_SELECT_SHORT":
                 _private.activateSelectedItem();
                 returnValue = true;
+                break;
+            case "TRACK_1":
+                returnValue = backButtonClearPatternHelper(0);
+                break;
+            case "TRACK_2":
+                returnValue = backButtonClearPatternHelper(1);
+                break;
+            case "TRACK_3":
+                returnValue = backButtonClearPatternHelper(2);
+                break;
+            case "TRACK_4":
+                returnValue = backButtonClearPatternHelper(3);
+                break;
+            case "TRACK_5":
+                returnValue = backButtonClearPatternHelper(4);
+                break;
+            case "TRACK_6":
+                returnValue = backButtonClearPatternHelper(5);
+                break;
+            case "TRACK_7":
+                returnValue = backButtonClearPatternHelper(6);
+                break;
+            case "TRACK_8":
+                returnValue = backButtonClearPatternHelper(7);
+                break;
+            case "TRACK_9":
+                returnValue = backButtonClearPatternHelper(8);
+                break;
+            case "TRACK_10":
+                returnValue = backButtonClearPatternHelper(9);
+                break;
+            case "TRACK_11":
+                returnValue = backButtonClearPatternHelper(10);
+                break;
+            case "TRACK_12":
+                returnValue = backButtonClearPatternHelper(11);
                 break;
             default:
                 break;
@@ -480,6 +534,25 @@ Zynthian.BasePlayGrid {
                     model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
+                    onRemoveNote: {
+                        component.ignoreNextBack = true;
+                        if (_private.activePatternModel) {
+                            for (var row = _private.activePatternModel.bankOffset; row < _private.activePatternModel.bankOffset + _private.activePatternModel.bankLength; ++row) {
+                                for (var column = 0; column < _private.activePatternModel.width; ++column) {
+                                    var subNoteIndex = _private.activePatternModel.subnoteIndex(row, column, note.midiNote);
+                                    if (subNoteIndex > -1) {
+                                        if (row == _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset && column == drumPadRepeater.selectedIndex) {
+                                            var seqPad = drumPadRepeater.itemAt(column);
+                                            if (seqPad.currentSubNote == subNoteIndex) {
+                                                seqPad.currentSubNote = -1;
+                                            }
+                                        }
+                                        _private.activePatternModel.removeSubnote(row, column, subNoteIndex);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // drum pad & sequencer
@@ -682,7 +755,9 @@ Zynthian.BasePlayGrid {
                                     repeat: false; running: false; interval: 0
                                     onTriggered: {
                                         sequencerPad.note = null;
-                                        sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                        if (_private.activePatternModel) {
+                                            sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                        }
                                         Qt.callLater(_private.updateUniqueCurrentRowNotes)
                                     }
                                 }
@@ -1442,20 +1517,25 @@ Zynthian.BasePlayGrid {
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         if (!pressingAndHolding) {
-                            if (component.listenForNotes) {
-                                component.listenForNotes = false;
-                                if (component.heardNotes.length === 1) {
-                                    component.mostRecentlyPlayedNote = component.heardNotes[0];
-                                    component.mostRecentNoteVelocity = component.heardVelocities[0];
-                                    component.heardNotes = [];
-                                    component.heardVelocities = [];
+                            if (zynthian.backButtonPressed && _private.activePatternModel) {
+                                component.ignoreNextBack = true;
+                                _private.activePatternModel.clear();
+                            } else {
+                                if (component.listenForNotes) {
+                                    component.listenForNotes = false;
+                                    if (component.heardNotes.length === 1) {
+                                        component.mostRecentlyPlayedNote = component.heardNotes[0];
+                                        component.mostRecentNoteVelocity = component.heardVelocities[0];
+                                        component.heardNotes = [];
+                                        component.heardVelocities = [];
+                                    } else {
+                                        component.mostRecentlyPlayedNote = undefined;
+                                    }
                                 } else {
                                     component.mostRecentlyPlayedNote = undefined;
+                                    component.heardNotes = [];
+                                    component.heardVelocities = [];
                                 }
-                            } else {
-                                component.mostRecentlyPlayedNote = undefined;
-                                component.heardNotes = [];
-                                component.heardVelocities = [];
                             }
                         }
                     }

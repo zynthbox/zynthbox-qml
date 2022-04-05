@@ -92,10 +92,15 @@ Zynthian.BasePlayGrid {
                     // Remember to set this, or things will look a bit weird
                     ignoreNextBack = false;
                 } else {
-                    if (_private.hasSelection) {
-                        _private.deselectSelectedItem();
-                    } else if (component.showPatternsMenu) {
+                    if (component.showPatternsMenu) {
                         component.showPatternsMenu = false;
+                    } else if (_private.hasSelection) {
+                        _private.deselectSelectedItem();
+                    } else if (component.mostRecentlyPlayedNote) {
+                        component.mostRecentlyPlayedNote = undefined;
+                    } else if (component.heardNotes.length > 0) {
+                        component.heardNotes = [];
+                        component.heardVelocities = [];
                     }
                 }
                 returnValue = true;

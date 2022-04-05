@@ -40,6 +40,9 @@ Rectangle {
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject sequence: root.selectedTrack && root.selectedTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.get(root.selectedTrack.connectedPattern) : null
+
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -173,90 +176,173 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            Item {
+                            RowLayout {
+                                visible: root.selectedTrack.trackAudioType === "synth"
                                 anchors {
-                                    fill: parent
-                                    margins: Kirigami.Units.largeSpacing
+                                    left: parent.left
+                                    right: parent.right
+                                    centerIn: parent
+                                    margins: Kirigami.Units.gridUnit
                                 }
-                                RowLayout {
-                                    anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                    }
 
-                                    RowLayout {
-                                        visible: root.selectedTrack.trackAudioType == "sample-trig"
-                                        Item {
-                                            Layout.fillWidth: true
-                                        }
-                                        QQC2.Label {
-                                            text: "Auto Split:"
-                                        }
-                                        QQC2.Button {
-                                            text: "Off"
-                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
-                                            onClicked: {
-                                                root.selectedTrack.keyZoneMode = "all-full";
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            text: "Full"
-                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
-                                            onClicked: {
-                                                root.selectedTrack.keyZoneMode = "split-full";
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            text: "Narrow"
-                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
-                                            onClicked: {
-                                                root.selectedTrack.keyZoneMode = "split-narrow";
-                                            }
-                                        }
-                                        //QQC2.Button {
-                                            //icon.name: "configure"
-                                            //onClicked: {
-                                                //trackKeyZoneSetup.open();
-                                            //}
-                                        //}
-                                    }
-                                    Item {
+                                Repeater {
+                                    model: root.selectedTrack.getSoundNames()
+
+                                    delegate: Rectangle {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit
-                                    }
-                                    RowLayout {
-                                        spacing: 0
-                                        QQC2.Button {
-                                            text: "Trig"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
-                                            onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-trig"
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+
+                                        Kirigami.Theme.inherit: false
+                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                        color: Kirigami.Theme.backgroundColor
+
+                                        border.color: "#ff999999"
+                                        border.width: 1
+                                        radius: 4
+
+                                        QQC2.Label {
+                                            anchors {
+                                                verticalCenter: parent.verticalCenter
+                                                left: parent.left
+                                                right: parent.right
+                                                leftMargin: Kirigami.Units.gridUnit*0.5
+                                                rightMargin: Kirigami.Units.gridUnit*0.5
                                             }
-                                        }
-                                        QQC2.Button {
-                                            text: "Slice"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
-                                            onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-slice"
-                                            }
+                                            horizontalAlignment: Text.AlignLeft
+                                            text: modelData
+
+                                            elide: "ElideRight"
                                         }
                                     }
                                 }
+                            }
 
-                                QQC2.Popup {
-                                    id: trackKeyZoneSetup
-                                    y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
-                                    x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
-                                    modal: true
-                                    focus: true
-                                    closePolicy: QQC2.Popup.CloseOnPressOutsideParent
-                                    TrackKeyZoneSetup {
-                                        anchors.fill: parent
-                                        implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
-                                        implicitHeight: root.height
-                                        readonly property QtObject song: zynthian.zynthiloops.song
-                                        selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                            RowLayout {
+                                visible: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                         root.selectedTrack.trackAudioType === "sample-slice"
+                                anchors {
+                                    top: parent.top
+                                    right: parent.right
+                                    margins: Kirigami.Units.gridUnit
+                                }
+
+                                RowLayout {
+                                    visible: root.selectedTrack.trackAudioType === "sample-trig"
+                                    Item {
+                                        Layout.fillWidth: true
+                                    }
+                                    QQC2.Label {
+                                        text: "Auto Split:"
+                                    }
+                                    QQC2.Button {
+                                        text: "Off"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "all-full";
+                                        }
+                                    }
+                                    QQC2.Button {
+                                        text: "Full"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "split-full";
+                                        }
+                                    }
+                                    QQC2.Button {
+                                        text: "Narrow"
+                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
+                                        onClicked: {
+                                            root.selectedTrack.keyZoneMode = "split-narrow";
+                                        }
+                                    }
+                                    //QQC2.Button {
+                                        //icon.name: "configure"
+                                        //onClicked: {
+                                            //trackKeyZoneSetup.open();
+                                        //}
+                                    //}
+                                }
+                                Item {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                                }
+                                RowLayout {
+                                    spacing: 0
+                                    QQC2.Button {
+                                        text: "Trig"
+                                        checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
+                                        onClicked: {
+                                            root.selectedTrack.trackAudioType = "sample-trig"
+                                        }
+                                    }
+                                    QQC2.Button {
+                                        text: "Slice"
+                                        checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
+                                        onClicked: {
+                                            root.selectedTrack.trackAudioType = "sample-slice"
+                                        }
+                                    }
+                                }
+                            }
+
+                            QQC2.Popup {
+                                id: trackKeyZoneSetup
+                                y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
+                                x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
+                                modal: true
+                                focus: true
+                                closePolicy: QQC2.Popup.CloseOnPressOutsideParent
+                                TrackKeyZoneSetup {
+                                    anchors.fill: parent
+                                    implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
+                                    implicitHeight: root.height
+                                    readonly property QtObject song: zynthian.zynthiloops.song
+                                    selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            Image {
+                                id: patternVisualiser
+                                anchors {
+                                    fill: parent
+                                }
+
+                                smooth: false
+                                visible: root.selectedTrack &&
+                                         root.selectedTrack.connectedPattern >= 0 &&
+                                         root.selectedTrack.trackAudioType === "synth"
+                                source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+                                Rectangle { // Progress
+                                    anchors {
+                                        top: parent.top
+                                        bottom: parent.bottom
+                                    }
+                                    visible: root.sequence &&
+                                             root.sequence.isPlaying &&
+                                             root.pattern &&
+                                             root.pattern.enabled
+                                    color: Kirigami.Theme.highlightColor
+                                    width: widthFactor // this way the progress rect is the same width as a step
+                                    property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                                    x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
+                                }
+                                MouseArea {
+                                    anchors.fill:parent
+                                    onClicked: {
+                                        var screenBack = zynthian.current_screen_id;
+                                        zynthian.current_modal_screen_id = "playgrid";
+                                        zynthian.forced_screen_back = "zynthiloops";
+                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                        sequence.activePattern = root.selectedTrack.connectedPattern;
                                     }
                                 }
                             }

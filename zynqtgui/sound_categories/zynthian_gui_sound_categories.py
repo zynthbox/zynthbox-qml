@@ -244,19 +244,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
         return res[:5]
 
-    # Return an array of 5 elements with sound name if available or empty string
-    @Slot(QObject, result='QVariantList')
-    def getSoundNamesFromTrack(self, track):
-        res = []
-
-        for sound in track.chainedSounds:
-            if sound >= 0 and track.checkIfLayerExists(sound):
-                res.append(track.getLayerNameByMidiChannel(sound))
-            else:
-                res.append("")
-
-        return res
-
     @Slot(str, result=bool)
     def checkIfSoundFileExists(self, filename):
         return len(list(self.__my_sounds_path__.glob(f"**/{filename}.*.sound"))) > 0

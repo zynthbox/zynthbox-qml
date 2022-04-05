@@ -134,6 +134,7 @@ QQC2.Button {
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
                     property var subNoteDuration: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "duration");
+                    property bool pressingAndHolding: false;
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
@@ -146,14 +147,21 @@ QQC2.Button {
                         touchPoints: [
                             TouchPoint {
                                 onPressedChanged: {
-                                    if (!pressed) {
+                                    if (pressed) {
+                                        longPressTimer.restart();
+                                    } else {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
                                             if (zynthian.altButtonPressed) {
                                                 component.tapped(-1);
                                             } else {
                                                 component.tapped(index);
                                             }
+                                            if (padSubNoteRect.pressingAndHolding) {
+                                                component.tapped(-1);
+                                            }
                                         }
+                                        padSubNoteRect.pressingAndHolding = false;
+                                        longPressTimer.stop();
                                     }
                                 }
                             }
@@ -222,6 +230,40 @@ QQC2.Button {
                         }
                         color: "transparent"
                         visible: component.currentSubNote == index
+                    }
+                    Rectangle {
+                        id: pressAndHoldVisualiser
+                        anchors {
+                            left: parent.left
+                            leftMargin: subnoteLayout.width - parent.x + (width / 2)
+                            bottom: parent.bottom
+                        }
+                        width: Kirigami.Units.smallSpacing
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.focusColor
+                        height: 0
+                        opacity: 0
+                        states: [
+                            State {
+                                name: "held"; when: (longPressTimer.running || padSubNoteRect.pressingAndHolding);
+                                PropertyChanges { target: pressAndHoldVisualiser; height: padSubNoteRect.height; opacity: 1 }
+                            }
+                        ]
+                        transitions: [
+                            Transition {
+                                from: ""; to: "held";
+                                NumberAnimation { property: "height"; duration: longPressTimer.interval; }
+                                NumberAnimation { property: "opacity"; duration: longPressTimer.interval; }
+                            }
+                        ]
+                        Timer {
+                            id: longPressTimer;
+                            interval: 1000; repeat: false; running: false
+                            onTriggered: {
+                                padSubNoteRect.pressingAndHolding = true;
+                            }
+                        }
                     }
                 }
             }

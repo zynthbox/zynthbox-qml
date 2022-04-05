@@ -154,25 +154,18 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-loop"
-                                text: qsTr("Loop")
-                                onClicked: root.selectedTrack.trackAudioType = "sample-loop"
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                                checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-trig"
-                                text: qsTr("Trig")
+                                checked: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                         root.selectedTrack.trackAudioType === "sample-slice"
+                                text: qsTr("Samples")
                                 onClicked: root.selectedTrack.trackAudioType = "sample-trig"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-slice"
-                                text: qsTr("Slice")
-                                onClicked: root.selectedTrack.trackAudioType = "sample-slice"
+                                checked: root.selectedTrack.trackAudioType === "sample-loop"
+                                text: qsTr("Loop")
+                                onClicked: root.selectedTrack.trackAudioType = "sample-loop"
                             }
                         }
 
@@ -186,45 +179,71 @@ Rectangle {
                                     margins: Kirigami.Units.largeSpacing
                                 }
                                 RowLayout {
-                                    visible: root.selectedTrack.trackAudioType == "sample-trig"
                                     anchors {
                                         top: parent.top
                                         right: parent.right
                                     }
-                                    Item {
-                                        Layout.fillWidth: true
-                                    }
-                                    QQC2.Label {
-                                        text: "Auto Split:"
-                                    }
-                                    QQC2.Button {
-                                        text: "Off"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
-                                        onClicked: {
-                                            root.selectedTrack.keyZoneMode = "all-full";
+
+                                    RowLayout {
+                                        visible: root.selectedTrack.trackAudioType == "sample-trig"
+                                        Item {
+                                            Layout.fillWidth: true
                                         }
-                                    }
-                                    QQC2.Button {
-                                        text: "Full"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
-                                        onClicked: {
-                                            root.selectedTrack.keyZoneMode = "split-full";
+                                        QQC2.Label {
+                                            text: "Auto Split:"
                                         }
-                                    }
-                                    QQC2.Button {
-                                        text: "Narrow"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
-                                        onClicked: {
-                                            root.selectedTrack.keyZoneMode = "split-narrow";
+                                        QQC2.Button {
+                                            text: "Off"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "all-full";
+                                            }
                                         }
-                                    }
-                                    //QQC2.Button {
-                                        //icon.name: "configure"
-                                        //onClicked: {
-                                            //trackKeyZoneSetup.open();
+                                        QQC2.Button {
+                                            text: "Full"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "split-full";
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            text: "Narrow"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "split-narrow";
+                                            }
+                                        }
+                                        //QQC2.Button {
+                                            //icon.name: "configure"
+                                            //onClicked: {
+                                                //trackKeyZoneSetup.open();
+                                            //}
                                         //}
-                                    //}
+                                    }
+                                    Item {
+                                        Layout.fillWidth: false
+                                        Layout.fillHeight: false
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit
+                                    }
+                                    RowLayout {
+                                        spacing: 0
+                                        QQC2.Button {
+                                            text: "Trig"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-trig"
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            text: "Slice"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-slice"
+                                            }
+                                        }
+                                    }
                                 }
+
                                 QQC2.Popup {
                                     id: trackKeyZoneSetup
                                     y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y

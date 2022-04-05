@@ -47,7 +47,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         self.__sound_type_filter_proxy_model__.setSourceModel(self.__sounds_model__)
         self.__sound_type_filter_proxy_model__.setFilterRole(sound_categories_sounds_model.Roles.SoundTypeRole)
         self.__sound_type_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.__sound_type_filter_proxy_model__.setFilterFixedString("community-sounds")
+        self.__sound_type_filter_proxy_model__.setFilterFixedString("my-sounds")
 
         self.__sound_category_filter_proxy_model__ = QSortFilterProxyModel()
         self.__sound_category_filter_proxy_model__.setSourceModel(self.__sound_type_filter_proxy_model__)

@@ -794,7 +794,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick sample for slot")
+                text: qsTr("Pick recording for slot")
 
                 onClicked: {
                     samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.track.recordingDir
@@ -807,10 +807,23 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick bank for track")
+                text: qsTr("Pick sample for slot")
 
                 onClicked: {
-                    bankPickerDialog.folderModel.folder = root.selectedSlotRowItem.track.recordingDir
+                    samplePickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/samples'
+                    samplePickerDialog.open()
+                    samplePickerPopup.close()
+                }
+            }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.alignment: Qt.AlignCenter
+                text: qsTr("Pick sample-bank for track")
+
+                onClicked: {
+                    bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
                     bankPickerDialog.open()
                     samplePickerPopup.close()
                 }

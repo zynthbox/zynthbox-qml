@@ -191,12 +191,12 @@ Zynthian.ScreenPage {
                 } else {
                     // Cycle through the trackAudioTypes when alt button is pressed
                     if (root.selectedTrack.trackAudioType === "synth") {
-                        root.selectedTrack.trackAudioType = "sample-loop"
-                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
                         root.selectedTrack.trackAudioType = "sample-trig"
                     } else if (root.selectedTrack.trackAudioType === "sample-trig") {
                         root.selectedTrack.trackAudioType = "sample-slice"
                     } else if (root.selectedTrack.trackAudioType === "sample-slice") {
+                        root.selectedTrack.trackAudioType = "sample-loop"
+                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
                         root.selectedTrack.trackAudioType = "synth"
                     }
                 }
@@ -661,7 +661,18 @@ Zynthian.ScreenPage {
 //                            subText: model.track.connectedPattern >= 0
 //                                      ? "Pat. " + (model.track.connectedPattern+1)
 //                                      : ""
-                            subSubText: model.track.trackAudioType.toUpperCase().replace("SAMPLE-", "")
+                            subSubText: {
+                                if (model.track.trackAudioType === "sample-loop") {
+                                    return qsTr("Loop")
+                                } else if (model.track.trackAudioType === "sample-trig") {
+                                    return qsTr("Smp: Trig")
+                                } else if (model.track.trackAudioType === "sample-slice") {
+                                    return qsTr("Smp: Slice")
+                                } else if (model.track.trackAudioType === "synth") {
+                                    return qsTr("Synth")
+                                }
+                            }
+
                             subSubTextSize: 7
 
                             color: {

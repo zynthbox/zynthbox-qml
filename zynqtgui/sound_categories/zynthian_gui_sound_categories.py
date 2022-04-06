@@ -143,61 +143,65 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot()
     def load_sounds_model(self):
+        def task():
+            # Create community-sounds categories.json if not exists
+            if not (self.__community_sounds_path__ / 'categories.json').exists():
+                with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:
+                    json.dump(self.__community_sounds__, f)
+                    f.flush()
+                    os.fsync(f.fileno())
+
+            # Create my-sounds categories.json if not exists
+            if not (self.__my_sounds_path__ / 'categories.json').exists():
+                with open(self.__my_sounds_path__ / 'categories.json', 'w') as f:
+                    json.dump(self.__my_sounds__, f)
+                    f.flush()
+                    os.fsync(f.fileno())
+
+            # Read community-sounds categories
+            try:
+                with open(self.__community_sounds_path__ / "categories.json", "r+") as f:
+                    self.__community_sounds__ = json.load(f)
+            except Exception as e:
+                logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
+                traceback.print_stack()
+
+            # Read my-sounds categories
+            try:
+                with open(self.__my_sounds_path__ / "categories.json", "r+") as f:
+                    self.__my_sounds__ = json.load(f)
+            except Exception as e:
+                logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
+                traceback.print_stack()
+
+            # Fill community-sounds list
+            for file in self.__community_sounds_path__.glob("**/*.sound"):
+                self.__sounds_model__.add_sound(
+                    sounds_model_sound_dto(
+                        self,
+                        self.zyngui,
+                        file.name,
+                        "community-sounds",
+                        self.get_category_for_sound(file.name, "community-sounds")
+                    )
+                )
+
+            # Fill my-sounds list
+            for file in self.__my_sounds_path__.glob("**/*.sound"):
+                self.__sounds_model__.add_sound(
+                    sounds_model_sound_dto(
+                        self,
+                        self.zyngui,
+                        file.name,
+                        "my-sounds",
+                        self.get_category_for_sound(file.name, "my-sounds")
+                    )
+                )
+
+            self.zyngui.end_long_task()
+
         self.__sounds_model__.clear()
-
-        # Create community-sounds categories.json if not exists
-        if not (self.__community_sounds_path__ / 'categories.json').exists():
-            with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:
-                json.dump(self.__community_sounds__, f)
-                f.flush()
-                os.fsync(f.fileno())
-
-        # Create my-sounds categories.json if not exists
-        if not (self.__my_sounds_path__ / 'categories.json').exists():
-            with open(self.__my_sounds_path__ / 'categories.json', 'w') as f:
-                json.dump(self.__my_sounds__, f)
-                f.flush()
-                os.fsync(f.fileno())
-
-        # Read community-sounds categories
-        try:
-            with open(self.__community_sounds_path__ / "categories.json", "r+") as f:
-                self.__community_sounds__ = json.load(f)
-        except Exception as e:
-            logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
-            traceback.print_stack()
-
-        # Read my-sounds categories
-        try:
-            with open(self.__my_sounds_path__ / "categories.json", "r+") as f:
-                self.__my_sounds__ = json.load(f)
-        except Exception as e:
-            logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
-            traceback.print_stack()
-
-        # Fill community-sounds list
-        for file in self.__community_sounds_path__.glob("**/*.sound"):
-            self.__sounds_model__.add_sound(
-                sounds_model_sound_dto(
-                    self,
-                    self.zyngui,
-                    file.name,
-                    "community-sounds",
-                    self.get_category_for_sound(file.name, "community-sounds")
-                )
-            )
-
-        # Fill my-sounds list
-        for file in self.__my_sounds_path__.glob("**/*.sound"):
-            self.__sounds_model__.add_sound(
-                sounds_model_sound_dto(
-                    self,
-                    self.zyngui,
-                    file.name,
-                    "my-sounds",
-                    self.get_category_for_sound(file.name, "my-sounds")
-                )
-            )
+        self.zyngui.do_long_task(task)
 
     def save_categories(self):
         with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:

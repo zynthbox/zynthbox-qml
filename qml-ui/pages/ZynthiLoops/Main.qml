@@ -316,22 +316,6 @@ Zynthian.ScreenPage {
 
     Connections {
         target: zynthian.zynthiloops
-        onNewSketchLoaded: {
-            /*var sequence = ZynQuick.PlayGridManager.getSequenceModel("Global");
-            sequence.song = zynthian.zynthiloops.song;
-            sequence.clear();
-
-            for (var i=0; i<5; i++) {
-                var pattern = sequence.get(i);
-                pattern.enabled = false;
-            }*/
-        }
-        onLongTaskStarted: {
-            longTaskOverlay.open = true;
-        }
-        onLongTaskEnded: {
-            longTaskOverlay.open = false;
-        }
         onSong_changed: {
             console.log("$$$ Song Changed :", song)
 
@@ -476,14 +460,6 @@ Zynthian.ScreenPage {
             height: privateProps.headerHeight*2 + loopGrid.columnSpacing*2
             color: "#2affffff"
             z: 100
-        }
-
-        Zynthian.ModalLoadingOverlay {
-            id: longTaskOverlay
-            parent: applicationWindow().contentItem.parent
-            anchors.fill: parent
-            z: 9999999
-            open: false
         }
 
         ColumnLayout {

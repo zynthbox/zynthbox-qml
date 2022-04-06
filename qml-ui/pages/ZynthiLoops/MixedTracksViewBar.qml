@@ -172,27 +172,113 @@ Rectangle {
                             }
                         }
 
-                        Item {
+                        ColumnLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            spacing: Kirigami.Units.gridUnit
 
-                            RowLayout {
-                                visible: root.selectedTrack.trackAudioType === "synth"
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
-                                    centerIn: parent
-                                    margins: Kirigami.Units.gridUnit
-                                }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
 
-                                Repeater {
-                                    model: root.selectedTrack.getSoundNames()
+                                RowLayout {
+                                    anchors.fill: parent
+                                    visible: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                             root.selectedTrack.trackAudioType === "sample-slice"
 
-                                    delegate: Rectangle {
+                                    Item {
+                                        Layout.fillWidth: true
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillHeight: true
+                                        visible: root.selectedTrack.trackAudioType === "sample-trig"
+
+                                        QQC2.Label {
+                                            Layout.fillHeight: true
+                                            text: "Auto Split:"
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Off"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "all-full";
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Auto"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "split-full";
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Narrow"
+                                            checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
+                                            onClicked: {
+                                                root.selectedTrack.keyZoneMode = "split-narrow";
+                                            }
+                                        }
+                                        //QQC2.Button {
+                                            //icon.name: "timeline-use-zone-on"
+                                            //onClicked: {
+                                                //trackKeyZoneSetup.open();
+                                            //}
+                                        //}
+                                    }
+                                    Item {
                                         Layout.fillWidth: false
                                         Layout.fillHeight: false
-                                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                                        Layout.preferredWidth: Kirigami.Units.gridUnit
+                                    }
+                                    RowLayout {
+                                        Layout.fillHeight: true
+                                        spacing: 0
+
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Trig"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-trig"
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Slice"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-slice"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                visible: root.selectedTrack.trackAudioType === "synth" ||
+                                         root.selectedTrack.trackAudioType === "sample-trig" ||
+                                         root.selectedTrack.trackAudioType === "sample-slice"
+
+                                Repeater {
+                                    model: root.selectedTrack.trackAudioType === "synth"
+                                            ? root.selectedTrack.getSoundNames()
+                                            : root.selectedTrack.trackAudioType === "sample-trig" ||
+                                              root.selectedTrack.trackAudioType === "sample-slice"
+                                                ? root.selectedTrack.samples
+                                                : []
+
+                                    delegate: Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                                         Kirigami.Theme.inherit: false
                                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -211,7 +297,12 @@ Rectangle {
                                                 rightMargin: Kirigami.Units.gridUnit*0.5
                                             }
                                             horizontalAlignment: Text.AlignLeft
-                                            text: modelData
+                                            text: root.selectedTrack.trackAudioType === "synth"
+                                                    ? modelData
+                                                    : root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                      root.selectedTrack.trackAudioType === "sample-slice"
+                                                        ? modelData.path.split("/").pop()
+                                                        : ""
 
                                             elide: "ElideRight"
                                         }
@@ -219,70 +310,46 @@ Rectangle {
                                 }
                             }
 
-                            RowLayout {
-                                visible: root.selectedTrack.trackAudioType === "sample-trig" ||
-                                         root.selectedTrack.trackAudioType === "sample-slice"
-                                anchors {
-                                    top: parent.top
-                                    right: parent.right
-                                    margins: Kirigami.Units.gridUnit
-                                }
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
 
-                                RowLayout {
-                                    visible: root.selectedTrack.trackAudioType === "sample-trig"
-                                    Item {
-                                        Layout.fillWidth: true
+                                Image {
+                                    id: patternVisualiser
+                                    anchors {
+                                        fill: parent
                                     }
-                                    QQC2.Label {
-                                        text: "Auto Split:"
-                                    }
-                                    QQC2.Button {
-                                        text: "Off"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
-                                        onClicked: {
-                                            root.selectedTrack.keyZoneMode = "all-full";
+
+                                    smooth: false
+                                    visible: root.selectedTrack &&
+                                             root.selectedTrack.connectedPattern >= 0 &&
+                                             (root.selectedTrack.trackAudioType === "synth" ||
+                                              root.selectedTrack.trackAudioType === "sample-trig" ||
+                                              root.selectedTrack.trackAudioType === "sample-slice")
+                                    source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+                                    Rectangle { // Progress
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
                                         }
+                                        visible: root.sequence &&
+                                                 root.sequence.isPlaying &&
+                                                 root.pattern &&
+                                                 root.pattern.enabled
+                                        color: Kirigami.Theme.highlightColor
+                                        width: widthFactor // this way the progress rect is the same width as a step
+                                        property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                                        x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
                                     }
-                                    QQC2.Button {
-                                        text: "Auto"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                    MouseArea {
+                                        anchors.fill:parent
                                         onClicked: {
-                                            root.selectedTrack.keyZoneMode = "split-full";
-                                        }
-                                    }
-                                    QQC2.Button {
-                                        text: "Narrow"
-                                        checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
-                                        onClicked: {
-                                            root.selectedTrack.keyZoneMode = "split-narrow";
-                                        }
-                                    }
-                                    //QQC2.Button {
-                                        //icon.name: "timeline-use-zone-on"
-                                        //onClicked: {
-                                            //trackKeyZoneSetup.open();
-                                        //}
-                                    //}
-                                }
-                                Item {
-                                    Layout.fillWidth: false
-                                    Layout.fillHeight: false
-                                    Layout.preferredWidth: Kirigami.Units.gridUnit
-                                }
-                                RowLayout {
-                                    spacing: 0
-                                    QQC2.Button {
-                                        text: "Trig"
-                                        checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
-                                        onClicked: {
-                                            root.selectedTrack.trackAudioType = "sample-trig"
-                                        }
-                                    }
-                                    QQC2.Button {
-                                        text: "Slice"
-                                        checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
-                                        onClicked: {
-                                            root.selectedTrack.trackAudioType = "sample-slice"
+                                            var screenBack = zynthian.current_screen_id;
+                                            zynthian.current_modal_screen_id = "playgrid";
+                                            zynthian.forced_screen_back = "zynthiloops";
+                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                            sequence.activePattern = root.selectedTrack.connectedPattern;
                                         }
                                     }
                                 }
@@ -301,49 +368,6 @@ Rectangle {
                                     implicitHeight: root.height
                                     readonly property QtObject song: zynthian.zynthiloops.song
                                     selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
-                                }
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-
-                            Image {
-                                id: patternVisualiser
-                                anchors {
-                                    fill: parent
-                                }
-
-                                smooth: false
-                                visible: root.selectedTrack &&
-                                         root.selectedTrack.connectedPattern >= 0 &&
-                                         root.selectedTrack.trackAudioType === "synth"
-                                source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
-                                Rectangle { // Progress
-                                    anchors {
-                                        top: parent.top
-                                        bottom: parent.bottom
-                                    }
-                                    visible: root.sequence &&
-                                             root.sequence.isPlaying &&
-                                             root.pattern &&
-                                             root.pattern.enabled
-                                    color: Kirigami.Theme.highlightColor
-                                    width: widthFactor // this way the progress rect is the same width as a step
-                                    property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
-                                    x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
-                                }
-                                MouseArea {
-                                    anchors.fill:parent
-                                    onClicked: {
-                                        var screenBack = zynthian.current_screen_id;
-                                        zynthian.current_modal_screen_id = "playgrid";
-                                        zynthian.forced_screen_back = "zynthiloops";
-                                        ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                        sequence.activePattern = root.selectedTrack.connectedPattern;
-                                    }
                                 }
                             }
                         }

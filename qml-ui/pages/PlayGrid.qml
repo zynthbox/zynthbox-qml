@@ -651,6 +651,7 @@ don't want to have to dig too far...
                     sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == i);
                 }
             }
+            adoptTrack();
         }
     }
     function adoptTrack() {

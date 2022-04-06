@@ -611,9 +611,9 @@ class zynthiloops_track(QObject):
             if cb is not None:
                 cb()
 
-            zyngui.zynthiloops.end_long_task()
+            zyngui.end_long_task()
 
-        zyngui.zynthiloops.do_long_task(task)
+        zyngui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
         class Worker:

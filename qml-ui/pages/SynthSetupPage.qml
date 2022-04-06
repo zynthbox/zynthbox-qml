@@ -620,8 +620,10 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: 1
                         text: qsTr("Load A Sound")
                         onClicked: {
-                            pickerDialog.mode = "sound";
-                            pickerDialog.open();
+//                            pickerDialog.mode = "sound";
+//                            pickerDialog.open();
+                            zynthian.show_modal("sound_categories")
+
                             layerSetupDialog.accept();
                             applicationWindow().layerSetupDialogLoadSoundClicked();
                         }

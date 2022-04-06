@@ -486,6 +486,8 @@ class zynthian_gui(QObject):
         self.status_object = zynthian_gui_status_data(self)
         self.status_counter = 0
 
+        self.__long_task_count__ = 0
+
         self.zynautoconnect_audio_flag = False
         self.zynautoconnect_midi_flag = False
 
@@ -3262,6 +3264,30 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sound_categories(self):
         return self.screens["sound_categories"]
+
+    ### Alternative long task handling than show_loading
+    def do_long_task(self, cb):
+        logging.error("### Start long task")
+
+        # Emit long task started if no other long task is already running
+        if self.__long_task_count__ == 0:
+            self.longTaskStarted.emit()
+
+        self.__long_task_count__ += 1
+
+        QTimer.singleShot(2000, cb)
+
+    def end_long_task(self):
+        logging.error("### End long task")
+        self.__long_task_count__ -= 1
+
+        # Emit long task ended only if all task has ended
+        if self.__long_task_count__ == 0:
+            self.longTaskEnded.emit()
+
+    longTaskStarted = Signal()
+    longTaskEnded = Signal()
+    ### END Alternative long task handling
 
     ### Property altButtonPressed
     def get_alt_button_pressed(self):

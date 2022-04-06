@@ -587,6 +587,14 @@ Kirigami.AbstractApplicationWindow {
         z: 9999999
     }
 
+    Zynthian.ModalLoadingOverlay {
+        id: alternateLoadingOverlay
+        parent: root.contentItem.parent
+        anchors.fill: parent
+        open: false
+        z: 9999999
+    }
+
     footer: Zynthian.ActionBar {
         z: 999999
         currentPage: root.currentPage
@@ -613,6 +621,17 @@ Kirigami.AbstractApplicationWindow {
         onRun_start_metronome_and_playback: Zynthian.CommonUtils.startMetronomeAndPlayback()
         onRun_stop_metronome_and_playback: Zynthian.CommonUtils.stopMetronomeAndPlayback()
     }
+
+    Connections {
+        target: zynthian
+        onLongTaskStarted: {
+            alternateLoadingOverlay.open = true;
+        }
+        onLongTaskEnded: {
+            alternateLoadingOverlay.open = false;
+        }
+    }
+
     QQC2.Drawer {
         id: miniPlayGridDrawer
         width: root.width

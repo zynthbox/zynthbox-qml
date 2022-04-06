@@ -95,6 +95,12 @@ Zynthian.Stack {
                     root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["midi_key_range"].visible = false;
                 }
+                if (!root.pageCache["sound_categories"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sound_categories");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["sound_categories"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["sound_categories"].visible = false;
+                }
             }
         },
         Connections {

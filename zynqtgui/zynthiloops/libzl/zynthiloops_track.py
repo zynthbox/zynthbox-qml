@@ -363,8 +363,16 @@ class zynthiloops_track(QObject):
 
         return is_empty
 
-    @Slot(QObject)
-    def copyFrom(self, source):
+    # source : Source zynthiloops_track object
+    # sequence_metadata_filepath : Filepath of source track's metadata.sequence.json
+    @Slot(QObject, str)
+    def copyFrom(self, source, sequence_metadata_filepath):
+        scene_name = Path(sequence_metadata_filepath).parent.name
+        source_pattern_path = Path(sequence_metadata_filepath).parent / 'patterns' / f'{scene_name}-{source.id+1}.pattern.json'
+        dest_pattern_path = Path(sequence_metadata_filepath).parent / 'patterns' / f'{scene_name}-{self.id+1}.pattern.json'
+
+        logging.error(f"scene_name({scene_name}), source_pattern_path({source_pattern_path}), dest_pattern_path({dest_pattern_path})")
+
         # Copy all clips from source track to self
         for clip_index in range(0, self.__clips_model__.count):
             self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
@@ -377,6 +385,9 @@ class zynthiloops_track(QObject):
         # Copy all samples from source track
         for file in source_bank_dir.glob("*"):
             shutil.copy2(file, dest_bank_dir / file.name)
+
+        # Copy pattern
+        shutil.copy2(source_pattern_path, dest_pattern_path)
 
         # Restore bank after copying
         self.restore_bank()

@@ -244,7 +244,7 @@ Rectangle {
                                         }
                                     }
                                     QQC2.Button {
-                                        text: "Full"
+                                        text: "Auto"
                                         checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
                                         onClicked: {
                                             root.selectedTrack.keyZoneMode = "split-full";
@@ -258,7 +258,7 @@ Rectangle {
                                         }
                                     }
                                     //QQC2.Button {
-                                        //icon.name: "configure"
+                                        //icon.name: "timeline-use-zone-on"
                                         //onClicked: {
                                             //trackKeyZoneSetup.open();
                                         //}

@@ -1034,9 +1034,15 @@ Zynthian.ScreenPage {
                                             root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol).copyFrom(root.copySourceObj)
                                             root.copySourceObj = null
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_track") {
-                                            // Copy Track
-                                            root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack).copyFrom(root.copySourceObj)
+                                            zynthian.start_loading()
+
+                                            // Copy Track and pattern
+                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                                            root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack).copyFrom(root.copySourceObj, seq.filePath)
                                             root.copySourceObj = null
+                                            seq.load()
+
+                                            zynthian.stop_loading()
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_scene") {
                                             // Copy Scene
                                             root.song.scenesModel.copyScene(root.copySourceObj.sceneIndex, root.song.scenesModel.selectedSceneIndex)

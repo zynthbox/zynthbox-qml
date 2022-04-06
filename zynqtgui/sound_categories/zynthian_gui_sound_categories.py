@@ -353,9 +353,9 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                     cb_counter += 1
                     track.remove_and_unchain_sound(i, post_removal_task)
 
-            self.zyngui.zynthiloops.end_long_task()
+            self.zyngui.end_long_task()
 
-        self.zyngui.zynthiloops.do_long_task(task)
+        self.zyngui.do_long_task(task)
 
 
     @Slot(None, result=str)

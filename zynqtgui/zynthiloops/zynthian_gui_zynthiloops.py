@@ -1013,16 +1013,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
-            QTimer.singleShot(3000, self.end_long_task)
+            QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.do_long_task(task)
+        self.zyngui.do_long_task(task)
 
     @Slot(None)
     def saveSketch(self):
         def task():
             self.__song__.save(False)
-            QTimer.singleShot(3000, self.end_long_task)
-        self.do_long_task(task)
+            QTimer.singleShot(3000, self.zyngui.end_long_task)
+        self.zyngui.do_long_task(task)
 
     @Slot(str)
     def createSketch(self, name):
@@ -1074,12 +1074,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
             self.song_changed.emit()
-            QTimer.singleShot(3000, self.end_long_task)
+            QTimer.singleShot(3000, self.zyngui.end_long_task)
 
             # logging.error("### Saving sketch to session")
             # self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
 
-        self.do_long_task(task)
+        self.zyngui.do_long_task(task)
 
     @Slot(str)
     def saveCopy(self, name):
@@ -1107,9 +1107,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             #     except Exception as e:
             #         logging.error(e)
 
-            QTimer.singleShot(3000, self.end_long_task)
+            QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.do_long_task(task)
+        self.zyngui.do_long_task(task)
 
     @Slot(str)
     def loadSketch(self, sketch, cb=None):
@@ -1141,7 +1141,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.screens["layer"].load_snapshot(
                         f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
 
-                    QTimer.singleShot(3000, self.end_long_task)
+                    QTimer.singleShot(3000, self.zyngui.end_long_task)
 
                 self.newSketch(sketch, _cb)
             else:
@@ -1159,12 +1159,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
 
-                QTimer.singleShot(3000, self.end_long_task)
+                QTimer.singleShot(3000, self.zyngui.end_long_task)
 
             if cb is not None:
                 cb()
 
-        self.do_long_task(task)
+        self.zyngui.do_long_task(task)
 
     @Slot(str)
     def loadSketchVersion(self, version):
@@ -1386,25 +1386,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         else:
             return False
 
-    def do_long_task(self, cb):
-        logging.error("### Start long task")
-
-        # Emit long task started if no other long task is already running
-        if self.__long_task_count__ == 0:
-            self.longTaskStarted.emit()
-
-        self.__long_task_count__ += 1
-
-        QTimer.singleShot(2000, cb)
-
-    def end_long_task(self):
-        logging.error("### End long task")
-        self.__long_task_count__ -= 1
-
-        # Emit long task ended only if all task has ended
-        if self.__long_task_count__ == 0:
-            self.longTaskEnded.emit()
-
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)
     metronomeBeatUpdate16th = Signal(int)
@@ -1414,6 +1395,4 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     cannotRecordEmptyLayer = Signal()
     newSketchLoaded = Signal()
-    longTaskStarted = Signal()
-    longTaskEnded = Signal()
     presetUpdated = Signal()

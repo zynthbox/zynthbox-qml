@@ -167,10 +167,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def init_sketch(self, sketch, cb=None):
         def _cb():
-            def timer_callback():
-                self.zyngui.zynthiloops.set_selector()
-                self.__is_init_in_progress__ = False
-
             libzl.registerTimerCallback(libzlCb)
             libzl.setRecordingAudioLevelCallback(audioLevelCb)
 
@@ -185,12 +181,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
-            # Call set_selector after a few seconds after loading sketch otherwise
-            # initial selected track value seems to be overwritten by big knob value
-            # no initial load to the maximum value which is 9. Calling set_selector
-            # after a timeout seems to mitigate the problem.
-            # Although (FIXME) a proper solution is required instead of the timer
-            QTimer.singleShot(5000, timer_callback)
+            self.zyngui.zynthiloops.set_selector()
+            self.__is_init_in_progress__ = False
 
         self.master_audio_level_timer.start()
 

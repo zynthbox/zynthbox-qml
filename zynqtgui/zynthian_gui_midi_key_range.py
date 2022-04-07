@@ -98,43 +98,55 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		return "{}{}".format(note_names[num],scale)
 
 	def set_zctrls(self):
+		logging.error(f"### Setting midi_key_range zctrl")
+
 		if self.shown:
 			if self.nlow_zctrl:
 				self.nlow_zctrl.setup_zyncoder()
 			else:
 				self.nlow_ctrl=zynthian_controller(None, 'note_low', 'note_low', { 'midi_cc':0, 'value_max':127 })
 				self.nlow_zctrl=zynthian_gui_controller(1, self.nlow_ctrl, self)
-			self.nlow_zctrl.val0=0
-			self.nlow_zctrl.set_value(self.note_low, True)
-			self.nlow_zctrl.show()
+			self.nlow_zctrl.val0 = 0
 
 			if self.nhigh_zctrl:
 				self.nhigh_zctrl.setup_zyncoder()
 			else:
 				self.nhigh_ctrl=zynthian_controller(None, 'note_high', 'note_high', { 'midi_cc':0, 'value_max':127 })
 				self.nhigh_zctrl=zynthian_gui_controller(3, self.nhigh_ctrl, self)
-			self.nhigh_zctrl.val0=0
-			self.nhigh_zctrl.set_value(self.note_high, True)
-			self.nhigh_zctrl.show()
+			self.nhigh_zctrl.val0 = 0
 
 			if self.octave_zctrl:
 				self.octave_zctrl.setup_zyncoder()
 			else:
 				self.octave_ctrl=zynthian_controller(None, 'octave transpose', 'octave transpose', { 'midi_cc':0, 'value_max':11 })
 				self.octave_zctrl=zynthian_gui_controller(2, self.octave_ctrl, self)
-			self.octave_zctrl.val0=-5
-			self.octave_zctrl.set_value(self.octave_trans+5, True)
-			self.octave_zctrl.show()
+			self.octave_zctrl.val0 = -5
 
 			if self.halftone_zctrl:
 				self.halftone_zctrl.setup_zyncoder()
 			else:
 				self.halftone_ctrl=zynthian_controller(None, 'semitone transpose', 'semitone transpose', { 'midi_cc':0, 'value_max':25 })
 				self.halftone_zctrl=zynthian_gui_controller(0, self.halftone_ctrl, self)
-			self.halftone_zctrl.val0=-12
-			self.halftone_zctrl.set_value(self.halftone_trans+12, True)
-			self.halftone_zctrl.show()
+			self.halftone_zctrl.val0 = -12
 
+			if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
+
+				self.nlow_zctrl.set_value(self.note_low, True)
+				self.nlow_zctrl.show()
+
+				self.nhigh_zctrl.set_value(self.note_high, True)
+				self.nhigh_zctrl.show()
+
+				self.octave_zctrl.set_value(self.octave_trans + 5, True)
+				self.octave_zctrl.show()
+
+				self.halftone_zctrl.set_value(self.halftone_trans + 12, True)
+				self.halftone_zctrl.show()
+			else:
+				self.nlow_zctrl.hide()
+				self.nhigh_zctrl.hide()
+				self.octave_zctrl.hide()
+				self.halftone_zctrl.hide()
 
 	def get_note_low_controller(self):
 		if not self.nlow_zctrl:
@@ -174,11 +186,11 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 
 	def hide(self):
 		super().hide()
+		self.set_zctrls()
 		#zyncoder.lib_zyncoder.set_midi_learning_mode(0)
 
-
 	def zyncoder_read(self, zcnums=None):
-		if self.shown:
+		if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() == self:
 			self.nlow_zctrl.read_zyncoder()
 			if self.note_low!=self.nlow_zctrl.value:
 				if self.nlow_zctrl.value>self.note_high:

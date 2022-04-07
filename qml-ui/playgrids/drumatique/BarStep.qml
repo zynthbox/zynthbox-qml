@@ -32,6 +32,7 @@ QQC2.Button {
     id:component
     Layout.fillHeight: true
     Layout.fillWidth: true
+    Layout.bottomMargin: Kirigami.Units.smallSpacing
     property int availableBars
     property int activeBar
     property int playedBar
@@ -68,11 +69,11 @@ QQC2.Button {
             anchors {
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                top: parent.bottom
                 margins: 1
             }
             height:9
-            color:  component.barStepIndex === component.playedBar ? "yellow" : component.backgroundColor
+            color:  component.barStepIndex === component.playedBar ? "yellow" : "transparent"
         }
     }
 

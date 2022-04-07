@@ -565,7 +565,7 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
-                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
+//                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
 
                         textSize: 11
                         subTextSize: 9
@@ -743,7 +743,7 @@ Zynthian.ScreenPage {
                         model: 1
 
                         delegate: TableHeader {
-                            text: "Clips"
+//                            text: "Clips"
 
                             width: ListView.view.width
                             height: privateProps.headerHeight

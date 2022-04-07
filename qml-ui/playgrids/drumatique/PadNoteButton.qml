@@ -299,7 +299,7 @@ QQC2.Button {
             anchors {
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                top: parent.bottom
                 margins: 1
             }
             height:9
@@ -307,11 +307,11 @@ QQC2.Button {
                 ? component.patternModel.sequence.isPlaying
                     ? component.patternModel.playingRow === component.padNoteRow && component.patternModel.playingColumn === component.padNoteIndex
                         ? "yellow"
-                        : component.backgroundColor
+                        : "transparent"
                     : component.padNoteRow === component.patternModel.bankOffset && component.padNoteIndex === 0 && ((component.patternModel.sequence.soloPattern > -1 && component.patternModel.sequence.soloPatternObject === component.patternModel) || (component.patternModel.sequence.soloPattern === -1 && component.patternModel.enabled))
                         ? "yellow"
-                        : component.backgroundColor
-                : "white"
+                        : "transparent"
+                : "transparent"
         }
         Rectangle {
             anchors {

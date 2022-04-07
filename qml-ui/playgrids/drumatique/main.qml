@@ -729,7 +729,11 @@ Zynthian.BasePlayGrid {
                                 id: sequencerPad
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                                // The indicator rect is 9 px tall, spaced by 1px, and we've got 5px margin, and so
+                                // if we want 11px space between the bottom of this and the settings, 6px it is (which
+                                // there's no reason to do arithmetics for, it's a fixed value anyway, but that's where
+                                // this particular magic number comes from)
+                                Layout.bottomMargin: component.showPatternSettings ? 6 : 0
                                 playgrid: component
                                 patternModel: _private.activePatternModel
                                 activeBar:_private.activeBar
@@ -817,25 +821,36 @@ Zynthian.BasePlayGrid {
                                 anchors.fill: parent
 
                                 ColumnLayout {
+                                    Layout.fillHeight: true
                                     Zynthian.PlayGridButton {
-                                        text: "+"
-                                        enabled: _private.availableBars > -1
+                                        text: "TRIG"
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
                                         onClicked: {
-                                            component.setPatternProperty("availableBars", _private.availableBars + 1)
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
                                         }
                                     }
-                                    QQC2.Label {
-                                        id:barsLabel
-                                        Layout.alignment: Qt.AlignHCenter
-                                        Layout.preferredHeight: noteLengthLabel.height
-                                        text: _private.availableBars + " Bars"
-                                    }
-
                                     Zynthian.PlayGridButton {
-                                        text:"-"
-                                        enabled: _private.availableBars < 9
+                                        text: "SYNTH"
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
                                         onClicked: {
-                                            component.setPatternProperty("availableBars", _private.availableBars - 1);
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
+                                        }
+                                    }
+                                }
+                                ColumnLayout {
+                                    Layout.fillHeight: true
+                                    Zynthian.PlayGridButton {
+                                        text: "SLICE"
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+                                        onClicked: {
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination)
+                                        }
+                                    }
+                                    Zynthian.PlayGridButton {
+                                        text: "LOOP"
+                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
+                                        onClicked: {
+                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination)
                                         }
                                     }
                                 }
@@ -890,6 +905,30 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
+                                ColumnLayout {
+                                    Zynthian.PlayGridButton {
+                                        text: "+"
+                                        enabled: _private.availableBars > -1
+                                        onClicked: {
+                                            component.setPatternProperty("availableBars", _private.availableBars + 1)
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        id:barsLabel
+                                        Layout.alignment: Qt.AlignHCenter
+                                        Layout.preferredHeight: noteLengthLabel.height
+                                        text: _private.availableBars + " Bars"
+                                    }
+
+                                    Zynthian.PlayGridButton {
+                                        text:"-"
+                                        enabled: _private.availableBars < 9
+                                        onClicked: {
+                                            component.setPatternProperty("availableBars", _private.availableBars - 1);
+                                        }
+                                    }
+                                }
+
                                 Zynthian.PlayGridButton {
                                     text: "copy\n"
                                     onClicked: {
@@ -918,23 +957,6 @@ Zynthian.BasePlayGrid {
                                     }
                                 }
 
-                                ColumnLayout {
-                                    Layout.fillHeight: true
-                                    Zynthian.PlayGridButton {
-                                        text: "SAMPLE"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                        onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "SYNTH"
-                                        checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
-                                        onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
-                                        }
-                                    }
-                                }
                                 //ColumnLayout {
                                     //Layout.fillHeight: true
                                     //Zynthian.PlayGridButton {

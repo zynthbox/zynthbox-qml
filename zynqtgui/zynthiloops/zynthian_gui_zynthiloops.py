@@ -351,6 +351,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def configure_big_knob(self):
         try:
+            if self.__zselector[0] is not None:
+                self.__zselector[0].show()
+
             if self.zyngui.sound_combinator_active:
                 # If sound combinator is active, Use Big knob to control preset
 
@@ -373,8 +376,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
                                                                   self.__zselector_ctrl[0], self)
+                    self.__zselector[0].show()
 
-                self.__zselector[0].show()
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
                      'value_max': max_value,
@@ -398,17 +401,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
                                                                   self)
+                    self.__zselector[0].show()
 
-                self.__zselector[0].show()
                 self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'zynthiloops_track', 'name': 'Zynthiloops Track', 'short_name': 'Track', 'midi_cc': 0,
+                    {'symbol': 'zynthiloops_track', 'name': 'zynthiloops_track', 'short_name': 'zynthiloops_track', 'midi_cc': 0,
                      'value_max': 90, 'value': selected_track})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
                 self.__zselector[0].custom_encoder_speed = 0
-
-            if self.__zselector[0] is not None:
-                self.__zselector[0].show()
         except:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()

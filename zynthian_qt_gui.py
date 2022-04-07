@@ -802,13 +802,13 @@ class zynthian_gui(QObject):
                 self.wsleds.setPixelColor(7, self.wscolor_off)
 
             # Stepseq screen:
-            if self.active_screen=="zynthiloops":
+            if self.modal_screen is None and self.active_screen == "zynthiloops":
                 self.wsleds.setPixelColor(8, self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(8, self.wscolor_light)
 
             # Audio Recorder screen:
-            if self.modal_screen=="playgrid":
+            if self.modal_screen == "playgrid":
                 self.wsleds.setPixelColor(9, self.wscolor_active)
             else:
                 self.wsleds.setPixelColor(9, self.wscolor_light)

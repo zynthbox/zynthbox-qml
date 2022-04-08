@@ -205,6 +205,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if track.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
                 logging.error(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
+                track.chainedSoundsInfoChanged.emit()
                 self.zyngui.fixed_layers.fill_list()
 
     @Slot(None)

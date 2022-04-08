@@ -28,6 +28,7 @@ import math
 import os
 import shutil
 import threading
+import traceback
 from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
@@ -661,6 +662,7 @@ class zynthiloops_track(QObject):
             pass
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
+        self.chainedSoundsInfoChanged.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
@@ -804,3 +806,50 @@ class zynthiloops_track(QObject):
 
     sceneClip = Property(QObject, get_scene_clip, notify=scene_clip_changed)
     ### END Property sceneClip
+
+    ### Property chainedSoundsInfo
+    def get_chainedSoundsInfo(self):
+        info = []
+
+        try:
+            for sound in self.chainedSounds:
+                if sound >= 0 and self.checkIfLayerExists(sound):
+                    layer = self.zyngui.layer.layer_midi_map[sound]
+                    info.append({
+                        'presetIndex': layer.preset_index,
+                        'presetLength': len(layer.preset_list),
+                        'bankName': layer.bank_name,
+                        'synthName': layer.engine.name,
+                        'presetName': layer.preset_name
+                    })
+                else:
+                    info.append({
+                        'presetIndex': 0,
+                        'presetLength': 0,
+                        'bankName': '',
+                        'synthName': '',
+                        'presetName': ''
+                    })
+        except Exception as e:
+            logging.error(f"Error getting sound info : {str(e)}")
+            traceback.print_exception()
+
+            info.append({
+                'presetIndex': 0,
+                'presetLength': 0,
+                'bankName': '',
+                'synthName': '',
+                'presetName': ''
+            })
+
+        return info
+
+    @Slot(None)
+    def updateChainedSoundsInfo(self):
+        self.chainedSoundsInfoChanged.emit()
+
+    chainedSoundsInfoChanged = Signal()
+
+    chainedSoundsInfo = Property('QVariantList', get_chainedSoundsInfo, notify=chainedSoundsInfoChanged)
+
+    ### END Property chained_sounds_presets

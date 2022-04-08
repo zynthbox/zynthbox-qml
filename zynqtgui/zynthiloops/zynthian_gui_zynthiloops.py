@@ -126,11 +126,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
-        self.select_preset_timer = QTimer()
-        self.select_preset_timer.setInterval(100)
-        self.select_preset_timer.setSingleShot(True)
-        # self.select_preset_timer.timeout.connect(lambda: self.zyngui.preset.select_action(self.zyngui.preset.current_index))
-
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
@@ -149,21 +144,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__volume_control_obj.value_changed.connect(self.set_selector)
             self.set_selector()
 
-
     def sync_selector_visibility(self):
-        pass
-        # if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
-        #     if not self.__is_init_in_progress__:
-        #         self.set_selector()
-        # else:
-        #     if self.__zselector[0]:
-        #         self.__zselector[0].hide()
-        #     if self.__zselector[1]:
-        #         self.__zselector[1].hide()
-        #     if self.__zselector[2]:
-        #         self.__zselector[2].hide()
-        #     if self.__zselector[3]:
-        #         self.__zselector[3].hide()
+        self.set_selector()
 
     def init_sketch(self, sketch, cb=None):
         def _cb():
@@ -218,14 +200,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
+            preset_index = min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1)
 
-            if track.checkIfLayerExists(selected_channel) and layer.preset_index != round(self.__zselector[0].value/1000):
-                logging.error(f"Selecting preset : {round(self.__zselector[0].value/1000)}")
-                layer.set_preset(min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1), True)
+            if track.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
+                logging.error(f"Selecting preset : {preset_index}")
+                layer.set_preset(preset_index, True)
                 self.zyngui.fixed_layers.fill_list()
-                self.presetUpdated.emit()
-                # self.select_preset_timer.start()
-
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
@@ -1387,4 +1367,3 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     cannotRecordEmptyLayer = Signal()
     newSketchLoaded = Signal()
-    presetUpdated = Signal()

@@ -46,6 +46,7 @@ QQC2.Button {
     property int currentSubNote: -1
     property alias subNoteCount: padSubNoteRepeater.count
     signal tapped(int subNoteIndex);
+    signal pressAndHold(int subNoteIndex);
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -68,51 +69,67 @@ QQC2.Button {
             property var timeOnClick
             property var timeOnRelease
 
-            onPressed: {
-                if (padNoteRect.shouldChange) {
-                    if (component.playgrid.heardNotes.length > 0) {
-                        var removedAtLeastOne = false;
-                        // First, let's see if any of the notes in our list are already on this position, and if so, remove them
-                        for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                            var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
-                            if (subNoteIndex > -1) {
-                                component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
-                                removedAtLeastOne = true;
-                            }
-                        }
-
-                        // And then, only if we didn't remove anything should we be adding the notes
-                        if (!removedAtLeastOne) {
-                            var subNoteIndex = -1;
-                            for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                                subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
-                                component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
-                            }
-                        }
-                        component.currentSubNote = -1;
-                        component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
-                    } else if (component.playgrid.mostRecentlyPlayedNote) {
-                        var aNoteData = {
-                            velocity: component.playgrid.mostRecentNoteVelocity,
-                            note: component.playgrid.mostRecentlyPlayedNote.midiNote,
-                            channel: component.playgrid.mostRecentlyPlayedNote.midiChannel
-                        }
-
-                        var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, aNoteData["note"]);
-                        if (subNoteIndex > -1) {
-                            component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
-                            subNoteIndex = subNoteIndex - 1;
+            touchPoints: [
+                TouchPoint {
+                    onPressedChanged: {
+                        if (pressed) {
+                            longPressTimer.restart();
                         } else {
-                            subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
-                            component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
+                            if (x > -1 && y > -1 && x < component.width && y < component.height) {
+                                if (longPressTimer.pressingAndHolding) {
+                                    component.pressAndHold(-1);
+                                } else {
+                                    if (padNoteRect.shouldChange) {
+                                        if (component.playgrid.heardNotes.length > 0) {
+                                            var removedAtLeastOne = false;
+                                            // First, let's see if any of the notes in our list are already on this position, and if so, remove them
+                                            for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                                                var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i].midiNote);
+                                                if (subNoteIndex > -1) {
+                                                    component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex);
+                                                    removedAtLeastOne = true;
+                                                }
+                                            }
+
+                                            // And then, only if we didn't remove anything should we be adding the notes
+                                            if (!removedAtLeastOne) {
+                                                var subNoteIndex = -1;
+                                                for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
+                                                    subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
+                                                    component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
+                                                }
+                                            }
+                                            component.currentSubNote = -1;
+                                            component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex);
+                                        } else if (component.playgrid.mostRecentlyPlayedNote) {
+                                            var aNoteData = {
+                                                velocity: component.playgrid.mostRecentNoteVelocity,
+                                                note: component.playgrid.mostRecentlyPlayedNote.midiNote,
+                                                channel: component.playgrid.mostRecentlyPlayedNote.midiChannel
+                                            }
+
+                                            var subNoteIndex = component.patternModel.subnoteIndex(component.padNoteRow, component.padNoteIndex, aNoteData["note"]);
+                                            if (subNoteIndex > -1) {
+                                                component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
+                                                subNoteIndex = subNoteIndex - 1;
+                                            } else {
+                                                subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
+                                                component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
+                                            }
+                                            component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
+                                            component.currentSubNote = subNoteIndex;
+                                        }
+                                    } else {
+                                        component.tapped(-1);
+                                    }
+                                }
+                            }
+                            longPressTimer.pressingAndHolding = false;
+                            longPressTimer.stop();
                         }
-                        component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
-                        component.currentSubNote = subNoteIndex;
                     }
-                } else {
-                    component.tapped(-1);
                 }
-            }
+            ]
         }
 
         RowLayout {
@@ -134,7 +151,6 @@ QQC2.Button {
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
                     property var subNoteDuration: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "duration");
-                    property bool pressingAndHolding: false;
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
@@ -156,11 +172,11 @@ QQC2.Button {
                                             } else {
                                                 component.tapped(index);
                                             }
-                                            if (padSubNoteRect.pressingAndHolding) {
-                                                component.tapped(-1);
+                                            if (longPressTimer.pressingAndHolding) {
+                                                component.pressAndHold(index);
                                             }
                                         }
-                                        padSubNoteRect.pressingAndHolding = false;
+                                        longPressTimer.pressingAndHolding = false;
                                         longPressTimer.stop();
                                     }
                                 }
@@ -231,40 +247,6 @@ QQC2.Button {
                         color: "transparent"
                         visible: component.currentSubNote == index
                     }
-                    Rectangle {
-                        id: pressAndHoldVisualiser
-                        anchors {
-                            left: parent.left
-                            leftMargin: subnoteLayout.width - parent.x + (width / 2)
-                            bottom: parent.bottom
-                        }
-                        width: Kirigami.Units.smallSpacing
-                        Kirigami.Theme.inherit: false
-                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                        color: Kirigami.Theme.focusColor
-                        height: 0
-                        opacity: 0
-                        states: [
-                            State {
-                                name: "held"; when: (longPressTimer.running || padSubNoteRect.pressingAndHolding);
-                                PropertyChanges { target: pressAndHoldVisualiser; height: padSubNoteRect.height; opacity: 1 }
-                            }
-                        ]
-                        transitions: [
-                            Transition {
-                                from: ""; to: "held";
-                                NumberAnimation { property: "height"; duration: longPressTimer.interval; }
-                                NumberAnimation { property: "opacity"; duration: longPressTimer.interval; }
-                            }
-                        ]
-                        Timer {
-                            id: longPressTimer;
-                            interval: 1000; repeat: false; running: false
-                            onTriggered: {
-                                padSubNoteRect.pressingAndHolding = true;
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -324,6 +306,42 @@ QQC2.Button {
             }
             color: "transparent"
             visible: component.isCurrent && component.currentSubNote === -1
+        }
+        Rectangle {
+            id: pressAndHoldVisualiser
+            anchors {
+                left: padNoteRect.right
+                leftMargin: 1
+                bottom: padNoteRect.bottom
+                bottomMargin: 1
+            }
+            width: Kirigami.Units.smallSpacing
+            Kirigami.Theme.inherit: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+            color: Kirigami.Theme.focusColor
+            height: 0
+            opacity: 0
+            states: [
+                State {
+                    name: "held"; when: (longPressTimer.running || longPressTimer.pressingAndHolding);
+                    PropertyChanges { target: pressAndHoldVisualiser; height: padNoteRect.height - 2; opacity: 1 }
+                }
+            ]
+            transitions: [
+                Transition {
+                    from: ""; to: "held";
+                    NumberAnimation { property: "height"; duration: longPressTimer.interval; }
+                    NumberAnimation { property: "opacity"; duration: longPressTimer.interval; }
+                }
+            ]
+            Timer {
+                id: longPressTimer;
+                interval: 1000; repeat: false; running: false
+                property bool pressingAndHolding: false;
+                onTriggered: {
+                    longPressTimer.pressingAndHolding = true;
+                }
+            }
         }
     }
 }

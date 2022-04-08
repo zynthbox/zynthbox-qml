@@ -27,6 +27,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
+import QtQuick.Window 2.1
 import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
@@ -536,6 +537,7 @@ Zynthian.BasePlayGrid {
                 anchors.fill: parent;
 
                 DrumsGrid {
+                    id: drumsGridItem
                     model: _private.activePatternModel ? (_private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination ? _private.activePatternModel.clipSliceNotes : _private.activePatternModel.gridModel) : null
                     positionalVelocity: _private.positionalVelocity
                     playgrid: component
@@ -671,7 +673,9 @@ Zynthian.BasePlayGrid {
                                 Qt.callLater(updateMostRecentFromSelection);
                             }
                             function deselectSelectedItem() {
-                                if (drumPadRepeater.selectedIndex > -1) {
+                                if (stepSettingsPopup.visible) {
+                                    stepSettingsPopup.close();
+                                } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     if (seqPad.currentSubNote > -1) {
                                         seqPad.currentSubNote = -1;
@@ -686,9 +690,11 @@ Zynthian.BasePlayGrid {
                                     if (seqPad.currentSubNote === -1) {
                                         console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
                                         // Then we're handling the position itself
+                                        stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
                                     } else {
                                         console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
                                         // Then we're handling the specific subnote
+                                        stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
                                     }
                                 }
                             }
@@ -1364,6 +1370,24 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                }
+            }
+            QQC2.Popup {
+                id: stepSettingsPopup
+                y: drumPad.y - height - Kirigami.Units.largeSpacing
+                x: Kirigami.Units.largeSpacing
+                modal: true
+                focus: true
+                function showStepSettings(model, row, column) {
+                    stepSettings.model = model;
+                    stepSettings.row = row;
+                    stepSettings.column = column;
+                    stepSettingsPopup.open();
+                }
+                StepSettings {
+                    id: stepSettings
+                    anchors.fill: parent
+                    implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
                 }
             }
             QQC2.Drawer {

@@ -1109,15 +1109,12 @@ Zynthian.ScreenPage {
                     id: infoBar
 
                     property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
-                    property string synthName: ""
+                    property int topLayerIndex: 0
                     property int topLayer: -1
-
-                    property int presetIndex: -1
-                    property int presetCount: 0
-                    property string presetName: "--"
-
-                    property int bankIndex: -1
-                    property string bankName: "--"
+                    property int selectedSoundSlot: zynthian.soundCombinatorActive
+                                                    ? zynthian.session_dashboard.selectedSoundRow
+                                                    : topLayerIndex
+                    property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
 
                     width: parent.width - Kirigami.Units.gridUnit
                     anchors.centerIn: parent
@@ -1130,12 +1127,6 @@ Zynthian.ScreenPage {
 
                         var layerIndex = -1;
                         var count = 0;
-                        var synthName = "--"
-                        var presetName = "--"
-
-                        infoBar.synthName = "--"
-                        infoBar.bankName = "--"
-                        infoBar.presetName = "--"
 
                         if (infoBar.clip) {
                             for (var i in infoBar.clip.clipTrack.chainedSounds) {
@@ -1147,30 +1138,17 @@ Zynthian.ScreenPage {
                                     count++;
                                 }
                             }
-
-                            for (var id in infoBar.clip.clipTrack.chainedSounds) {
-                                if (infoBar.clip.clipTrack.chainedSounds[id] >= 0 &&
-                                    infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[id])) {
-                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(infoBar.clip.clipTrack.chainedSounds[id]).split(">");
-                                    synthName = soundName[0] ? soundName[0].trim() : "--";
-                                    presetName = soundName[1] ? soundName[1].trim() : "--";
-                                    break;
-                                }
-                            }
                         }
 
                         layerLabel.layerIndex = layerIndex
+                        infoBar.topLayerIndex = layerIndex
                         infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipTrack.chainedSounds[layerIndex]
                         layerLabel.layerCount = count
+//                        infoBar.selectedChannel = zynthian.soundCombinatorActive
+//                                                    ? infoBar.clip.clipTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow]
+//                                                    : infoBar.clip.clipTrack.connectedSound
 
-                        infoBar.presetIndex = zynthian.preset.current_index
-                        infoBar.presetCount = zynthian.preset.effective_count
-                        infoBar.presetName = presetName
-
-                        infoBar.bankIndex = zynthian.bank.current_index
-                        infoBar.bankName = infoBar.topLayer >= 0 ? zynthian.bank.selector_list.getDisplayValue(infoBar.bankIndex) : "--"
-
-                        infoBar.synthName = synthName
+                        infoBar.clip.clipTrack.updateChainedSoundsInfo()
                     }
 
                     Timer {
@@ -1192,14 +1170,17 @@ Zynthian.ScreenPage {
                         onSelectedTrackChanged: {
                             updateSoundNameTimer.restart()
                         }
+                        onSelectedSoundRowChanged: {
+                            updateSoundNameTimer.restart()
+                        }
                     }
 
-//                    Connections {
-//                        target: zynthian.bank
-//                        onList_updated: {
-//                            updateSoundNameTimer.restart()
-//                        }
-//                    }
+                    Connections {
+                        target: zynthian.bank
+                        onList_updated: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
 
                     Connections {
                         target: infoBar.clip ? infoBar.clip.clipTrack : null
@@ -1213,6 +1194,13 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                console.log(infoBar.selectedSoundSlot, infoBar.topLayer, JSON.stringify(infoBar.clip.clipTrack.chainedSoundsInfo, null, 2))
+                            }
+                        }
                     }
                     QQC2.Label {
                         id: layerLabel
@@ -1236,11 +1224,11 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.topLayer >= 0
+                        text: infoBar.selectedSoundSlotExists
                                   ? qsTr("Preset (%2/%3): %1")
-                                      .arg(infoBar.presetName === "-" ? "--" : infoBar.presetName)
-                                        .arg(zynthian.preset.current_index+1)
-                                        .arg(infoBar.presetCount)
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
                                   : qsTr("Preset: --")
                     }
                     QQC2.Label {
@@ -1248,15 +1236,20 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: qsTr("Bank: %1")
-                                .arg(infoBar.bankName === "-" || infoBar.bankName === "None" ? "--" : infoBar.bankName)
+                        text: infoBar.selectedSoundSlotExists
+                                ? qsTr("Bank: %1")
+                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
+                                : qsTr("Bank: --")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: qsTr("Synth: %1").arg(infoBar.synthName)
+                        text: infoBar.selectedSoundSlotExists
+                                ? qsTr("Synth: %1")
+                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
+                                : qsTr("Synth: --")
                     }
                     QQC2.Label {
                         Layout.fillWidth: false

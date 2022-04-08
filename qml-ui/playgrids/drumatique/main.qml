@@ -757,6 +757,9 @@ Zynthian.BasePlayGrid {
                                     sequencerPad.currentSubNote = subNoteIndex;
                                     drumPadRepeater.updateMostRecentFromSelection();
                                 }
+                                onPressAndHold: {
+                                    stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, model.index);
+                                }
                                 onCurrentSubNoteChanged: {
                                     if (drumPadRepeater.selectedIndex != model.index) {
                                         if (drumPadRepeater.selectedIndex > -1) {

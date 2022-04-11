@@ -583,6 +583,16 @@ Zynthian.BasePlayGrid {
                         onKnob3Up: drumPadRepeater.delayUp();
                         onKnob3Down: drumPadRepeater.delayDown();
                     }
+                    Connections {
+                        target: stepSettings
+                        onChangeSubnote: {
+                            var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                            if (seqPad) {
+                                seqPad.currentSubNote = newSubnote;
+                                Qt.callLater(drumPadRepeater.updateMostRecentFromSelection);
+                            }
+                        }
+                    }
 
                     RowLayout {
                         anchors.fill:parent

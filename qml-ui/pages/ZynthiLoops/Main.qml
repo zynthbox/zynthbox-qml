@@ -158,7 +158,7 @@ Zynthian.ScreenPage {
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectPrevPreset(selectedMidiChannel);
-                    updateSoundNameTimer.restart();
+                    infoBar.updateInfoBar();
                 }
                 return true;
 
@@ -166,7 +166,7 @@ Zynthian.ScreenPage {
                 var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectNextPreset(selectedMidiChannel);
-                    updateSoundNameTimer.restart();
+                    infoBar.updateInfoBar();
                 }
                 return true;
 

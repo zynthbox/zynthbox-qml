@@ -134,6 +134,9 @@ don't want to have to dig too far...
                 playGridStack.replace(playgrid.grid);
                 currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
                 placeholderAction.children = playgrid.additionalActions;
+                if (playgrid.isSequencer) {
+                    ZynQuick.PlayGridManager.setPreferredSequencer(ZynQuick.PlayGridManager.playgrids[ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]]);
+                }
             }
         }
         Component.onCompleted: updatePlaygrid();

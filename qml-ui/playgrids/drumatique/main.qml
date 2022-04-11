@@ -580,6 +580,8 @@ Zynthian.BasePlayGrid {
                         onKnob1Down: drumPadRepeater.velocityDown();
                         onKnob2Up: drumPadRepeater.durationUp();
                         onKnob2Down: drumPadRepeater.durationDown();
+                        onKnob3Up: drumPadRepeater.delayUp();
+                        onKnob3Down: drumPadRepeater.delayDown();
                     }
 
                     RowLayout {
@@ -618,6 +620,7 @@ Zynthian.BasePlayGrid {
                                 } else {
                                     component.mostRecentlyPlayedNote = undefined;
                                 }
+                                stepSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                             }
                             function goNext() {
                                 var changeStep = true;
@@ -737,6 +740,16 @@ Zynthian.BasePlayGrid {
                             }
                             function durationDown() {
                                 changeValue("duration", -1, 0, 2147483647, 0);
+                            }
+                            function delayUp() {
+                                if (stepSettings.visible) {
+                                    changeValue("delay", 1, 0, 2147483647, 0);
+                                }
+                            }
+                            function delayDown() {
+                                if (stepSettings.visible) {
+                                    changeValue("delay", -1, 0, 2147483647, 0);
+                                }
                             }
                             PadNoteButton {
                                 id: sequencerPad

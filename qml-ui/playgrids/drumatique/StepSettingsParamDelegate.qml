@@ -68,10 +68,50 @@ RowLayout {
         }
     }
     QQC2.Label {
+        id: paramLabel
         Layout.fillWidth: true
+        Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         text: parent.paramValue === undefined || component.paramValue === component.paramDefault ? component.paramDefaultString : parent.paramValue + component.paramValueSuffix
+        MultiPointTouchArea {
+            anchors.fill: parent
+            touchPoints: [
+                TouchPoint {
+                    id: slidePoint;
+                    property var currentValue: undefined
+                    onPressedChanged: {
+                        if (pressed) {
+                            currentValue = (component.paramValue === undefined) ? component.paramDefault : component.paramValue;
+                        } else {
+                            currentValue = undefined;
+                        }
+                    }
+                    onXChanged: {
+                        if (pressed && currentValue !== undefined) {
+                            var delta = Math.round((slidePoint.x - slidePoint.startX) * (127 / paramLabel.width));
+                            component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
+                        }
+                    }
+                }
+            ]
+        }
+        Item {
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: Kirigami.Units.largeSpacing
+            Rectangle {
+                anchors {
+                    fill: parent
+                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramValue.paramDefault : component.paramValue)) / component.paramMax)
+                }
+                color: Kirigami.Theme.textColor
+            }
+        }
     }
     Zynthian.PlayGridButton {
         text: "+"

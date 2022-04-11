@@ -119,6 +119,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__selected_clip_col__ = 0
         self.__is_init_in_progress__ = True
         self.__long_task_count__ = 0
+        self.__big_knob_mode__ = ""
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -185,7 +186,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/10):
+        if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/10):
             logging.error(f"Setting track from zyncoder {round(self.__zselector[0].value/10)}")
             self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/10))
             self.set_selector()
@@ -199,7 +200,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
 
-        if selected_channel in self.zyngui.layer.layer_midi_map:
+        if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
             preset_index = min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1)
 
@@ -298,9 +299,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[0] and self.__song__:
             self.__zselector[0].read_zyncoder()
 
-            if self.zyngui.sound_combinator_active:
+            if self.__big_knob_mode__ == "preset":
                 QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
-            else:
+            elif self.__big_knob_mode__ == "track":
                 QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
 
         # Update clip startposition/layer volume when required with small knob 1
@@ -330,6 +331,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if self.zyngui.sound_combinator_active:
                 # If sound combinator is active, Use Big knob to control preset
+
+                self.__big_knob_mode__ = "preset"
 
                 logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
@@ -361,6 +364,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector[0].custom_encoder_speed = 0
             else:
                 # If sound combinator is not active, Use Big knob to control selected track
+
+                self.__big_knob_mode__ = "track"
 
                 try:
                     selected_track = self.zyngui.session_dashboard.get_selected_track() * 10

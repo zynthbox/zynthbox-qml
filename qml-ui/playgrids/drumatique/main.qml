@@ -42,6 +42,7 @@ Zynthian.BasePlayGrid {
     sidebar: drumsGridSidebar
     name:'Drumatique'
     dashboardModel: _private.sequence
+    isSequencer: true
     useOctaves: true
     additionalActions: [
         Kirigami.Action {

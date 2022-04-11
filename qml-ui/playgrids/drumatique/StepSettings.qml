@@ -35,6 +35,22 @@ GridLayout {
     property QtObject model
     property int row: -1
     property int column: -1
+    property int currentSubNote: -1
+
+    property var noteSpecificColor: {
+        "C":"#f08080",
+        "C#":"#4b0082",
+        "D":"#8a2be2",
+        "D#":"#a52a2a" ,
+        "E":"#deb887",
+        "F":"#5f9ea0",
+        "F#":"#7fff00",
+        "G":"#d2691e",
+        "G#":"#6495ed",
+        "A":"#dc143c",
+        "A#":"#008b8b",
+        "B":"#b8860b"
+    }
 
     onVisibleChanged: {
         if (!visible) {
@@ -47,8 +63,11 @@ GridLayout {
     flow: GridLayout.TopToBottom
     rows: note ? note.subnotes.length + 2 : 2
     readonly property QtObject note: component.model && component.row > -1 && component.column > -1 ? component.model.getNote(component.row, component.column) : null
+
+
     QQC2.Label {
         Layout.fillWidth: true
+        Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
@@ -56,15 +75,43 @@ GridLayout {
     }
     Repeater {
         model: component.note ? component.note.subnotes : 0
-        QQC2.Label {
+        Item {
             Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            font.bold: true
-            text: modelData ? modelData.name + modelData.octave : ""
+            Layout.fillHeight: true
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                    margins: 1
+                }
+                width: Kirigami.Units.largeSpacing
+                color: Kirigami.Theme.highlightColor
+                visible: model.index === component.currentSubNote
+            }
+            Rectangle {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+                    bottom: parent.bottom
+                    margins: 1
+                }
+                width: height
+                radius: height / 2
+                color: modelData ? component.noteSpecificColor[modelData.name] : "transparent"
+            }
+            QQC2.Label {
+                anchors.fill: parent
+                horizontalAlignment: Text.AlignHCenter
+                font.bold: true
+                text: modelData ? modelData.name + modelData.octave : ""
+            }
         }
     }
     QQC2.Label {
         Layout.fillWidth: true
+        Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         horizontalAlignment: Text.AlignHCenter
         text: "DEFAULT"

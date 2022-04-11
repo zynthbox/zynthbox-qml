@@ -129,8 +129,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
-        Path('/zynthian/zynthian-my-data/sample-banks/my-samples').mkdir(exist_ok=True, parents=True)
-        Path('/zynthian/zynthian-my-data/sample-banks/community-samples').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
+        Path('/zynthian/zynthian-my-data/sample-banks/community-samplebanks').mkdir(exist_ok=True, parents=True)
 
     def connect_control_objects(self):
         if self.__volume_control_obj == self.zyngui.layers_for_track.get_volume_controls()[self.zyngui.session_dashboard.selectedSoundRow]:

@@ -36,6 +36,7 @@ import "pages/SessionDashboard" as SessionDashboard
 Kirigami.AbstractApplicationWindow {
     id: root
     visible: false
+    flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: {
@@ -75,8 +76,8 @@ Kirigami.AbstractApplicationWindow {
     signal soundsDialogAccepted()
     signal soundsDialogRejected()
 
-    width: screen.width
-    height: screen.height
+    minimumWidth: screen.width
+    minimumHeight: screen.height
 
     Timer {
         id: displayWindowTimer
@@ -84,9 +85,16 @@ Kirigami.AbstractApplicationWindow {
         interval: 13000
         repeat: false
         onTriggered: {
-            root.showFullScreen();
+            root.minimumWidth = root.screen.width;
+            root.minimumHeight = root.screen.height;
+            root.showNormal();
+            root.visibility = Window.Windowed;
             zynthian.stop_splash();
         }
+    }
+    onHeightChanged: {
+        //FIXME: workaround
+        height = screen.height;
     }
 
     header: RowLayout {

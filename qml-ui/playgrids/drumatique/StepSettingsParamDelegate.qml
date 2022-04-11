@@ -48,6 +48,12 @@ RowLayout {
     Layout.fillWidth: true
     property var paramValue: component.model && component.row > -1 && component.column > -1 && updateForcery > -1 ? component.model.subnoteMetadata(component.row, component.column, component.paramIndex, paramName) : undefined;
     property int updateForcery: 0
+    Connections {
+        target: component.model
+        onLastModifiedChanged: {
+            component.updateForcery += 1;
+        }
+    }
     Zynthian.PlayGridButton {
         text: "-"
         Layout.preferredWidth: Kirigami.Units.gridUnit * 2

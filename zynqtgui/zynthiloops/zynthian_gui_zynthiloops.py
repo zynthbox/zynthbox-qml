@@ -164,6 +164,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 cb()
 
             self.zyngui.zynthiloops.set_selector()
+            self.zyngui.session_dashboard.selectedTrack = 0
             self.__is_init_in_progress__ = False
 
         self.master_audio_level_timer.start()

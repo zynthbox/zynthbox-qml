@@ -710,11 +710,19 @@ Zynthian.BasePlayGrid {
                                     if (seqPad.currentSubNote === -1) {
                                         console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
                                         // Then we're handling the position itself
-                                        stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                        if (stepSettingsPopup.visible) {
+                                            stepSettingsPopup.close();
+                                        } else {
+                                            stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                        }
                                     } else {
                                         console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
                                         // Then we're handling the specific subnote
-                                        stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                        if (stepSettingsPopup.visible) {
+                                            stepSettingsPopup.close();
+                                        } else {
+                                            stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                        }
                                     }
                                 }
                             }

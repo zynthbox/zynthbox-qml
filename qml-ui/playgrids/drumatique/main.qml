@@ -630,6 +630,9 @@ Zynthian.BasePlayGrid {
                                         seqPad.currentSubNote = -1;
                                     }
                                 }
+                                if (stepSettings.visible) {
+                                    changeStep = false;
+                                }
                                 if (changeStep) {
                                     if (selectedIndex < _private.activeBarModelWidth - 1) {
                                         selectedIndex = selectedIndex + 1;
@@ -656,6 +659,9 @@ Zynthian.BasePlayGrid {
                                         seqPad.currentSubNote = seqPad.subNoteCount - 1;
                                         changeStep = false;
                                     }
+                                }
+                                if (stepSettings.visible) {
+                                    changeStep = false;
                                 }
                                 if (changeStep) {
                                     if (selectedIndex > 0) {

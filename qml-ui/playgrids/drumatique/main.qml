@@ -711,14 +711,22 @@ Zynthian.BasePlayGrid {
                             function changeValue(valueName, howMuch, minValue, maxValue, defaultValue) {
                                 if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                    if (seqPad.currentSubNote > -1) {
-                                        var currentValue = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, valueName);
+                                    var indicesToChange = []
+                                    if (seqPad.currentSubNote === -1) {
+                                        for (var i = 0; i < seqPad.note.subnotes.length; ++i) {
+                                            indicesToChange.push(i);
+                                        }
+                                    } else {
+                                        indicesToChange.push(seqPad.currentSubNote);
+                                    }
+                                    for (var i = 0; i < indicesToChange.length; ++i) {
+                                        var currentValue = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, indicesToChange[i], valueName);
                                         if (currentValue === undefined) {
                                             currentValue = defaultValue;
                                         }
                                         //console.log("Current", valueName, currentValue);
                                         if (currentValue + howMuch >= minValue && currentValue + howMuch <= maxValue) {
-                                            _private.activePatternModel.setSubnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, valueName, currentValue + howMuch);
+                                            _private.activePatternModel.setSubnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, indicesToChange[i], valueName, currentValue + howMuch);
                                         }
                                     }
                                 }

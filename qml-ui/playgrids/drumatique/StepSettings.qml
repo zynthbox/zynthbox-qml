@@ -36,6 +36,10 @@ GridLayout {
     property int row: -1
     property int column: -1
     property int currentSubNote: -1
+    signal changeSubnote(int newSubnote);
+    onChangeSubnote: {
+        component.currentSubNote = newSubnote;
+    }
 
     property var noteSpecificColor: {
         "C":"#f08080",
@@ -64,20 +68,57 @@ GridLayout {
     rows: note ? note.subnotes.length + 2 : 2
     readonly property QtObject note: component.model && component.row > -1 && component.column > -1 ? component.model.getNote(component.row, component.column) : null
 
+    function setDuration(duration, isDefault) {
+        if (component.currentSubNote === -1) {
+            if (note) {
+                for (var subnoteIndex = 0; subnoteIndex < note.subnotes.length; ++subnoteIndex) {
+                    component.model.setSubnoteMetadata(component.row, component.column, subnoteIndex, "duration", isDefault ? 0 : duration);
+                }
+            }
+        } else {
+            component.model.setSubnoteMetadata(component.row, component.column, component.currentSubNote, "duration", isDefault ? 0 : duration);
+        }
+    }
 
     QQC2.Label {
+        id: noteHeaderLabel
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         horizontalAlignment: Text.AlignHCenter
         font.bold: true
         text: "Note"
+        MultiPointTouchArea {
+            anchors.fill: parent
+            touchPoints: [
+                TouchPoint {
+                    onPressedChanged: {
+                        if (!pressed && x > -1 && y > -1 && x < noteHeaderLabel.width && y < noteHeaderLabel.height) {
+                            component.changeSubnote(-1);
+                        }
+                    }
+                }
+            ]
+        }
     }
     Repeater {
         model: component.note ? component.note.subnotes : 0
         Item {
+            id: noteDelegate
             Layout.fillWidth: true
             Layout.fillHeight: true
+            MultiPointTouchArea {
+                anchors.fill: parent
+                touchPoints: [
+                    TouchPoint {
+                        onPressedChanged: {
+                            if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
+                                component.changeSubnote(model.index);
+                            }
+                        }
+                    }
+                ]
+            }
             Rectangle {
                 anchors {
                     top: parent.top
@@ -141,11 +182,13 @@ GridLayout {
         text: "1"
         checked: component.model ? component.model.noteLength === 1 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(32, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/2"
         checked: component.model ? component.model.noteLength === 2 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(16, checked); }
     }
 
     QQC2.Label {
@@ -172,11 +215,13 @@ GridLayout {
         text: "1/4"
         checked: component.model ? component.model.noteLength === 3 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(8, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/8"
         checked: component.model ? component.model.noteLength === 4 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(4, checked); }
     }
 
     QQC2.Label {
@@ -203,10 +248,12 @@ GridLayout {
         text: "1/16"
         checked: component.model ? component.model.noteLength === 5 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(2, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/32"
         checked: component.model ? component.model.noteLength === 6 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        onClicked: { component.setDuration(1, checked); }
     }
 }

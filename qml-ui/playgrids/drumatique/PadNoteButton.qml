@@ -71,14 +71,25 @@ QQC2.Button {
 
             touchPoints: [
                 TouchPoint {
+                    function updateInsideBounds() {
+                        if (pressed) {
+                            if (x > -1 && y > -1 && x < component.width && y < component.height) {
+                                longPressTimer.insideBounds = true;
+                            } else {
+                                longPressTimer.insideBounds = false;
+                            }
+                        }
+                    }
+                    onXChanged: updateInsideBounds();
+                    onYChanged: updateInsideBounds();
                     onPressedChanged: {
                         if (pressed) {
+                            updateInsideBounds();
+                            longPressTimer.subNoteIndex = -1;
                             longPressTimer.restart();
                         } else {
                             if (x > -1 && y > -1 && x < component.width && y < component.height) {
-                                if (longPressTimer.pressingAndHolding) {
-                                    component.pressAndHold(-1);
-                                } else {
+                                if (!longPressTimer.pressingAndHolding) {
                                     if (padNoteRect.shouldChange) {
                                         if (component.playgrid.heardNotes.length > 0) {
                                             var removedAtLeastOne = false;
@@ -162,18 +173,30 @@ QQC2.Button {
                         anchors.fill: parent
                         touchPoints: [
                             TouchPoint {
+                                function updateInsideBounds() {
+                                    if (pressed) {
+                                        if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
+                                            longPressTimer.insideBounds = true;
+                                        } else {
+                                            longPressTimer.insideBounds = false;
+                                        }
+                                    }
+                                }
+                                onXChanged: updateInsideBounds();
+                                onYChanged: updateInsideBounds();
                                 onPressedChanged: {
                                     if (pressed) {
+                                        updateInsideBounds();
+                                        longPressTimer.subNoteIndex = index;
                                         longPressTimer.restart();
                                     } else {
                                         if (x > -1 && y > -1 && x < padSubNoteRect.width && y < padSubNoteRect.height) {
-                                            if (zynthian.altButtonPressed) {
-                                                component.tapped(-1);
-                                            } else {
-                                                component.tapped(index);
-                                            }
-                                            if (longPressTimer.pressingAndHolding) {
-                                                component.pressAndHold(index);
+                                            if (!longPressTimer.pressingAndHolding) {
+                                                if (zynthian.altButtonPressed) {
+                                                    component.tapped(-1);
+                                                } else {
+                                                    component.tapped(index);
+                                                }
                                             }
                                         }
                                         longPressTimer.pressingAndHolding = false;
@@ -338,7 +361,12 @@ QQC2.Button {
                 id: longPressTimer;
                 interval: 1000; repeat: false; running: false
                 property bool pressingAndHolding: false;
+                property bool insideBounds: false;
+                property int subNoteIndex: -1;
                 onTriggered: {
+                    if (insideBounds) {
+                        component.pressAndHold(subNoteIndex);
+                    }
                     longPressTimer.pressingAndHolding = true;
                 }
             }

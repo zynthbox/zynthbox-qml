@@ -72,12 +72,11 @@ RowLayout {
         enabled: component.paramValue === undefined || component.paramValue > component.paramMin
         onClicked: {
             if (component.paramList.length > 0) {
-                var value = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                var value = parseInt((component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue);
                 var newValue = component.paramMin;
-                for (var i = 0; i < component.paramList.length; ++i) {
-                    if (component.paramList[i] < value) {
-                        newValue = component.paramList[i];
-                    } else {
+                for (var i = component.paramList.length - 1; i > -1 ; --i) {
+                    if (parseInt(component.paramList[i]) < value) {
+                        newValue = parseInt(component.paramList[i]);
                         break;
                     }
                 }
@@ -148,11 +147,11 @@ RowLayout {
         enabled: component.paramValue === undefined || component.paramValue < component.paramMax
         onClicked: {
             if (component.paramList.length > 0) {
-                var value = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                var value = parseInt(component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
                 var newValue = component.paramMax;
                 for (var i = 0; i < component.paramList.length; ++i) {
-                    if (component.paramList[i] > value || i === component.paramList.length - 1) {
-                        newValue = component.paramList[i];
+                    if (parseInt(component.paramList[i]) > value) {
+                        newValue = parseInt(component.paramList[i]);
                         break;
                     }
                 }

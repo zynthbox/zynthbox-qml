@@ -65,6 +65,7 @@ class zynthiloops_track(QObject):
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
+        self.__selected_slot_row__ = 0
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
@@ -866,3 +867,17 @@ class zynthiloops_track(QObject):
     chainedSoundsInfo = Property('QVariantList', get_chainedSoundsInfo, notify=chainedSoundsInfoChanged)
 
     ### END Property chained_sounds_presets
+
+    ### Property selectedSlotRow
+    def get_selectedSlotRow(self):
+        return self.__selected_slot_row__
+
+    def set_selectedSlotRow(self, row):
+        if self.__selected_slot_row__ != row:
+            self.__selected_slot_row__ = row
+            self.selectedSlotRowChanged.emit()
+
+    selectedSlotRowChanged = Signal()
+
+    selectedSlotRow = Property(int, get_selectedSlotRow, set_selectedSlotRow, notify=selectedSlotRowChanged)
+    ### END Property selectedSlotRow

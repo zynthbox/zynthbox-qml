@@ -307,7 +307,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # Update clip startposition/layer volume when required with small knob 1
         if self.__zselector[1] and self.__song__:
             self.__zselector[1].read_zyncoder()
-            if self.zyngui.sound_combinator_active:
+            if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)

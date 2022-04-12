@@ -108,7 +108,7 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||
                 selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 0
+                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 0
                 bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
                 return true
             }
@@ -122,7 +122,7 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||
                 selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 1
+                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 1
                 bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
                 return true
             }
@@ -136,7 +136,7 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||
                 selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 2
+                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 2
                 bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
                 return true
             }
@@ -150,7 +150,7 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||
                 selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 3
+                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 3
                 bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
                 return true
             }
@@ -164,7 +164,7 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||
                 selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.selectedRow = 4
+                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 4
                 bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
                 return true
             }

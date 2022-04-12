@@ -602,6 +602,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_track_active(self, isActive):
         if self.slots_bar_track_active != isActive:
             self.slots_bar_track_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.slotsBarTrackActiveChanged.emit()
 
     slotsBarTrackActiveChanged = Signal()

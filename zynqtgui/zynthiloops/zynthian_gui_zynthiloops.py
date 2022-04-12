@@ -217,13 +217,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return
 
         selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+
         try:
-            volume_control_obj = self.zyngui.layers_for_track.volume_controls[self.zyngui.session_dashboard.selectedSoundRow]
+            if self.zyngui.slotsBarTrackActive and \
+                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]) and \
+                    selected_track.trackAudioType == "synth":
+                volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
+            elif self.zyngui.sound_combinator_active and \
+                    selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]):
+                volume_control_obj = self.zyngui.layers_for_track.volume_controls[
+                    self.zyngui.session_dashboard.selectedSoundRow]
+            else:
+                volume_control_obj = None
         except:
             volume_control_obj = None
 
         if volume_control_obj is not None and \
-           selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]) and \
            volume_control_obj.value != self.__zselector[1].value / 1000:
             volume_control_obj.value = self.__zselector[1].value / 1000
             logging.error(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
@@ -412,6 +421,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.sound_combinator_active and
                     selected_track is not None and
                     selected_track.checkIfLayerExists(self.zyngui.session_dashboard.selectedSoundRow)
+                ) or (
+                    self.zyngui.slotsBarTrackActive and
+                    selected_track is not None and
+                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]) and
+                    selected_track.trackAudioType == "synth"
                 ):
             logging.error(
                 f"### set_selector : Configuring small knob 1, showing")
@@ -424,15 +438,26 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[1]:
                 self.__zselector[1].hide()
 
-        if self.zyngui.sound_combinator_active:
+        if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive:
             volume = 0
             min_value = 0
             max_value = 0
 
             try:
-                logging.error(f"layer({selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]}), layerExists({selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow])})")
-                if selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]):
-                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[self.zyngui.session_dashboard.selectedSoundRow]
+                # logging.error(f"layer({selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]}), layerExists({selected_track.checkIfLayerExists(selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow])})")
+
+                if self.zyngui.sound_combinator_active and \
+                        selected_track.checkIfLayerExists(
+                            selected_track.chainedSounds[self.zyngui.session_dashboard.selectedSoundRow]):
+                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[
+                        self.zyngui.session_dashboard.selectedSoundRow]
+                    volume = volume_control_obj.value * 1000
+                    min_value = volume_control_obj.value_min * 1000
+                    max_value = volume_control_obj.value_max * 1000
+                elif self.zyngui.slotsBarTrackActive and \
+                        selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]) and \
+                        selected_track.trackAudioType == "synth":
+                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
                     volume = volume_control_obj.value * 1000
                     min_value = volume_control_obj.value_min * 1000
                     max_value = volume_control_obj.value_max * 1000

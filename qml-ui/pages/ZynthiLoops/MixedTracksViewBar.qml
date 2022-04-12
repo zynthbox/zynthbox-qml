@@ -294,7 +294,7 @@ Rectangle {
                                                 : []
 
                                     delegate: Rectangle {
-                                        property bool highlighted: bottomStack.slotsBar.selectedSlotRowItem.selectedRow === index
+                                        property bool highlighted: root.selectedTrack.selectedSlotRow === index
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
@@ -331,8 +331,8 @@ Rectangle {
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
-                                                if (index !== bottomStack.slotsBar.selectedSlotRowItem.selectedRow) {
-                                                    bottomStack.slotsBar.selectedSlotRowItem.selectedRow = index
+                                                if (index !== root.selectedTrack.selectedSlotRow) {
+                                                    root.selectedTrack.selectedSlotRow = index
                                                 } else {
                                                     bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                                                 }
@@ -358,7 +358,7 @@ Rectangle {
                                     radius: 4
 
                                     WaveFormItem {
-                                        property QtObject clip: root.selectedTrack.samples[bottomStack.slotsBar.selectedSlotRowItem.selectedRow]
+                                        property QtObject clip: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                                         anchors.fill: parent
                                         color: Kirigami.Theme.textColor

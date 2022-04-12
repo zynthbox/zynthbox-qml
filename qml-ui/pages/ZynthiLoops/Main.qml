@@ -1113,7 +1113,7 @@ Zynthian.ScreenPage {
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
                                                     ? zynthian.session_dashboard.selectedSoundRow
-                                                    : bottomStack.slotsBar.selectedSlotRowItem.selectedRow
+                                                    : root.selectedTrack.selectedSlotRow
                     property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
 
                     width: parent.width - Kirigami.Units.gridUnit
@@ -1212,7 +1212,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("Slot %1 %2")
-                                .arg(bottomStack.slotsBar.selectedSlotRowItem.selectedRow + 1)
+                                .arg(root.selectedTrack.selectedSlotRow + 1)
                                 .arg(layerIndex >= 0
                                         ? layerCount > 0
                                             ? "(+" + (layerCount-1) + ")"

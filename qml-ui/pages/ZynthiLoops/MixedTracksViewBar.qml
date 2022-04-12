@@ -294,7 +294,13 @@ Rectangle {
                                                 : []
 
                                     delegate: Rectangle {
+                                        id: delegate
+
                                         property bool highlighted: root.selectedTrack.selectedSlotRow === index
+                                        property QtObject volumeControlObj: zynthian.layers_for_track.volume_controls[index]
+                                        property real volumePercent: volumeControlObj
+                                                                        ? (volumeControlObj.value - volumeControlObj.value_min)/(volumeControlObj.value_max - volumeControlObj.value_min)
+                                                                        : 0
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
@@ -308,6 +314,17 @@ Rectangle {
                                         border.color: highlighted ? Kirigami.Theme.highlightColor : "#ff999999"
                                         border.width: 1
                                         radius: 4
+
+                                        Rectangle {
+                                            width: parent.width * delegate.volumePercent
+                                            anchors {
+                                                left: parent.left
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+
+                                            color: Kirigami.Theme.highlightColor
+                                        }
 
                                         QQC2.Label {
                                             anchors {

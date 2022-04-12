@@ -41,6 +41,15 @@ GridLayout {
         component.currentSubNote = newSubnote;
     }
 
+    property var noteLengths: {
+        1: 32,
+        2: 16,
+        3: 8,
+        4: 4,
+        5: 2,
+        6: 1
+    }
+    property int stepDuration: component.model ? noteLengths[component.model.noteLength] : 0
     property var noteSpecificColor: {
         "C":"#f08080",
         "C#":"#4b0082",
@@ -176,17 +185,18 @@ GridLayout {
             paramDefault: 64
             paramMin: 0
             paramMax: 127
+            scrollWidth: 128
         }
     }
     Zynthian.PlayGridButton {
         text: "1"
-        checked: component.model ? component.model.noteLength === 1 : false
+        checked: component.model ? component.model.noteLength === 6 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(32, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/2"
-        checked: component.model ? component.model.noteLength === 2 : false
+        checked: component.model ? component.model.noteLength === 5 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(16, checked); }
     }
@@ -207,19 +217,33 @@ GridLayout {
             paramDefaultString: "(default)"
             paramValueSuffix: "/32qn"
             paramDefault: 0
+            paramInterpretedDefault: component.stepDuration
             paramMin: 0
             paramMax: 2147483647
+            scrollWidth: 128
+            paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
+            paramNames: {
+                0: "(default)",
+                1: (component.model.noteLength === 1 ? "1/32 (default)" : "1/32"),
+                2: (component.model.noteLength === 2 ? "1/16 (default)" : "1/16"),
+                4: (component.model.noteLength === 3 ? "1/8 (default)" : "1/8"),
+                8: (component.model.noteLength === 4 ? "1/4 (default)" : "1/4"),
+                16: (component.model.noteLength === 5 ? "1/2 (default)" : "1/2"),
+                32: (component.model.noteLength === 6 ? "1 (default)" : "1"),
+                64: "2",
+                128: "4"
+            }
         }
     }
     Zynthian.PlayGridButton {
         text: "1/4"
-        checked: component.model ? component.model.noteLength === 3 : false
+        checked: component.model ? component.model.noteLength === 4 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(8, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/8"
-        checked: component.model ? component.model.noteLength === 4 : false
+        checked: component.model ? component.model.noteLength === 3 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(4, checked); }
     }
@@ -241,18 +265,44 @@ GridLayout {
             paramValueSuffix: "/32qn"
             paramDefault: 0
             paramMin: 0
-            paramMax: 2147483647
+            paramMax: component.stepDuration - 1
+            scrollWidth: component.stepDuration
+            property var potentialValues: {
+                0: "(default)",
+                1: "1/32",
+                2: "1/16",
+                4: "1/8",
+                8: "1/4",
+                16: "1/2",
+                32: "1",
+                64: "2",
+                128: "4"
+            }
+            paramNames: {
+                var names = {};
+                var valueStep = 0;
+                for (var i = 0; i < component.stepDuration; ++i) {
+                    if (valueStep === 0 || i % valueStep === 0) {
+                        names[valueStep] = potentialValues[valueStep];
+                        ++valueStep;
+                        if (!potentialValues.hasOwnProperty(valueStep)) {
+                            break;
+                        }
+                    }
+                }
+                return names;
+            }
         }
     }
     Zynthian.PlayGridButton {
         text: "1/16"
-        checked: component.model ? component.model.noteLength === 5 : false
+        checked: component.model ? component.model.noteLength === 2 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(2, checked); }
     }
     Zynthian.PlayGridButton {
         text: "1/32"
-        checked: component.model ? component.model.noteLength === 6 : false
+        checked: component.model ? component.model.noteLength === 1 : false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
         onClicked: { component.setDuration(1, checked); }
     }

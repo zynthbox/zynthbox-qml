@@ -41,8 +41,20 @@ RowLayout {
     property string paramDefaultString
     property string paramValueSuffix
     property int paramDefault
+    property int paramInterpretedDefault: paramDefault
     property int paramMin
     property int paramMax
+    property int scrollWidth
+
+    // Set to an ordered list of values, which the -/+ buttons should flick
+    // through in place of just switching numbers (that is still possible using
+    // the tap-and-slide functionality)
+    property var paramList: []
+    // Set to an object with properties where the name is a parameter value,
+    // and the value is the human-friendly string representing that value (for
+    // e.g. { 1: "1/32", 2: "1/16", 4: "1/8", 8: "1/4", 16: "1/2", 32: "1"}
+    // for the sub-divisions of a quarter note)
+    property var paramNames: undefined
 
     Layout.columnSpan: 2
     Layout.fillWidth: true
@@ -59,10 +71,23 @@ RowLayout {
         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
         enabled: component.paramValue === undefined || component.paramValue > component.paramMin
         onClicked: {
-            if (component.paramValue === undefined) {
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.max(component.paramDefault - 1, component.paramMin));
+            if (component.paramList.length > 0) {
+                var value = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                var newValue = component.paramMin;
+                for (var i = 0; i < component.paramList.length; ++i) {
+                    if (component.paramList[i] < value) {
+                        newValue = component.paramList[i];
+                    } else {
+                        break;
+                    }
+                }
+                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
             } else {
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue - 1);
+                if (component.paramValue === undefined) {
+                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.max(component.paramInterpretedDefault - 1, component.paramMin));
+                } else {
+                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue - 1);
+                }
             }
             component.updateForcery += 1;
         }
@@ -74,7 +99,11 @@ RowLayout {
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        text: parent.paramValue === undefined || component.paramValue === component.paramDefault ? component.paramDefaultString : parent.paramValue + component.paramValueSuffix
+        text: parent.paramValue === undefined || component.paramValue === component.paramDefault
+            ? component.paramDefaultString
+            : component.paramNames !== undefined && component.paramNames.hasOwnProperty(component.paramValue)
+                ? component.paramNames[component.paramValue]
+                : parent.paramValue + component.paramValueSuffix
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: [
@@ -83,14 +112,14 @@ RowLayout {
                     property var currentValue: undefined
                     onPressedChanged: {
                         if (pressed) {
-                            currentValue = (component.paramValue === undefined) ? component.paramDefault : component.paramValue;
+                            currentValue = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
                         } else {
                             currentValue = undefined;
                         }
                     }
                     onXChanged: {
                         if (pressed && currentValue !== undefined) {
-                            var delta = Math.round((slidePoint.x - slidePoint.startX) * (127 / paramLabel.width));
+                            var delta = Math.round((slidePoint.x - slidePoint.startX) * (component.scrollWidth / paramLabel.width));
                             component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
                         }
                     }
@@ -107,7 +136,7 @@ RowLayout {
             Rectangle {
                 anchors {
                     fill: parent
-                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramDefault : component.paramValue)) / component.paramMax)
+                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramInterpretedDefault : component.paramValue)) / component.paramMax)
                 }
                 color: Kirigami.Theme.textColor
             }
@@ -118,10 +147,22 @@ RowLayout {
         Layout.preferredWidth: Kirigami.Units.gridUnit * 2
         enabled: component.paramValue === undefined || component.paramValue < component.paramMax
         onClicked: {
-            if (component.paramValue === undefined) {
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(component.paramMax, component.paramDefault + 1));
+            if (component.paramList.length > 0) {
+                var value = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                var newValue = component.paramMax;
+                for (var i = 0; i < component.paramList.length; ++i) {
+                    if (component.paramList[i] > value || i === component.paramList.length - 1) {
+                        newValue = component.paramList[i];
+                        break;
+                    }
+                }
+                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
             } else {
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue + 1);
+                if (component.paramValue === undefined) {
+                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(component.paramMax, component.paramInterpretedDefault + 1));
+                } else {
+                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue + 1);
+                }
             }
             component.updateForcery += 1;
         }

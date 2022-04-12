@@ -275,6 +275,8 @@ Rectangle {
                                                 : []
 
                                     delegate: Rectangle {
+                                        property bool highlighted: bottomStack.slotsBar.selectedSlotRowItem.selectedRow === index
+
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -284,7 +286,7 @@ Rectangle {
                                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                                         color: Kirigami.Theme.backgroundColor
 
-                                        border.color: "#ff999999"
+                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "#ff999999"
                                         border.width: 1
                                         radius: 4
 
@@ -305,6 +307,17 @@ Rectangle {
                                                         : ""
 
                                             elide: "ElideRight"
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (index !== bottomStack.slotsBar.selectedSlotRowItem.selectedRow) {
+                                                    bottomStack.slotsBar.selectedSlotRowItem.selectedRow = index
+                                                } else {
+                                                    bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                                                }
+                                            }
                                         }
                                     }
                                 }

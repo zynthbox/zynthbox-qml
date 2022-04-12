@@ -505,6 +505,8 @@ class zynthiloops_track(QObject):
 
         self.connected_sound_changed.emit()
         self.chained_sounds_changed.emit()
+        self.chainedSoundsInfoChanged.emit()
+        self.chainedSoundsNamesChanged.emit()
 
     @Slot(None)
     def clearChainedSoundsWithoutCloning(self):
@@ -522,6 +524,8 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
+        self.chainedSoundsInfoChanged.emit()
+        self.chainedSoundsNamesChanged.emit()
 
     @Slot(str)
     def setBank(self, path):
@@ -546,9 +550,9 @@ class zynthiloops_track(QObject):
         # Populate samples
         self.restore_bank()
 
-    # Return an array of 5 elements with sound name if available or empty string
-    @Slot(None, result='QVariantList')
-    def getSoundNames(self):
+    ### Property chainedSoundNames
+    ### An array of 5 elements with sound name if available or empty string
+    def get_chainedSoundsNames(self):
         res = []
 
         for sound in self.chainedSounds:
@@ -558,6 +562,12 @@ class zynthiloops_track(QObject):
                 res.append("")
 
         return res
+
+    chainedSoundsNamesChanged = Signal()
+
+    chainedSoundsNames = Property('QVariantList', get_chainedSoundsNames, notify=chainedSoundsNamesChanged)
+
+    ### END Property chainedSoundNames
 
     ### Property connectedPattern
     def get_connected_pattern(self):
@@ -619,6 +629,8 @@ class zynthiloops_track(QObject):
 
             self.chained_sounds_changed.emit()
             self.connected_sound_changed.emit()
+            self.chainedSoundsInfoChanged.emit()
+            self.chainedSoundsNamesChanged.emit()
 
             if cb is not None:
                 cb()
@@ -663,6 +675,7 @@ class zynthiloops_track(QObject):
         self.chained_sounds_changed.emit()
         self.connected_sound_changed.emit()
         self.chainedSoundsInfoChanged.emit()
+        self.chainedSoundsNamesChanged.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)

@@ -287,7 +287,7 @@ Rectangle {
 
                                 Repeater {
                                     model: root.selectedTrack.trackAudioType === "synth"
-                                            ? root.selectedTrack.getSoundNames()
+                                            ? root.selectedTrack.chainedSoundsNames
                                             : root.selectedTrack.trackAudioType === "sample-trig" ||
                                               root.selectedTrack.trackAudioType === "sample-slice"
                                                 ? root.selectedTrack.samples

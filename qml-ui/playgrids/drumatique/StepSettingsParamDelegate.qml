@@ -107,7 +107,7 @@ RowLayout {
             Rectangle {
                 anchors {
                     fill: parent
-                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramValue.paramDefault : component.paramValue)) / component.paramMax)
+                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramDefault : component.paramValue)) / component.paramMax)
                 }
                 color: Kirigami.Theme.textColor
             }

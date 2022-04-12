@@ -1113,7 +1113,7 @@ Zynthian.ScreenPage {
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
                                                     ? zynthian.session_dashboard.selectedSoundRow
-                                                    : topLayerIndex
+                                                    : bottomStack.slotsBar.selectedSlotRowItem.selectedRow
                     property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
 
                     width: parent.width - Kirigami.Units.gridUnit

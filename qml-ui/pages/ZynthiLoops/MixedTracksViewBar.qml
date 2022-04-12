@@ -34,6 +34,7 @@ import QtQuick.Controls.Styles 1.4
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
+import JuceGraphics 1.0
 
 Rectangle {
     id: root
@@ -96,6 +97,22 @@ Rectangle {
         property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
     }
 
+    QQC2.Popup {
+        id: trackKeyZoneSetup
+        y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
+        x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
+        modal: true
+        focus: true
+        closePolicy: QQC2.Popup.CloseOnPressOutsideParent
+        TrackKeyZoneSetup {
+            anchors.fill: parent
+            implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
+            implicitHeight: root.height
+            readonly property QtObject song: zynthian.zynthiloops.song
+            selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+        }
+    }
+
     GridLayout {
         rows: 1
         anchors.fill: parent
@@ -137,8 +154,10 @@ Rectangle {
                     }
 
                     ColumnLayout {
+                        id: contentColumn
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        Layout.margins: Kirigami.Units.gridUnit / 2
 
                         RowLayout {
                             id: tabButtons
@@ -261,7 +280,7 @@ Rectangle {
 
                             RowLayout {
                                 Layout.fillWidth: true
-                                Layout.fillHeight: true
+                                Layout.fillHeight: false
                                 visible: root.selectedTrack.trackAudioType === "synth" ||
                                          root.selectedTrack.trackAudioType === "sample-trig" ||
                                          root.selectedTrack.trackAudioType === "sample-slice"
@@ -323,64 +342,92 @@ Rectangle {
                                 }
                             }
 
-                            Item {
+                            RowLayout {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                spacing: Kirigami.Units.gridUnit / 2
 
-                                Image {
-                                    id: patternVisualiser
-                                    anchors {
-                                        fill: parent
+                                // Take 3/5 th of available width
+                                Rectangle {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: (parent.width/5) * 3
+                                    color: "#222222"
+                                    border.width: 1
+                                    border.color: "#ff999999"
+                                    radius: 4
+
+                                    WaveFormItem {
+                                        property QtObject clip: root.selectedTrack.samples[bottomStack.slotsBar.selectedSlotRowItem.selectedRow]
+
+                                        anchors.fill: parent
+                                        color: Kirigami.Theme.textColor
+                                        source: clip.path
+                                        onSourceChanged: {
+                                            console.log("Source changed")
+                                        }
+
+                                        visible: (root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                 root.selectedTrack.trackAudioType === "sample-slice") &&
+                                                 clip.path && clip.path.length > 0
                                     }
+                                }
 
-                                    smooth: false
+                                // Take remaining available width
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
                                     visible: root.selectedTrack &&
                                              root.selectedTrack.connectedPattern >= 0 &&
                                              (root.selectedTrack.trackAudioType === "synth" ||
                                               root.selectedTrack.trackAudioType === "sample-trig" ||
                                               root.selectedTrack.trackAudioType === "sample-slice")
-                                    source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
-                                    Rectangle { // Progress
-                                        anchors {
-                                            top: parent.top
-                                            bottom: parent.bottom
-                                        }
-                                        visible: root.sequence &&
-                                                 root.sequence.isPlaying &&
-                                                 root.pattern &&
-                                                 root.pattern.enabled
-                                        color: Kirigami.Theme.highlightColor
-                                        width: widthFactor // this way the progress rect is the same width as a step
-                                        property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
-                                        x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
-                                    }
-                                    MouseArea {
-                                        anchors.fill:parent
-                                        onClicked: {
-                                            var screenBack = zynthian.current_screen_id;
-                                            zynthian.current_modal_screen_id = "playgrid";
-                                            zynthian.forced_screen_back = "zynthiloops";
-                                            ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                            sequence.activePattern = root.selectedTrack.connectedPattern;
-                                        }
-                                    }
-                                }
-                            }
 
-                            QQC2.Popup {
-                                id: trackKeyZoneSetup
-                                y: parent.mapFromGlobal(0, Math.round(parent.Window.height/2 - height/2)).y
-                                x: parent.mapFromGlobal(Math.round(parent.Window.width/2 - width/2), 0).x
-                                modal: true
-                                focus: true
-                                closePolicy: QQC2.Popup.CloseOnPressOutsideParent
-                                TrackKeyZoneSetup {
-                                    anchors.fill: parent
-                                    implicitWidth: root.width - Kirigami.Units.largeSpacing * 2
-                                    implicitHeight: root.height
-                                    readonly property QtObject song: zynthian.zynthiloops.song
-                                    selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+                                    border.width: 1
+                                    border.color: "#ff999999"
+                                    radius: 4
+                                    color: "#222222"
+                                    clip: true
+
+                                    Image {
+                                        id: patternVisualiser
+
+                                        anchors {
+                                            fill: parent
+                                            centerIn: parent
+                                            topMargin: 3
+                                            leftMargin: 3
+                                            rightMargin: 3
+                                            bottomMargin: 2
+                                        }
+                                        smooth: false
+                                        source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+                                        Rectangle { // Progress
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            visible: root.sequence &&
+                                                     root.sequence.isPlaying &&
+                                                     root.pattern &&
+                                                     root.pattern.enabled
+                                            color: Kirigami.Theme.highlightColor
+                                            width: widthFactor // this way the progress rect is the same width as a step
+                                            property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                                            x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
+                                        }
+                                        MouseArea {
+                                            anchors.fill:parent
+                                            onClicked: {
+                                                var screenBack = zynthian.current_screen_id;
+                                                zynthian.current_modal_screen_id = "playgrid";
+                                                zynthian.forced_screen_back = "zynthiloops";
+                                                ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                                sequence.activePattern = root.selectedTrack.connectedPattern;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -1211,8 +1211,8 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Layer %1 %2")
-                                .arg(layerIndex >= 0 ? layerIndex+1 : "--")
+                        text: qsTr("Slot %1 %2")
+                                .arg(bottomStack.slotsBar.selectedSlotRowItem.selectedRow + 1)
                                 .arg(layerIndex >= 0
                                         ? layerCount > 0
                                             ? "(+" + (layerCount-1) + ")"

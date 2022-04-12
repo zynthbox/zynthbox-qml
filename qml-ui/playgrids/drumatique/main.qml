@@ -739,7 +739,7 @@ Zynthian.BasePlayGrid {
                                     }
                                     for (var i = 0; i < indicesToChange.length; ++i) {
                                         var currentValue = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, indicesToChange[i], valueName);
-                                        if (currentValue === undefined) {
+                                        if (currentValue === undefined || currentValue === 0 || isNaN(currentValue)) {
                                             currentValue = defaultValue;
                                         }
                                         //console.log("Current", valueName, currentValue);
@@ -755,26 +755,21 @@ Zynthian.BasePlayGrid {
                             function velocityDown() {
                                 changeValue("velocity", -1, 0, 127, 64);
                             }
-                            // An arbitrary upper value here (2^32) - technically it can be just any
-                            // integer number, and we /could/ use Number.MAX_SAFE_INTEGER, but
-                            // also... that's a very, very big number, and this is a number of 32th
-                            // quarternotes, so even this "low" value is /really/ big... and input is
-                            // an encoder, and it will take a really long time to reach that number.
                             // TODO Default value should probably be the current note duration... get that from PatternModel (which need it exposed)
                             function durationUp() {
-                                changeValue("duration", 1, 0, 2147483647, 0);
+                                changeValue("duration", 1, 0, 128, 0);
                             }
                             function durationDown() {
-                                changeValue("duration", -1, 0, 2147483647, 0);
+                                changeValue("duration", -1, 0, 128, 0);
                             }
                             function delayUp() {
                                 if (stepSettings.visible) {
-                                    changeValue("delay", 1, 0, 2147483647, 0);
+                                    changeValue("delay", 1, 0, stepSettings.stepDuration - 1, 0);
                                 }
                             }
                             function delayDown() {
                                 if (stepSettings.visible) {
-                                    changeValue("delay", -1, 0, 2147483647, 0);
+                                    changeValue("delay", -1, 0, stepSettings.stepDuration - 1, 0);
                                 }
                             }
                             PadNoteButton {

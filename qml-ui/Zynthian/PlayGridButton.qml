@@ -82,7 +82,11 @@ QQC2.Button {
         Timer {
             id: longPressTimer;
             interval: 1000; repeat: false; running: false
+            property bool insideBounds: false;
             onTriggered: {
+                if (insideBounds) {
+                    component.pressAndHold();
+                }
                 component.pressingAndHolding = true;
             }
         }
@@ -91,20 +95,29 @@ QQC2.Button {
         anchors.fill: parent
         touchPoints: [
             TouchPoint {
+                function updateInsideBounds() {
+                    if (pressed) {
+                        if (x > -1 && y > -1 && x < component.width && y < component.height) {
+                            longPressTimer.insideBounds = true;
+                        } else {
+                            longPressTimer.insideBounds = false;
+                        }
+                    }
+                }
+                onXChanged: updateInsideBounds();
+                onYChanged: updateInsideBounds();
                 onPressedChanged: {
                     if (pressed) {
                         component.pressed();
                         component.down = true;
                         component.focus = true;
+                        updateInsideBounds();
                         longPressTimer.restart();
                     } else {
                         component.released();
                         component.down = false;
                         if (x > -1 && y > -1 && x < component.width && y < component.height) {
                             component.clicked();
-                            if (component.pressingAndHolding) {
-                                component.pressAndHold()
-                            }
                         }
                         component.pressingAndHolding = false;
                         longPressTimer.stop();

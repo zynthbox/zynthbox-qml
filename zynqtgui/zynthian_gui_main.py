@@ -69,7 +69,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_metadata = []
 
         # Main Apps
-        self.list_data.append((self.zynthiloops, 0, "Matrix"))
+        self.list_data.append((self.zynthiloops, 0, "Looper"))
         self.list_metadata.append({"icon":"../../img/clipsview.svg"})
 
         self.list_data.append((self.session_dashboard, 0, "Tracks"))

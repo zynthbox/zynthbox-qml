@@ -391,6 +391,25 @@ Rectangle {
                                         visible: (root.selectedTrack.trackAudioType === "sample-trig" ||
                                                  root.selectedTrack.trackAudioType === "sample-slice") &&
                                                  clip.path && clip.path.length > 0
+
+                                        // SamplerSynth progress dots
+                                        Repeater {
+                                            property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(parent.clip.cppObjId) : null;
+                                            model: (root.selectedTrack.trackAudioType === "sample-slice" || root.selectedTrack.trackAudioType === "sample-trig") && cppClipObject
+                                                ? cppClipObject.playbackPositions
+                                                : 0
+                                            delegate: Item {
+                                                Rectangle {
+                                                    anchors.centerIn: parent
+                                                    rotation: 45
+                                                    color: Kirigami.Theme.highlightColor
+                                                    width: Kirigami.Units.largeSpacing
+                                                    height:  Kirigami.Units.largeSpacing
+                                                }
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                x: Math.floor(model.positionProgress * parent.width)
+                                            }
+                                        }
                                     }
                                 }
 

@@ -166,6 +166,7 @@ Rectangle {
 
                             QQC2.Button {
                                 Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
                                 checked: root.selectedTrack.trackAudioType === "synth"
@@ -174,6 +175,7 @@ Rectangle {
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
                                 checked: root.selectedTrack.trackAudioType === "sample-trig" ||
@@ -183,6 +185,7 @@ Rectangle {
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
                                 checked: root.selectedTrack.trackAudioType === "sample-loop"

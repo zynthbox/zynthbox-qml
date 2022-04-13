@@ -789,7 +789,7 @@ Zynthian.BasePlayGrid {
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
                                 note: _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
                                 isCurrent: model.index == drumPadRepeater.selectedIndex
-                                onTapped: {
+                                function setSelected(subNoteIndex) {
                                     if (drumPadRepeater.selectedIndex > -1) {
                                         var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
                                         seqPad.currentSubNote = -1;
@@ -798,7 +798,11 @@ Zynthian.BasePlayGrid {
                                     sequencerPad.currentSubNote = subNoteIndex;
                                     drumPadRepeater.updateMostRecentFromSelection();
                                 }
+                                onTapped: {
+                                    setSelected(subNoteIndex);
+                                }
                                 onPressAndHold: {
+                                    setSelected(subNoteIndex);
                                     stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, model.index);
                                 }
                                 onCurrentSubNoteChanged: {

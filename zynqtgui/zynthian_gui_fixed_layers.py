@@ -78,7 +78,8 @@ class MixerControl(QObject):
             return
         if self.__zctrl.value == value:
             return
-        self.__zctrl.set_value(value)
+
+        self.__zctrl.set_value(value, True)
         self.value_changed.emit()
     value = Property(float, get_value, set_value, notify = value_changed)
 

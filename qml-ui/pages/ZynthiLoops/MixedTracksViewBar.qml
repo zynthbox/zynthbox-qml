@@ -322,6 +322,7 @@ Rectangle {
                                                 top: parent.top
                                                 bottom: parent.bottom
                                             }
+                                            visible: root.selectedTrack.trackAudioType === "synth"
 
                                             color: Kirigami.Theme.highlightColor
                                         }

@@ -30,7 +30,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
 
-GridLayout {
+ColumnLayout {
     id: component
     property QtObject model
     property int row: -1
@@ -82,8 +82,6 @@ GridLayout {
         }
     }
 
-    flow: GridLayout.TopToBottom
-    rows: note ? note.subnotes.length + 2 : 2
     readonly property QtObject note: component.model && component.row > -1 && component.column > -1 ? component.model.getNote(component.row, component.column) : null
 
     function setDuration(duration, isDefault) {
@@ -98,226 +96,240 @@ GridLayout {
         }
     }
 
-    QQC2.Label {
-        id: noteHeaderLabel
+    RowLayout {
         Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        horizontalAlignment: Text.AlignHCenter
-        font.bold: true
-        text: "Note"
-        MultiPointTouchArea {
-            anchors.fill: parent
-            touchPoints: [
-                TouchPoint {
-                    onPressedChanged: {
-                        if (!pressed && x > -1 && y > -1 && x < noteHeaderLabel.width && y < noteHeaderLabel.height) {
-                            component.changeSubnote(-1);
-                        }
-                    }
-                }
-            ]
-        }
-    }
-    Repeater {
-        model: component.note ? component.note.subnotes : 0
-        Item {
-            id: noteDelegate
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            id: noteHeaderLabel
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            text: "Note"
             MultiPointTouchArea {
                 anchors.fill: parent
                 touchPoints: [
                     TouchPoint {
                         onPressedChanged: {
-                            if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
-                                component.changeSubnote(model.index);
+                            if (!pressed && x > -1 && y > -1 && x < noteHeaderLabel.width && y < noteHeaderLabel.height) {
+                                component.changeSubnote(-1);
                             }
                         }
                     }
                 ]
             }
-            Rectangle {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    bottom: parent.bottom
-                    margins: 1
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            text: "Velocity"
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            text: "Duration"
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            font.bold: true
+            text: "Position"
+        }
+    }
+    Repeater {
+        model: component.note ? component.note.subnotes : 0
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Item {
+                id: noteDelegate
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                MultiPointTouchArea {
+                    anchors.fill: parent
+                    touchPoints: [
+                        TouchPoint {
+                            onPressedChanged: {
+                                if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
+                                    component.changeSubnote(model.index);
+                                }
+                            }
+                        }
+                    ]
                 }
-                width: Kirigami.Units.largeSpacing
-                color: Kirigami.Theme.highlightColor
-                visible: model.index === component.currentSubNote
-            }
-            Rectangle {
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
-                    bottom: parent.bottom
-                    margins: 1
-                }
-                width: height
-                radius: height / 2
-                color: modelData ? component.noteSpecificColor[modelData.name] : "transparent"
-            }
-            QQC2.Label {
-                anchors.fill: parent
-                horizontalAlignment: Text.AlignHCenter
-                font.bold: true
-                text: modelData ? modelData.name + modelData.octave : ""
-            }
-        }
-    }
-    QQC2.Label {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        horizontalAlignment: Text.AlignHCenter
-        text: "DEFAULT"
-    }
-
-    QQC2.Label {
-        Layout.columnSpan: 2
-        Layout.fillWidth: true
-        horizontalAlignment: Text.AlignHCenter
-        font.bold: true
-        text: "Velocity"
-    }
-    Repeater {
-        model: component.note ? component.note.subnotes : 0
-        StepSettingsParamDelegate {
-            Layout.columnSpan: 2
-            Layout.fillWidth: true
-            model: component.model; row: component.row; column: component.column;
-            paramIndex: index
-            paramName: "velocity"
-            paramDefaultString: "64"
-            paramValueSuffix: ""
-            paramDefault: 64
-            paramMin: 0
-            paramMax: 127
-            scrollWidth: 128
-        }
-    }
-    Zynthian.PlayGridButton {
-        text: "1"
-        checked: component.model ? component.model.noteLength === 1 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(32, checked); }
-    }
-    Zynthian.PlayGridButton {
-        text: "1/2"
-        checked: component.model ? component.model.noteLength === 2 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(16, checked); }
-    }
-
-    QQC2.Label {
-        Layout.columnSpan: 2
-        Layout.fillWidth: true
-        horizontalAlignment: Text.AlignHCenter
-        font.bold: true
-        text: "Duration"
-    }
-    Repeater {
-        model: component.note ? component.note.subnotes : 0
-        StepSettingsParamDelegate {
-            Layout.columnSpan: 2
-            Layout.fillWidth: true
-            model: component.model; row: component.row; column: component.column;
-            paramIndex: index
-            paramName: "duration"
-            paramDefaultString: component.stepDurationName
-            paramValueSuffix: "/32qn"
-            paramDefault: undefined
-            paramInterpretedDefault: component.stepDuration
-            paramMin: 0
-            paramMax: 128
-            scrollWidth: 128
-            paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
-            paramNames: {
-                0: component.stepDurationName,
-                1: (component.model.noteLength === 6 ? "1/32 (default)" : "1/32"),
-                2: (component.model.noteLength === 5 ? "1/16 (default)" : "1/16"),
-                4: (component.model.noteLength === 4 ? "1/8 (default)" : "1/8"),
-                8: (component.model.noteLength === 3 ? "1/4 (default)" : "1/4"),
-                16: (component.model.noteLength === 2 ? "1/2 (default)" : "1/2"),
-                32: (component.model.noteLength === 1 ? "1 (default)" : "1"),
-                64: "2",
-                128: "4"
-            }
-        }
-    }
-    Zynthian.PlayGridButton {
-        text: "1/4"
-        checked: component.model ? component.model.noteLength === 3 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(8, checked); }
-    }
-    Zynthian.PlayGridButton {
-        text: "1/8"
-        checked: component.model ? component.model.noteLength === 4 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(4, checked); }
-    }
-
-    QQC2.Label {
-        Layout.columnSpan: 2
-        Layout.fillWidth: true
-        horizontalAlignment: Text.AlignHCenter
-        font.bold: true
-        text: "Delay"
-    }
-    Repeater {
-        model: component.note ? component.note.subnotes : 0
-        StepSettingsParamDelegate {
-            Layout.columnSpan: 2
-            Layout.fillWidth: true
-            model: component.model; row: component.row; column: component.column;
-            paramIndex: index
-            paramName: "delay"
-            paramDefaultString: "(no delay)"
-            paramValueSuffix: "/32qn"
-            paramDefault: undefined
-            paramInterpretedDefault: 0
-            paramMin: 0
-            paramMax: component.stepDuration - 1
-            scrollWidth: component.stepDuration
-            Component.onCompleted: {
-                var potentialValues = {
-                    0: "(no delay)",
-                    1: "1/32",
-                    2: "1/16",
-                    4: "1/8",
-                    8: "1/4",
-                    16: "1/2",
-                    32: "1",
-                    64: "2",
-                    128: "4"
-                };
-                var values = [];
-                var names = {};
-                for (var key in potentialValues) {
-                    if (potentialValues.hasOwnProperty(key) && key < component.stepDuration) {
-                        values.push(key);
-                        names[key] = potentialValues[key];
+                Rectangle {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        bottom: parent.bottom
+                        margins: 1
                     }
+                    width: Kirigami.Units.largeSpacing
+                    color: Kirigami.Theme.highlightColor
+                    visible: model.index === component.currentSubNote
                 }
-                paramList = values;
-                paramNames = names;
+                Rectangle {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+                        bottom: parent.bottom
+                        margins: 1
+                    }
+                    width: height
+                    radius: height / 2
+                    color: modelData ? component.noteSpecificColor[modelData.name] : "transparent"
+                }
+                QQC2.Label {
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    font.bold: true
+                    text: modelData ? modelData.name + modelData.octave : ""
+                }
+            }
+            StepSettingsParamDelegate {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                model: component.model; row: component.row; column: component.column;
+                paramIndex: index
+                paramName: "velocity"
+                paramDefaultString: "64"
+                paramValueSuffix: ""
+                paramDefault: 64
+                paramMin: 0
+                paramMax: 127
+                scrollWidth: 128
+            }
+            StepSettingsParamDelegate {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                model: component.model; row: component.row; column: component.column;
+                paramIndex: index
+                paramName: "duration"
+                paramDefaultString: component.stepDurationName
+                paramValueSuffix: "/32qn"
+                paramDefault: undefined
+                paramInterpretedDefault: component.stepDuration
+                paramMin: 0
+                paramMax: 128
+                scrollWidth: 128
+                paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
+                paramNames: {
+                    0: component.stepDurationName,
+                    1: (component.model.noteLength === 6 ? "1/32qn (default)" : "1/32qn"),
+                    2: (component.model.noteLength === 5 ? "1/16qn (default)" : "1/16qn"),
+                    4: (component.model.noteLength === 4 ? "1/8qn (default)" : "1/8qn"),
+                    8: (component.model.noteLength === 3 ? "1/4qn (default)" : "1/4qn"),
+                    16: (component.model.noteLength === 2 ? "1/2qn (default)" : "1/2qn"),
+                    32: (component.model.noteLength === 1 ? "1qn (default)" : "1qn"),
+                    64: "2qn",
+                    96: "3qn",
+                    128: "4qn"
+                }
+            }
+            StepSettingsParamDelegate {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                model: component.model; row: component.row; column: component.column;
+                paramIndex: index
+                paramName: "delay"
+                paramDefaultString: "0 (default)"
+                paramValuePrefix: "+"
+                paramValueSuffix: "/32qn"
+                paramDefault: undefined
+                paramInterpretedDefault: 0
+                paramMin: 0
+                paramMax: component.stepDuration - 1
+                scrollWidth: component.stepDuration
+                Component.onCompleted: {
+                    var potentialValues = {
+                        0: "0 (default)",
+                        1: "+1/32qn",
+                        2: "+1/16qn",
+                        4: "+1/8qn",
+                        8: "+1/4qn",
+                        16: "+1/2qn",
+                        32: "+1qn",
+                        64: "+2qn",
+                        96: "+3qn",
+                        128: "+4qn"
+                    };
+                    var values = [];
+                    var names = {};
+                    for (var key in potentialValues) {
+                        if (potentialValues.hasOwnProperty(key) && key < component.stepDuration) {
+                            values.push(key);
+                            names[key] = potentialValues[key];
+                        }
+                    }
+                    paramList = values;
+                    paramNames = names;
+                }
             }
         }
     }
-    Zynthian.PlayGridButton {
-        text: "1/16"
-        checked: component.model ? component.model.noteLength === 5 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(2, checked); }
+    Rectangle {
+        Layout.fillWidth: true
+        Layout.minimumHeight: 1
+        Layout.maximumHeight: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.5
     }
-    Zynthian.PlayGridButton {
-        text: "1/32"
-        checked: component.model ? component.model.noteLength === 6 : false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        onClicked: { component.setDuration(1, checked); }
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            horizontalAlignment: Text.AlignHCenter
+            text: "DEFAULT"
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1"
+            checked: component.model ? component.model.noteLength === 1 : false
+            onClicked: { component.setDuration(32, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/2"
+            checked: component.model ? component.model.noteLength === 2 : false
+            onClicked: { component.setDuration(16, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/4"
+            checked: component.model ? component.model.noteLength === 3 : false
+            onClicked: { component.setDuration(8, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/8"
+            checked: component.model ? component.model.noteLength === 4 : false
+            onClicked: { component.setDuration(4, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/16"
+            checked: component.model ? component.model.noteLength === 5 : false
+            onClicked: { component.setDuration(2, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/32"
+            checked: component.model ? component.model.noteLength === 6 : false
+            onClicked: { component.setDuration(1, checked); }
+        }
     }
 }

@@ -302,6 +302,7 @@ QQC2.Dialog {
 
                     model: FolderListModel {
                         id: folderModel
+                        caseSensitive: false
                         showDirs: true
                         showDirsFirst: true
                         showDotAndDotDot: false

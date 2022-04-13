@@ -50,6 +50,15 @@ GridLayout {
         6: 1
     }
     property int stepDuration: component.model ? noteLengths[component.model.noteLength] : 0
+    property var noteLengthNames: {
+        1: "1 (default)",
+        2: "1/2 (default)",
+        3: "1/4 (default)",
+        4: "1/8 (default)",
+        5: "1/16 (default)",
+        6: "1/32 (default)"
+    }
+    property string stepDurationName: component.model ? noteLengthNames[component.model.noteLength] : ""
     property var noteSpecificColor: {
         "C":"#f08080",
         "C#":"#4b0082",
@@ -177,6 +186,8 @@ GridLayout {
     Repeater {
         model: component.note ? component.note.subnotes : 0
         StepSettingsParamDelegate {
+            Layout.columnSpan: 2
+            Layout.fillWidth: true
             model: component.model; row: component.row; column: component.column;
             paramIndex: index
             paramName: "velocity"
@@ -211,19 +222,21 @@ GridLayout {
     Repeater {
         model: component.note ? component.note.subnotes : 0
         StepSettingsParamDelegate {
+            Layout.columnSpan: 2
+            Layout.fillWidth: true
             model: component.model; row: component.row; column: component.column;
             paramIndex: index
             paramName: "duration"
-            paramDefaultString: "(default)"
+            paramDefaultString: component.stepDurationName
             paramValueSuffix: "/32qn"
-            paramDefault: 0
+            paramDefault: undefined
             paramInterpretedDefault: component.stepDuration
             paramMin: 0
             paramMax: 128
             scrollWidth: 128
             paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
             paramNames: {
-                0: "(default)",
+                0: component.stepDurationName,
                 1: (component.model.noteLength === 6 ? "1/32 (default)" : "1/32"),
                 2: (component.model.noteLength === 5 ? "1/16 (default)" : "1/16"),
                 4: (component.model.noteLength === 4 ? "1/8 (default)" : "1/8"),
@@ -258,19 +271,21 @@ GridLayout {
     Repeater {
         model: component.note ? component.note.subnotes : 0
         StepSettingsParamDelegate {
+            Layout.columnSpan: 2
+            Layout.fillWidth: true
             model: component.model; row: component.row; column: component.column;
             paramIndex: index
             paramName: "delay"
             paramDefaultString: "(no delay)"
             paramValueSuffix: "/32qn"
-            paramDefault: 0
+            paramDefault: undefined
             paramInterpretedDefault: 0
             paramMin: 0
             paramMax: component.stepDuration - 1
             scrollWidth: component.stepDuration
             Component.onCompleted: {
                 var potentialValues = {
-                    0: "(default)",
+                    0: "(no delay)",
                     1: "1/32",
                     2: "1/16",
                     4: "1/8",

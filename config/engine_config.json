@@ -4,6 +4,7 @@
         "description": "Synth V1 small description"
     },
     "JV/amsynth": {
+        "volumeControl": ["master_vol"],
         "description": "A tiny custom description for amsynth"
     },
     "default": {

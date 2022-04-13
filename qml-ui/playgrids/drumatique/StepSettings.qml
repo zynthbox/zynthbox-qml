@@ -51,12 +51,12 @@ ColumnLayout {
     }
     property int stepDuration: component.model ? noteLengths[component.model.noteLength] : 0
     property var noteLengthNames: {
-        1: "1 (default)",
-        2: "1/2 (default)",
-        3: "1/4 (default)",
-        4: "1/8 (default)",
-        5: "1/16 (default)",
-        6: "1/32 (default)"
+        1: "1qn (default)",
+        2: "1/2qn (default)",
+        3: "1/4qn (default)",
+        4: "1/8qn (default)",
+        5: "1/16qn (default)",
+        6: "1/32qn (default)"
     }
     property string stepDurationName: component.model ? noteLengthNames[component.model.noteLength] : ""
     property var noteSpecificColor: {
@@ -226,12 +226,12 @@ ColumnLayout {
                 paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
                 paramNames: {
                     0: component.stepDurationName,
-                    1: (component.model.noteLength === 6 ? "1/32qn (default)" : "1/32qn"),
-                    2: (component.model.noteLength === 5 ? "1/16qn (default)" : "1/16qn"),
-                    4: (component.model.noteLength === 4 ? "1/8qn (default)" : "1/8qn"),
-                    8: (component.model.noteLength === 3 ? "1/4qn (default)" : "1/4qn"),
-                    16: (component.model.noteLength === 2 ? "1/2qn (default)" : "1/2qn"),
-                    32: (component.model.noteLength === 1 ? "1qn (default)" : "1qn"),
+                    1: "1/32qn",
+                    2: "1/16qn",
+                    4: "1/8qn",
+                    8: "1/4qn",
+                    16: "1/2qn",
+                    32: "1qn",
                     64: "2qn",
                     96: "3qn",
                     128: "4qn"

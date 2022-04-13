@@ -39,6 +39,7 @@ RowLayout {
     property int paramIndex
     property string paramName
     property string paramDefaultString
+    property string paramValuePrefix
     property string paramValueSuffix
     property var paramDefault
     property int paramInterpretedDefault: parseInt(paramDefault)
@@ -103,11 +104,11 @@ RowLayout {
         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        text: parent.paramValue === undefined || component.paramValue === component.paramDefault
+        text: component.paramValue === undefined || component.paramValue === component.paramDefault
             ? component.paramDefaultString
             : component.paramNames !== undefined && component.paramNames.hasOwnProperty(component.paramValue)
                 ? component.paramNames[component.paramValue]
-                : parent.paramValue + component.paramValueSuffix
+                : component.paramValuePrefix + component.paramValue + component.paramValueSuffix
         MultiPointTouchArea {
             anchors.fill: parent
             touchPoints: [

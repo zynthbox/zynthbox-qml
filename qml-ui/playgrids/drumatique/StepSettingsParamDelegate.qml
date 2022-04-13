@@ -40,8 +40,8 @@ RowLayout {
     property string paramName
     property string paramDefaultString
     property string paramValueSuffix
-    property int paramDefault
-    property int paramInterpretedDefault: paramDefault
+    property var paramDefault
+    property int paramInterpretedDefault: parseInt(paramDefault)
     property int paramMin
     property int paramMax
     property int scrollWidth
@@ -56,9 +56,8 @@ RowLayout {
     // for the sub-divisions of a quarter note)
     property var paramNames: undefined
 
-    Layout.columnSpan: 2
-    Layout.fillWidth: true
-    property var paramValue: component.model && component.row > -1 && component.column > -1 && updateForcery > -1 ? component.model.subnoteMetadata(component.row, component.column, component.paramIndex, paramName) : undefined;
+    readonly property var paramValue: component.model && component.row > -1 && component.column > -1 && updateForcery > -1 ? component.model.subnoteMetadata(component.row, component.column, component.paramIndex, paramName) : undefined;
+    readonly property bool preferInterpretedValue: component.paramValue === undefined || isNaN(parseInt(component.paramValue)) || parseInt(component.paramValue) === 0
     property int updateForcery: 0
     Connections {
         target: component.model
@@ -66,13 +65,19 @@ RowLayout {
             component.updateForcery += 1;
         }
     }
+    function setNewValue(newValue) {
+        if (newValue === component.paramInterpretedDefault) {
+            newValue = component.paramDefault;
+        }
+        component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
+    }
     Zynthian.PlayGridButton {
         text: "-"
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-        enabled: component.paramValue === undefined || component.paramValue > component.paramMin
+        Layout.preferredWidth: Kirigami.Units.gridUnit
+        enabled: (component.preferInterpretedValue && component.paramInterpretedDefault > component.paramMin) || parseInt(component.paramValue) > component.paramMin
         onClicked: {
             if (component.paramList.length > 0) {
-                var value = parseInt((component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue);
+                var value = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
                 var newValue = component.paramMin;
                 for (var i = component.paramList.length - 1; i > -1 ; --i) {
                     if (parseInt(component.paramList[i]) < value) {
@@ -80,12 +85,12 @@ RowLayout {
                         break;
                     }
                 }
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
+                component.setNewValue(newValue);
             } else {
-                if (component.paramValue === undefined) {
-                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.max(component.paramInterpretedDefault - 1, component.paramMin));
+                if (component.preferInterpretedValue) {
+                    component.setNewValue(Math.max(component.paramInterpretedDefault - 1, component.paramMin));
                 } else {
-                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue - 1);
+                    component.setNewValue(component.paramValue - 1);
                 }
             }
             component.updateForcery += 1;
@@ -95,7 +100,7 @@ RowLayout {
         id: paramLabel
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: parent.paramValue === undefined || component.paramValue === component.paramDefault
@@ -111,7 +116,7 @@ RowLayout {
                     property var currentValue: undefined
                     onPressedChanged: {
                         if (pressed) {
-                            currentValue = (component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                            currentValue = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
                         } else {
                             currentValue = undefined;
                         }
@@ -119,7 +124,7 @@ RowLayout {
                     onXChanged: {
                         if (pressed && currentValue !== undefined) {
                             var delta = Math.round((slidePoint.x - slidePoint.startX) * (component.scrollWidth / paramLabel.width));
-                            component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
+                            component.setNewValue(Math.min(Math.max(currentValue + delta, component.paramMin), component.paramMax));
                         }
                     }
                 }
@@ -135,7 +140,7 @@ RowLayout {
             Rectangle {
                 anchors {
                     fill: parent
-                    rightMargin: parent.width * ((component.paramMax - (component.paramValue === undefined ? component.paramInterpretedDefault : component.paramValue)) / component.paramMax)
+                    rightMargin: parent.width * ((component.paramMax - (component.preferInterpretedValue ? component.paramInterpretedDefault : component.paramValue)) / component.paramMax)
                 }
                 color: Kirigami.Theme.textColor
             }
@@ -143,11 +148,11 @@ RowLayout {
     }
     Zynthian.PlayGridButton {
         text: "+"
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-        enabled: component.paramValue === undefined || component.paramValue < component.paramMax
+        Layout.preferredWidth: Kirigami.Units.gridUnit
+        enabled: (component.preferInterpretedValue && component.paramInterpretedDefault < component.paramMax) || parseInt(component.paramValue) < component.paramMax
         onClicked: {
             if (component.paramList.length > 0) {
-                var value = parseInt(component.paramValue === undefined) ? component.paramInterpretedDefault : component.paramValue;
+                var value = component.preferInterpretedValue ? component.paramInterpretedDefault : parseInt(component.paramValue);
                 var newValue = component.paramMax;
                 for (var i = 0; i < component.paramList.length; ++i) {
                     if (parseInt(component.paramList[i]) > value) {
@@ -155,12 +160,12 @@ RowLayout {
                         break;
                     }
                 }
-                component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, newValue);
+                component.setNewValue(newValue);
             } else {
-                if (component.paramValue === undefined) {
-                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, Math.min(component.paramMax, component.paramInterpretedDefault + 1));
+                if (component.preferInterpretedValue) {
+                    component.setNewValue(Math.min(component.paramMax, component.paramInterpretedDefault + 1));
                 } else {
-                    component.model.setSubnoteMetadata(component.row, component.column, component.paramIndex, paramName, component.paramValue + 1);
+                    component.setNewValue(component.paramValue + 1);
                 }
             }
             component.updateForcery += 1;

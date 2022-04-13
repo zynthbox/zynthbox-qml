@@ -154,8 +154,11 @@ Rectangle {
             type = ""
         }
 
+        console.log("handleItemClick :", type, synthsButton.checked, fxButton.checked, samplesButton.checked)
+
         if (synthsButton.checked || type === "synth") {
             // Clicked entry is synth
+            console.log("handleItemClick : Synth")
 
             var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
 
@@ -194,10 +197,11 @@ Rectangle {
             }
         } else if (fxButton.checked) {
             // Clicked entry is fx
+            console.log("handleItemClick : FX")
+
             var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
 
-
-            logging.error("### FX BUTTTON CHECKED", chainedSound, root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound), zynthian.backButtonPressed)
+            console.log("### FX BUTTTON CHECKED", chainedSound, root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound), zynthian.backButtonPressed)
 
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
@@ -215,6 +219,8 @@ Rectangle {
             }
         } else if (samplesButton.checked || type === "sample-trig" || type === "sample-slice") {
             // Clicked entry is samples
+            console.log("handleItemClick : Samples")
+
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
                 root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.track.selectedSlotRow].clear()

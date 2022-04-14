@@ -875,6 +875,7 @@ class zynthiloops_track(QObject):
     def set_selectedSlotRow(self, row):
         if self.__selected_slot_row__ != row:
             self.__selected_slot_row__ = row
+            self.zyngui.zynthiloops.set_selector()
             self.selectedSlotRowChanged.emit()
 
     selectedSlotRowChanged = Signal()

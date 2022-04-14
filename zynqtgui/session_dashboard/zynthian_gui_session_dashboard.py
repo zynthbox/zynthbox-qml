@@ -92,6 +92,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         return "zynthiloops"
 
     def selected_track_changed_handler(self):
+        self.zyngui.fixed_layers.fill_list()
         self.selected_track_name_changed.emit()
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
         if selected_track != None:

@@ -962,7 +962,7 @@ Zynthian.BasePlayGrid {
                                 ColumnLayout {
                                     Zynthian.PlayGridButton {
                                         text: "+"
-                                        enabled: _private.availableBars > -1
+                                        enabled: _private.availableBars < 8
                                         onClicked: {
                                             component.setPatternProperty("availableBars", _private.availableBars + 1)
                                         }
@@ -976,7 +976,7 @@ Zynthian.BasePlayGrid {
 
                                     Zynthian.PlayGridButton {
                                         text:"-"
-                                        enabled: _private.availableBars < 9
+                                        enabled: _private.availableBars > 1
                                         onClicked: {
                                             component.setPatternProperty("availableBars", _private.availableBars - 1);
                                         }

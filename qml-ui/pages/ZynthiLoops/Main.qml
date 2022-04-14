@@ -1020,17 +1020,35 @@ Zynthian.ScreenPage {
                                                                    : "")
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
+                                            var sourceClip = root.copySourceObj
+                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+
                                             // Copy Clip
-                                            root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol).copyFrom(root.copySourceObj)
+                                            destClip.copyFrom(sourceClip)
+                                            // Copy pattern
+                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
+                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
+                                            destPattern.cloneOther(sourcePattern)
+
                                             root.copySourceObj = null
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_track") {
                                             zynthian.start_loading()
 
-                                            // Copy Track and pattern
-                                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                                            root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack).copyFrom(root.copySourceObj, seq.filePath)
+                                            // Copy Track
+                                            var sourceTrack = root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+                                            var destTrack = root.copySourceObj
+                                            destTrack.copyFrom(sourceTrack)
+
+//                                            for (var i=0; i<=sourceTrack.clipsModel.count; i++) {
+//                                                var sourceClip = sourceTrack.clipsModel.getClip(i)
+//                                                var destClip = destTrack.clipsModel.getClip(i)
+//                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
+//                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
+
+//                                                destPattern.cloneOther(sourcePattern)
+//                                            }
+
                                             root.copySourceObj = null
-                                            seq.load()
 
                                             zynthian.stop_loading()
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_scene") {

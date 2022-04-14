@@ -147,12 +147,6 @@ Rectangle {
                         Layout.fillHeight: true
                     }
 
-                    Kirigami.Separator {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 1
-                        color: "#ff31363b"
-                    }
-
                     ColumnLayout {
                         id: contentColumn
                         Layout.fillWidth: true
@@ -379,18 +373,21 @@ Rectangle {
                                     radius: 4
 
                                     WaveFormItem {
-                                        property QtObject clip: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+                                        property QtObject clip: root.selectedTrack.trackAudioType === "sample-loop"
+                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipRow)
+                                                                    : root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                                         anchors.fill: parent
                                         color: Kirigami.Theme.textColor
-                                        source: clip.path
+                                        source: clip ? clip.path : ""
                                         onSourceChanged: {
                                             console.log("Source changed")
                                         }
 
                                         visible: (root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                 root.selectedTrack.trackAudioType === "sample-slice") &&
-                                                 clip.path && clip.path.length > 0
+                                                  root.selectedTrack.trackAudioType === "sample-slice" ||
+                                                  root.selectedTrack.trackAudioType === "sample-loop") &&
+                                                 clip && clip.path && clip.path.length > 0
 
                                         // SamplerSynth progress dots
                                         Repeater {
@@ -417,11 +414,6 @@ Rectangle {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    visible: root.selectedTrack &&
-                                             root.selectedTrack.connectedPattern >= 0 &&
-                                             (root.selectedTrack.trackAudioType === "synth" ||
-                                              root.selectedTrack.trackAudioType === "sample-trig" ||
-                                              root.selectedTrack.trackAudioType === "sample-slice")
 
                                     border.width: 1
                                     border.color: "#ff999999"
@@ -431,6 +423,12 @@ Rectangle {
 
                                     Image {
                                         id: patternVisualiser
+
+                                        visible: root.selectedTrack &&
+                                                 root.selectedTrack.connectedPattern >= 0 &&
+                                                 (root.selectedTrack.trackAudioType === "synth" ||
+                                                  root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                  root.selectedTrack.trackAudioType === "sample-slice")
 
                                         anchors {
                                             fill: parent

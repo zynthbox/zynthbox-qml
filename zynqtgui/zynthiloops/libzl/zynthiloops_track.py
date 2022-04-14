@@ -726,6 +726,7 @@ class zynthiloops_track(QObject):
                 except:
                     pass
             self.__track_audio_type__ = type
+            self.zyngui.zynthiloops.set_selector()
             self.track_audio_type_changed.emit()
             if not force_set:
                 self.__song__.schedule_save()

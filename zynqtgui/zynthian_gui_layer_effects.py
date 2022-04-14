@@ -187,6 +187,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		self.zyngui.screens["fixed_layers"].fill_list()
 
 
+	@Slot(None)
 	def fx_reset_confirmed(self, params=None):
 		# Remove all layers
 		for sl in self.fx_layers:

@@ -154,8 +154,6 @@ Rectangle {
             type = ""
         }
 
-        console.log("handleItemClick :", type, synthsButton.checked, fxButton.checked, samplesButton.checked)
-
         if (synthsButton.checked || type === "synth") {
             // Clicked entry is synth
             console.log("handleItemClick : Synth")
@@ -201,13 +199,13 @@ Rectangle {
 
             var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
 
-            console.log("### FX BUTTTON CHECKED", chainedSound, root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound), zynthian.backButtonPressed)
-
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
                 if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
+                    zynthian.start_loading()
                     zynthian.fixed_layers.activate_index(chainedSound)
-                    zynthian.layer_effects.fx_reset()
+                    zynthian.layer_effects.fx_reset_confirmed()
+                    zynthian.stop_loading()
                 }
             } else {
                 zynthian.fixed_layers.activate_index(chainedSound)

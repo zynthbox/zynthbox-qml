@@ -225,6 +225,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def set_selected_sound_row(self, row):
         if self.__selected_sound_row__ != row:
             self.__selected_sound_row__ = row
+            self.zyngui.zynthiloops.set_selector()
             self.zyngui.screens["zynthiloops"].connect_control_objects()
             self.selected_sound_row_changed.emit()
 

@@ -338,6 +338,7 @@ Zynthian.Card {
                             ListElement { text: "Smp: Loop"; value: "sample-loop" }
                             ListElement { text: "Smp: Trig"; value: "sample-trig" }
                             ListElement { text: "Smp: Slice"; value: "sample-slice" }
+                            ListElement { text: "External"; value: "external" }
                         }
                         textRole: "text"
                         currentIndex: controlObj &&

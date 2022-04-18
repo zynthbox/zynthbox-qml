@@ -178,6 +178,15 @@ Rectangle {
                                 text: qsTr("Samples")
                                 onClicked: root.selectedTrack.trackAudioType = "sample-trig"
                             }
+                            QQC2.Button {
+                                Layout.fillWidth: true
+                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.fillHeight: false
+                                checkable: true
+                                checked: root.selectedTrack.trackAudioType === "external"
+                                text: qsTr("External")
+                                onClicked: root.selectedTrack.trackAudioType = "external"
+                            }
                         }
 
                         ColumnLayout {

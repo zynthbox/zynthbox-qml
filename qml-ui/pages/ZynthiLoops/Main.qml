@@ -629,7 +629,7 @@ Zynthian.ScreenPage {
 //                                      : ""
                             subSubText: {
                                 if (model.track.trackAudioType === "sample-loop") {
-                                    return qsTr("Loop")
+                                    return qsTr("Smp: Loop")
                                 } else if (model.track.trackAudioType === "sample-trig") {
                                     return qsTr("Smp: Trig")
                                 } else if (model.track.trackAudioType === "sample-slice") {

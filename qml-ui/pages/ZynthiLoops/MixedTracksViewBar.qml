@@ -172,19 +172,11 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                checked: root.selectedTrack.trackAudioType === "sample-loop" ||
+                                         root.selectedTrack.trackAudioType === "sample-trig" ||
                                          root.selectedTrack.trackAudioType === "sample-slice"
                                 text: qsTr("Samples")
                                 onClicked: root.selectedTrack.trackAudioType = "sample-trig"
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.fillHeight: false
-                                checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-loop"
-                                text: qsTr("Loop")
-                                onClicked: root.selectedTrack.trackAudioType = "sample-loop"
                             }
                         }
 
@@ -200,7 +192,8 @@ Rectangle {
 
                                 RowLayout {
                                     anchors.fill: parent
-                                    visible: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                    visible: root.selectedTrack.trackAudioType === "sample-loop" ||
+                                             root.selectedTrack.trackAudioType === "sample-trig" ||
                                              root.selectedTrack.trackAudioType === "sample-slice"
 
                                     Item {
@@ -269,6 +262,14 @@ Rectangle {
                                             checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
                                             onClicked: {
                                                 root.selectedTrack.trackAudioType = "sample-slice"
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Loop"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-loop"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-loop"
                                             }
                                         }
                                     }

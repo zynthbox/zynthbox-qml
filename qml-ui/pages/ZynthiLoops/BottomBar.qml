@@ -335,7 +335,7 @@ Zynthian.Card {
                         // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
                         model: ListModel {
                             ListElement { text: "Synth"; value: "synth" }
-                            ListElement { text: "Loop"; value: "sample-loop" }
+                            ListElement { text: "Smp: Loop"; value: "sample-loop" }
                             ListElement { text: "Smp: Trig"; value: "sample-trig" }
                             ListElement { text: "Smp: Slice"; value: "sample-slice" }
                         }

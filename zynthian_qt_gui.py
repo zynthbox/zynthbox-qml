@@ -398,6 +398,7 @@ class zynthian_gui(QObject):
         self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
         self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
         self.wscolor_yellow = rpi_ws281x.Color(255, 235, 59)
+        self.wscolor_purple = rpi_ws281x.Color(142, 36, 170)
         self.wscolor_off = self.wscolor_blue # Set unlit buttons to blue
         self.wscolor_light = self.wscolor_blue
         self.wscolor_active = self.wscolor_green
@@ -768,15 +769,8 @@ class zynthian_gui(QObject):
 
                     continue
 
-                # # If any other bottom bar is open, light up selected track with green color otherwise display blue color
-                # if not self.tracks_mod_active and \
-                #         self.screens['session_dashboard'].selectedTrack == (i - 1):
-                #     self.wsleds.setPixelColor(i, self.wscolor_active)
-                # elif self.tracks_mod_active and \
-                #         self.screens['session_dashboard'].selectedTrack == (i + 4):
-                #     self.wsleds.setPixelColor(i, self.wscolor_active)
-                # else:
-                #     self.wsleds.setPixelColor(i, self.wscolor_light)
+                # If none of the above conditions were true, light up button with blue color
+                self.wsleds.setPixelColor(i, self.wscolor_light)
 
             # # Button 6 will act as modifier key to select track 6-10 when slots bar tabs other than mixer is not open
             # # Light up when self.tracks_mod_active is true and other tabs are not open except mixer
@@ -799,6 +793,8 @@ class zynthian_gui(QObject):
                 self.wsleds.setPixelColor(7, self.wscolor_blue)
             elif self.active_screen == "zynthiloops" and track.trackAudioType == "sample-loop":
                 self.wsleds.setPixelColor(7, self.wscolor_green)
+            elif self.active_screen == "zynthiloops" and track.trackAudioType == "external":
+                self.wsleds.setPixelColor(7, self.wscolor_purple)
             else:
                 self.wsleds.setPixelColor(7, self.wscolor_off)
 

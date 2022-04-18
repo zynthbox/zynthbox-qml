@@ -197,6 +197,8 @@ Zynthian.ScreenPage {
                     } else if (root.selectedTrack.trackAudioType === "sample-slice") {
                         root.selectedTrack.trackAudioType = "sample-loop"
                     } else if (root.selectedTrack.trackAudioType === "sample-loop") {
+                        root.selectedTrack.trackAudioType = "external"
+                    } else if (root.selectedTrack.trackAudioType === "external") {
                         root.selectedTrack.trackAudioType = "synth"
                     }
                 }

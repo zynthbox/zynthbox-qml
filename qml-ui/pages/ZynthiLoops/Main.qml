@@ -809,6 +809,7 @@ Zynthian.ScreenPage {
                                     Connections {
                                         target: track
                                         onConnectedPatternChanged: colorTimer.restart()
+                                        onTrackAudioTypeChanged: colorTimer.restart()
                                     }
                                     Connections {
                                         target: clipCell.pattern
@@ -834,14 +835,14 @@ Zynthian.ScreenPage {
                                                 hasNotes = clipCell.pattern.bankHasNotes(0)
                                             } catch(err) {}
 
-                                            if (track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
+                                            if (track.trackAudioType === "sample-loop" && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
                                                 // In scene
                                                 clipCell.backgroundColor = "#3381d4fa";
                                             } else if (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)) {
                                                 // Not in scene
                                                 clipCell.backgroundColor = "#33f44336";
                                             } else if ((track.connectedPattern >= 0 && hasNotes)
-                                                || (track.sceneClip.path && track.sceneClip.path.length > 0)) {
+                                                || (track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0)) {
                                                 clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                             } else {
                                                 clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);

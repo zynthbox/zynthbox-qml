@@ -45,6 +45,7 @@ Rectangle {
     property alias fxButton: fxButton    
 
     readonly property QtObject song: zynthian.zynthiloops.song
+    readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property QtObject selectedSlotRowItem
 
     Layout.fillWidth: true
@@ -224,6 +225,17 @@ Rectangle {
                 root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.track.selectedSlotRow].clear()
             } else {
                 samplePickerPopup.open()
+            }
+        } else if (type === "sample-loop") {
+            if (root.selectedTrack.selectedSlotRow === 0) {
+                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
+
+                if (zynthian.backButtonPressed) {
+                    clip.clear()
+                } else {
+                    loopPickerDialog.folderModel.folder = clip.recordingDir
+                    loopPickerDialog.open()
+                }
             }
         }
     }
@@ -803,6 +815,26 @@ Rectangle {
         }
         onFileSelected: {
             root.selectedSlotRowItem.track.setBank(file.filePath)
+        }
+    }
+
+    Zynthian.FilePickerDialog {
+        id: loopPickerDialog
+        parent: zlScreen.parent
+
+        width: parent.width
+        height: parent.height
+        x: parent.x
+        y: parent.y
+
+        headerText: qsTr("%1 : Pick an audio file")
+                        .arg(root.selectedTrack.name)
+        rootFolder: "/zynthian/zynthian-my-data"
+        folderModel {
+            nameFilters: ["*.wav"]
+        }
+        onFileSelected: {
+            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol).path = file.filePath
         }
     }
 

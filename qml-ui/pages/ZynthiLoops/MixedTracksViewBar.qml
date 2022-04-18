@@ -296,7 +296,9 @@ Rectangle {
                                             : root.selectedTrack.trackAudioType === "sample-trig" ||
                                               root.selectedTrack.trackAudioType === "sample-slice"
                                                 ? root.selectedTrack.samples
-                                                : []
+                                                : root.selectedTrack.trackAudioType === "sample-loop"
+                                                    ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol), null, null, null, null]
+                                                    : []
 
                                     delegate: Rectangle {
                                         id: delegate
@@ -343,7 +345,8 @@ Rectangle {
                                             text: root.selectedTrack.trackAudioType === "synth"
                                                     ? modelData
                                                     : root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                      root.selectedTrack.trackAudioType === "sample-slice"
+                                                      root.selectedTrack.trackAudioType === "sample-slice" ||
+                                                      root.selectedTrack.trackAudioType === "sample-loop"
                                                         ? modelData.path.split("/").pop()
                                                         : ""
 
@@ -381,7 +384,7 @@ Rectangle {
 
                                     WaveFormItem {
                                         property QtObject clip: root.selectedTrack.trackAudioType === "sample-loop"
-                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipRow)
+                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
                                                                     : root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                                         anchors.fill: parent

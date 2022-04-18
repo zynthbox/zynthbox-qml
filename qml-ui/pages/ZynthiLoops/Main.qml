@@ -197,6 +197,12 @@ Zynthian.ScreenPage {
                     } else if (root.selectedTrack.trackAudioType === "sample-slice") {
                         root.selectedTrack.trackAudioType = "sample-loop"
                     } else if (root.selectedTrack.trackAudioType === "sample-loop") {
+                        // HACK
+                        // FIXME : When changing trackAudioType to external it somehow first gets selected to "synth"
+                        //         And then on changing the value 2nd time it finally changes to "external"
+                        //         Couldn't find any probable cause for the issue but forcefully setting to external twice
+                        //         seems to do temporarily solve the problem. But this issue needs to be fixed ASAP
+                        root.selectedTrack.trackAudioType = "external"
                         root.selectedTrack.trackAudioType = "external"
                     } else if (root.selectedTrack.trackAudioType === "external") {
                         root.selectedTrack.trackAudioType = "synth"

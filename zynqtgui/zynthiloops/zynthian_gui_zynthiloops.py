@@ -1011,6 +1011,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # Set ALSA Mixer volume to 100% when creating new sketch
             self.zyngui.screens["master_alsa_mixer"].volume = 100
 
+            # Update volume controls
+            self.zyngui.fixed_layers.fill_list()
+            self.set_selector()
+
             if cb is not None:
                 cb()
 

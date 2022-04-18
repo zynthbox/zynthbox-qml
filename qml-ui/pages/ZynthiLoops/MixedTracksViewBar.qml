@@ -279,9 +279,7 @@ Rectangle {
                             RowLayout {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
-                                visible: root.selectedTrack.trackAudioType === "synth" ||
-                                         root.selectedTrack.trackAudioType === "sample-trig" ||
-                                         root.selectedTrack.trackAudioType === "sample-slice"
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                                 Repeater {
                                     model: root.selectedTrack.trackAudioType === "synth"
@@ -301,8 +299,7 @@ Rectangle {
                                                                         : 0
 
                                         Layout.fillWidth: true
-                                        Layout.fillHeight: false
-                                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                        Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                                         Kirigami.Theme.inherit: false

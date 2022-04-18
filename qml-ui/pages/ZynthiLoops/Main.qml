@@ -644,6 +644,8 @@ Zynthian.ScreenPage {
                                     return qsTr("Smp: Slice")
                                 } else if (model.track.trackAudioType === "synth") {
                                     return qsTr("Synth")
+                                } else if (model.track.trackAudioType === "external") {
+                                    return qsTr("External")
                                 }
                             }
 
@@ -653,13 +655,15 @@ Zynthian.ScreenPage {
                                 if (root.copySourceObj === model.track)
                                     return "#ff2196f3"
                                 else if (model.track.trackAudioType === "synth")
-                                    return "#22ff0000"
+                                    return "#66ff0000"
                                 else if (model.track.trackAudioType === "sample-loop")
-                                    return "#220000ff"
+                                    return "#6600ff00"
                                 else if (model.track.trackAudioType === "sample-trig")
-                                    return "#22ffff00"
+                                    return "#66ffff00"
                                 else if (model.track.trackAudioType === "sample-slice")
-                                    return "#22ffff00"
+                                    return "#66ffff00"
+                                else if (model.track.trackAudioType === "external")
+                                    return "#998e24aa"
                                 else
                                     return Kirigami.Theme.backgroundColor
                             }

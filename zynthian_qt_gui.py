@@ -576,6 +576,7 @@ class zynthian_gui(QObject):
     def set_track_samples_bar_active(self, isActive):
         if self.track_samples_bar_active != isActive:
             self.track_samples_bar_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.trackSamplesBarActiveChanged.emit()
 
     trackSamplesBarActiveChanged = Signal()
@@ -617,6 +618,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_mixer_active(self, isActive):
         if self.slots_bar_mixer_active != isActive:
             self.slots_bar_mixer_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.slotsBarMixerActiveChanged.emit()
 
     slotsBarMixerActiveChanged = Signal()
@@ -630,6 +632,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_synths_active(self, isActive):
         if self.slots_bar_synths_active != isActive:
             self.slots_bar_synths_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.slotsBarSynthsActiveChanged.emit()
 
     slotsBarSynthsActiveChanged = Signal()
@@ -643,6 +646,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_samples_active(self, isActive):
         if self.slots_bar_samples_active != isActive:
             self.slots_bar_samples_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.slotsBarSamplesActiveChanged.emit()
 
     slotsBarSamplesActiveChanged = Signal()
@@ -656,6 +660,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_fx_active(self, isActive):
         if self.slots_bar_fx_active != isActive:
             self.slots_bar_fx_active = isActive
+            self.screens["zynthiloops"].set_selector()
             self.slotsBarFxActiveChanged.emit()
 
     slotsBarFxActiveChanged = Signal()

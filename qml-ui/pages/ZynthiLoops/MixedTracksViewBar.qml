@@ -449,7 +449,7 @@ Rectangle {
                                             bottomMargin: 2
                                         }
                                         smooth: false
-                                        source: root.pattern && root.selectedTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + root.selectedTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+                                        source: root.pattern ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "?" + root.pattern.lastModified : ""
                                         Rectangle { // Progress
                                             anchors {
                                                 top: parent.top

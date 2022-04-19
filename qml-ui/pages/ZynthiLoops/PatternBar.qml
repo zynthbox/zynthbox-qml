@@ -93,7 +93,7 @@ GridLayout {
             smooth: false
 
             visible: controlObj.clipTrack && controlObj.clipTrack.connectedPattern >= 0
-            source: root.pattern && controlObj.clipTrack ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + controlObj.clipTrack.connectedPattern + "/0?" + root.pattern.lastModified : ""
+            source: root.pattern && controlObj.clipTrack ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "??" + root.pattern.lastModified : ""
             Rectangle { // Progress
                 anchors {
                     top: parent.top

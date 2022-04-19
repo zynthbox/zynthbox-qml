@@ -66,9 +66,9 @@ Zynthian.ScreenPage {
         }
 
         if (!returnValue) {
-            if (playGridsRepeater.count > 0 && playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback != null) {
+            if (applicationWindow().playGrids.count > 0 && applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback != null) {
                 try {
-                    returnValue = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback(cuia);
+                    returnValue = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.cuiaCallback(cuia);
                 }
                 catch(error) {
                     console.log("Error in the current playgrid's cuia callback:", error);
@@ -82,9 +82,9 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             id: placeholderAction
-            text: children.length > 0 ? qsTr("%1 Actions").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ") : "       "
+            text: children.length > 0 ? qsTr("%1 Actions").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ") : "       "
             enabled: children.length > 0
-            children: playGridsRepeater.count === 0 ? [] : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
+            children: applicationWindow().playGrids.count === 0 ? [] : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.additionalActions
         }
     ]
 
@@ -108,7 +108,7 @@ don't want to have to dig too far...
         id: playGridActionInstantiator
         model: ZynQuick.PlayGridManager.playgrids
         delegate: Kirigami.Action {
-            property Item relevantPlaygrid: playGridsRepeater.itemAt(index) ? playGridsRepeater.itemAt(index).item : null
+            property Item relevantPlaygrid: applicationWindow().playGrids.itemAt(index) ? applicationWindow().playGrids.itemAt(index).item : null
             text: relevantPlaygrid ? relevantPlaygrid.name : ""
             onTriggered: {
                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", index);
@@ -124,25 +124,6 @@ don't want to have to dig too far...
         }
     }
 */
-
-    Connections {
-        target: ZynQuick.PlayGridManager
-        property int currentPlaygrid: -1
-        function updatePlaygrid() {
-            if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
-                var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
-                playGridStack.replace(playgrid.grid);
-                currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
-                placeholderAction.children = playgrid.additionalActions;
-                if (playgrid.isSequencer) {
-                    ZynQuick.PlayGridManager.setPreferredSequencer(ZynQuick.PlayGridManager.playgrids[ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]]);
-                }
-            }
-        }
-        Component.onCompleted: updatePlaygrid();
-        onPlaygridsChanged: updatePlaygrid();
-        onCurrentPlaygridsChanged: updatePlaygrid();
-    }
 
     RowLayout {
         anchors.fill: parent
@@ -160,7 +141,7 @@ don't want to have to dig too far...
             QQC2.Dialog {
                 id: settingsDialog
                 visible: false
-                title: qsTr("%1 Settings").arg(playGridsRepeater.currentItem ? playGridsRepeater.currentItem.name : " ")
+                title: qsTr("%1 Settings").arg(playGridStack.currentPlayGridItem ? playGridStack.currentPlayGridItem.name : " ")
                 modal: true
                 width: component.width - Kirigami.Units.largeSpacing * 4
                 height: component.height - Kirigami.Units.largeSpacing * 4
@@ -198,7 +179,7 @@ don't want to have to dig too far...
                 contentItem: Loader {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.settings ? playGridsRepeater.currentItem.settings : null
+                    sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.settings ? playGridStack.currentPlayGridItem.settings : null
                 }
             }
 
@@ -334,7 +315,7 @@ don't want to have to dig too far...
                                         Layout.fillWidth: true
                                         Layout.minimumHeight: settingsButton.width
                                         Layout.maximumHeight: settingsButton.width
-                                        property Item relevantPlaygrid: playGridsRepeater.itemAt(index) ? playGridsRepeater.itemAt(index).item : null
+                                        property Item relevantPlaygrid: applicationWindow().playGrids.itemAt(index) ? applicationWindow().playGrids.itemAt(index).item : null
                                         text: relevantPlaygrid ? relevantPlaygrid.name : ""
                                         icon.name: relevantPlaygrid ? relevantPlaygrid.icon : "view-grid-symbolic"
                                         display: QQC2.AbstractButton.TextBesideIcon
@@ -363,7 +344,7 @@ don't want to have to dig too far...
                             id: gridSettingsPopup
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.popup ? playGridsRepeater.currentItem.popup : null
+                            sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
                         }
                     }
                     Row {
@@ -372,15 +353,15 @@ don't want to have to dig too far...
                             left: parent.right
                             bottom: parent.bottom
                         }
-                        width: playGridsRepeater.count * settingsButton.width
+                        width: applicationWindow().playGrids.count * settingsButton.width
                         spacing: 0
                         visible: settingsSlidePoint.pressed && settingsTouchArea.xChoice > 0
                         Repeater {
-                            model: playGridsRepeater.count
+                            model: applicationWindow().playGrids.count
                             delegate: Item {
                                 id: slideDelegate
                                 property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
-                                property var playGrid: playGridsRepeater.itemAt(index).item
+                                property var playGrid: applicationWindow().playGrids.itemAt(index).item
                                 property int labelRotation: 45
                                 width: settingsButton.width
                                 height: width
@@ -495,7 +476,7 @@ don't want to have to dig too far...
                                             break;
                                     }
                                 } else if (yChoice === 0 && xChoice !== 0) {
-                                    if (0 < xChoice && xChoice <= playGridsRepeater.count && ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
+                                    if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && ZynQuick.PlayGridManager.currentPlaygrids["playgrid"] !== xChoice - 1) {
                                         ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", xChoice - 1);
                                     }
                                 }
@@ -508,7 +489,7 @@ don't want to have to dig too far...
                     id: sidebarLoader
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    sourceComponent: playGridsRepeater.currentItem && playGridsRepeater.currentItem.sidebar ? playGridsRepeater.currentItem.sidebar : defaultSidebar
+                    sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.sidebar ? playGridStack.currentPlayGridItem.sidebar : defaultSidebar
                 }
             }
         }
@@ -528,7 +509,33 @@ don't want to have to dig too far...
                 popExit: Transition {}
                 pushEnter: Transition {}
                 pushExit: Transition {}
-                initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item.grid
+                initialItem: currentPlayGridItem.grid
+                property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
+                property int currentPlaygrid: -1
+                function updatePlaygrid() {
+                    updatePlaygridTimer.restart();
+                }
+                Timer {
+                    id: updatePlaygridTimer
+                    interval: 1; repeat: false; running: false;
+                    onTriggered: {
+                        if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]){
+                            var playgrid = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
+                            playGridStack.replace(playgrid.grid);
+                            playGridStack.currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["playgrid"];
+                            placeholderAction.children = playgrid.additionalActions;
+                            if (playgrid.isSequencer) {
+                                ZynQuick.PlayGridManager.setPreferredSequencer(ZynQuick.PlayGridManager.playgrids[ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]]);
+                            }
+                        }
+                    }
+                }
+                Connections {
+                    target: ZynQuick.PlayGridManager
+                    Component.onCompleted: playGridStack.updatePlaygrid();
+                    onPlaygridsChanged: playGridStack.updatePlaygrid();
+                    onCurrentPlaygridsChanged: playGridStack.updatePlaygrid();
+                }
             }
         }
     }
@@ -540,12 +547,12 @@ don't want to have to dig too far...
 
             Zynthian.PlayGridButton {
                 icon.name: "arrow-up"
-                enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+                enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
-                    if (playGridsRepeater.currentItem.octave + 1 < 11){
-                        playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
+                    if (playGridStack.currentPlayGridItem.octave + 1 < 11){
+                        playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
                     } else {
-                        playGridsRepeater.currentItem.octave =  10;
+                        playGridStack.currentPlayGridItem.octave =  10;
                     }
                 }
             }
@@ -557,12 +564,12 @@ don't want to have to dig too far...
 
             Zynthian.PlayGridButton {
                 icon.name: "arrow-down"
-                enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+                enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
-                    if (playGridsRepeater.currentItem.octave - 1 > 0) {
-                        playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
+                    if (playGridStack.currentPlayGridItem.octave - 1 > 0) {
+                        playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
                     } else {
-                        playGridsRepeater.currentItem.octave = 0;
+                        playGridStack.currentPlayGridItem.octave = 0;
                     }
                 }
             }
@@ -613,20 +620,6 @@ don't want to have to dig too far...
                 onReleased: {
                     ZynQuick.PlayGridManager.pitch = 0;
                 }
-            }
-        }
-    }
-
-
-    Repeater {
-        id:playGridsRepeater
-        model: ZynQuick.PlayGridManager.playgrids
-        property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["playgrid"]).item
-        Loader {
-            id:playGridLoader
-            source: modelData + "/main.qml"
-            onLoaded: {
-                playGridLoader.item.setId(modelData);
             }
         }
     }

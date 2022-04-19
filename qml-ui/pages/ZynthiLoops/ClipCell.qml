@@ -53,7 +53,7 @@ QQC2.AbstractButton {
     property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
 
     // Hack to bind to last modified
-    property bool patternHasNotes: pattern.lastModified > -1 ? pattern.bankHasNotes(0) : pattern.bankHasNotes(0)
+    property bool patternHasNotes: pattern === null ? false : (pattern.lastModified > -1 ? pattern.bankHasNotes(0) : pattern.bankHasNotes(0))
 
     property QtObject sequence
     property QtObject pattern
@@ -131,10 +131,10 @@ QQC2.AbstractButton {
             smooth: false
 
             visible: root.isInScene &&
-                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
-                     track.connectedPattern >= 0 &&
+                     track.sceneClip.trackAudioType !== "sample-loop" &&
+                     root.pattern &&
                      root.patternHasNotes
-            source: pattern ? "image://pattern/Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName+"/" + track.sceneClip.clipTrack.connectedPattern + "/0?" + pattern.lastModified : ""
+            source: root.pattern ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "?" + root.pattern.lastModified : ""
         }
 
         QQC2.Label {
@@ -143,7 +143,7 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: root.isInScene &&
-                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&
                      track.sceneClip.path.length > 0
             text: qsTr("%1%2")
@@ -160,7 +160,7 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: root.isInScene &&
-                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.sceneClip.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      root.patternHasNotes
             text: qsTr("%1%2")
@@ -196,7 +196,7 @@ QQC2.AbstractButton {
             color: "#ffffff"
             text: qsTr("Loop")
             visible: root.isInScene &&
-                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&
                      track.sceneClip.path.length > 0
         }
@@ -217,7 +217,7 @@ QQC2.AbstractButton {
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
                      track.sceneClip.isPlaying &&
-                     track.sceneClip.clipTrack.trackAudioType === "sample-loop" &&
+                     track.sceneClip.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&
                      track.sceneClip.path.length > 0
 
@@ -230,7 +230,7 @@ QQC2.AbstractButton {
 
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     track.sceneClip.clipTrack.trackAudioType !== "sample-loop" &&
+                     track.sceneClip.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      sequence.isPlaying &&
                      root.patternHasNotes

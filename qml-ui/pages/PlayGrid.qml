@@ -784,6 +784,8 @@ don't want to have to dig too far...
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
                         } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
+                        } else if (patternObject.associatedTrack.trackAudioType == "external") {
+                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
                         } else {
                             patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                         }
@@ -823,6 +825,9 @@ don't want to have to dig too far...
                             case ZynQuick.PatternModel.SampleLoopedDestination:
                                 patternObject.associatedTrack.trackAudioType = "sample-loop";
                                 break;
+                            case ZynQuick.PatternModel.ExternalDestination:
+                                patternObject.associatedTrack.trackAudioType = "external";
+                                break;
                             case ZynQuick.PatternModel.SynthDestination:
                             default:
                                 patternObject.associatedTrack.trackAudioType = "synth";
@@ -851,6 +856,8 @@ don't want to have to dig too far...
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
                     } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
+                    } else if (patternObject.associatedTrack.trackAudioType == "external") {
+                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
                     } else {
                         patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                     }

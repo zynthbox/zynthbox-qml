@@ -63,15 +63,15 @@ RowLayout {
                     left: parent.right
                     bottom: parent.bottom
                 }
-                width: playGridsRepeater.count * settingsButton.width
+                width: applicationWindow().playGrids.count * settingsButton.width
                 spacing: 0
                 opacity: settingsSlidePoint.pressed ? 1 : 0
                 Repeater {
-                    model: playGridsRepeater.count
+                    model: applicationWindow().playGrids.count
                     delegate: Item {
                         id: slideDelegate
                         property bool hovered: settingsTouchArea.xChoice - 1 === index && settingsTouchArea.yChoice === 0
-                        property var playGrid: playGridsRepeater.itemAt(index).item
+                        property var playGrid: applicationWindow().playGrids.itemAt(index).item
                         property int labelRotation: -45
                         width: settingsButton.width
                         height: width
@@ -181,7 +181,7 @@ RowLayout {
                                     break;
                             }
                         } else if (yChoice === 0 && xChoice !== 0) {
-                            if (0 < xChoice && xChoice <= playGridsRepeater.count && ZynQuick.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
+                            if (0 < xChoice && xChoice <= applicationWindow().playGrids.count && ZynQuick.PlayGridManager.currentPlaygrids["minigrid"] !== xChoice - 1) {
                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("minigrid", xChoice - 1);
                             }
                         }
@@ -196,12 +196,12 @@ RowLayout {
             icon.name: "arrow-up"
             Layout.preferredHeight: width
             Layout.maximumHeight: width
-            enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+            enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
-                if (playGridsRepeater.currentItem.octave + 1 < 11){
-                    playGridsRepeater.currentItem.octave =  playGridsRepeater.currentItem.octave + 1;
+                if (playGridStack.currentPlayGridItem.octave + 1 < 11){
+                    playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
                 } else {
-                    playGridsRepeater.currentItem.octave =  10;
+                    playGridStack.currentPlayGridItem.octave =  10;
                 }
             }
         }
@@ -215,12 +215,12 @@ RowLayout {
             icon.name: "arrow-down"
             Layout.preferredHeight: width
             Layout.maximumHeight: width
-            enabled: playGridsRepeater.currentItem && playGridsRepeater.currentItem.useOctaves ? playGridsRepeater.currentItem.useOctaves : false
+            enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
-                if (playGridsRepeater.currentItem.octave - 1 > 0) {
-                    playGridsRepeater.currentItem.octave = playGridsRepeater.currentItem.octave - 1;
+                if (playGridStack.currentPlayGridItem.octave - 1 > 0) {
+                    playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
                 } else {
-                    playGridsRepeater.currentItem.octave = 0;
+                    playGridStack.currentPlayGridItem.octave = 0;
                 }
             }
         }
@@ -248,34 +248,29 @@ RowLayout {
         popExit: Transition {}
         pushEnter: Transition {}
         pushExit: Transition {}
-        initialItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item.miniGrid
-        Connections {
-            target: ZynQuick.PlayGridManager
-            property int currentPlaygrid: -1
-            function updatePlaygrid() {
-                if (playGridsRepeater.count > 0 && currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]) {
-                    var playgrid = playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
+        initialItem: currentPlayGridItem.miniGrid
+        property Item currentPlayGridItem: applicationWindow().playGrids.count === 0 ? null : applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
+        property int currentPlaygrid: -1
+        function updatePlaygrid() {
+            updatePlaygridTimer.restart();
+        }
+        Timer {
+            id: updatePlaygridTimer
+            interval: 1; repeat: false; running: false;
+            onTriggered: {
+                if (applicationWindow().playGrids.count > 0 && playGridStack.currentPlaygrid != ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]) {
+                    var playgrid = applicationWindow().playGrids.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
                     playGridStack.replace(playgrid.miniGrid);
                     //settingsStack.replace(playgrid.settings);
-                    currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["minigrid"];
+                    playGridStack.currentPlaygrid = ZynQuick.PlayGridManager.currentPlaygrids["minigrid"];
                 }
             }
-            Component.onCompleted: updatePlaygrid();
-            onPlaygridsChanged: updatePlaygrid();
-            onCurrentPlaygridsChanged: updatePlaygrid();
         }
-
-        Repeater {
-            id:playGridsRepeater
-            model: ZynQuick.PlayGridManager.playgrids
-            property Item currentItem: playGridsRepeater.count === 0 ? null : playGridsRepeater.itemAt(ZynQuick.PlayGridManager.currentPlaygrids["minigrid"]).item
-            Loader {
-                id:playGridLoader
-                source: modelData + "/main.qml"
-                onLoaded: {
-                    playGridLoader.item.setId(modelData);
-                }
-            }
+        Connections {
+            target: ZynQuick.PlayGridManager
+            Component.onCompleted: playGridStack.updatePlaygrid();
+            onPlaygridsChanged: playGridStack.updatePlaygrid();
+            onCurrentPlaygridsChanged: playGridStack.updatePlaygrid();
         }
     }
 }

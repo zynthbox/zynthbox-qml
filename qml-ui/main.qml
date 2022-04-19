@@ -30,6 +30,7 @@ import QtQuick.Window 2.1
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 import "pages" as Pages
 import "pages/SessionDashboard" as SessionDashboard
 
@@ -640,6 +641,18 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    readonly property Item playGrids: playGridsRepeater
+    Repeater {
+        id: playGridsRepeater
+        model: ZynQuick.PlayGridManager.playgrids
+        Loader {
+            id:playGridLoader
+            source: modelData + "/main.qml"
+            onLoaded: {
+                playGridLoader.item.setId(modelData);
+            }
+        }
+    }
     QQC2.Drawer {
         id: miniPlayGridDrawer
         width: root.width

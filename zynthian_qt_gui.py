@@ -44,7 +44,7 @@ import xml.etree.ElementTree as ET
 
 # Qt modules
 from PySide2.QtCore import (
-    Qt,
+    QProcess, Qt,
     QObject,
     QMetaObject,
     Slot,
@@ -3066,6 +3066,16 @@ class zynthian_gui(QObject):
             f.write("quit\n")
             f.close()
 
+        extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
+
+        if extro_path.exists():
+            process = QProcess()
+            process.start("mplayer", ('-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+            process.waitForStarted()
+            process.waitForFinished()
+
+        self.displayMainWindow.emit()
+
     def get_encoder_list_speed_multiplier(self):
         return self.__encoder_list_speed_multiplier
 
@@ -3471,6 +3481,7 @@ class zynthian_gui(QObject):
     run_start_metronome_and_playback = Signal()
     run_stop_metronome_and_playback = Signal()
     encoder_list_speed_multiplier_changed = Signal()
+    displayMainWindow = Signal()
 
     current_screen_id = Property(
         str,

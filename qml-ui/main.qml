@@ -86,10 +86,6 @@ Kirigami.AbstractApplicationWindow {
         interval: 13000
         repeat: false
         onTriggered: {
-            root.minimumWidth = root.screen.width;
-            root.minimumHeight = root.screen.height;
-            root.showNormal();
-            root.visibility = Window.Windowed;
             zynthian.stop_splash();
         }
     }
@@ -629,6 +625,12 @@ Kirigami.AbstractApplicationWindow {
         onMiniPlayGridToggle: miniPlayGridDrawer.visible = !miniPlayGridDrawer.visible
         onRun_start_metronome_and_playback: Zynthian.CommonUtils.startMetronomeAndPlayback()
         onRun_stop_metronome_and_playback: Zynthian.CommonUtils.stopMetronomeAndPlayback()
+        onDisplayMainWindow: {
+            root.minimumWidth = root.screen.width;
+            root.minimumHeight = root.screen.height;
+            root.showNormal();
+            root.visibility = Window.Windowed;
+        }
     }
 
     Connections {

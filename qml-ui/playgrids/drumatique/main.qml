@@ -44,6 +44,10 @@ Zynthian.BasePlayGrid {
     dashboardModel: _private.sequence
     isSequencer: true
     useOctaves: true
+    defaults: {
+        "positionalVelocity": true
+    }
+    persist: ["positionalVelocity"]
     additionalActions: [
         Kirigami.Action {
             text: qsTr("Load Sequence or Pattern...")
@@ -173,6 +177,53 @@ Zynthian.BasePlayGrid {
                 break;
         }
         return returnValue;
+    }
+    Connections {
+        target: zynthian.playgrid
+        onBigKnobValueChanged: {
+            if (zynthian.playgrid.bigKnobValue < 0) {
+                for (var i = zynthian.playgrid.bigKnobValue; i < 0; ++i) {
+                    _private.goLeft();
+                }
+            } else if (zynthian.playgrid.bigKnobValue > 0) {
+                for (var i = zynthian.playgrid.bigKnobValue; i > 0; --i) {
+                    _private.goRight();
+                }
+            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+        }
+        onKnob1ValueChanged: {
+            if (zynthian.playgrid.knob1Value < 0) {
+                for (var i = zynthian.playgrid.knob1Value; i < 0; ++i) {
+                    _private.knob1Down();
+                }
+            } else if (zynthian.playgrid.knob1Value > 0) {
+                for (var i = zynthian.playgrid.knob1Value; i > 0; --i) {
+                    _private.knob1Up();
+                }
+            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+        }
+        onKnob2ValueChanged: {
+            if (zynthian.playgrid.knob2Value < 0) {
+                for (var i = zynthian.playgrid.knob2Value; i < 0; ++i) {
+                    _private.knob2Down();
+                }
+            } else if (zynthian.playgrid.knob2Value > 0) {
+                for (var i = zynthian.playgrid.knob2Value; i > 0; --i) {
+                    _private.knob2Up();
+                }
+            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+        }
+        onKnob3ValueChanged: {
+            if (zynthian.playgrid.knob3Value < 0) {
+                for (var i = zynthian.playgrid.knob3Value; i < 0; ++i) {
+                    _private.knob3Down();
+                }
+            } else if (zynthian.playgrid.knob3Value > 0) {
+                for (var i = zynthian.playgrid.knob3Value; i > 0; --i) {
+                    _private.knob3Up();
+                }
+            } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
+        }
     }
 
     property bool showPatternsMenu: false
@@ -465,7 +516,13 @@ Zynthian.BasePlayGrid {
     }
     // on component completed
     onInitialize: {
+        _private.positionalVelocity = component.getProperty("positionalVelocity")
         _private.adoptSequence();
+    }
+    onPropertyChanged: {
+        if (property === "positionalVelocity") {
+            _private.positionalVelocity = value;
+        }
     }
     Connections {
         target: ZynQuick.PlayGridManager
@@ -1684,57 +1741,10 @@ Zynthian.BasePlayGrid {
                 Layout.fillWidth: true
                 Layout.minimumWidth: Kirigami.Units.gridUnit * 5
                 Kirigami.FormData.label: "Use Tap Position As Velocity"
-                checked: _private.positionalVelocity
+                checked: component.getProperty("positionalVelocity")
                 onClicked: {
-                    _private.positionalVelocity = !_private.positionalVelocity;
-                }
-                // TODO This wants to move to global when once the playground modules are created by pgm's instancing system
-                Connections {
-                    target: zynthian.playgrid
-                    onBigKnobValueChanged: {
-                        if (zynthian.playgrid.bigKnobValue < 0) {
-                            for (var i = zynthian.playgrid.bigKnobValue; i < 0; ++i) {
-                                _private.goLeft();
-                            }
-                        } else if (zynthian.playgrid.bigKnobValue > 0) {
-                            for (var i = zynthian.playgrid.bigKnobValue; i > 0; --i) {
-                                _private.goRight();
-                            }
-                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-                    }
-                    onKnob1ValueChanged: {
-                        if (zynthian.playgrid.knob1Value < 0) {
-                            for (var i = zynthian.playgrid.knob1Value; i < 0; ++i) {
-                                _private.knob1Down();
-                            }
-                        } else if (zynthian.playgrid.knob1Value > 0) {
-                            for (var i = zynthian.playgrid.knob1Value; i > 0; --i) {
-                                _private.knob1Up();
-                            }
-                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-                    }
-                    onKnob2ValueChanged: {
-                        if (zynthian.playgrid.knob2Value < 0) {
-                            for (var i = zynthian.playgrid.knob2Value; i < 0; ++i) {
-                                _private.knob2Down();
-                            }
-                        } else if (zynthian.playgrid.knob2Value > 0) {
-                            for (var i = zynthian.playgrid.knob2Value; i > 0; --i) {
-                                _private.knob2Up();
-                            }
-                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-                    }
-                    onKnob3ValueChanged: {
-                        if (zynthian.playgrid.knob3Value < 0) {
-                            for (var i = zynthian.playgrid.knob3Value; i < 0; ++i) {
-                                _private.knob3Down();
-                            }
-                        } else if (zynthian.playgrid.knob3Value > 0) {
-                            for (var i = zynthian.playgrid.knob3Value; i > 0; --i) {
-                                _private.knob3Up();
-                            }
-                        } // and no reason to do anything with 0, that's just the knob resetting itself after sending the delta out
-                    }
+                    var positionalVelocity = component.getProperty("positionalVelocity")
+                    component.setProperty("positionalVelocity", !positionalVelocity);
                 }
             }
         }

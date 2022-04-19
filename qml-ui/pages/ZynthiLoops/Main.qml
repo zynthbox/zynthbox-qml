@@ -870,8 +870,8 @@ Zynthian.ScreenPage {
                                         }
                                     }
 
-                                    sequence: track.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                    pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                    sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                                    pattern: track.connectedPattern >= 0 && sequence ? sequence.get(track.connectedPattern) : null
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth

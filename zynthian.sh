@@ -102,6 +102,8 @@ function splash_zynthian_error() {
 # Main Program
 #------------------------------------------------------------------------------
 
+xsetroot -cursor blank_cursor.xbm blank_cursor.xbm
+
 cd $ZYNTHIAN_UI_DIR
 
 backlight_on

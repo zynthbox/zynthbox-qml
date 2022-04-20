@@ -89,6 +89,10 @@ Kirigami.AbstractApplicationWindow {
             zynthian.stop_splash();
         }
     }
+    onWidthChanged: {
+        //FIXME: workaround
+        width = screen.width;
+    }
     onHeightChanged: {
         //FIXME: workaround
         height = screen.height;

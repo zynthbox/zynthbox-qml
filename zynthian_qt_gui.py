@@ -3064,6 +3064,7 @@ class zynthian_gui(QObject):
     def stop_splash(self):
         extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 
+        process = None
         if extro_path.exists():
             process = QProcess()
             process.start("mplayer", ('-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
@@ -3075,7 +3076,7 @@ class zynthian_gui(QObject):
         if process is not None:
             process.waitForStarted()
             process.waitForFinished()
-        
+
         self.displayMainWindow.emit()
 
     def get_encoder_list_speed_multiplier(self):

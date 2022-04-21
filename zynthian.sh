@@ -125,33 +125,6 @@ while true; do
     fi
 	mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mkv -loop 0 &> /dev/null &
 	
-    if [ "$ZYNTHIAN_WIRING_LAYOUT" = "Z2_V2" ]; then
-        # Clone or update zynthbox-z2-setup
-        if [ ! -e /zynthian/zynthbox-z2-setup ]; then
-            echo "Z2 Setup script repo not available. Cloning"
-            (
-                cd /zynthian
-                git clone https://github.com/zynthbox/zynthbox-z2-setup/
-            )
-        else
-            echo "Z2 Setup script repo available. Pulling latest changes"
-            (
-                cd /zynthian/zynthbox-z2-setup
-                git pull
-            )
-        fi
-        
-        (
-            cd /zynthian/zynthbox-z2-setup
-            # Execute setup script
-            bash /zynthian/zynthbox-z2-setup/setup_z2.sh
-            systemctl daemon-reload
-        )
-        
-        #Load Config Environment
-        load_config_env
-    fi
-
 	# Start Zynthian GUI & Synth Engine
 	export QT_QUICK_CONTROLS_MOBILE=1
 	export QT_QUICK_CONTROLS_STYLE=Zynthian-Plasma

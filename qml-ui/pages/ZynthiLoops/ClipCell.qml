@@ -43,7 +43,7 @@ QQC2.AbstractButton {
                                track.sceneClip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === track.sceneClip
     property color highlightColor: !highlighted &&
                                    track.sceneClip.inCurrentScene &&
-                                   ((track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0) || patternHasNotes)
+                                   ((track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0) || pattern.hasNotes)
                                        ? Qt.rgba(255,255,255,0.6)
                                        : highlighted
                                            ? track.sceneClip.inCurrentScene
@@ -51,9 +51,6 @@ QQC2.AbstractButton {
                                                : "#aaf44336"
                                            : "transparent"
     property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
-
-    // Hack to bind to last modified
-    property bool patternHasNotes: pattern == null ? false : (pattern.lastModified > -1 ? pattern.bankHasNotes(0) : pattern.bankHasNotes(0))
 
     property QtObject sequence
     property QtObject pattern
@@ -133,7 +130,7 @@ QQC2.AbstractButton {
             visible: root.isInScene &&
                      track.trackAudioType !== "sample-loop" &&
                      root.pattern &&
-                     root.patternHasNotes
+                     root.pattern.hasNotes
             source: root.pattern ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "?" + root.pattern.lastModified : ""
         }
 
@@ -162,9 +159,9 @@ QQC2.AbstractButton {
             visible: root.isInScene &&
                      track.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
-                     root.patternHasNotes
+                     root.pattern.hasNotes
             text: qsTr("%1%2")
-                    .arg(root.patternHasNotes &&
+                    .arg(root.pattern.hasNotes &&
                          sequence && sequence.isPlaying &&
                          pattern.bankPlaybackPosition >= 0 &&
                          zynthian.zynthiloops.isMetronomeRunning
@@ -233,7 +230,7 @@ QQC2.AbstractButton {
                      track.trackAudioType !== "sample-loop" &&
                      track.connectedPattern >= 0 &&
                      sequence.isPlaying &&
-                     root.patternHasNotes
+                     root.pattern.hasNotes
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
             width: pattern ? (parent.width/16)*(pattern.bankPlaybackPosition%16) : 0

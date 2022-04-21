@@ -267,7 +267,7 @@ Rectangle {
                                             Layout.fillHeight: true
                                             text: "Bounce To Loop"
                                             onClicked: {
-                                                bouncePopup.bounce(root.selectedTrack);
+                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedSceneName, root.selectedTrack);
                                             }
                                         }
                                         Item {

@@ -34,7 +34,8 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 QQC2.Popup {
     id: root
-    function bounce(track) {
+    function bounce(sceneName, track) {
+        _private.sceneName = sceneName;
         _private.selectedTrack = track;
         open();
     }
@@ -56,31 +57,54 @@ QQC2.Popup {
  
             QtObject {
                 id: _private
+                property string sceneName
                 property QtObject selectedTrack
                 property double bounceProgress: -1
+
+                property QtObject sequence: null
+                property QtObject pattern: null
+                property int previousSolo
+                property int patternDurationInMS
+                property int recordingDurationInMS
+                property int playbackStopDurationInMS
+                property int recordingDurationInBeats
+                property int playbackStopDurationInBeats
+                property bool isRecording: false
+                property int cumulativeBeats
                 function performBounce() {
-                    _private.bounceProgress = 0.0;
+                    _private.bounceProgress = 0;
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
-                    // If there's currently a pattern set to be solo, let's remember that
-                    // Now, set the pattern we're wanting to record as solo
-                    // Startrecordingandplaything!
-                    testTimerThing.start();
-                }
-                property QtObject testTimerThing: Timer {
-                    repeat: true;
-                    running: false;
-                    interval: 50;
-                    onTriggered: {
-                        if (_private.bounceProgress < 1) {
-                            // set progress based on what the thing is actually doing
-                            _private.bounceProgress = _private.bounceProgress + 0.01;
-                        } else {
-                            stop();
-                            _private.bounceProgress = -1;
-                            // Reset solo to whatever it was before we started working
-                            // Set the bounced wave as loop sample
-                            // Set track mode to loop
-                            root.close();
+                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+_private.sceneName);
+                    if (_private.sequence) {
+                        _private.pattern = sequence.get(_private.selectedTrack.connectedPattern);
+                        if (_private.pattern) {
+                            // If there's currently a pattern set to be solo, let's remember that
+                            _private.previousSolo = _private.sequence.soloPattern;
+                            // Now, set the pattern we're wanting to record as solo
+                            _private.sequence.soloPattern = _private.selectedTrack.connectedPattern;
+                            // Assemble the duration of time we want to be recording for
+                            var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
+                            var patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
+                            var beatMultiplier = ZynQuick.PlayGridManager.syncTimer.getMultiplier();
+                            var beatsPerMinute = zynthian.zynthiloops.song.bpm;
+                            _private.patternDurationInMS = ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, patternDurationInBeats) * 1000;
+                            _private.recordingDurationInMS = _private.patternDurationInMS;
+                            _private.recordingDurationInBeats = patternDurationInBeats;
+                            if (_private.includeLeadin) {
+                                _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
+                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + patternDurationInBeats;
+                            }
+                            _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
+                            _private.playbackStopDurationInMS = _private.recordingDurationInMS;
+                            if (_private.includeFadeout) {
+                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + patternDurationInBeats;
+                                _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
+                            }
+                            // Startrecordingandplaythethinggo!
+                            // TODO start recorder
+                            _private.cumulativeBeats = 0;
+                            _private.isRecording = true;
+                            _private.sequence.startSequencePlayback();
                         }
                     }
                 }
@@ -88,6 +112,56 @@ QQC2.Popup {
                 property bool includeLeadinInLoop: false
                 property bool includeFadeout: false
                 property bool includeFadeoutInLoop: false
+            }
+            Connections {
+                enabled: _private.isRecording
+                target: ZynQuick.PlayGridManager
+                onMetronomeBeat128thChanged: {
+                    _private.cumulativeBeats = _private.cumulativeBeats + 1;
+                    if (_private.recordingDurationInBeats > _private.cumulativeBeats) {
+                        // set progress based on what the thing is actually doing
+                        _private.bounceProgress = _private.cumulativeBeats/_private.recordingDurationInBeats;
+                        if (_private.playbackStopDurationInBeats < _private.cumulativeBeats) {
+                            console.log("Fadeout reached, disconnecting playback at cumulative beat position");
+                            _private.sequence.disconnectSequencePlayback();
+                            // Minor hackery, this just ensure the above only happens once
+                            _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
+                        }
+                    } else {
+                        _private.isRecording = false;
+                        _private.sequence.stopSequencePlayback();
+                        ZynQuick.PlayGridManager.stopMetronome();
+                        _private.bounceProgress = 0;
+                        // Reset solo to whatever it was before we started working
+                        _private.sequence.soloPattern = _private.previousSolo;
+                        // Set the bounced wave as loop sample
+                        // TODO
+                        // Work out where the start and end points should be for the loop
+                        var startTime = 0;
+                        var duration = _private.patternDurationInMS;
+                        if (_private.includeLeadin) {
+                            if (_private.includeLeadinInLoop) {
+                                // Leave the start point at 0 and just increase the duration by the pattern duration
+                                duration = duration + _private.patternDurationInMS;
+                            } else {
+                                // Leave the duration alone and just move the start point
+                                startTime = startTime + _private.patternDurationInMS;
+                            }
+                        }
+                        if (_private.includeFadeout && _private.includeFadeoutInLoop) {
+                            // Whatever the start time is, end time should be moved by the pattern duration
+                            duration = duration + _private.patternDurationInMS;
+                        }
+                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop start and durations at", startTime, "and", duration);
+                        // Set the new sample's start and end points
+                        // TODO
+                        // Set track mode to loop
+                        //_private.selectedTrack.trackAudioType = "sample-loop";
+                        // Close out and we're done
+                        root.close();
+                        _private.bounceProgress = -1;
+                    }
+                }
             }
             Connections {
                 target: root

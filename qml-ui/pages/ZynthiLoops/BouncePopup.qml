@@ -49,7 +49,6 @@ QQC2.Popup {
     ColumnLayout {
         anchors.fill: parent
         implicitWidth: Kirigami.Units.gridUnit * 30
-        implicitHeight: Kirigami.Units.gridUnit * 40
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -61,6 +60,10 @@ QQC2.Popup {
                 property double bounceProgress: -1
                 function performBounce() {
                     _private.bounceProgress = 0.0;
+                    // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
+                    // If there's currently a pattern set to be solo, let's remember that
+                    // Now, set the pattern we're wanting to record as solo
+                    // Startrecordingandplaything!
                     testTimerThing.start();
                 }
                 property QtObject testTimerThing: Timer {
@@ -74,8 +77,9 @@ QQC2.Popup {
                         } else {
                             stop();
                             _private.bounceProgress = -1;
-                            // set the bounced wave as loop sample
-                            // set track mode to loop
+                            // Reset solo to whatever it was before we started working
+                            // Set the bounced wave as loop sample
+                            // Set track mode to loop
                             root.close();
                         }
                     }
@@ -147,7 +151,7 @@ QQC2.Popup {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            visible: _private.bounceProgress > -1
+            opacity: _private.bounceProgress > -1 ? 1 : 0.3
             value: _private.bounceProgress
         }
         Rectangle {

@@ -830,18 +830,13 @@ Zynthian.ScreenPage {
                                         interval: 0
                                         onTriggered: {
                                             // update color
-                                            var hasNotes = false;
-                                            try {
-                                                hasNotes = clipCell.pattern.bankHasNotes(0)
-                                            } catch(err) {}
-
                                             if (track.trackAudioType === "sample-loop" && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
                                                 // In scene
                                                 clipCell.backgroundColor = "#3381d4fa";
                                             } else if (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)) {
                                                 // Not in scene
                                                 clipCell.backgroundColor = "#33f44336";
-                                            } else if ((track.connectedPattern >= 0 && hasNotes)
+                                            } else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)
                                                 || (track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0)) {
                                                 clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                             } else {

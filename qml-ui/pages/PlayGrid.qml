@@ -881,9 +881,6 @@ don't want to have to dig too far...
                         }
                     }
                     patternObject.thisPattern.enabled = (enabledBank > -1);
-                    if (enabledBank > -1) {
-                        patternObject.thisPattern.bankOffset = enabledBank * patternObject.thisPattern.bankLength;
-                    }
                 }
             }
             Timer {

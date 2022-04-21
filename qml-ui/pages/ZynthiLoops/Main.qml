@@ -824,10 +824,14 @@ Zynthian.ScreenPage {
                                         target: zynthian.zynthiloops
                                         onIsMetronomeRunningChanged: colorTimer.restart()
                                     }
+                                    Connections {
+                                        target: root.song.scenesModel
+                                        onSelectedSceneIndexChanged: colorTimer.restart()
+                                    }
 
                                     Timer {
                                         id: colorTimer
-                                        interval: 0
+                                        interval: 10
                                         onTriggered: {
                                             // update color
                                             if (track.trackAudioType === "sample-loop" && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {

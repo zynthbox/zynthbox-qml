@@ -31,6 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
 
+import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 
 Rectangle {
@@ -190,7 +191,7 @@ Rectangle {
                                             audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
                                             inputAudioLeveldB: highlighted
                                                                 ? !model.track.muted
-                                                                    ? zynthian.zynthiloops.recordingAudioLevel
+                                                                    ? ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB)
                                                                     : -400
                                                                 : -400
 

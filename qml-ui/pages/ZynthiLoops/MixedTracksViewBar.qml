@@ -347,6 +347,14 @@ Rectangle {
                                         border.width: 1
                                         radius: 4
 
+                                        // For loop and slice modes only first slot is visible.
+                                        // For other modes all slots are visible
+                                        enabled: root.selectedTrack.trackAudioType === "sample-loop" ||
+                                                 root.selectedTrack.trackAudioType === "sample-slice"
+                                                    ? index === 0
+                                                    : true
+                                        opacity: enabled ? 1 : 0
+
                                         Rectangle {
                                             width: parent.width * delegate.volumePercent
                                             anchors {

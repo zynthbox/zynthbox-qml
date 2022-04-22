@@ -33,6 +33,7 @@ import org.kde.kirigami 2.4 as Kirigami
 
 import Qt.labs.folderlistmodel 2.11
 
+import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 
 // GridLayout so TabbedControlView knows how to navigate it
@@ -154,10 +155,6 @@ GridLayout {
     }
 
     ColumnLayout {
-        property bool isCapturing: false
-
-        id: monitorColumn
-
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
@@ -167,7 +164,6 @@ GridLayout {
             Layout.fillHeight: true
 
             RowLayout {
-                opacity: monitorColumn.isCapturing ? 1 : 0.3
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -177,13 +173,11 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -400
-                    maximumValue: 0
-                    value: monitorColumn.isCapturing
-                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                  ? zynthian.zynthiloops.recordingAudioLevel
-                                  : zynthian.zynthiloops.captureAudioLevelLeft
-                               : -400
+                    minimumValue: -100
+                    maximumValue: 20
+                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                              ? ZL.AudioLevels.synthA
+                              : ZL.AudioLevels.captureA
 
                     font.pointSize: 8
 
@@ -201,13 +195,11 @@ GridLayout {
                 Extras.Gauge {
                     Layout.fillHeight: true
 
-                    minimumValue: -400
-                    maximumValue: 0
-                    value: monitorColumn.isCapturing
-                               ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                  ? zynthian.zynthiloops.recordingAudioLevel
-                                  : zynthian.zynthiloops.captureAudioLevelRight
-                               : -400
+                    minimumValue: -100
+                    maximumValue: 20
+                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                              ? ZL.AudioLevels.synthB
+                              : ZL.AudioLevels.captureB
 
                     font.pointSize: 8
 
@@ -220,16 +212,6 @@ GridLayout {
                         tickmark: null
                         tickmarkLabel: null
                     }
-                }
-            }
-
-            QQC2.Button {
-                visible: !monitorColumn.isCapturing
-                text: "Monitor"
-                anchors.centerIn: parent
-                onClicked: {
-                    monitorColumn.isCapturing = true;
-                    zynthian.zynthiloops.monitorCaptureAudioLevels();
                 }
             }
         }
@@ -271,6 +253,26 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
+
+        QQC2.Label {
+            text: "Synth A : " + ZL.AudioLevels.synthA.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Synth B : " + ZL.AudioLevels.synthB.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Synth : " + ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB).toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Capture A : " + ZL.AudioLevels.captureA.toFixed(2)
+        }
+
+        QQC2.Label {
+            text: "Capture B : " + ZL.AudioLevels.captureB.toFixed(2)
+        }
     }
 
     ColumnLayout {

@@ -227,6 +227,15 @@ Zynthian.ScreenPage {
         interval: 30
         repeat: false
         onTriggered: {
+            // Check if song bar is active
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("SongBar") >= 0 // Checks if current active page is sound combinator or not
+            ) {
+                zynthian.songBarActive = true;
+            } else {
+                zynthian.songBarActive = false;
+            }
+
             // Check if sound combinator is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
                 bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
@@ -514,7 +523,9 @@ Zynthian.ScreenPage {
                         model: root.song.scenesModel
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
-                            text: model.scene.name
+                            text: zynthian.songBarActive
+                                    ? model.scene.name
+                                    : (index + 1)
                             color: Kirigami.Theme.backgroundColor
 
                             Layout.fillWidth: false
@@ -522,28 +533,34 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: root.song.scenesModel.selectedSceneIndex === index
+                            highlighted: zynthian.songBarActive
+                                            ? root.song.scenesModel.selectedSceneIndex === index
+                                            : zynthian.session_dashboard.selectedTrack === index
 
                             onPressed: {
-                                root.lastSelectedObj = {
-                                    className: "zynthiloops_scene",
-                                    sceneIndex: index
+                                if (zynthian.songBarActive) {
+                                    root.lastSelectedObj = {
+                                        className: "zynthiloops_scene",
+                                        sceneIndex: index
+                                    }
+
+//                                    // If MixedTracksViewBar is not open, open MixedTracksViewBar first
+//                                    if (!bottomStack.slotsBar.trackButton.checked) {
+//                                        bottomStack.slotsBar.trackButton.checked = true
+
+//                                        return;
+//                                    }
+
+                                    Zynthian.CommonUtils.switchToScene(index);
                                 }
-
-                                // If MixedTracksViewBar is not open, open MixedTracksViewBar first
-                                if (!bottomStack.slotsBar.trackButton.checked) {
-                                    bottomStack.slotsBar.trackButton.checked = true
-
-                                    return;
-                                }
-
-                                Zynthian.CommonUtils.switchToScene(index);
                             }
 
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: root.song.scenesModel.selectedSceneIndex === index
+                                visible: zynthian.songBarActive
+                                            ? root.song.scenesModel.selectedSceneIndex === index
+                                            : zynthian.session_dashboard.selectedTrack === index
                             }
                         }
                     }

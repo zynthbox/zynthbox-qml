@@ -408,6 +408,7 @@ class zynthian_gui(QObject):
         self.wsleds = None
         self.wsleds_blink_count = 0
 
+        self.song_bar_active = False
         self.sound_combinator_active = False
         self.track_wave_editor_bar_active = False
         self.track_samples_bar_active = False
@@ -541,6 +542,19 @@ class zynthian_gui(QObject):
     # ---------------------------------------------------------------------------
 
     # LED management properties
+
+    def get_song_bar_active(self):
+        return self.song_bar_active
+
+    def set_song_bar_active(self, isActive):
+        if self.song_bar_active != isActive:
+            self.song_bar_active = isActive
+            self.screens["zynthiloops"].set_selector()
+            self.songBarActiveChanged.emit()
+
+    songBarActiveChanged = Signal()
+
+    songBarActive = Property(bool, get_song_bar_active, set_song_bar_active, notify=songBarActiveChanged)
 
     def get_sound_combinator_active(self):
         return self.sound_combinator_active

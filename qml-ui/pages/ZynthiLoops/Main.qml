@@ -1047,18 +1047,18 @@ Zynthian.ScreenPage {
                                             zynthian.start_loading()
 
                                             // Copy Track
-                                            var sourceTrack = root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-                                            var destTrack = root.copySourceObj
+                                            var sourceTrack = root.copySourceObj
+                                            var destTrack = root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
                                             destTrack.copyFrom(sourceTrack)
 
-//                                            for (var i=0; i<=sourceTrack.clipsModel.count; i++) {
-//                                                var sourceClip = sourceTrack.clipsModel.getClip(i)
-//                                                var destClip = destTrack.clipsModel.getClip(i)
-//                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
-//                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
+                                            for (var i=0; i<sourceTrack.clipsModel.count; i++) {
+                                                var sourceClip = sourceTrack.clipsModel.getClip(i)
+                                                var destClip = destTrack.clipsModel.getClip(i)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
 
-//                                                destPattern.cloneOther(sourcePattern)
-//                                            }
+                                                destPattern.cloneOther(sourcePattern)
+                                            }
 
                                             root.copySourceObj = null
 

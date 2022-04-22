@@ -100,10 +100,13 @@ QQC2.Popup {
                                 _private.recordingDurationInBeats = _private.recordingDurationInBeats + patternDurationInBeats;
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
                             }
-                            // Startrecordingandplaythethinggo!
-                            // TODO start recorder
+                            // Startrecordingandplaythethingletsgo!
                             _private.cumulativeBeats = 0;
                             _private.isRecording = true;
+                            var sceneIndices = { "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7, "I": 8, "J": 9};
+                            var clip = _private.selectedTrack.clipsModel.getClip(sceneIndices[_private.sceneName]);
+                            clip.queueRecording("internal", "*");
+                            ZynQuick.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
                             _private.sequence.startSequencePlayback();
                         }
                     }
@@ -129,6 +132,12 @@ QQC2.Popup {
                         }
                     } else {
                         _private.isRecording = false;
+                        var clip = zynthian.zynthiloops.clipToRecord
+                        if (clip) {
+                            ZynQuick.MidiRecorder.stopRecording();
+                            clip.stopRecording();
+                            clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi();
+                        }
                         _private.sequence.stopSequencePlayback();
                         ZynQuick.PlayGridManager.stopMetronome();
                         _private.bounceProgress = 0;
@@ -138,25 +147,26 @@ QQC2.Popup {
                         // TODO
                         // Work out where the start and end points should be for the loop
                         var startTime = 0;
-                        var duration = _private.patternDurationInMS;
+                        var loopLength = _private.patternDurationInMS;
                         if (_private.includeLeadin) {
                             if (_private.includeLeadinInLoop) {
-                                // Leave the start point at 0 and just increase the duration by the pattern duration
-                                duration = duration + _private.patternDurationInMS;
+                                // Leave the start point at 0 and just increase the loopLength by the pattern duration
+                                loopLength = loopLength + _private.patternDurationInMS;
                             } else {
-                                // Leave the duration alone and just move the start point
+                                // Leave the loopLength alone and just move the start point
                                 startTime = startTime + _private.patternDurationInMS;
                             }
                         }
                         if (_private.includeFadeout && _private.includeFadeoutInLoop) {
-                            // Whatever the start time is, end time should be moved by the pattern duration
-                            duration = duration + _private.patternDurationInMS;
+                            // Whatever the start time is, end time should be moved by the pattern loopLength
+                            loopLength = loopLength + _private.patternDurationInMS;
                         }
-                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop start and durations at", startTime, "and", duration);
+                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop start and lengths at", startTime, "and", loopLength);
                         // Set the new sample's start and end points
-                        // TODO
+                        clip.startPosition = startTime / 1000;
+                        clip.length = loopLength / 1000;
                         // Set track mode to loop
-                        //_private.selectedTrack.trackAudioType = "sample-loop";
+                        _private.selectedTrack.trackAudioType = "sample-loop";
                         // Close out and we're done
                         root.close();
                         _private.bounceProgress = -1;

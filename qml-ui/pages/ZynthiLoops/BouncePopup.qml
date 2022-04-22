@@ -65,6 +65,7 @@ QQC2.Popup {
                 property QtObject pattern: null
                 property int previousSolo
                 property int patternDurationInMS
+                property int patternDurationInBeats
                 property int recordingDurationInMS
                 property int playbackStopDurationInMS
                 property int recordingDurationInBeats
@@ -84,20 +85,20 @@ QQC2.Popup {
                             _private.sequence.soloPattern = _private.selectedTrack.connectedPattern;
                             // Assemble the duration of time we want to be recording for
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
-                            var patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
+                            _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
                             var beatMultiplier = ZynQuick.PlayGridManager.syncTimer.getMultiplier();
                             var beatsPerMinute = zynthian.zynthiloops.song.bpm;
-                            _private.patternDurationInMS = ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, patternDurationInBeats) * 1000;
+                            _private.patternDurationInMS = ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, _private.patternDurationInBeats) * 1000;
                             _private.recordingDurationInMS = _private.patternDurationInMS;
-                            _private.recordingDurationInBeats = patternDurationInBeats;
+                            _private.recordingDurationInBeats = _private.patternDurationInBeats;
                             if (_private.includeLeadin) {
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
-                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + patternDurationInBeats;
+                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                             }
                             _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
                             _private.playbackStopDurationInMS = _private.recordingDurationInMS;
                             if (_private.includeFadeout) {
-                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + patternDurationInBeats;
+                                _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
                             }
                             // Startrecordingandplaythethingletsgo!
@@ -125,14 +126,14 @@ QQC2.Popup {
                         // set progress based on what the thing is actually doing
                         _private.bounceProgress = _private.cumulativeBeats/_private.recordingDurationInBeats;
                         if (_private.playbackStopDurationInBeats < _private.cumulativeBeats) {
-                            console.log("Fadeout reached, disconnecting playback at cumulative beat position");
+                            console.log("Fadeout reached, disconnecting playback at cumulative beat position", _private.cumulativeBeats);
                             _private.sequence.disconnectSequencePlayback();
                             // Minor hackery, this just ensure the above only happens once
                             _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
                         }
                     } else {
                         _private.isRecording = false;
-                        var clip = zynthian.zynthiloops.clipToRecord
+                        var clip = zynthian.zynthiloops.clipToRecord;
                         if (clip) {
                             ZynQuick.MidiRecorder.stopRecording();
                             clip.stopRecording();
@@ -143,15 +144,13 @@ QQC2.Popup {
                         _private.bounceProgress = 0;
                         // Reset solo to whatever it was before we started working
                         _private.sequence.soloPattern = _private.previousSolo;
-                        // Set the bounced wave as loop sample
-                        // TODO
                         // Work out where the start and end points should be for the loop
-                        var startTime = 0;
-                        var loopLength = _private.patternDurationInMS;
+                        var startTime = 0; // startTime is in seconds
+                        var loopLength = _private.patternDurationInBeats; // loop length is in numbers of beats
                         if (_private.includeLeadin) {
                             if (_private.includeLeadinInLoop) {
                                 // Leave the start point at 0 and just increase the loopLength by the pattern duration
-                                loopLength = loopLength + _private.patternDurationInMS;
+                                loopLength = loopLength + _private.patternDurationInBeats;
                             } else {
                                 // Leave the loopLength alone and just move the start point
                                 startTime = startTime + _private.patternDurationInMS;
@@ -159,12 +158,13 @@ QQC2.Popup {
                         }
                         if (_private.includeFadeout && _private.includeFadeoutInLoop) {
                             // Whatever the start time is, end time should be moved by the pattern loopLength
-                            loopLength = loopLength + _private.patternDurationInMS;
+                            loopLength = loopLength + _private.patternDurationInBeats;
                         }
-                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop start and lengths at", startTime, "and", loopLength);
+                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long");
                         // Set the new sample's start and end points
+                        clip.snapLengthToBeat = false;
                         clip.startPosition = startTime / 1000;
-                        clip.length = loopLength / 1000;
+                        clip.length = loopLength / ZynQuick.PlayGridManager.syncTimer.getMultiplier();
                         // Set track mode to loop
                         _private.selectedTrack.trackAudioType = "sample-loop";
                         // Close out and we're done

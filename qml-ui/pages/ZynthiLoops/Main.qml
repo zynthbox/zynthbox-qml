@@ -135,12 +135,6 @@ Zynthian.ScreenPage {
 
         // Forward CUIA actions to bottomBar only when bottomBar is open
         if (bottomStack.currentIndex === 0) {
-            if (bottomBar.filePickerDialog.opened) {
-                if (bottomBar.filePickerDialog.cuiaCallback(cuia)) {
-                    return true;
-                }
-            }
-
             if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {
                 if (bottomBar.tabbedView.activeItem.cuiaCallback(cuia)) {
                     return true;

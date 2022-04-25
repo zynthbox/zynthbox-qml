@@ -158,12 +158,6 @@ Zynthian.ScreenPage {
         let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
         layerSetupDialog.close(); // Close the new layer popup at any keyboard interaction
 
-        if (pickerDialog.visible) {
-            return pickerDialog.cuiaCallback(cuia);
-        } else if (saveDialog.visible) {
-            return saveDialog.cuiaCallback(cuia);
-        }
-
         switch (cuia) {
         case "NAVIGATE_LEFT":
             var newIndex = Math.max(0, currentScreenIndex - 1);

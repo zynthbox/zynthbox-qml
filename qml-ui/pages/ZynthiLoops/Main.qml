@@ -563,6 +563,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
+                                visible: !zynthian.songBarActive
 
                                 Repeater {
                                     id: slotsOccupiedIndicatorRepeater

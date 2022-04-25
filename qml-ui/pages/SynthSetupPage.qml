@@ -173,12 +173,6 @@ Zynthian.ScreenPage {
         let currentScreenIndex = root.screenIds.indexOf(zynthian.current_screen_id);
         layerSetupDialog.reject(); // Close the new layer popup at any keyboard interaction
 
-        if (pickerDialog.visible) {
-            return pickerDialog.cuiaCallback(cuia);
-        } else if (saveDialog.visible) {
-            return saveDialog.cuiaCallback(cuia);
-        }
-
         switch (cuia) {
         case "SWITCH_SELECT_SHORT":
             if (zynthian.current_screen_id == "layers_for_track" && !zynthian.fixed_layers.current_index_valid) {

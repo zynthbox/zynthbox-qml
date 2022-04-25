@@ -419,6 +419,8 @@ class zynthian_gui(QObject):
         self.slots_bar_samples_active = False
         self.slots_bar_fx_active = False
 
+        self.opened_dialog = None
+
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
         self.zynswitch_long_triggered.connect(self.zynswitch_long, Qt.QueuedConnection)
@@ -1476,12 +1478,27 @@ class zynthian_gui(QObject):
     def callable_ui_action(self, cuia, params=None):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 
+        # Check if there are any open dialogs. Forward cuia events to cuiaCallback of opened dialog
+        if self.opened_dialog is not None:
+            try:
+                cuia_callback = self.opened_dialog.property("cuiaCallback")
+                visible = self.opened_dialog.property("visible")
+
+                if cuia_callback is not None and cuia_callback.isCallable() and visible:
+                    _result = cuia_callback.call([cuia])
+
+                    if _result is not None and _result.toBool():
+                        return
+            except Exception as e:
+                logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
+                pass
+
         if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
             try:
                 js_value = self.current_qml_page_prop.property("cuiaCallback")
-                if js_value != None and js_value.isCallable():
+                if js_value is not None and js_value.isCallable():
                     _result = js_value.call([cuia])
-                    if _result != None and _result.toBool():
+                    if _result is not None and _result.toBool():
                         return
             except Exception as e:
                 logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
@@ -3480,6 +3497,21 @@ class zynthian_gui(QObject):
 
     rightButtonPressed = Property(bool, get_right_button_pressed, set_right_button_pressed, notify=right_button_pressed_changed)
     ### END Property rightButtonPressed
+
+    ### Property openedDialog
+    def get_openedDialog(self):
+        self.opened_dialog
+
+    def set_openedDialog(self, dialog):
+        if dialog != self.opened_dialog:
+            self.opened_dialog = dialog
+            self.openedDialogChanged.emit()
+
+    openedDialogChanged = Signal()
+
+    openedDialog = Property(QObject, get_openedDialog, set_openedDialog, notify=openedDialogChanged)
+
+    ### End Property openedDialog
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

@@ -102,6 +102,16 @@ QQC2.Dialog {
         }
     }
     onVisibleChanged: {
+        if (visible) {
+            // Report dialog open to zynthian for passing cuia events to dialog
+            zynthian.openedDialog = root
+        } else {
+            // Report dialog close to zynthian to stop receiving cuia events
+            if (zynthian.openedDialog === root) {
+                zynthian.openedDialog = null
+            }
+        }
+
         namedFile.text = "";
         filesListView.currentIndex = -1;
     }
@@ -494,7 +504,7 @@ QQC2.Dialog {
         }
     }
 
-    function cuiaCallback(cuia) {
+    property var cuiaCallback: function (cuia) {
         switch (cuia) {
             case "SELECT_UP":
                 root.filesListView.currentIndex = root.filesListView.currentIndex > 0

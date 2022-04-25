@@ -52,17 +52,6 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     function cuiaCallback(cuia) {
-        if (samplePickerDialog.opened) {
-            if (samplePickerDialog.cuiaCallback(cuia)) {
-                return true;
-            }
-        }
-        if (bankPickerDialog.opened) {
-            if (bankPickerDialog.cuiaCallback(cuia)) {
-                return true;
-            }
-        }
-
         switch (cuia) {
             case "SWITCH_TRACKS_MOD_SHORT":
                 return true

@@ -68,6 +68,12 @@ Zynthian.Card {
         y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 6 : 0
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            tabbedView.initialAction.trigger()
+        }
+    }
+
     contentItem: RowLayout {
         spacing: 1
 
@@ -358,7 +364,12 @@ Zynthian.Card {
                     case BottomBar.ControlType.Clip:
                         return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
                     case BottomBar.ControlType.Track:
-                        return trackSoundsAction;
+                        if (controlObj.trackAudioType === "synth")
+                            return trackSoundsAction;
+                        else {
+                            return sampleSoundsAction;
+                        }
+
                     case BottomBar.ControlType.Part:
                         return partAction;
                     case BottomBar.ControlType.Pattern:

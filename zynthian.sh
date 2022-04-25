@@ -124,6 +124,7 @@ while true; do
         mkfifo /tmp/mplayer-splash-control
     fi
 	mplayer -slave -input file=/tmp/mplayer-splash-control -noborder -ontop -geometry 50%:50% /usr/share/zynthbox-bootsplash/zynthbox-bootsplash.mkv -loop 0 &> /dev/null &
+	SPLASH_PID=$!
 	
 	# Start Zynthian GUI & Synth Engine
 	export QT_QUICK_CONTROLS_MOBILE=1
@@ -190,7 +191,9 @@ while true; do
 			splash_zynthian_error
 			sleep 3
 		;;
-	esac  
+	esac
+	
+	kill -9 $SPLASH_PID
 done
 
 #------------------------------------------------------------------------------

@@ -38,7 +38,7 @@ import rpi_ws281x
 import time
 from datetime import datetime
 from threading import Thread, Lock
-from subprocess import check_output
+from subprocess import Popen, check_output
 from ctypes import c_float, c_double, CDLL
 import xml.etree.ElementTree as ET
 
@@ -3080,16 +3080,14 @@ class zynthian_gui(QObject):
 
         process = None
         if extro_path.exists():
-            process = QProcess()
-            process.start("mplayer", ('-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+            process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
         with open("/tmp/mplayer-splash-control", "w") as f:
             f.write("quit\n")
             f.close()
 
         if process is not None:
-            process.waitForStarted()
-            process.waitForFinished()
+            process.wait()
 
         self.displayMainWindow.emit()
 

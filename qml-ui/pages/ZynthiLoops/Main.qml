@@ -537,6 +537,11 @@ Zynthian.ScreenPage {
                                     }
 
                                     Zynthian.CommonUtils.switchToScene(index);
+                                } else {
+                                    zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
+                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
+                                    bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
+                                    bottomStack.slotsBar.bottomBarButton.checked = true
                                 }
                             }
 

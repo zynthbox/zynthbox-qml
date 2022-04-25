@@ -1225,6 +1225,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.recorder_process is not None:
             self.recorder_process.terminate()
+            logging.error("Asked recorder to stop doing the thing");
             self.recording_complete.emit()
 
     @Slot(None)
@@ -1291,8 +1292,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.current_beat_changed.emit()
 
     def load_recorded_file_to_clip(self):
-        while not Path(self.clip_to_record_path).exists():
-            sleep(0.1)
+        logging.error("Loading recorded clip - but first, wait for the recorder to exit")
+        self.recorder_process.wait()
+        logging.error("Recorder exited, now we should have a file")
+        if not Path(self.clip_to_record_path).exists():
+            logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
         layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
         logging.error(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")

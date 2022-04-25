@@ -523,9 +523,12 @@ Zynthian.ScreenPage {
                         model: root.song.scenesModel
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
+
+                            property QtObject track: root.song.tracksModel.getTrack(index)
+
                             text: zynthian.songBarActive
                                     ? model.scene.name
-                                    : (index + 1)
+                                    : ""
                             color: Kirigami.Theme.backgroundColor
 
                             Layout.fillWidth: false
@@ -552,6 +555,60 @@ Zynthian.ScreenPage {
 //                                    }
 
                                     Zynthian.CommonUtils.switchToScene(index);
+                                }
+                            }
+
+                            ColumnLayout {
+                                anchors {
+                                    centerIn: parent
+                                    margins: Kirigami.Units.gridUnit
+                                }
+
+                                Repeater {
+                                    id: slotsOccupiedIndicatorRepeater
+                                    model: sceneHeaderDelegate.track.occupiedSlots
+                                    onModelChanged: {
+                                        console.log("slotsOccupiedIndicatorRepeater :", model)
+                                    }
+
+                                    delegate: Rectangle {
+                                        width: 50
+                                        height: 3
+                                        radius: 100
+                                        // Display occupied slots for all trackAudioType modes except external
+                                        opacity: sceneHeaderDelegate.track.trackAudioType !== "external"
+                                                    ? 1
+                                                    : 0
+                                        color: "#ccffffff"
+                                    }
+                                }
+
+                                Repeater {
+                                    id: slotsFreeIndicatorRepeater
+                                    property int availableSlots: sceneHeaderDelegate.track.trackAudioType === "sample-loop" ||
+                                                                 sceneHeaderDelegate.track.trackAudioType === "sample-slice"
+                                                                    ? 1
+                                                                    : 5
+                                    model: availableSlots - sceneHeaderDelegate.track.occupiedSlots
+                                    onModelChanged: {
+                                        console.log("slotsFreeIndicatorRepeater :", model)
+                                    }
+                                    delegate: Rectangle {
+                                        width: 50
+                                        height: 3
+                                        radius: 100
+                                        color: "#11ffffff"
+                                    }
+                                }
+
+                                // Spacer in case where number of visible slot is 1
+                                Repeater {
+                                    model: 5 - (slotsOccupiedIndicatorRepeater.model + slotsFreeIndicatorRepeater.model)
+                                    delegate: Rectangle {
+                                        width: 50
+                                        height: 3
+                                        color: "transparent"
+                                    }
                                 }
                             }
 

@@ -34,7 +34,7 @@ import uuid
 from datetime import datetime
 from os.path import dirname, realpath
 from pathlib import Path
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from time import sleep
 import json
 
@@ -105,7 +105,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__jack_client_init_timer__.setSingleShot(True)
         self.__jack_client_init_timer__.timeout.connect(self.init_jack_client)
         self.recorder_process = None
-        self.recorder_process_internal_arguments = ["--daemon", "--port",
+        self.recorder_process_internal_arguments = ["--disable-console", "--no-stdin", "--port",
                                                     f"zynthiloops_audio_levels_client:synth_port_a",
                                                     "--port", f"zynthiloops_audio_levels_client:synth_port_b"]
         self.__last_recording_type__ = ""
@@ -1197,7 +1197,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path))
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
             else:
                 if channel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"
@@ -1205,7 +1205,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__last_recording_type__ = "External (Mono Right)"
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--daemon", "--port", f"system:capture_{channel}", self.clip_to_record_path))
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--disable-console", "--no-stdin", "--port", f"system:capture_{channel}", self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
+
+            logging.error("Process opened, let's wait for output...")
+            # Let's make sure that we have at least a bit of output before continuing (so we know the process has actually started)
+            self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
+            logging.error("Output get! Continue.")
 
             self.set_clip_to_record(clip)
             self.clip_to_record.isRecording = True

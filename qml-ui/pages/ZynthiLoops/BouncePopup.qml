@@ -133,15 +133,18 @@ QQC2.Popup {
                         }
                     } else {
                         _private.isRecording = false;
+                        _private.bounceProgress = 0;
                         var clip = zynthian.zynthiloops.clipToRecord;
                         if (clip) {
                             ZynQuick.MidiRecorder.stopRecording();
                             clip.stopRecording();
                             clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi();
                         }
+                        zynthian.zynthiloops.stopAllPlayback();
                         _private.sequence.stopSequencePlayback();
                         ZynQuick.PlayGridManager.stopMetronome();
-                        _private.bounceProgress = 0;
+                        zynthian.song_arranger.stop();
+                        zynthian.zynthiloops.resetMetronome();
                         // Reset solo to whatever it was before we started working
                         _private.sequence.soloPattern = _private.previousSolo;
                         // Work out where the start and end points should be for the loop
@@ -160,7 +163,11 @@ QQC2.Popup {
                             // Whatever the start time is, end time should be moved by the pattern loopLength
                             loopLength = loopLength + _private.patternDurationInBeats;
                         }
-                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long");
+                        while (clip.duration == 0) {
+                            // wait a moment before we go on...
+                            console.log("No clip duration yet...");
+                        }
+                        console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long, and the clip says it is", clip.duration, "seconds long");
                         // Set the new sample's start and end points
                         clip.snapLengthToBeat = false;
                         clip.startPosition = startTime / 1000;
@@ -252,20 +259,20 @@ QQC2.Popup {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                text: "Bounce"
-                enabled: _private.bounceProgress === -1
-                onClicked: {
-                    _private.performBounce();
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true;
-                Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                 text: "Close"
                 enabled: _private.bounceProgress === -1
                 onClicked: {
                     root.close();
+                }
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                text: "Bounce"
+                enabled: _private.bounceProgress === -1
+                onClicked: {
+                    _private.performBounce();
                 }
             }
         }

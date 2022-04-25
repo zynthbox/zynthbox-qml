@@ -91,6 +91,12 @@ class zynthiloops_track(QObject):
 
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.scene_clip_changed.emit())
 
+        # Emit occupiedSlotsChanged on dependant property changes
+        self.chained_sounds_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.zyngui.zynthiloops.selectedClipColChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+
     @Property(str, constant=True)
     def className(self):
         return "zynthiloops_track"
@@ -873,3 +879,53 @@ class zynthiloops_track(QObject):
 
     selectedSlotRow = Property(int, get_selectedSlotRow, set_selectedSlotRow, notify=selectedSlotRowChanged)
     ### END Property selectedSlotRow
+
+    ### Property occupiedSlots
+    @Slot(None, result=int)
+    def get_occupiedSlots(self):
+        occupied_slots = 0
+
+        if self.__track_audio_type__ == "sample-trig":
+            logging.error(f"### get_occupiedSlots : Sample trig")
+            # If type is sample-trig check how many samples has wavs selected
+            for sample in self.__samples__:
+                if sample is not None and \
+                        sample.path is not None and \
+                        len(sample.path) > 0:
+                    occupied_slots += 1
+        elif self.__track_audio_type__ == "synth":
+            logging.error(f"### get_occupiedSlots : synth")
+            # If type is synth check how many synth engines are selected and chained
+            for sound in self.__chained_sounds__:
+                if sound >= 0 and self.checkIfLayerExists(sound):
+                    occupied_slots += 1
+        elif self.__track_audio_type__ == "sample-loop":
+            logging.error(f"### get_occupiedSlots : Sample loop")
+            # If type is sample-trig check if visually clip has wav selected
+            clip = self.__song__.getClip(self.id, self.zyngui.zynthiloops.selectedClipCol)
+
+            if clip is not None and \
+                    clip.path is not None and \
+                    len(clip.path) > 0:
+                occupied_slots += 1
+        elif self.__track_audio_type__ == "sample-slice":
+            logging.error(f"### get_occupiedSlots : Sample slice")
+
+            # If type is sample-slice check if samples[0] has wav selected
+            if self.__samples__[0] is not None and \
+                    self.__samples__[0].path is not None and \
+                    len(self.__samples__[0].path) > 0:
+                occupied_slots += 1
+        else:
+            logging.error(f"### get_occupiedSlots : Slots not in use")
+            # For any other modes, sample slots are not in use. Hence do not increment occupied_slots
+            pass
+
+        logging.error(f"### get_occupiedSlots : occupied_slots({occupied_slots})")
+
+        return occupied_slots
+
+    occupiedSlotsChanged = Signal()
+
+    occupiedSlots = Property(int, get_occupiedSlots, notify=occupiedSlotsChanged)
+    ### END Property occupiedSlots

@@ -39,6 +39,7 @@ Zynthian.ScreenPage {
     property alias zlScreen: root
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property bool displaySceneButtons: false
 
     // Used to temporarily cache clip/track object to be copied
     property var copySourceObj: null
@@ -325,9 +326,6 @@ Zynthian.ScreenPage {
         onSong_changed: {
             console.log("$$$ Song Changed :", song)
 
-            // Reset focus to song cell
-            songCell.focus = true
-            songCell.focus = false
             bottomBar.controlType = BottomBar.ControlType.Song;
             bottomBar.controlObj = root.song;
             bottomStack.slotsBar.trackButton.checked = true
@@ -493,6 +491,8 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
+                        highlighted: root.displaySceneButtons
+                        highlightOnFocus: false
                         text: root.song.name
 //                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
                         // subText: "BPM: " + root.song.bpm
@@ -503,19 +503,14 @@ Zynthian.ScreenPage {
 //                        subSubTextSize: 0
 
                         onPressed: {
-                            // If MixedTracksViewBar is not open, open MixedTracksViewBar first
-                            if (!bottomStack.slotsBar.trackButton.checked) {
-                                bottomStack.slotsBar.trackButton.checked = true
-
-                                return;
-                            }
-
                             bottomBar.controlType = BottomBar.ControlType.Song;
                             bottomBar.controlObj = root.song;
 
                             if (bottomStack.slotsBar.trackButton.checked) {
                                 bottomStack.slotsBar.bottomBarButton.checked = true
                             }
+
+                            root.displaySceneButtons = !root.displaySceneButtons
                         }
                     }
 
@@ -526,7 +521,7 @@ Zynthian.ScreenPage {
 
                             property QtObject track: root.song.tracksModel.getTrack(index)
 
-                            text: zynthian.songBarActive
+                            text: root.displaySceneButtons
                                     ? model.scene.name
                                     : ""
                             color: Kirigami.Theme.backgroundColor
@@ -536,23 +531,16 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: zynthian.songBarActive
+                            highlighted: root.displaySceneButtons
                                             ? root.song.scenesModel.selectedSceneIndex === index
                                             : zynthian.session_dashboard.selectedTrack === index
 
                             onPressed: {
-                                if (zynthian.songBarActive) {
+                                if (root.displaySceneButtons) {
                                     root.lastSelectedObj = {
                                         className: "zynthiloops_scene",
                                         sceneIndex: index
                                     }
-
-//                                    // If MixedTracksViewBar is not open, open MixedTracksViewBar first
-//                                    if (!bottomStack.slotsBar.trackButton.checked) {
-//                                        bottomStack.slotsBar.trackButton.checked = true
-
-//                                        return;
-//                                    }
 
                                     Zynthian.CommonUtils.switchToScene(index);
                                 }
@@ -563,7 +551,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !zynthian.songBarActive
+                                visible: !root.displaySceneButtons
 
                                 Repeater {
                                     id: slotsOccupiedIndicatorRepeater
@@ -616,7 +604,7 @@ Zynthian.ScreenPage {
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: zynthian.songBarActive
+                                visible: root.displaySceneButtons
                                             ? root.song.scenesModel.selectedSceneIndex === index
                                             : zynthian.session_dashboard.selectedTrack === index
                             }

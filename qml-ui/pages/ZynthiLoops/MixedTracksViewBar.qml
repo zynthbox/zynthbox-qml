@@ -393,11 +393,7 @@ Rectangle {
                                                 if (index !== root.selectedTrack.selectedSlotRow) {
                                                     root.selectedTrack.selectedSlotRow = index
                                                 } else {
-                                                    // bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
-                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
-                                                    bottomStack.bottomBar.controlObj = root.selectedTrack;
-
-                                                    bottomStack.slotsBar.bottomBarButton.checked = true
+                                                    bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                                                 }
                                             }
                                         }

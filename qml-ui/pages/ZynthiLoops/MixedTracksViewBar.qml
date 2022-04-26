@@ -452,6 +452,31 @@ Rectangle {
                                             }
                                         }
                                     }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if (root.selectedTrack.trackAudioType === "sample-loop") {
+                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
+
+                                                if (clip && clip.path && clip.path.length > 0) {
+                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol);
+                                                    bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                    bottomStack.bottomBar.waveEditorAction.trigger();
+                                                }
+                                            } else {
+                                                var clip = root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+
+                                                if (clip && clip.path && clip.path.length > 0) {
+                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
+                                                    bottomStack.bottomBar.controlObj = root.selectedTrack;
+                                                    bottomStack.slotsBar.bottomBarButton.checked = true;
+                                                    bottomStack.bottomBar.trackWaveEditorAction.trigger();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
 
                                 // Take remaining available width

@@ -564,7 +564,7 @@ Zynthian.ScreenPage {
                                         width: 50
                                         height: 3
                                         radius: 100
-                                        color: "#ccffffff"
+                                        color: "#ccbbbbbb"
                                     }
                                 }
 

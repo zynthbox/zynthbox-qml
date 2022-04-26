@@ -1121,9 +1121,22 @@ Zynthian.ScreenPage {
 
                                             zynthian.stop_loading()
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_scene") {
+                                            zynthian.start_loading()
+
                                             // Copy Scene
                                             root.song.scenesModel.copyScene(root.copySourceObj.sceneIndex, root.song.scenesModel.selectedSceneIndex)
+
+                                            for (var i=0; i<root.song.tracksModel.count; i++) {
+                                                var track = root.song.tracksModel.getTrack(i)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.copySourceObj.sceneIndex + 65)).get(track.connectedPattern)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).get(track.connectedPattern)
+
+                                                destPattern.cloneOther(sourcePattern)
+                                            }
+
                                             root.copySourceObj = null
+
+                                            zynthian.stop_loading()
                                         }
                                     }
                                 }

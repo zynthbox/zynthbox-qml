@@ -676,7 +676,38 @@ Kirigami.AbstractApplicationWindow {
         x: 0
         y: screen.height - height
         flags: Qt.WindowDoesNotAcceptFocus
-        visible: root.visible && !root.active
+
+        // Initially set to false as this value will be set after an interval
+        // when UI loads for the first time
+        visible: false
+
+        /**
+          * This Connections object triggers a timer to display the external window control panel
+          * after an interval when UI loads for the first time
+          * This prevent displaying the panel for a brief moment before UI loads for the first time after boot.
+          */
+        Connections {
+            id: rootVisibilityConnections
+            target: root
+            onVisibleChanged: panelVisibilityTimer.restart()
+            onActiveChanged: panelVisibilityTimer.restart()
+        }
+
+        Timer {
+            id: panelVisibilityTimer
+            interval: 5000
+            repeat: false
+            onTriggered: {
+                /**
+                  * Disable the connections object as it is no longer required to trigger
+                  * this timer. Once the timer is triggered, visible property of panel is bound to
+                  * the dependendant properties.
+                  */
+                rootVisibilityConnections.enabled = false
+                panel.visible = Qt.binding(function() { return root.visible && !root.active })
+            }
+        }
+
         QQC2.ToolBar {
             anchors.fill: parent
             position: QQC2.ToolBar.Footer

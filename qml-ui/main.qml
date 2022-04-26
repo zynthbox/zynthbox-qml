@@ -134,7 +134,7 @@ Kirigami.AbstractApplicationWindow {
                       && zynthian.zynthiloops.song.suggestedName
                         ? zynthian.zynthiloops.song.suggestedName
                         : zynthian.zynthiloops.song.name
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 padding: Kirigami.Units.largeSpacing*1.5
                 rightPadding: Kirigami.Units.largeSpacing*1.5
                 onClicked: {
@@ -147,7 +147,7 @@ Kirigami.AbstractApplicationWindow {
            /* Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("1-6")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
                     zynthian.current_screen_id = 'session_dashboard';
@@ -158,7 +158,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("7-12")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
                     zynthian.current_screen_id = 'session_dashboard';
@@ -171,7 +171,7 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("Scene %2 ˬ")
                         .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: scenesMenu.visible = true
 
@@ -211,7 +211,7 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("Track %1 ˬ")
                         .arg(zynthian.session_dashboard.selectedTrack+1)
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: tracksMenu.visible = true
                 QQC2.Menu {
@@ -239,7 +239,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: synthButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: {
                     // As per #299, open library instead
@@ -294,7 +294,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: presetButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = "preset"
 
@@ -374,14 +374,14 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
                 onClicked: zynthian.current_screen_id = effectScreen
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
             }
             Zynthian.BreadcrumbButton {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: "EDIT"
                 visible: zynthian.current_screen_id === "control"
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
             }
             /*Zynthian.BreadcrumbButton {

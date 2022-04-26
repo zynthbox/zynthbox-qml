@@ -899,15 +899,6 @@ class zynthiloops_track(QObject):
             for sound in self.__chained_sounds__:
                 if sound >= 0 and self.checkIfLayerExists(sound):
                     occupied_slots += 1
-        elif self.__track_audio_type__ == "sample-loop":
-            logging.error(f"### get_occupiedSlots : Sample loop")
-            # If type is sample-trig check if visually clip has wav selected
-            clip = self.__song__.getClip(self.id, self.zyngui.zynthiloops.selectedClipCol)
-
-            if clip is not None and \
-                    clip.path is not None and \
-                    len(clip.path) > 0:
-                occupied_slots += 1
         elif self.__track_audio_type__ == "sample-slice":
             logging.error(f"### get_occupiedSlots : Sample slice")
 

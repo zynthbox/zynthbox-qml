@@ -960,7 +960,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
         logging.info("RESTART ZYNTHIAN-UI")
         self.last_state_action()
         #self.zyngui.exit(102)
-        self.start_command(["systemctl restart zynthian"])
+        self.start_command(["systemctl restart jack2 zynthian"])
 
     def exit_to_console(self):
         logging.info("EXIT TO CONSOLE")

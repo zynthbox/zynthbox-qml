@@ -550,7 +550,8 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displaySceneButtons
+                                visible: !root.displaySceneButtons &&
+                                         ["sample-loop", "external"].indexOf(sceneHeaderDelegate.track.trackAudioType) < 0
 
                                 Repeater {
                                     id: slotsOccupiedIndicatorRepeater
@@ -563,20 +564,14 @@ Zynthian.ScreenPage {
                                         width: 50
                                         height: 3
                                         radius: 100
-                                        // Display occupied slots for all trackAudioType modes except external
-                                        opacity: sceneHeaderDelegate.track.trackAudioType !== "external"
-                                                    ? 1
-                                                    : 0
                                         color: "#ccffffff"
                                     }
                                 }
 
                                 Repeater {
                                     id: slotsFreeIndicatorRepeater
-                                    property int availableSlots: sceneHeaderDelegate.track.trackAudioType === "sample-loop" ||
-                                                                 sceneHeaderDelegate.track.trackAudioType === "sample-slice"
-                                                                    ? 1
-                                                                    : 5
+                                    property int availableSlots: sceneHeaderDelegate.track.trackAudioType === "sample-slice" ? 1 : 5
+
                                     model: availableSlots - sceneHeaderDelegate.track.occupiedSlots
                                     onModelChanged: {
                                         console.log("slotsFreeIndicatorRepeater :", model)

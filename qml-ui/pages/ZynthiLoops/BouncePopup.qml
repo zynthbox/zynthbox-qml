@@ -95,8 +95,14 @@ QQC2.Popup {
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
                                 _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                             }
-                            _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
-                            _private.playbackStopDurationInMS = _private.recordingDurationInMS;
+                            if (_private.selectedTrack.trackAudioType === "synth") {
+                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats - ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount;
+                                //_private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount) * 1000);
+                                _private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, 6) * 1000);
+                            } else {
+                                _private.playbackStopDurationInBeats = _private.recordingDurationInBeats;
+                                _private.playbackStopDurationInMS = _private.recordingDurationInMS;
+                            }
                             if (_private.includeFadeout) {
                                 _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
@@ -170,7 +176,7 @@ QQC2.Popup {
                         console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long, and the clip says it is", clip.duration, "seconds long");
                         // Set the new sample's start and end points
                         clip.snapLengthToBeat = false;
-                        clip.startPosition = startTime / 1000;
+                        clip.startPosition = (startTime / 1000) + Math.max(0, clip.duration - (_private.recordingDurationInMS / 1000));
                         clip.length = loopLength / ZynQuick.PlayGridManager.syncTimer.getMultiplier();
                         // Set track mode to loop
                         _private.selectedTrack.trackAudioType = "sample-loop";

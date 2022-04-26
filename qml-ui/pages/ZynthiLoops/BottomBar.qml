@@ -40,6 +40,9 @@ Zynthian.Card {
     property var clipCopySource: null
     property alias tabbedView: tabbedView
 
+    property alias waveEditorAction: waveEditorAction
+    property alias trackWaveEditorAction: trackWaveEditorAction
+
     leftPadding: 0
     rightPadding: 0
     topPadding: 0
@@ -362,7 +365,7 @@ Zynthian.Card {
                     case BottomBar.ControlType.Song:
                         return songAction;
                     case BottomBar.ControlType.Clip:
-                        return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? waveAction : recordingAction;
+                        return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? clipSettingsAction : recordingAction;
                     case BottomBar.ControlType.Track:
                         if (controlObj.trackAudioType === "synth")
                             return trackSoundsAction;
@@ -375,7 +378,7 @@ Zynthian.Card {
                     case BottomBar.ControlType.Pattern:
                         return patternAction;
                     default:
-                        return waveAction;
+                        return clipSettingsAction;
                     }
                 }
 
@@ -410,7 +413,7 @@ Zynthian.Card {
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
-                        id: waveAction
+                        id: clipSettingsAction
                         text: qsTr("Clip Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
@@ -418,7 +421,7 @@ Zynthian.Card {
                         preload: true
                     },
                     Zynthian.TabbedControlViewAction {
-                        id: editorAction
+                        id: waveEditorAction
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
@@ -454,7 +457,7 @@ Zynthian.Card {
                     },
                     // Duplicate tab instance but for different placement and controlObj for track
                     Zynthian.TabbedControlViewAction {
-                        id: trackWaveAction
+                        id: trackclipSettingsAction
 
                         property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
 

@@ -812,12 +812,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 try:
                     for port in jack_client.get_all_connections(jack_capture_port_a):
                         try:
-                            jack_client.disconnect(port.name, jack_capture_port_a)
+                            # jack_client.disconnect(port.name, jack_capture_port_a)
+                            p = Popen(("jack_disconnect", port.name, jack_capture_port_a))
+                            p.wait()
                         except Exception as e:
                             logging.error(f"Error disconnecting jack port : {str(e)}")
                     for port in jack_client.get_all_connections(jack_capture_port_b):
                         try:
-                            jack_client.disconnect(port.name, jack_capture_port_b)
+                            # jack_client.disconnect(port.name, jack_capture_port_b)
+                            p = Popen(("jack_disconnect", port.name, jack_capture_port_b))
+                            p.wait()
                         except Exception as e:
                             logging.error(f"Error disconnecting jack port : {str(e)}")
                 except Exception as e:
@@ -837,7 +841,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                         if not (port.startswith("JUCE") or port.startswith(
                                 "system")) and port.startswith(jack_basename):
                             logging.debug("ACCEPTED {}".format(port))
-                            jack_client.connect(port, target)
+                            # jack_client.connect(port, target)
+                            p = Popen(("jack_connect", port, target))
+                            p.wait()
                         else:
                             logging.debug("REJECTED {}".format(port))
                 except Exception as e:

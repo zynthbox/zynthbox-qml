@@ -56,11 +56,11 @@ GridLayout {
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-        Binding {
-            target: volumeControl.slider
-            property: "value"
-            value: bottomBar.controlObj.volume
-        }
+//        Binding {
+//            target: volumeControl.slider
+//            property: "value"
+//            value: bottomBar.controlObj.volume
+//        }
 
         VolumeControl {
             id: volumeControl
@@ -76,7 +76,7 @@ GridLayout {
             audioLeveldB: bottomBar.controlObj.audioLevel
 
             slider.value: bottomBar.controlObj.volume
-            slider.onValueChanged: {
+            onValueChanged: {
                 bottomBar.controlObj.volume = slider.value
             }
 

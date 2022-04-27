@@ -40,6 +40,8 @@ import "../ZynthiLoops" as ZynthiLoops
 QQC2.Dialog {
     id: soundsDialog
 
+    /* Disable Sounds Dialog as it is not used anymore
+
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property var chainedSoundsArr: selectedTrack ? selectedTrack.chainedSounds.slice() : []
 //     property var chainColors: ({
@@ -123,10 +125,10 @@ QQC2.Dialog {
               //  soundsDialog.selectedTrack.connectedSound = -1;
 //                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
                 soundsDialog.selectedTrack.clearChainedSoundsWithoutCloning();
-                /*if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(soundsDialog.selectedTrack.connectedPattern);
-                    seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
-                }*/
+//                if (soundsDialog.selectedTrack.connectedPattern >= 0) {
+//                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(soundsDialog.selectedTrack.connectedPattern);
+//                    seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
+//                }
                 soundsDialog.accept();
             }
         }
@@ -379,31 +381,33 @@ QQC2.Dialog {
                     }
 
                     // Disable Chaining
-                    /*Kirigami.Icon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.right
-                        anchors.leftMargin: Kirigami.Units.gridUnit*0.5
-                        anchors.rightMargin: Kirigami.Units.gridUnit*0.5
-                        width: Kirigami.Units.gridUnit*1.5
-                        height: width
+//                    Kirigami.Icon {
+//                        anchors.verticalCenter: parent.verticalCenter
+//                        anchors.left: parent.right
+//                        anchors.leftMargin: Kirigami.Units.gridUnit*0.5
+//                        anchors.rightMargin: Kirigami.Units.gridUnit*0.5
+//                        width: Kirigami.Units.gridUnit*1.5
+//                        height: width
 
-                        source: "link"
-                        color: Kirigami.Theme.textColor
-                        visible: (index+1)%5 !== 0
-                        opacity: model.metadata.midi_cloned || (index >= 5 && index <= 9)? 1 : 0.4
+//                        source: "link"
+//                        color: Kirigami.Theme.textColor
+//                        visible: (index+1)%5 !== 0
+//                        opacity: model.metadata.midi_cloned || (index >= 5 && index <= 9)? 1 : 0.4
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                if (!(index >= 5 && index <= 9)) {
-                                    console.log("Toggle layer chaining")
-                                    Zynthian.CommonUtils.toggleLayerChaining(model);
-                                }
-                            }
-                        }
-                    }*/
+//                        MouseArea {
+//                            anchors.fill: parent
+//                            onClicked: {
+//                                if (!(index >= 5 && index <= 9)) {
+//                                    console.log("Toggle layer chaining")
+//                                    Zynthian.CommonUtils.toggleLayerChaining(model);
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
         }
     }
+
+    */
 }

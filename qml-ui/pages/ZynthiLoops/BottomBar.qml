@@ -201,7 +201,7 @@ Zynthian.Card {
 
                 SidebarButton {
                     icon.name: "user-trash-symbolic"
-                    visible: controlObj && controlObj.path && controlObj.path.length > 0
+                    visible: controlObj != null && controlObj.path != null && controlObj.path.length > 0
 
                     onClicked: {
                         controlObj.deleteClip()

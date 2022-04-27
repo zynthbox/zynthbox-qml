@@ -248,7 +248,7 @@ Item {
         id: mainLayout
         columns: root.orientation === Qt.Horizontal ? 2 : 1
         anchors.fill: parent
-        property var pageCache: {}
+        property var pageCache: ({})
         function loadAndCachePage(pageUrl, initialProperties) {
             if (!pageCache) {
                 pageCache = {};
@@ -278,8 +278,8 @@ Item {
         }
         onWidthChanged: {
             for (var i in pageCache) {
-                root.pageCache[i].width = width;
-                root.pageCache[i].height = height;
+                pageCache[i].width = width;
+                pageCache[i].height = height;
             }
         }
         FocusScope {

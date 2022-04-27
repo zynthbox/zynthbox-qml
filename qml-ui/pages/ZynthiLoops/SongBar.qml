@@ -113,7 +113,11 @@ GridLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignCenter
             model: root.bottomBar.controlObj.scaleModel
-            currentIndex: root.bottomBar && root.bottomBar.controlObj ? root.bottomBar.controlObj.selectedScaleIndex : 0
+            currentIndex: root.bottomBar &&
+                          root.bottomBar.controlObj &&
+                          root.bottomBar.controlObj.selectedScaleIndex
+                            ? root.bottomBar.controlObj.selectedScaleIndex
+                            : 0
             onActivated: {
                 root.bottomBar.controlObj.selectedScaleIndex = index;
             }

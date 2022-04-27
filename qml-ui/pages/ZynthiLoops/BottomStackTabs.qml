@@ -31,7 +31,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar.trackButton.checked
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.trackButton.checked : false
         text: qsTr("Track")
         onClicked: {
             bottomStack.slotsBar.trackButton.checked = true
@@ -42,7 +42,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar.mixerButton.checked
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.mixerButton.checked : false
         text: qsTr("Mixer")
         onClicked: {
             bottomStack.slotsBar.mixerButton.checked = true
@@ -53,7 +53,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar.synthsButton.checked
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.synthsButton.checked : false
         text: qsTr("Synths")
         onClicked: {
             bottomStack.slotsBar.synthsButton.checked = true
@@ -64,7 +64,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar.samplesButton.checked
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.samplesButton.checked : false
         text: qsTr("Samples")
         onClicked: {
             bottomStack.slotsBar.samplesButton.checked = true
@@ -75,7 +75,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar.fxButton.checked
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.fxButton.checked : false
         text: qsTr("FX")
         onClicked: {
             bottomStack.slotsBar.fxButton.checked = true

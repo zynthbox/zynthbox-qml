@@ -688,12 +688,14 @@ Rectangle {
                             onSelectedTrackChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
-                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
+                            enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
                             target: root.selectedSlotRowItem
                             onSelectedRowChanged: sidebarUpdateTimer.restart()
                         }
                         Connections {
-                            enabled: bottomStack.currentIndex === 2 && root.selectedSlotRowItem != null && root.selectedSlotRowItem.track != null
+                            enabled: root.selectedSlotRowItem != null &&
+                                     root.selectedSlotRowItem.track != null &&
+                                     bottomStack.currentIndex === 2
                             target: root.selectedSlotRowItem.track
                             onChainedSoundsChanged: sidebarUpdateTimer.restart()
                             onSamplesChanged: sidebarUpdateTimer.restart()

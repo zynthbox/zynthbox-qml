@@ -556,9 +556,6 @@ Zynthian.ScreenPage {
                                 Repeater {
                                     id: slotsOccupiedIndicatorRepeater
                                     model: sceneHeaderDelegate.track.occupiedSlots
-                                    onModelChanged: {
-                                        console.log("slotsOccupiedIndicatorRepeater :", model)
-                                    }
 
                                     delegate: Rectangle {
                                         width: 50
@@ -573,9 +570,6 @@ Zynthian.ScreenPage {
                                     property int availableSlots: sceneHeaderDelegate.track.trackAudioType === "sample-slice" ? 1 : 5
 
                                     model: availableSlots - sceneHeaderDelegate.track.occupiedSlots
-                                    onModelChanged: {
-                                        console.log("slotsFreeIndicatorRepeater :", model)
-                                    }
                                     delegate: Rectangle {
                                         width: 50
                                         height: 3

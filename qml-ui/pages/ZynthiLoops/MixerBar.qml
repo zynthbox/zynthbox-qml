@@ -196,7 +196,7 @@ Rectangle {
                                                                 : -400
 
                                             slider.value: model.track.volume
-                                            slider.onValueChanged: {
+                                            onValueChanged: {
                                                 model.track.volume = slider.value
                                             }
 
@@ -373,10 +373,10 @@ Rectangle {
                                 from: 0
                                 to: 100
                                 stepSize: 1
-                                onValueChanged: {
-                                    zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
-                                    zynthian.zynthiloops.song.volume = masterVolume.slider.value;
-                                }
+                            }
+                            onValueChanged: {
+                                zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
+                                zynthian.zynthiloops.song.volume = masterVolume.slider.value;
                             }
                         }
                     }

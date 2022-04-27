@@ -95,27 +95,18 @@ Zynthian.ScreenPage {
                             Layout.preferredHeight: Kirigami.Units.gridUnit * 16
                             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                             Layout.bottomMargin: 5
-//                             headerText: zynthian.zynthiloops.masterAudioLevel <= -40
-//                                             ? ""
-//                                             : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
                             footerText: modelData.name
                             audioLeveldB: -200
                             inputAudioLevelVisible: false
-
-//                            Binding {
-//                                target: volumeDelegate.slider
-//                                property: "value"
-//                                value: modelData.value
-//                            }
 
                             slider {
                                 value: modelData.value
                                 from: modelData.value_min
                                 to: modelData.value_max
                                 stepSize: 1
-                                onValueChanged: {
-                                    zynthian.audio_settings.setChannelValue(modelData.name, volumeDelegate.slider.value);
-                                }
+                            }
+                            onValueChanged: {
+                                zynthian.audio_settings.setChannelValue(modelData.name, volumeDelegate.slider.value);
                             }
                         }
                     }

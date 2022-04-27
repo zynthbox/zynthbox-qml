@@ -98,7 +98,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		return "{}{}".format(note_names[num],scale)
 
 	def set_zctrls(self):
-		logging.error(f"### Setting midi_key_range zctrl")
+		logging.debug(f"### Setting midi_key_range zctrl")
 
 		if self.shown:
 			if self.nlow_zctrl:

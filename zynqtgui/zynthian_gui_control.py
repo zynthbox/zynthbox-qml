@@ -265,7 +265,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		self.list_data = []
 
 		if not self.zyngui.curlayer:
-			logging.error("Can't fill control screen list for None layer!")
+			logging.info("Can't fill control screen list for None layer!")
 			return
 
 		self.layers = self.zyngui.screens['layer'].get_fxchain_layers()

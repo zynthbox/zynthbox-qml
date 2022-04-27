@@ -147,7 +147,7 @@ class zynthiloops_clip(QObject):
     def track_volume_changed(self):
         if self.track is not None:
             self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
-            logging.error(f"Track volume changed : {self.track.volume}")
+            logging.info(f"Track volume changed : {self.track.volume}")
 
             if self.audioSource is not None:
                 self.audioSource.set_volume(self.track.volume)
@@ -171,9 +171,9 @@ class zynthiloops_clip(QObject):
 
     def update_synced_values(self):
         if self.__should_sync__:
-            logging.error(f"Song BPM : {self.__song__.bpm}")
+            logging.debug(f"Song BPM : {self.__song__.bpm}")
             new_ratio = self.__song__.bpm / self.__bpm__
-            logging.error(f"Song New Ratio : {new_ratio}")
+            logging.debug(f"Song New Ratio : {new_ratio}")
             self.set_time(new_ratio, True)
 
             # if self.__start_position_before_sync__ is not None:
@@ -552,18 +552,18 @@ class zynthiloops_clip(QObject):
 
         if self.is_track_sample:
             if selected_path.parent != self.bank_path:
-                logging.error(
+                logging.info(
                     f"Sample({path}) is not from same track/sketch. Copying into bank folder ({self.bank_path / selected_path.name})")
                 self.bank_path.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(selected_path, self.bank_path / selected_path.name)
             else:
-                logging.error(f"Sample({self.bank_path / selected_path.name}) is from same bank")
+                logging.info(f"Sample({self.bank_path / selected_path.name}) is from same bank")
         else:
             if selected_path.parent != self.wav_path:
-                logging.error(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
+                logging.info(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
                 shutil.copy2(selected_path, self.wav_path / selected_path.name)
             else:
-                logging.error(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
+                logging.info(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
 
         self.__path__ = str(selected_path.name)
         self.stop()
@@ -606,7 +606,7 @@ class zynthiloops_clip(QObject):
         self.audioSource.progressChanged.connect(lambda progress: self.progress_changed_cb(progress))
 
         try:
-            logging.error(f"Setting bpm from metadata : {self.audio_metadata}")
+            logging.info(f"Setting bpm from metadata : {self.audio_metadata}")
             self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
         except Exception as e:
             logging.error(f"Error setting bpm from metadata : {str(e)}")
@@ -668,14 +668,14 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def play(self):
         if not self.__is_playing__:
-            logging.error(f"Playing Clip {self}")
+            logging.info(f"Playing Clip {self}")
 
             if self.track is not None:
                 clipsModel = self.track.clipsModel
 
                 for clip_index in range(0, clipsModel.count):
                     clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-                    logging.error(f"Track({self.track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+                    logging.debug(f"Track({self.track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
 
                     if clip.__is_playing__:
                         clip.stop()
@@ -694,7 +694,7 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def stop(self):
         if self.__is_playing__:
-            logging.error(f"Stopping Clip {self}")
+            logging.info(f"Stopping Clip {self}")
 
             try:
                 self.__song__.get_metronome_manager().current_beat_changed.disconnect(self.update_current_beat)
@@ -752,7 +752,7 @@ class zynthiloops_clip(QObject):
                 if self.__bpm__ <= 0:
                     self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
             except Exception as e:
-                logging.error(f"Error setting BPM from metadata : {str(e)}")
+                logging.info(f"Error setting BPM from metadata : {str(e)}")
 
             self.sound_data_changed.emit()
             self.metadata_bpm_changed.emit()
@@ -765,7 +765,7 @@ class zynthiloops_clip(QObject):
     def __get_metadata_prop__(self, name, default):
         try:
             value = self.audio_metadata[name][0]
-            logging.error(f"Restoring from metadata : {name}({value})")
+            logging.info(f"Restoring from metadata : {name}({value})")
             return value
         except:
             return default

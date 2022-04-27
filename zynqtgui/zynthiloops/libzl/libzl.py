@@ -148,7 +148,7 @@ def stopTimer():
 
 def stopClips(clips: list):
     if len(clips) > 0:
-        logging.error(f"{clips[0]}, {clips[0].audioSource}")
+        logging.debug(f"{clips[0]}, {clips[0].audioSource}")
 
         arr = (ctypes.c_void_p * len(clips))()
         arr[:] = [c.audioSource.obj for c in clips]
@@ -177,7 +177,7 @@ class ClipAudioSource(QObject):
         if libzl:
             self.obj = libzl.ClipAudioSource_new(filepath, muted)
 
-            logging.error(f"@@@ libzl CLIP OBJ : {self.obj}")
+            logging.debug(f"@@@ libzl CLIP OBJ : {self.obj}")
 
             if zl_clip is not None:
                 self.audio_level_changed_callback = AudioLevelChangedCallback(self.audio_level_changed_callback)
@@ -197,7 +197,7 @@ class ClipAudioSource(QObject):
             libzl.ClipAudioSource_play(self.obj, loop)
 
     def stop(self):
-        logging.error(f"Stopping Audio Source : {self.obj}, {libzl}")
+        logging.debug(f"Stopping Audio Source : {self.obj}, {libzl}")
 
         if libzl:
             libzl.ClipAudioSource_stop(self.obj)

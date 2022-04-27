@@ -93,7 +93,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if midi_chan in self.layer_midi_map:
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(max(0, layer.preset_index - 1), True)
-			logging.error(layer.preset_index)
+			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 
@@ -102,7 +102,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		if midi_chan in self.layer_midi_map:
 			layer = self.layer_midi_map[midi_chan]
 			layer.set_preset(min(layer.preset_index + 1, len(layer.preset_list) -1), True)
-			logging.error(layer.preset_index)
+			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
 
@@ -113,7 +113,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			if 0 <= preset_index < len(layer.preset_list):
 				layer.set_preset(preset_index, True)
-				logging.error(layer.preset_index)
+				logging.debug(layer.preset_index)
 				self.zyngui.screens['control'].show()
 				self.fill_list()
 
@@ -620,7 +620,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.zyngui.show_confirm("Do you really want to remove this synth?", self.remove_current_layer)
 
 	def remove_current_layer(self, params=None):
-		logging.error("REMOVING {}".format(self.index))
+		logging.debug("REMOVING {}".format(self.index))
 		self.remove_root_layer(self.index)
 
 	def remove_root_layer(self, i, stop_unused_engines=True):
@@ -1646,7 +1646,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 							self.remove_clone_midi(i, midi_chan)
 							self.remove_clone_midi(midi_chan, i)
 
-					logging.error(f"### Restoring engine : {layer_data['engine_nick']}")
+					logging.debug(f"### Restoring engine : {layer_data['engine_nick']}")
 					engine = self.zyngui.screens['engine'].start_engine(layer_data['engine_nick'])
 					new_layer = zynthian_layer(engine, midi_chan, self.zyngui)
 					new_layer.restore_snapshot_1(layer_data)
@@ -1894,11 +1894,11 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				actualPath = Path(self.__sounds_basepath__ + file_name)
 			f = open(actualPath, "r")
-			logging.error(f"### Loading layers from file")
+			logging.info(f"### Loading layers from file")
 			layers = self.load_channels_snapshot(JSONDecoder().decode(f.read()), 0, 16, channels_mapping)
-			logging.error(f"### Loaded layers : {layers}")
+			logging.debug(f"### Loaded layers : {layers}")
 			for layer in layers:
-				logging.error(f"#### Loaded layer {layer.engine.name} on channel {layer.midi_chan}")
+				logging.debug(f"#### Loaded layer {layer.engine.name} on channel {layer.midi_chan}")
 			self.activate_index(self.index)
 		except Exception as e:
 			logging.error(e)
@@ -1966,8 +1966,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			actualPath = Path(final_name)
 		else:
 			actualPath = Path(self.__sounds_basepath__ + final_name)
-		logging.error(actualPath)
-		logging.error(os.path.isfile(actualPath))
+		logging.debug(actualPath)
+		logging.debug(os.path.isfile(actualPath))
 		return os.path.isfile(actualPath)
 
 
@@ -2026,7 +2026,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		for i in range(5, 10):
 			for j in range(5, 10):
 				if i in self.layer_midi_map and j in self.layer_midi_map and not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
-					logging.error("CLONING {} TO {}".format(i, j))
+					logging.debug("CLONING {} TO {}".format(i, j))
 					self.clone_midi(i, j)
 				#elif zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					#self.remove_clone_midi(i, j)
@@ -2101,7 +2101,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			if to_midichan in self.layer_midi_map:
 				self.remove_root_layer(self.root_layers.index(self.layer_midi_map[to_midichan]), True)
 			layer_to_copy = self.layer_midi_map[from_midichan]
-			logging.error("COPYING {} {}".format(from_midichan, to_midichan))
+			logging.debug("COPYING {} {}".format(from_midichan, to_midichan))
 			engine = self.zyngui.screens['engine'].start_engine(layer_to_copy.engine.nickname)
 			new_layer = zynthian_layer(engine, to_midichan, self.zyngui)
 			#new_layer.set_bank(layer_to_copy.bank_index)

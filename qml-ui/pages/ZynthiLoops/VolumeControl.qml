@@ -17,6 +17,7 @@ Rectangle {
 
     signal clicked();
     signal doubleClicked();
+    signal valueChanged();
 
     id: control
     border.color: Kirigami.Theme.highlightColor
@@ -243,6 +244,7 @@ Rectangle {
 
             slider.value = value;
             valueChanged = true
+            control.valueChanged()
         }
         onClicked: {
             if (dblTimer.running) {

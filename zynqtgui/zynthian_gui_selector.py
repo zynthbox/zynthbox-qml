@@ -194,7 +194,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def adjust_knob_speed(self):
 		if self.zselector and len(self.list_data) > 0:
-			logging.error("ADJUSTING KNOB SPEED")
+			logging.debug("ADJUSTING KNOB SPEED")
 			if self.zyngui.get_encoder_list_speed_multiplier() == 0:
 				self.zselector.custom_encoder_speed = 0
 			else:

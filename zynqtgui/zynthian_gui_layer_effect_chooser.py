@@ -87,7 +87,7 @@ class zynthian_gui_layer_effect_chooser(zynthian_gui_engine):
 
 				else:
 					self.zyngui.screens['layer'].replace_layer_index = None
-				logging.error(self.layer_chain_parallel)
+				logging.debug(self.layer_chain_parallel)
 				self.zyngui.screens['layer'].layer_chain_parallel = self.layer_chain_parallel
 				#sometimes this raises an invalid index exection, despite the indexes having been checked already
 				self.zyngui.screens['layer'].add_layer_engine(self.list_data[i][0], self.zyngui.curlayer.midi_chan, False)

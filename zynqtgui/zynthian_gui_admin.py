@@ -921,7 +921,7 @@ class zynthian_gui_admin(zynthian_gui_selector):
                 if process_check_for_updates.returncode > 0:
                     self.checkForUpdatesUnavailable.emit()
                 else:
-                    logging.error("zynthbox-update-script Update Available")
+                    logging.info("zynthbox-update-script Update Available")
                     self.checkForUpdatesCompleted.emit()
 
                     self.zyngui.show_confirm("Do you want to update the system? System will reboot after updating.",

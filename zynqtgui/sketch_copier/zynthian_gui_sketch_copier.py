@@ -70,7 +70,7 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.is_copy_in_progress_changed.emit()
         self.track_copy_source_changed.emit()
 
-        logging.error(f"Copied track : {self.__track_copy_cache__}")
+        logging.info(f"Copied track : {self.__track_copy_cache__}")
 
     @Slot(None)
     def cancelCopyTrack(self):
@@ -79,11 +79,11 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.is_copy_in_progress_changed.emit()
         self.track_copy_source_changed.emit()
 
-        logging.error(f"Track Copy Cancelled")
+        logging.info(f"Track Copy Cancelled")
 
     @Slot(QObject)
     def pasteTrack(self, sketch):
-        logging.error(f"Pasting track to sketch : {sketch.name}")
+        logging.info(f"Pasting track to sketch : {sketch.name}")
 
         pasted_track = zynthiloops_track(sketch.tracksModel.count, sketch, self)
         sketch.tracksModel.add_track(pasted_track)

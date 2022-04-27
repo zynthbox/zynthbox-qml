@@ -91,7 +91,7 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
         else:
             sketch_path = Path(sketch)
             self.__sketches__[slot] = zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self.__session_dashboard__.zyngui.zynthiloops)
-            logging.error(f"Session add sketch : {slot}, {sketch_path}, {self.__sketches__[slot]}")
+            logging.debug(f"Session add sketch : {slot}, {sketch_path}, {self.__sketches__[slot]}")
 
         self.endInsertRows()
 
@@ -104,10 +104,10 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
         return res
 
     def deserialize(self, obj):
-        logging.error(f"Deserializing session sketches : {obj}")
+        logging.debug(f"Deserializing session sketches : {obj}")
         for i in range(0, 11):
             try:
-                logging.error(f"{i}, {obj[str(i)]}")
+                logging.debug(f"{i}, {obj[str(i)]}")
             except:
                 pass
 

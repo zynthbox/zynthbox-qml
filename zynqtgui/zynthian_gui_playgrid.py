@@ -64,7 +64,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_bigknob(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.debug(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__bigknob_value__ != self.__zselector[0].value:
@@ -75,7 +75,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_knob1(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.debug(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__knob1_value__ != self.__zselector[1].value:
@@ -86,7 +86,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_knob2(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.debug(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__knob2_value__ != self.__zselector[2].value:
@@ -97,7 +97,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_knob3(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.debug(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__knob3_value__ != self.__zselector[3].value:

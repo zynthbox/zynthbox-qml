@@ -58,7 +58,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
                     self.audio_device = re.search("hw:([^ ]*)", raw_dev).group(1)
                     break
 
-        logging.error(f"### ALSA Mixer card : {self.audio_device}")
+        logging.debug(f"### ALSA Mixer card : {self.audio_device}")
 
         try:
             accepted_mixer_names = ["Master", "Headphone", "HDMI", "Digital"];
@@ -67,7 +67,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
                 if mixer_name in accepted_mixer_names:
                     self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
                     break
-            logging.error(f"Using the mixer named {self.__mixer.mixer()}")
+            logging.debug(f"Using the mixer named {self.__mixer.mixer()}")
         except Exception as e:
             self.__mixer = None
             logging.error(e)
@@ -85,7 +85,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
         return vol[0]
 
     def set_volume(self, vol: int):
-        logging.error("SETTING VOLUME TO{}".format(vol))
+        logging.debug("SETTING VOLUME TO{}".format(vol))
         if self.__mixer is None:
             return
         self.__mixer.setvolume(max(0, min(100, vol)))

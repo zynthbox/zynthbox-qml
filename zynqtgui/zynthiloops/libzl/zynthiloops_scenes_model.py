@@ -56,7 +56,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         self.__name_change_timer.timeout.connect(self.selected_scene_name_changed)
 
     def serialize(self):
-        logging.error("### Serializing Scenes")
+        logging.debug("### Serializing Scenes")
         scene_data = {}
 
         for key, val in self.__scenes__.items():
@@ -76,7 +76,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         }
 
     def deserialize(self, obj):
-        logging.error("### Deserializing Scenes")
+        logging.debug("### Deserializing Scenes")
         if "scenesData" in obj:
             self.beginResetModel()
             for key, val in obj["scenesData"].items():

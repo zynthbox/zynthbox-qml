@@ -107,18 +107,18 @@ class zynthiloops_track(QObject):
     def select_correct_layer(self):
         zyngui = self.__song__.get_metronome_manager().zyngui
         if self.checkIfLayerExists(zyngui.active_midi_channel):
-            logging.error("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
+            logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
             # zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
             try:
                 zyngui.screens["layers_for_track"].update_track_sounds()
             except:
                 pass
         else:
-            logging.error("### select_correct_layer : Do not Reselect track sound since it is not removing current selected channel")
+            logging.info("### select_correct_layer : Do not Reselect track sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
-        logging.error(f"Master Volume : {self.master_volume} dB")
+        logging.debug(f"Master Volume : {self.master_volume} dB")
 
     def save_bank(self):
         bank_dir = Path(self.bankDir)
@@ -142,7 +142,7 @@ class zynthiloops_track(QObject):
             if c is not None:
                 bank_dir.mkdir(parents=True, exist_ok=True)
                 try:
-                    logging.error(f"Writing to bank.json {bank_dir}/bank.json")
+                    logging.info(f"Writing to bank.json {bank_dir}/bank.json")
                     with open(bank_dir / 'bank.json', "w") as f:
                         json.dump(obj, f)
                         f.truncate()
@@ -157,9 +157,9 @@ class zynthiloops_track(QObject):
         bank_dir = Path(self.bankDir)
 
         if not (bank_dir / 'bank.json').exists():
-            logging.error(f"bank.json does not exist for track {self.id + 1}. Skipping restoration")
+            logging.info(f"bank.json does not exist for track {self.id + 1}. Skipping restoration")
         else:
-            logging.error(f"Restoring bank.json for track {self.id + 1}")
+            logging.info(f"Restoring bank.json for track {self.id + 1}")
 
             try:
                 with open(bank_dir / 'bank.json', "r") as f:
@@ -279,12 +279,12 @@ class zynthiloops_track(QObject):
         track = self.__song__.tracksModel.getTrack(self.__id__)
         clipsModel = track.clipsModel
 
-        logging.error(f"Track {track} ClipsModel {clipsModel}")
+        logging.debug(f"Track {track} ClipsModel {clipsModel}")
 
         for clip_index in range(0, clipsModel.count):
-            logging.error(f"Track {self.__id__} Clip {clip_index}")
+            logging.debug(f"Track {self.__id__} Clip {clip_index}")
             clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-            logging.error(
+            logging.debug(
                 f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
             clip.clear()
 
@@ -317,7 +317,7 @@ class zynthiloops_track(QObject):
     def set_volume(self, volume:int, force_set=False):
         if self.__volume__ != math.floor(volume) or force_set is True:
             self.__volume__ = math.floor(volume)
-            logging.error(f"Track : Setting volume {self.__volume__}")
+            logging.debug(f"Track : Setting volume {self.__volume__}")
             self.volume_changed.emit()
             self.__song__.schedule_save()
 
@@ -396,7 +396,7 @@ class zynthiloops_track(QObject):
         assigned_layers = [x for x in zyngui.screens["layer"].layer_midi_map.keys()]
         next_free_layer = -1
 
-        logging.error(f"Already Assigned layers : {assigned_layers}")
+        logging.debug(f"Already Assigned layers : {assigned_layers}")
 
         for i in range(0, 15):
             if i not in assigned_layers:
@@ -406,7 +406,7 @@ class zynthiloops_track(QObject):
         if next_free_layer == -1:
             return False
         else:
-            logging.error(f"Next free layer : {next_free_layer}")
+            logging.debug(f"Next free layer : {next_free_layer}")
             zyngui.screens["fixed_layers"].activate_index(next_free_layer)
 
             self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
@@ -485,7 +485,7 @@ class zynthiloops_track(QObject):
             while len(chained) < 5:
                 chained.append(-1)
             self.set_chained_sounds(chained)
-            logging.error(chained)
+            logging.debug(chained)
 
             #sounds_to_clone = []
             #for m_sound in self.__chained_sounds__:
@@ -613,7 +613,7 @@ class zynthiloops_track(QObject):
                         zyngui.screens['layer'].remove_clone_midi(j, i)
 
             for i, sound in enumerate(self.__chained_sounds__):
-                logging.error("AAAA {} {}".format(sound, chan))
+                logging.debug("AAAA {} {}".format(sound, chan))
                 if sound == chan:
                     self.__chained_sounds__[i] = -1
             zyngui.screens['layers_for_track'].fill_list()
@@ -703,7 +703,7 @@ class zynthiloops_track(QObject):
         return self.__track_audio_type__
 
     def set_track_audio_type(self, type:str, force_set=False):
-        logging.error(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
+        logging.debug(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
         if force_set or type != self.__track_audio_type__:
             for sound in self.__chained_sounds__:
                 try:
@@ -789,7 +789,7 @@ class zynthiloops_track(QObject):
             bank_name = "bank"
         path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
 
-        logging.error(f"get_bank_dir track{self.id + 1} : bankDir({path})")
+        logging.debug(f"get_bank_dir track{self.id + 1} : bankDir({path})")
 
         return str(path)
 
@@ -886,7 +886,7 @@ class zynthiloops_track(QObject):
         occupied_slots = 0
 
         if self.__track_audio_type__ == "sample-trig":
-            logging.error(f"### get_occupiedSlots : Sample trig")
+            logging.debug(f"### get_occupiedSlots : Sample trig")
             # If type is sample-trig check how many samples has wavs selected
             for sample in self.__samples__:
                 if sample is not None and \
@@ -894,13 +894,13 @@ class zynthiloops_track(QObject):
                         len(sample.path) > 0:
                     occupied_slots += 1
         elif self.__track_audio_type__ == "synth":
-            logging.error(f"### get_occupiedSlots : synth")
+            logging.debug(f"### get_occupiedSlots : synth")
             # If type is synth check how many synth engines are selected and chained
             for sound in self.__chained_sounds__:
                 if sound >= 0 and self.checkIfLayerExists(sound):
                     occupied_slots += 1
         elif self.__track_audio_type__ == "sample-slice":
-            logging.error(f"### get_occupiedSlots : Sample slice")
+            logging.debug(f"### get_occupiedSlots : Sample slice")
 
             # If type is sample-slice check if samples[0] has wav selected
             if self.__samples__[0] is not None and \
@@ -908,11 +908,11 @@ class zynthiloops_track(QObject):
                     len(self.__samples__[0].path) > 0:
                 occupied_slots += 1
         else:
-            logging.error(f"### get_occupiedSlots : Slots not in use")
+            logging.debug(f"### get_occupiedSlots : Slots not in use")
             # For any other modes, sample slots are not in use. Hence do not increment occupied_slots
             pass
 
-        logging.error(f"### get_occupiedSlots : occupied_slots({occupied_slots})")
+        logging.debug(f"### get_occupiedSlots : occupied_slots({occupied_slots})")
 
         return occupied_slots
 

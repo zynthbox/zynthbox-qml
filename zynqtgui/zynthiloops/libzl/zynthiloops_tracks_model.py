@@ -138,7 +138,7 @@ class zynthiloops_tracks_model(QAbstractListModel):
                 already_connected = True
                 break
 
-        logging.error(f"Pattern {patternIndex} already connected: {already_connected}")
+        logging.debug(f"Pattern {patternIndex} already connected: {already_connected}")
 
         return already_connected
 
@@ -155,7 +155,7 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
         values = np.unique(assigned_layers)
 
-        logging.error(f"### Connected Sounds Count : length({len(values)}) -> {values}")
+        logging.debug(f"### Connected Sounds Count : length({len(values)}) -> {values}")
 
         return len(values)
     connected_sounds_count_changed = Signal()

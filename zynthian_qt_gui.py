@@ -1222,8 +1222,8 @@ class zynthian_gui(QObject):
 
         self.screen_back = None
         self.modal_screen = screen
-        logging.error("AAAAA{}".format(screen))
-        logging.error(self.screens[screen])
+        logging.debug("AAAAA{}".format(screen))
+        logging.debug(self.screens[screen])
         if screen != "confirm":
             self.screens[screen].show()
 
@@ -1290,7 +1290,7 @@ class zynthian_gui(QObject):
         self.screens["info"].show(text)
         self.hide_screens(exclude="info")
         self.current_modal_screen_id_changed.emit()
-        logging.error(tms)
+        logging.debug(tms)
         if tms:
             self.hide_info_timer()
 
@@ -1764,7 +1764,7 @@ class zynthian_gui(QObject):
                 self.screens["session_dashboard"].selectedTrack += 1
 
         elif cuia == "KEYBOARD":
-            logging.error("KEYBOARD")
+            logging.info("KEYBOARD")
             self.miniPlayGridToggle.emit()
 
         elif cuia == "ZL_PLAY":
@@ -1782,20 +1782,20 @@ class zynthian_gui(QObject):
             zl = self.screens["zynthiloops"]
             if zl.clipToRecord is None:
                 # No clips are currently being recorded
-                logging.error("CUIA Start Recording")
+                logging.info("CUIA Start Recording")
                 if self.trackSamplesBarActive:
-                    logging.error(f"Clip is a track sample")
+                    logging.debug(f"Clip is a track sample")
                     track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
                     clip = track.samples[track.selectedSampleRow]
                 else:
-                    logging.error(f"Clip is a not a track sample")
+                    logging.debug(f"Clip is a not a track sample")
                     clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
-                logging.error(f"Recording Clip : {clip}")
+                logging.info(f"Recording Clip : {clip}")
                 clip.queueRecording("internal", "*")
                 self.run_start_metronome_and_playback.emit()
             else:
                 # Some Clip is currently being recorded
-                logging.error("Some Clip is currently being recorded. Stopping record")
+                logging.info("Some Clip is currently being recorded. Stopping record")
                 self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "STOP_RECORD":
@@ -1806,7 +1806,7 @@ class zynthian_gui(QObject):
 
         elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
             self.tracks_mod_active = not self.tracks_mod_active
-            logging.error(f'self.tracks_mod_active({self.tracks_mod_active})')
+            logging.debug(f'self.tracks_mod_active({self.tracks_mod_active})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
             self.screens["zynthiloops"].clickTrackEnabled = not self.screens["zynthiloops"].clickTrackEnabled
@@ -1814,7 +1814,7 @@ class zynthian_gui(QObject):
     def custom_switch_ui_action(self, i, t):
         try:
             if t in zynthian_gui_config.custom_switch_ui_actions[i]:
-                logging.error("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
+                logging.info("Executing CUIA action: {}".format(zynthian_gui_config.custom_switch_ui_actions[i]))
                 self.callable_ui_action(
                     zynthian_gui_config.custom_switch_ui_actions[i][t]
                 )
@@ -2658,7 +2658,7 @@ class zynthian_gui(QObject):
             n -= 1
 
         if n <= 0:
-            logging.error(
+            logging.info(
                 "Reached maximum count while awaiting threads to end!"
             )
             return False
@@ -3018,9 +3018,9 @@ class zynthian_gui(QObject):
         _DOCK = display.intern_atom("_NET_WM_WINDOW_TYPE_DOCK")
         window.change_property(_TYPE, _ATOM, 32, [_DOCK])
 
-        logging.error(panel)
-        logging.error(panel.winId())
-        logging.error(window)
+        logging.debug(panel)
+        logging.debug(panel.winId())
+        logging.debug(window)
         display.sync()
 
     @Slot(None)
@@ -3031,7 +3031,7 @@ class zynthian_gui(QObject):
         root = display.screen().root
         wid = root.get_full_property(display.intern_atom('_NET_ACTIVE_WINDOW'), Xlib.X.AnyPropertyType).value[0]
 
-        logging.error(wid)
+        logging.debug(wid)
         window = display.create_resource_object("window", wid)
 
         _NET_CLOSE_WINDOW = display.intern_atom("_NET_CLOSE_WINDOW")
@@ -3311,7 +3311,7 @@ class zynthian_gui(QObject):
 
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):
-        logging.error("### Start long task")
+        logging.debug("### Start long task")
 
         # Emit long task started if no other long task is already running
         if self.__long_task_count__ == 0:
@@ -3322,7 +3322,7 @@ class zynthian_gui(QObject):
         QTimer.singleShot(2000, cb)
 
     def end_long_task(self):
-        logging.error("### End long task")
+        logging.debug("### End long task")
         self.__long_task_count__ -= 1
 
         # Emit long task ended only if all task has ended
@@ -3339,7 +3339,7 @@ class zynthian_gui(QObject):
 
     def set_alt_button_pressed(self, pressed):
         if self.__alt_button_pressed__ != pressed:
-            logging.error(f"alt Button pressed : {pressed}")
+            logging.debug(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
             self.alt_button_pressed_changed.emit()
 
@@ -3354,7 +3354,7 @@ class zynthian_gui(QObject):
 
     def set_startRecord_button_pressed(self, pressed):
         if self.__startRecord_button_pressed__ != pressed:
-            logging.error(f"startRecord Button pressed : {pressed}")
+            logging.debug(f"startRecord Button pressed : {pressed}")
             self.__startRecord_button_pressed__ = pressed
             self.startRecord_button_pressed_changed.emit()
 
@@ -3369,7 +3369,7 @@ class zynthian_gui(QObject):
 
     def set_play_button_pressed(self, pressed):
         if self.__play_button_pressed__ != pressed:
-            logging.error(f"play Button pressed : {pressed}")
+            logging.debug(f"play Button pressed : {pressed}")
             self.__play_button_pressed__ = pressed
             self.play_button_pressed_changed.emit()
 
@@ -3384,7 +3384,7 @@ class zynthian_gui(QObject):
 
     def set_metronome_button_pressed(self, pressed):
         if self.__metronome_button_pressed__ != pressed:
-            logging.error(f"metronome Button pressed : {pressed}")
+            logging.debug(f"metronome Button pressed : {pressed}")
             self.__metronome_button_pressed__ = pressed
             self.metronome_button_pressed_changed.emit()
 
@@ -3399,7 +3399,7 @@ class zynthian_gui(QObject):
 
     def set_stop_button_pressed(self, pressed):
         if self.__stop_button_pressed__ != pressed:
-            logging.error(f"stop Button pressed : {pressed}")
+            logging.debug(f"stop Button pressed : {pressed}")
             self.__stop_button_pressed__ = pressed
             self.stop_button_pressed_changed.emit()
 
@@ -3414,7 +3414,7 @@ class zynthian_gui(QObject):
 
     def set_back_button_pressed(self, pressed):
         if self.__back_button_pressed__ != pressed:
-            logging.error(f"back Button pressed : {pressed}")
+            logging.debug(f"back Button pressed : {pressed}")
             self.__back_button_pressed__ = pressed
             self.back_button_pressed_changed.emit()
 
@@ -3429,7 +3429,7 @@ class zynthian_gui(QObject):
 
     def set_up_button_pressed(self, pressed):
         if self.__up_button_pressed__ != pressed:
-            logging.error(f"up Button pressed : {pressed}")
+            logging.debug(f"up Button pressed : {pressed}")
             self.__up_button_pressed__ = pressed
             self.up_button_pressed_changed.emit()
 
@@ -3444,7 +3444,7 @@ class zynthian_gui(QObject):
 
     def set_select_button_pressed(self, pressed):
         if self.__select_button_pressed__ != pressed:
-            logging.error(f"select Button pressed : {pressed}")
+            logging.debug(f"select Button pressed : {pressed}")
             self.__select_button_pressed__ = pressed
             self.select_button_pressed_changed.emit()
 
@@ -3459,7 +3459,7 @@ class zynthian_gui(QObject):
 
     def set_left_button_pressed(self, pressed):
         if self.__left_button_pressed__ != pressed:
-            logging.error(f"left Button pressed : {pressed}")
+            logging.debug(f"left Button pressed : {pressed}")
             self.__left_button_pressed__ = pressed
             self.left_button_pressed_changed.emit()
 
@@ -3474,7 +3474,7 @@ class zynthian_gui(QObject):
 
     def set_down_button_pressed(self, pressed):
         if self.__down_button_pressed__ != pressed:
-            logging.error(f"down Button pressed : {pressed}")
+            logging.debug(f"down Button pressed : {pressed}")
             self.__down_button_pressed__ = pressed
             self.down_button_pressed_changed.emit()
 
@@ -3489,7 +3489,7 @@ class zynthian_gui(QObject):
 
     def set_right_button_pressed(self, pressed):
         if self.__right_button_pressed__ != pressed:
-            logging.error(f"right Button pressed : {pressed}")
+            logging.debug(f"right Button pressed : {pressed}")
             self.__right_button_pressed__ = pressed
             self.right_button_pressed_changed.emit()
 
@@ -3732,7 +3732,7 @@ if __name__ == "__main__":
     ### FIXME : Find the root cause of the issue instead of this workaround
     try:
         if Path("/root/.config/libzl/Settings.xml").exists():
-            logging.error(f"libzl settings file found. Removing elements")
+            logging.debug(f"libzl settings file found. Removing elements")
             tree = ET.parse('/root/.config/libzl/Settings.xml')
             root = tree.getroot()
 
@@ -3740,13 +3740,13 @@ if __name__ == "__main__":
             e2 = root.find(".//VALUE[@name='defaultWaveDevice_JACK']")
             e3 = root.find(".//VALUE[@name='defaultWaveInDevice_JACK']")
             if e1 is not None:
-                logging.error(f"Removing element audiosettings_JACK")
+                logging.debug(f"Removing element audiosettings_JACK")
                 root.remove(e1)
             if e2 is not None:
-                logging.error(f"Removing element defaultWaveDevice_JACK")
+                logging.debug(f"Removing element defaultWaveDevice_JACK")
                 root.remove(e2)
             if e3 is not None:
-                logging.error(f"Removing element defaultWaveInDevice_JACK")
+                logging.debug(f"Removing element defaultWaveInDevice_JACK")
                 root.remove(e3)
 
             tree.write("/root/.config/libzl/Settings.xml")

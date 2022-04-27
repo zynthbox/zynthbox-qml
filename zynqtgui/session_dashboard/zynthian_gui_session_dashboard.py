@@ -66,7 +66,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
         if not self.restore():
             def cb():
-                logging.error("Session dashboard Init Sketch CB (No restore)")
+                logging.info("Session dashboard Init Sketch CB (No restore)")
                 self.set_selected_track(self.__selected_track__, True)
 
                 selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
@@ -96,29 +96,29 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.selected_track_name_changed.emit()
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
         if selected_track != None:
-            selected_track.chained_sounds_changed.connect(lambda: logging.error(f"Chained Sounds Changed"))
+            selected_track.chained_sounds_changed.connect(lambda: logging.debug(f"Chained Sounds Changed"))
             selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
         selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        logging.error(f"Layer created : {index}, Selected Track Chained Sounds : {selected_track.chainedSounds}")
+        logging.debug(f"Layer created : {index}, Selected Track Chained Sounds : {selected_track.chainedSounds}")
 
         sounds_to_clone = []
         for sound in selected_track.chainedSounds:
             if sound > -1:
                 sounds_to_clone.append(sound)
 
-        logging.error(f"Sounds to clone : {sounds_to_clone}")
+        logging.debug(f"Sounds to clone : {sounds_to_clone}")
 
         for index in range(0, len(sounds_to_clone)-1):
-            logging.error(f"Cloning layers {sounds_to_clone[index], sounds_to_clone[index+1]}")
+            logging.debug(f"Cloning layers {sounds_to_clone[index], sounds_to_clone[index+1]}")
             self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index], sounds_to_clone[index+1])
             self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index+1], sounds_to_clone[index])
 
         QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     def fx_layers_changed(self):
-        logging.error(f"FX Layer Changed")
+        logging.debug(f"FX Layer Changed")
         QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     @Signal
@@ -174,7 +174,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         return self.__selected_track__
     def set_selected_track(self, track, force_set=False):
         if self.__selected_track__ != track or force_set is True:
-            logging.error(f"### Setting selected track : track({track})")
+            logging.debug(f"### Setting selected track : track({track})")
             self.__selected_track__ = track
 
             # FIXME : A good way to implement this without explicitly calling set_selector would be to connect to
@@ -250,7 +250,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         # Save session to cache
         self.__sessions_base_dir__.mkdir(parents=True, exist_ok=True)
 
-        logging.error(f"Saving session to cache : {self.__cache_json_path__}")
+        logging.info(f"Saving session to cache : {self.__cache_json_path__}")
 
         try:
             with open(self.__cache_json_path__, "w") as f:
@@ -265,7 +265,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__sessions_base_dir__.mkdir(parents=True, exist_ok=True)
 
         session_json_path = self.__sessions_base_dir__ / (fileName + ".json")
-        logging.error(f"Saving session to file : {session_json_path}")
+        logging.info(f"Saving session to file : {session_json_path}")
 
         try:
             with open(session_json_path, "w") as f:
@@ -275,7 +275,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         except Exception as e:
             logging.error(f"Error saving session : {str(e)}")
 
-        logging.error(f"Deleting cache : {self.__cache_json_path__}")
+        logging.info(f"Deleting cache : {self.__cache_json_path__}")
 
         try:
             self.__cache_json_path__.unlink()
@@ -288,13 +288,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
         if self.__cache_json_path__.exists():
-            logging.error(f"Cache found. Restoring Session from {self.__cache_json_path__}")
+            logging.info(f"Cache found. Restoring Session from {self.__cache_json_path__}")
             session_json_path = self.__cache_json_path__
         elif len(sketch) > 0 and Path(sketch).exists():
             session_json_path = Path(sketch)
-            logging.error(f"Cache not found. Restoring Session from {session_json_path}")
+            logging.info(f"Cache not found. Restoring Session from {session_json_path}")
         else:
-            logging.error("Nothing to restore session from")
+            logging.info("Nothing to restore session from")
             return False
 
         try:
@@ -334,7 +334,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None, result=float)
     def get_session_time(self):
-        logging.error((datetime.now() - self.__sessionStartTime).total_seconds())
+        logging.debug((datetime.now() - self.__sessionStartTime).total_seconds())
         return (datetime.now() - self.__sessionStartTime).total_seconds()
 
     def set_select_path(self):

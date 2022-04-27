@@ -77,7 +77,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			self.list_data = sorted(self.list_data, key=cmp_to_key(customSort))
 		else:
 			if not self.zyngui.curlayer:
-				logging.error("Can't fill bank list for None layer!")
+				logging.info("Can't fill bank list for None layer!")
 				super().fill_list()
 				return
 			self.zyngui.curlayer.load_bank_list()
@@ -113,7 +113,7 @@ class zynthian_gui_bank(zynthian_gui_selector):
 			super().show()
 			return
 		if not self.zyngui.curlayer:
-			logging.error("Can't show bank list for None layer!")
+			logging.info("Can't show bank list for None layer!")
 			super().show()
 			return
 		if not self.zyngui.curlayer.get_bank_name():

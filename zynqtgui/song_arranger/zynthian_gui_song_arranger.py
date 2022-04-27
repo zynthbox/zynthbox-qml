@@ -105,7 +105,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.playing_bar_changed.emit()
 
     def generate_tracks_model(self):
-        logging.error(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
+        logging.info(f"Generating tracks model from Sketch({self.zyngui.zynthiloops.song})")
 
         self.__sketch__:zynthiloops_song = self.zyngui.zynthiloops.song
         self.__tracks_model__.clear()
@@ -137,7 +137,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
                 if zl_clip is not None:
                     for pos in zl_clip.arrangerBarPositions:
                         cell = track.cellsModel.getCell(pos)
-                        logging.error(f"Restoring arranger clip({zl_clip}) to {pos} for {cell}")
+                        logging.info(f"Restoring arranger clip({zl_clip}) to {pos} for {cell}")
                         cell.zlClip = zl_clip
 
         self.tracks_model_changed.emit()

@@ -138,7 +138,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         try:
             return self.__sound_category_name_mapping__[key]
         except Exception as e:
-            logging.error(f"Sound Category with key `{key}` not found : {str(e)}")
+            logging.debug(f"Sound Category with key `{key}` not found : {str(e)}")
             return ""
 
     @Slot()
@@ -268,7 +268,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     @Slot(QObject)
     def loadSound(self, sound):
         def task():
-            logging.error(f"### Loading sound : {sound.path}")
+            logging.debug(f"### Loading sound : {sound.path}")
 
             track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
             source_channels = self.zyngui.layer.load_layer_channels_from_file(sound.path)
@@ -279,19 +279,19 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                 if i >= 0 and track.checkIfLayerExists(i):
                     used_layers.append(i)
 
-            logging.error(f"### Before Removing")
-            logging.error(f"# Selected Track         : {self.zyngui.session_dashboard.selectedTrack}")
-            logging.error(f"# Source Channels        : {source_channels}")
-            logging.error(f"# Free Layers            : {free_layers}")
-            logging.error(f"# Used Layers            : {used_layers}")
-            logging.error(f"# Chained Sounds         : {track.chainedSounds}")
-            logging.error(f"# Source Channels Count  : {len(source_channels)}")
-            logging.error(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
+            logging.debug(f"### Before Removing")
+            logging.debug(f"# Selected Track         : {self.zyngui.session_dashboard.selectedTrack}")
+            logging.debug(f"# Source Channels        : {source_channels}")
+            logging.debug(f"# Free Layers            : {free_layers}")
+            logging.debug(f"# Used Layers            : {used_layers}")
+            logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
+            logging.debug(f"# Source Channels Count  : {len(source_channels)}")
+            logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
 
             # Check if count of channels required to load sound is available or not
             # Available count of channels : used layers by current track (will get replaced) + free layers
             if (len(free_layers) + len(used_layers)) < len(source_channels):
-                logging.error(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from tracks to continue.")
+                logging.debug(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from tracks to continue.")
             else:
                 # Required free channel count condition satisfied. Continue loading.
 
@@ -316,15 +316,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         # That is how load_layer_from_file method expects the values
                         new_channels_map = {}
 
-                        logging.error(f"### After Removing")
-                        logging.error(f"# Source Channels        : {source_channels}")
-                        logging.error(f"# Free Layers            : {free_layers}")
-                        logging.error(f"# Chained Sounds         : {track.chainedSounds}")
+                        logging.debug(f"### After Removing")
+                        logging.debug(f"# Source Channels        : {source_channels}")
+                        logging.debug(f"# Free Layers            : {free_layers}")
+                        logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
 
                         for index, channel in enumerate(source_channels):
                             new_channels_map[f"{channel}"] = f"{free_layers[index]}"
 
-                        logging.error(f"# Channel map for loading sound : {new_channels_map}")
+                        logging.debug(f"# Channel map for loading sound : {new_channels_map}")
 
                         # Populate new chained sounds and update track
                         new_chained_sounds = []
@@ -343,10 +343,10 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         # Repopulate after loading sound
                         free_layers = track.getFreeLayers()
 
-                        logging.error(f"### After Loading")
-                        logging.error(f"# Free Layers            : {free_layers}")
-                        logging.error(f"# New Chained Sounds     : {new_chained_sounds}")
-                        logging.error(f"# Chained Sounds         : {track.chainedSounds}")
+                        logging.debug(f"### After Loading")
+                        logging.debug(f"# Free Layers            : {free_layers}")
+                        logging.debug(f"# New Chained Sounds     : {new_chained_sounds}")
+                        logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
 
                 # Remove all current sounds from track
                 for i in used_layers:

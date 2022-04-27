@@ -137,10 +137,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         try:
             jack.Client('').get_port_by_name("zynthiloops_audio_levels_client:playback_port_a")
             self.jack_client = jack.Client('zynthiloops_audio_levels_client')
-            logging.error(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
+            logging.info(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
             self.update_recorder_jack_port()
         except:
-            logging.error(f"*** zynthiloops_audio_levels_client Jack client not found. Checking again in 1000ms")
+            logging.info(f"*** zynthiloops_audio_levels_client Jack client not found. Checking again in 1000ms")
             self.__jack_client_init_timer__.start()
 
     def connect_control_objects(self):
@@ -180,9 +180,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.start()
 
         if sketch is not None:
-            logging.error(f"### Checking Sketch {sketch} : exists({Path(sketch).exists()}) ")
+            logging.debug(f"### Checking Sketch : {sketch} : exists({Path(sketch).exists()}) ")
         else:
-            logging.error(f"### Checking Sketch sketch is none ")
+            logging.debug(f"### Checking Sketch : sketch is none ")
 
         if sketch is not None and Path(sketch).exists():
             self.loadSketch(sketch, _cb)
@@ -192,18 +192,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_set_selected_track(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/10):
-            logging.error(f"Setting track from zyncoder {round(self.__zselector[0].value/10)}")
+            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/10)}")
             self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/10))
             self.set_selector()
 
     @Slot(None)
     def zyncoder_set_preset(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
@@ -214,7 +214,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             preset_index = min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1)
 
             if track.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
-                logging.error(f"Selecting preset : {preset_index}")
+                logging.debug(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
                 track.chainedSoundsInfoChanged.emit()
                 self.zyngui.fixed_layers.fill_list()
@@ -222,7 +222,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_update_layer_volume(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
@@ -243,13 +243,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if volume_control_obj is not None and \
            volume_control_obj.value != self.__zselector[1].value / 1000:
             volume_control_obj.value = self.__zselector[1].value / 1000
-            logging.error(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
+            logging.debug(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
             self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
@@ -262,13 +262,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
             selected_clip.startPosition = self.__zselector[1].value / 1000
-            logging.error(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
+            logging.debug(f"### zyncoder_update_clip_start_position {selected_clip.startPosition}")
             self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
@@ -281,13 +281,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
             selected_clip.loopDelta = self.__zselector[2].value/1000
-            logging.error(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
+            logging.debug(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
             self.set_selector()
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
         if self.is_set_selector_running:
-            logging.error(f"Set selector in progress. Not setting value with encoder")
+            logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
@@ -301,12 +301,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if selected_clip is not None and selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value//100:
                 selected_clip.length = self.__zselector[3].value//100
-                logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
         elif selected_clip is not None and not selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value/100:
                 selected_clip.length = self.__zselector[3].value/100
-                logging.error(f"### zyncoder_update_clip_length {selected_clip.length}")
+                logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
 
     def zyncoder_read(self):
@@ -351,10 +351,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__big_knob_mode__ = "preset"
 
-                logging.error(f"### set_selector : Configuring big knob, sound combinator is active.")
+                logging.info(f"### set_selector : Configuring big knob, sound combinator is active.")
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
-                logging.error(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({self.zyngui.session_dashboard.selectedSoundRow}), channel({selected_channel})")
+                logging.debug(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({self.zyngui.session_dashboard.selectedSoundRow}), channel({selected_channel})")
                 preset_index = 0
                 max_value = 0
 
@@ -389,7 +389,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 except:
                     selected_track = 0
 
-                logging.error(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
@@ -434,12 +434,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     selected_track is not None and
                     selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])
                 ):
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 1, showing")
 
             self.__zselector[1].show()
         else:
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 1, hiding")
 
             if self.__zselector[1]:
@@ -470,7 +470,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             except Exception as e:
                 logging.error(f"Error configuring knob 1 : {str(e)}")
 
-            logging.error(
+            logging.debug(
                 f"### set_selector : Configuring small knob 1, value({volume}), max_value({max_value}), min_value({min_value})")
 
             self.__zselector_ctrl[1].set_options(
@@ -500,7 +500,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                                                               self)
                 self.__zselector[1].index = 0
 
-            logging.error(f"### set_selector : Configuring small knob 1, value({start_position}), max_value({max_value})")
+            logging.debug(f"### set_selector : Configuring small knob 1, value({start_position}), max_value({max_value})")
 
             self.__zselector_ctrl[1].set_options(
                 {'symbol': 'zynthiloops_knob1', 'name': 'Zynthiloops Knob 1', 'short_name': 'Knob1',
@@ -536,16 +536,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 2, showing")
 
             self.__zselector[2].show()
         else:
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 2, hiding")
             self.__zselector[2].hide()
 
-        logging.error(
+        logging.debug(
             f"### set_selector : Configuring small knob 2, value({loop}), max_value({max_value})")
 
         self.__zselector_ctrl[2].set_options(
@@ -582,15 +582,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 3, showing")
             self.__zselector[3].show()
         else:
-            logging.error(
+            logging.info(
                 f"### set_selector : Configuring small knob 3, hiding")
             self.__zselector[3].hide()
 
-        logging.error(
+        logging.debug(
             f"### set_selector : Configuring small knob 3, value({value}), max_value({max_value})")
 
         self.__zselector_ctrl[3].set_options(
@@ -622,10 +622,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
 
         if self.zyngui.trackWaveEditorBarActive:
-            logging.error(f"### set_selector : trackWaveEditorBarActive is active.")
+            logging.info(f"### set_selector : trackWaveEditorBarActive is active.")
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            logging.error(f"### set_selector : clipWaveEditorBarActive is active.")
+            logging.info(f"### set_selector : clipWaveEditorBarActive is active.")
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
         ###
 
@@ -766,7 +766,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if tid < 0 or tid >= self.__song__.tracksModel.count:
             return
         track_layers_snapshot = self.track_layers_snapshot()
-        logging.error(track_layers_snapshot)
+        logging.debug(track_layers_snapshot)
         self.__song__.tracksModel.getTrack(tid).set_layers_snapshot(track_layers_snapshot)
         self.__song__.schedule_save()
 
@@ -836,15 +836,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     for jack_basename in active_jack_basenames:
                         if not (port.startswith("JUCE") or port.startswith(
                                 "system")) and port.startswith(jack_basename):
-                            logging.error("ACCEPTED {}".format(port))
+                            logging.debug("ACCEPTED {}".format(port))
                             jack_client.connect(port, target)
                         else:
-                            logging.error("REJECTED {}".format(port))
+                            logging.debug("REJECTED {}".format(port))
                 except Exception as e:
                     logging.error(f"Error processing jack port : {port}({str(e)})")
 
         if self.jack_client is None:
-            logging.error(f'*** Jack client not set. Starting jack client init timer')
+            logging.info(f'*** Jack client not set. Starting jack client init timer')
             self.__jack_client_init_timer__.start()
         else:
             selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
@@ -855,7 +855,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             worker_thread.start()
 
     def recording_process_stopped(self, exitCode, exitStatus):
-        logging.error(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
+        logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
 
     def show(self):
         self.set_selector()
@@ -907,7 +907,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
             if base_sketch is not None:
-                logging.error(f"Creating New Sketch from community sketch : {base_sketch}")
+                logging.info(f"Creating New Sketch from community sketch : {base_sketch}")
 
                 suggested_name = None
                 base_sketch_path = Path(base_sketch)
@@ -915,7 +915,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Copy community sketch as temp
                 shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / 'temp')
 
-                logging.error(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name)}")
+                logging.info(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name)}")
 
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/",
                                                                   base_sketch_path.stem.replace(".sketch", ""), self)
@@ -923,21 +923,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name))
 
                 if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
-                    logging.error(f"Loading default snapshot")
+                    logging.info(f"Loading default snapshot")
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
             else:
-                logging.error(f"Creating New Sketch")
+                logging.info(f"Creating New Sketch")
 
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
                     str(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json'))
 
                 if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
-                    logging.error(f"Loading default snapshot")
+                    logging.info(f"Loading default snapshot")
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -1056,7 +1056,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(str)
     def loadSketch(self, sketch, cb=None):
         def task():
-            logging.error(f"Loading sketch : {sketch}")
+            logging.info(f"Loading sketch : {sketch}")
 
             try:
                 self.__song__.bpm_changed.disconnect()
@@ -1078,7 +1078,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     last_selected_sketch_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketch())
 
                     # Load snapshot
-                    logging.error(
+                    logging.info(
                         f"Loading snapshot : '{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss'")
                     self.zyngui.screens["layer"].load_snapshot(
                         f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
@@ -1087,12 +1087,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.newSketch(sketch, _cb)
             else:
-                logging.error(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
+                logging.info(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
                 # Load snapshot
-                logging.error(
+                logging.info(
                     f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
                 self.zyngui.screens["layer"].load_snapshot(
                     str(sketch_path.parent.absolute()) + "/soundsets/" + str(
@@ -1192,7 +1192,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
             #self.countInValue = countInBars * 4
-            logging.error(
+            logging.debug(
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
 
             if source == 'internal':
@@ -1207,10 +1207,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__last_recording_type__ = "External (Stereo)"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--disable-console", "--no-stdin", "--port", f"system:capture_{channel}", self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
 
-            logging.error("Process opened, let's wait for output...")
+            logging.info("Process opened, let's wait for output...")
             # Let's make sure that we have at least a bit of output before continuing (so we know the process has actually started)
             self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
-            logging.error("Output get! Continue.")
+            logging.info("Output get! Continue.")
 
             self.set_clip_to_record(clip)
             self.clip_to_record.isRecording = True
@@ -1225,7 +1225,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.recorder_process is not None:
             self.recorder_process.terminate()
-            logging.error("Asked recorder to stop doing the thing");
+            logging.info("Asked recorder to stop doing the thing");
             self.recording_complete.emit()
 
     @Slot(None)
@@ -1236,7 +1236,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def start_metronome_request(self):
         self.metronome_running_refcount += 1
 
-        logging.error(f"Start Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
+        logging.debug(f"Start Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
 
         if self.metronome_running_refcount == 1:
             if self.metronome_schedule_stop:
@@ -1257,12 +1257,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.metronome_running_refcount = max(self.metronome_running_refcount - 1, 0)
 
-        logging.error(f"Stop Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
+        logging.debug(f"Stop Metronome Request : refcount({self.metronome_running_refcount}), metronome_schedule_stop({self.metronome_schedule_stop}")
 
     @Slot(None)
     def resetMetronome(self):
         if self.metronome_running_refcount > 0:
-            logging.error(f"Resetting metronome")
+            logging.info(f"Resetting metronome")
             self.metronome_running_refcount = 0
             self.metronome_schedule_stop = True
 
@@ -1292,14 +1292,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.current_beat_changed.emit()
 
     def load_recorded_file_to_clip(self):
-        logging.error("Loading recorded clip - but first, wait for the recorder to exit")
+        logging.info("Loading recorded clip - but first, wait for the recorder to exit")
         self.recorder_process.wait()
-        logging.error("Recorder exited, now we should have a file")
+        logging.info("Recorder exited, now we should have a file")
         if not Path(self.clip_to_record_path).exists():
             logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
         layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-        logging.error(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
+        logging.debug(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
 
         self.clip_to_record.path = self.clip_to_record_path
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
@@ -1307,7 +1307,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
 
         if self.clip_to_record.isTrackSample:
-            logging.error(f"Recorded clip is a sample")
+            logging.info(f"Recorded clip is a sample")
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
             track.samples_changed.emit()
 
@@ -1318,7 +1318,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # self.__song__.save()
 
     def get_next_free_layer(self):
-        logging.error(self.zyngui.screens["layers"].layers)
+        logging.debug(self.zyngui.screens["layers"].layers)
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):

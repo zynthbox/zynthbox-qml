@@ -324,7 +324,7 @@ class zynthian_gui_network(zynthian_gui_selector):
             self.reboot_confirmed)
     
     def reboot_confirmed(self, params=None):
-        logging.error(f"Rebooting")
+        logging.info(f"Rebooting")
         self.zyngui.screens["admin"].reboot_confirmed()
 
     # Derived from webconf security_config_handler.py

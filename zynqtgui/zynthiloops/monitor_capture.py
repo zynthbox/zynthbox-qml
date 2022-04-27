@@ -87,7 +87,7 @@ def process(frames):
     if peak < 0.0:
         peak = 0.0
 
-    logging.error(f"Peak : {convertToDBFS(peak)}")
+    logging.debug(f"Peak : {convertToDBFS(peak)}")
 
     # buf = np.frombuffer(port.get_buffer())
     # maxValue = 2**16

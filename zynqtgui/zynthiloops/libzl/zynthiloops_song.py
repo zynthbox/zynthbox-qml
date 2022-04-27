@@ -139,7 +139,7 @@ class zynthiloops_song(QObject):
             filename = self.__name__ + ".sketch.json"
             self.__initial_name__ = self.name
 
-            logging.error(f"Storing to {filename} : {self}")
+            logging.info(f"Storing to {filename} : {self}")
 
             # Handle saving to sketch json file
             try:
@@ -170,7 +170,7 @@ class zynthiloops_song(QObject):
             # Handle saving to cache
             cache_id = str(uuid.uuid1())
 
-            logging.error(f"Storing to cache {cache_id}.sketch.json")
+            logging.info(f"Storing to cache {cache_id}.sketch.json")
 
             try:
                 with open(self.sketch_folder + filename, "r+") as f:
@@ -219,7 +219,7 @@ class zynthiloops_song(QObject):
         filename = self.__name__ + ".sketch.json"
 
         try:
-            logging.error(f"Restoring {self.sketch_folder + filename}")
+            logging.info(f"Restoring {self.sketch_folder + filename}")
             with open(self.sketch_folder + filename, "r") as f:
                 sketch = json.loads(f.read())
 

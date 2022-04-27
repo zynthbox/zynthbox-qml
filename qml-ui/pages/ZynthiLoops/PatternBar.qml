@@ -92,7 +92,7 @@ GridLayout {
             Layout.fillHeight: true
             smooth: false
 
-            visible: controlObj.clipTrack && controlObj.clipTrack.connectedPattern >= 0
+            visible: controlObj != null && controlObj.clipTrack != null && controlObj.clipTrack.connectedPattern >= 0
             source: root.pattern && controlObj.clipTrack ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "??" + root.pattern.lastModified : ""
             Rectangle { // Progress
                 anchors {

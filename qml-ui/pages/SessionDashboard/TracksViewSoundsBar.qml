@@ -309,12 +309,32 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1] : ""
+                            text: {
+                                var str = "";
+
+                                if (chainedSound !== -1) {
+                                    var presetName = root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                                    if (presetName != null) {
+                                        str = presetName;
+                                    }
+                                }
+
+                                return str;
+                            }
 
                             elide: "ElideRight"
 
                             function updateName() {
-                                text = chainedSound === -1 ? "" : root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                                var str = "";
+
+                                if (chainedSound !== -1) {
+                                    var presetName = root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                                    if (presetName != null) {
+                                        str = presetName;
+                                    }
+                                }
+
+                                text = str;
                             }
                         }
 

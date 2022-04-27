@@ -42,7 +42,9 @@ GridLayout {
     property QtObject bottomBar: null
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSampleRow] : null // selected bottomBar object is not clip/pattern and hence it is a track
+                                    : bottomBar.controlObj && bottomBar.controlObj.samples && bottomBar.controlObj.selectedSampleRow // selected bottomBar object is not clip/pattern and hence it is a track
+                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSampleRow]
+                                        : null
 
     function cuiaCallback(cuia) {
         switch (cuia) {

@@ -192,10 +192,6 @@ Zynthian.Card {
 
                     onClicked: {
                         controlObj.clear()
-
-                        if (root.controlType === BottomBar.ControlType.Pattern || root.controlType === BottomBar.ControlType.Clip) {
-                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(root.controlObj);
-                        }
                     }
                 }
 

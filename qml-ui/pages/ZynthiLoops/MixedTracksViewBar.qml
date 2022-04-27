@@ -378,9 +378,10 @@ Rectangle {
                                             horizontalAlignment: Text.AlignLeft
                                             text: root.selectedTrack.trackAudioType === "synth"
                                                     ? modelData
-                                                    : root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                    : (root.selectedTrack.trackAudioType === "sample-trig" ||
                                                       root.selectedTrack.trackAudioType === "sample-slice" ||
-                                                      root.selectedTrack.trackAudioType === "sample-loop"
+                                                      root.selectedTrack.trackAudioType === "sample-loop") &&
+                                                      modelData
                                                         ? modelData.path.split("/").pop()
                                                         : ""
 
@@ -424,9 +425,6 @@ Rectangle {
                                         anchors.fill: parent
                                         color: Kirigami.Theme.textColor
                                         source: clip ? clip.path : ""
-                                        onSourceChanged: {
-                                            console.log("Source changed")
-                                        }
 
                                         visible: (root.selectedTrack.trackAudioType === "sample-trig" ||
                                                   root.selectedTrack.trackAudioType === "sample-slice" ||

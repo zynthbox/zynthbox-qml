@@ -258,13 +258,6 @@ Kirigami.AbstractApplicationWindow {
                     }
                 }
 
-                Connections {
-                    target: track
-                    onChainedSoundsChanged: {
-                        synthButton.updateSoundName();
-                    }
-                }
-
                 function updateSoundName() {
                     var text = "";
 
@@ -305,13 +298,6 @@ Kirigami.AbstractApplicationWindow {
                 Connections {
                     target: zynthian.fixed_layers
                     onList_updated: {
-                        presetButton.updateSoundName();
-                    }
-                }
-
-                Connections {
-                    target: track
-                    onChainedSoundsChanged: {
                         presetButton.updateSoundName();
                     }
                 }

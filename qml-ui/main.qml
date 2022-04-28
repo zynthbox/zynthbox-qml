@@ -238,10 +238,51 @@ Kirigami.AbstractApplicationWindow {
                 }
             }
             Zynthian.BreadcrumbButton {
+                id: samplesButton
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("Sample %1 ˬ").arg(root.selectedTrack.selectedSampleRow + 1)
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                rightPadding: Kirigami.Units.largeSpacing*2
+                onClicked: samplesMenu.visible = true
+                visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+
+                QQC2.Menu {
+                    id: samplesMenu
+                    y: parent.height
+                    modal: true
+                    dim: false
+                    Repeater {
+                        model: 5
+                        delegate: QQC2.MenuItem {
+                            text: qsTr("Sample %1").arg(index + 1)
+                            width: parent.width
+                            onClicked: {
+                                root.selectedTrack.selectedSampleRow = index
+                            }
+                            highlighted: root.selectedTrack.selectedSampleRow === index
+                        }
+                    }
+                }
+            }
+            Zynthian.BreadcrumbButton {
+                id: sampleLoopButton
+
+                property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+
+                icon.color: customTheme.Kirigami.Theme.textColor
+                text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
+                rightPadding: Kirigami.Units.largeSpacing*2
+                visible: root.selectedTrack.trackAudioType === "sample-loop" &&
+                         clip && clip.path && clip.path.length >= 0
+            }
+            Zynthian.BreadcrumbButton {
                 id: synthButton
                 icon.color: customTheme.Kirigami.Theme.textColor
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
+                visible: root.selectedTrack.trackAudioType === "synth"
+
                 onClicked: {
                     // As per #299, open library instead
                     // soundsDialog.visible = true
@@ -291,6 +332,7 @@ Kirigami.AbstractApplicationWindow {
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: zynthian.current_screen_id = "preset"
+                visible: root.selectedTrack.trackAudioType === "synth"
 
                 text: {
                     presetButton.updateSoundName();

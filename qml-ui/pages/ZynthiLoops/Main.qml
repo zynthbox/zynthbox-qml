@@ -967,6 +967,8 @@ Zynthian.ScreenPage {
                                     Timer { //FIXME: why onDoubleClicked doesn't work
                                         id: dblTimer
                                         interval: 200
+                                        repeat: false
+                                        running: false
                                         onTriggered: {
                                             if (zynthian.session_dashboard.selectedTrack === track.id
                                                 && bottomStack.slotsBar.trackButton.checked) {

@@ -73,6 +73,7 @@ Kirigami.AbstractApplicationWindow {
     signal layerSetupDialogRejected()
     signal layerSetupDialogLoadSoundClicked()
     signal layerSetupDialogNewSynthClicked()
+    signal layerSetupDialogChangePresetClicked()
     signal layerSetupDialogPickSoundClicked()
     signal soundsDialogAccepted()
     signal soundsDialogRejected()

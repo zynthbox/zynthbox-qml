@@ -300,6 +300,10 @@ Rectangle {
             // Disable Rejected handler as popup is accepted
             layerPopupRejectedConnections.enabled = false;
         }
+        onLayerSetupDialogChangePresetClicked: {
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
         onLayerSetupDialogPickSoundClicked: {
             console.log("Sound Dialog Opened");
 

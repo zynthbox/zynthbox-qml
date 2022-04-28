@@ -1240,7 +1240,7 @@ Zynthian.ScreenPage {
                     Timer {
                         id: updateSoundNameTimer
                         repeat: false
-                        interval: 1000
+                        interval: 10
                         onTriggered: infoBar.updateInfoBar()
                     }
 

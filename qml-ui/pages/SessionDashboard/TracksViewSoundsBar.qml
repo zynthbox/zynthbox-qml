@@ -132,6 +132,12 @@ Zynthian.Card {
             // Disable Rejected handler as popup is accepted
             layerPopupRejectedConnections.enabled = false;
         }
+        onLayerSetupDialogChangePresetClicked: {
+            bottomDrawer.close();
+
+            // Disable Rejected handler as popup is accepted
+            layerPopupRejectedConnections.enabled = false;
+        }
         onLayerSetupDialogPickSoundClicked: {
             console.log("Sound Dialog Opened");
 

@@ -610,6 +610,20 @@ Zynthian.ScreenPage {
                         }
                     }
                     QQC2.Button {
+                        property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        visible: selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        text: qsTr("Change preset")
+                        onClicked: {
+                            zynthian.current_screen_id = "preset"
+
+                            layerSetupDialog.accept();
+                            applicationWindow().layerSetupDialogChangePresetClicked();
+                        }
+                    }
+                    QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         text: qsTr("Load A Sound")

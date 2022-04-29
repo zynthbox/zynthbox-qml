@@ -92,10 +92,17 @@ class zynthiloops_track(QObject):
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.scene_clip_changed.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
-        self.chained_sounds_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
         self.zyngui.zynthiloops.selectedClipColChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+
+    def chained_sounds_changed_handler(self):
+        self.occupiedSlotsChanged.emit()
+
+        # Update zynthiloops recorder ports if selected track chained sounds changes
+        if self.zyngui.selectedTrack == self.__id__:
+            self.zyngui.zynthiloops.update_recorder_jack_port()
 
     @Property(str, constant=True)
     def className(self):

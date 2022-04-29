@@ -238,6 +238,7 @@ Item {
                                 width: 4
                                 radius: 2
                                 color: sampleKeyzoneDelegate.lineColor
+                                opacity: 0.5 + (model.positionGain / 2)
                             }
                         }
                     }

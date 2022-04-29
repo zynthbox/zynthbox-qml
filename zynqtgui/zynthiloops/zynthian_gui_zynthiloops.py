@@ -793,6 +793,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     #
     # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
 
+    ### returns Thread instance if thread is started otherwise returns None
     def update_recorder_jack_port(self):
         class Worker:
             def run(self, zyngui, jack_client, jack_capture_port_a, jack_capture_port_b, selected_track):
@@ -852,6 +853,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.jack_client is None:
             logging.info(f'*** Jack client not set. Starting jack client init timer')
             self.__jack_client_init_timer__.start()
+
+            return None
         else:
             selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
             worker = Worker()
@@ -859,6 +862,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:synth_port_a",
             "zynthiloops_audio_levels_client:synth_port_b", selected_track))
             worker_thread.start()
+
+            return worker_thread
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
@@ -1165,7 +1170,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def queue_clip_record(self, clip, source, channel):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-            self.update_recorder_jack_port()
+            thread = self.update_recorder_jack_port()
+
+            logging.debug(f"### queue_clip_record: Trying to join update_recorder_jack_port thread to current")
+
+            if thread is not None:
+                thread.join()
+                logging.debug(f"### queue_clip_record: Joined Thread. Carrying on with recording")
+
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
 
             if clip.isTrackSample:

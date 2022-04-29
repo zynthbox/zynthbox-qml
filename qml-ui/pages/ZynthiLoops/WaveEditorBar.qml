@@ -380,6 +380,7 @@ GridLayout {
                         color: Kirigami.Theme.highlightColor
                         width: Kirigami.Units.largeSpacing
                         height:  Kirigami.Units.largeSpacing
+                        scale: 0.5 + model.positionGain
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     x: Math.floor(model.positionProgress * parent.width)

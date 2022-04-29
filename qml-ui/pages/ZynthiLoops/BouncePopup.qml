@@ -47,6 +47,23 @@ QQC2.Popup {
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: _private.bounceProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
 
+    function cuiaCallback(cuia) {
+        var returnValue = false;
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                root.close();
+                returnValue = true;
+                break;
+        case "SWITCH_SELECT_SHORT":
+            _private.performBounce();
+            returnValue = true;
+            break;
+        }
+        return returnValue;
+    }
+
     ColumnLayout {
         anchors.fill: parent
         implicitWidth: Kirigami.Units.gridUnit * 30

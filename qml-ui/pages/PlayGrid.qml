@@ -693,6 +693,12 @@ don't want to have to dig too far...
         target: zynthian.zynthiloops
         onSongChanged: adoptCurrentMidiChannel();
     }
+    Connections {
+        target: zynthian.zynthiloops.song
+        onBpmChanged: {
+            ZynQuick.PlayGridManager.syncTimer.bpm = zynthian.zynthiloops.song.bpm
+        }
+    }
     Repeater {
         model: zynthian.zynthiloops.song.scenesModel
         delegate: Item {

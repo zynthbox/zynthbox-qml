@@ -26,6 +26,7 @@ import logging
 
 from PySide2.QtCore import QAbstractListModel, QObject, QTimer, Qt, Property, Signal, Slot
 
+from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
 
 
@@ -34,6 +35,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     def __init__(self, song=None):
         super().__init__(song)
+        self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = song
         self.__selected_scene_index__ = 0
         self.__scenes__ = {
@@ -155,7 +157,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
         for i in range(0, len(scene["clips"])):
             clip = scene["clips"][i]
-            clip.play()
+
+            # Start all clips except clip to be recorded
+            if clip != self.zyngui.zynthiloops.clipToRecord:
+                clip.play()
 
     @Slot(int)
     def stopScene(self, sceneIndex):

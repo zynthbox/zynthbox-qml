@@ -431,6 +431,66 @@ Rectangle {
                                                   root.selectedTrack.trackAudioType === "sample-loop") &&
                                                  clip && clip.path && clip.path.length > 0
 
+                                        // Mask for wave part before start
+                                        Rectangle {
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                                left: parent.left
+                                                right: startLoopLine.left
+                                            }
+                                            color: "#99000000"
+                                        }
+
+                                        // Mask for wave part after
+                                        Rectangle {
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                                left: endLoopLine.right
+                                                right: parent.right
+                                            }
+                                            color: "#99000000"
+                                        }
+
+                                        // Start loop line
+                                        Rectangle {
+                                            id: startLoopLine
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            color: Kirigami.Theme.positiveTextColor
+                                            opacity: 0.6
+                                            width: Kirigami.Units.smallSpacing
+                                            x: (parent.clip.startPosition / parent.clip.duration) * parent.width
+                                        }
+
+                                        // End loop line
+                                        Rectangle {
+                                            id: endLoopLine
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            color: Kirigami.Theme.neutralTextColor
+                                            opacity: 0.6
+                                            width: Kirigami.Units.smallSpacing
+                                            x: ((((60/zynthian.zynthiloops.song.bpm) * parent.clip.length) / parent.clip.duration) * parent.width) + ((parent.clip.startPosition / parent.clip.duration) * parent.width)
+                                        }
+
+                                        // Progress line
+                                        Rectangle {
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            visible: parent.clip.isPlaying
+                                            color: Kirigami.Theme.highlightColor
+                                            width: Kirigami.Units.smallSpacing
+                                            x: parent.clip.progress/parent.clip.duration * parent.width
+                                        }
+
                                         // SamplerSynth progress dots
                                         Repeater {
                                             property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(parent.clip.cppObjId) : null;
@@ -444,6 +504,7 @@ Rectangle {
                                                     color: Kirigami.Theme.highlightColor
                                                     width: Kirigami.Units.largeSpacing
                                                     height:  Kirigami.Units.largeSpacing
+                                                    scale: 0.5 + model.positionGain
                                                 }
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 x: Math.floor(model.positionProgress * parent.width)

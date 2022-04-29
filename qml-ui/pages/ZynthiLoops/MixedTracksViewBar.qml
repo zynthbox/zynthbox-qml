@@ -50,42 +50,46 @@ Rectangle {
 
     function cuiaCallback(cuia) {
         var returnValue = false;
-        switch (cuia) {
-            case "SWITCH_TRACKS_MOD_SHORT":
-                returnValue = true;
-                break;
+        if (bouncePopup.opened) {
+            returnValue = bouncePopup.cuiaCallback(cuia);
+        } else {
+            switch (cuia) {
+                case "SWITCH_TRACKS_MOD_SHORT":
+                    returnValue = true;
+                    break;
 
-            case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack -= 1;
-                }
-                returnValue = true;
-                break;
-
-            case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < 9) {
-                    zynthian.session_dashboard.selectedTrack += 1;
-                }
-                returnValue = true;
-                break;
-
-            case "SELECT_UP":
-                if (root.selectedTrack.trackAudioType === "sample-trig") {
-                    if (root.selectedTrack.selectedSampleRow > 0) {
-                        root.selectedTrack.selectedSampleRow -= 1;
+                case "NAVIGATE_LEFT":
+                    if (zynthian.session_dashboard.selectedTrack > 0) {
+                        zynthian.session_dashboard.selectedTrack -= 1;
                     }
                     returnValue = true;
-                }
-                break;
+                    break;
 
-            case "SELECT_DOWN":
-                if (root.selectedTrack.trackAudioType === "sample-trig") {
-                    if (root.selectedTrack.selectedSampleRow < 4) {
-                        root.selectedTrack.selectedSampleRow += 1;
+                case "NAVIGATE_RIGHT":
+                    if (zynthian.session_dashboard.selectedTrack < 9) {
+                        zynthian.session_dashboard.selectedTrack += 1;
                     }
                     returnValue = true;
-                }
-                break;
+                    break;
+
+                case "SELECT_UP":
+                    if (root.selectedTrack.trackAudioType === "sample-trig") {
+                        if (root.selectedTrack.selectedSampleRow > 0) {
+                            root.selectedTrack.selectedSampleRow -= 1;
+                        }
+                        returnValue = true;
+                    }
+                    break;
+
+                case "SELECT_DOWN":
+                    if (root.selectedTrack.trackAudioType === "sample-trig") {
+                        if (root.selectedTrack.selectedSampleRow < 4) {
+                            root.selectedTrack.selectedSampleRow += 1;
+                        }
+                        returnValue = true;
+                    }
+                    break;
+            }
         }
         return returnValue;
     }

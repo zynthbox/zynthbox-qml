@@ -127,6 +127,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
+        self.update_recorder_jack_port_timer = QTimer()
+        self.update_recorder_jack_port_timer.setInterval(100)
+        self.update_recorder_jack_port_timer.setSingleShot(True)
+        self.update_recorder_jack_port_timer.timeout.connect(self.do_update_recorder_jack_port)
+
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
@@ -779,7 +784,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
         self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.tracksModel.getTrack(tid).get_layers_snapshot(), 5, 9)
 
-
     # @Signal
     # def count_in_value_changed(self):
     #     pass
@@ -793,77 +797,73 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     #
     # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
 
-    ### returns Thread instance if thread is started otherwise returns None
     def update_recorder_jack_port(self):
-        class Worker:
-            def run(self, zyngui, jack_client, jack_capture_port_a, jack_capture_port_b, selected_track):
-                jack_basenames = []
+        self.update_recorder_jack_port_timer.start()
 
-                for channel in selected_track.chainedSounds:
-                    if channel >= 0 and selected_track.checkIfLayerExists(channel):
-                        layer = zyngui.screens['layer'].layer_midi_map[channel]
+    def do_update_recorder_jack_port(self):
+        def task(zyngui, jack_client, jack_capture_port_a, jack_capture_port_b, selected_track):
+            jack_basenames = []
 
-                        for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
-                            try:
-                                jack_basenames.append(fxlayer.jackname.split(":")[0])
-                            except Exception as e:
-                                logging.error(f"### update_recorder_jack_port Error : {str(e)}")
+            for channel in selected_track.chainedSounds:
+                if channel >= 0 and selected_track.checkIfLayerExists(channel):
+                    layer = zyngui.screens['layer'].layer_midi_map[channel]
 
-                # Disconnect all connected ports first
-                try:
-                    for port in jack_client.get_all_connections(jack_capture_port_a):
+                    for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
                         try:
-                            # jack_client.disconnect(port.name, jack_capture_port_a)
-                            p = Popen(("jack_disconnect", port.name, jack_capture_port_a))
-                            p.wait()
+                            jack_basenames.append(fxlayer.jackname.split(":")[0])
                         except Exception as e:
-                            logging.error(f"Error disconnecting jack port : {str(e)}")
-                    for port in jack_client.get_all_connections(jack_capture_port_b):
-                        try:
-                            # jack_client.disconnect(port.name, jack_capture_port_b)
-                            p = Popen(("jack_disconnect", port.name, jack_capture_port_b))
-                            p.wait()
-                        except Exception as e:
-                            logging.error(f"Error disconnecting jack port : {str(e)}")
-                except Exception as e:
-                    logging.error(f"Error while disconnecting ports : {str(e)}")
-                ###
+                            logging.error(f"### update_recorder_jack_port Error : {str(e)}")
 
-                # Connect to selected track's output ports
-                for port in jack_client.get_all_connections('system:playback_1'):
-                    self.process_jack_port(jack_client, port.name, jack_capture_port_a, jack_basenames)
-                for port in jack_client.get_all_connections('system:playback_2'):
-                    self.process_jack_port(jack_client, port.name, jack_capture_port_b, jack_basenames)
-                ###
+            # Disconnect all connected ports first
+            try:
+                for port in jack_client.get_all_connections(jack_capture_port_a):
+                    try:
+                        # jack_client.disconnect(port.name, jack_capture_port_a)
+                        p = Popen(("jack_disconnect", port.name, jack_capture_port_a))
+                        p.wait()
+                    except Exception as e:
+                        logging.error(f"Error disconnecting jack port : {str(e)}")
+                for port in jack_client.get_all_connections(jack_capture_port_b):
+                    try:
+                        # jack_client.disconnect(port.name, jack_capture_port_b)
+                        p = Popen(("jack_disconnect", port.name, jack_capture_port_b))
+                        p.wait()
+                    except Exception as e:
+                        logging.error(f"Error disconnecting jack port : {str(e)}")
+            except Exception as e:
+                logging.error(f"Error while disconnecting ports : {str(e)}")
+            ###
 
-            def process_jack_port(self, jack_client, port, target, active_jack_basenames):
-                try:
-                    for jack_basename in active_jack_basenames:
-                        if not (port.startswith("JUCE") or port.startswith(
-                                "system")) and port.startswith(jack_basename):
-                            logging.debug("ACCEPTED {}".format(port))
-                            # jack_client.connect(port, target)
-                            p = Popen(("jack_connect", port, target))
-                            p.wait()
-                        else:
-                            logging.debug("REJECTED {}".format(port))
-                except Exception as e:
-                    logging.error(f"Error processing jack port : {port}({str(e)})")
+            # Connect to selected track's output ports
+            for port in jack_client.get_all_connections('system:playback_1'):
+                process_jack_port(jack_client, port.name, jack_capture_port_a, jack_basenames)
+            for port in jack_client.get_all_connections('system:playback_2'):
+                process_jack_port(jack_client, port.name, jack_capture_port_b, jack_basenames)
+            ###
+
+        def process_jack_port(jack_client, port, target, active_jack_basenames):
+            try:
+                for jack_basename in active_jack_basenames:
+                    if not (port.startswith("JUCE") or port.startswith(
+                            "system")) and port.startswith(jack_basename):
+                        logging.debug("ACCEPTED {}".format(port))
+                        # jack_client.connect(port, target)
+                        p = Popen(("jack_connect", port, target))
+                        p.wait()
+                    else:
+                        logging.debug("REJECTED {}".format(port))
+            except Exception as e:
+                logging.error(f"Error processing jack port : {port}({str(e)})")
 
         if self.jack_client is None:
             logging.info(f'*** Jack client not set. Starting jack client init timer')
             self.__jack_client_init_timer__.start()
-
-            return None
         else:
             selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-            worker = Worker()
-            worker_thread = threading.Thread(target=worker.run, args=(
+            worker_thread = threading.Thread(target=task, args=(
             self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:synth_port_a",
             "zynthiloops_audio_levels_client:synth_port_b", selected_track))
             worker_thread.start()
-
-            return worker_thread
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
@@ -1170,14 +1170,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def queue_clip_record(self, clip, source, channel):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-            thread = self.update_recorder_jack_port()
-
-            logging.debug(f"### queue_clip_record: Trying to join update_recorder_jack_port thread to current")
-
-            if thread is not None:
-                thread.join()
-                logging.debug(f"### queue_clip_record: Joined Thread. Carrying on with recording")
-
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
 
             if clip.isTrackSample:

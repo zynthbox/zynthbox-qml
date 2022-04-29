@@ -181,6 +181,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             #         selected_track_changed signal on ZL side but it has a delay which resets the selectedTrack
             #         to previous value
             self.zyngui.zynthiloops.set_selector()
+            self.zyngui.zynthiloops.update_recorder_jack_port()
 
             self.selected_track_changed.emit()
             self.__change_track_sound_timer__.start()

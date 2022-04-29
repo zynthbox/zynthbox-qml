@@ -1171,6 +1171,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            self.set_clip_to_record(clip)
 
             if clip.isTrackSample:
                 Path(track.bankDir).mkdir(parents=True, exist_ok=True)
@@ -1222,7 +1223,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
             logging.info("Output get! Continue.")
 
-            self.set_clip_to_record(clip)
             self.clip_to_record.isRecording = True
         else:
             logging.error("Empty layer selected. Cannot record.")

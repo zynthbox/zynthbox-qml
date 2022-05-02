@@ -715,9 +715,16 @@ Kirigami.AbstractApplicationWindow {
                 Repeater {
                     model: 5
                     delegate: QQC2.Button {
+                       property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
                        Layout.fillWidth: true
                        Layout.fillHeight: true
                        text: index + 1
+                       onClicked: {
+                           selectedTrack.selectedSlotRow = index;
+                           dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
+                           slotSelectionDrawer.position = 0
+                       }
                     }
                 }
             }

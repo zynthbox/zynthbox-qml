@@ -702,6 +702,7 @@ Kirigami.AbstractApplicationWindow {
         width: root.width * 0.1
         height: root.height
         edge: Qt.LeftEdge
+        dragMargin: Kirigami.Units.gridUnit * 1.5
         modal: true
 
         contentItem: Rectangle {

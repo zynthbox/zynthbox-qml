@@ -705,13 +705,13 @@ Zynthian.ScreenPage {
                             color: {
                                 if (root.copySourceObj === model.track)
                                     return "#ff2196f3"
-                                else if (model.track.trackAudioType === "synth")
+                                else if (model.track.trackAudioType === "synth" && model.track.occupiedSlots > 0)
                                     return "#66ff0000"
                                 else if (model.track.trackAudioType === "sample-loop")
                                     return "#6600ff00"
-                                else if (model.track.trackAudioType === "sample-trig")
+                                else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlots > 0)
                                     return "#66ffff00"
-                                else if (model.track.trackAudioType === "sample-slice")
+                                else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlots > 0)
                                     return "#66ffff00"
                                 else if (model.track.trackAudioType === "external")
                                     return "#998e24aa"

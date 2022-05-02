@@ -697,6 +697,32 @@ Kirigami.AbstractApplicationWindow {
 
         contentItem: MiniPlayGrid {}
     }
+    QQC2.Drawer {
+        id: slotSelectionDrawer
+        width: root.width * 0.1
+        height: root.height
+        edge: Qt.LeftEdge
+        modal: true
+
+        contentItem: Rectangle {
+            color: "#222222"
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: Kirigami.Units.gridUnit * 0.5
+                spacing: Kirigami.Units.gridUnit * 0.5
+
+                Repeater {
+                    model: 5
+                    delegate: QQC2.Button {
+                       Layout.fillWidth: true
+                       Layout.fillHeight: true
+                       text: index + 1
+                    }
+                }
+            }
+        }
+    }
 
     Window {
         id: panel

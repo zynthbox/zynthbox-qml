@@ -372,7 +372,7 @@ Zynthian.Card {
                     case BottomBar.ControlType.Part:
                         return partAction;
                     case BottomBar.ControlType.Pattern:
-                        return patternAction;
+                        return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? clipSettingsAction : patternAction;
                     default:
                         return clipSettingsAction;
                     }

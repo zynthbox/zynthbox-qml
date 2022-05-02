@@ -191,7 +191,7 @@ QQC2.AbstractButton {
         QQC2.Label {
             anchors.centerIn: parent
             color: "#ffffff"
-            text: qsTr("Loop")
+            text: qsTr("Clip")
             visible: root.isInScene &&
                      track.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&

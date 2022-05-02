@@ -1141,7 +1141,20 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
-                                    text: qsTr("Delete")
+                                    enabled: root.lastSelectedObj != null &&
+                                             root.lastSelectedObj.className != null &&
+                                             root.lastSelectedObj.className === "zynthiloops_clip"
+                                    text: qsTr("Clear")
+                                    onClicked: {
+                                        root.lastSelectedObj.clear()
+
+                                        // Try clearing pattern if exists.
+                                        try {
+                                            if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
+                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).get(root.lastSelectedObj.clipTrack.connectedPattern).clear()
+                                            }
+                                        } catch(e) {}
+                                    }
                                 }
                             }
                         }

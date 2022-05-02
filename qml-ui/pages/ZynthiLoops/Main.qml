@@ -37,6 +37,7 @@ Zynthian.ScreenPage {
     id: root
 
     property alias zlScreen: root
+    property alias bottomStack: bottomStack
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property bool displaySceneButtons: false

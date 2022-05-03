@@ -30,8 +30,10 @@ import shutil
 import threading
 import traceback
 from pathlib import Path
+from subprocess import Popen
 
-from PySide2.QtCore import Property, QObject, QThread, Signal, Slot
+import jack
+from PySide2.QtCore import Property, QObject, QThread, QTimer, Signal, Slot
 
 from . import libzl
 from .zynthiloops_clips_model import zynthiloops_clips_model
@@ -67,6 +69,11 @@ class zynthiloops_track(QObject):
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
 
+        self.update_jack_port_timer = QTimer()
+        self.update_jack_port_timer.setInterval(100)
+        self.update_jack_port_timer.setSingleShot(True)
+        self.update_jack_port_timer.timeout.connect(self.do_update_jack_port)
+
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
             self.__samples__.append(zynthiloops_clip(self.id, -1, self.__song__, self, True))
@@ -96,6 +103,8 @@ class zynthiloops_track(QObject):
         self.zyngui.zynthiloops.selectedClipColChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+
+        self.chained_sounds_changed.connect(self.update_jack_port)
 
     def chained_sounds_changed_handler(self):
         self.occupiedSlotsChanged.emit()
@@ -280,6 +289,34 @@ class zynthiloops_track(QObject):
         return self.__layers_snapshot
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
+    def update_jack_port(self):
+        self.update_jack_port_timer.start()
+
+    def do_update_jack_port(self):
+        def task(zyngui, track):
+            jack_basenames = []
+
+            for channel in track.chainedSounds:
+                if channel >= 0 and track.checkIfLayerExists(channel):
+                    layer = zyngui.screens['layer'].layer_midi_map[channel]
+
+                    for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
+                        try:
+                            jack_basenames.append(fxlayer.jackname.split(":")[0])
+                        except Exception as e:
+                            logging.error(f"### update_jack_port Error : {str(e)}")
+
+            for port_name in jack_basenames:
+                try:
+                    for port in jack.Client("").get_ports(name_pattern=port_name, is_output=True):
+                        logging.error(f"Connecting port zynthiloops_audio_levels_client:T{self.id + 1} -> {port.name}")
+                        p = Popen(("jack_connect", f"zynthiloops_audio_levels_client:T{self.id + 1}", port.name))
+                        p.wait()
+                except Exception as e:
+                    logging.error(f"Error processing jack port for T{self.id + 1} : {port}({str(e)})")
+
+        worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
+        worker_thread.start()
 
     @Slot(None)
     def clear(self):

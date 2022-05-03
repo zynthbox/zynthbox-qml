@@ -254,7 +254,7 @@ ColumnLayout {
                                     Connections {
                                         target: control.pattern
                                         onEnabledChanged: {
-                                            if (track.sceneClip.col === pattern.bankOffset / pattern.bankLength && ((pattern.enabled && !track.sceneClip.inCurrentScene) || (!pattern.enabled && track.sceneClip.inCurrentScene))) {
+                                            if (track.sceneClip.col === control.pattern.bankOffset / control.pattern.bankLength && ((control.pattern.enabled && !track.sceneClip.inCurrentScene) || (!control.pattern.enabled && track.sceneClip.inCurrentScene))) {
                                                 zynthian.zynthiloops.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
                                             }
                                         }

@@ -106,7 +106,15 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            enabled: false
+            text: qsTr("Mixer")
+            checked: bottomStack.slotsBar.mixerButton.checked
+            onTriggered: {
+                if (bottomStack.slotsBar.mixerButton.checked) {
+                    bottomStack.slotsBar.trackButton.checked = true
+                } else {
+                    bottomStack.slotsBar.mixerButton.checked = true
+                }
+            }
         },
         Kirigami.Action {
             text: qsTr("Sounds")
@@ -172,8 +180,8 @@ Zynthian.ScreenPage {
                 if (zynthian.altButtonPressed) {
                     // Cycle between track, mixer, synths, samples, fx when alt button is not pressed
                     if (bottomStack.slotsBar.trackButton.checked) {
-                        bottomStack.slotsBar.mixerButton.checked = true
-                    } else if (bottomStack.slotsBar.mixerButton.checked) {
+                        bottomStack.slotsBar.partButton.checked = true
+                    } else if (bottomStack.slotsBar.partButton.checked) {
                         bottomStack.slotsBar.synthsButton.checked = true
                     } else if (bottomStack.slotsBar.synthsButton.checked) {
                         bottomStack.slotsBar.samplesButton.checked = true
@@ -1180,6 +1188,12 @@ Zynthian.ScreenPage {
 
                 MixedTracksViewBar {
                     id: mixedTracksViewBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+
+                PartBar {
+                    id: partBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }

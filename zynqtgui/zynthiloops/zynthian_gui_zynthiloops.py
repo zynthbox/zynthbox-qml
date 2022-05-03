@@ -144,6 +144,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.jack_client = jack.Client('zynthiloops_audio_levels_client')
             logging.info(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
             self.update_recorder_jack_port()
+
+            # Connect all jack ports of respective track after jack client initialization is done.
+            for i in range(0, self.__song__.tracksModel.count):
+                track = self.__song__.tracksModel.getTrack(i)
+                track.update_jack_port()
         except:
             logging.info(f"*** zynthiloops_audio_levels_client Jack client not found. Checking again in 1000ms")
             self.__jack_client_init_timer__.start()

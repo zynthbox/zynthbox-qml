@@ -189,11 +189,7 @@ Rectangle {
                                             headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
                                             audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
-                                            inputAudioLeveldB: highlighted
-                                                                ? !model.track.muted
-                                                                    ? ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB)
-                                                                    : -400
-                                                                : -400
+                                            inputAudioLeveldB: -400
 
                                             slider.value: model.track.volume
                                             onValueChanged: {
@@ -205,6 +201,69 @@ Rectangle {
                                             }
                                             onDoubleClicked: {
                                                 slider.value = model.track.initialVolume;
+                                            }
+
+                                            // Hack to bind to correct property as it is not possible to read a property value dynamically
+                                            // FIXME : Update AudioLevels class implementation so that the following hack is not required
+                                            Binding {
+                                                when: model.track.id === 0
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T1
+                                            }
+                                            Binding {
+                                                when: model.track.id === 1
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T2
+                                            }
+                                            Binding {
+                                                when: model.track.id === 2
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T3
+                                            }
+                                            Binding {
+                                                when: model.track.id === 3
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T4
+                                            }
+                                            Binding {
+                                                when: model.track.id === 4
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T5
+                                            }
+                                            Binding {
+                                                when: model.track.id === 5
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T6
+                                            }
+                                            Binding {
+                                                when: model.track.id === 6
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T7
+                                            }
+                                            Binding {
+                                                when: model.track.id === 7
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T8
+                                            }
+                                            Binding {
+                                                when: model.track.id === 8
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T9
+                                            }
+                                            Binding {
+                                                when: model.track.id === 9
+                                                target: volumeControl
+                                                property: "inputAudioLeveldB"
+                                                value: ZL.AudioLevels.T10
                                             }
                                         }
 

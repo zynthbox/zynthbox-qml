@@ -738,201 +738,191 @@ don't want to have to dig too far...
                     sceneObject.sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == sceneObject.thisIndex);
                 }
             }
-        }
-    }
-    Repeater {
-        model: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-        delegate: Item {
-            id: patternObject
-            property QtObject thisPattern: model.pattern
-            property int thisPatternIndex: model.index
-            property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
-            property QtObject associatedTrack: null
-            property int associatedTrackIndex: -1
-            onAssociatedTrackChanged: {
-                adoptSamples();
-            }
-            function adoptSamples() {
-                var clipIds = [-1,-1,-1,-1,-1];
-                if (patternObject.associatedTrack) {
-                    for (var i = 0; i < patternObject.associatedTrack.samples.length; ++i) {
-                        var sample = patternObject.associatedTrack.samples[i];
-                        if (sample) {
-                            clipIds[i] = sample.cppObjId;
-                        }
-                    }
-                }
-                patternObject.thisPattern.clipIds = clipIds;
-            }
-            function adoptTrackLayer() {
-                trackAdopterTimer.restart();
-            }
-            Timer {
-                id: trackAdopterTimer; interval: 1; repeat: false; running: false
-                onTriggered: {
-                    var foundTrack = null;
-                    var foundIndex = -1;
-                    for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                        var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                        if (track && track.connectedPattern === patternObject.thisPatternIndex) {
-                            foundTrack = track;
-                            foundIndex = i;
-                            break;
-                        }
-                    }
-                    patternObject.associatedTrack = foundTrack;
-                    patternObject.associatedTrackIndex = foundIndex;
-
-                    if (patternObject.associatedTrackIndex > -1) {
-                        if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
-                        } else if (patternObject.associatedTrack.trackAudioType == "sample-slice") {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
-                        } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
-                        } else if (patternObject.associatedTrack.trackAudioType == "external") {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
-                        } else {
-                            patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
-                        }
-                        var connectedSound = patternObject.associatedTrackIndex;
-                        if (connectedSound === -1) {
-                            // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
-                            patternObject.thisPattern.layer = 15;
-                        } else if (connectedSound !== patternObject.thisPattern.layer) {
-                            patternObject.thisPattern.layer = connectedSound;
-                        }
-                    } else {
-                        // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
-                        patternObject.thisPattern.layer = 15;
-                    }
-                    if (patternObject.thisPattern.layer === 15) {
-                        patternObject.thisPattern.layerData = "";
-                    } else {
-                        patternObject.thisPattern.layerData = zynthian.layer.layer_as_json(patternObject.associatedTrack.connectedSound);
-                    }
-                    trackClipsRepeater.updateEnabledFromClips();
-                }
-            }
-            Connections {
-                target: patternObject.thisPattern
-                onLayerChanged: patternObject.adoptTrackLayer()
-                onEnabledChanged: trackClipsRepeater.updateClipsFromEnabled()
-                onBankOffsetChanged: trackClipsRepeater.updateClipsFromEnabled()
-                onNoteDestinationChanged: {
-                    if (patternObject.associatedTrack) {
-                        switch (patternObject.thisPattern.noteDestination) {
-                            case ZynQuick.PatternModel.SampleTriggerDestination:
-                                patternObject.associatedTrack.trackAudioType = "sample-trig";
-                                break;
-                            case ZynQuick.PatternModel.SampleSlicedDestination:
-                                patternObject.associatedTrack.trackAudioType = "sample-slice";
-                                break;
-                            case ZynQuick.PatternModel.SampleLoopedDestination:
-                                patternObject.associatedTrack.trackAudioType = "sample-loop";
-                                break;
-                            case ZynQuick.PatternModel.ExternalDestination:
-                                patternObject.associatedTrack.trackAudioType = "external";
-                                break;
-                            case ZynQuick.PatternModel.SynthDestination:
-                            default:
-                                patternObject.associatedTrack.trackAudioType = "synth";
-                                break;
-                        }
-                    }
-                }
-            }
-            Connections {
-                target: zynthian.zynthiloops.song.tracksModel
-                onConnectedSoundsCountChanged: patternObject.adoptTrackLayer()
-                onConnectedPatternsCountChanged: patternObject.adoptTrackLayer()
-            }
-            Connections {
-                target: zynthian.zynthiloops
-                onSongChanged: patternObject.adoptTrackLayer()
-            }
-            Connections {
-                target: patternObject.associatedTrack
-                onConnectedPatternChanged: patternObject.adoptTrackLayer()
-                onConnectedSoundChanged: patternObject.adoptTrackLayer()
-                onTrackAudioTypeChanged: {
-                    if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
-                    } else if (patternObject.associatedTrack.trackAudioType == "sample-slice") {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
-                    } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
-                    } else if (patternObject.associatedTrack.trackAudioType == "external") {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
-                    } else {
-                        patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
-                    }
-                }
-                onSamplesChanged: {
-                    adoptSamples();
-                }
-            }
-            Component.onCompleted: {
-                adoptTrackLayer();
-            }
-            Timer {
-                id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
-                onTriggered: {
-                    var enabledBank = -1;
-                    for(var i = 0; i < trackClipsRepeater.count; ++i) {
-                        var clipItem = trackClipsRepeater.itemAt(i);
-                        if (clipItem.clipInScene) {
-                            enabledBank = i;
-                            break;
-                        }
-                    }
-                    patternObject.thisPattern.enabled = (enabledBank > -1);
-                }
-            }
-            Timer {
-                id: updateClipsFromEnabledTimer; interval: 1; repeat: false; running: false
-                onTriggered: {
-                    var enabledClip = patternObject.thisPattern.bankOffset / patternObject.thisPattern.bankLength;
-                    if (!patternObject.thisPattern.enabled) {
-                        enabledClip = -1;
-                    }
-                    for (var i = 0; i < trackClipsRepeater.count; ++i) {
-                        var clipItem = trackClipsRepeater.itemAt(i);
-                        if (i === enabledClip && !clipItem.clipInScene) {
-                            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clipItem.clip);
-                            // Since the call above already disables all other clips from the same
-                            // track, there's no particular need to keep this going
-                            break;
-                        } else if (enabledClip === -1 && clipItem.clipInScene) {
-                            // If there are no enabled clips, then we'll need to remove any that are
-                            // set as in the scene right now
-                            zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(clipItem.clip);
-                        }
-                    }
-                }
-            }
             Repeater {
-                id: trackClipsRepeater
-                model: patternObject.trackClipsModel
-                function updateEnabledFromClips() {
-                    updateEnabledFromClipsTimer.restart();
-                }
-                // The inverse situation of the above - if we're setting the state here,
-                // we should feed it back to the scene model, so it knows what's going on
-                function updateClipsFromEnabled() {
-                    updateClipsFromEnabledTimer.restart();
-                }
+                model: sceneObject.sequence
                 delegate: Item {
-                    id: clipProxyDelegate
-                    property QtObject clip: model.clip
-                    property bool clipInScene: model.clip.inCurrentScene
-                    Connections {
-                        target: clipProxyDelegate.clip
-                        onCppObjIdChanged: {
-                            trackClipsRepeater.updateEnabledFromClips();
+                    id: patternObject
+                    property QtObject thisPattern: model.pattern
+                    property int thisPatternIndex: model.index
+                    property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
+                    property QtObject associatedTrack: null
+                    property int associatedTrackIndex: -1
+                    onAssociatedTrackChanged: {
+                        adoptSamples();
+                    }
+                    function adoptSamples() {
+                        var clipIds = [-1,-1,-1,-1,-1];
+                        if (patternObject.associatedTrack) {
+                            for (var i = 0; i < patternObject.associatedTrack.samples.length; ++i) {
+                                var sample = patternObject.associatedTrack.samples[i];
+                                if (sample) {
+                                    clipIds[i] = sample.cppObjId;
+                                }
+                            }
                         }
-                        onInCurrentSceneChanged: {
-                            trackClipsRepeater.updateEnabledFromClips();
+                        patternObject.thisPattern.clipIds = clipIds;
+                    }
+                    function adoptTrackLayer() {
+                        trackAdopterTimer.restart();
+                    }
+                    Timer {
+                        id: trackAdopterTimer; interval: 1; repeat: false; running: false
+                        onTriggered: {
+                            var foundTrack = null;
+                            var foundIndex = -1;
+                            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                if (track && track.connectedPattern === patternObject.thisPatternIndex) {
+                                    foundTrack = track;
+                                    foundIndex = i;
+                                    break;
+                                }
+                            }
+                            patternObject.associatedTrack = foundTrack;
+                            patternObject.associatedTrackIndex = foundIndex;
+
+                            if (patternObject.associatedTrackIndex > -1) {
+                                if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
+                                    patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
+                                } else if (patternObject.associatedTrack.trackAudioType == "sample-slice") {
+                                    patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
+                                } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
+                                    patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
+                                } else if (patternObject.associatedTrack.trackAudioType == "external") {
+                                    patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
+                                } else {
+                                    patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
+                                }
+                                var connectedSound = patternObject.associatedTrackIndex;
+                                if (connectedSound === -1) {
+                                    // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                                    patternObject.thisPattern.layer = 15;
+                                } else if (connectedSound !== patternObject.thisPattern.layer) {
+                                    patternObject.thisPattern.layer = connectedSound;
+                                }
+                            } else {
+                                // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
+                                patternObject.thisPattern.layer = 15;
+                            }
+                            if (patternObject.thisPattern.layer === 15) {
+                                patternObject.thisPattern.layerData = "";
+                            } else {
+                                patternObject.thisPattern.layerData = zynthian.layer.layer_as_json(patternObject.associatedTrack.connectedSound);
+                            }
+                            sceneClipItem.updateEnabledFromClips();
+                        }
+                    }
+                    Connections {
+                        target: patternObject.thisPattern
+                        onLayerChanged: patternObject.adoptTrackLayer()
+                        onEnabledChanged: sceneClipItem.updateClipsFromEnabled()
+                        onBankOffsetChanged: sceneClipItem.updateClipsFromEnabled()
+                        onNoteDestinationChanged: {
+                            if (patternObject.associatedTrack) {
+                                switch (patternObject.thisPattern.noteDestination) {
+                                    case ZynQuick.PatternModel.SampleTriggerDestination:
+                                        patternObject.associatedTrack.trackAudioType = "sample-trig";
+                                        break;
+                                    case ZynQuick.PatternModel.SampleSlicedDestination:
+                                        patternObject.associatedTrack.trackAudioType = "sample-slice";
+                                        break;
+                                    case ZynQuick.PatternModel.SampleLoopedDestination:
+                                        patternObject.associatedTrack.trackAudioType = "sample-loop";
+                                        break;
+                                    case ZynQuick.PatternModel.ExternalDestination:
+                                        patternObject.associatedTrack.trackAudioType = "external";
+                                        break;
+                                    case ZynQuick.PatternModel.SynthDestination:
+                                    default:
+                                        patternObject.associatedTrack.trackAudioType = "synth";
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    Connections {
+                        target: zynthian.zynthiloops.song.tracksModel
+                        onConnectedSoundsCountChanged: patternObject.adoptTrackLayer()
+                        onConnectedPatternsCountChanged: patternObject.adoptTrackLayer()
+                    }
+                    Connections {
+                        target: zynthian.zynthiloops
+                        onSongChanged: patternObject.adoptTrackLayer()
+                    }
+                    Connections {
+                        target: patternObject.associatedTrack
+                        onConnectedPatternChanged: patternObject.adoptTrackLayer()
+                        onConnectedSoundChanged: patternObject.adoptTrackLayer()
+                        onTrackAudioTypeChanged: {
+                            if (patternObject.associatedTrack.trackAudioType === "sample-trig") {
+                                patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
+                            } else if (patternObject.associatedTrack.trackAudioType == "sample-slice") {
+                                patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
+                            } else if (patternObject.associatedTrack.trackAudioType == "sample-loop") {
+                                patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
+                            } else if (patternObject.associatedTrack.trackAudioType == "external") {
+                                patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
+                            } else {
+                                patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
+                            }
+                        }
+                        onSamplesChanged: {
+                            adoptSamples();
+                        }
+                    }
+                    Component.onCompleted: {
+                        adoptTrackLayer();
+                    }
+                    // Our basic structure is logically scene contains tracks which contain patterns, but in reality it's a set of parallel structures
+                    // the scene model basically contains only scenes
+                    // the tracks contain clips, each of which corresponds to a scene
+                    // there is further a set of sequence models which are partnered each to a scene, and inside each sequence is a pattern, which is paired with a track
+                    // Which means that, logically, the structure is actually more:
+                    // The scene model contains scenes
+                    //   Each scene contains a sequence
+                    //     Each sequence contains a number of patterns equal to the number of tracks
+                    // The tracks model contains clips
+                    //   Each row of clips corresponds to one scene (so all clips in the same position in each track correspond to the same scene)
+                    //   Each individual clip corresponds to one pattern (specifically the pattern in the track's position, in the scene associated with the clip)
+                    // Synchronising the states means matching each pattern with the clip matching it in each track
+                    Timer {
+                        id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
+                        onTriggered: {
+                            var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
+                            patternObject.thisPattern.enabled = clipInScene;
+                        }
+                    }
+                    Timer {
+                        id: updateClipsFromEnabledTimer; interval: 1; repeat: false; running: false
+                        onTriggered: {
+                            var enabledClip = patternObject.thisPattern.enabled ? sceneObject.thisIndex : -1;
+                            var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
+                            if (patternObject.thisPattern.enabled && !clipInScene) {
+                                zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(sceneClipItem.clip);
+                            } else if (!patternObject.thisPattern.enabled && clipInScene) {
+                                zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(sceneClipItem.clip);
+                            }
+                        }
+                    }
+                    Item {
+                        id: sceneClipItem
+                        property QtObject clip: patternObject.trackClipsModel ? patternObject.trackClipsModel.getClip(sceneObject.thisIndex) : null
+                        function updateEnabledFromClips() {
+                            updateEnabledFromClipsTimer.restart();
+                        }
+                        // The inverse situation of the above - if we're setting the state here,
+                        // we should feed it back to the scene model, so it knows what's going on
+                        function updateClipsFromEnabled() {
+                            updateClipsFromEnabledTimer.restart();
+                        }
+                        Connections {
+                            target: sceneClipItem.clip
+                            onCppObjIdChanged: {
+                                sceneClipItem.updateEnabledFromClips();
+                            }
+                            onInCurrentSceneChanged: {
+                                sceneClipItem.updateEnabledFromClips();
+                            }
                         }
                     }
                 }

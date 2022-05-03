@@ -191,8 +191,13 @@ QQC2.Popup {
                             console.log("No clip duration yet...");
                         }
                         console.log("New sample is", _private.recordingDurationInMS, "ms long, with a pattern length of", _private.patternDurationInMS, "and loop that starts at", startTime, "and", loopLength, "beats long, and the clip says it is", clip.duration, "seconds long");
+                        // Snap length to beat size if our pattern will actually fit inside such a thing (otherwise don't do that)
+                        if (loopLength % ZynQuick.PlayGridManager.syncTimer.getMultiplier() === 0) {
+                            clip.snapLengthToBeat = true;
+                        } else {
+                            clip.snapLengthToBeat = false;
+                        }
                         // Set the new sample's start and end points
-                        clip.snapLengthToBeat = false;
                         clip.startPosition = (startTime / 1000) + Math.max(0, clip.duration - (_private.recordingDurationInMS / 1000));
                         clip.length = loopLength / ZynQuick.PlayGridManager.syncTimer.getMultiplier();
                         // Set track mode to loop

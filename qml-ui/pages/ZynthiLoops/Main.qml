@@ -907,12 +907,7 @@ Zynthian.ScreenPage {
                                             } else {
                                                 var patternIsPlaying = false;
                                                 if (clipCell.sequence && clipCell.sequence.isPlaying) {
-                                                    /*if (pattern.isEmpty) {
-                                                        return false
-                                                    } else if ((track.sceneClip.col === 0 && pattern.bank !== "I")
-                                                        || (track.sceneClip.col === 1 && pattern.bank !== "II")) {
-                                                        clipCell.isPlaying = false
-                                                    } else */if (clipCell.sequence.soloPattern > -1) {
+                                                    if (clipCell.sequence.soloPattern > -1) {
                                                         patternIsPlaying = (clipCell.sequence.soloPattern == track.connectedPattern)
                                                     } else if (clipCell.pattern) {
                                                         patternIsPlaying = clipCell.pattern.enabled
@@ -932,24 +927,13 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        console.log("@@@ CLIP :", track.sceneClip.cppObjAddress, track.sceneClip.cppObjId)
                                         root.lastSelectedObj = track.sceneClip
-
-//                                            try {
-//                                                console.log("@@@ CLIP :", track.sceneClip.cppObj)
-//                                            } catch(e) {
-//                                                console.error(e)
-//                                            }
 
                                         if (dblTimer.running) {
                                             root.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
 
                                             if (track.connectedPattern >= 0) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern);
-                                                seq.bank = track.sceneClip.col === 0 ? "A" : "B";
-                                                seq.enabled = track.sceneClip.inCurrentScene;
-
-                                                console.log("Clip Row :", track.sceneClip.row, ", Enabled :", seq.enabled);
+                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern).enabled = track.sceneClip.inCurrentScene;
                                             }
                                             dblTimer.stop()
                                             return

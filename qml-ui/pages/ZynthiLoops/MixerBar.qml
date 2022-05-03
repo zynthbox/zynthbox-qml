@@ -249,28 +249,43 @@ Rectangle {
 
                                                 Connections {
                                                     target: zynthian.fixed_layers
-                                                    onList_updated: {
-                                                        soundLabel.updateSoundName();
-                                                    }
+                                                    onList_updated: soundLabel.updateSoundName()
                                                 }
 
                                                 Connections {
                                                     target: model.track
-                                                    onChainedSoundsChanged: {
-                                                        soundLabel.updateSoundName();
-                                                    }
+                                                    onChainedSoundsChanged: soundLabel.updateSoundName()
+                                                    onSamplesChanged: soundLabel.updateSoundName()
+                                                    onTrackAudioTypeChanged: soundLabel.updateSoundName()
+                                                    onSceneClipChanged: soundLabel.updateSoundName()
+                                                }
+
+                                                Connections {
+                                                    target: model.track.sceneClip
+                                                    onPathChanged: soundLabel.updateSoundName()
                                                 }
 
                                                 function updateSoundName() {
                                                     var text = "";
 
-                                                    for (var id in model.track.chainedSounds) {
-                                                        if (model.track.chainedSounds[id] >= 0 &&
-                                                            model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                            var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
-                                                            text = qsTr("%1 (%2)").arg(soundName[1] ? soundName[1].trim() : "").arg(soundName[0] ? soundName[0].trim() : "")
-                                                            break;
+                                                    if (model.track.trackAudioType === "synth") {
+                                                        for (var id in model.track.chainedSounds) {
+                                                            if (model.track.chainedSounds[id] >= 0 &&
+                                                                model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                                var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                                text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
+                                                                break;
+                                                            }
                                                         }
+                                                    } else if (model.track.trackAudioType === "sample-trig" ||
+                                                               model.track.trackAudioType === "sample-slice") {
+                                                        try {
+                                                            text = model.track.samples[0].path.split("/").pop()
+                                                        } catch (e) {}
+                                                    } else if (model.track.trackAudioType === "sample-loop") {
+                                                        try {
+                                                            text = model.track.sceneClip.path.split("/").pop()
+                                                        } catch (e) {}
                                                     }
 
                                                     soundLabel.text = text;

@@ -699,33 +699,54 @@ Kirigami.AbstractApplicationWindow {
     }
     QQC2.Drawer {
         id: slotSelectionDrawer
-        width: root.width * 0.1
+        width: Kirigami.Units.gridUnit * 8
         height: root.height
         edge: Qt.LeftEdge
         dragMargin: Kirigami.Units.gridUnit * 1.5
-        modal: true
+        modal: false
 
-        contentItem: Rectangle {
-            color: "#222222"
+        background: Item {
+        }
+        contentItem: Item {
+            id: slotSelectionDelegate
+            property real margin: Kirigami.Units.gridUnit * 1
 
-            ColumnLayout {
+            Rectangle {
+                color: "#222222"
                 anchors.fill: parent
-                anchors.margins: Kirigami.Units.gridUnit * 0.5
-                spacing: Kirigami.Units.gridUnit * 0.5
+                anchors.margins: Kirigami.Units.gridUnit
+                radius: 6
+                border.color: Qt.rgba(Kirigami.Theme.textColor.r,
+                                      Kirigami.Theme.textColor.g,
+                                      Kirigami.Theme.textColor.b,
+                                      0.2)
+                border.width: 1
 
-                Repeater {
-                    model: 5
-                    delegate: QQC2.Button {
-                       property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: slotSelectionDelegate.margin
+                    spacing: slotSelectionDelegate.margin
 
-                       Layout.fillWidth: true
-                       Layout.fillHeight: true
-                       text: index + 1
-                       onClicked: {
-                           selectedTrack.selectedSlotRow = index;
-                           dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
-                           slotSelectionDrawer.position = 0
-                       }
+                    Repeater {
+                        model: 5
+                        delegate: Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+
+                            QQC2.Button {
+                                property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
+                                width: parent.width
+                                height: Kirigami.Units.gridUnit * 4
+                                anchors.centerIn: parent
+                                text: index + 1
+                                onClicked: {
+                                    selectedTrack.selectedSlotRow = index;
+                                    dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
+                                    slotSelectionDrawer.position = 0
+                                }
+                            }
+                        }
                     }
                 }
             }

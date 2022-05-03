@@ -40,9 +40,10 @@ Rectangle {
     property alias bottomBarButton: bottomBarButton
     property alias trackButton: trackButton
     property alias mixerButton: mixerButton
+    property alias partButton: partButton
     property alias synthsButton: synthsButton
     property alias samplesButton: samplesButton
-    property alias fxButton: fxButton    
+    property alias fxButton: fxButton
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
@@ -392,10 +393,25 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            visible: false
                             text: qsTr("Mixer")
                             onCheckedChanged: {
                                 if (checked) {
                                     bottomStack.currentIndex = 1
+                                    updateLedVariablesTimer.restart()
+                                }
+                            }
+                        }
+
+                        QQC2.Button {
+                            id: partButton
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            text: qsTr("Part")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    bottomStack.currentIndex = 4
                                     updateLedVariablesTimer.restart()
                                 }
                             }

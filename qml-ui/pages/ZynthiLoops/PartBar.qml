@@ -51,17 +51,35 @@ GridLayout {
         return false;
     }
 
-//    Zynthian.ZynthiloopsDial {
-//        id: lengthDial
-//        text: qsTr("Length (beats)")
-//        controlObj: root.bottomBar.controlObj
-//        controlProperty: "length"
+    ColumnLayout {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        spacing: 1
 
-//        dial {
-//            stepSize: 1
-//            from: 1
-//            to: 16
-//        }
-//    }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 1
+
+            QQC2.ButtonGroup {
+                buttons: buttonsColumn.children
+            }
+
+            BottomStackTabs {
+                id: buttonsColumn
+                Layout.preferredWidth: privateProps.cellWidth + 6
+                Layout.maximumWidth: privateProps.cellWidth + 6
+                Layout.bottomMargin: 5
+                Layout.fillHeight: true
+            }
+
+            ColumnLayout {
+                id: contentColumn
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.margins: Kirigami.Units.gridUnit / 2
+            }
+        }
+    }
 }
 

@@ -33,11 +33,13 @@ import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
 
+
 // GridLayout so TabbedControlView knows how to navigate it
-GridLayout {
+Rectangle {
     id: root
-    rows: 1
+
     Layout.fillWidth: true
+    color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
 
@@ -51,81 +53,85 @@ GridLayout {
         return false;
     }
 
-    ColumnLayout {
-        Layout.fillHeight: true
-        Layout.fillWidth: true
-        spacing: 1
+    GridLayout {
+        anchors.fill: parent
+        rows: 1
 
-        RowLayout {
-            Layout.fillWidth: true
+        ColumnLayout {
             Layout.fillHeight: true
+            Layout.fillWidth: true
             spacing: 1
 
-            QQC2.ButtonGroup {
-                buttons: buttonsColumn.children
-            }
-
-            BottomStackTabs {
-                id: buttonsColumn
-                Layout.preferredWidth: privateProps.cellWidth + 6
-                Layout.maximumWidth: privateProps.cellWidth + 6
-                Layout.bottomMargin: 5
-                Layout.fillHeight: true
-            }
-
             RowLayout {
-                id: contentColumn
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.bottomMargin: 5
-
                 spacing: 1
 
-                // Spacer
-                Item {
-                    Layout.fillWidth: false
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
+                QQC2.ButtonGroup {
+                    buttons: buttonsColumn.children
                 }
 
-                Repeater {
-                    model: 10
-                    delegate: ColumnLayout {
-                        id: gridColumns
-                        property int colIndex: index
+                BottomStackTabs {
+                    id: buttonsColumn
+                    Layout.preferredWidth: privateProps.cellWidth + 6
+                    Layout.maximumWidth: privateProps.cellWidth + 6
+                    Layout.bottomMargin: 5
+                    Layout.fillHeight: true
+                }
 
+                RowLayout {
+                    id: contentColumn
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.bottomMargin: 5
+
+                    spacing: 1
+
+                    // Spacer
+                    Item {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
-                        Layout.preferredWidth: privateProps.cellWidth
+                        Layout.preferredWidth: 1
+                    }
 
-                        spacing: 1
+                    Repeater {
+                        model: 10
+                        delegate: ColumnLayout {
+                            id: gridColumns
+                            property int colIndex: index
 
-                        Repeater {
-                            model: 5
-                            delegate: Rectangle {
-                                id: gridRows
-                                property int rowIndex: index
+                            Layout.fillWidth: false
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: privateProps.cellWidth
 
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                color: "#000000"
-                                border.color: Kirigami.Theme.highlightColor
-                                border.width: gridColumns.colIndex === 2 &&
-                                              gridRows.rowIndex === 3
-                                                ? 1
-                                                : 0
+                            spacing: 1
+
+                            Repeater {
+                                model: 5
+                                delegate: Rectangle {
+                                    id: gridRows
+                                    property int rowIndex: index
+
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    color: "#000000"
+                                    border.color: Kirigami.Theme.highlightColor
+                                    border.width: gridColumns.colIndex === 2 &&
+                                                  gridRows.rowIndex === 3
+                                                    ? 1
+                                                    : 0
+                                }
                             }
                         }
                     }
-                }
 
-                Item {
-                    Layout.fillWidth: false
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: privateProps.cellWidth*2
+                    Item {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: privateProps.cellWidth*2
+                    }
                 }
             }
         }
     }
 }
-

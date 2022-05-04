@@ -364,6 +364,7 @@ class zynthiloops_track(QObject):
             logging.debug(f"Track : Setting volume {self.__volume__}")
             self.volume_changed.emit()
             self.__song__.schedule_save()
+            self.zyngui.zynthiloops.set_selector()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
 

@@ -43,7 +43,7 @@ ColumnLayout {
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.partButton.checked : false
-        text: qsTr("Part")
+        text: qsTr("Parts")
         onClicked: {
             bottomStack.slotsBar.partButton.checked = true
         }

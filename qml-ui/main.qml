@@ -703,7 +703,7 @@ Kirigami.AbstractApplicationWindow {
         height: root.height
         edge: Qt.LeftEdge
         dragMargin: Kirigami.Units.gridUnit * 1.5
-        modal: false
+        modal: true
 
         background: Item {
         }
@@ -713,8 +713,12 @@ Kirigami.AbstractApplicationWindow {
 
             Rectangle {
                 color: "#222222"
-                anchors.fill: parent
-                anchors.margins: Kirigami.Units.gridUnit
+                anchors {
+                    fill: parent
+                    leftMargin: Kirigami.Units.gridUnit * 0.5
+                    topMargin: Kirigami.Units.gridUnit * 4
+                    bottomMargin: Kirigami.Units.gridUnit * 4
+                }
                 radius: 6
                 border.color: Qt.rgba(Kirigami.Theme.textColor.r,
                                       Kirigami.Theme.textColor.g,
@@ -737,7 +741,7 @@ Kirigami.AbstractApplicationWindow {
                                 property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
                                 width: parent.width
-                                height: Kirigami.Units.gridUnit * 4
+                                height: Kirigami.Units.gridUnit * 3
                                 anchors.centerIn: parent
                                 text: index + 1
                                 onClicked: {

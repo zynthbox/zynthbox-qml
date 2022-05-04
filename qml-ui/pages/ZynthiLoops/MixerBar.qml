@@ -33,6 +33,7 @@ import QtQuick.Controls.Styles 1.4
 
 import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 Rectangle {
     id: root
@@ -182,14 +183,27 @@ Rectangle {
                                             id: volumeControl
 
                                             property var audioLevelText: model.track.audioLevel.toFixed(2)
+                                            property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.track.samples[0].cppObjId);
+                                            property real synthAudioLevel
 
                                             anchors.fill: parent
 
                                             enabled: !model.track.muted
                                             headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
-                                            audioLeveldB:  model.track.muted ? -400 : model.track.audioLevel
-                                            inputAudioLeveldB: -400
+                                            audioLeveldB: !model.track.muted
+                                                              ? model.track.trackAudioType === "sample-loop"
+                                                                   ? ZL.AudioLevels.add(model.track.audioLevel, synthAudioLevel)
+                                                                   : model.track.trackAudioType === "synth"
+                                                                       ? synthAudioLevel
+                                                                       : model.track.trackAudioType === "sample-trig" ||
+                                                                         model.track.trackAudioType === "sample-slice"
+                                                                           ? sampleClipObject
+                                                                               ? sampleClipObject.audioLevel
+                                                                               : -400
+                                                                           : -400
+                                                               : -400
+                                            inputAudioLevelVisible: false
 
                                             slider.value: model.track.volume
                                             onValueChanged: {
@@ -208,61 +222,61 @@ Rectangle {
                                             Binding {
                                                 when: model.track.id === 0
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T1
                                             }
                                             Binding {
                                                 when: model.track.id === 1
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T2
                                             }
                                             Binding {
                                                 when: model.track.id === 2
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T3
                                             }
                                             Binding {
                                                 when: model.track.id === 3
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T4
                                             }
                                             Binding {
                                                 when: model.track.id === 4
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T5
                                             }
                                             Binding {
                                                 when: model.track.id === 5
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T6
                                             }
                                             Binding {
                                                 when: model.track.id === 6
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T7
                                             }
                                             Binding {
                                                 when: model.track.id === 7
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T8
                                             }
                                             Binding {
                                                 when: model.track.id === 8
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T9
                                             }
                                             Binding {
                                                 when: model.track.id === 9
                                                 target: volumeControl
-                                                property: "inputAudioLeveldB"
+                                                property: "synthAudioLevel"
                                                 value: ZL.AudioLevels.T10
                                             }
                                         }

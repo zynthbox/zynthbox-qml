@@ -205,16 +205,21 @@ Rectangle {
                                                                : -400
                                             inputAudioLevelVisible: false
 
-                                            slider.value: model.track.volume
                                             onValueChanged: {
-                                                model.track.volume = slider.value
+                                                 model.track.volume = slider.value
                                             }
 
                                             onClicked: {
                                                 tracksVolumeRow.handleClick(track);
                                             }
                                             onDoubleClicked: {
-                                                slider.value = model.track.initialVolume;
+                                                model.track.volume = model.track.initialVolume;
+                                            }
+
+                                            Binding {
+                                                target: volumeControl.slider
+                                                property: "value"
+                                                value: model.track.volume
                                             }
 
                                             // Hack to bind to correct property as it is not possible to read a property value dynamically

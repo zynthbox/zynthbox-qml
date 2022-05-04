@@ -257,6 +257,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.set_selector()
 
     @Slot(None)
+    def zyncoder_update_track_volume(self):
+        if self.is_set_selector_running:
+            logging.info(f"Set selector in progress. Not setting value with encoder")
+            return
+
+        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
+
+        if selected_track.volume != volume:
+            # zselector doesnt support negetive mimimum value. Need to interoporale zyncoder value from range(0 to 60) to actual range(-40 to 20)
+            selected_track.volume = volume
+            logging.debug(f"### zyncoder_update_track_volume {selected_track.volume}")
+            self.set_selector()
+
+    @Slot(None)
     def zyncoder_update_clip_start_position(self):
         if self.is_set_selector_running:
             logging.info(f"Set selector in progress. Not setting value with encoder")
@@ -336,6 +351,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[1].read_zyncoder()
             if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive or self.zyngui.slotsBarSynthsActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
+            elif self.zyngui.slotsBarMixerActive:
+                QMetaObject.invokeMethod(self, "zyncoder_update_track_volume", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
 
@@ -443,6 +460,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and
                     selected_track is not None and
                     selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])
+                ) or (
+                    self.zyngui.slotsBarMixerActive and
+                    selected_track is not None
                 ):
             logging.info(
                 f"### set_selector : Configuring small knob 1, showing")
@@ -487,6 +507,28 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 {'symbol': 'zynthiloops_knob1', 'name': 'Zynthiloops Knob 1',
                  'short_name': 'Knob1',
                  'midi_cc': 0, 'value_max': round(max_value), 'value_min': round(min_value), 'value': round(volume)})
+
+            self.__zselector[1].config(self.__zselector_ctrl[1])
+            self.__zselector[1].custom_encoder_speed = 0
+        elif self.zyngui.slotsBarMixerActive:
+            # zselector doesnt negetive minimum value. need to interpolate actual range (-40 to 20) to range (0 to 60)
+            volume = np.interp(selected_track.volume, (-40, 20), (0, 60))
+
+            if self.__zselector[1] is None:
+                self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
+                                                               'zynthiloops_knob1',
+                                                               {'midi_cc': 0, 'value': volume})
+
+                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[1],
+                                                              self)
+                self.__zselector[1].index = 0
+
+            logging.debug(f"### set_selector : Configuring small knob 1, value({volume})")
+
+
+            self.__zselector_ctrl[1].set_options(
+                {'symbol': 'zynthiloops_knob1', 'name': 'Zynthiloops Knob 1', 'short_name': 'Knob1',
+                 'midi_cc': 0, 'value_max': 60, 'value': volume})
 
             self.__zselector[1].config(self.__zselector_ctrl[1])
             self.__zselector[1].custom_encoder_speed = 0

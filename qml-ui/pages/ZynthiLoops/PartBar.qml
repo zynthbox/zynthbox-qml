@@ -73,11 +73,57 @@ GridLayout {
                 Layout.fillHeight: true
             }
 
-            ColumnLayout {
+            RowLayout {
                 id: contentColumn
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.gridUnit / 2
+                Layout.bottomMargin: 5
+
+                spacing: 1
+
+                // Spacer
+                Item {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                }
+
+                Repeater {
+                    model: 10
+                    delegate: ColumnLayout {
+                        id: gridColumns
+                        property int colIndex: index
+
+                        Layout.fillWidth: false
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: privateProps.cellWidth
+
+                        spacing: 1
+
+                        Repeater {
+                            model: 5
+                            delegate: Rectangle {
+                                id: gridRows
+                                property int rowIndex: index
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                color: "#000000"
+                                border.color: Kirigami.Theme.highlightColor
+                                border.width: gridColumns.colIndex === 2 &&
+                                              gridRows.rowIndex === 3
+                                                ? 1
+                                                : 0
+                            }
+                        }
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: privateProps.cellWidth*2
+                }
             }
         }
     }

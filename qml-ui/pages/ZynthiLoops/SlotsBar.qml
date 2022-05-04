@@ -408,7 +408,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            text: qsTr("Part")
+                            text: qsTr("Parts")
                             onCheckedChanged: {
                                 if (checked) {
                                     bottomStack.currentIndex = 4

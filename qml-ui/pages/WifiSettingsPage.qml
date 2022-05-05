@@ -50,6 +50,55 @@ Zynthian.ScreenPage {
         color: Kirigami.Theme.backgroundColor
         radius: 2
 
+        QQC2.Dialog {
+            id: connectDialog
+
+            property string ssid
+
+            x: root.width / 2 - width / 2
+            y: root.height / 2 - height / 2
+            dim: true
+            modal: true
+            width: Math.round(Math.max(implicitWidth, root.width * 0.4))
+            height: Math.round(Math.max(implicitHeight, root.height * 0.4))
+            closePolicy: QQC2.Popup.CloseOnPressOutside
+            header: ColumnLayout {
+                Kirigami.Heading {
+                    Layout.fillWidth: true
+                    Layout.margins: Kirigami.Units.gridUnit
+                    text: qsTr("Connect to %1").arg(connectDialog.ssid)
+                }
+                Kirigami.Separator {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: 2
+                }
+            }
+            footer: RowLayout {
+                anchors.margins: Kirigami.Units.gridUnit
+                spacing: Kirigami.Units.gridUnit
+
+                QQC2.Button {
+                    text: qsTr("Connect")
+                    Layout.alignment: Qt.AlignRight
+                    onClicked: {
+                        zynthian.wifi_settings.connect(connectDialog.ssid, passwordField.text)
+                    }
+                }
+            }
+            contentItem: Item {
+                QQC2.TextField {
+                    id: passwordField
+
+                    width: connectDialog.width * 0.7
+                    height: Kirigami.Units.gridUnit * 2
+                    anchors.centerIn: parent
+                    placeholderText: "Password"
+                    echoMode: "Password"
+                }
+            }
+        }
+
         ColumnLayout {
             anchors.margins: Kirigami.Units.gridUnit
 
@@ -109,7 +158,6 @@ Zynthian.ScreenPage {
 
             RowLayout {
                 Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
-                visible: zynthian.wifi_settings.wifiMode === "on"
 
                 QQC2.Label {
                     Layout.alignment: Qt.AlignVCenter
@@ -127,6 +175,17 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
                     model: zynthian.wifi_settings.availableWifiNetworks
                     textRole: "ssid"
+                }
+
+                QQC2.Button {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*6
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    text: qsTr("Connect")
+                    enabled: availableNetworksDropdown.currentText.trim().length > 0
+                    onClicked: {
+                        connectDialog.ssid = availableNetworksDropdown.currentText
+                        connectDialog.open()
+                    }
                 }
             }
 

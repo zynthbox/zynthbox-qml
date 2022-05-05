@@ -11,6 +11,7 @@ Zynthian.Card {
     id: root
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property int selectedTrackIndex: zynthian.session_dashboard.selectedTrack;
     property var chainedSounds: selectedTrack ? selectedTrack.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
 
@@ -19,7 +20,7 @@ Zynthian.Card {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
 
             if (root.selectedTrack.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.selectedTrack.selectedPart);
                 pattern.midiChannel = root.selectedTrack.connectedSound;
             }
         }
@@ -256,7 +257,7 @@ Zynthian.Card {
                         backToSelection.enabled = true;
 
                         if (root.selectedTrack.connectedPattern >= 0) {
-                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
+                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
                             pattern.midiChannel = root.selectedTrack.connectedSound;
                         }
                     }
@@ -417,7 +418,7 @@ Zynthian.Card {
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(root.selectedTrack.connectedPattern);
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
                                             pattern.midiChannel = root.selectedTrack.connectedSound;
                                         }
                                     }

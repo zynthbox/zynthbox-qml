@@ -40,8 +40,8 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject sequence: controlObj.clipTrack && controlObj.clipTrack.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-    property QtObject pattern: root.sequence && controlObj.clipTrack ? root.sequence.get(controlObj.clipTrack.connectedPattern) : null
+    property QtObject sequence: controlObj.clipTrack ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject pattern: root.sequence && controlObj.clipTrack ? root.sequence.getByPart(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart) : null
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
@@ -93,7 +93,7 @@ GridLayout {
             smooth: false
 
             visible: controlObj != null && controlObj.clipTrack != null && controlObj.clipTrack.connectedPattern >= 0
-            source: root.pattern && controlObj.clipTrack ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "??" + root.pattern.lastModified : ""
+            source: root.pattern && controlObj.clipTrack ? root.pattern.thumbnailUrl : ""
             Rectangle { // Progress
                 anchors {
                     top: parent.top
@@ -117,7 +117,7 @@ GridLayout {
                     zynthian.forced_screen_back = "zynthiloops";
                     ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                     var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                    sequence.activePattern = controlObj.clipTrack.connectedPattern;
+                    sequence.setActiveTrack(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart);
                 }
             }
         }

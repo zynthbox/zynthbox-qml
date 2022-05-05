@@ -250,7 +250,7 @@ ColumnLayout {
                                     radius: 2
                                     highlighted: trackDelegate.selectedClip === track.sceneClip && track.sceneClip.inCurrentScene
                                     property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
+                                    property QtObject pattern: sequence ? sequence.getByPart(trackIndex, track.selectedPart) : null
                                     Connections {
                                         target: control.pattern
                                         onEnabledChanged: {
@@ -329,7 +329,7 @@ ColumnLayout {
                                                 zynthian.current_modal_screen_id = "playgrid";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                                                 var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                                sequence.activePattern = track.connectedPattern;
+                                                sequence.setActiveTrack(track.id, 0);
                                             } else if (trackDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
                                                 bottomBar.forceActiveFocus();
@@ -398,8 +398,8 @@ ColumnLayout {
                                     anchors.fill: parent
                                     visible: trackDelegate.trackHasConnectedPattern
                                     property QtObject sequence: trackDelegate.trackHasConnectedPattern ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-                                    property QtObject pattern: sequence ? sequence.get(track.connectedPattern) : null
-                                    source: pattern ? "image://pattern/" + sequence.objectName + "/" + sequence.indexOf(pattern) + "/" + (pattern.bankOffset / 8) + "?" + pattern.lastModified : ""
+                                    property QtObject pattern: sequence ? sequence.getByPart(trackIndex, trackDelegate.track.selectedPart) : null
+                                    source: pattern ? pattern.thumbnailUrl : ""
                                     Rectangle { // Progress
                                         anchors {
                                             top: parent.top
@@ -479,7 +479,7 @@ ColumnLayout {
                                             zynthian.session_dashboard.selectedTrack = index;
                                         } else {
                                             if (trackDelegate.trackHasConnectedPattern) {
-                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(trackDelegate.track.connectedPattern);
+                                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(trackDelegate.trackIndex, trackDelegate.track.selectedPart);
                                                 seq.enabled = false;
                                                 trackDelegate.track.connectedPattern = -1;
                                             } else {
@@ -512,6 +512,7 @@ ColumnLayout {
                                             zynthian.session_dashboard.selectedTrack = index;
                                         } else {
                                             playgridPickerPopup.trackObj = track;
+                                            playgridPickerPopup.trackIndex = trackIndex;
                                             playgridPickerPopup.clipObj = trackDelegate.selectedClip;
                                             playgridPickerPopup.open();
                                         }
@@ -584,12 +585,14 @@ ColumnLayout {
         onMidiSelectionRequested: {
             var trackDelegate = tracksRepeater.itemAt(zynthian.session_dashboard.selectedTrack)
             playgridPickerPopup.trackObj = trackDelegate.track;
+            playgridPickerPopup.trackIndex = trackDelegate.trackIndex;
             playgridPickerPopup.clipObj = trackDelegate.selectedClip;
             playgridPickerPopup.open()
         }
     }
     QQC2.Popup {
         property QtObject trackObj
+        property int trackIndex
         property QtObject clipObj
 
         id: playgridPickerPopup
@@ -632,7 +635,7 @@ ColumnLayout {
                                 playgridPickerPopup.trackObj.clipsModel.getClip(1).clear();
                                 playgridPickerPopup.trackObj.connectedPattern = index;
 
-                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(playgridPickerPopup.trackObj.connectedPattern);
+                                var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(playgridPickerPopup.trackIndex, playgridPickerPopup.trackObj.selectedPart);
                                 seq.midiChannel = playgridPickerPopup.trackObj.connectedSound;
                                 seq.bank = "A"
                                 seq.enabled = true;

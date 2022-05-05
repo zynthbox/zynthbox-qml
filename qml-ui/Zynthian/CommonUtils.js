@@ -4,23 +4,23 @@ function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
     var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {
-        // First, explicitly turn off any Patterns which are not assigned a Track - otherwise
-        // we'll end up confusing people by playing back stuff where we don't know where the
-        // notes should be going, and that just wouldn't be cool.
-        for (var j = 0; j < sequence.rowCount(); ++j) {
-            var pattern = sequence.get(j);
-            var foundIndex = -1;
-            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                if (track && track.connectedPattern === j) {
-                    foundIndex = i;
-                    break;
-                }
-            }
-            if (foundIndex === -1) {
-                pattern.enabled = false;
-            }
-        }
+//         // First, explicitly turn off any Patterns which are not assigned a Track - otherwise
+//         // we'll end up confusing people by playing back stuff where we don't know where the
+//         // notes should be going, and that just wouldn't be cool.
+//         for (var j = 0; j < sequence.rowCount(); ++j) {
+//             var pattern = sequence.get(j);
+//             var foundIndex = -1;
+//             for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+//                 var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+//                 if (track && track.connectedPattern === j) {
+//                     foundIndex = i;
+//                     break;
+//                 }
+//             }
+//             if (foundIndex === -1) {
+//                 pattern.enabled = false;
+//             }
+//         }
         sequence.prepareSequencePlayback();
     } else {
         console.debug("Sequence could not be fetched, and playback could not be prepared");

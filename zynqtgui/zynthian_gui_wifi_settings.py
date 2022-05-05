@@ -87,6 +87,8 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
                     quality = 0
                     signal_level = 0
 
+                    check_output(f"ifconfig {interface} up", shell=True)
+
                     for line_byte in check_output(
                             "iwlist {0} scan | grep -e ESSID -e Encryption -e Quality".format(interface),
                             shell=True).splitlines():
@@ -243,6 +245,10 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
             return False
         else:
             return True
+
+    @Slot(str, str)
+    def connect(self, ssid, password):
+        logging.error(f"Connect to wifi : {ssid}, {password}")
 
     ### Property wifiMode
     def get_wifiMode(self):

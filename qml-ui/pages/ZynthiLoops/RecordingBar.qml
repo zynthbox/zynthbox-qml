@@ -254,25 +254,25 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
 
-        QQC2.Label {
-            text: "Synth A : " + ZL.AudioLevels.synthA.toFixed(2)
-        }
+//        QQC2.Label {
+//            text: "Synth A : " + ZL.AudioLevels.synthA.toFixed(2)
+//        }
 
-        QQC2.Label {
-            text: "Synth B : " + ZL.AudioLevels.synthB.toFixed(2)
-        }
+//        QQC2.Label {
+//            text: "Synth B : " + ZL.AudioLevels.synthB.toFixed(2)
+//        }
 
-        QQC2.Label {
-            text: "Synth : " + ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB).toFixed(2)
-        }
+//        QQC2.Label {
+//            text: "Synth : " + ZL.AudioLevels.add(ZL.AudioLevels.synthA, ZL.AudioLevels.synthB).toFixed(2)
+//        }
 
-        QQC2.Label {
-            text: "Capture A : " + ZL.AudioLevels.captureA.toFixed(2)
-        }
+//        QQC2.Label {
+//            text: "Capture A : " + ZL.AudioLevels.captureA.toFixed(2)
+//        }
 
-        QQC2.Label {
-            text: "Capture B : " + ZL.AudioLevels.captureB.toFixed(2)
-        }
+//        QQC2.Label {
+//            text: "Capture B : " + ZL.AudioLevels.captureB.toFixed(2)
+//        }
     }
 
     ColumnLayout {

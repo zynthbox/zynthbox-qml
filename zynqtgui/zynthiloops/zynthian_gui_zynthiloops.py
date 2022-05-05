@@ -105,9 +105,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__jack_client_init_timer__.setSingleShot(True)
         self.__jack_client_init_timer__.timeout.connect(self.init_jack_client)
         self.recorder_process = None
-        self.recorder_process_internal_arguments = ["--disable-console", "--no-stdin", "--port",
-                                                    f"zynthiloops_audio_levels_client:synth_port_a",
-                                                    "--port", f"zynthiloops_audio_levels_client:synth_port_b"]
+        self.recorder_process_internal_arguments = ["--disable-console", "--no-stdin"]
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
@@ -127,11 +125,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
-        self.update_recorder_jack_port_timer = QTimer()
-        self.update_recorder_jack_port_timer.setInterval(100)
-        self.update_recorder_jack_port_timer.setSingleShot(True)
-        self.update_recorder_jack_port_timer.timeout.connect(self.do_update_recorder_jack_port)
-
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
@@ -143,7 +136,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             jack.Client('').get_port_by_name("zynthiloops_audio_levels_client:playback_port_a")
             self.jack_client = jack.Client('zynthiloops_audio_levels_client')
             logging.info(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
-            self.update_recorder_jack_port()
 
             # Connect all jack ports of respective track after jack client initialization is done.
             for i in range(0, self.__song__.tracksModel.count):
@@ -175,7 +167,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
-            self.zyngui.screens['layer'].current_index_changed.connect(lambda: self.update_recorder_jack_port())
             self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
             self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
             self.zyngui.session_dashboard.selected_sound_row_changed.connect(self.set_selector)
@@ -844,74 +835,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     #
     # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
 
-    def update_recorder_jack_port(self):
-        self.update_recorder_jack_port_timer.start()
-
-    def do_update_recorder_jack_port(self):
-        def task(zyngui, jack_client, jack_capture_port_a, jack_capture_port_b, selected_track):
-            jack_basenames = []
-
-            for channel in selected_track.chainedSounds:
-                if channel >= 0 and selected_track.checkIfLayerExists(channel):
-                    layer = zyngui.screens['layer'].layer_midi_map[channel]
-
-                    for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
-                        try:
-                            jack_basenames.append(fxlayer.jackname.split(":")[0])
-                        except Exception as e:
-                            logging.error(f"### update_recorder_jack_port Error : {str(e)}")
-
-            # Disconnect all connected ports first
-            try:
-                for port in jack_client.get_all_connections(jack_capture_port_a):
-                    try:
-                        # jack_client.disconnect(port.name, jack_capture_port_a)
-                        p = Popen(("jack_disconnect", port.name, jack_capture_port_a))
-                        p.wait()
-                    except Exception as e:
-                        logging.error(f"Error disconnecting jack port : {str(e)}")
-                for port in jack_client.get_all_connections(jack_capture_port_b):
-                    try:
-                        # jack_client.disconnect(port.name, jack_capture_port_b)
-                        p = Popen(("jack_disconnect", port.name, jack_capture_port_b))
-                        p.wait()
-                    except Exception as e:
-                        logging.error(f"Error disconnecting jack port : {str(e)}")
-            except Exception as e:
-                logging.error(f"Error while disconnecting ports : {str(e)}")
-            ###
-
-            # Connect to selected track's output ports
-            for port in jack_client.get_all_connections('system:playback_1'):
-                process_jack_port(jack_client, port.name, jack_capture_port_a, jack_basenames)
-            for port in jack_client.get_all_connections('system:playback_2'):
-                process_jack_port(jack_client, port.name, jack_capture_port_b, jack_basenames)
-            ###
-
-        def process_jack_port(jack_client, port, target, active_jack_basenames):
-            try:
-                for jack_basename in active_jack_basenames:
-                    if not (port.startswith("JUCE") or port.startswith(
-                            "system")) and port.startswith(jack_basename):
-                        logging.debug("ACCEPTED {}".format(port))
-                        # jack_client.connect(port, target)
-                        p = Popen(("jack_connect", port, target))
-                        p.wait()
-                    else:
-                        logging.debug("REJECTED {}".format(port))
-            except Exception as e:
-                logging.error(f"Error processing jack port : {port}({str(e)})")
-
-        if self.jack_client is None:
-            logging.info(f'*** Jack client not set. Starting jack client init timer')
-            self.__jack_client_init_timer__.start()
-        else:
-            selected_track = self.song.tracksModel.getTrack(self.zyngui.screens["session_dashboard"].selectedTrack)
-            worker_thread = threading.Thread(target=task, args=(
-            self.zyngui, self.jack_client, "zynthiloops_audio_levels_client:synth_port_a",
-            "zynthiloops_audio_levels_client:synth_port_b", selected_track))
-            worker_thread.start()
-
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
 
@@ -1251,11 +1174,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             #self.countInValue = countInBars * 4
             logging.debug(
-                f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} {self.clip_to_record_path}")
+                f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} \
+                --port zynthiloops_audio_levels_client:T{track.id + 1}A \
+                --port zynthiloops_audio_levels_client:T{track.id + 1}B \
+                {self.clip_to_record_path}")
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments, self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments,
+                                               "--port", f"zynthiloops_audio_levels_client:T{track.id + 1}A", "--port",
+                                               f"zynthiloops_audio_levels_client:T{track.id + 1}B",
+                                               self.clip_to_record_path), stdout=PIPE, stderr=PIPE)
             else:
                 if channel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"

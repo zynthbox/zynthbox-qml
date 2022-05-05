@@ -308,9 +308,12 @@ class zynthiloops_track(QObject):
 
             for port_name in jack_basenames:
                 try:
-                    for port in jack.Client("").get_ports(name_pattern=port_name, is_output=True):
-                        logging.error(f"Connecting port zynthiloops_audio_levels_client:T{self.id + 1} -> {port.name}")
-                        p = Popen(("jack_connect", f"zynthiloops_audio_levels_client:T{self.id + 1}", port.name))
+                    ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
+
+                    # Map first port from jack.Client.get_ports to track A and second port to track B
+                    for port in zip(ports, [f"T{self.id + 1}A", f"T{self.id + 1}B"]):
+                        logging.error(f"Connecting port zynthiloops_audio_levels_client:{port[1]} -> {port[0]}")
+                        p = Popen(("jack_connect", f"zynthiloops_audio_levels_client:{port[1]}", port[0]))
                         p.wait()
                 except Exception as e:
                     logging.error(f"Error processing jack port for T{self.id + 1} : {port}({str(e)})")

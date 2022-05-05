@@ -656,7 +656,7 @@ don't want to have to dig too far...
         for (var i = 0; i < 10; ++i) {
             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
             if (sequence) {
-                sequence.activePattern = theTrack.connectedPattern;
+                sequence.setActiveTrack(theTrack.id, 0);
             }
         }
     }
@@ -770,12 +770,17 @@ don't want to have to dig too far...
                         onTriggered: {
                             var foundTrack = null;
                             var foundIndex = -1;
-                            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                                if (track && track.connectedPattern === patternObject.thisPatternIndex) {
-                                    foundTrack = track;
-                                    foundIndex = i;
-                                    break;
+                            if (patternObject.thisPattern.trackIndex > -1) {
+                                foundIndex = patternObject.thisPattern.trackIndex;
+                                foundTrack = zynthian.zynthiloops.song.tracksModel.getTrack(patternObject.thisPattern.trackIndex)
+                            } else {
+                                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                    if (track && track.connectedPattern === patternObject.thisPatternIndex) {
+                                        foundTrack = track;
+                                        foundIndex = i;
+                                        break;
+                                    }
                                 }
                             }
                             patternObject.associatedTrack = foundTrack;
@@ -869,27 +874,32 @@ don't want to have to dig too far...
                         onSamplesChanged: {
                             adoptSamples();
                         }
+                        onSelectedPartChanged: {
+                            sceneClipItem.updateEnabledFromClips();
+                        }
                     }
                     Component.onCompleted: {
                         adoptTrackLayer();
                     }
                     // Our basic structure is logically scene contains tracks which contain patterns, but in reality it's a set of parallel structures
                     // the scene model basically contains only scenes
-                    // the tracks contain clips, each of which corresponds to a scene
+                    // the tracks contain clips, each of which corresponds to a scene, and references a part (held as an index, though they are named a, b, c, d, and e)
                     // there is further a set of sequence models which are partnered each to a scene, and inside each sequence is a pattern, which is paired with a track
                     // Which means that, logically, the structure is actually more:
                     // The scene model contains scenes
                     //   Each scene contains a sequence
-                    //     Each sequence contains a number of patterns equal to the number of tracks
+                    //     Each sequence contains a number of patterns equal to the number of tracks multiplied by the number of parts in each track
                     // The tracks model contains clips
                     //   Each row of clips corresponds to one scene (so all clips in the same position in each track correspond to the same scene)
-                    //   Each individual clip corresponds to one pattern (specifically the pattern in the track's position, in the scene associated with the clip)
-                    // Synchronising the states means matching each pattern with the clip matching it in each track
+                    //   Each individual clip holds a set of parts
+                    //   Each part in a clip corresponds to one pattern
+                    // Synchronising the states means matching each pattern with the part in the clip matching it in each track
                     Timer {
                         id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
                         onTriggered: {
                             var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
-                            patternObject.thisPattern.enabled = clipInScene;
+                            var isSelectedPart = (patternObject.associatedTrack.selectedPart === patternObject.thisPattern.partIndex);
+                            patternObject.thisPattern.enabled = clipInScene && isSelectedPart;
                         }
                     }
                     Timer {
@@ -897,10 +907,13 @@ don't want to have to dig too far...
                         onTriggered: {
                             var enabledClip = patternObject.thisPattern.enabled ? sceneObject.thisIndex : -1;
                             var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
-                            if (patternObject.thisPattern.enabled && !clipInScene) {
-                                zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(sceneClipItem.clip);
-                            } else if (!patternObject.thisPattern.enabled && clipInScene) {
-                                zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(sceneClipItem.clip);
+                            // Only update clips if we're actually the selected pattern
+                            if (patternObject.associatedTrack.selectedPart === patternObject.thisPattern.partIndex) {
+                                if (patternObject.thisPattern.enabled && !clipInScene) {
+                                    zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(sceneClipItem.clip);
+                                } else if (!patternObject.thisPattern.enabled && clipInScene) {
+                                    zynthian.zynthiloops.song.scenesModel.removeClipFromCurrentScene(sceneClipItem.clip);
+                                }
                             }
                         }
                     }

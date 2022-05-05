@@ -61,16 +61,18 @@ class zynthian_gui_network(zynthian_gui_selector):
 
         self.list_data.append((self.network_info, 0, "Network Info"))
 
-        if zynconf.is_wifi_active():
-            if zynconf.is_service_active("hostapd"):
-                self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi Hotspot"))
-            else:
-                self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi"))
-        else:
-            self.list_data.append((self.start_wifi, 0, "[  ] Wi-Fi"))
-            self.list_data.append(
-                (self.start_wifi_hotspot, 0, "[  ] Wi-Fi Hotspot")
-            )
+        #if zynconf.is_wifi_active():
+            #if zynconf.is_service_active("hostapd"):
+                #self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi Hotspot"))
+            #else:
+                #self.list_data.append((self.stop_wifi, 0, "[x] Wi-Fi"))
+        #else:
+            #self.list_data.append((self.start_wifi, 0, "[  ] Wi-Fi"))
+            #self.list_data.append(
+                #(self.start_wifi_hotspot, 0, "[  ] Wi-Fi Hotspot")
+            #)
+        self.list_data.append((self.wifi_settings, 0, "Wifi"))
+
 
         if zynconf.is_service_active("vncserver@:1"):
             self.list_data.append((self.stop_vncserver, 0, "[x] VNC Server"))
@@ -198,15 +200,10 @@ class zynthian_gui_network(zynthian_gui_selector):
         self.zyngui.show_modal("network")
 
     def network_info(self):
-        # self.zyngui.show_info("NETWORK INFO\n")
-        #
-        # res = zynconf.network_info()
-        # for k, v in res.items():
-        #     self.zyngui.add_info(" {} => {}\n".format(k, v[0]), v[1])
-        #
-        # self.zyngui.hide_info_timer(5000)
-        # self.zyngui.stop_loading()
         self.zyngui.show_modal("network_info")
+
+    def wifi_settings(self):
+        self.zyngui.show_modal("wifi_settings")
 
     def start_wifi(self):
         if not zynconf.start_wifi():

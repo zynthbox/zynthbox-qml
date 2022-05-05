@@ -67,6 +67,7 @@ from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
+from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
 from zynqtgui.zynthiloops.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
@@ -1040,6 +1041,7 @@ class zynthian_gui(QObject):
         self.screens["admin"] = zynthian_gui_admin(self)
         self.screens["guioptions"] = zynthian_gui_guioptions(self)
         self.screens["audio_settings"] = zynthian_gui_audio_settings(self)
+        self.screens["wifi_settings"] = zynthian_gui_wifi_settings(self)
         self.screens["synth_behaviour"] = zynthian_gui_synth_behaviour(self)
         self.screens["snapshots_menu"] = zynthian_gui_snapshots_menu(self)
         self.screens["sound_categories"] = zynthian_gui_sound_categories(self)
@@ -3272,6 +3274,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def audio_settings(self):
         return self.screens["audio_settings"]
+
+    @Property(QObject, constant=True)
+    def wifi_settings(self):
+        return self.screens["wifi_settings"]
 
     @Property(QObject, constant=True)
     def synth_behaviour(self):

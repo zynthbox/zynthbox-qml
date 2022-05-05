@@ -927,7 +927,7 @@ Zynthian.ScreenPage {
                                     }
 
                                     sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                                    pattern: track.connectedPattern >= 0 && sequence ? sequence.get(track.connectedPattern) : null
+                                    pattern: track.connectedPattern >= 0 && sequence ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
@@ -941,7 +941,7 @@ Zynthian.ScreenPage {
                                             root.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
 
                                             if (track.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(track.connectedPattern).enabled = track.sceneClip.inCurrentScene;
+                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(track.id, track.selectedPart).enabled = track.sceneClip.inCurrentScene;
                                             }
                                             dblTimer.stop()
                                             return
@@ -1086,8 +1086,8 @@ Zynthian.ScreenPage {
                                             // Copy Clip
                                             destClip.copyFrom(sourceClip)
                                             // Copy pattern
-                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
-                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
+                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).getByPart(sourceClip.clipTrack.id, sourceClip.clipTrack.selectedPart)
+                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).getByPart(destClip.clipTrack.id, destClip.clipTrack.selectedPart)
                                             destPattern.cloneOther(sourcePattern)
 
                                             root.copySourceObj = null
@@ -1102,8 +1102,8 @@ Zynthian.ScreenPage {
                                             for (var i=0; i<sourceTrack.clipsModel.count; i++) {
                                                 var sourceClip = sourceTrack.clipsModel.getClip(i)
                                                 var destClip = destTrack.clipsModel.getClip(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).get(sourceClip.clipTrack.connectedPattern)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).get(destClip.clipTrack.connectedPattern)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).getByPart(sourceClip.clipTrack.id, sourceClip.clipTrack.selectedPart)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).getByPart(destClip.clipTrack.id, destClip.clipTrack.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)
                                             }
@@ -1119,8 +1119,8 @@ Zynthian.ScreenPage {
 
                                             for (var i=0; i<root.song.tracksModel.count; i++) {
                                                 var track = root.song.tracksModel.getTrack(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.copySourceObj.sceneIndex + 65)).get(track.connectedPattern)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).get(track.connectedPattern)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.copySourceObj.sceneIndex + 65)).getByPart(track.id, track.selectedPart)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).getByPart(track.id, track.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)
                                             }
@@ -1146,7 +1146,7 @@ Zynthian.ScreenPage {
                                         // Try clearing pattern if exists.
                                         try {
                                             if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).get(root.lastSelectedObj.clipTrack.connectedPattern).clear()
+                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedSceneIndex + 65)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
                                             }
                                         } catch(e) {}
                                     }

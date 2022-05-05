@@ -119,7 +119,7 @@ Zynthian.Card {
                             return qsTr("PART: %1").arg(text);
     //                    case BottomBar.ControlType.Pattern:
     //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-    //                        var pattern = sequence.get(root.controlObj.clipTrack.connectedPattern)
+    //                        var pattern = sequence.getByPart(root.controlObj.clipTrack.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
                             return text;
@@ -297,7 +297,7 @@ Zynthian.Card {
     //                QQC2.Label {
     //                    visible: controlObj.connectedPattern >= 0
     //                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
-    //                    property QtObject pattern: sequence ? sequence.get(controlObj.connectedPattern) : null
+    //                    property QtObject pattern: sequence ? sequence.getByPart(controlObj.id, controlObj.selectedPart) : null
     //                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
     //                }
                     QQC2.Button {
@@ -319,7 +319,7 @@ Zynthian.Card {
     //                    onClicked: {
     //                        controlObj.clear()
 
-    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).get(controlObj.connectedPattern);
+    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(controlObj.id, controlObj.selectedPart);
     //                        seq.enabled = false;
     //                        controlObj.connectedPattern = -1;
     //                    }

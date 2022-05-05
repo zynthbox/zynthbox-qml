@@ -131,7 +131,7 @@ QQC2.AbstractButton {
                      track.trackAudioType !== "sample-loop" &&
                      root.pattern &&
                      root.pattern.hasNotes
-            source: root.pattern ? "image://pattern/" + root.pattern.sequence.objectName + "/" + root.pattern.sequence.indexOf(root.pattern) + "/" + (root.pattern.bankOffset / 8) + "?" + root.pattern.lastModified : ""
+            source: root.pattern ? root.pattern.thumbnailUrl : ""
         }
 
         QQC2.Label {

@@ -221,68 +221,10 @@ Rectangle {
                                                 property: "value"
                                                 value: model.track.volume
                                             }
-
-                                            // Hack to bind to correct property as it is not possible to read a property value dynamically
-                                            // FIXME : Update AudioLevels class implementation so that the following hack is not required
                                             Binding {
-                                                when: model.track.id === 0
                                                 target: volumeControl
                                                 property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T1
-                                            }
-                                            Binding {
-                                                when: model.track.id === 1
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T2
-                                            }
-                                            Binding {
-                                                when: model.track.id === 2
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T3
-                                            }
-                                            Binding {
-                                                when: model.track.id === 3
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T4
-                                            }
-                                            Binding {
-                                                when: model.track.id === 4
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T5
-                                            }
-                                            Binding {
-                                                when: model.track.id === 5
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T6
-                                            }
-                                            Binding {
-                                                when: model.track.id === 6
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T7
-                                            }
-                                            Binding {
-                                                when: model.track.id === 7
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T8
-                                            }
-                                            Binding {
-                                                when: model.track.id === 8
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T9
-                                            }
-                                            Binding {
-                                                when: model.track.id === 9
-                                                target: volumeControl
-                                                property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.T10
+                                                value: ZL.AudioLevels.tracks[model.track.id]
                                             }
                                         }
 

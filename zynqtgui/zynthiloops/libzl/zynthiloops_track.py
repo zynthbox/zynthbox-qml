@@ -109,10 +109,6 @@ class zynthiloops_track(QObject):
     def chained_sounds_changed_handler(self):
         self.occupiedSlotsChanged.emit()
 
-        # Update zynthiloops recorder ports if selected track chained sounds changes
-        if self.zyngui.session_dashboard.selectedTrack == self.__id__:
-            self.zyngui.zynthiloops.update_recorder_jack_port()
-
     @Property(str, constant=True)
     def className(self):
         return "zynthiloops_track"

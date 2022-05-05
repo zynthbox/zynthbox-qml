@@ -32,7 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
-
+import org.zynthian.quick 1.0 as ZynQuick
 
 // GridLayout so TabbedControlView knows how to navigate it
 Rectangle {
@@ -42,6 +42,7 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -49,7 +50,6 @@ Rectangle {
                 bottomStack.slotsBar.trackButton.checked = true
                 return true;
         }
-        
         return false;
     }
 
@@ -97,8 +97,8 @@ Rectangle {
                     Repeater {
                         model: 10
                         delegate: ColumnLayout {
-                            id: gridColumns
-                            property int colIndex: index
+                            id: trackDelegate
+                            property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index);
 
                             Layout.fillWidth: false
                             Layout.fillHeight: true
@@ -109,17 +109,49 @@ Rectangle {
                             Repeater {
                                 model: 5
                                 delegate: Rectangle {
-                                    id: gridRows
-                                    property int rowIndex: index
+                                    id: partDelegate
+                                    property int partIndex: index
+                                    property QtObject pattern: root.sequence.getByPart(trackDelegate.track.id, model.index)
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     color: "#000000"
-                                    border.color: Kirigami.Theme.highlightColor
-                                    border.width: gridColumns.colIndex === 2 &&
-                                                  gridRows.rowIndex === 3
-                                                    ? 1
-                                                    : 0
+                                    border{
+                                        color: Kirigami.Theme.highlightColor
+                                        width: partDelegate.pattern && partDelegate.pattern.enabled
+                                            ? 1
+                                            : 0
+                                    }
+                                    Image {
+                                        anchors.fill: parent
+                                        anchors.margins: 2
+                                        smooth: false
+                                        visible: trackDelegate.track.trackAudioType !== "sample-loop"
+                                            && partDelegate.pattern
+                                        source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
+                                        Rectangle {
+                                            anchors {
+                                                top: parent.top
+                                                bottom: parent.bottom
+                                            }
+                                            visible: partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                                            color: Kirigami.Theme.highlightColor
+                                            property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
+                                            width: Math.max(1, Math.floor(widthFactor))
+                                            x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
+                                        }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if (trackDelegate.track.selectedPart === partDelegate.partIndex) {
+                                                partDelegate.pattern.enabled = !partDelegate.pattern.enabled;
+                                            } else {
+                                                trackDelegate.track.selectedPart = partDelegate.partIndex;
+                                                partDelegate.pattern.enabled = true;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

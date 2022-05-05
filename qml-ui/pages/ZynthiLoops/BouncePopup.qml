@@ -26,7 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -94,7 +94,7 @@ QQC2.Popup {
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
                     _private.sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+_private.sceneName);
                     if (_private.sequence) {
-                        _private.pattern = sequence.get(_private.selectedTrack.connectedPattern);
+                        _private.pattern = sequence.getByPart(_private.selectedTrack.connectedPattern, _private.selectedTrack.selectedPart);
                         if (_private.pattern) {
                             // If there's currently a pattern set to be solo, let's remember that
                             _private.previousSolo = _private.sequence.soloPattern;

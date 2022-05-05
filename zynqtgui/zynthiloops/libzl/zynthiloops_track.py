@@ -68,6 +68,7 @@ class zynthiloops_track(QObject):
         self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
+        self.__selected_part__ = 0
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -964,3 +965,17 @@ class zynthiloops_track(QObject):
 
     occupiedSlots = Property(int, get_occupiedSlots, notify=occupiedSlotsChanged)
     ### END Property occupiedSlots
+
+    ### Property selectedPart
+    def get_selected_part(self):
+        return self.__selected_part__
+
+    def set_selected_part(self, selected_part):
+        if selected_part != self.__selected_part__:
+            self.__selected_part__ = selected_part
+            self.selectedPartChanged.emit()
+
+    selectedPartChanged = Signal()
+
+    selectedPart = Property(int, get_selected_part, set_selected_part, notify=selectedPartChanged)
+    ### END Property selectedPart

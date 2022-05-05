@@ -77,12 +77,14 @@ Zynthian.BasePlayGrid {
 
     property bool ignoreNextBack: false
     cuiaCallback: function(cuia) {
-        var backButtonClearPatternHelper = function(patternIndex) {
+        var backButtonClearPatternHelper = function(trackIndex) {
             if (zynthian.backButtonPressed) {
                 component.ignoreNextBack = true;
-                var pattern = _private.sequence.get(patternIndex);
-                if (pattern) {
-                    pattern.clear();
+                for (var partIndex = 0; partIndex < _private.partCount; ++partIndex) {
+                    var pattern = _private.sequence.getByPart(trackIndex, partIndex);
+                    if (pattern) {
+                        pattern.clear();
+                    }
                 }
                 return true;
             }
@@ -112,14 +114,14 @@ Zynthian.BasePlayGrid {
                 returnValue = true;
                 break;
             case "SELECT_UP":
-                if (_private.sequence && _private.sequence.activePattern > 0) {
-                    component.pickPattern(_private.sequence.activePattern - 1);
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex - 1;
                     returnValue = true;
                 }
                 break;
             case "SELECT_DOWN":
-                if (_private.sequence && _private.sequence.activePattern < _private.sequence.rowCount()) {
-                    component.pickPattern(_private.sequence.activePattern + 1);
+                if (zynthian.session_dashboard.selectedTrack < _private.trackCount) {
+                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex + 1;
                     returnValue = true;
                 }
                 break;
@@ -279,11 +281,17 @@ Zynthian.BasePlayGrid {
     }
 
     function pickPattern(patternIndex) {
-        for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-            if (track && track.connectedPattern === patternIndex) {
-                zynthian.session_dashboard.selectedTrack = i;
-                break;
+        var patternObject = _private.sequence.get(patternIndex);
+        if (patternObject.trackIndex > -1 && patternObject.partIndex > -1) {
+            zynthian.session_dashboard.selectedTrack = patternObject.trackIndex;
+            // TODO also set the part on the track
+        } else {
+            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                if (track && track.connectedPattern === patternIndex) {
+                    zynthian.session_dashboard.selectedTrack = i;
+                    break;
+                }
             }
         }
         _private.sequence.activePattern = patternIndex
@@ -314,8 +322,10 @@ Zynthian.BasePlayGrid {
     QtObject {
         id:_private;
         // Yes, this is a hack - if we don't do this, we'll forever be rebuilding the patterns popup etc when the sequence and pattern changes, which is all manner of expensive
-        property int sequencePatternCount: 10
-        property int activeBarModelWidth: 16
+        readonly property int trackCount: 10
+        readonly property int partCount: 5
+        readonly property int activeBarModelWidth: 16
+
         property QtObject sequence
         property int activePattern: sequence ? sequence.activePattern : -1
         property QtObject activePatternModel: sequence ? sequence.activePatternObject : null;
@@ -350,18 +360,27 @@ Zynthian.BasePlayGrid {
             repeat: false;
             interval: 1;
             onTriggered: {
-                var foundTrack = null;
-                var foundIndex = -1;
-                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                    if (track && track.connectedPattern === _private.activePattern) {
-                        foundTrack = track;
-                        foundIndex = i;
-                        break;
+                if (_private.activePatternModel) {
+                    var foundTrack = null;
+                    var foundIndex = -1;
+                    if (_private.activePatternModel.trackIndex > -1) {
+                        foundTrack = zynthian.zynthiloops.song.tracksModel.getTrack(_private.activePatternModel.trackIndex)
+                        foundIndex = _private.activePatternModel.trackIndex;
+                    } else {
+                        for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                            if (track && track.connectedPattern === _private.activePattern) {
+                                foundTrack = track;
+                                foundIndex = i;
+                                break;
+                            }
+                        }
                     }
+                    _private.associatedTrack = foundTrack;
+                    _private.associatedTrackIndex = foundIndex;
+                } else {
+                    _private.updateTrack();
                 }
-                _private.associatedTrack = foundTrack;
-                _private.associatedTrackIndex = foundIndex;
             }
         }
 
@@ -1140,19 +1159,18 @@ Zynthian.BasePlayGrid {
                         id: patternsMenuListView
                         clip: true
                         cacheBuffer: height * 2 // a little brutish, but it means all our delegates always exist, which is what we're actually after here
-                        model: _private.sequencePatternCount
+                        model: _private.trackCount
                         Connections {
                             target: _private
-                            onActivePatternChanged: {
-                                patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePattern / 5), ListView.Beginning);
+                            onActivePatternModelChanged: {
+                                patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.trackIndex / 5), ListView.Beginning);
                             }
                         }
 
                         delegate: Rectangle {
                             id: patternsMenuItem
-                            property QtObject thisPattern: _private.sequence ? _private.sequence.get(model.index) : null
-                            property int thisPatternIndex: model.index
-                            property int bankIndex: thisPattern ? thisPattern.bankOffset / 8 : 0
+                            property QtObject thisPattern: _private.sequence && associatedTrack ? _private.sequence.getByPart(model.index, associatedTrack.selectedPart) : null
+                            property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
                             property int activePattern: _private.activePattern
                             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
                             property QtObject associatedTrack: null
@@ -1161,7 +1179,7 @@ Zynthian.BasePlayGrid {
                             width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
                             Kirigami.Theme.inherit: false
                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: activePattern === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
+                            color: _private.activePatternModel && _private.activePatternModel.trackIndex === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
                             border.color: Kirigami.Theme.textColor
                             function pickThisPattern() {
                                 component.pickPattern(patternsMenuItem.thisPatternIndex)
@@ -1172,18 +1190,27 @@ Zynthian.BasePlayGrid {
                             Timer {
                                 id: trackAdopterTimer; interval: 1; repeat: false; running: false
                                 onTriggered: {
-                                    var foundTrack = null;
-                                    var foundIndex = -1;
-                                    for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                                        var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                                        if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
-                                            foundTrack = track;
-                                            foundIndex = i;
-                                            break;
+                                    if (patternsMenuItem.thisPattern) {
+                                        var foundTrack = null;
+                                        var foundIndex = -1;
+                                        if (patternsMenuItem.thisPattern.trackIndex > -1) {
+                                            foundIndex = patternsMenuItem.thisPattern.trackIndex;
+                                            foundTrack = zynthian.zynthiloops.song.tracksModel.getTrack(patternsMenuItem.thisPattern.trackIndex)
+                                        } else {
+                                            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
+                                                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                                if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
+                                                    foundTrack = track;
+                                                    foundIndex = i;
+                                                    break;
+                                                }
+                                            }
                                         }
+                                        patternsMenuItem.associatedTrack = foundTrack;
+                                        patternsMenuItem.associatedTrackIndex = foundIndex;
+                                    } else {
+                                        trackAdopterTimer.restart();
                                     }
-                                    patternsMenuItem.associatedTrack = foundTrack;
-                                    patternsMenuItem.associatedTrackIndex = foundIndex;
                                 }
                             }
                             Connections {
@@ -1300,7 +1327,7 @@ Zynthian.BasePlayGrid {
                                             Image {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
-                                                source: _private.sequence ? "image://pattern/" + _private.sequence.objectName + "/" + patternsMenuItem.thisPatternIndex + "/" + patternsMenuItem.bankIndex + "?" + patternsMenuItem.thisPattern.lastModified : ""
+                                                source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
                                                 Rectangle {
                                                     anchors {
                                                         top: parent.top
@@ -1593,7 +1620,9 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     text: _private.sequence && _private.sequence.soloPattern > -1
                         ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + " " + _private.sceneName + "\nSOLO"
-                        : "Pattern:\n" + (_private.activePattern + 1) + " " + _private.sceneName + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)");
+                        : _private.activePatternModel
+                            ? "Pattern:\n" + _private.sceneName + "-" + (_private.activePatternModel.trackIndex + 1) + (_private.activePatternModel.partName) + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)")
+                            : "";
                     onClicked: {
                         sidebarRoot.hideAllMenus();
                         component.showPatternsMenu = !component.showPatternsMenu;

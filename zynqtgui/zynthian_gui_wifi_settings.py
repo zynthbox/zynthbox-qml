@@ -31,6 +31,8 @@ from subprocess import check_output
 from PySide2.QtCore import Property, QTimer, Signal, Slot
 
 import logging
+
+import zynconf
 import zyngine
 from . import zynthian_qt_gui_base
 
@@ -42,6 +44,9 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
         super(zynthian_gui_wifi_settings, self).__init__(parent)
         self.wpa_supplicant_config_fpath = os.environ.get('ZYNTHIAN_CONFIG_DIR', "/zynthian/config") + "/wpa_supplicant.conf"
 
+        self.available_wifi_networks = []
+        self.saved_wifi_networks = []
+
     def show(self):
         pass
 
@@ -51,10 +56,21 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
+    @Slot(None)
+    def reloadLists(self):
+        def task():
+            self.update_saved_wifi_networks_list()
+            self.update_available_wifi_networks_list()
+            self.wifiModeChanged.emit()
+            self.zyngui.end_long_task()
+
+        self.zyngui.do_long_task(task)
+
     ### BELOW METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
-    @Slot(None, result='QVariantMap')
-    def list_available_wifi_networks(self):
+    def update_available_wifi_networks_list(self):
         wifiList = OrderedDict()
+        saved_wifi_ssids = [x["ssid"] for x in self.saved_wifi_networks]
+
         try:
             for interface_byte in check_output("ifconfig -a | sed 's/[ \t].*//;/^$/d'", shell=True).splitlines():
                 interface = interface_byte.decode("utf-8")
@@ -78,7 +94,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
                         if line.find('ESSID') >= 0:
                             network = {'encryption': False, 'quality': 0, 'signalLevel': 0}
                             ssid = line.split(':')[1].replace("\"", "")
-                            if ssid:
+                            if ssid and ssid not in saved_wifi_ssids:
                                 self.add_network(wifiList, ssid, network, encryption, quality, signal_level)
                                 logging.error("Found Network: %s" % ssid)
                                 encryption = False
@@ -97,7 +113,26 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
         except Exception as e:
             logging.error(e)
 
-        return dict(wifiList)
+        self.available_wifi_networks = [{"ssid": ssid, **values} for ssid, values in wifiList.items()]
+        self.availableWifiNetworksChanged.emit()
+
+    def update_saved_wifi_networks_list(self):
+        idx = 0
+        networks = []
+        p = re.compile('.*?network=\\{.*?ssid=\\"(.*?)\\".*?psk=\\"(.*?)\\"\n?(.*?)\\}.*?', re.I | re.M | re.S)
+        iterator = p.finditer(self.read_wpa_supplicant_config())
+        for m in iterator:
+            networks.append({
+                'idx': idx,
+                'ssid': m.group(1),
+                'ssid64': base64.b64encode(m.group(1).encode())[:5],
+                'psk': m.group(2),
+                'options': m.group(3)
+            })
+            idx += 1
+
+        self.saved_wifi_networks = networks
+        self.savedWifiNetworksChanged.emit()
 
     def add_network(self, wifiList, ssid, network, encryption, quality, signalLevel):
         network['quality'] = quality
@@ -113,24 +148,6 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
                 wifiList.update({ssid: network})
         else:
             wifiList.update({ssid: network})
-
-    @Slot(None, result='QVariantList')
-    def list_saved_wifi_networks(self):
-        idx = 0
-        networks = []
-        p = re.compile('.*?network=\\{.*?ssid=\\"(.*?)\\".*?psk=\\"(.*?)\\"\n?(.*?)\\}.*?', re.I | re.M | re.S)
-        iterator = p.finditer(self.read_wpa_supplicant_config())
-        for m in iterator:
-            networks.append({
-                'idx': idx,
-                'ssid': m.group(1),
-                'ssid64': base64.b64encode(m.group(1).encode())[:5],
-                'psk': m.group(2),
-                'options': m.group(3)
-            })
-            idx += 1
-
-        return networks
 
     def read_wpa_supplicant_config(self):
         try:
@@ -205,3 +222,64 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
 
         self.save_wpa_supplicant_config(wpa_supplicant_header)
     ### ABOVE METHODS ARE DERIVED FROM WEBCONF wifi_config_handler.py
+
+    def startWifi(self):
+        if not zynconf.start_wifi():
+            logging.error("Can't start WIFI network!")
+            return False
+        else:
+            return True
+
+    def stopWifi(self):
+        if not zynconf.stop_wifi():
+            logging.error("Can't start WIFI network!")
+            return False
+        else:
+            return True
+
+    def startHotspot(self):
+        if not zynconf.start_wifi_hotspot():
+            logging.error("Can't start WIFI Hotspot!")
+            return False
+        else:
+            return True
+
+    ### Property wifiMode
+    def get_wifiMode(self):
+        return zynconf.get_current_wifi_mode()
+
+    def set_wifiMode(self, mode):
+        def task():
+            if mode == "on":
+                self.startWifi()
+            elif mode == "hotspot":
+                self.startHotspot()
+            else:
+                self.stopWifi()
+            self.wifiModeChanged.emit()
+            self.zyngui.end_long_task()
+
+        self.zyngui.do_long_task(task)
+
+    wifiModeChanged = Signal()
+
+    wifiMode = Property(str, get_wifiMode, set_wifiMode, notify=wifiModeChanged)
+    ### End Property wifiMode
+
+    ### Property availableWifiNetworks
+    def get_availableWifiNetworks(self):
+        return self.available_wifi_networks
+
+    availableWifiNetworksChanged = Signal()
+
+    availableWifiNetworks = Property('QVariantList', get_availableWifiNetworks, notify=availableWifiNetworksChanged)
+    ### END Property availableWifiNetworks
+
+    ### Property savedWifiNetworks
+    def get_savedWifiNetworks(self):
+        return self.saved_wifi_networks
+
+    savedWifiNetworksChanged = Signal()
+
+    savedWifiNetworks = Property('QVariantList', get_savedWifiNetworks, notify=savedWifiNetworksChanged)
+    ### END Property savedWifiNetworks

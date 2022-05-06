@@ -876,6 +876,11 @@ don't want to have to dig too far...
                         }
                         onSelectedPartChanged: {
                             sceneClipItem.updateEnabledFromClips();
+                            if (patternObject.thisPattern.trackIndex === sceneObject.sequence.activePatternObject.trackIndex) {
+                                if (patternObject.thisPattern.partIndex === patternObject.associatedTrack.selectedPart) {
+                                    sceneObject.sequence.activePattern = patternObject.thisPatternIndex;
+                                }
+                            }
                         }
                     }
                     Component.onCompleted: {

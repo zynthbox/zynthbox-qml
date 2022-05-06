@@ -28,7 +28,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Window 2.1
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -1173,8 +1173,8 @@ Zynthian.BasePlayGrid {
                             property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
                             property int activePattern: _private.activePattern
                             property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
-                            property QtObject associatedTrack: null
-                            property int associatedTrackIndex: -1
+                            property QtObject associatedTrack: zynthian.zynthiloops.song && zynthian.zynthiloops.song.tracksModel ? zynthian.zynthiloops.song.tracksModel.getTrack(model.index) : null
+                            property int associatedTrackIndex: model.index
                             height: ListView.view.height * 0.2
                             width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
                             Kirigami.Theme.inherit: false
@@ -1183,58 +1183,6 @@ Zynthian.BasePlayGrid {
                             border.color: Kirigami.Theme.textColor
                             function pickThisPattern() {
                                 component.pickPattern(patternsMenuItem.thisPatternIndex)
-                            }
-                            function adoptTrackLayer() {
-                                trackAdopterTimer.restart();
-                            }
-                            Timer {
-                                id: trackAdopterTimer; interval: 1; repeat: false; running: false
-                                onTriggered: {
-                                    if (patternsMenuItem.thisPattern) {
-                                        var foundTrack = null;
-                                        var foundIndex = -1;
-                                        if (patternsMenuItem.thisPattern.trackIndex > -1) {
-                                            foundIndex = patternsMenuItem.thisPattern.trackIndex;
-                                            foundTrack = zynthian.zynthiloops.song.tracksModel.getTrack(patternsMenuItem.thisPattern.trackIndex)
-                                        } else {
-                                            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                                                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                                                if (track && track.connectedPattern === patternsMenuItem.thisPatternIndex) {
-                                                    foundTrack = track;
-                                                    foundIndex = i;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        patternsMenuItem.associatedTrack = foundTrack;
-                                        patternsMenuItem.associatedTrackIndex = foundIndex;
-                                    } else {
-                                        trackAdopterTimer.restart();
-                                    }
-                                }
-                            }
-                            Connections {
-                                target: patternsMenuItem.thisPattern
-                                onLayerChanged: {
-                                    patternsMenuItem.adoptTrackLayer();
-                                }
-                            }
-                            Connections {
-                                target: zynthian.zynthiloops.song.tracksModel
-                                onConnectedSoundsCountChanged: patternsMenuItem.adoptTrackLayer()
-                                onConnectedPatternsCountChanged: patternsMenuItem.adoptTrackLayer()
-                            }
-                            Connections {
-                                target: zynthian.zynthiloops
-                                onSongChanged: patternsMenuItem.adoptTrackLayer()
-                            }
-                            Connections {
-                                target: patternsMenuItem.associatedTrack
-                                onConnectedPatternChanged: patternsMenuItem.adoptTrackLayer()
-                                onConnectedSoundChanged: patternsMenuItem.adoptTrackLayer()
-                            }
-                            Component.onCompleted: {
-                                adoptTrackLayer();
                             }
                             MouseArea {
                                 anchors.fill: parent
@@ -1299,7 +1247,7 @@ Zynthian.BasePlayGrid {
                                             Layout.fillHeight: true
                                             Layout.preferredHeight: patternsMenuItem.height / 2
                                             Layout.fillWidth: true
-                                            text: "Track:"
+                                            text: patternsMenuItem.associatedTrack ? "Track " + patternsMenuItem.associatedTrack.name : "(no track)"
                                             font.pixelSize: 15
                                             Kirigami.Theme.inherit: false
                                             Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -1309,10 +1257,10 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             Layout.fillHeight: true
                                             Layout.preferredHeight: patternsMenuItem.height / 2
-                                            text: patternsMenuItem.associatedTrack ? patternsMenuItem.associatedTrack.name : "None Associated"
+                                            text: patternsMenuItem.thisPattern ? qsTr("Part %1").arg(patternsMenuItem.thisPattern.partName) : "(no part)"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             onClicked: {
-                                                trackPicker.pickTrack(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
+                                                partPicker.pickPart(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
                                             }
                                         }
                                     }
@@ -1537,52 +1485,65 @@ Zynthian.BasePlayGrid {
                 }
             }
             QQC2.Popup {
-                id: trackPicker
-                function pickTrack(patternIndex, associatedTrackIndex) {
-                    trackPicker.patternIndex = patternIndex;
-                    trackPicker.associatedTrackIndex = associatedTrackIndex;
+                id: partPicker
+                function pickPart(patternIndex, associatedTrackIndex) {
+                    partPicker.patternIndex = patternIndex;
+                    partPicker.associatedTrackIndex = associatedTrackIndex;
                     open();
                 }
                 modal: true
+                parent: QQC2.Overlay.overlay
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)
-                width: parent.width * 0.9
-                height: parent.height * 0.8
                 property int patternIndex: -1
+                property QtObject pattern: patternIndex > -1 && _private.sequence ? _private.sequence.get(partPicker.patternIndex) : null
                 property int associatedTrackIndex: -1
+                property QtObject associatedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(partPicker.associatedTrackIndex)
                 ColumnLayout {
                     anchors.fill: parent
+                    implicitWidth: Kirigami.Units.gridUnit * 30
+                    implicitHeight: Kirigami.Units.gridUnit * 40
                     Kirigami.Heading {
                         Layout.fillWidth: true
-                        text: qsTr("Move Pattern To Another Track")
+                        text: qsTr("Select Active Part For Track %1").arg(partPicker.associatedTrackIndex + 1)
                     }
-                    GridLayout {
+                    ColumnLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        columns: 4
                         Repeater {
-                            model: zynthian.zynthiloops.song.tracksModel
-                            delegate: Zynthian.PlayGridButton {
+                            model: partPicker.associatedTrack ? 5 : 0
+                            delegate: RowLayout {
+                                id: partDelegate
                                 Layout.fillWidth: true
-                                Layout.preferredWidth: trackPicker.width / 4
                                 Layout.fillHeight: true
-                                text: model.track.connectedPattern === trackPicker.patternIndex
-                                    ? qsTr("Remove from:\nTrack %1").arg(model.id + 1)
-                                    : qsTr("Move to:\nTrack %1").arg(model.id + 1)
-                                onClicked: {
-                                    if (model.track.connectedPattern === trackPicker.patternIndex) {
-                                        // Remove the pattern from this track
-                                        model.track.connectedPattern = -1;
-                                    } else {
-                                        // If we already were associated with a track, unassociate, otherwise it gets weird
-                                        if (trackPicker.associatedTrackIndex > -1) {
-                                            var oldTrack = zynthian.zynthiloops.song.tracksModel.getTrack(trackPicker.associatedTrackIndex);
-                                            oldTrack.connectedPattern = -1;
-                                        }
-                                        // Add the pattern to this track
-                                        model.track.connectedPattern = trackPicker.patternIndex;
+                                property QtObject pattern: _private.sequence.getByPart(partPicker.associatedTrackIndex, model.index)
+                                Zynthian.PlayGridButton {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                    enabled: partPicker.associatedTrack.selectedPart !== model.index
+                                    readonly property var partNames: ["a", "b", "c", "d", "e"]
+                                    text: qsTr("Part %1").arg(partNames[model.index])
+                                    onClicked: {
+                                        partPicker.associatedTrack.selectedPart = model.index;
+                                        partPicker.close();
                                     }
-                                    trackPicker.close();
+                                }
+                                Image {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+                                    source: partDelegate.pattern.thumbnailUrl
+                                    Kirigami.Heading {
+                                        anchors {
+                                            fill: parent
+                                            margins: Kirigami.Units.smallSpacing
+                                        }
+                                        horizontalAlignment: Text.AlignRight
+                                        verticalAlignment: Text.AlignBottom
+                                        level: 4
+                                        text: partDelegate.pattern.name
+                                    }
                                 }
                             }
                         }
@@ -1593,7 +1554,7 @@ Zynthian.BasePlayGrid {
                             property QtObject backAction: Kirigami.Action {
                                 text: "Back"
                                 onTriggered: {
-                                    trackPicker.close();
+                                    partPicker.close();
                                 }
                             }
                             property list<QtObject> contextualActions

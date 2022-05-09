@@ -384,7 +384,7 @@ def midi_autoconnect(force=False):
 	#Connect ZynMidiRouter:midi_out to enabled Hardware MIDI Output Ports
 	for hw in hw_in:
 		try:
-			if zynthian_gui_config.midi_filter_output and get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports:
+			if zynthian_gui_config.midi_filter_output and (get_port_alias_id(hw) in zynthian_gui_config.enabled_midi_out_ports or hw.name in  zynthian_gui_config.enabled_midi_out_ports):
 				jclient.connect(zmr_out['midi_out'],hw)
 			else:
 				jclient.disconnect(zmr_out['midi_out'],hw)

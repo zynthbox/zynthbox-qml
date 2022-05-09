@@ -272,7 +272,7 @@ def get_enabled_midi_out_ports(midi_ports):
 		enabled_midi_out_ports=m.group(1).split(",")
 		logging.debug("ENABLED_MIDI_OUT = %s" % enabled_midi_out_ports)
 	else:
-		enabled_midi_out_ports=["ttymidi:MIDI_out"]
+		enabled_midi_out_ports=["system:midi_playback_1", "ttymidi:MIDI_out"]
 		logging.warning("Using default ENABLED MIDI OUT ports")
 	return enabled_midi_out_ports
 

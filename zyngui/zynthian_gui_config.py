@@ -440,7 +440,7 @@ def set_midi_config():
 	midi_filter_rules=midi_filter_rules.replace("\\n","\n")
 
 	# MIDI Ports
-	midi_ports=os.environ.get('ZYNTHIAN_MIDI_PORTS',"DISABLED_IN=\nENABLED_OUT=ttymidi:MIDI_out\nENABLED_FB=")
+	midi_ports=os.environ.get('ZYNTHIAN_MIDI_PORTS',"DISABLED_IN=\nENABLED_OUT=system:midi_playback_1,ttymidi:MIDI_out\nENABLED_FB=")
 	midi_ports=midi_ports.replace("\\n","\n")
 	disabled_midi_in_ports=zynconf.get_disabled_midi_in_ports(midi_ports)
 	enabled_midi_out_ports=zynconf.get_enabled_midi_out_ports(midi_ports)

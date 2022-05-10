@@ -1273,7 +1273,7 @@ Zynthian.BasePlayGrid {
                                         Zynthian.PlayGridButton {
                                             Layout.fillHeight: true
                                             Layout.preferredHeight: patternsMenuItem.height / 2
-                                            text: patternsMenuItem.thisPattern ? qsTr("Part %1").arg(patternsMenuItem.thisPattern.partName) : "(no part)"
+                                            text: patternsMenuItem.thisPattern ? qsTr("Part %1%2").arg(patternsMenuItem.associatedTrackIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             onClicked: {
                                                 partPicker.pickPart(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
@@ -1555,7 +1555,7 @@ Zynthian.BasePlayGrid {
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                     enabled: partPicker.associatedTrack.selectedPart !== model.index
                                     readonly property var partNames: ["a", "b", "c", "d", "e"]
-                                    text: qsTr("Part %1").arg(partNames[model.index])
+                                    text: qsTr("Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
                                     onClicked: {
                                         partPicker.associatedTrack.selectedPart = model.index;
                                         partPicker.close();
@@ -1611,10 +1611,10 @@ Zynthian.BasePlayGrid {
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
-                    text: _private.sequence && _private.sequence.soloPattern > -1
-                        ? "Pattern:\n" + (_private.sequence.soloPattern + 1) + " " + _private.sceneName + "\nSOLO"
+                    text: _private.sequence && _private.sequence.soloPatternObject
+                        ? "Pattern:\nSOLO\n" + _private.sceneName + "-" + (_private.sequence.soloPatternObject.trackIndex + 1) + _private.sequence.soloPatternObject.partName
                         : _private.activePatternModel
-                            ? "Pattern:\n" + _private.sceneName + "-" + (_private.activePatternModel.trackIndex + 1) + (_private.activePatternModel.partName) + "\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)")
+                            ? "Pattern:\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)") + "\n" + _private.sceneName + "-" + (_private.activePatternModel.trackIndex + 1) + _private.activePatternModel.partName
                             : "";
                     onClicked: {
                         sidebarRoot.hideAllMenus();

@@ -102,32 +102,32 @@ Zynthian.ScreenPage {
         ColumnLayout {
             anchors.margins: Kirigami.Units.gridUnit
 
-            RowLayout {
-                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
+//            RowLayout {
+//                Layout.preferredHeight: Kirigami.Units.gridUnit*2.5
 
-                QQC2.Label {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                    Layout.leftMargin: Kirigami.Units.gridUnit
-                    horizontalAlignment: TextInput.AlignLeft
-                    text: qsTr("Wifi")
-                }
+//                QQC2.Label {
+//                    Layout.alignment: Qt.AlignVCenter
+//                    Layout.preferredWidth: Kirigami.Units.gridUnit*8
+//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+//                    Layout.leftMargin: Kirigami.Units.gridUnit
+//                    horizontalAlignment: TextInput.AlignLeft
+//                    text: qsTr("Wifi")
+//                }
 
-                QQC2.Switch {
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: Kirigami.Units.gridUnit*4
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                    checked: zynthian.wifi_settings.wifiMode === "on"
-                    onToggled: {
-                        if (checked) {
-                            zynthian.wifi_settings.wifiMode = "on"
-                        } else {
-                            zynthian.wifi_settings.wifiMode = "off"
-                        }
-                    }
-                }
-            }
+//                QQC2.Switch {
+//                    Layout.alignment: Qt.AlignVCenter
+//                    Layout.preferredWidth: Kirigami.Units.gridUnit*4
+//                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+//                    checked: zynthian.wifi_settings.wifiMode === "on"
+//                    onToggled: {
+//                        if (checked) {
+//                            zynthian.wifi_settings.wifiMode = "on"
+//                        } else {
+//                            zynthian.wifi_settings.wifiMode = "off"
+//                        }
+//                    }
+//                }
+//            }
 
             RowLayout {
                 Layout.preferredHeight: Kirigami.Units.gridUnit*2.5

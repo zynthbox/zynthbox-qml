@@ -71,49 +71,50 @@ class zynthian_gui_main(zynthian_gui_selector):
         # Main Apps
         self.list_data.append((self.zynthiloops, 0, "Looper"))
         self.list_metadata.append({"icon":"../../img/clipsview.svg"})
-
-        self.list_data.append((self.session_dashboard, 0, "Tracks"))
-        self.list_metadata.append({"icon":"../../img/tracks.svg"})
-
-        self.list_data.append((self.song_arranger, 0, "Song Arranger"))
-        self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
-
-        self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
-        self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
         
         self.list_data.append((self.playgrid, 0, "Playground"))
         self.list_metadata.append({"icon":"../../img/playground.svg"})
-        
+
         self.list_data.append((self.layers, 0, "Library"))
         self.list_metadata.append({"icon":"../../img/library.svg"})
+        
+        self.list_data.append((self.song_arranger, 0, "Song Arranger"))
+        self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
+        
+        self.list_data.append((self.admin, 0, "Settings"))
+        self.list_metadata.append({"icon":"../../img/settings.svg"})
+
+        # As per #299, rename Snapshots to Soundsets
+        self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
+        self.list_metadata.append({"icon":"../../img/snapshots.svg"})
+        
+        self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
+        self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
+
+        #self.list_data.append((self.session_dashboard, 0, "Tracks"))
+        #self.list_metadata.append({"icon":"../../img/tracks.svg"})
         
         #if "zynseq" in zynthian_gui_config.experimental_features:
             # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
         # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
 
-        self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
-        self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
+        #self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
+        #self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
 
-        self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
-        self.list_metadata.append({"icon":"../../img/rec.svg"})
+        #self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
+        #self.list_metadata.append({"icon":"../../img/rec.svg"})
 
         # if "autoeq" in zynthian_gui_config.experimental_features:
         #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
 
         # Snapshot Management
         # self.list_data.append((None, 0, ""))
-
-        # As per #299, rename Snapshots to Soundsets
-        self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
-        self.list_metadata.append({"icon":"../../img/snapshots.svg"})
-
+        
         # if len(self.zyngui.screens["layer"].layers) > 0:
             # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
             # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
 
         # self.list_data.append((None, 0, ""))
-        self.list_data.append((self.admin, 0, "Settings"))
-        self.list_metadata.append({"icon":"../../img/settings.svg"})
 
         apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
         if Path(apps_folder).exists():

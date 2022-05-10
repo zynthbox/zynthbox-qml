@@ -593,7 +593,7 @@ Rectangle {
                                                 zynthian.forced_screen_back = "zynthiloops";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                                                 var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                                sequence.setActiveTrack(root.selectedTrack.id, 0);
+                                                sequence.setActiveTrack(root.selectedTrack.id, root.selectedTrack.selectedPart);
                                             }
                                         }
                                     }

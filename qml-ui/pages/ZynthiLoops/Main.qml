@@ -872,6 +872,7 @@ Zynthian.ScreenPage {
                                         target: track
                                         onConnectedPatternChanged: colorTimer.restart()
                                         onTrackAudioTypeChanged: colorTimer.restart()
+                                        onClipsModelChanged: colorTimer.restart()
                                     }
                                     Connections {
                                         target: clipCell.pattern

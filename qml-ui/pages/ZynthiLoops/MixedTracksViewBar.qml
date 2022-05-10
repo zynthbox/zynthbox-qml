@@ -52,6 +52,8 @@ Rectangle {
         var returnValue = false;
         if (bouncePopup.opened) {
             returnValue = bouncePopup.cuiaCallback(cuia);
+        } if (externalMidiChannelPicker.opened) {
+            returnValue = externalMidiChannelPicker.cuiaCallback(cuia);
         } else {
             switch (cuia) {
                 case "SWITCH_TRACKS_MOD_SHORT":
@@ -119,6 +121,9 @@ Rectangle {
 
     BouncePopup {
         id: bouncePopup
+    }
+    ExternalMidiChannelPicker {
+        id: externalMidiChannelPicker
     }
 
     GridLayout {
@@ -220,6 +225,24 @@ Rectangle {
 
                                     Item {
                                         Layout.fillWidth: true
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillHeight: true
+                                        visible: root.selectedTrack.trackAudioType === "external"
+
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: qsTr("External Midi Channel: %1").arg(root.selectedTrack ? (root.selectedTrack.externalMidiChannel > -1 ? root.selectedTrack.externalMidiChannel + 1 : root.selectedTrack.id + 1) : "")
+                                            onClicked: {
+                                                externalMidiChannelPicker.pickChannel(root.selectedTrack);
+                                            }
+                                        }
+                                        Item {
+                                            Layout.fillWidth: false
+                                            Layout.fillHeight: false
+                                            Layout.preferredWidth: Kirigami.Units.gridUnit
+                                        }
                                     }
 
                                     RowLayout {
@@ -558,6 +581,7 @@ Rectangle {
                                         visible: root.selectedTrack &&
                                                  root.selectedTrack.connectedPattern >= 0 &&
                                                  (root.selectedTrack.trackAudioType === "synth" ||
+                                                  root.selectedTrack.trackAudioType === "external" ||
                                                   root.selectedTrack.trackAudioType === "sample-trig" ||
                                                   root.selectedTrack.trackAudioType === "sample-slice")
 

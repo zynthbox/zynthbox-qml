@@ -956,14 +956,22 @@ Zynthian.BasePlayGrid {
                                         text: "TRIG"
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
                                         onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
+                                            if (checked) {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                            } else {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
+                                            }
                                         }
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "SYNTH"
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
                                         onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
+                                            if (checked) {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                            } else {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
+                                            }
                                         }
                                     }
                                 }
@@ -973,14 +981,22 @@ Zynthian.BasePlayGrid {
                                         text: "SLICE"
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
                                         onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination)
+                                            if (checked) {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                            } else {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination)
+                                            }
                                         }
                                     }
                                     Zynthian.PlayGridButton {
                                         text: "LOOP"
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
                                         onClicked: {
-                                            component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination)
+                                            if (checked) {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                            } else {
+                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination)
+                                            }
                                         }
                                     }
                                 }
@@ -1381,7 +1397,11 @@ Zynthian.BasePlayGrid {
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
                                             onClicked: {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination, patternsMenuItem.thisPatternIndex)
+                                                if (checked) {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                } else {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination, patternsMenuItem.thisPatternIndex)
+                                                }
                                             }
                                         }
                                         Zynthian.PlayGridButton {
@@ -1389,7 +1409,11 @@ Zynthian.BasePlayGrid {
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
                                             onClicked: {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
+                                                if (checked) {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                } else {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
+                                                }
                                             }
                                         }
                                     }
@@ -1400,7 +1424,11 @@ Zynthian.BasePlayGrid {
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
                                             onClicked: {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination, patternsMenuItem.thisPatternIndex)
+                                                if (checked) {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                } else {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination, patternsMenuItem.thisPatternIndex)
+                                                }
                                             }
                                         }
                                         Zynthian.PlayGridButton {
@@ -1408,7 +1436,11 @@ Zynthian.BasePlayGrid {
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
                                             onClicked: {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination, patternsMenuItem.thisPatternIndex)
+                                                if (checked) {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                } else {
+                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination, patternsMenuItem.thisPatternIndex)
+                                                }
                                             }
                                         }
                                     }

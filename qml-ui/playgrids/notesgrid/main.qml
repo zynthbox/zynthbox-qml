@@ -205,6 +205,12 @@ Zynthian.BasePlayGrid {
                         onDataChanged: {
                             gridDelegate.refetchNote();
                         }
+                        onModelReset: {
+                            gridDelegate.refetchNote();
+                        }
+                        onRowsChanged: {
+                            gridDelegate.refetchNote();
+                        }
                     }
                 }
             }
@@ -228,6 +234,12 @@ Zynthian.BasePlayGrid {
                     Connections {
                         target: miniGridRepeater.model;
                         onDataChanged: {
+                            miniGridDelegate.refetchNote();
+                        }
+                        onModelReset: {
+                            miniGridDelegate.refetchNote();
+                        }
+                        onRowsChanged: {
                             miniGridDelegate.refetchNote();
                         }
                     }

@@ -1123,10 +1123,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def stopAllPlayback(self):
-        for i in range(self.__song__.partsModel.count):
-            self.__song__.partsModel.getPart(i).stop()
-            for j in range(self.__song__.tracksModel.count):
-                self.__song__.getClip(j, i).stop()
+        for track_index in range(self.__song__.tracksModel.count):
+            self.__song__.tracksModel.getTrack(track_index).stopAllClips()
 
     def update_timer_bpm(self):
         self.click_track_click.set_length(4, self.__song__.bpm)

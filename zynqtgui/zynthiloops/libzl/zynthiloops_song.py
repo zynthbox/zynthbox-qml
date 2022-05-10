@@ -82,10 +82,14 @@ class zynthiloops_song(QObject):
             for _ in range(0, 10):
                 track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
                 self.__tracks_model__.add_track(track)
-                for i in range(0, 10):
-                    clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
-                    track.clipsModel.add_clip(clip)
-                    self.__scenes_model__.addClipToScene(clip, i)
+
+                # Create 5 parts per track
+                for i in range(0, 5):
+                    clipsModel = track.getClipsModelByPart(i)
+                    for j in range(0, 10):
+                        clip = zynthiloops_clip(track.id, j, i, self, clipsModel)
+                        clipsModel.add_clip(clip)
+                        self.__scenes_model__.addClipToScene(clip, j)
         self.bpm_changed.emit()
 
         # Create wav dir for recording
@@ -257,7 +261,7 @@ class zynthiloops_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, track: int, part: int):
+    def getClip(self, track: int, scene: int):
         # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
         if track >= self.__tracks_model__.count:
             return None
@@ -265,10 +269,26 @@ class zynthiloops_song(QObject):
         track = self.__tracks_model__.getTrack(track)
         # logging.error(track.clipsModel.count)
 
-        if part >= track.clipsModel.count:
+        if scene >= track.clipsModel.count:
             return None
 
-        clip = track.clipsModel.getClip(part)
+        clip = track.clipsModel.getClip(scene)
+        # logging.error(clip)
+        return clip
+
+    @Slot(int, int, result=QObject)
+    def getClipByPart(self, track: int, scene: int, part: int):
+        # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
+        if track >= self.__tracks_model__.count:
+            return None
+
+        track = self.__tracks_model__.getTrack(track)
+        # logging.error(track.clipsModel.count)
+
+        if scene >= track.getClipsModelByPart(part).count:
+            return None
+
+        clip = track.getClipsModelByPart(part).getClip(scene)
         # logging.error(clip)
         return clip
 
@@ -394,15 +414,15 @@ class zynthiloops_song(QObject):
         return self.__is_playing__
     isPlaying = Property(bool, notify=__is_playing_changed__)
 
-    @Slot(None)
-    def addTrack(self):
-        track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
-        self.__tracks_model__.add_track(track)
-        for i in range(0, 2): #TODO: keep numer of parts consistent
-            clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
-            track.clipsModel.add_clip(clip)
-            #self.add_clip_to_part(clip, i)
-        self.schedule_save()
+    # @Slot(None)
+    # def addTrack(self):
+    #     track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
+    #     self.__tracks_model__.add_track(track)
+    #     for i in range(0, 2): #TODO: keep numer of parts consistent
+    #         clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
+    #         track.clipsModel.add_clip(clip)
+    #         #self.add_clip_to_part(clip, i)
+    #     self.schedule_save()
 
     def bpm(self):
         return self.__bpm__

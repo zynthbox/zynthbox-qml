@@ -53,7 +53,7 @@ class zynthiloops_track(QObject):
         self.__initial_volume__ = 0
         self.__volume__ = self.__initial_volume__
         self.__audio_level__ = -200
-        self.__clips_model__ = zynthiloops_clips_model(song, self)
+        self.__clips_model__ = [zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self)]
         self.__layers_snapshot = []
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
@@ -77,7 +77,7 @@ class zynthiloops_track(QObject):
 
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
-            self.__samples__.append(zynthiloops_clip(self.id, -1, self.__song__, self, True))
+            self.__samples__.append(zynthiloops_clip(self.id, -1, -1, self.__song__, self, True))
 
         # Small array in which to keep any midi-outs that we might need to restore again
         # when switching between track types. This is done per-chained-sound, so...
@@ -107,6 +107,9 @@ class zynthiloops_track(QObject):
 
         self.chained_sounds_changed.connect(self.update_jack_port)
 
+        self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
+        self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
+
     def chained_sounds_changed_handler(self):
         self.occupiedSlotsChanged.emit()
 
@@ -132,6 +135,11 @@ class zynthiloops_track(QObject):
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         logging.debug(f"Master Volume : {self.master_volume} dB")
+
+    def stopAllClips(self):
+        for part_index in range(0, 5):
+            for clip_index in range(0, self.getClipsModelByPart(part_index).count):
+                self.__song__.getClipByPart(self.__id__, clip_index, part_index).stop()
 
     def save_bank(self):
         bank_dir = Path(self.bankDir)
@@ -211,7 +219,7 @@ class zynthiloops_track(QObject):
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
-                "clips": self.__clips_model__.serialize(),
+                "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
                 "keyzone_mode": self.__keyzone_mode__}
 
@@ -236,7 +244,8 @@ class zynthiloops_track(QObject):
             self.__track_audio_type__ = obj["trackAudioType"]
             self.set_track_audio_type(self.__track_audio_type__, True)
         if "clips" in obj:
-            self.__clips_model__.deserialize(obj["clips"])
+            for x in range(0, 5):
+                self.__clips_model__[x].deserialize(obj["clips"][x], x)
         if "layers_snapshot" in obj:
             self.__layers_snapshot = obj["layers_snapshot"]
             self.sound_data_changed.emit()
@@ -378,9 +387,13 @@ class zynthiloops_track(QObject):
         return self.__type__
     type = Property(str, type, constant=True)
 
+    @Slot(int, result=QObject)
+    def getClipsModelByPart(self, part):
+        return self.__clips_model__[part]
     def clipsModel(self):
-        return self.__clips_model__
-    clipsModel = Property(QObject, clipsModel, constant=True)
+        return self.__clips_model__[self.__selected_part__]
+    clipsModelChanged = Signal()
+    clipsModel = Property(QObject, clipsModel, notify=clipsModelChanged)
 
     @Slot(None)
     def delete(self):
@@ -749,6 +762,7 @@ class zynthiloops_track(QObject):
 
     def set_track_audio_type(self, type:str, force_set=False):
         logging.debug(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
+
         if force_set or type != self.__track_audio_type__:
             for sound in self.__chained_sounds__:
                 try:
@@ -972,7 +986,17 @@ class zynthiloops_track(QObject):
 
     def set_selected_part(self, selected_part):
         if selected_part != self.__selected_part__:
+            old_selected_part = self.__selected_part__
             self.__selected_part__ = selected_part
+
+            self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex,
+                                        old_selected_part).stop()
+
+            clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex, selected_part)
+
+            if clip.inCurrentScene:
+                clip.play()
+
             self.selectedPartChanged.emit()
 
     selectedPartChanged = Signal()

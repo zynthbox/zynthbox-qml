@@ -33,6 +33,7 @@ import Qt.labs.folderlistmodel 2.11
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
+import JuceGraphics 1.0
 
 // GridLayout so TabbedControlView knows how to navigate it
 Rectangle {
@@ -118,9 +119,20 @@ Rectangle {
                                     color: "#000000"
                                     border{
                                         color: Kirigami.Theme.highlightColor
-                                        width: partDelegate.pattern && partDelegate.pattern.enabled
-                                            ? 1
-                                            : 0
+                                        width: (trackDelegate.track.trackAudioType === "sample-loop" && trackDelegate.track.selectedPart === partDelegate.partIndex) ||
+                                               (partDelegate.pattern && partDelegate.pattern.enabled)
+                                                ? 1
+                                                : 0
+                                    }
+                                    WaveFormItem {
+                                        property QtObject clip: trackDelegate.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
+
+                                        anchors.fill: parent
+                                        color: Kirigami.Theme.textColor
+                                        source: clip ? clip.path : ""
+
+                                        visible: trackDelegate.track.trackAudioType === "sample-loop" &&
+                                                 clip && clip.path && clip.path.length > 0
                                     }
                                     Image {
                                         anchors.fill: parent

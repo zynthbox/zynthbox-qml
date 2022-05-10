@@ -69,7 +69,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
             for index, clip in enumerate(scene_data[key]["clips"]):
                 scene_data[key]["clips"][index] = {
                     "row": clip.row,
-                    "col": clip.col
+                    "col": clip.col,
+                    "part": clip.part
                 }
         # logging.error(f"{self.__scenes__}")
         return {
@@ -84,7 +85,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
             for key, val in obj["scenesData"].items():
                 self.__scenes__[key] = val.copy()
                 for index, clip in enumerate(self.__scenes__[key]["clips"]):
-                    self.__scenes__[key]["clips"][index] = self.__song__.getClip(clip["row"], clip["col"])
+                    self.__scenes__[key]["clips"][index] = self.__song__.getClipByPart(clip["row"], clip["col"],
+                                                                                       clip["part"])
             self.endResetModel()
 
         if "selectedIndex" in obj:
@@ -159,7 +161,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
             clip = scene["clips"][i]
 
             # Start all clips except clip to be recorded
-            if clip != self.zyngui.zynthiloops.clipToRecord:
+            if clip != self.zyngui.zynthiloops.clipToRecord and \
+                    clip.part == clip.clipTrack.selectedPart:
                 clip.play()
 
     @Slot(int)

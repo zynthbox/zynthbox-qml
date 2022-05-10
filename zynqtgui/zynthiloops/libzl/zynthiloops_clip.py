@@ -37,11 +37,12 @@ from .libzl import ClipAudioSource
 import logging
 
 class zynthiloops_clip(QObject):
-    def __init__(self, row_index: int, col_index: int, song: QObject, parent=None, is_track_sample=False):
+    def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_track_sample=False):
         super(zynthiloops_clip, self).__init__(parent)
         self.is_track_sample = is_track_sample
         self.__row_index__ = row_index
         self.__col_index__ = col_index
+        self.__part_index__ = part_index
         self.__is_playing__ = False
         self.__initial_length__ = 4
         self.__length__ = self.__initial_length__
@@ -421,6 +422,12 @@ class zynthiloops_clip(QObject):
         self.col_index_changed.emit()
 
     col = Property(int, col, set_col_index, notify=col_index_changed)
+
+
+    def part(self):
+        return self.__part_index__
+
+    part = Property(int, part, constant=True)
 
 
     def name(self):

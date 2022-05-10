@@ -674,7 +674,12 @@ don't want to have to dig too far...
     Timer {
         id: adoptCurrentMidiChannelTimer; interval: 1; repeat: false; running: false
         onTriggered: {
-            ZynQuick.PlayGridManager.currentMidiChannel = zynthian.session_dashboard.selectedTrack;
+            var currentTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+            var newChannel = zynthian.session_dashboard.selectedTrack
+            if (currentTrack && currentTrack.trackAudioType == "external" && currentTrack.externalMidiChannel > -1) {
+                newChannel = currentTrack.externalMidiChannel;
+            }
+            ZynQuick.PlayGridManager.currentMidiChannel = newChannel;
         }
     }
     Connections {
@@ -814,6 +819,7 @@ don't want to have to dig too far...
                             } else {
                                 patternObject.thisPattern.layerData = zynthian.layer.layer_as_json(patternObject.associatedTrack.connectedSound);
                             }
+                            patternObject.thisPattern.externalMidiChannel = patternObject.associatedTrack.externalMidiChannel;
                             sceneClipItem.updateEnabledFromClips();
                         }
                     }
@@ -870,6 +876,7 @@ don't want to have to dig too far...
                             } else {
                                 patternObject.thisPattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
                             }
+                            component.adoptCurrentMidiChannel();
                         }
                         onSamplesChanged: {
                             adoptSamples();
@@ -881,6 +888,10 @@ don't want to have to dig too far...
                                     sceneObject.sequence.activePattern = patternObject.thisPatternIndex;
                                 }
                             }
+                        }
+                        onExternalMidiChannelChanged: {
+                            patternObject.thisPattern.externalMidiChannel = patternObject.associatedTrack.externalMidiChannel;
+                            component.adoptCurrentMidiChannel();
                         }
                     }
                     Component.onCompleted: {
@@ -902,9 +913,13 @@ don't want to have to dig too far...
                     Timer {
                         id: updateEnabledFromClipsTimer; interval: 1; repeat: false; running: false
                         onTriggered: {
-                            var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
-                            var isSelectedPart = (patternObject.associatedTrack.selectedPart === patternObject.thisPattern.partIndex);
-                            patternObject.thisPattern.enabled = clipInScene && isSelectedPart;
+                            if (sceneClipItem.clip) {
+                                var clipInScene = zynthian.zynthiloops.song.scenesModel.isClipInScene(sceneClipItem.clip, sceneClipItem.clip.col);
+                                var isSelectedPart = (patternObject.associatedTrack.selectedPart === patternObject.thisPattern.partIndex);
+                                patternObject.thisPattern.enabled = clipInScene && isSelectedPart;
+                            } else {
+                                updateEnabledFromClipsTimer.restart();
+                            }
                         }
                     }
                     Timer {

@@ -69,6 +69,7 @@ class zynthiloops_track(QObject):
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
         self.__selected_part__ = 0
+        self.__externalMidiChannel__ = -1
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -219,6 +220,8 @@ class zynthiloops_track(QObject):
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
                 "trackAudioType": self.__track_audio_type__,
+                "selectedPart": self.__selected_part__,
+                "externalMidiChannel" : self.__externalMidiChannel__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
                 "keyzone_mode": self.__keyzone_mode__}
@@ -243,6 +246,10 @@ class zynthiloops_track(QObject):
         if "trackAudioType" in obj:
             self.__track_audio_type__ = obj["trackAudioType"]
             self.set_track_audio_type(self.__track_audio_type__, True)
+        if "selectedPart" in obj:
+            self.set_selected_part(obj["selectedPart"])
+        if "externalMidiChannel" in obj:
+            self.set_externalMidiChannel(obj["externalMidiChannel"])
         if "clips" in obj:
             for x in range(0, 5):
                 self.__clips_model__[x].deserialize(obj["clips"][x], x)
@@ -1002,4 +1009,19 @@ class zynthiloops_track(QObject):
     selectedPartChanged = Signal()
 
     selectedPart = Property(int, get_selected_part, set_selected_part, notify=selectedPartChanged)
+    ### END Property selectedPart
+
+    ### Property externalMidiChannel
+    # Logic for this is, -1 is "just use the normal one", anything else is a specific channel
+    def get_externalMidiChannel(self):
+        return self.__externalMidiChannel__
+
+    def set_externalMidiChannel(self, externalMidiChannel):
+        if externalMidiChannel != self.__externalMidiChannel__:
+            self.__externalMidiChannel__ = externalMidiChannel
+            self.externalMidiChannelChanged.emit()
+
+    externalMidiChannelChanged = Signal()
+
+    externalMidiChannel = Property(int, get_externalMidiChannel, set_externalMidiChannel, notify=externalMidiChannelChanged)
     ### END Property selectedPart

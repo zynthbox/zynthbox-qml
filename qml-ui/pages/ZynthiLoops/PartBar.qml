@@ -113,6 +113,7 @@ Rectangle {
                                     id: partDelegate
                                     property int partIndex: index
                                     property QtObject pattern: root.sequence.getByPart(trackDelegate.track.id, model.index)
+                                    property QtObject clip: trackDelegate.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
 
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
@@ -125,14 +126,12 @@ Rectangle {
                                                 : 0
                                     }
                                     WaveFormItem {
-                                        property QtObject clip: trackDelegate.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
-
                                         anchors.fill: parent
                                         color: Kirigami.Theme.textColor
-                                        source: clip ? clip.path : ""
+                                        source: partDelegate.clip ? partDelegate.clip.path : ""
 
                                         visible: trackDelegate.track.trackAudioType === "sample-loop" &&
-                                                 clip && clip.path && clip.path.length > 0
+                                                 partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
                                     }
                                     Image {
                                         anchors.fill: parent
@@ -151,6 +150,36 @@ Rectangle {
                                             property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
                                             width: Math.max(1, Math.floor(widthFactor))
                                             x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
+                                        }
+                                    }
+                                    QQC2.Label {
+                                        anchors.centerIn: parent
+                                        font.pointSize: 8
+                                        visible: ["sample-trig", "sample-slice", "synth", "external"].indexOf(trackDelegate.track.trackAudioType) >= 0
+                                        text: qsTr("%1%2")
+                                                .arg(trackDelegate.track.id + 1)
+                                                .arg(String.fromCharCode(partDelegate.partIndex+65).toLowerCase())
+                                    }
+                                    Rectangle {
+                                        height: 16
+                                        anchors {
+                                            left: parent.left
+                                            top: parent.top
+                                            right: parent.right
+                                        }
+                                        color: "#99888888"
+                                        visible: trackDelegate.track.trackAudioType === "sample-loop" &&
+                                                 detailsLabel.text && detailsLabel.text.trim().length > 0
+
+                                        QQC2.Label {
+                                            id: detailsLabel
+
+                                            anchors.centerIn: parent
+                                            width: parent.width - 4
+                                            elide: "ElideRight"
+                                            horizontalAlignment: "AlignHCenter"
+                                            font.pointSize: 8
+                                            text: partDelegate.clip.path.split("/").pop()
                                         }
                                     }
                                     MouseArea {

@@ -1304,7 +1304,7 @@ Zynthian.BasePlayGrid {
                                             id: soundButton
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: patternsMenuItem.height / 2
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
                                             opacity: enabled ? 1 : 0.7
                                             property string soundName
                                             Component.onCompleted: {

@@ -572,30 +572,11 @@ Zynthian.ScreenPage {
                                         width: 50
                                         height: 3
                                         radius: 100
-                                        color: "#ccbbbbbb"
-                                    }
-                                }
-
-                                Repeater {
-                                    id: slotsFreeIndicatorRepeater
-                                    property int availableSlots: sceneHeaderDelegate.track.trackAudioType === "sample-slice" ? 1 : 5
-
-                                    model: availableSlots - sceneHeaderDelegate.track.occupiedSlots
-                                    delegate: Rectangle {
-                                        width: 50
-                                        height: 3
-                                        radius: 100
-                                        color: "#11ffffff"
-                                    }
-                                }
-
-                                // Spacer in case where number of visible slot is 1
-                                Repeater {
-                                    model: 5 - (slotsOccupiedIndicatorRepeater.model + slotsFreeIndicatorRepeater.model)
-                                    delegate: Rectangle {
-                                        width: 50
-                                        height: 3
-                                        color: "transparent"
+                                        color: slotsOccupiedIndicatorRepeater.model[index] == null
+                                                ? "transparent"
+                                                : slotsOccupiedIndicatorRepeater.model[index]
+                                                    ? "#ccbbbbbb"
+                                                    : "#11ffffff"
                                     }
                                 }
                             }
@@ -716,13 +697,13 @@ Zynthian.ScreenPage {
                             color: {
                                 if (root.copySourceObj === model.track)
                                     return "#ff2196f3"
-                                else if (model.track.trackAudioType === "synth" && model.track.occupiedSlots > 0)
+                                else if (model.track.trackAudioType === "synth" && model.track.occupiedSlotsCount > 0)
                                     return "#66ff0000"
                                 else if (model.track.trackAudioType === "sample-loop")
                                     return "#6600ff00"
-                                else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlots > 0)
+                                else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlotsCount > 0)
                                     return "#66ffff00"
-                                else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlots > 0)
+                                else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlotsCount > 0)
                                     return "#66ffff00"
                                 else if (model.track.trackAudioType === "external")
                                     return "#998e24aa"

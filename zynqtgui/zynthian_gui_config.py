@@ -433,7 +433,7 @@ def set_midi_config():
 	midi_single_active_channel=int(os.environ.get('ZYNTHIAN_MIDI_SINGLE_ACTIVE_CHANNEL',0))
 	midi_prog_change_zs3=int(os.environ.get('ZYNTHIAN_MIDI_PROG_CHANGE_ZS3',1))
 	preset_preload_noteon=int(os.environ.get('ZYNTHIAN_MIDI_PRESET_PRELOAD_NOTEON',1))
-	midi_filter_output=int(os.environ.get('ZYNTHIAN_MIDI_FILTER_OUTPUT',1))
+	midi_filter_output=int(os.environ.get('ZYNTHIAN_MIDI_FILTER_OUTPUT',0))
 	midi_sys_enabled=int(os.environ.get('ZYNTHIAN_MIDI_SYS_ENABLED',1))
 	midi_cc_automode=int(os.environ.get('ZYNTHIAN_MIDI_CC_AUTOMODE',1))
 	midi_network_enabled=int(os.environ.get('ZYNTHIAN_MIDI_NETWORK_ENABLED',0))
@@ -446,7 +446,7 @@ def set_midi_config():
 	midi_filter_rules=midi_filter_rules.replace("\\n","\n")
 
 	# MIDI Ports
-	midi_ports=os.environ.get('ZYNTHIAN_MIDI_PORTS',"DISABLED_IN=\nENABLED_OUT=system:midi_playback_1,ttymidi:MIDI_ou\nENABLED_FB=")
+	midi_ports=os.environ.get('ZYNTHIAN_MIDI_PORTS',"DISABLED_IN=\nENABLED_OUT=ttymidi:MIDI_out\nENABLED_FB=")
 	midi_ports=midi_ports.replace("\\n","\n")
 	disabled_midi_in_ports=zynconf.get_disabled_midi_in_ports(midi_ports)
 	enabled_midi_out_ports=zynconf.get_enabled_midi_out_ports(midi_ports)

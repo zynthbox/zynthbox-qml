@@ -674,12 +674,7 @@ don't want to have to dig too far...
     Timer {
         id: adoptCurrentMidiChannelTimer; interval: 1; repeat: false; running: false
         onTriggered: {
-            var currentTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-            var newChannel = zynthian.session_dashboard.selectedTrack
-            if (currentTrack && currentTrack.trackAudioType == "external" && currentTrack.externalMidiChannel > -1) {
-                newChannel = currentTrack.externalMidiChannel;
-            }
-            ZynQuick.PlayGridManager.currentMidiChannel = newChannel;
+            ZynQuick.PlayGridManager.currentMidiChannel = zynthian.session_dashboard.selectedTrack;
         }
     }
     Connections {

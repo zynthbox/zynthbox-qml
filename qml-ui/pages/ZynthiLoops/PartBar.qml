@@ -44,9 +44,72 @@ Rectangle {
 
     property QtObject bottomBar: null
     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     function cuiaCallback(cuia) {
+        var pattern;
+
         switch (cuia) {
+            case "TRACK_1":
+            case "TRACK_6":
+                pattern = root.sequence.getByPart(root.selectedTrack.id, 0)
+                if (root.selectedTrack.selectedPart === 0) {
+                    pattern.enabled = !pattern.enabled;
+                } else {
+                    root.selectedTrack.selectedPart = 0;
+                    pattern.enabled = true;
+                }
+
+                return true
+
+            case "TRACK_2":
+            case "TRACK_7":
+                pattern = root.sequence.getByPart(root.selectedTrack.id, 1)
+                if (root.selectedTrack.selectedPart === 1) {
+                    pattern.enabled = !pattern.enabled;
+                } else {
+                    root.selectedTrack.selectedPart = 1;
+                    pattern.enabled = true;
+                }
+
+                return true
+
+            case "TRACK_3":
+            case "TRACK_8":
+                pattern = root.sequence.getByPart(root.selectedTrack.id, 2)
+                if (root.selectedTrack.selectedPart === 2) {
+                    pattern.enabled = !pattern.enabled;
+                } else {
+                    root.selectedTrack.selectedPart = 2;
+                    pattern.enabled = true;
+                }
+
+                return true
+
+            case "TRACK_4":
+            case "TRACK_9":
+                pattern = root.sequence.getByPart(root.selectedTrack.id, 3)
+                if (root.selectedTrack.selectedPart === 3) {
+                    pattern.enabled = !pattern.enabled;
+                } else {
+                    root.selectedTrack.selectedPart = 3;
+                    pattern.enabled = true;
+                }
+
+                return true
+
+            case "TRACK_5":
+            case "TRACK_10":
+                pattern = root.sequence.getByPart(root.selectedTrack.id, 4)
+                if (root.selectedTrack.selectedPart === 4) {
+                    pattern.enabled = !pattern.enabled;
+                } else {
+                    root.selectedTrack.selectedPart = 4;
+                    pattern.enabled = true;
+                }
+
+                return true
+
             case "SWITCH_BACK_SHORT":
                 bottomStack.slotsBar.trackButton.checked = true
                 return true;

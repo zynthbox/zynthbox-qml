@@ -97,104 +97,11 @@ Rectangle {
 
                     Repeater {
                         model: 10
-                        delegate: ColumnLayout {
-                            id: trackDelegate
-                            property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index);
-
+                        delegate: PartBarDelegate {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: privateProps.cellWidth
-
-                            spacing: 1
-
-                            Repeater {
-                                model: 5
-                                delegate: Rectangle {
-                                    id: partDelegate
-                                    property int partIndex: index
-                                    property QtObject pattern: root.sequence.getByPart(trackDelegate.track.id, model.index)
-                                    property QtObject clip: trackDelegate.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
-
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    color: "#000000"
-                                    border{
-                                        color: Kirigami.Theme.highlightColor
-                                        width: (trackDelegate.track.trackAudioType === "sample-loop" && trackDelegate.track.selectedPart === partDelegate.partIndex) ||
-                                               (partDelegate.pattern && partDelegate.pattern.enabled)
-                                                ? 1
-                                                : 0
-                                    }
-                                    WaveFormItem {
-                                        anchors.fill: parent
-                                        color: Kirigami.Theme.textColor
-                                        source: partDelegate.clip ? partDelegate.clip.path : ""
-
-                                        visible: trackDelegate.track.trackAudioType === "sample-loop" &&
-                                                 partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
-                                    }
-                                    Image {
-                                        anchors.fill: parent
-                                        anchors.margins: 2
-                                        smooth: false
-                                        visible: trackDelegate.track.trackAudioType !== "sample-loop"
-                                            && partDelegate.pattern
-                                        source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
-                                        Rectangle {
-                                            anchors {
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                            }
-                                            visible: partDelegate.pattern ? partDelegate.pattern.isPlaying : false
-                                            color: Kirigami.Theme.highlightColor
-                                            property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
-                                            width: Math.max(1, Math.floor(widthFactor))
-                                            x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
-                                        }
-                                    }
-                                    QQC2.Label {
-                                        anchors.centerIn: parent
-                                        font.pointSize: 8
-                                        visible: ["sample-trig", "sample-slice", "synth", "external"].indexOf(trackDelegate.track.trackAudioType) >= 0
-                                        text: qsTr("%1%2")
-                                                .arg(trackDelegate.track.id + 1)
-                                                .arg(String.fromCharCode(partDelegate.partIndex+65).toLowerCase())
-                                    }
-                                    Rectangle {
-                                        height: 16
-                                        anchors {
-                                            left: parent.left
-                                            top: parent.top
-                                            right: parent.right
-                                        }
-                                        color: "#99888888"
-                                        visible: trackDelegate.track.trackAudioType === "sample-loop" &&
-                                                 detailsLabel.text && detailsLabel.text.trim().length > 0
-
-                                        QQC2.Label {
-                                            id: detailsLabel
-
-                                            anchors.centerIn: parent
-                                            width: parent.width - 4
-                                            elide: "ElideRight"
-                                            horizontalAlignment: "AlignHCenter"
-                                            font.pointSize: 8
-                                            text: partDelegate.clip.path.split("/").pop()
-                                        }
-                                    }
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            if (trackDelegate.track.selectedPart === partDelegate.partIndex) {
-                                                partDelegate.pattern.enabled = !partDelegate.pattern.enabled;
-                                            } else {
-                                                trackDelegate.track.selectedPart = partDelegate.partIndex;
-                                                partDelegate.pattern.enabled = true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index)
                         }
                     }
 

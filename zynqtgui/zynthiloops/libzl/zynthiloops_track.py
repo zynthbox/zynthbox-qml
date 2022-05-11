@@ -947,9 +947,9 @@ class zynthiloops_track(QObject):
     ### END Property selectedSlotRow
 
     ### Property occupiedSlots
-    @Slot(None, result=int)
+    @Slot(None, result='QVariantList')
     def get_occupiedSlots(self):
-        occupied_slots = 0
+        occupied_slots = []
 
         if self.__track_audio_type__ == "sample-trig":
             logging.debug(f"### get_occupiedSlots : Sample trig")
@@ -958,13 +958,17 @@ class zynthiloops_track(QObject):
                 if sample is not None and \
                         sample.path is not None and \
                         len(sample.path) > 0:
-                    occupied_slots += 1
+                    occupied_slots.append(True)
+                else:
+                    occupied_slots.append(False)
         elif self.__track_audio_type__ == "synth":
             logging.debug(f"### get_occupiedSlots : synth")
             # If type is synth check how many synth engines are selected and chained
             for sound in self.__chained_sounds__:
                 if sound >= 0 and self.checkIfLayerExists(sound):
-                    occupied_slots += 1
+                    occupied_slots.append(True)
+                else:
+                    occupied_slots.append(False)
         elif self.__track_audio_type__ == "sample-slice":
             logging.debug(f"### get_occupiedSlots : Sample slice")
 
@@ -972,7 +976,9 @@ class zynthiloops_track(QObject):
             if self.__samples__[0] is not None and \
                     self.__samples__[0].path is not None and \
                     len(self.__samples__[0].path) > 0:
-                occupied_slots += 1
+                occupied_slots = [True, None, None, None, None]
+            else:
+                occupied_slots = [False, None, None, None, None]
         else:
             logging.debug(f"### get_occupiedSlots : Slots not in use")
             # For any other modes, sample slots are not in use. Hence do not increment occupied_slots
@@ -984,7 +990,21 @@ class zynthiloops_track(QObject):
 
     occupiedSlotsChanged = Signal()
 
-    occupiedSlots = Property(int, get_occupiedSlots, notify=occupiedSlotsChanged)
+    occupiedSlots = Property('QVariantList', get_occupiedSlots, notify=occupiedSlotsChanged)
+    ### END Property occupiedSlots
+
+    ### Property occupiedSlots
+    @Slot(None, result='QVariantList')
+    def get_occupiedSlotsCount(self):
+        count = 0
+
+        for slot in self.occupiedSlots:
+            if slot:
+                count += 1
+
+        return count
+
+    occupiedSlotsCount = Property(int, get_occupiedSlotsCount, notify=occupiedSlotsChanged)
     ### END Property occupiedSlots
 
     ### Property selectedPart

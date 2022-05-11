@@ -33,6 +33,7 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 import "pages" as Pages
 import "pages/SessionDashboard" as SessionDashboard
+import "pages/ZynthiLoops" as Zynthiloops
 
 Kirigami.AbstractApplicationWindow {
     id: root
@@ -699,7 +700,7 @@ Kirigami.AbstractApplicationWindow {
     }
     QQC2.Drawer {
         id: slotSelectionDrawer
-        width: Kirigami.Units.gridUnit * 8
+        width: Kirigami.Units.gridUnit * 16
         height: root.height
         edge: Qt.LeftEdge
         dragMargin: Kirigami.Units.gridUnit * 1.5
@@ -711,45 +712,94 @@ Kirigami.AbstractApplicationWindow {
             id: slotSelectionDelegate
             property real margin: Kirigami.Units.gridUnit * 1
 
-            Rectangle {
-                color: "#222222"
+            RowLayout {
                 anchors {
                     fill: parent
                     leftMargin: Kirigami.Units.gridUnit * 0.5
                     topMargin: Kirigami.Units.gridUnit * 4
                     bottomMargin: Kirigami.Units.gridUnit * 4
                 }
-                radius: 6
-                border.color: Qt.rgba(Kirigami.Theme.textColor.r,
-                                      Kirigami.Theme.textColor.g,
-                                      Kirigami.Theme.textColor.b,
-                                      0.2)
-                border.width: 1
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: slotSelectionDelegate.margin
-                    spacing: slotSelectionDelegate.margin
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#222222"
+                    radius: 6
+                    border.color: Qt.rgba(Kirigami.Theme.textColor.r,
+                                          Kirigami.Theme.textColor.g,
+                                          Kirigami.Theme.textColor.b,
+                                          0.2)
+                    border.width: 1
 
-                    Repeater {
-                        model: 5
-                        delegate: Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                    ColumnLayout {
+                        id: slotsColumn
+                        property bool slotsColumnVisible: ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
 
-                            QQC2.Button {
-                                property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+                        anchors.fill: parent
+                        anchors.margins: slotSelectionDelegate.margin
+                        spacing: slotSelectionDelegate.margin
 
-                                width: parent.width
-                                height: Kirigami.Units.gridUnit * 3
-                                anchors.centerIn: parent
-                                text: index + 1
-                                onClicked: {
-                                    selectedTrack.selectedSlotRow = index;
-                                    dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
-                                    slotSelectionDrawer.position = 0
+                        QQC2.Label {
+                            Layout.alignment: Qt.AlignCenter
+                            visible: slotsColumn.slotsColumnVisible
+                            text: root.selectedTrack.trackAudioType === "synth"
+                                    ? qsTr("Synth Slots")
+                                    : ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+                                        ? qsTr("Sample Slots")
+                                        : ""
+                        }
+
+                        Repeater {
+                            model: slotsColumn.slotsColumnVisible
+                                    ? 5
+                                    : 0
+                            delegate: Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                QQC2.Button {
+                                    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+
+                                    width: parent.width
+                                    height: Kirigami.Units.gridUnit * 3
+                                    anchors.centerIn: parent
+                                    text: index + 1
+                                    onClicked: {
+                                        selectedTrack.selectedSlotRow = index;
+                                        dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
+                                        slotSelectionDrawer.position = 0
+                                    }
                                 }
                             }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#222222"
+                    radius: 6
+                    border.color: Qt.rgba(Kirigami.Theme.textColor.r,
+                                          Kirigami.Theme.textColor.g,
+                                          Kirigami.Theme.textColor.b,
+                                          0.2)
+                    border.width: 1
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: slotSelectionDelegate.margin
+                        spacing: slotSelectionDelegate.margin
+
+                        QQC2.Label {
+                            Layout.alignment: Qt.AlignCenter
+                            text: qsTr("Parts")
+                        }
+
+                        Zynthiloops.PartBarDelegate {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            track: root.selectedTrack
                         }
                     }
                 }

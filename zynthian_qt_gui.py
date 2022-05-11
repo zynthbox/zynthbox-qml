@@ -410,6 +410,7 @@ class zynthian_gui(QObject):
         self.wsleds_blink_count = 0
 
         self.song_bar_active = False
+        self.slots_bar_part_active = False
         self.sound_combinator_active = False
         self.track_wave_editor_bar_active = False
         self.track_samples_bar_active = False
@@ -643,6 +644,19 @@ class zynthian_gui(QObject):
     slotsBarMixerActive = Property(bool, get_slots_bar_mixer_active, set_slots_bar_mixer_active,
                                    notify=slotsBarMixerActiveChanged)
 
+    def get_slots_bar_part_active(self):
+        return self.slots_bar_part_active
+
+    def set_slots_bar_part_active(self, isActive):
+        if self.slots_bar_part_active != isActive:
+            self.slots_bar_part_active = isActive
+            self.screens["zynthiloops"].set_selector()
+            self.slotsBarPartActiveChanged.emit()
+
+    slotsBarPartActiveChanged = Signal()
+
+    slotsBarPartActive = Property(bool, get_slots_bar_part_active, set_slots_bar_part_active, notify=slotsBarPartActiveChanged)
+
     def get_slots_bar_synths_active(self):
         return self.slots_bar_synths_active
 
@@ -731,6 +745,7 @@ class zynthian_gui(QObject):
 
         try:
             track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+            occupied_slots = track.occupiedSlots
 
             # Menu
             if self.modal_screen is None and self.active_screen == "main":
@@ -740,6 +755,25 @@ class zynthian_gui(QObject):
 
             # Light up 1-6 buttons as per opened screen / bottomBar
             for i in range(1, 6):
+                # If parts bar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
+                if self.active_screen == "zynthiloops" and self.slotsBarPartActive:
+                    partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedSceneIndex, i-1)
+
+                    if (track.trackAudioType in ["synth", "sample-trig", "sample-slice", "external"] and track.selectedPart == (i - 1)) or \
+                            (track.trackAudioType == "sample-loop" and partClip and partClip.path and len(partClip.path) > 0):
+                        if track.trackAudioType == "synth":
+                            self.wsled_blink(i, self.wscolor_red)
+                        elif track.trackAudioType in ["sample-trig", "sample-slice"]:
+                            self.wsled_blink(i, self.wscolor_yellow)
+                        elif track.trackAudioType == "sample-loop":
+                            self.wsled_blink(i, self.wscolor_green)
+                        elif track.trackAudioType == "external":
+                            self.wsled_blink(i, self.wscolor_purple)
+                    else:
+                        self.wsled_blink(i, self.wscolor_off)
+
+                    continue
+
                 # If slots synths bar is active, light up filled cells otherwise turn off led
                 if self.active_screen == "zynthiloops" and track.trackAudioType == "synth":
                     if track.chainedSounds[i-1] > -1 and \
@@ -808,17 +842,35 @@ class zynthian_gui(QObject):
 
             # 7 : FX Button
             if self.active_screen == "zynthiloops" and track.trackAudioType == "synth":
-                self.wsleds.setPixelColor(7, self.wscolor_red)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_red)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_red)
             elif self.active_screen == "zynthiloops" and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
-                self.wsleds.setPixelColor(7, self.wscolor_yellow)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_yellow)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_yellow)
             elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
-                self.wsleds.setPixelColor(7, self.wscolor_blue)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_blue)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_blue)
             elif self.active_screen == "zynthiloops" and track.trackAudioType == "sample-loop":
-                self.wsleds.setPixelColor(7, self.wscolor_green)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_green)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_green)
             elif self.active_screen == "zynthiloops" and track.trackAudioType == "external":
-                self.wsleds.setPixelColor(7, self.wscolor_purple)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_purple)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_purple)
             else:
-                self.wsleds.setPixelColor(7, self.wscolor_off)
+                if self.slotsBarPartActive:
+                    self.wsled_blink(7, self.wscolor_off)
+                else:
+                    self.wsleds.setPixelColor(7, self.wscolor_off)
 
             # Stepseq screen:
             if self.modal_screen is None and self.active_screen == "zynthiloops":

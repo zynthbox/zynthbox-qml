@@ -193,23 +193,30 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.trackButton.checked = true
                     }
                 } else {
-                    // Cycle through the trackAudioTypes when alt button is pressed
-                    if (root.selectedTrack.trackAudioType === "synth") {
-                        root.selectedTrack.trackAudioType = "sample-trig"
-                    } else if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        root.selectedTrack.trackAudioType = "sample-slice"
-                    } else if (root.selectedTrack.trackAudioType === "sample-slice") {
-                        root.selectedTrack.trackAudioType = "sample-loop"
-                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
-                        // HACK
-                        // FIXME : When changing trackAudioType to external it somehow first gets selected to "synth"
-                        //         And then on changing the value 2nd time it finally changes to "external"
-                        //         Couldn't find any probable cause for the issue but forcefully setting to external twice
-                        //         seems to do temporarily solve the problem. But this issue needs to be fixed ASAP
-                        root.selectedTrack.trackAudioType = "external"
-                        root.selectedTrack.trackAudioType = "external"
-                    } else if (root.selectedTrack.trackAudioType === "external") {
-                        root.selectedTrack.trackAudioType = "synth"
+//                    // Cycle through the trackAudioTypes when alt button is pressed
+//                    if (root.selectedTrack.trackAudioType === "synth") {
+//                        root.selectedTrack.trackAudioType = "sample-trig"
+//                    } else if (root.selectedTrack.trackAudioType === "sample-trig") {
+//                        root.selectedTrack.trackAudioType = "sample-slice"
+//                    } else if (root.selectedTrack.trackAudioType === "sample-slice") {
+//                        root.selectedTrack.trackAudioType = "sample-loop"
+//                    } else if (root.selectedTrack.trackAudioType === "sample-loop") {
+//                        // HACK
+//                        // FIXME : When changing trackAudioType to external it somehow first gets selected to "synth"
+//                        //         And then on changing the value 2nd time it finally changes to "external"
+//                        //         Couldn't find any probable cause for the issue but forcefully setting to external twice
+//                        //         seems to do temporarily solve the problem. But this issue needs to be fixed ASAP
+//                        root.selectedTrack.trackAudioType = "external"
+//                        root.selectedTrack.trackAudioType = "external"
+//                    } else if (root.selectedTrack.trackAudioType === "external") {
+//                        root.selectedTrack.trackAudioType = "synth"
+//                    }
+
+                    // Toggle between Part and Track bar with FX Button
+                    if (!bottomStack.slotsBar.partButton.checked) {
+                        bottomStack.slotsBar.partButton.checked = true
+                    } else {
+                        bottomStack.slotsBar.trackButton.checked = true
                     }
                 }
 
@@ -281,6 +288,7 @@ Zynthian.ScreenPage {
             if (bottomStack.slotsBar.trackButton.checked) {
                 console.log("LED : Slots Track Bar active")
                 zynthian.slotsBarTrackActive = true;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
@@ -288,13 +296,23 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.mixerButton.checked) {
                 console.log("LED : Slots Mixer Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = true;
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
+            } else if (bottomStack.slotsBar.partButton.checked) {
+                console.log("LED : Slots Part Bar active")
+                zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = true;
+                zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
             } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
@@ -302,6 +320,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
@@ -309,6 +328,7 @@ Zynthian.ScreenPage {
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
@@ -316,6 +336,7 @@ Zynthian.ScreenPage {
             } else {
                 console.log("LED : No Slots Bar active")
                 zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
                 zynthian.slotsBarMixerActive = false;
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;

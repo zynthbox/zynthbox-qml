@@ -1123,6 +1123,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def stopAllPlayback(self):
+        self.click_track_click.queueClipToStop()
+        self.click_track_clack.queueClipToStop()
+
         for track_index in range(self.__song__.tracksModel.count):
             self.__song__.tracksModel.getTrack(track_index).stopAllClips()
 

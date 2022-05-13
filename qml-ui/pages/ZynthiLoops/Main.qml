@@ -899,10 +899,10 @@ Zynthian.ScreenPage {
                                         interval: 10
                                         onTriggered: {
                                             // update color
-                                            if (track.trackAudioType === "sample-loop" && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
+                                            if (track.trackAudioType === "sample-loop" && track.sceneClip && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
                                                 // In scene
                                                 clipCell.backgroundColor = "#3381d4fa";
-                                            } else if (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)) {
+                                            } else if (track.sceneClip && (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col))) {
                                                 // Not in scene
                                                 clipCell.backgroundColor = "#33f44336";
                                             } else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)

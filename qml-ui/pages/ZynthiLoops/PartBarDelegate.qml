@@ -30,7 +30,7 @@ ColumnLayout {
             border{
                 color: Kirigami.Theme.highlightColor
                 width: (root.track.trackAudioType === "sample-loop" && root.track.selectedPart === partDelegate.partIndex) ||
-                       (partDelegate.pattern && partDelegate.pattern.enabled)
+                       (partDelegate.clip && partDelegate.clip.enabled)
                         ? 1
                         : 0
             }
@@ -95,10 +95,10 @@ ColumnLayout {
                 anchors.fill: parent
                 onClicked: {
                     if (root.track.selectedPart === partDelegate.partIndex) {
-                        partDelegate.pattern.enabled = !partDelegate.pattern.enabled;
+                        partDelegate.clip.enabled = !partDelegate.clip.enabled;
                     } else {
                         root.track.selectedPart = partDelegate.partIndex;
-                        partDelegate.pattern.enabled = true;
+                        partDelegate.clip.enabled = true;
                     }
                 }
             }

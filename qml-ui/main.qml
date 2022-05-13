@@ -765,9 +765,7 @@ Kirigami.AbstractApplicationWindow {
                                     anchors.centerIn: parent
                                     text: index + 1
                                     onClicked: {
-                                        selectedTrack.selectedSlotRow = index;
-                                        dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType);
-                                        slotSelectionDrawer.position = 0
+                                        zynthian.callable_ui_action("TRACK_"+(index+1))
                                     }
                                 }
                             }

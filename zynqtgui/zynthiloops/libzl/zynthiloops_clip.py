@@ -74,6 +74,7 @@ class zynthiloops_clip(QObject):
         self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'bank.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
+        self.__enabled__ = False
         self.track = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
@@ -992,3 +993,16 @@ class zynthiloops_clip(QObject):
 
     isTrackSample = Property(bool, get_is_track_sample, constant=True)
     ### END Property isTrackSample
+
+    ### BEGIN Property enabled
+    def get_enabled(self):
+        return self.__enabled__
+    def set_enabled(self, enabled):
+        if self.__enabled__ != enabled:
+            self.__enabled__ = enabled;
+            self.enabled_changed.emit()
+    @Signal
+    def enabled_changed(self):
+        pass
+    enabled = Property(bool, get_enabled, set_enabled, notify=enabled_changed)
+    ### END Property enabled

@@ -64,6 +64,10 @@ Kirigami.AbstractApplicationWindow {
     function openSoundsDialog() {
         soundsDialog.open();
     }
+    function openRecordingPopup() {
+        recordingPopup.open();
+    }
+
     Component.onCompleted: {
         displayWindowTimer.start()
     }
@@ -665,6 +669,7 @@ Kirigami.AbstractApplicationWindow {
             root.showNormal();
             root.visibility = Window.Windowed;
         }
+        onDisplayRecordingPopup: recordingPopup.open()
     }
 
     Connections {
@@ -688,6 +693,10 @@ Kirigami.AbstractApplicationWindow {
                 playGridLoader.item.setId(modelData);
             }
         }
+    }
+
+    Zynthiloops.RecordingPopup {
+        id: recordingPopup
     }
     QQC2.Drawer {
         id: miniPlayGridDrawer

@@ -1595,6 +1595,17 @@ Zynthian.BasePlayGrid {
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                                     source: partDelegate.pattern.thumbnailUrl
+                                    Rectangle {
+                                        anchors {
+                                            top: parent.top
+                                            bottom: parent.bottom
+                                        }
+                                        visible: partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                                        color: Kirigami.Theme.highlightColor
+                                        width: Math.max(1, Math.floor(widthFactor))
+                                        property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
+                                        x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
+                                    }
                                     Kirigami.Heading {
                                         anchors {
                                             fill: parent

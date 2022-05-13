@@ -193,6 +193,7 @@ class zynthiloops_clip(QObject):
                 "pitch": self.__pitch__,
                 "time": self.__time__,
                 "bpm": self.__bpm__,
+                "enabled": self.__enabled__,
                 "shouldSync": self.__should_sync__,
                 "snapLengthToBeat": self.__snap_length_to_beat__,
                 "arrangerBarPositions": self.__arranger_bar_positions__}
@@ -226,7 +227,10 @@ class zynthiloops_clip(QObject):
             self.set_time(self.__time__, True)
         if "bpm" in obj:
             self.__bpm__ = obj["bpm"]
-            self.set_bpm(self.bpm, True)
+            self.set_bpm(self.__bpm__, True)
+        if "enabled" in obj:
+            self.__enabled__ = obj["enabled"]
+            self.set_enabled(self.__enabled__)
         if "shouldSync" in obj:
             self.__should_sync__ = obj["shouldSync"]
             self.set_shouldSync(self.__should_sync__, True)

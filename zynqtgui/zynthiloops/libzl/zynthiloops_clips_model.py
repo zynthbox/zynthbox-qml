@@ -39,6 +39,8 @@ class zynthiloops_clips_model(QAbstractListModel):
         self.__track__ = parentTrack
         self.__song__ = song
         self.__clips__ = []
+        self.__partName__ = "(?)"
+        self.__samples__ = []
 
     def serialize(self):
         data = []
@@ -117,3 +119,39 @@ class zynthiloops_clips_model(QAbstractListModel):
     def count(self):
         return len(self.__clips__)
     count = Property(int, count, notify=countChanged)
+
+    ### BEGIN Property partName
+    def get_partName(self):
+        return self.__partName__
+    def set_partName(self, partName):
+        if self.__partName__ != partName:
+            self.__partName__ = partName;
+            self.partName_changed.emit()
+    @Signal
+    def partName_changed(self):
+        pass
+    partName = Property(str, get_partName, set_partName, notify=partName_changed)
+    ### END Property partName
+
+    ### BEGIN Property samples
+    def get_samples(self):
+        return self.__samples__
+    def set_samples(self, samples):
+        if self.__samples__ != samples:
+            self.__samples = samples;
+            self.samples_changed.emit()
+    @Signal
+    def samples_changed(self):
+        pass
+    @Slot(int)
+    def addSample(self, sample):
+        if not sample in self.__samples__:
+            self.__samples__.append(sample)
+            self.samples_changed.emit()
+    @Slot(int)
+    def removeSample(self, sample):
+        if sample in self.__samples__:
+            self.__samples__.remove(sample)
+            self.samples_changed.emit()
+    samples = Property('QVariantList', get_samples, set_samples, notify=samples_changed)
+    ### END Property samples

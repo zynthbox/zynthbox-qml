@@ -420,6 +420,7 @@ class zynthian_gui(QObject):
         self.slots_bar_synths_active = False
         self.slots_bar_samples_active = False
         self.slots_bar_fx_active = False
+        self.recording_popup_active = False
 
         self.opened_dialog = None
 
@@ -699,6 +700,18 @@ class zynthian_gui(QObject):
     slotsBarFxActive = Property(bool, get_slots_bar_fx_active, set_slots_bar_fx_active,
                                 notify=slotsBarFxActiveChanged)
     ###
+
+    def get_recording_popup_active(self):
+        return self.recording_popup_active
+
+    def set_recording_popup_active(self, isActive):
+        if self.recording_popup_active != isActive:
+            self.recording_popup_active = isActive
+            self.recordingPopupActiveChanged.emit()
+
+    recordingPopupActiveChanged = Signal()
+
+    recordingPopupActive = Property(bool, get_recording_popup_active, set_recording_popup_active, notify=recordingPopupActiveChanged)
 
     def init_wsleds(self):
         if zynthian_gui_config.wiring_layout=="Z2_V1":
@@ -1833,24 +1846,27 @@ class zynthian_gui(QObject):
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
-            zl = self.screens["zynthiloops"]
-            if zl.clipToRecord is None:
-                # No clips are currently being recorded
-                logging.info("CUIA Start Recording")
-                if self.trackSamplesBarActive:
-                    logging.debug(f"Clip is a track sample")
-                    track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-                    clip = track.samples[track.selectedSampleRow]
+            if self.recording_popup_active or self.altButtonPressed:
+                zl = self.screens["zynthiloops"]
+                if zl.clipToRecord is None:
+                    # No clips are currently being recorded
+                    logging.info("CUIA Start Recording")
+                    if self.trackSamplesBarActive:
+                        logging.debug(f"Clip is a track sample")
+                        track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                        clip = track.samples[track.selectedSampleRow]
+                    else:
+                        logging.debug(f"Clip is a not a track sample")
+                        clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
+                    logging.info(f"Recording Clip : {clip}")
+                    clip.queueRecording("internal", "*")
+                    self.run_start_metronome_and_playback.emit()
                 else:
-                    logging.debug(f"Clip is a not a track sample")
-                    clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
-                logging.info(f"Recording Clip : {clip}")
-                clip.queueRecording("internal", "*")
-                self.run_start_metronome_and_playback.emit()
+                    # Some Clip is currently being recorded
+                    logging.info("Some Clip is currently being recorded. Stopping record")
+                    self.run_stop_metronome_and_playback.emit()
             else:
-                # Some Clip is currently being recorded
-                logging.info("Some Clip is currently being recorded. Stopping record")
-                self.run_stop_metronome_and_playback.emit()
+                self.displayRecordingPopup.emit()
 
         elif cuia == "STOP_RECORD":
             self.run_stop_metronome_and_playback.emit()
@@ -3587,6 +3603,7 @@ class zynthian_gui(QObject):
     run_stop_metronome_and_playback = Signal()
     encoder_list_speed_multiplier_changed = Signal()
     displayMainWindow = Signal()
+    displayRecordingPopup = Signal()
 
     current_screen_id = Property(
         str,

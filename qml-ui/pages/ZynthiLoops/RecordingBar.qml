@@ -235,17 +235,18 @@ GridLayout {
             icon.name: controlObj.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
             onClicked: {
-                if (!controlObj.isRecording) {
-                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-                    controlObj.queueRecording(
-                        sourceComboModel.get(sourceCombo.currentIndex).value,
-                        channelComboModel.get(channelCombo.currentIndex).value
-                    );
-                    Zynthian.CommonUtils.startMetronomeAndPlayback();
-                } else {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                    bottomBar.tabbedView.initialAction.trigger()
-                }
+                applicationWindow().openRecordingPopup()
+//                if (!controlObj.isRecording) {
+//                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
+//                    controlObj.queueRecording(
+//                        sourceComboModel.get(sourceCombo.currentIndex).value,
+//                        channelComboModel.get(channelCombo.currentIndex).value
+//                    );
+//                    Zynthian.CommonUtils.startMetronomeAndPlayback();
+//                } else {
+//                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+//                    bottomBar.tabbedView.initialAction.trigger()
+//                }
             }
         }
     }

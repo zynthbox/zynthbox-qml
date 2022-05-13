@@ -189,13 +189,20 @@ QQC2.AbstractButton {
         }
 
         QQC2.Label {
+            width: parent.width - 8
             anchors.centerIn: parent
+            horizontalAlignment: "AlignHCenter"
+            elide: "ElideRight"
             color: "#ffffff"
-            text: qsTr("Clip")
-            visible: root.isInScene &&
-                     track.trackAudioType === "sample-loop" &&
-                     track.sceneClip.path &&
-                     track.sceneClip.path.length > 0
+            text: track.trackAudioType === "sample-loop"
+                    ? track.sceneClip && track.sceneClip.path && track.sceneClip.path.length > 0
+                      ? track.sceneClip.path.split("/").pop()
+                      : ""
+                    : qsTr("%1%2")
+                        .arg(track.id+1)
+                        .arg(String.fromCharCode(track.selectedPart+65).toLowerCase())
+            font.pointSize: 8
+            visible: root.isInScene
         }
     }
 

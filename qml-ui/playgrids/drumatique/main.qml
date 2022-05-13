@@ -957,9 +957,9 @@ Zynthian.BasePlayGrid {
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
                                         onClicked: {
                                             if (checked) {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                                _private.associatedTrack.trackAudioType = "external";
                                             } else {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination)
+                                                _private.associatedTrack.trackAudioType = "sample-trig";
                                             }
                                         }
                                     }
@@ -968,9 +968,9 @@ Zynthian.BasePlayGrid {
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SynthDestination
                                         onClicked: {
                                             if (checked) {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                                _private.associatedTrack.trackAudioType = "external";
                                             } else {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination)
+                                                _private.associatedTrack.trackAudioType = "synth";
                                             }
                                         }
                                     }
@@ -982,9 +982,9 @@ Zynthian.BasePlayGrid {
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
                                         onClicked: {
                                             if (checked) {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                                _private.associatedTrack.trackAudioType = "external";
                                             } else {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination)
+                                                _private.associatedTrack.trackAudioType = "sample-slice";
                                             }
                                         }
                                     }
@@ -993,9 +993,9 @@ Zynthian.BasePlayGrid {
                                         checked: _private.activePatternModel && _private.activePatternModel.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination
                                         onClicked: {
                                             if (checked) {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination)
+                                                _private.associatedTrack.trackAudioType = "external";
                                             } else {
-                                                component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination)
+                                                _private.associatedTrack.trackAudioType = "sample-loop";
                                             }
                                         }
                                     }
@@ -1241,7 +1241,9 @@ Zynthian.BasePlayGrid {
                                                 icon.name: "player-volume"
                                                 onClicked: {
                                                     if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                        patternsMenuItem.thisPattern.enabled = !patternsMenuItem.thisPattern.enabled
+                                                        var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                                        // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
+                                                        associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                     }
                                                 }
                                             }
@@ -1398,9 +1400,9 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
                                             onClicked: {
                                                 if (checked) {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
                                                 } else {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleTriggerDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-trig";
                                                 }
                                             }
                                         }
@@ -1410,9 +1412,9 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
                                             onClicked: {
                                                 if (checked) {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
                                                 } else {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SynthDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "synth";
                                                 }
                                             }
                                         }
@@ -1425,9 +1427,9 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
                                             onClicked: {
                                                 if (checked) {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
                                                 } else {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleSlicedDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-slice";
                                                 }
                                             }
                                         }
@@ -1437,9 +1439,9 @@ Zynthian.BasePlayGrid {
                                             checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
                                             onClicked: {
                                                 if (checked) {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.ExternalDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
                                                 } else {
-                                                    component.setPatternProperty("noteDestination", ZynQuick.PatternModel.SampleLoopedDestination, patternsMenuItem.thisPatternIndex)
+                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-loop";
                                                 }
                                             }
                                         }
@@ -1537,25 +1539,52 @@ Zynthian.BasePlayGrid {
                     implicitHeight: Kirigami.Units.gridUnit * 40
                     Kirigami.Heading {
                         Layout.fillWidth: true
-                        text: qsTr("Select Active Part For Track %1").arg(partPicker.associatedTrackIndex + 1)
+                        text: qsTr("Select Active Parts For Track %1").arg(partPicker.associatedTrackIndex + 1)
                     }
                     ColumnLayout {
                         Layout.fillHeight: true
                         Layout.fillWidth: true
+                        spacing: Kirigami.Units.largeSpacing
                         Repeater {
                             model: partPicker.associatedTrack ? 5 : 0
                             delegate: RowLayout {
                                 id: partDelegate
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                                spacing: Kirigami.Units.smallSpacing
                                 property QtObject pattern: _private.sequence.getByPart(partPicker.associatedTrackIndex, model.index)
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+                                    Zynthian.PlayGridButton {
+                                        anchors.fill: parent
+                                        opacity: partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1 ? 1 : 0.5
+                                        icon.name: "player-volume"
+                                        onClicked: {
+                                            if (partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1) {
+                                                var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                                // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
+                                                associatedClip.enabled = !partDelegate.pattern.enabled
+                                            }
+                                        }
+                                    }
+                                    Rectangle {
+                                        visible: partDelegate.pattern ? !partDelegate.pattern.enabled : false
+                                        anchors.centerIn: parent
+                                        rotation: 45
+                                        width: parent.height
+                                        height: Kirigami.Units.smallSpacing
+                                        color: "red"
+                                    }
+                                }
                                 Zynthian.PlayGridButton {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                     enabled: partPicker.associatedTrack.selectedPart !== model.index
                                     readonly property var partNames: ["a", "b", "c", "d", "e"]
-                                    text: qsTr("Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
+                                    text: qsTr("Show Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
                                     onClicked: {
                                         partPicker.associatedTrack.selectedPart = model.index;
                                         partPicker.close();

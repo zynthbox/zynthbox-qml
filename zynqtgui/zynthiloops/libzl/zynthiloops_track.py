@@ -54,6 +54,9 @@ class zynthiloops_track(QObject):
         self.__volume__ = self.__initial_volume__
         self.__audio_level__ = -200
         self.__clips_model__ = [zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self)]
+        partNames = ['a', 'b', 'c', 'd', 'e']
+        for i in range(0, 5):
+            self.__clips_model__[i].partName = partNames[i]
         self.__layers_snapshot = []
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
@@ -400,6 +403,13 @@ class zynthiloops_track(QObject):
         return self.__clips_model__[self.__selected_part__]
     clipsModelChanged = Signal()
     clipsModel = Property(QObject, clipsModel, notify=clipsModelChanged)
+
+    ### BEGIN Property parts
+    def getParts(self):
+        return self.__clips_model__
+    partsChanged = Signal()
+    parts = Property('QVariantList', getParts, notify=partsChanged)
+    ### END Property parts
 
     @Slot(None)
     def delete(self):
@@ -1021,11 +1031,11 @@ class zynthiloops_track(QObject):
             old_selected_part = self.__selected_part__
             self.__selected_part__ = selected_part
 
-            self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex,
-                                        old_selected_part).stop()
+            old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex, old_selected_part)
+            if old_clip is not None:
+                old_clip.stop()
 
             clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex, selected_part)
-
             if clip.inCurrentScene:
                 clip.play()
 

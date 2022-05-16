@@ -34,13 +34,15 @@ class zynthiloops_clips_model(QAbstractListModel):
     ClipRole = ClipIndexRole + 2
     __clips__: [zynthiloops_clip] = []
 
-    def __init__(self, song, parentTrack=None):
+    def __init__(self, song, parentTrack=None, partIndex=-1):
         super().__init__(parentTrack)
         self.__track__ = parentTrack
         self.__song__ = song
         self.__clips__ = []
-        self.__partName__ = "(?)"
         self.__samples__ = []
+        self.__partIndex__ = partIndex
+        partNames = ['a', 'b', 'c', 'd', 'e']
+        self.__partName__ = "(?)" if (partIndex == -1) else partNames[partIndex]
 
     def serialize(self):
         data = []
@@ -102,7 +104,9 @@ class zynthiloops_clips_model(QAbstractListModel):
         self.__clips__.append(clip)
         self.endInsertRows()
         self.countChanged.emit()
-
+        if self.__track__ is not None and self.__partIndex__ > -1:
+            # The clips in a parts model contains the scene-related information for the track/clip
+            clip.enabled_changed.connect(lambda clipIndex=length: self.__track__.onClipEnabledChanged(clipIndex, self.__partIndex__))
 
     @Slot(int, result=QObject)
     def getClip(self, row : int):

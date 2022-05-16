@@ -171,6 +171,11 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
 
+                            EditableHeader {
+                                property QtObject controlObj: root.selectedTrack
+                                text: qsTr("TRACK: %1").arg(controlObj ? controlObj.name : "")
+                            }
+
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -222,6 +227,30 @@ Rectangle {
 
                                 RowLayout {
                                     anchors.fill: parent
+
+                                    RowLayout {
+                                        visible: root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                 root.selectedTrack.trackAudioType === "sample-slice"
+                                        Layout.fillHeight: true
+                                        spacing: 0
+
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Trig"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-trig"
+                                            }
+                                        }
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Slice"
+                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
+                                            onClicked: {
+                                                root.selectedTrack.trackAudioType = "sample-slice"
+                                            }
+                                        }
+                                    }
 
                                     Item {
                                         Layout.fillWidth: true
@@ -309,29 +338,6 @@ Rectangle {
                                             Layout.fillWidth: false
                                             Layout.fillHeight: false
                                             Layout.preferredWidth: Kirigami.Units.gridUnit
-                                        }
-                                    }
-                                    RowLayout {
-                                        visible: root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                 root.selectedTrack.trackAudioType === "sample-slice"
-                                        Layout.fillHeight: true
-                                        spacing: 0
-
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Trig"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
-                                            onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-trig"
-                                            }
-                                        }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: "Slice"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
-                                            onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-slice"
-                                            }
                                         }
                                     }
                                 }

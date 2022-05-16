@@ -743,10 +743,17 @@ class zynthiloops_track(QObject):
 
     ### Property connectedSoundName
     def get_connected_sound_name(self):
-        for index, sound in enumerate(self.__chained_sounds__):
-            if sound >= 0 and self.checkIfLayerExists(sound):
-                return self.chainedSoundsNames[index]
-        return ""
+        soundName = " > "
+
+        try:
+            for index, sound in enumerate(self.__chained_sounds__):
+                if sound >= 0 and self.checkIfLayerExists(sound):
+                    soundName = self.chainedSoundsNames[index]
+                    break
+        except:
+            pass
+
+        return soundName
 
     connectedSoundNameChanged = Signal()
 

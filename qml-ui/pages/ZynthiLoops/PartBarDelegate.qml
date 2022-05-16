@@ -94,12 +94,7 @@ ColumnLayout {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (root.track.selectedPart === partDelegate.partIndex) {
-                        partDelegate.clip.enabled = !partDelegate.clip.enabled;
-                    } else {
-                        root.track.selectedPart = partDelegate.partIndex;
-                        partDelegate.clip.enabled = true;
-                    }
+                    partDelegate.clip.enabled = !partDelegate.clip.enabled;
                 }
             }
         }

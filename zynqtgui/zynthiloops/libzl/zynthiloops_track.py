@@ -53,10 +53,7 @@ class zynthiloops_track(QObject):
         self.__initial_volume__ = 0
         self.__volume__ = self.__initial_volume__
         self.__audio_level__ = -200
-        self.__clips_model__ = [zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self), zynthiloops_clips_model(song, self)]
-        partNames = ['a', 'b', 'c', 'd', 'e']
-        for i in range(0, 5):
-            self.__clips_model__[i].partName = partNames[i]
+        self.__clips_model__ = [zynthiloops_clips_model(song, self, 0), zynthiloops_clips_model(song, self, 1), zynthiloops_clips_model(song, self, 2), zynthiloops_clips_model(song, self, 3), zynthiloops_clips_model(song, self, 4)]
         self.__layers_snapshot = []
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
         self.__song__.get_metronome_manager().master_volume_changed.connect(lambda: self.master_volume_changed())
@@ -110,6 +107,21 @@ class zynthiloops_track(QObject):
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
+
+    # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
+    def onClipEnabledChanged(self, sceneIndex, partNum):
+        clip = self.__song__.getClipByPart(self.__id__, sceneIndex, partNum)
+        #logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
+        if clip and clip.enabled == True:
+            self.set_selected_part(partNum)
+            allowMultipart = self.trackAudioType == "sample-trig" and self.keyZoneMode == "all-full"
+            #logging.error(f"Allowing multipart playback: {allowMultipart}")
+            if not allowMultipart:
+                for part in range(0, 5):
+                    if part != self.__selected_part__:
+                        clipForDisabling = self.__song__.getClipByPart(self.__id__, sceneIndex, part)
+                        # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
+                        clipForDisabling.enabled = False
 
     def chained_sounds_changed_handler(self):
         logging.error(f"### chained_sounds_changed_handler")
@@ -813,6 +825,9 @@ class zynthiloops_track(QObject):
             self.__track_audio_type__ = type
             self.zyngui.zynthiloops.set_selector()
             self.track_audio_type_changed.emit()
+            for scene in range(0, 10):
+                for part in range(0, 5):
+                    self.onClipEnabledChanged(scene, part)
             if not force_set:
                 self.__song__.schedule_save()
 
@@ -850,6 +865,9 @@ class zynthiloops_track(QObject):
         if self.__keyzone_mode__ != keyZoneMode:
             self.__keyzone_mode__ = keyZoneMode
             self.keyZoneModeChanged.emit()
+            for scene in range(0, 10):
+                for part in range(0, 5):
+                    self.onClipEnabledChanged(scene, part)
             self.__song__.schedule_save()
 
     keyZoneModeChanged = Signal()
@@ -1044,10 +1062,11 @@ class zynthiloops_track(QObject):
                 old_clip.stop()
 
             clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSceneIndex, selected_part)
-            if clip.inCurrentScene:
+            if clip is not None and clip.inCurrentScene:
                 clip.play()
 
             self.selectedPartChanged.emit()
+            self.__song__.schedule_save()
 
     selectedPartChanged = Signal()
 

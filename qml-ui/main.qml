@@ -767,7 +767,8 @@ Kirigami.AbstractApplicationWindow {
                                 Layout.fillHeight: true
 
                                 QQC2.Button {
-                                    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+                                    id: slotsColumnDelegate
+                                    property string soundName: root.selectedTrack.chainedSoundsNames[index]
 
                                     width: parent.width
                                     height: Kirigami.Units.gridUnit * 3
@@ -794,7 +795,9 @@ Kirigami.AbstractApplicationWindow {
                                             horizontalAlignment: "AlignHCenter"
                                             verticalAlignment: "AlignVCenter"
                                             font.pointSize: 7
-                                            text: selectedTrack.chainedSoundsNames[index].split(" > ")[0]
+                                            text: slotsColumnDelegate.soundName.length > 0
+                                                    ? slotsColumnDelegate.soundName.split(" > ")[0]
+                                                    : ""
                                         }
                                     }
 
@@ -815,7 +818,9 @@ Kirigami.AbstractApplicationWindow {
                                             horizontalAlignment: "AlignHCenter"
                                             verticalAlignment: "AlignVCenter"
                                             font.pointSize: 7
-                                            text: selectedTrack.chainedSoundsNames[index].split(" > ")[1]
+                                            text: slotsColumnDelegate.soundName.length > 0
+                                                    ? slotsColumnDelegate.soundName.split(" > ")[1]
+                                                    : ""
                                         }
                                     }
                                 }

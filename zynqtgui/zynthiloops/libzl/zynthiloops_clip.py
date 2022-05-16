@@ -199,47 +199,50 @@ class zynthiloops_clip(QObject):
                 "arrangerBarPositions": self.__arranger_bar_positions__}
 
     def deserialize(self, obj):
-        if "path" in obj:
-            if obj["path"] is None:
-                self.__path__ = None
-            else:
-                if self.is_track_sample:
-                    self.path = str(self.bank_path / obj["path"])
+        try:
+            if "path" in obj:
+                if obj["path"] is None:
+                    self.__path__ = None
                 else:
-                    self.path = str(self.wav_path / obj["path"])
-        if "start" in obj:
-            self.__start_position__ = obj["start"]
-            self.set_start_position(self.__start_position__, True)
-        if "loopDelta" in obj:
-            self.__loop_delta__ = obj["loopDelta"]
-            self.set_loop_delta(self.__loop_delta__, True)
-        if "length" in obj:
-            self.__length__ = obj["length"]
-            self.set_length(self.__length__, True)
-        if "pitch" in obj:
-            self.__pitch__ = obj["pitch"]
-            self.set_pitch(self.__pitch__, True)
-        if "gain" in obj:
-            self.__gain__ = obj["gain"]
-            self.set_gain(self.__gain__, True)
-        if "time" in obj:
-            self.__time__ = obj["time"]
-            self.set_time(self.__time__, True)
-        if "bpm" in obj:
-            self.__bpm__ = obj["bpm"]
-            self.set_bpm(self.__bpm__, True)
-        if "enabled" in obj:
-            self.__enabled__ = obj["enabled"]
-            self.set_enabled(self.__enabled__)
-        if "shouldSync" in obj:
-            self.__should_sync__ = obj["shouldSync"]
-            self.set_shouldSync(self.__should_sync__, True)
-        if "snapLengthToBeat" in obj:
-            self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
-            self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
-        if "arrangerBarPositions" in obj:
-            self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
-            self.arranger_bar_positions_changed.emit()
+                    if self.is_track_sample:
+                        self.path = str(self.bank_path / obj["path"])
+                    else:
+                        self.path = str(self.wav_path / obj["path"])
+            if "start" in obj:
+                self.__start_position__ = obj["start"]
+                self.set_start_position(self.__start_position__, True)
+            if "loopDelta" in obj:
+                self.__loop_delta__ = obj["loopDelta"]
+                self.set_loop_delta(self.__loop_delta__, True)
+            if "length" in obj:
+                self.__length__ = obj["length"]
+                self.set_length(self.__length__, True)
+            if "pitch" in obj:
+                self.__pitch__ = obj["pitch"]
+                self.set_pitch(self.__pitch__, True)
+            if "gain" in obj:
+                self.__gain__ = obj["gain"]
+                self.set_gain(self.__gain__, True)
+            if "time" in obj:
+                self.__time__ = obj["time"]
+                self.set_time(self.__time__, True)
+            if "bpm" in obj:
+                self.__bpm__ = obj["bpm"]
+                self.set_bpm(self.__bpm__, True)
+            if "enabled" in obj:
+                self.__enabled__ = obj["enabled"]
+                self.set_enabled(self.__enabled__)
+            if "shouldSync" in obj:
+                self.__should_sync__ = obj["shouldSync"]
+                self.set_shouldSync(self.__should_sync__, True)
+            if "snapLengthToBeat" in obj:
+                self.__snap_length_to_beat__ = obj["snapLengthToBeat"]
+                self.set_snap_length_to_beat(self.__snap_length_to_beat__, True)
+            if "arrangerBarPositions" in obj:
+                self.__arranger_bar_positions__ = obj["arrangerBarPositions"]
+                self.arranger_bar_positions_changed.emit()
+        except Exception as e:
+            logging.error(f"Error during clip deserialization: {e}")
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)

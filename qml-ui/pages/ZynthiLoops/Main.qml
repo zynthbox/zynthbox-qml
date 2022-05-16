@@ -192,6 +192,8 @@ Zynthian.ScreenPage {
                     } else {
                         bottomStack.slotsBar.trackButton.checked = true
                     }
+
+                    return true;
                 } else {
 //                    // Cycle through the trackAudioTypes when alt button is pressed
 //                    if (root.selectedTrack.trackAudioType === "synth") {
@@ -212,15 +214,15 @@ Zynthian.ScreenPage {
 //                        root.selectedTrack.trackAudioType = "synth"
 //                    }
 
-                    // Toggle between Part and Track bar with FX Button
-                    if (!bottomStack.slotsBar.partButton.checked) {
-                        bottomStack.slotsBar.partButton.checked = true
-                    } else {
-                        bottomStack.slotsBar.trackButton.checked = true
-                    }
-                }
+//                    // Toggle between Part and Track bar with FX Button
+//                    if (!bottomStack.slotsBar.partButton.checked) {
+//                        bottomStack.slotsBar.partButton.checked = true
+//                    } else {
+//                        bottomStack.slotsBar.trackButton.checked = true
+//                    }
 
-                return true;
+//                    return true;
+                }
         }
 
         // If cuia is not handled by any bottomBars or the switch block

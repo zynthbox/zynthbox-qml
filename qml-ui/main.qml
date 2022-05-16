@@ -776,6 +776,48 @@ Kirigami.AbstractApplicationWindow {
                                     onClicked: {
                                         zynthian.callable_ui_action("TRACK_"+(index+1))
                                     }
+
+                                    Rectangle {
+                                        height: Kirigami.Units.gridUnit * 0.7
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.top: parent.top
+                                        color: "#99888888"
+                                        visible: root.selectedTrack.trackAudioType === "synth" &&
+                                                 synthName.text &&
+                                                 synthName.text.length > 0
+
+                                        QQC2.Label {
+                                            id: synthName
+                                            anchors.fill: parent
+                                            elide: "ElideRight"
+                                            horizontalAlignment: "AlignHCenter"
+                                            verticalAlignment: "AlignVCenter"
+                                            font.pointSize: 7
+                                            text: selectedTrack.chainedSoundsNames[index].split(" > ")[0]
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        height: Kirigami.Units.gridUnit * 0.7
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.bottom: parent.bottom
+                                        color: "#99888888"
+                                        visible: root.selectedTrack.trackAudioType === "synth" &&
+                                                 presetName.text &&
+                                                 presetName.text.length > 0
+
+                                        QQC2.Label {
+                                            id: presetName
+                                            anchors.fill: parent
+                                            elide: "ElideRight"
+                                            horizontalAlignment: "AlignHCenter"
+                                            verticalAlignment: "AlignVCenter"
+                                            font.pointSize: 7
+                                            text: selectedTrack.chainedSoundsNames[index].split(" > ")[1]
+                                        }
+                                    }
                                 }
                             }
                         }

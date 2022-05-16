@@ -421,8 +421,10 @@ class zynthian_gui(QObject):
         self.slots_bar_samples_active = False
         self.slots_bar_fx_active = False
         self.recording_popup_active = False
+        self.left_sidebar_active = False
 
         self.opened_dialog = None
+        self.left_sidebar = None
 
         # This makes zynswitch_short execute in the main thread, zynswitch_short_triggered will be emitted from a different thread
         self.zynswitch_short_triggered.connect(self.zynswitch_short, Qt.QueuedConnection)
@@ -713,6 +715,18 @@ class zynthian_gui(QObject):
 
     recordingPopupActive = Property(bool, get_recording_popup_active, set_recording_popup_active, notify=recordingPopupActiveChanged)
 
+    def get_left_sidebar_active(self):
+        return self.left_sidebar_active
+
+    def set_left_sidebar_active(self, isActive):
+        if self.left_sidebar_active != isActive:
+            self.left_sidebar_active = isActive
+            self.leftSidebarActiveChanged.emit()
+
+    leftSidebarActiveChanged = Signal()
+
+    leftSidebarActive = Property(bool, get_left_sidebar_active, set_left_sidebar_active, notify=leftSidebarActiveChanged)
+
     def init_wsleds(self):
         if zynthian_gui_config.wiring_layout=="Z2_V1":
             # LEDS with PWM1 (pin 13, channel 1)
@@ -768,8 +782,9 @@ class zynthian_gui(QObject):
 
             # Light up 1-6 buttons as per opened screen / bottomBar
             for i in range(1, 6):
-                # If parts bar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
-                if self.active_screen == "zynthiloops" and self.slotsBarPartActive:
+                # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
+                # This is global (i.e. for all screens)
+                if self.leftSidebarActive:
                     partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedSceneIndex, i-1)
 
                     if (track.trackAudioType in ["synth", "sample-trig", "sample-slice", "external"] and track.selectedPart == (i - 1)) or \
@@ -855,32 +870,32 @@ class zynthian_gui(QObject):
 
             # 7 : FX Button
             if self.active_screen == "zynthiloops" and track.trackAudioType == "synth":
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_red)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_red)
             elif self.active_screen == "zynthiloops" and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_yellow)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_yellow)
             elif self.active_screen == "zynthiloops" and self.slotsBarFxActive:
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_blue)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_blue)
             elif self.active_screen == "zynthiloops" and track.trackAudioType == "sample-loop":
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_green)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_green)
             elif self.active_screen == "zynthiloops" and track.trackAudioType == "external":
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_purple)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_purple)
             else:
-                if self.slotsBarPartActive:
+                if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_off)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_off)
@@ -1557,7 +1572,21 @@ class zynthian_gui(QObject):
                     if _result is not None and _result.toBool():
                         return
             except Exception as e:
-                logging.error("Attempted to use cuiaCallback, got error: {}".format(e))
+                logging.error("Attempted to use cuiaCallback on openeedDialog, got error: {}".format(e))
+                pass
+
+        if self.left_sidebar is not None:
+            try:
+                cuia_callback = self.left_sidebar.property("cuiaCallback")
+                visible = self.left_sidebar.property("opened")
+
+                if cuia_callback is not None and cuia_callback.isCallable() and visible:
+                    _result = cuia_callback.call([cuia])
+
+                    if _result is not None and _result.toBool():
+                        return
+            except Exception as e:
+                logging.error("Attempted to use cuiaCallback on leftSidebar, got error: {}".format(e))
                 pass
 
         if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
@@ -1872,7 +1901,10 @@ class zynthian_gui(QObject):
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "MODE_SWITCH_SHORT" or cuia == "MODE_SWITCH_BOLD" or cuia == "MODE_SWITCH_LONG":
-            pass
+            if self.leftSidebarActive:
+                self.closeLeftSidebar.emit()
+            else:
+                self.openLeftSidebar.emit()
 
         elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
             self.tracks_mod_active = not self.tracks_mod_active
@@ -3574,7 +3606,7 @@ class zynthian_gui(QObject):
 
     ### Property openedDialog
     def get_openedDialog(self):
-        self.opened_dialog
+        return self.opened_dialog
 
     def set_openedDialog(self, dialog):
         if dialog != self.opened_dialog:
@@ -3586,6 +3618,21 @@ class zynthian_gui(QObject):
     openedDialog = Property(QObject, get_openedDialog, set_openedDialog, notify=openedDialogChanged)
 
     ### End Property openedDialog
+
+    ### Property leftSidebar
+    def get_leftSidebar(self):
+        return self.left_sidebar
+
+    def set_leftSidebar(self, sidebar):
+        if sidebar != self.left_sidebar:
+            self.left_sidebar = sidebar
+            self.leftSidebarChanged.emit()
+
+    leftSidebarChanged = Signal()
+
+    leftSidebar = Property(QObject, get_leftSidebar, set_leftSidebar, notify=leftSidebarChanged)
+
+    ### End Property leftSidebar
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()
@@ -3604,6 +3651,8 @@ class zynthian_gui(QObject):
     encoder_list_speed_multiplier_changed = Signal()
     displayMainWindow = Signal()
     displayRecordingPopup = Signal()
+    openLeftSidebar = Signal()
+    closeLeftSidebar = Signal()
 
     current_screen_id = Property(
         str,

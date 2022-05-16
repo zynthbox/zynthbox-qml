@@ -222,7 +222,7 @@ QQC2.AbstractButton {
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
                 font.pointSize: 7
-                text: track.connectedSoundName.length > 0 ? track.connectedSoundName.split(" > ")[0] : ""
+                text: track.connectedSoundName.split(" > ")[0]
             }
         }
 
@@ -243,7 +243,7 @@ QQC2.AbstractButton {
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
                 font.pointSize: 7
-                text: track.connectedSoundName.length > 0 ? track.connectedSoundName.split(" > ")[1] : ""
+                text: track.connectedSoundName.split(" > ")[1]
             }
         }
     }

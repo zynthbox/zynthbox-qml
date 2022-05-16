@@ -108,13 +108,18 @@ class zynthiloops_track(QObject):
         self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
 
-        self.chained_sounds_changed.connect(self.update_jack_port)
-
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
 
     def chained_sounds_changed_handler(self):
+        logging.error(f"### chained_sounds_changed_handler")
+
         self.occupiedSlotsChanged.emit()
+        self.update_jack_port()
+        self.connectedSoundChanged.emit()
+        self.connectedSoundNameChanged.emit()
+        self.chainedSoundsInfoChanged.emit()
+        self.chainedSoundsNamesChanged.emit()
 
     @Property(str, constant=True)
     def className(self):
@@ -574,10 +579,7 @@ class zynthiloops_track(QObject):
             #self.set_chained_sounds([index, -1, -1, -1, -1])
             #zyngui.screens["fixed_layers"].activate_index(index)
 
-        self.connected_sound_changed.emit()
         self.chained_sounds_changed.emit()
-        self.chainedSoundsInfoChanged.emit()
-        self.chainedSoundsNamesChanged.emit()
 
     @Slot(None)
     def clearChainedSoundsWithoutCloning(self):
@@ -594,9 +596,6 @@ class zynthiloops_track(QObject):
 
         self.__song__.schedule_save()
         self.chained_sounds_changed.emit()
-        self.connected_sound_changed.emit()
-        self.chainedSoundsInfoChanged.emit()
-        self.chainedSoundsNamesChanged.emit()
 
     @Slot(str)
     def setBank(self, path):
@@ -654,23 +653,6 @@ class zynthiloops_track(QObject):
     connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)
     ### END Property connectedPattern
 
-    ### Property connectedSound
-    def get_connected_sound(self):
-        # return self.__connected_sound__
-        for sound in self.__chained_sounds__:
-            if sound >= 0:
-                return math.floor(sound)
-
-        return -1
-    # def set_connected_sound(self, sound):
-    #     self.__connected_sound__ = sound
-    #     self.__song__.schedule_save()
-    #     self.connected_sound_changed.emit()
-    #     self.__song__.tracksModel.connected_sounds_count_changed.emit()
-    connected_sound_changed = Signal()
-    connectedSound = Property(int, get_connected_sound, notify=connected_sound_changed)
-    ### END Property connectedSound
-
     ### Property chainedSounds
     def get_chained_sounds(self):
         return self.__chained_sounds__
@@ -699,9 +681,6 @@ class zynthiloops_track(QObject):
             self.__song__.schedule_save()
 
             self.chained_sounds_changed.emit()
-            self.connected_sound_changed.emit()
-            self.chainedSoundsInfoChanged.emit()
-            self.chainedSoundsNamesChanged.emit()
 
             if cb is not None:
                 cb()
@@ -744,13 +723,35 @@ class zynthiloops_track(QObject):
         except:
             pass
         self.chained_sounds_changed.emit()
-        self.connected_sound_changed.emit()
-        self.chainedSoundsInfoChanged.emit()
-        self.chainedSoundsNamesChanged.emit()
 
     chained_sounds_changed = Signal()
     chainedSounds = Property('QVariantList', get_chained_sounds, set_chained_sounds, notify=chained_sounds_changed)
     ### END Property chainedSounds
+
+    ### Property connectedSound
+    def get_connected_sound(self):
+        for sound in self.__chained_sounds__:
+            if sound >= 0 and self.checkIfLayerExists(sound):
+                return sound
+
+        return -1
+
+    connectedSoundChanged = Signal()
+
+    connectedSound = Property(int, get_connected_sound, notify=connectedSoundChanged)
+    ### END Property connectedSound
+
+    ### Property connectedSoundName
+    def get_connected_sound_name(self):
+        for index, sound in enumerate(self.__chained_sounds__):
+            if sound >= 0 and self.checkIfLayerExists(sound):
+                return self.chainedSoundsNames[index]
+        return ""
+
+    connectedSoundNameChanged = Signal()
+
+    connectedSoundName = Property(str, get_connected_sound_name, notify=connectedSoundNameChanged)
+    ### END Property connectedSoundName
 
     ### Property muted
     def get_muted(self):

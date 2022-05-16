@@ -75,6 +75,10 @@ class zynthiloops_song(QObject):
         self.__to_be_deleted__ = False
 
         if not self.restore():
+            # First, clear out any cruft that might have occurred during a failed load attempt
+            self.__parts_model__ = zynthiloops_parts_model(self)
+            self.__tracks_model__ = zynthiloops_tracks_model(self)
+            self.__scenes_model__ = zynthiloops_scenes_model(self)
             # Add default parts
             for i in range(0, 10):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
@@ -260,7 +264,7 @@ class zynthiloops_song(QObject):
 
                 return True
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Error during sketch restoration: {e}")
             return False
 
     @Slot(int, int, result=QObject)

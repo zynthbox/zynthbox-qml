@@ -238,14 +238,14 @@ QQC2.AbstractButton {
 
             QQC2.Label {
                 id: presetName
-                property string presetName: track.connectedSoundName.split(" > ")[1]
+                property string presetText: track.connectedSoundName.split(" > ")[1]
 
                 anchors.fill: parent
                 elide: "ElideRight"
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
                 font.pointSize: 7
-                text: presetName ? presetName : ""
+                text: presetText ? presetText : ""
             }
         }
     }

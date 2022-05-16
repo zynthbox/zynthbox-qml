@@ -246,38 +246,41 @@ class zynthiloops_track(QObject):
                 "keyzone_mode": self.__keyzone_mode__}
 
     def deserialize(self, obj):
-        if "name" in obj:
-            self.__name__ = obj["name"]
-        if "color" in obj:
-            self.__color__ = obj["color"]
-        if "volume" in obj:
-            self.__volume__ = obj["volume"]
-            self.set_volume(self.__volume__, True)
-        if "connectedPattern" in obj:
-            self.__connected_pattern__ = obj["connectedPattern"]
-            self.set_connected_pattern(self.__connected_pattern__)
-        # if "connectedSound" in obj:
-        #     self.__connected_sound__ = obj["connectedSound"]
-        #     self.set_connected_sound(self.__connected_sound__)
-        if "chainedSounds" in obj:
-            self.__chained_sounds__ = obj["chainedSounds"]
-            self.set_chained_sounds(self.__chained_sounds__)
-        if "trackAudioType" in obj:
-            self.__track_audio_type__ = obj["trackAudioType"]
-            self.set_track_audio_type(self.__track_audio_type__, True)
-        if "selectedPart" in obj:
-            self.set_selected_part(obj["selectedPart"])
-        if "externalMidiChannel" in obj:
-            self.set_externalMidiChannel(obj["externalMidiChannel"])
-        if "clips" in obj:
-            for x in range(0, 5):
-                self.__clips_model__[x].deserialize(obj["clips"][x], x)
-        if "layers_snapshot" in obj:
-            self.__layers_snapshot = obj["layers_snapshot"]
-            self.sound_data_changed.emit()
-        if "keyzone_mode" in obj:
-            self.__keyzone_mode__ = obj["keyzone_mode"]
-            self.keyZoneModeChanged.emit();
+        try:
+            if "name" in obj:
+                self.__name__ = obj["name"]
+            if "color" in obj:
+                self.__color__ = obj["color"]
+            if "volume" in obj:
+                self.__volume__ = obj["volume"]
+                self.set_volume(self.__volume__, True)
+            if "connectedPattern" in obj:
+                self.__connected_pattern__ = obj["connectedPattern"]
+                self.set_connected_pattern(self.__connected_pattern__)
+            # if "connectedSound" in obj:
+            #     self.__connected_sound__ = obj["connectedSound"]
+            #     self.set_connected_sound(self.__connected_sound__)
+            if "chainedSounds" in obj:
+                self.__chained_sounds__ = obj["chainedSounds"]
+                self.set_chained_sounds(self.__chained_sounds__)
+            if "trackAudioType" in obj:
+                self.__track_audio_type__ = obj["trackAudioType"]
+                self.set_track_audio_type(self.__track_audio_type__, True)
+            if "externalMidiChannel" in obj:
+                self.set_externalMidiChannel(obj["externalMidiChannel"])
+            if "clips" in obj:
+                for x in range(0, 5):
+                    self.__clips_model__[x].deserialize(obj["clips"][x], x)
+            if "layers_snapshot" in obj:
+                self.__layers_snapshot = obj["layers_snapshot"]
+                self.sound_data_changed.emit()
+            if "keyzone_mode" in obj:
+                self.__keyzone_mode__ = obj["keyzone_mode"]
+                self.keyZoneModeChanged.emit();
+            if "selectedPart" in obj:
+                self.set_selected_part(obj["selectedPart"])
+        except Exception as e:
+            logging.error(f"Error during track deserialization: {e}")
 
         # Restore bank after restoring track
         self.restore_bank()

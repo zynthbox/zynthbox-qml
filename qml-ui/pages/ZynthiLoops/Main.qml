@@ -585,23 +585,56 @@ Zynthian.ScreenPage {
                                     margins: Kirigami.Units.gridUnit
                                 }
                                 visible: !root.displaySceneButtons &&
-                                         ["sample-loop", "external"].indexOf(sceneHeaderDelegate.track.trackAudioType) < 0
+                                         sceneHeaderDelegate.track.trackAudioType === "synth"
 
                                 Repeater {
-                                    id: slotsOccupiedIndicatorRepeater
+                                    id: synthsOccupiedIndicatorRepeater
                                     model: sceneHeaderDelegate.track.occupiedSlots
 
                                     delegate: Rectangle {
                                         width: 50
                                         height: 3
                                         radius: 100
-                                        color: slotsOccupiedIndicatorRepeater.model[index] == null
+                                        color: synthsOccupiedIndicatorRepeater.model[index] == null
                                                 ? "transparent"
-                                                : slotsOccupiedIndicatorRepeater.model[index]
+                                                : synthsOccupiedIndicatorRepeater.model[index]
                                                     ? "#ccbbbbbb"
                                                     : "#11ffffff"
                                     }
                                 }
+                            }
+
+                            RowLayout {
+                                anchors {
+                                    centerIn: parent
+                                    margins: Kirigami.Units.gridUnit
+                                }
+                                visible: !root.displaySceneButtons &&
+                                         ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
+
+                                Repeater {
+                                    id: samplesOccupiedIndicatorRepeater
+                                    model: sceneHeaderDelegate.track.occupiedSlots
+
+                                    delegate: Rectangle {
+                                        width: 3
+                                        height: 40
+                                        Layout.alignment: Qt.AlignVCenter
+                                        radius: 100
+                                        color: samplesOccupiedIndicatorRepeater.model[index] == null
+                                                ? "transparent"
+                                                : samplesOccupiedIndicatorRepeater.model[index]
+                                                    ? "#ccbbbbbb"
+                                                    : "#11ffffff"
+                                    }
+                                }
+                            }
+
+                            QQC2.Label {
+                                anchors.centerIn: parent
+                                visible: !root.displaySceneButtons &&
+                                         sceneHeaderDelegate.track.trackAudioType === "external"
+                                text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
                             }
 
                             Rectangle {

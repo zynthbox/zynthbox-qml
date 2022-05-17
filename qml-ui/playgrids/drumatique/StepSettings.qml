@@ -40,6 +40,7 @@ ColumnLayout {
     onChangeSubnote: {
         component.currentSubNote = newSubnote;
     }
+    signal close();
 
     property var noteLengths: {
         1: 32,
@@ -181,8 +182,8 @@ ColumnLayout {
                 Rectangle {
                     anchors {
                         top: parent.top
-                        left: parent.left
-                        leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+                        right: parent.right
+                        rightMargin: 1
                         bottom: parent.bottom
                         margins: 1
                     }
@@ -195,6 +196,33 @@ ColumnLayout {
                     horizontalAlignment: Text.AlignHCenter
                     font.bold: true
                     text: modelData ? modelData.name + modelData.octave : ""
+                }
+                Zynthian.PlayGridButton {
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        leftMargin: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+                        bottom: parent.bottom
+                        margins: 1
+                    }
+                    width: height
+                    icon.name: "edit-delete"
+                    visualPressAndHold: true
+                    onPressAndHold: {
+                        // This is a workaround for "this element disappeared for some reason"
+                        var rootComponent = component;
+                        if (rootComponent.currentSubNote >= model.index) {
+                            rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
+                        }
+                        rootComponent.model.removeSubnote(rootComponent.row, rootComponent.column, model.index);
+                        // Now refetch the note we're displaying
+                        var theColumn = rootComponent.column;
+                        rootComponent.column = -1;
+                        rootComponent.column = theColumn;
+                        if (rootComponent.note.subnotes.count === 0) {
+                            rootComponent.close();
+                        }
+                    }
                 }
             }
             StepSettingsParamDelegate {

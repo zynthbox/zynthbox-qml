@@ -94,18 +94,22 @@ def midi_autoconnect(force=False):
 	#  - inputs are outputs for jack
 	#------------------------------------
 
+	### NOTE Zynthbox ZLRouter does hardware pre-routing, so disable all hardware device handling in
+	### zynthian itself by just setting the list of hardware in/out devices to empty:
+	hw_out=[]
+	hw_in=[]
 	#Get Physical MIDI input ports ...
-	try:
-		hw_out=jclient.get_ports(is_output=True, is_physical=True, is_midi=True)
-	except:
-		logging.error("Failed to get ports via jack")
-	if len(hw_out)==0:
-		hw_out=[]
+	#try:
+		#hw_out=jclient.get_ports(is_output=True, is_physical=True, is_midi=True)
+	#except:
+		#logging.error("Failed to get ports via jack")
+	#if len(hw_out)==0:
+		#hw_out=[]
 
 	#Get Physical MIDI output ports ...
-	hw_in=jclient.get_ports(is_input=True, is_physical=True, is_midi=True)
-	if len(hw_in)==0:
-		hw_in=[]
+	#hw_in=jclient.get_ports(is_input=True, is_physical=True, is_midi=True)
+	#if len(hw_in)==0:
+		#hw_in=[]
 
 
 	#Add Aubio MIDI out port ...

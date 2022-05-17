@@ -787,8 +787,7 @@ class zynthian_gui(QObject):
                 if self.leftSidebarActive:
                     partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedSceneIndex, i-1)
 
-                    if (track.trackAudioType in ["synth", "sample-trig", "sample-slice", "external"] and track.selectedPart == (i - 1)) or \
-                            (track.trackAudioType == "sample-loop" and partClip and partClip.path and len(partClip.path) > 0):
+                    if partClip.enabled:
                         if track.trackAudioType == "synth":
                             self.wsled_blink(i, self.wscolor_red)
                         elif track.trackAudioType in ["sample-trig", "sample-slice"]:

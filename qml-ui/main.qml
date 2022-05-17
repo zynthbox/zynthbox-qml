@@ -719,74 +719,58 @@ Kirigami.AbstractApplicationWindow {
         modal: true
 
         property var cuiaCallback: function(cuia) {
-            var pattern;
+            var clip
+            var returnVal = false
 
             switch (cuia) {
                 case "TRACK_1":
                 case "TRACK_6":
-                    pattern = root.sequence.getByPart(root.selectedTrack.id, 0)
-                    if (root.selectedTrack.selectedPart === 0) {
-                        pattern.enabled = !pattern.enabled;
-                    } else {
-                        root.selectedTrack.selectedPart = 0;
-                        pattern.enabled = true;
-                    }
+                    clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip.enabled = !clip.enabled
 
-                    return true
+                    returnVal = true
+                    break
 
                 case "TRACK_2":
                 case "TRACK_7":
-                    pattern = root.sequence.getByPart(root.selectedTrack.id, 1)
-                    if (root.selectedTrack.selectedPart === 1) {
-                        pattern.enabled = !pattern.enabled;
-                    } else {
-                        root.selectedTrack.selectedPart = 1;
-                        pattern.enabled = true;
-                    }
+                    clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip.enabled = !clip.enabled
 
-                    return true
+                    returnVal = true
+                    break
 
                 case "TRACK_3":
                 case "TRACK_8":
-                    pattern = root.sequence.getByPart(root.selectedTrack.id, 2)
-                    if (root.selectedTrack.selectedPart === 2) {
-                        pattern.enabled = !pattern.enabled;
-                    } else {
-                        root.selectedTrack.selectedPart = 2;
-                        pattern.enabled = true;
-                    }
+                    clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip.enabled = !clip.enabled
 
-                    return true
+                    returnVal = true
+                    break
 
                 case "TRACK_4":
                 case "TRACK_9":
-                    pattern = root.sequence.getByPart(root.selectedTrack.id, 3)
-                    if (root.selectedTrack.selectedPart === 3) {
-                        pattern.enabled = !pattern.enabled;
-                    } else {
-                        root.selectedTrack.selectedPart = 3;
-                        pattern.enabled = true;
-                    }
+                    clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip.enabled = !clip.enabled
 
-                    return true
+                    returnVal = true
+                    break
 
                 case "TRACK_5":
                 case "TRACK_10":
-                    pattern = root.sequence.getByPart(root.selectedTrack.id, 4)
-                    if (root.selectedTrack.selectedPart === 4) {
-                        pattern.enabled = !pattern.enabled;
-                    } else {
-                        root.selectedTrack.selectedPart = 4;
-                        pattern.enabled = true;
-                    }
+                    clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip.enabled = !clip.enabled
 
-                    return true
+                    returnVal = true
+                    break
 
                 case "SWITCH_BACK_SHORT":
                     slotSelectionDrawer.close()
-                    return true;
+
+                    returnVal = true
+                    break
             }
-            return false;
+
+            return returnVal;
         }
 
         onOpened: {

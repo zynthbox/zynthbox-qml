@@ -50,7 +50,7 @@ QQC2.AbstractButton {
                                                ? Kirigami.Theme.highlightColor
                                                : "#aaf44336"
                                            : "transparent"
-    property bool isInScene: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
+    property bool isInScene: track.selectedPartNames.length > 0 // track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
 
     property QtObject sequence
     property QtObject pattern
@@ -132,6 +132,7 @@ QQC2.AbstractButton {
                      root.pattern &&
                      root.pattern.hasNotes
             source: root.pattern ? root.pattern.thumbnailUrl : ""
+            cache: false
         }
 
         QQC2.Label {
@@ -194,14 +195,10 @@ QQC2.AbstractButton {
             horizontalAlignment: "AlignHCenter"
             elide: "ElideRight"
             color: "#ffffff"
-            text: track.trackAudioType === "sample-loop"
-                    ? track.sceneClip && track.sceneClip.path && track.sceneClip.path.length > 0
-                      ? track.sceneClip.path.split("/").pop()
-                      : ""
-                    : qsTr("%1%2")
-                        .arg(track.id+1)
-                        .arg(String.fromCharCode(track.selectedPart+65).toLowerCase())
-            font.pointSize: 8
+            text: qsTr("%1 %2")
+                    .arg(track.id+1)
+                    .arg(track.selectedPartNames)
+            font.pointSize: 7
             visible: root.isInScene
         }
 

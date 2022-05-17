@@ -119,6 +119,8 @@ class zynthiloops_track(QObject):
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
                         clipForDisabling.enabled = False
 
+        self.selectedPartNamesChanged.emit()
+
     def chained_sounds_changed_handler(self):
         logging.error(f"### chained_sounds_changed_handler")
 
@@ -1065,3 +1067,19 @@ class zynthiloops_track(QObject):
 
     externalMidiChannel = Property(int, get_externalMidiChannel, set_externalMidiChannel, notify=externalMidiChannelChanged)
     ### END Property selectedPart
+
+    ### Property selectedPartNames
+    def get_selectedPartNames(self):
+        partNames = []
+        for i in range(5):
+            clip = self.getClipsModelByPart(i).getClip(self.zyngui.zynthiloops.selectedClipCol)
+
+            if clip.enabled:
+                partNames.append(chr(i+65).lower())
+
+        return "/".join(partNames)
+
+    selectedPartNamesChanged = Signal()
+
+    selectedPartNames = Property(str, get_selectedPartNames, notify=selectedPartNamesChanged)
+    ### Property selectedPartNames

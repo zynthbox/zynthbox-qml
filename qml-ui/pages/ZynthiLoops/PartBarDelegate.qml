@@ -46,9 +46,11 @@ ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 2
                 smooth: false
-                visible: root.track.trackAudioType !== "sample-loop"
-                    && partDelegate.pattern
+                visible: root.track.trackAudioType !== "sample-loop" &&
+                         partDelegate.pattern &&
+                         partDelegate.pattern.hasNotes
                 source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
+                cache: false
                 Rectangle {
                     anchors {
                         top: parent.top

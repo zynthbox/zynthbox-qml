@@ -277,6 +277,7 @@ class zynthiloops_track(QObject):
                 self.set_selected_part(obj["selectedPart"])
         except Exception as e:
             logging.error(f"Error during track deserialization: {e}")
+            traceback.print_exception(None, e, e.__traceback__)
 
         # Restore bank after restoring track
         self.restore_bank()

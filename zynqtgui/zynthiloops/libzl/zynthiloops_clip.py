@@ -24,6 +24,7 @@
 # ******************************************************************************
 import math
 import shutil
+import traceback
 
 from datetime import datetime
 from pathlib import Path
@@ -243,6 +244,7 @@ class zynthiloops_clip(QObject):
                 self.arranger_bar_positions_changed.emit()
         except Exception as e:
             logging.error(f"Error during clip deserialization: {e}")
+            traceback.print_exception(None, e, e.__traceback__)
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)

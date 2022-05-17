@@ -42,6 +42,7 @@ Zynthian.Card {
 
     property alias waveEditorAction: waveEditorAction
     property alias trackWaveEditorAction: trackWaveEditorAction
+    property alias tracksViewSoundsBarAction: trackSoundsAction
 
     leftPadding: 0
     rightPadding: 0

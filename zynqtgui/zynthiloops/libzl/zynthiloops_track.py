@@ -80,10 +80,6 @@ class zynthiloops_track(QObject):
         for i in range(0, 5):
             self.__samples__.append(zynthiloops_clip(self.id, -1, -1, self.__song__, self, True))
 
-        # Small array in which to keep any midi-outs that we might need to restore again
-        # when switching between track types. This is done per-chained-sound, so...
-        self.__previous_midi_out__ = [[] for x in range(len(self.__chained_sounds__))]
-
         self.__track_audio_type__ = "synth"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
@@ -803,28 +799,6 @@ class zynthiloops_track(QObject):
         logging.debug(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
 
         if force_set or type != self.__track_audio_type__:
-            for sound_index, sound in enumerate(self.__chained_sounds__):
-                if sound != -1 and self.checkIfLayerExists(sound):
-                    try:
-                        layer = self.zyngui.screens['layer'].layer_midi_map[sound]
-                        if layer is not None:
-                            if type == "synth" or type == "sample-loop":
-                                logging.info(f"Unmuting Layer({layer}) for Channel({sound})")
-
-                                if len(layer.get_midi_out()) == 0:
-                                    layer.set_midi_out(self.__previous_midi_out__[sound_index])
-                                self.__previous_midi_out__[sound_index] = []
-                                layer.reset_audio_out()
-                            else:
-                                logging.info(f"Muting Layer({layer}) for Channel({sound})")
-
-                                if len(self.__previous_midi_out__[sound_index]) == 0:
-                                    self.__previous_midi_out__[sound_index] = layer.get_midi_out()
-                                layer.mute_midi_out()
-                                layer.mute_audio_out()
-                    except Exception as e:
-                        logging.error(f"Error muting/unmuting layer({layer}) on channel({sound}) : {str(e)}")
-
             self.__track_audio_type__ = type
             self.zyngui.zynthiloops.set_selector()
             self.track_audio_type_changed.emit()

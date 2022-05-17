@@ -265,6 +265,8 @@ class zynthiloops_song(QObject):
                 return True
         except Exception as e:
             logging.error(f"Error during sketch restoration: {e}")
+            traceback.print_exception(None, e, e.__traceback__)
+
             return False
 
     @Slot(int, int, result=QObject)

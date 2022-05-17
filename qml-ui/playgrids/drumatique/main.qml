@@ -1498,10 +1498,15 @@ Zynthian.BasePlayGrid {
                     stepSettings.column = column;
                     stepSettingsPopup.open();
                 }
+                onClosed: {
+                    stepSettings.row = -1;
+                    stepSettings.column = -1;
+                }
                 StepSettings {
                     id: stepSettings
                     anchors.fill: parent
                     implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
+                    onClose: stepSettingsPopup.close();
                 }
             }
             QQC2.Drawer {
@@ -1524,6 +1529,10 @@ Zynthian.BasePlayGrid {
                     partPicker.patternIndex = patternIndex;
                     partPicker.associatedTrackIndex = associatedTrackIndex;
                     open();
+                }
+                onClosed: {
+                    partPicker.patternIndex = -1;
+                    partPicker.associatedTrackIndex = -1;
                 }
                 modal: true
                 parent: QQC2.Overlay.overlay

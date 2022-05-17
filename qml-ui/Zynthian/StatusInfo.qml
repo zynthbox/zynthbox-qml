@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 MouseArea {
     id: root
@@ -266,7 +267,9 @@ MouseArea {
             visible: zynthian.status_information.midi_recorder.length > 0
         }
         QQC2.Label {
-            text: zynthian.last_note
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 4
+            text: ZynQuick.PlayGridManager.activeNotes.join(",")
+            elide: Text.ElideRight
             font.pointSize: 9
         }
         QQC2.Label {

@@ -41,6 +41,7 @@ QQC2.Popup {
     id: root
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
+    exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true
     focus: true
     parent: QQC2.Overlay.overlay

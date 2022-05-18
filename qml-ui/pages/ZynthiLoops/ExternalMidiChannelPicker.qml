@@ -38,6 +38,7 @@ QQC2.Popup {
         open();
     }
 
+    exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true
     focus: true
     parent: QQC2.Overlay.overlay

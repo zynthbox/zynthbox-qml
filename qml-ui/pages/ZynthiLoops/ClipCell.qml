@@ -202,26 +202,33 @@ QQC2.AbstractButton {
             visible: root.isInScene
         }
 
-//        Rectangle {
-//            height: Kirigami.Units.gridUnit * 0.7
-//            anchors.left: parent.left
-//            anchors.right: parent.right
-//            anchors.top: parent.top
-//            color: "#99888888"
-//            visible: track.trackAudioType === "synth" &&
-//                     synthName.text &&
-//                     synthName.text.length > 0
+        Rectangle {
+            height: Kirigami.Units.gridUnit * 0.7
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            color: "#99888888"
+            visible: synthName.text &&
+                     synthName.text.length > 0
+//                   track.trackAudioType === "synth" &&
 
-//            QQC2.Label {
-//                id: synthName
-//                anchors.fill: parent
-//                elide: "ElideRight"
-//                horizontalAlignment: "AlignHCenter"
-//                verticalAlignment: "AlignVCenter"
-//                font.pointSize: 7
-//                text: track.connectedSoundName.split(" > ")[0]
-//            }
-//        }
+            QQC2.Label {
+                id: synthName
+                anchors.fill: parent
+                elide: "ElideRight"
+                horizontalAlignment: "AlignHCenter"
+                verticalAlignment: "AlignVCenter"
+                font.pointSize: 7
+                // text: track.connectedSoundName.split(" > ")[0]
+                text: model.track.trackAudioType === "synth"
+                          ? model.track.connectedSoundName.split(" > ")[0]
+                          : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
+                              ? model.track.samples[0].path.split("/").pop()
+                              : model.track.trackAudioType === "sample-loop"
+                                  ? model.track.sceneClip.path.split("/").pop()
+                                  : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
+            }
+        }
 
 //        Rectangle {
 //            height: Kirigami.Units.gridUnit * 0.7

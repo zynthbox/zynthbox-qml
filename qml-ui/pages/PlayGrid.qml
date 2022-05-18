@@ -656,7 +656,7 @@ don't want to have to dig too far...
         for (var i = 0; i < 10; ++i) {
             var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
             if (sequence) {
-                sequence.setActiveTrack(theTrack.id, 0);
+                sequence.setActiveTrack(theTrack.id, theTrack.selectedPart);
             }
         }
     }
@@ -768,16 +768,17 @@ don't want to have to dig too far...
                         onConnectedSoundChanged: trackPartSceneDelegate.adoptTrack()
                         onTrackAudioTypeChanged: trackPartSceneDelegate.adoptTrack()
                         onSamplesChanged: trackPartSceneDelegate.adoptSamples()
-                        onSelectedPartChanged: trackPartSceneDelegate.updateEnabledFromClips()
+                        onSelectedPartChanged: trackPartSceneDelegate.adoptSelectedPart()
                         onExternalMidiChannelChanged: {
                             trackPartSceneDelegate.pattern.externalMidiChannel = baseTrackDelegate.theTrack.externalMidiChannel;
                         }
                     }
                     Connections {
+                        target: trackPartDelegate.part
+                        onSamplesChanged: trackPartSceneDelegate.adoptSamples()
+                    }
+                    Connections {
                         target: trackPartSceneDelegate.sceneClip
-                        onEnabledChanged: trackPartSceneDelegate.updateEnabledFromClips()
-                        onCppObjIdChanged: trackPartSceneDelegate.updateEnabledFromClips()
-                        onInCurrentSceneChanged: trackPartSceneDelegate.updateEnabledFromClips()
                     }
                     Connections {
                         target: trackPartSceneDelegate.sequence
@@ -805,21 +806,12 @@ don't want to have to dig too far...
                     function adoptTrack() {
                         trackAdopterTimer.restart();
                     }
+                    property bool updateBindings: true
                     Timer {
                         id: trackAdopterTimer; interval: 1; repeat: false; running: false
                         onTriggered: {
                             if (trackPartSceneDelegate.pattern) {
-                                if (baseTrackDelegate.theTrack.trackAudioType === "sample-trig") {
-                                    trackPartSceneDelegate.pattern.noteDestination = ZynQuick.PatternModel.SampleTriggerDestination;
-                                } else if (baseTrackDelegate.theTrack.trackAudioType == "sample-slice") {
-                                    trackPartSceneDelegate.pattern.noteDestination = ZynQuick.PatternModel.SampleSlicedDestination;
-                                } else if (baseTrackDelegate.theTrack.trackAudioType == "sample-loop") {
-                                    trackPartSceneDelegate.pattern.noteDestination = ZynQuick.PatternModel.SampleLoopedDestination;
-                                } else if (baseTrackDelegate.theTrack.trackAudioType == "external") {
-                                    trackPartSceneDelegate.pattern.noteDestination = ZynQuick.PatternModel.ExternalDestination;
-                                } else {
-                                    trackPartSceneDelegate.pattern.noteDestination = ZynQuick.PatternModel.SynthDestination;
-                                }
+                                trackPartSceneDelegate.updateBindings = false;
                                 var connectedSound = baseTrackDelegate.trackIndex;
                                 if (connectedSound === -1) {
                                     // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
@@ -832,30 +824,67 @@ don't want to have to dig too far...
                                 } else {
                                     trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
                                 }
-                                trackPartSceneDelegate.pattern.externalMidiChannel = baseTrackDelegate.theTrack.externalMidiChannel;
                                 trackPartSceneDelegate.adoptSamples();
-                                trackPartSceneDelegate.updateEnabledFromClips();
+                                trackPartSceneDelegate.updateBindings = true;
                             } else {
                                 trackAdopterTimer.restart();
                             }
                         }
                     }
+                    Binding {
+                        target: trackPartSceneDelegate.pattern
+                        property: "enabled"
+                        value: trackPartSceneDelegate.sceneClip.enabled
+                        delayed: true
+                        when: trackPartSceneDelegate.updateBindings
+                    }
+                    Binding {
+                        target: trackPartSceneDelegate.pattern
+                        property: "noteDestination"
+                        value: {
+                            switch (baseTrackDelegate.theTrack.trackAudioType) {
+                            case "sample-trig":
+                                return ZynQuick.PatternModel.SampleTriggerDestination;
+                                break;
+                            case "sample-slice":
+                                return ZynQuick.PatternModel.SampleSlicedDestination;
+                                break;
+                            case "sample-loop":
+                                return ZynQuick.PatternModel.SampleLoopedDestination;
+                                break;
+                            case "external":
+                                return ZynQuick.PatternModel.ExternalDestination;
+                                break;
+                            default:
+                                return ZynQuick.PatternModel.SynthDestination;
+                                break;
+                            }
+                        }
+                        delayed: true
+                        when: trackPartSceneDelegate.updateBindings
+                    }
+                    Binding {
+                        target: trackPartSceneDelegate.pattern
+                        property: "externalMidiChannel"
+                        value: baseTrackDelegate.theTrack.externalMidiChannel
+                        delayed: true
+                        when: trackPartSceneDelegate.updateBindings
+                    }
 
                     function adoptSamples() {
-                        var clipIds = [-1,-1,-1,-1,-1];
-                        if (baseTrackDelegate.theTrack) {
+                        var clipIds = [];
+                        if (baseTrackDelegate.theTrack && trackPartDelegate.part) {
                             for (var i = 0; i < baseTrackDelegate.theTrack.samples.length; ++i) {
                                 var sample = baseTrackDelegate.theTrack.samples[i];
-                                if (sample) {
+                                if (sample && trackPartDelegate.part.samples.indexOf(i) > -1) {
                                     clipIds[i] = sample.cppObjId;
                                 }
                             }
                         }
                         trackPartSceneDelegate.pattern.clipIds = clipIds;
                     }
-
-                    function updateEnabledFromClips() {
-                        trackPartSceneDelegate.pattern.enabled = trackPartSceneDelegate.sceneClip.enabled;
+                    function adoptSelectedPart() {
+                        trackPartSceneDelegate.sequence.setActiveTrack(baseTrackDelegate.theTrack.id, baseTrackDelegate.theTrack.selectedPart);
                     }
                 }
             }

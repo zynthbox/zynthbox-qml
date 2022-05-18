@@ -251,7 +251,7 @@ Zynthian.ScreenPage {
                                     fillMode: Image.PreserveAspectCrop
                                     clip: true
                                     opacity: 0.5
-                                    source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(" ", "-")  + ".png")
+                                    source: Qt.resolvedUrl("../../img/synths/" + model.display.toLowerCase().replace(/ /g, "-")  + ".png")
                                 }
 
                                 Image {

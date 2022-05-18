@@ -232,7 +232,7 @@ class zynthiloops_clip(QObject):
                 self.set_bpm(self.__bpm__, True)
             if "enabled" in obj:
                 self.__enabled__ = obj["enabled"]
-                self.set_enabled(self.__enabled__)
+                self.set_enabled(self.__enabled__, True)
             if "shouldSync" in obj:
                 self.__should_sync__ = obj["shouldSync"]
                 self.set_shouldSync(self.__should_sync__, True)
@@ -1006,8 +1006,8 @@ class zynthiloops_clip(QObject):
     ### BEGIN Property enabled
     def get_enabled(self):
         return self.__enabled__
-    def set_enabled(self, enabled):
-        if self.__enabled__ != enabled:
+    def set_enabled(self, enabled, force_set=False):
+        if self.__enabled__ != enabled or force_set:
             self.__enabled__ = enabled;
             self.enabled_changed.emit()
     @Signal

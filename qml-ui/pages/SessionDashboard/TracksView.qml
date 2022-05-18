@@ -329,7 +329,7 @@ ColumnLayout {
                                                 zynthian.current_modal_screen_id = "playgrid";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                                                 var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
-                                                sequence.setActiveTrack(track.id, 0);
+                                                sequence.setActiveTrack(track.id, track.selectedPart);
                                             } else if (trackDelegate.hasWavLoaded) {
                                                 console.log("Opening bottom drawer");
                                                 bottomBar.forceActiveFocus();

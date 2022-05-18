@@ -284,17 +284,9 @@ Zynthian.BasePlayGrid {
         var patternObject = _private.sequence.get(patternIndex);
         if (patternObject.trackIndex > -1 && patternObject.partIndex > -1) {
             zynthian.session_dashboard.selectedTrack = patternObject.trackIndex;
-            // TODO also set the part on the track
-        } else {
-            for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                if (track && track.connectedPattern === patternIndex) {
-                    zynthian.session_dashboard.selectedTrack = i;
-                    break;
-                }
-            }
+            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+            track.selectedPart = patternObject.partIndex;
         }
-        _private.sequence.activePattern = patternIndex
     }
 
     property var noteSpecificColor: {
@@ -1278,7 +1270,7 @@ Zynthian.BasePlayGrid {
                                             text: patternsMenuItem.thisPattern ? qsTr("Part %1%2").arg(patternsMenuItem.associatedTrackIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
                                             onClicked: {
-                                                partPicker.pickPart(patternsMenuItem.thisPatternIndex, patternsMenuItem.associatedTrackIndex);
+                                                partPicker.pickPart(patternsMenuItem.associatedTrackIndex);
                                             }
                                         }
                                     }
@@ -1356,15 +1348,32 @@ Zynthian.BasePlayGrid {
 
                                                 soundName = text;
                                             }
+                                            function clipShorthands(clipIds) {
+                                                var names = [];
+                                                if (patternsMenuItem.associatedTrack) {
+                                                    for (var i = 0; i < patternsMenuItem.associatedTrack.samples.length; ++i) {
+                                                        var sample = patternsMenuItem.associatedTrack.samples[i];
+                                                        if (sample && clipIds.indexOf(sample.cppObjId) > -1) {
+                                                            names.push("S" + i);
+                                                        }
+                                                    }
+                                                }
+                                                if (names.length > 0) {
+                                                    return names.join(",");
+                                                }
+                                                return "(no sample)";
+                                            }
                                             text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                                ? "Sample Trigger Mode"
+                                                ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
                                                 : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
                                                     ? "Sample Slice Mode"
-                                                    : patternsMenuItem.associatedTrack
-                                                        ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
-                                                            ? "Sound: " + soundName
-                                                            : "No sound assigned - tap to select one"
-                                                        : "Unassigned - playing to: " + _private.currentSoundName
+                                                    : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
+                                                        ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
+                                                        : patternsMenuItem.associatedTrack
+                                                            ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                                ? "Sound: " + soundName
+                                                                : "No sound assigned - tap to select one"
+                                                    : "Unassigned - playing to: " + _private.currentSoundName
                                             onClicked: {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
@@ -1488,6 +1497,7 @@ Zynthian.BasePlayGrid {
             }
             QQC2.Popup {
                 id: stepSettingsPopup
+                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                 y: drumPad.y - height - Kirigami.Units.largeSpacing
                 x: Kirigami.Units.largeSpacing
                 modal: true
@@ -1525,21 +1535,18 @@ Zynthian.BasePlayGrid {
             }
             QQC2.Popup {
                 id: partPicker
-                function pickPart(patternIndex, associatedTrackIndex) {
-                    partPicker.patternIndex = patternIndex;
+                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+                function pickPart(associatedTrackIndex) {
                     partPicker.associatedTrackIndex = associatedTrackIndex;
                     open();
                 }
                 onClosed: {
-                    partPicker.patternIndex = -1;
                     partPicker.associatedTrackIndex = -1;
                 }
                 modal: true
                 parent: QQC2.Overlay.overlay
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)
-                property int patternIndex: -1
-                property QtObject pattern: patternIndex > -1 && _private.sequence ? _private.sequence.get(partPicker.patternIndex) : null
                 property int associatedTrackIndex: -1
                 property QtObject associatedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(partPicker.associatedTrackIndex)
                 ColumnLayout {
@@ -1562,6 +1569,12 @@ Zynthian.BasePlayGrid {
                                 Layout.fillHeight: true
                                 spacing: Kirigami.Units.smallSpacing
                                 property QtObject pattern: _private.sequence.getByPart(partPicker.associatedTrackIndex, model.index)
+                                Rectangle {
+                                    Layout.fillHeight: true
+                                    Layout.minimumWidth: Kirigami.Units.largeSpacing
+                                    Layout.maximumWidth: Kirigami.Units.largeSpacing
+                                    color: partPicker.associatedTrack.selectedPart === model.index ? Kirigami.Theme.highlightColor : "transparent"
+                                }
                                 Item {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
@@ -1591,11 +1604,15 @@ Zynthian.BasePlayGrid {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                    enabled: partPicker.associatedTrack.selectedPart !== model.index
                                     readonly property var partNames: ["a", "b", "c", "d", "e"]
-                                    text: qsTr("Show Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
+                                    text: qsTr("Pick Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
                                     onClicked: {
-                                        partPicker.associatedTrack.selectedPart = model.index;
+                                        var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                        if (partPicker.associatedTrack.enabled) {
+                                            partPicker.associatedTrack.selectedPart = model.index;
+                                        } else {
+                                            associatedClip.enabled = true;
+                                        }
                                         partPicker.close();
                                     }
                                 }

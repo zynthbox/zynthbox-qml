@@ -779,6 +779,7 @@ don't want to have to dig too far...
                     }
                     Connections {
                         target: trackPartSceneDelegate.sceneClip
+                        onEnabledChanged: trackPartSceneDelegate.adoptSelectedPart()
                     }
                     Connections {
                         target: trackPartSceneDelegate.sequence

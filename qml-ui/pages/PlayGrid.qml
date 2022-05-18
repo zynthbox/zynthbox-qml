@@ -812,16 +812,12 @@ don't want to have to dig too far...
                         onTriggered: {
                             if (trackPartSceneDelegate.pattern) {
                                 trackPartSceneDelegate.updateBindings = false;
-                                var connectedSound = baseTrackDelegate.trackIndex;
-                                if (connectedSound === -1) {
-                                    // Channel 15 is interpreted as "no assigned sound, either use override or play nothing"
-                                    trackPartSceneDelegate.pattern.layer = 15;
-                                } else if (baseTrackDelegate.trackIndex !== trackPartSceneDelegate.pattern.layer) {
-                                    trackPartSceneDelegate.pattern.layer = baseTrackDelegate.trackIndex;
-                                }
-                                if (trackPartSceneDelegate.pattern.layer === 15) {
+                                trackPartSceneDelegate.pattern.midiChannel = baseTrackDelegate.trackIndex;
+                                if (baseTrackDelegate.theTrack.connectedSound === -1) {
                                     trackPartSceneDelegate.pattern.layerData = "";
                                 } else {
+                                    // TODO One for Anupam, probably ;) This wants to be something else maybe?
+                                    // Idea is "store the setup for this track", and i guess this only captures the first synth, not the whole thing?
                                     trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
                                 }
                                 trackPartSceneDelegate.adoptSamples();

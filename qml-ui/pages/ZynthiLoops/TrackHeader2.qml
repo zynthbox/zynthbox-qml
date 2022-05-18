@@ -51,40 +51,15 @@ QQC2.AbstractButton {
     property bool highlightOnFocus: true
 
     contentItem: Item {
-        Image {
-            id: synthImage
-            visible: model.track.trackAudioType === "synth" &&
-                     synthImage.status !== Image.Error
-            anchors.fill: parent
-            anchors.margins: 2
-            fillMode: Image.PreserveAspectCrop
-            clip: true
-            opacity: 0.4
-            source: Qt.resolvedUrl("../../../img/synths/" + String(model.track.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")  + ".png")
-        }
-
-        Image {
-            visible: model.track.trackAudioType === "synth" &&
-                     model.track.connectedSoundName.split(" > ")[0].length > 0 &&
-                     synthImage.status === Image.Error
-            anchors.fill: parent
-            anchors.margins: 2
-            fillMode: Image.PreserveAspectCrop
-            horizontalAlignment: Image.AlignHCenter
-            verticalAlignment: Image.AlignVCenter
-            clip: true
-            opacity: 0.4
-            source: Qt.resolvedUrl("../../../img/synths/zynth-default.png")
-        }
-
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 2
+            spacing: 2
 
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.7
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
                 color: root.color
                 radius: 2
 
@@ -93,14 +68,8 @@ QQC2.AbstractButton {
                     anchors.centerIn: parent
                     horizontalAlignment: "AlignHCenter"
                     elide: "ElideRight"
-                    font.pointSize: 7
-                    text: model.track.trackAudioType === "synth"
-                          ? model.track.connectedSoundName.split(" > ")[0]
-                          : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
-                              ? model.track.samples[0].path.split("/").pop()
-                              : model.track.trackAudioType === "sample-loop"
-                                  ? model.track.sceneClip.path.split("/").pop()
-                                  : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
+                    font.pointSize: 6
+                    text: subSubText
                 }
             }
 
@@ -110,37 +79,78 @@ QQC2.AbstractButton {
 
                 QQC2.Label {
                     id: contents
-                    anchors.fill: parent
+                    width: parent.width * 0.4
+                    height: parent.height
+
                     horizontalAlignment: "AlignHCenter"
                     verticalAlignment: "AlignVCenter"
                     elide: "ElideRight"
                     text: root.text
+                    font.pointSize: 8
                 }
-            }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 0.5
-                color: "#66444444"
-                visible: detailsLabel.text &&
-                         detailsLabel.text.length > 0
+                Item {
+                    anchors {
+                        left: contents.right
+                    }
+                    width: parent.width * 0.6
+                    height: parent.height
 
-                QQC2.Label {
-                    id: detailsLabel
-                    anchors.fill: parent
-                    elide: "ElideRight"
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    font.pointSize: 7
-                    text: subSubText
+                    Image {
+                        id: synthImage
+                        visible: synthImage.status !== Image.Error
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectCrop
+                        clip: true
+                        opacity: 0.7
+                        source: Qt.resolvedUrl("../../../img/synths/" + String(model.track.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")  + ".png")
+                    }
+
+                    Image {
+                        visible: synthImage.status === Image.Error
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectCrop
+                        horizontalAlignment: Image.AlignHCenter
+                        verticalAlignment: Image.AlignVCenter
+                        clip: true
+                        opacity: 0.5
+                        source: Qt.resolvedUrl("../../../img/synths/zynth-default.png")
+                    }
                 }
+
+//                Rectangle {
+//                    anchors {
+//                        left: parent.left
+//                        right: parent.right
+//                        bottom: parent.bottom
+//                    }
+//                    height: Kirigami.Units.gridUnit * 0.5
+
+//                    color: "#66444444"
+//                    visible: detailsLabel.text &&
+//                             detailsLabel.text.length > 0
+
+//                    QQC2.Label {
+//                        id: detailsLabel
+//                        anchors.fill: parent
+//                        elide: "ElideRight"
+//                        horizontalAlignment: "AlignHCenter"
+//                        verticalAlignment: "AlignVCenter"
+//                        font.pointSize: 7
+//                        text: model.track.trackAudioType === "synth"
+//                              ? model.track.connectedSoundName.split(" > ")[0]
+//                              : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
+//                                  ? model.track.samples[0].path.split("/").pop()
+//                                  : model.track.trackAudioType === "sample-loop"
+//                                      ? model.track.sceneClip.path.split("/").pop()
+//                                      : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
+//                    }
+//                }
             }
         }
     }
 
     onPressed: {
-        console.log("@@@ :", model.track.connectedSoundName, model.track.connectedSoundName.split(" > ")[0], Qt.resolvedUrl("../../../img/synths/" + String(model.track.connectedSoundName.toLowerCase().split(" > ")[0]).replace(/ /g, "-")  + ".png"))
         root.forceActiveFocus()
     }
 

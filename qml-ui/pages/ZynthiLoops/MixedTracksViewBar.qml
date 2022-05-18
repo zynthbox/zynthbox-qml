@@ -173,6 +173,8 @@ Rectangle {
 
                             EditableHeader {
                                 property QtObject controlObj: root.selectedTrack
+                                property QtObject controlType: BottomBar.ControlType.Track
+
                                 text: qsTr("TRACK: %1").arg(controlObj ? controlObj.name : "")
                             }
 

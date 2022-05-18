@@ -284,7 +284,7 @@ Zynthian.BasePlayGrid {
         var patternObject = _private.sequence.get(patternIndex);
         if (patternObject.trackIndex > -1 && patternObject.partIndex > -1) {
             zynthian.session_dashboard.selectedTrack = patternObject.trackIndex;
-            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+            var track = zynthian.zynthiloops.song.tracksModel.getTrack(patternObject.trackIndex);
             track.selectedPart = patternObject.partIndex;
         }
     }
@@ -353,23 +353,8 @@ Zynthian.BasePlayGrid {
             interval: 1;
             onTriggered: {
                 if (_private.activePatternModel) {
-                    var foundTrack = null;
-                    var foundIndex = -1;
-                    if (_private.activePatternModel.trackIndex > -1) {
-                        foundTrack = zynthian.zynthiloops.song.tracksModel.getTrack(_private.activePatternModel.trackIndex)
-                        foundIndex = _private.activePatternModel.trackIndex;
-                    } else {
-                        for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                            var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                            if (track && track.connectedPattern === _private.activePattern) {
-                                foundTrack = track;
-                                foundIndex = i;
-                                break;
-                            }
-                        }
-                    }
-                    _private.associatedTrack = foundTrack;
-                    _private.associatedTrackIndex = foundIndex;
+                    _private.associatedTrack = zynthian.zynthiloops.song.tracksModel.getTrack(_private.activePatternModel.trackIndex);
+                    _private.associatedTrackIndex =  _private.activePatternModel.trackIndex;
                 } else {
                     _private.updateTrack();
                 }
@@ -1608,7 +1593,7 @@ Zynthian.BasePlayGrid {
                                     text: qsTr("Pick Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
                                     onClicked: {
                                         var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
-                                        if (partPicker.associatedTrack.enabled) {
+                                        if (associatedClip.enabled) {
                                             partPicker.associatedTrack.selectedPart = model.index;
                                         } else {
                                             associatedClip.enabled = true;

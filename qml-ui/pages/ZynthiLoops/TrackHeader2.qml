@@ -98,7 +98,9 @@ QQC2.AbstractButton {
 
                     Image {
                         id: synthImage
-                        visible: synthImage.status !== Image.Error
+                        visible: model.track.trackAudioType === "synth" &&
+                                 model.track.occupiedSlotsCount > 0  &&
+                                 synthImage.status !== Image.Error
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         clip: true
@@ -107,7 +109,8 @@ QQC2.AbstractButton {
                     }
 
                     Image {
-                        visible: synthImage.status === Image.Error
+                        visible: (model.track.trackAudioType === "synth" && synthImage.status === Image.Error && model.track.occupiedSlotsCount > 0) ||
+                                 ["sample-loop", "sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         horizontalAlignment: Image.AlignHCenter
@@ -146,6 +149,30 @@ QQC2.AbstractButton {
 //                                      : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
 //                    }
 //                }
+
+
+                Rectangle {
+                    height: Kirigami.Units.gridUnit * 0.7
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    color: "#99888888"
+                    visible: synthName.text &&
+                             synthName.text.length > 0
+
+                    QQC2.Label {
+                        id: synthName
+                        anchors.fill: parent
+                        elide: "ElideRight"
+                        horizontalAlignment: "AlignHCenter"
+                        verticalAlignment: "AlignVCenter"
+                        font.pointSize: 7
+                        // text: track.connectedSoundName.split(" > ")[0]
+                        text: model.track.trackAudioType === "synth"
+                                  ? model.track.connectedSoundName.split(" > ")[0]
+                                  : ""
+                    }
+                }
             }
         }
     }

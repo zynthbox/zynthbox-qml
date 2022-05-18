@@ -313,6 +313,7 @@ Rectangle {
                                             }
                                         }
                                         QQC2.Button {
+                                            Layout.fillHeight: true
                                             icon.name: "timeline-use-zone-on"
                                             onClicked: {
                                                 trackKeyZoneSetup.open();

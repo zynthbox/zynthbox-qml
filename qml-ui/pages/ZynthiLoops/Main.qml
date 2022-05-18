@@ -679,7 +679,7 @@ Zynthian.ScreenPage {
                         id: tracksHeaderRepeater
                         model: root.song.tracksModel
 
-                        delegate: TableHeader {
+                        delegate: TrackHeader2 {
                             text: model.track.name
 
                             Connections {
@@ -755,7 +755,7 @@ Zynthian.ScreenPage {
                                     return "#ff2196f3"
                                 else if (model.track.trackAudioType === "synth" && model.track.occupiedSlotsCount > 0)
                                     return "#66ff0000"
-                                else if (model.track.trackAudioType === "sample-loop")
+                                else if (model.track.trackAudioType === "sample-loop" && model.track.sceneClip.path && model.track.sceneClip.path.length > 0)
                                     return "#6600ff00"
                                 else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlotsCount > 0)
                                     return "#66ffff00"
@@ -764,7 +764,7 @@ Zynthian.ScreenPage {
                                 else if (model.track.trackAudioType === "external")
                                     return "#998e24aa"
                                 else
-                                    return Kirigami.Theme.backgroundColor
+                                    return "#66888888"
                             }
 
                             highlightOnFocus: false

@@ -43,6 +43,9 @@ class zynthiloops_clips_model(QAbstractListModel):
         self.__partIndex__ = partIndex
         partNames = ['a', 'b', 'c', 'd', 'e']
         self.__partName__ = "(?)" if (partIndex == -1) else partNames[partIndex]
+        if self.__track__ is not None:
+            self.__track__.keyZoneModeChanged.connect(self.updateSamplesFromTrack)
+            self.__track__.track_audio_type_changed.connect(self.updateSamplesFromTrack)
 
     def serialize(self):
         data = []
@@ -142,7 +145,7 @@ class zynthiloops_clips_model(QAbstractListModel):
         return self.__samples__
     def set_samples(self, samples):
         if self.__samples__ != samples:
-            self.__samples = samples;
+            self.__samples__ = samples;
             self.samples_changed.emit()
     @Signal
     def samples_changed(self):
@@ -156,6 +159,18 @@ class zynthiloops_clips_model(QAbstractListModel):
     def removeSample(self, sample):
         if sample in self.__samples__:
             self.__samples__.remove(sample)
+            self.samples_changed.emit()
+    @Slot(None)
+    def clearSamples(self):
+        self.__samples__.clear()
+        self.samples_changed.emit()
+    @Slot(None)
+    def updateSamplesFromTrack(self):
+        if self.__track__ is not None:
+            if self.__track__.trackAudioType == "sample-trig" and self.__track__.keyZoneMode == "all-full":
+                self.__samples__ = [self.__partIndex__] # A little odd seeming perhaps, but the indices line up (five parts, five samples, we want the sample for trig/full to match the part)
+            else:
+                self.__samples__ = [0, 1, 2, 3, 4]
             self.samples_changed.emit()
     samples = Property('QVariantList', get_samples, set_samples, notify=samples_changed)
     ### END Property samples

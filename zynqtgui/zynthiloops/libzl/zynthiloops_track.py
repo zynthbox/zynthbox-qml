@@ -103,6 +103,7 @@ class zynthiloops_track(QObject):
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
+        self.zyngui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler)
 
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, sceneIndex, partNum):
@@ -126,6 +127,12 @@ class zynthiloops_track(QObject):
 
         self.occupiedSlotsChanged.emit()
         self.update_jack_port()
+        self.connectedSoundChanged.emit()
+        self.connectedSoundNameChanged.emit()
+        self.chainedSoundsInfoChanged.emit()
+        self.chainedSoundsNamesChanged.emit()
+
+    def fixed_layers_list_updated_handler(self):
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()

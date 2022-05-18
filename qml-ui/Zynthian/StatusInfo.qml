@@ -302,6 +302,7 @@ MouseArea {
 
     QQC2.Popup {
         id: popup
+        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
         y: parent.height
         modal: true
         width: Kirigami.Units.gridUnit * 20

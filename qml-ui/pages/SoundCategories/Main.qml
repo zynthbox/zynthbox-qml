@@ -33,7 +33,7 @@ import '../../Zynthian' 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject track: applicationWindow().selectedTrack
     property QtObject soundCopySource
 
     title: qsTr("Sound Categories")
@@ -449,10 +449,12 @@ Zynthian.ScreenPage {
                     flickableDirection: Flickable.VerticalFlick
                     orientation: ListView.Vertical
                     clip: true
-                    model: soundButtonGroup.checkedButton != null &&
-                           soundButtonGroup.checkedButton.checked
-                            ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                            : root.track.chainedSoundsNames
+                    model: root.visible
+                            ? soundButtonGroup.checkedButton != null &&
+                              soundButtonGroup.checkedButton.checked
+                                ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
+                                : root.track.chainedSoundsNames
+                            : null
 
                     delegate: Item {
                         width: ListView.view.width

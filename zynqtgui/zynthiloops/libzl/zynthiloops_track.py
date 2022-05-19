@@ -76,6 +76,11 @@ class zynthiloops_track(QObject):
         self.update_jack_port_timer.setSingleShot(True)
         self.update_jack_port_timer.timeout.connect(self.do_update_jack_port)
 
+        self.fixed_layers_list_updated_handler_throttle = QTimer()
+        self.fixed_layers_list_updated_handler_throttle.setInterval(100)
+        self.fixed_layers_list_updated_handler_throttle.setSingleShot(True)
+        self.fixed_layers_list_updated_handler_throttle.timeout.connect(self.fixed_layers_list_updated_handler)
+
         # Create 5 clip objects for 5 samples per track
         for i in range(0, 5):
             self.__samples__.append(zynthiloops_clip(self.id, -1, -1, self.__song__, self, True))
@@ -103,7 +108,7 @@ class zynthiloops_track(QObject):
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
-        self.zyngui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler)
+        self.zyngui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler_throttle.start)
 
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, sceneIndex, partNum):
@@ -133,6 +138,8 @@ class zynthiloops_track(QObject):
         self.chainedSoundsNamesChanged.emit()
 
     def fixed_layers_list_updated_handler(self):
+        logging.error(f"### fixed_layers_list_updated_handler")
+
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()

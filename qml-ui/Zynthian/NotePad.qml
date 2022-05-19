@@ -65,7 +65,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.firstNoteBackground : component.backgroundColor)
+                color: component.visible && modelData.isPlaying ? component.playingBackgroundColor : (modelData.midiNote % 12 === 0 ? component.firstNoteBackground : component.backgroundColor)
                 QQC2.Label {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
@@ -81,7 +81,7 @@ Item {
         anchors.fill: parent
         color: {
             var color = component.backgroundColor;
-            if (component.note) {
+            if (component.visible && component.note) {
                 if (component.note.isPlaying) {
                     color = component.playingBackgroundColor;
                 } else {

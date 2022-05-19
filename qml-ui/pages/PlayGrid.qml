@@ -757,11 +757,11 @@ don't want to have to dig too far...
                             trackPartSceneDelegate.sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == trackPartSceneDelegate.sequenceIndex);
                         }
                     }
-                    Connections {
-                        target: zynthian.zynthiloops.song.tracksModel
-                        onConnectedSoundsCountChanged: trackPartSceneDelegate.adoptTrack()
-                        onConnectedPatternsCountChanged: trackPartSceneDelegate.adoptTrack()
-                    }
+//                    Connections {
+//                        target: zynthian.zynthiloops.song.tracksModel
+//                        onConnectedSoundsCountChanged: trackPartSceneDelegate.adoptTrack()
+//                        onConnectedPatternsCountChanged: trackPartSceneDelegate.adoptTrack()
+//                    }
                     Connections {
                         target: baseTrackDelegate.theTrack
                         onConnectedPatternChanged: trackPartSceneDelegate.adoptTrack()
@@ -798,18 +798,22 @@ don't want to have to dig too far...
                         sequenceSaverThrottle.restart();
                     }
                     Timer {
-                        id: sequenceSaverThrottle; repeat: false; running: false; interval: 100
+                        id: sequenceSaverThrottle; repeat: false; running: false; interval: 1000
                         onTriggered: {
-                            trackPartSceneDelegate.sequence.save();
+                            if (trackPartSceneDelegate.sequenceIndex === zynthian.zynthiloops.song.scenesModel.selectedSceneIndex) {
+                                trackPartSceneDelegate.sequence.save();
+                            }
                         }
                     }
 
                     function adoptTrack() {
-                        trackAdopterTimer.restart();
+                        if (trackPartSceneDelegate.sequenceIndex === zynthian.zynthiloops.song.scenesModel.selectedSceneIndex) {
+                            trackAdopterTimer.restart();
+                        }
                     }
                     property bool updateBindings: true
                     Timer {
-                        id: trackAdopterTimer; interval: 1; repeat: false; running: false
+                        id: trackAdopterTimer; interval: 50; repeat: false; running: false
                         onTriggered: {
                             if (trackPartSceneDelegate.pattern) {
                                 trackPartSceneDelegate.updateBindings = false;
@@ -819,7 +823,7 @@ don't want to have to dig too far...
                                 } else {
                                     // TODO One for Anupam, probably ;) This wants to be something else maybe?
                                     // Idea is "store the setup for this track", and i guess this only captures the first synth, not the whole thing?
-                                    trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
+                                    // trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
                                 }
                                 trackPartSceneDelegate.adoptSamples();
                                 trackPartSceneDelegate.updateBindings = true;

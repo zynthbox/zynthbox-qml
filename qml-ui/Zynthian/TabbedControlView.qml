@@ -250,6 +250,7 @@ Item {
         anchors.fill: parent
         property var pageCache: ({})
         function loadAndCachePage(pageUrl, initialProperties) {
+            print("AAAA"+pageUrl)
             if (!pageCache) {
                 pageCache = {};
             }

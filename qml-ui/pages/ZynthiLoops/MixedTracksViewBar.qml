@@ -40,7 +40,7 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject selectedTrack: song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    readonly property QtObject selectedTrack: applicationWindow().selectedTrack
     property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
     property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart) : null
 
@@ -353,14 +353,16 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                                 Repeater {
-                                    model: root.selectedTrack.trackAudioType === "synth"
+                                    model: visible
+                                    ? (root.selectedTrack.trackAudioType === "synth"
                                             ? root.selectedTrack.chainedSoundsNames
                                             : root.selectedTrack.trackAudioType === "sample-trig" ||
                                               root.selectedTrack.trackAudioType === "sample-slice"
                                                 ? root.selectedTrack.samples
                                                 : root.selectedTrack.trackAudioType === "sample-loop"
                                                     ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol), null, null, null, null]
-                                                    : []
+                                                    : [])
+                                    : null
 
                                     delegate: Rectangle {
                                         id: delegate

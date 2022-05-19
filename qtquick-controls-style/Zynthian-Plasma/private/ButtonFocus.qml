@@ -47,7 +47,7 @@ Item {
         }
     ]
 
-    transitions: [
+    /*transitions: [
         Transition {
             from: "*"
             to: "hidden"
@@ -78,5 +78,5 @@ Item {
                 }
             }
         }
-    ]
+    ]*/
 }

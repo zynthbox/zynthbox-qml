@@ -274,15 +274,15 @@ Rectangle {
 
                                                 Connections {
                                                     target: model.track
-                                                    onChainedSoundsChanged: soundLabel.updateSoundName()
-                                                    onSamplesChanged: soundLabel.updateSoundName()
+                                                    onChainedSoundsChanged: model.track.trackAudioType === "synth" ? soundLabel.updateSoundName() : false
+                                                    onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundLabel.updateSoundName() : false
                                                     onTrackAudioTypeChanged: soundLabel.updateSoundName()
-                                                    onSceneClipChanged: soundLabel.updateSoundName()
+                                                    onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundLabel.updateSoundName() : false
                                                 }
 
                                                 Connections {
                                                     target: model.track.sceneClip
-                                                    onPathChanged: soundLabel.updateSoundName()
+                                                    onPathChanged: model.track.trackAudioType === "sample-loop" ? soundLabel.updateSoundName() : false
                                                 }
 
                                                 function updateSoundName() {

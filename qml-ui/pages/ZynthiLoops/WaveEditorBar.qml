@@ -361,16 +361,16 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                visible: waveBar.controlObj.isPlaying
+                visible: waveBar.visible && waveBar.controlObj.isPlaying
                 color: Kirigami.Theme.highlightColor
                 width: Kirigami.Units.smallSpacing
-                x: waveBar.controlObj.progress/waveBar.controlObj.duration * parent.width
+                x: visible ? waveBar.controlObj.progress/waveBar.controlObj.duration * parent.width : 0
             }
 
             // Slice progress lines
             Repeater {
                 property QtObject cppClipObject: ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId);
-                model: (waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
+                model: (waveBar.visible && waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
                     ? cppClipObject.playbackPositions
                     : 0
                 delegate: Item {

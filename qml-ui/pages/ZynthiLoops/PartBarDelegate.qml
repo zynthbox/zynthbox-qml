@@ -56,11 +56,11 @@ ColumnLayout {
                         top: parent.top
                         bottom: parent.bottom
                     }
-                    visible: partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                    visible: root.visible && parent.visible && partDelegate.pattern ? partDelegate.pattern.isPlaying : false
                     color: Kirigami.Theme.highlightColor
-                    property double widthFactor: partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
+                    property double widthFactor: root.visible && parent.visible && partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
                     width: Math.max(1, Math.floor(widthFactor))
-                    x: partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
+                    x: root.visible && parent.visible && partDelegate.pattern ? partDelegate.pattern.bankPlaybackPosition * widthFactor : 0
                 }
             }
             QQC2.Label {

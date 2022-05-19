@@ -1156,7 +1156,9 @@ Zynthian.BasePlayGrid {
                         Connections {
                             target: _private
                             onActivePatternModelChanged: {
-                                patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.trackIndex / 5), ListView.Beginning);
+                                if (_private.activePatternModel) {
+                                    patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.trackIndex / 5), ListView.Beginning);
+                                }
                             }
                         }
 

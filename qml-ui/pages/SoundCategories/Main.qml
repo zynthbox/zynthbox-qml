@@ -449,10 +449,12 @@ Zynthian.ScreenPage {
                     flickableDirection: Flickable.VerticalFlick
                     orientation: ListView.Vertical
                     clip: true
-                    model: soundButtonGroup.checkedButton != null &&
+                    model: visible
+                        ? (soundButtonGroup.checkedButton != null &&
                            soundButtonGroup.checkedButton.checked
                             ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                            : root.track.chainedSoundsNames
+                            : root.track.chainedSoundsNames)
+                        : null
 
                     delegate: Item {
                         width: ListView.view.width

@@ -73,7 +73,7 @@ QQC2.Button {
                 margins: 1
             }
             height:9
-            color:  component.barStepIndex === component.playedBar ? "yellow" : "transparent"
+            color: visible && component.barStepIndex === component.playedBar ? "yellow" : "transparent"
         }
     }
 

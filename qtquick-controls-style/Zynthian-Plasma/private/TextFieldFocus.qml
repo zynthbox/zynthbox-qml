@@ -74,13 +74,13 @@ Item {
         }
     ]
 
-    transitions: [
-        Transition {
-            PropertyAnimation {
-                properties: "opacity"
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.OutQuad
-            }
-        }
-    ]
+//     transitions: [
+//         Transition {
+//             PropertyAnimation {
+//                 properties: "opacity"
+//                 duration: Kirigami.Units.longDuration
+//                 easing.type: Easing.OutQuad
+//             }
+//         }
+//     ]
 }

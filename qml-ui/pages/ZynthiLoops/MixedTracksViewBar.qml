@@ -173,7 +173,8 @@ Rectangle {
                             Layout.fillHeight: false
 
                             EditableHeader {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                                Layout.minimumWidth: parent.width / 4
+                                Layout.maximumWidth: parent.width / 4
                                 property QtObject controlObj: root.selectedTrack
                                 property QtObject controlType: BottomBar.ControlType.Track
 

@@ -942,36 +942,12 @@ Zynthian.ScreenPage {
                                     Layout.maximumHeight: privateProps.cellHeight
 
                                     onPressed: {
-                                        root.lastSelectedObj = track.sceneClip
+                                        Qt.callLater(function() {
+                                            root.lastSelectedObj = track.sceneClip
 
-                                        if (dblTimer.running) {
-                                            root.song.scenesModel.toggleClipInCurrentScene(track.sceneClip);
-
-                                            if (track.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(track.id, track.selectedPart).enabled = track.sceneClip.inCurrentScene;
-                                            }
-                                            dblTimer.stop()
-                                            return
-                                        }
-                                        dblTimer.restart()
-
-                                        // If MixedTracksViewBar is not open, open MixedTracksViewBar first and switch to track
-                                        if (!bottomStack.slotsBar.trackButton.checked) {
-                                            bottomStack.slotsBar.trackButton.checked = true
-                                            dblTimer.stop();
-
-                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                            zynthian.session_dashboard.selectedTrack = track.sceneClip.row;
-
-                                            return;
-                                        }
-                                    }
-                                    Timer { //FIXME: why onDoubleClicked doesn't work
-                                        id: dblTimer
-                                        interval: 200
-                                        repeat: false
-                                        running: false
-                                        onTriggered: {
+                                            // Directly switch to track instead of implementing muting on double click
+                                            // as we probably wont need muting anymore. Muting is handled by partsBar
+                                            // when  none of the parts are selected
                                             if (zynthian.session_dashboard.selectedTrack === track.id
                                                 && bottomStack.slotsBar.trackButton.checked) {
                                                 bottomStack.slotsBar.bottomBarButton.checked = true
@@ -989,7 +965,7 @@ Zynthian.ScreenPage {
                                                 bottomBar.controlType = BottomBar.ControlType.Clip;
                                                 bottomBar.controlObj = track.sceneClip;
                                             }
-                                        }
+                                        })
                                     }
                                 }
                             }

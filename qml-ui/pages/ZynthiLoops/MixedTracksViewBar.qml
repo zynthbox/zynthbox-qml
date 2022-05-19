@@ -176,7 +176,7 @@ Rectangle {
                                 Layout.minimumWidth: parent.width / 4
                                 Layout.maximumWidth: parent.width / 4
                                 property QtObject controlObj: root.selectedTrack
-                                property QtObject controlType: BottomBar.ControlType.Track
+                                property int controlType: BottomBar.ControlType.Track
 
                                 text: qsTr("TRACK: %1").arg(controlObj ? controlObj.name : "")
                             }
@@ -525,16 +525,16 @@ Rectangle {
                                                 top: parent.top
                                                 bottom: parent.bottom
                                             }
-                                            visible: parent.clip.isPlaying
+                                            visible: root.visible && parent.clip.isPlaying
                                             color: Kirigami.Theme.highlightColor
                                             width: Kirigami.Units.smallSpacing
-                                            x: parent.clip.progress/parent.clip.duration * parent.width
+                                            x: visible ? parent.clip.progress/parent.clip.duration * parent.width : 0
                                         }
 
                                         // SamplerSynth progress dots
                                         Repeater {
                                             property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(parent.clip.cppObjId) : null;
-                                            model: (root.selectedTrack.trackAudioType === "sample-slice" || root.selectedTrack.trackAudioType === "sample-trig") && cppClipObject
+                                            model: (root.visible && root.selectedTrack.trackAudioType === "sample-slice" || root.selectedTrack.trackAudioType === "sample-trig") && cppClipObject
                                                 ? cppClipObject.playbackPositions
                                                 : 0
                                             delegate: Item {
@@ -614,14 +614,15 @@ Rectangle {
                                                 top: parent.top
                                                 bottom: parent.bottom
                                             }
-                                            visible: root.sequence &&
+                                            visible: root.visible &&
+                                                     root.sequence &&
                                                      root.sequence.isPlaying &&
                                                      root.pattern &&
                                                      root.pattern.enabled
                                             color: Kirigami.Theme.highlightColor
                                             width: widthFactor // this way the progress rect is the same width as a step
-                                            property double widthFactor: root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
-                                            x: root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
+                                            property double widthFactor: visible && root.pattern ? parent.width / (root.pattern.width * root.pattern.bankLength) : 1
+                                            x: visible && root.pattern ? root.pattern.bankPlaybackPosition * widthFactor : 0
                                         }
                                         MouseArea {
                                             anchors.fill:parent

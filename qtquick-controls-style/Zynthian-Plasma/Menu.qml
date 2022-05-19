@@ -66,7 +66,7 @@ T.Menu {
         }
     }
 
-    enter: Transition {
+    enter: null/* Transition {
         NumberAnimation {
             property: "opacity"
             from: 0
@@ -74,9 +74,9 @@ T.Menu {
             easing.type: Easing.InOutQuad
             duration: Kirigami.Units.shortDuration
         }
-    }
+    }*/
 
-    exit: Transition {
+    exit: null/* Transition {
         NumberAnimation {
             property: "opacity"
             from: 1
@@ -84,7 +84,7 @@ T.Menu {
             easing.type: Easing.InOutQuad
             duration: Kirigami.Units.shortDuration
         }
-    }
+    }*/
 
     background: PlasmaCore.FrameSvgItem {
         imagePath: "widgets/background"

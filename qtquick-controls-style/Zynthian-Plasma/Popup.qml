@@ -29,7 +29,7 @@ T.Popup {
         color: Qt.rgba(0, 0, 0, 0.5)
     }
 
-    enter: Transition {
+    enter: null /*Transition {
         NumberAnimation {
             property: "opacity"
             from: 0
@@ -37,9 +37,9 @@ T.Popup {
             easing.type: Easing.InOutQuad
             duration: Kirigami.Units.longDuration
         }
-    }
+    }*/
 
-    exit: Transition {
+    exit: null /*Transition {
         NumberAnimation {
             property: "opacity"
             from: 1
@@ -47,7 +47,7 @@ T.Popup {
             easing.type: Easing.InOutQuad
             duration: Kirigami.Units.longDuration
         }
-    }
+    }*/
 
     contentItem: Item { }
 

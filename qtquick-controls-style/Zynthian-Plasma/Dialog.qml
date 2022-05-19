@@ -36,7 +36,7 @@ T.Dialog {
         }
     }
 
-    enter: Transition {
+    enter: null/* Transition {
         NumberAnimation {
             property: "opacity"
             from: 0
@@ -51,9 +51,9 @@ T.Dialog {
             easing.type: Easing.OutQuad
             duration: 10//Kirigami.Units.shortDuration
         }
-    }
+    }*/
 
-    exit: Transition {
+    exit: null /* Transition {
         NumberAnimation {
             property: "opacity"
             from: 1
@@ -68,7 +68,7 @@ T.Dialog {
             easing.type: Easing.InQuad
             duration: 10//Kirigami.Units.shortDuration
         }
-    }
+    }*/
 
     contentItem: Item { }
 

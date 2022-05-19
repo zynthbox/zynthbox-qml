@@ -1303,20 +1303,26 @@ Zynthian.BasePlayGrid {
                                             opacity: enabled ? 1 : 0.7
                                             property string soundName
                                             Component.onCompleted: {
-                                                updateSoundName();
+                                                updateSoundNameTimer.restart();
+                                            }
+                                            Timer {
+                                                id: updateSoundNameTimer
+                                                interval: 100
+                                                repeat: false
+                                                onTriggered: soundButton.updateSoundName()
                                             }
                                             Connections {
                                                 target: patternsMenuItem
-                                                onAssociatedTrackChanged: soundButton.updateSoundName();
+                                                onAssociatedTrackChanged: updateSoundNameTimer.restart();
                                             }
                                             Connections {
                                                 target: zynthian.fixed_layers
-                                                onList_updated: soundButton.updateSoundName();
+                                                onList_updated: updateSoundNameTimer.restart();
                                             }
                                             Connections {
                                                 target: patternsMenuItem.associatedTrack
-                                                onChainedSoundsChanged: soundButton.updateSoundName();
-                                                onConnectedSoundChanged: soundButton.updateSoundName();
+                                                onChainedSoundsChanged: updateSoundNameTimer.restart();
+                                                onConnectedSoundChanged: updateSoundNameTimer.restart();
                                             }
                                             function updateSoundName() {
                                                 var text = "";

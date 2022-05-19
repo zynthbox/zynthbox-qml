@@ -40,7 +40,7 @@ ColumnLayout {
     signal removeNote(QtObject note)
 
     Repeater {
-        model: component.model
+        model: visible ? component.model : null
         delegate: RowLayout {
             property var row: index
             Repeater {

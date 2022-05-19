@@ -125,75 +125,75 @@ Item {
         }
     ]
 
-    transitions: [
-        /* FIXME: For some reason, one of the surfaces will stop working when
-         * OpacityAnimator is used.
-         * OpacityAnimator would be more efficient.
-         */
-        Transition {
-            from: "*"
-            to: "normal"
-            SequentialAnimation {
-                PropertyAction {
-                    targets: [surfaceHover]
-                    property: "visible"
-                    value: false
-                }
-                NumberAnimation {
-                    property: "opacity"
-                    duration: Kirigami.Units.shortDuration
-                    easing.type: Easing.OutQuad
-                }
-                PropertyAction {
-                    targets: [surfacePressed]
-                    property: "visible"
-                    value: false
-                }
-            }
-        },
-        Transition {
-            from: "*"
-            to: "hovered"
-            SequentialAnimation {
-                PropertyAction {
-                    target: surfaceHover
-                    property: "visible"
-                    value: true
-                }
-                NumberAnimation {
-                    property: "opacity"
-                    // Using a shorter duration here makes things feel more responsive.
-                    duration: Kirigami.Units.shortDuration/2
-                    easing.type: Easing.OutQuad
-                }
-                PropertyAction {
-                    target: surfacePressed
-                    property: "visible"
-                    value: false
-                }
-            }
-        },
-        Transition {
-            from: "*"
-            to: "pressed"
-            SequentialAnimation {
-                PropertyAction {
-                    target: surfacePressed
-                    property: "visible"
-                    value: true
-                }
-                NumberAnimation {
-                    property: "opacity"
-                    // Using a shorter duration here makes things feel more responsive.
-                    duration: Kirigami.Units.shortDuration/2
-                    easing.type: Easing.OutQuad
-                }
-                PropertyAction {
-                    target: surfaceHover
-                    property: "visible"
-                    value: false
-                }
-            }
-        }
-    ]
+//     transitions: [
+//         /* FIXME: For some reason, one of the surfaces will stop working when
+//          * OpacityAnimator is used.
+//          * OpacityAnimator would be more efficient.
+//          */
+//         Transition {
+//             from: "*"
+//             to: "normal"
+//             SequentialAnimation {
+//                 PropertyAction {
+//                     targets: [surfaceHover]
+//                     property: "visible"
+//                     value: false
+//                 }
+//                 NumberAnimation {
+//                     property: "opacity"
+//                     duration: Kirigami.Units.shortDuration
+//                     easing.type: Easing.OutQuad
+//                 }
+//                 PropertyAction {
+//                     targets: [surfacePressed]
+//                     property: "visible"
+//                     value: false
+//                 }
+//             }
+//         },
+//         Transition {
+//             from: "*"
+//             to: "hovered"
+//             SequentialAnimation {
+//                 PropertyAction {
+//                     target: surfaceHover
+//                     property: "visible"
+//                     value: true
+//                 }
+//                 NumberAnimation {
+//                     property: "opacity"
+//                     // Using a shorter duration here makes things feel more responsive.
+//                     duration: Kirigami.Units.shortDuration/2
+//                     easing.type: Easing.OutQuad
+//                 }
+//                 PropertyAction {
+//                     target: surfacePressed
+//                     property: "visible"
+//                     value: false
+//                 }
+//             }
+//         },
+//         Transition {
+//             from: "*"
+//             to: "pressed"
+//             SequentialAnimation {
+//                 PropertyAction {
+//                     target: surfacePressed
+//                     property: "visible"
+//                     value: true
+//                 }
+//                 NumberAnimation {
+//                     property: "opacity"
+//                     // Using a shorter duration here makes things feel more responsive.
+//                     duration: Kirigami.Units.shortDuration/2
+//                     easing.type: Easing.OutQuad
+//                 }
+//                 PropertyAction {
+//                     target: surfaceHover
+//                     property: "visible"
+//                     value: false
+//                 }
+//             }
+//         }
+//     ]
 }

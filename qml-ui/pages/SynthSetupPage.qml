@@ -285,11 +285,16 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 id: mainLabel
                                 Layout.fillWidth: true
-                                text: model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "";
+                                text: visible
+                                    ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
+                                    : ""
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {
                                 text: {
+                                    if (!visible) {
+                                        return "";
+                                    }
                                     let text = "";
                                     if (model.metadata && model.metadata.note_high < 60) {
                                         text = "L";

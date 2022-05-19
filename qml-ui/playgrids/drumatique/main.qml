@@ -840,8 +840,8 @@ Zynthian.BasePlayGrid {
                                 mostRecentlyPlayedNote: component.mostRecentlyPlayedNote
                                 padNoteIndex: model.index
                                 padNoteNumber: ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count) + padNoteIndex
-                                note: _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
-                                isCurrent: model.index == drumPadRepeater.selectedIndex
+                                note: visible && _private.activePatternModel ? _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index) : null
+                                isCurrent: visible && model.index == drumPadRepeater.selectedIndex
                                 function setSelected(subNoteIndex) {
                                     if (drumPadRepeater.selectedIndex > -1) {
                                         var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
@@ -1276,11 +1276,11 @@ Zynthian.BasePlayGrid {
                                                         top: parent.top
                                                         bottom: parent.bottom
                                                     }
-                                                    visible: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
+                                                    visible: parent.visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
                                                     color: Kirigami.Theme.highlightColor
                                                     width: Math.max(1, Math.floor(widthFactor))
-                                                    property double widthFactor: patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
-                                                    x: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
+                                                    property double widthFactor: visible && patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
+                                                    x: visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
                                                 }
                                                 Kirigami.Heading {
                                                     anchors {
@@ -1354,17 +1354,19 @@ Zynthian.BasePlayGrid {
                                                 }
                                                 return "(no sample)";
                                             }
-                                            text: patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                                ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
-                                                : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
-                                                    ? "Sample Slice Mode"
-                                                    : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
-                                                        ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
-                                                        : patternsMenuItem.associatedTrack
-                                                            ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
-                                                                ? "Sound: " + soundName
-                                                                : "No sound assigned - tap to select one"
-                                                    : "Unassigned - playing to: " + _private.currentSoundName
+                                            text: visible
+                                                ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
+                                                    ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
+                                                    : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+                                                        ? "Sample Slice Mode"
+                                                        : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
+                                                            ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
+                                                            : patternsMenuItem.associatedTrack
+                                                                ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                                    ? "Sound: " + soundName
+                                                                    : "No sound assigned - tap to select one"
+                                                        : "Unassigned - playing to: " + _private.currentSoundName
+                                                : ""
                                             onClicked: {
                                                 if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
                                                     zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;

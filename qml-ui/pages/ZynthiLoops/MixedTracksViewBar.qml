@@ -353,14 +353,16 @@ Rectangle {
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                                 Repeater {
-                                    model: root.selectedTrack.trackAudioType === "synth"
+                                    model: visible
+                                    ? (root.selectedTrack.trackAudioType === "synth"
                                             ? root.selectedTrack.chainedSoundsNames
                                             : root.selectedTrack.trackAudioType === "sample-trig" ||
                                               root.selectedTrack.trackAudioType === "sample-slice"
                                                 ? root.selectedTrack.samples
                                                 : root.selectedTrack.trackAudioType === "sample-loop"
                                                     ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol), null, null, null, null]
-                                                    : []
+                                                    : [])
+                                    : null
 
                                     delegate: Rectangle {
                                         id: delegate

@@ -771,15 +771,17 @@ Zynthian.ScreenPage {
                             highlighted: index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
-                                root.lastSelectedObj = model.track
+                                Qt.callLater(function() {
+                                    root.lastSelectedObj = model.track
 
-                                // Open MixedTracksViewBar and switch to track
-                                bottomStack.slotsBar.trackButton.checked = true
+                                    // Open MixedTracksViewBar and switch to track
+                                    bottomStack.slotsBar.trackButton.checked = true
 
-                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                zynthian.session_dashboard.selectedTrack = index;
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = model.track;
+                                    // zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                    zynthian.session_dashboard.selectedTrack = index;
+                                    bottomBar.controlType = BottomBar.ControlType.Track;
+                                    bottomBar.controlObj = model.track;
+                                })
                             }
 
                             onPressAndHold: {

@@ -688,11 +688,6 @@ don't want to have to dig too far...
         }
     }
     Connections {
-        target: zynthian.zynthiloops.song.tracksModel
-        onConnectedSoundsCountChanged: adoptCurrentMidiChannel()
-        onConnectedPatternsCountChanged: adoptCurrentMidiChannel();
-    }
-    Connections {
         target: zynthian.zynthiloops.song
         onBpmChanged: {
             ZynQuick.PlayGridManager.syncTimer.bpm = zynthian.zynthiloops.song.bpm
@@ -734,20 +729,18 @@ don't want to have to dig too far...
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence ? trackPartSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackPartDelegate.partIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
-                    Component.onCompleted: {
-                        adoptTrack();
-                        //console.log("on track", baseTrackDelegate.theTrack.id, "in part", trackPartDelegate.part.partName, "at index", model.index, "we find clip", trackPartSceneDelegate.sceneClip, "for track/part/scene", trackPartSceneDelegate.sceneClip.name, "for which we have sequence", trackPartSceneDelegate.sequence, "and pattern", trackPartSceneDelegate.pattern);
-                    }
-                    Connections {
-                        target: zynthian.zynthiloops
-                        onSongChanged: trackPartSceneDelegate.adoptTrack()
+                    onPatternChanged: {
+                        if (trackPartSceneDelegate.pattern) {
+                            trackPartSceneDelegate.pattern.zlTrack = baseTrackDelegate.theTrack;
+                            trackPartSceneDelegate.pattern.zlPart = trackPartDelegate.part;
+                            trackPartSceneDelegate.pattern.zlScene = trackPartSceneDelegate.sceneClip;
+                        }
                     }
                     Connections {
                         target: zynthian.zynthiloops.song
                         onBpmChanged: {
                             if (trackPartSceneDelegate.sequence && trackPartSceneDelegate.sequence.bpm != zynthian.zynthiloops.song.bpm) {
                                 trackPartSceneDelegate.sequence.bpm = zynthian.zynthiloops.song.bpm;
-                                scheduleSequenceSave();
                             }
                         }
                     }
@@ -757,53 +750,9 @@ don't want to have to dig too far...
                             trackPartSceneDelegate.sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == trackPartSceneDelegate.sequenceIndex);
                         }
                     }
-//                    Connections {
-//                        target: zynthian.zynthiloops.song.tracksModel
-//                        onConnectedSoundsCountChanged: trackPartSceneDelegate.adoptTrack()
-//                        onConnectedPatternsCountChanged: trackPartSceneDelegate.adoptTrack()
-//                    }
                     Connections {
                         target: baseTrackDelegate.theTrack
-                        onConnectedPatternChanged: trackPartSceneDelegate.adoptTrack()
                         onConnectedSoundChanged: trackPartSceneDelegate.adoptTrack()
-                        onTrackAudioTypeChanged: trackPartSceneDelegate.adoptTrack()
-                        onSamplesChanged: trackPartSceneDelegate.adoptSamples()
-                        onSelectedPartChanged: trackPartSceneDelegate.adoptSelectedPart()
-                        onExternalMidiChannelChanged: {
-                            trackPartSceneDelegate.pattern.externalMidiChannel = baseTrackDelegate.theTrack.externalMidiChannel;
-                        }
-                    }
-                    Connections {
-                        target: trackPartDelegate.part
-                        onSamplesChanged: trackPartSceneDelegate.adoptSamples()
-                    }
-                    Connections {
-                        target: trackPartSceneDelegate.sceneClip
-                        onEnabledChanged: trackPartSceneDelegate.adoptSelectedPart()
-                    }
-                    Connections {
-                        target: trackPartSceneDelegate.sequence
-                        onIsDirtyChanged: {
-                            if (trackPartSceneDelegate.sequence.isDirty) {
-                                scheduleSequenceSave()
-                            }
-                        }
-                    }
-                    Connections {
-                        target: trackPartSceneDelegate.pattern
-                        onLayerChanged: trackPartSceneDelegate.adoptTrack()
-                    }
-
-                    function scheduleSequenceSave() {
-                        sequenceSaverThrottle.restart();
-                    }
-                    Timer {
-                        id: sequenceSaverThrottle; repeat: false; running: false; interval: 1000
-                        onTriggered: {
-                            if (trackPartSceneDelegate.sequenceIndex === zynthian.zynthiloops.song.scenesModel.selectedSceneIndex) {
-                                trackPartSceneDelegate.sequence.save();
-                            }
-                        }
                     }
 
                     function adoptTrack() {
@@ -811,13 +760,10 @@ don't want to have to dig too far...
                             trackAdopterTimer.restart();
                         }
                     }
-                    property bool updateBindings: true
                     Timer {
                         id: trackAdopterTimer; interval: 50; repeat: false; running: false
                         onTriggered: {
                             if (trackPartSceneDelegate.pattern) {
-                                trackPartSceneDelegate.updateBindings = false;
-                                trackPartSceneDelegate.pattern.midiChannel = baseTrackDelegate.trackIndex;
                                 if (baseTrackDelegate.theTrack.connectedSound === -1) {
                                     trackPartSceneDelegate.pattern.layerData = "";
                                 } else {
@@ -825,67 +771,10 @@ don't want to have to dig too far...
                                     // Idea is "store the setup for this track", and i guess this only captures the first synth, not the whole thing?
                                     // trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
                                 }
-                                trackPartSceneDelegate.adoptSamples();
-                                trackPartSceneDelegate.updateBindings = true;
                             } else {
                                 trackAdopterTimer.restart();
                             }
                         }
-                    }
-                    Binding {
-                        target: trackPartSceneDelegate.pattern
-                        property: "enabled"
-                        value: trackPartSceneDelegate.sceneClip.enabled
-                        delayed: true
-                        when: trackPartSceneDelegate.updateBindings
-                    }
-                    Binding {
-                        target: trackPartSceneDelegate.pattern
-                        property: "noteDestination"
-                        value: {
-                            switch (baseTrackDelegate.theTrack.trackAudioType) {
-                            case "sample-trig":
-                                return ZynQuick.PatternModel.SampleTriggerDestination;
-                                break;
-                            case "sample-slice":
-                                return ZynQuick.PatternModel.SampleSlicedDestination;
-                                break;
-                            case "sample-loop":
-                                return ZynQuick.PatternModel.SampleLoopedDestination;
-                                break;
-                            case "external":
-                                return ZynQuick.PatternModel.ExternalDestination;
-                                break;
-                            default:
-                                return ZynQuick.PatternModel.SynthDestination;
-                                break;
-                            }
-                        }
-                        delayed: true
-                        when: trackPartSceneDelegate.updateBindings
-                    }
-                    Binding {
-                        target: trackPartSceneDelegate.pattern
-                        property: "externalMidiChannel"
-                        value: baseTrackDelegate.theTrack.externalMidiChannel
-                        delayed: true
-                        when: trackPartSceneDelegate.updateBindings
-                    }
-
-                    function adoptSamples() {
-                        var clipIds = [];
-                        if (baseTrackDelegate.theTrack && trackPartDelegate.part) {
-                            for (var i = 0; i < baseTrackDelegate.theTrack.samples.length; ++i) {
-                                var sample = baseTrackDelegate.theTrack.samples[i];
-                                if (sample && trackPartDelegate.part.samples.indexOf(i) > -1) {
-                                    clipIds[i] = sample.cppObjId;
-                                }
-                            }
-                        }
-                        trackPartSceneDelegate.pattern.clipIds = clipIds;
-                    }
-                    function adoptSelectedPart() {
-                        trackPartSceneDelegate.sequence.setActiveTrack(baseTrackDelegate.theTrack.id, baseTrackDelegate.theTrack.selectedPart);
                     }
                 }
             }

@@ -496,6 +496,205 @@ Zynthian.ScreenPage {
         ColumnLayout {
             anchors.fill: parent
 
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                color: Kirigami.Theme.backgroundColor
+
+                RowLayout {
+                    id: infoBar
+
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+                    property int topLayerIndex: 0
+                    property int topLayer: -1
+                    property int selectedSoundSlot: zynthian.soundCombinatorActive
+                                                    ? zynthian.session_dashboard.selectedSoundRow
+                                                    : root.selectedTrack.selectedSlotRow
+                    property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
+
+                    width: parent.width - Kirigami.Units.gridUnit
+                    anchors.centerIn: parent
+                    spacing: Kirigami.Units.gridUnit
+
+                    onClipChanged: updateSoundNameTimer.restart()
+
+                    function updateInfoBar() {
+                        console.log("### Updating info bar :", Date.now())
+
+                        var layerIndex = -1;
+                        var count = 0;
+
+                        if (infoBar.clip) {
+                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
+                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
+                                    infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[i])) {
+                                    if (layerIndex < 0) {
+                                        layerIndex = i
+                                    }
+                                    count++;
+                                }
+                            }
+                        }
+
+                        layerLabel.layerIndex = layerIndex
+                        infoBar.topLayerIndex = layerIndex
+                        infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipTrack.chainedSounds[layerIndex]
+                        layerLabel.layerCount = count
+//                        infoBar.selectedChannel = zynthian.soundCombinatorActive
+//                                                    ? infoBar.clip.clipTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow]
+//                                                    : infoBar.clip.clipTrack.connectedSound
+
+                        infoBar.clip.clipTrack.updateChainedSoundsInfo()
+                    }
+
+                    Timer {
+                        id: updateSoundNameTimer
+                        repeat: false
+                        interval: 10
+                        onTriggered: infoBar.updateInfoBar()
+                    }
+
+                    Connections {
+                        target: zynthian.fixed_layers
+                        onList_updated: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    Connections {
+                        target: zynthian.session_dashboard
+                        onSelectedTrackChanged: {
+                            updateSoundNameTimer.restart()
+                        }
+                        onSelectedSoundRowChanged: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    Connections {
+                        target: zynthian.bank
+                        onList_updated: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    Connections {
+                        target: infoBar.clip ? infoBar.clip.clipTrack : null
+                        onChainedSoundsChanged: {
+                            updateSoundNameTimer.restart()
+                        }
+                    }
+
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                console.log(infoBar.selectedSoundSlot, infoBar.topLayer, JSON.stringify(infoBar.clip.clipTrack.chainedSoundsInfo, null, 2))
+                            }
+                        }
+                    }
+                    QQC2.Label {
+                        id: layerLabel
+
+                        property int layerIndex: -1
+                        property int layerCount: 0
+
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("Slot %1 %2")
+                                .arg(root.selectedTrack.selectedSlotRow + 1)
+                                .arg(layerIndex >= 0
+                                        ? layerCount > 0
+                                            ? "(+" + (layerCount-1) + ")"
+                                            : 0
+                                        : "")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
+                        text: infoBar.selectedSoundSlotExists
+                                  ? qsTr("Preset (%2/%3): %1")
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
+                                  : qsTr("Preset: --")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
+                        text: infoBar.selectedSoundSlotExists
+                                ? qsTr("Bank: %1")
+                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
+                                : qsTr("Bank: --")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
+                        text: infoBar.selectedSoundSlotExists
+                                ? qsTr("Synth: %1")
+                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
+                                : qsTr("Synth: --")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
+                        text: qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
+                    }
+                    QQC2.Label {
+                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[0]
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
+                                 infoBar.clip.clipTrack.trackAudioType === "sample-slice")
+                        text: qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--")
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    QQC2.Button {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
+                        Layout.alignment: Qt.AlignVCenter
+                        icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
+                        checkable: true
+                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
+                        // Bind to current index to properly update when preset changed from other screen
+                        checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
+                        onToggled: {
+                            zynthian.preset.current_is_favorite = checked
+                        }
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignVCenter
+                        text: qsTr("%1 %2")
+                                .arg(infoBar.clip ? infoBar.clip.name : "")
+                                .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
+                    }
+                }
+            }
+
             ColumnLayout {
                 id: tableLayout
                 Layout.fillHeight: true
@@ -1179,205 +1378,6 @@ Zynthian.ScreenPage {
                     id: partBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-                color: Kirigami.Theme.backgroundColor
-
-                RowLayout {
-                    id: infoBar
-
-                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
-                    property int topLayerIndex: 0
-                    property int topLayer: -1
-                    property int selectedSoundSlot: zynthian.soundCombinatorActive
-                                                    ? zynthian.session_dashboard.selectedSoundRow
-                                                    : root.selectedTrack.selectedSlotRow
-                    property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
-
-                    width: parent.width - Kirigami.Units.gridUnit
-                    anchors.centerIn: parent
-                    spacing: Kirigami.Units.gridUnit
-
-                    onClipChanged: updateSoundNameTimer.restart()
-
-                    function updateInfoBar() {
-                        console.log("### Updating info bar :", Date.now())
-
-                        var layerIndex = -1;
-                        var count = 0;
-
-                        if (infoBar.clip) {
-                            for (var i in infoBar.clip.clipTrack.chainedSounds) {
-                                if (infoBar.clip.clipTrack.chainedSounds[i] >= 0 &&
-                                    infoBar.clip.clipTrack.checkIfLayerExists(infoBar.clip.clipTrack.chainedSounds[i])) {
-                                    if (layerIndex < 0) {
-                                        layerIndex = i
-                                    }
-                                    count++;
-                                }
-                            }
-                        }
-
-                        layerLabel.layerIndex = layerIndex
-                        infoBar.topLayerIndex = layerIndex
-                        infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipTrack.chainedSounds[layerIndex]
-                        layerLabel.layerCount = count
-//                        infoBar.selectedChannel = zynthian.soundCombinatorActive
-//                                                    ? infoBar.clip.clipTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow]
-//                                                    : infoBar.clip.clipTrack.connectedSound
-
-                        infoBar.clip.clipTrack.updateChainedSoundsInfo()
-                    }
-
-                    Timer {
-                        id: updateSoundNameTimer
-                        repeat: false
-                        interval: 10
-                        onTriggered: infoBar.updateInfoBar()
-                    }
-
-                    Connections {
-                        target: zynthian.fixed_layers
-                        onList_updated: {
-                            updateSoundNameTimer.restart()
-                        }
-                    }
-
-                    Connections {
-                        target: zynthian.session_dashboard
-                        onSelectedTrackChanged: {
-                            updateSoundNameTimer.restart()
-                        }
-                        onSelectedSoundRowChanged: {
-                            updateSoundNameTimer.restart()
-                        }
-                    }
-
-                    Connections {
-                        target: zynthian.bank
-                        onList_updated: {
-                            updateSoundNameTimer.restart()
-                        }
-                    }
-
-                    Connections {
-                        target: infoBar.clip ? infoBar.clip.clipTrack : null
-                        onChainedSoundsChanged: {
-                            updateSoundNameTimer.restart()
-                        }
-                    }
-
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                console.log(infoBar.selectedSoundSlot, infoBar.topLayer, JSON.stringify(infoBar.clip.clipTrack.chainedSoundsInfo, null, 2))
-                            }
-                        }
-                    }
-                    QQC2.Label {
-                        id: layerLabel
-
-                        property int layerIndex: -1
-                        property int layerCount: 0
-
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("Slot %1 %2")
-                                .arg(root.selectedTrack.selectedSlotRow + 1)
-                                .arg(layerIndex >= 0
-                                        ? layerCount > 0
-                                            ? "(+" + (layerCount-1) + ")"
-                                            : 0
-                                        : "")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                  ? qsTr("Preset (%2/%3): %1")
-                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
-                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
-                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
-                                  : qsTr("Preset: --")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                ? qsTr("Bank: %1")
-                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
-                                : qsTr("Bank: --")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                ? qsTr("Synth: %1")
-                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
-                                : qsTr("Synth: --")
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
-                        text: qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
-                    }
-                    QQC2.Label {
-                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[0]
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
-                                 infoBar.clip.clipTrack.trackAudioType === "sample-slice")
-                        text: qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--")
-                    }
-
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                    }
-
-                    QQC2.Button {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.2
-                        Layout.alignment: Qt.AlignVCenter
-                        icon.name: checked ? "starred-symbolic" : "non-starred-symbolic"
-                        checkable: true
-                        visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        // Bind to current index to properly update when preset changed from other screen
-                        checked: zynthian.preset.current_index && zynthian.preset.current_is_favorite
-                        onToggled: {
-                            zynthian.preset.current_is_favorite = checked
-                        }
-                    }
-                    QQC2.Label {
-                        Layout.fillWidth: false
-                        Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("%1 %2")
-                                .arg(infoBar.clip ? infoBar.clip.name : "")
-                                .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
-                    }
                 }
             }
         }

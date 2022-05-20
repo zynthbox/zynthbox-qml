@@ -27,13 +27,14 @@ import logging
 import math
 import os
 import shutil
+import tempfile
 import threading
 import traceback
 from pathlib import Path
 from subprocess import Popen
 
 import jack
-from PySide2.QtCore import Property, QObject, QThread, QTimer, Signal, Slot
+from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
 
 from . import libzl
 from .zynthiloops_clips_model import zynthiloops_clips_model
@@ -1097,3 +1098,33 @@ class zynthiloops_track(QObject):
 
     selectedPartNames = Property(str, get_selectedPartNames, notify=selectedPartNamesChanged)
     ### Property selectedPartNames
+
+    @Slot(None, result=str)
+    def getTrackSoundSnapshotJson(self):
+        logging.error(f"getTrackSoundSnapshotJson : T({self.__id__ + 1})")
+        return json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+
+    @Slot(str, result=None)
+    def setTrackSoundFromSnapshotJson(self, snapshot):
+        logging.error(f"setTrackSoundSnapshotJson : T({self.__id__ + 1})")
+
+        self.zyngui.session_dashboard.selectedTrack = self.__id__
+
+        f = tempfile.NamedTemporaryFile(prefix="zynthbox_t1_", suffix=".sound", delete=False)
+        sound_path = f.name
+
+        logging.error(f"setTrackSoundSnapshotJson : teemp sound file({sound_path})")
+
+        try:
+            f.write(bytes(snapshot, encoding='utf8'))
+            f.flush()
+            os.fsync(f.fileno())
+        finally:
+            f.close()
+
+        QMetaObject.invokeMethod(self, "do_invoke_loadSoundFromFile", Qt.QueuedConnection, QGenericArgument("str", bytes(sound_path, encoding="utf8")))
+
+    @Slot(str)
+    def do_invoke_loadSoundFromFile(self, path):
+        logging.error(f"do_invoke_loadSoundFromFile: {path}")
+        self.zyngui.sound_categories.loadSoundFromFile(path)

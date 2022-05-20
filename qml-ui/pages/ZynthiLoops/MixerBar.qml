@@ -191,18 +191,20 @@ Rectangle {
                                             enabled: !model.track.muted
                                             headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
         //                                    footerText: model.track.name
-                                            audioLeveldB: !model.track.muted
-                                                              ? model.track.trackAudioType === "sample-loop"
-                                                                   ? ZL.AudioLevels.add(model.track.audioLevel, synthAudioLevel)
-                                                                   : model.track.trackAudioType === "synth"
-                                                                       ? synthAudioLevel
-                                                                       : model.track.trackAudioType === "sample-trig" ||
-                                                                         model.track.trackAudioType === "sample-slice"
-                                                                           ? sampleClipObject
-                                                                               ? sampleClipObject.audioLevel
-                                                                               : -400
-                                                                           : -400
-                                                               : -400
+                                            audioLeveldB: visible
+                                                            ? !model.track.muted
+                                                                ? model.track.trackAudioType === "sample-loop"
+                                                                    ? ZL.AudioLevels.add(model.track.audioLevel, synthAudioLevel)
+                                                                    : model.track.trackAudioType === "synth"
+                                                                        ? synthAudioLevel
+                                                                        : model.track.trackAudioType === "sample-trig" ||
+                                                                            model.track.trackAudioType === "sample-slice"
+                                                                            ? sampleClipObject
+                                                                                ? sampleClipObject.audioLevel
+                                                                                : -400
+                                                                            : -400
+                                                                : -400
+                                                            : -400
                                             inputAudioLevelVisible: false
 
                                             onValueChanged: {
@@ -394,7 +396,7 @@ Rectangle {
                                             ? ""
                                             : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
                             footerText: "Master"
-                            audioLeveldB: zynthian.zynthiloops.masterAudioLevel
+                            audioLeveldB: visible ? zynthian.zynthiloops.masterAudioLevel :  -400
                             inputAudioLevelVisible: false
 
                             Binding {

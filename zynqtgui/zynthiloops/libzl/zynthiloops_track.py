@@ -751,6 +751,12 @@ class zynthiloops_track(QObject):
                     self.zyngui.screens['layers_for_track'].current_index)
         except:
             pass
+
+        if self.connectedSound == -1:
+            self.__sound_json_snapshot__ = ""
+        else:
+            self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+
         self.chained_sounds_changed.emit()
 
     chained_sounds_changed = Signal()
@@ -1101,8 +1107,8 @@ class zynthiloops_track(QObject):
 
     @Slot(None, result=str)
     def getTrackSoundSnapshotJson(self):
-        logging.error(f"getTrackSoundSnapshotJson : T({self.__id__ + 1})")
-        return json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+        #logging.error(f"getTrackSoundSnapshotJson : T({self.__id__ + 1})")
+        return self.__sound_json_snapshot__
 
     @Slot(str, result=None)
     def setTrackSoundFromSnapshotJson(self, snapshot):

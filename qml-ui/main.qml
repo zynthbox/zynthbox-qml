@@ -90,7 +90,7 @@ Kirigami.AbstractApplicationWindow {
     Timer {
         id: displayWindowTimer
         // This interval makes sure to wait until all the pages are cached before showing window
-        interval: 13000
+        interval: 2000
         repeat: false
         onTriggered: {
             zynthian.stop_splash();
@@ -1060,10 +1060,12 @@ Kirigami.AbstractApplicationWindow {
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("File")
                     page: Qt.resolvedUrl("ExternalRecordingDestinationFile.qml")
+                    preload: true
                 },
                 Zynthian.TabbedControlViewAction {
                     text: qsTr("Clip")
                     page: Qt.resolvedUrl("ExternalRecordingDestinationClip.qml")
+                    preload: true
                 }
             ]
         }

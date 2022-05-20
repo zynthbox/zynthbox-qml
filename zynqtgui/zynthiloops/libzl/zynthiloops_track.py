@@ -987,7 +987,7 @@ class zynthiloops_track(QObject):
         occupied_slots = []
 
         if self.__track_audio_type__ == "sample-trig":
-            logging.debug(f"### get_occupiedSlots : Sample trig")
+            # logging.debug(f"### get_occupiedSlots : Sample trig")
             # If type is sample-trig check how many samples has wavs selected
             for sample in self.__samples__:
                 if sample is not None and \
@@ -997,7 +997,7 @@ class zynthiloops_track(QObject):
                 else:
                     occupied_slots.append(False)
         elif self.__track_audio_type__ == "synth":
-            logging.debug(f"### get_occupiedSlots : synth")
+            # logging.debug(f"### get_occupiedSlots : synth")
             # If type is synth check how many synth engines are selected and chained
             for sound in self.__chained_sounds__:
                 if sound >= 0 and self.checkIfLayerExists(sound):
@@ -1005,7 +1005,7 @@ class zynthiloops_track(QObject):
                 else:
                     occupied_slots.append(False)
         elif self.__track_audio_type__ == "sample-slice":
-            logging.debug(f"### get_occupiedSlots : Sample slice")
+            # logging.debug(f"### get_occupiedSlots : Sample slice")
 
             # If type is sample-slice check if samples[0] has wav selected
             if self.__samples__[0] is not None and \
@@ -1015,11 +1015,11 @@ class zynthiloops_track(QObject):
             else:
                 occupied_slots = [False, None, None, None, None]
         else:
-            logging.debug(f"### get_occupiedSlots : Slots not in use")
+            # logging.debug(f"### get_occupiedSlots : Slots not in use")
             # For any other modes, sample slots are not in use. Hence do not increment occupied_slots
             pass
 
-        logging.debug(f"### get_occupiedSlots : occupied_slots({occupied_slots})")
+        # logging.debug(f"### get_occupiedSlots : occupied_slots({occupied_slots})")
 
         return occupied_slots
 

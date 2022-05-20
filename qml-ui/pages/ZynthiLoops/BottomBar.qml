@@ -386,6 +386,7 @@ Zynthian.Card {
                         id: songAction
                         text: qsTr("Song")
                         page: Qt.resolvedUrl("SongBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Song
                         initialProperties: {"bottomBar": root}
                     },
@@ -413,9 +414,9 @@ Zynthian.Card {
                         id: clipSettingsAction
                         text: qsTr("Clip Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
+                        preload: true
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
-                        preload: true
                     },
                     Zynthian.TabbedControlViewAction {
                         id: waveEditorAction
@@ -442,6 +443,7 @@ Zynthian.Card {
                         id: trackSoundsAction
                         text: qsTr("Sounds")
                         page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Track
                         initialProperties: {"bottomBar": root}
                     },
@@ -449,6 +451,7 @@ Zynthian.Card {
                         id: sampleSoundsAction
                         text: qsTr("Samples")
                         page: Qt.resolvedUrl("SamplesBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Track
                         initialProperties: {"bottomBar": root}
                     },
@@ -463,7 +466,6 @@ Zynthian.Card {
                         visible: root.controlType === BottomBar.ControlType.Track &&
                                  clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
-                        preload: true
                     },
                     // Duplicate tab instance but for different placement and controlObj for track
                     Zynthian.TabbedControlViewAction {

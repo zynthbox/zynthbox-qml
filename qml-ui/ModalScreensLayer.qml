@@ -59,18 +59,6 @@ Zynthian.Stack {
                 if (!root.pageCache) {
                     root.pageCache = {};
                 }
-//                 if (!root.pageCache["zynthiloops"]) {
-//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("zynthiloops");
-//                     var component = Qt.createComponent(file);
-//                     root.pageCache["zynthiloops"] = component.createObject(root, {"width": root.width, "height": root.height});
-//                     root.pageCache["zynthiloops"].visible = false;
-//                 }
-//                 if (!root.pageCache["session_dashboard"]) {
-//                     file = applicationWindow().pageScreenMapping.pageForModalScreen("session_dashboard");
-//                     var component = Qt.createComponent(file);
-//                     root.pageCache["session_dashboard"] = component.createObject(root, {"width": root.width, "height": root.height});
-//                     root.pageCache["session_dashboard"].visible = false;
-//                 }
                 if (!root.pageCache["song_arranger"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
                     var component = Qt.createComponent(file);

@@ -58,7 +58,7 @@ Zynthian.BasePlayGrid {
             : null
         property QtObject model
         property QtObject miniGridModel
-        property int channel: 15
+        property int channel: ZynQuick.PlayGridManager.currentMidiChannel
         property int startingNote: component.octave * 12
         property string scale
         property int rows
@@ -119,11 +119,6 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
-        if (zynthian.fixed_layers.active_midi_channel > -1) {
-            _private.channel = zynthian.fixed_layers.active_midi_channel;
-        } else {
-            _private.channel = 15;
-        }
         fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
         fillModel(_private.miniGridModel, _private.startingNote + 12, _private.scale, 4, _private.columns, _private.positionalVelocity)
     }
@@ -167,8 +162,12 @@ Zynthian.BasePlayGrid {
     Connections {
         target: ZynQuick.PlayGridManager
         onCurrentMidiChannelChanged: {
-            Qt.callLater(_private.model.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
-            Qt.callLater(_private.miniGridModel.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+            if (_private.model) {
+                Qt.callLater(_private.model.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+            }
+            if (_private.miniGridModel) {
+                Qt.callLater(_private.miniGridModel.changeMidiChannel, ZynQuick.PlayGridManager.currentMidiChannel);
+            }
         }
     }
 

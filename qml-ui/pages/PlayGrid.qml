@@ -689,33 +689,6 @@ don't want to have to dig too far...
                             trackPartSceneDelegate.pattern.zlScene = trackPartSceneDelegate.sceneClip;
                         }
                     }
-
-                    Connections {
-                        target: baseTrackDelegate.theTrack
-                        onConnectedSoundChanged: trackPartSceneDelegate.adoptTrack()
-                    }
-
-                    function adoptTrack() {
-                        if (trackPartSceneDelegate.sequenceIndex === zynthian.zynthiloops.song.scenesModel.selectedSceneIndex) {
-                            trackAdopterTimer.restart();
-                        }
-                    }
-                    Timer {
-                        id: trackAdopterTimer; interval: 50; repeat: false; running: false
-                        onTriggered: {
-                            if (trackPartSceneDelegate.pattern) {
-                                if (baseTrackDelegate.theTrack.connectedSound === -1) {
-                                    trackPartSceneDelegate.pattern.layerData = "";
-                                } else {
-                                    // TODO One for Anupam, probably ;) This wants to be something else maybe?
-                                    // Idea is "store the setup for this track", and i guess this only captures the first synth, not the whole thing?
-                                    trackPartSceneDelegate.pattern.layerData = baseTrackDelegate.theTrack.getTrackSoundSnapshotJson()
-                                }
-                            } else {
-                                trackAdopterTimer.restart();
-                            }
-                        }
-                    }
                 }
             }
         }

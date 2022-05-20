@@ -769,7 +769,7 @@ don't want to have to dig too far...
                                 } else {
                                     // TODO One for Anupam, probably ;) This wants to be something else maybe?
                                     // Idea is "store the setup for this track", and i guess this only captures the first synth, not the whole thing?
-                                    // trackPartSceneDelegate.pattern.layerData = zynthian.layer.layer_as_json(baseTrackDelegate.theTrack.connectedSound);
+                                    trackPartSceneDelegate.pattern.layerData = baseTrackDelegate.theTrack.getTrackSoundSnapshotJson()
                                 }
                             } else {
                                 trackAdopterTimer.restart();

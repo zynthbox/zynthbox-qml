@@ -267,11 +267,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(QObject)
     def loadSound(self, sound):
+        self.loadSoundFromFile(sound.path)
+
+    @Slot(str)
+    def loadSoundFromFile(self, filepath):
         def task():
-            logging.debug(f"### Loading sound : {sound.path}")
+            logging.debug(f"### Loading sound : {filepath}")
 
             track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-            source_channels = self.zyngui.layer.load_layer_channels_from_file(sound.path)
+            source_channels = self.zyngui.layer.load_layer_channels_from_file(filepath)
             free_layers = track.getFreeLayers()
             used_layers = []
 
@@ -336,7 +340,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                             for i in range(5 - len(new_chained_sounds)):
                                 new_chained_sounds.append(-1)
 
-                        self.zyngui.layer.load_layer_from_file(sound.path, new_channels_map)
+                        self.zyngui.layer.load_layer_from_file(filepath, new_channels_map)
 
                         track.chainedSounds = new_chained_sounds
 
@@ -356,7 +360,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             self.zyngui.end_long_task()
 
         self.zyngui.do_long_task(task)
-
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):

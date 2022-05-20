@@ -630,68 +630,11 @@ don't want to have to dig too far...
      * synchronising the behaviour of sequences with zynthiloops, but for now, this location
      * works (it's a single instance location which is always loaded)
      */
-    function adoptSong() {
-        adoptSongTimer.restart();
-    }
-    Timer {
-        id: adoptSongTimer; interval: 1; repeat: false; running: false
-        onTriggered: {
-            var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-            for (var i = 0; i < 10; ++i) {
-                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
-                if (sequence) {
-                    // This operation is potentially a bit pricy, as setting the song
-                    // to something new will cause the global sequence to be reloaded
-                    // to match what is in that song
-                    sequence.song = zynthian.zynthiloops.song;
-                    sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == i);
-                }
-            }
-            adoptTrack();
-        }
-    }
-    function adoptTrack() {
-        var sceneNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-        var theTrack = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
-        for (var i = 0; i < 10; ++i) {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + sceneNames[i]);
-            if (sequence) {
-                sequence.setActiveTrack(theTrack.id, theTrack.selectedPart);
-            }
-        }
-    }
-    Connections {
-        target: zynthian.zynthiloops
-        onSongChanged: {
-            adoptSong();
-            adoptCurrentMidiChannel();
-        }
-    }
-    Component.onCompleted: {
-        adoptSong();
-    }
 
-    function adoptCurrentMidiChannel() {
-        adoptCurrentMidiChannelTimer.restart();
-    }
-    Timer {
-        id: adoptCurrentMidiChannelTimer; interval: 1; repeat: false; running: false
-        onTriggered: {
-            ZynQuick.PlayGridManager.currentMidiChannel = zynthian.session_dashboard.selectedTrack;
-        }
-    }
-    Connections {
-        target: zynthian.session_dashboard
-        onSelectedTrackChanged: {
-            adoptTrack();
-            adoptCurrentMidiChannel();
-        }
-    }
-    Connections {
-        target: zynthian.zynthiloops.song
-        onBpmChanged: {
-            ZynQuick.PlayGridManager.syncTimer.bpm = zynthian.zynthiloops.song.bpm
-        }
+    Binding {
+        target: ZynQuick.PlayGridManager
+        property: "zlDashboard"
+        value: zynthian.session_dashboard
     }
     // Our basic structure is logically scene contains tracks which contain patterns, and accessing them is done through the song's inverted-structure tracks model
     // the tracks contain clips models (each of which holds information for all track/part combinations for that track), and each clip in that model holds the data pertaining to one scene/part/track
@@ -723,12 +666,22 @@ don't want to have to dig too far...
                 delegate: Item {
                     id: trackPartSceneDelegate
                     property QtObject sceneClip: model.clip
+                    property int sceneIndex: model.index
                     property var sceneNames: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
                     property string connectedSequenceName: "Scene " + sceneNames[model.index]
                     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName);
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence ? trackPartSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackPartDelegate.partIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
+                    onSequenceChanged: {
+                        if (trackPartSceneDelegate.sequence) {
+                            trackPartSceneDelegate.sequence.sceneIndex = trackPartSceneDelegate.sceneIndex;
+                            // This operation is potentially a bit pricy, as setting the song
+                            // to something new will cause the global sequence to be reloaded
+                            // to match what is in that song
+                            trackPartSceneDelegate.sequence.song = zynthian.zynthiloops.song;
+                        }
+                    }
                     onPatternChanged: {
                         if (trackPartSceneDelegate.pattern) {
                             trackPartSceneDelegate.pattern.zlTrack = baseTrackDelegate.theTrack;
@@ -736,20 +689,7 @@ don't want to have to dig too far...
                             trackPartSceneDelegate.pattern.zlScene = trackPartSceneDelegate.sceneClip;
                         }
                     }
-                    Connections {
-                        target: zynthian.zynthiloops.song
-                        onBpmChanged: {
-                            if (trackPartSceneDelegate.sequence && trackPartSceneDelegate.sequence.bpm != zynthian.zynthiloops.song.bpm) {
-                                trackPartSceneDelegate.sequence.bpm = zynthian.zynthiloops.song.bpm;
-                            }
-                        }
-                    }
-                    Connections {
-                        target: zynthian.zynthiloops.song.scenesModel
-                        onSelectedSceneIndexChanged: {
-                            trackPartSceneDelegate.sequence.shouldMakeSounds = (zynthian.zynthiloops.song.scenesModel.selectedSceneIndex == trackPartSceneDelegate.sequenceIndex);
-                        }
-                    }
+
                     Connections {
                         target: baseTrackDelegate.theTrack
                         onConnectedSoundChanged: trackPartSceneDelegate.adoptTrack()

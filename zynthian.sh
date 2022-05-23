@@ -163,6 +163,7 @@ while true; do
         matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
         #openbox&
     fi
+# 	python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,block
 	./zynthian_qt_gui.py
 	status=$?
 

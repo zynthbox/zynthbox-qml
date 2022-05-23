@@ -226,7 +226,7 @@ Rectangle {
                                             Binding {
                                                 target: volumeControl
                                                 property: "synthAudioLevel"
-                                                value: ZL.AudioLevels.tracks[model.track.id]
+                                                value: root.visible ? ZL.AudioLevels.tracks[model.track.id] : -400
                                             }
                                         }
 

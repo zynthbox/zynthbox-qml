@@ -28,8 +28,6 @@ QQC2.Dialog {
         cancelSaveButton.forceActiveFocus();
         if (visible) {
             delayKeyboardTimer.restart()
-        } else {
-            fileName.text = "";
         }
     }
     Timer {

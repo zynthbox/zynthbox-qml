@@ -822,7 +822,7 @@ Rectangle {
                         .arg(root.selectedSlotRowItem.track.selectedSlotRow + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
-            nameFilters: ["bank.json"]
+            nameFilters: ["sample-bank.json"]
         }
         onFileSelected: {
             root.selectedSlotRowItem.track.setBank(file.filePath)

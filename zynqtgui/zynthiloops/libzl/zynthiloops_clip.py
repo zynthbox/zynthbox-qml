@@ -72,7 +72,7 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
-        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'bank.{self.row + 1}'
+        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'sample-bank.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.__enabled__ = False
@@ -416,7 +416,7 @@ class zynthiloops_clip(QObject):
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'bank.{new_index + 1}'
+            self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'sample-bank.{new_index + 1}'
         except:
             pass
         self.row_index_changed.emit()

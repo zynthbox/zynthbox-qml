@@ -1141,7 +1141,7 @@ Zynthian.ScreenPage {
                                         }
 
                                         sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                                        pattern: track.connectedPattern >= 0 && sequence ? sequence.getByPart(track.id, track.selectedPart) : null
+                                        pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                         onPressed: {
                                             Qt.callLater(function() {

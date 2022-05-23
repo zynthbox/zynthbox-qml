@@ -171,9 +171,11 @@ QQC2.Popup {
             orientation: Qt.Horizontal
             minimumValue: -100
             maximumValue: 20
-            value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                      ? ZL.AudioLevels.tracks[root.selectedTrack.id]
-                      : ZL.AudioLevels.add(ZL.AudioLevels.captureA, ZL.AudioLevels.captureB)
+            value: root.visible
+                    ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                        ? ZL.AudioLevels.tracks[root.selectedTrack.id]
+                        : ZL.AudioLevels.add(ZL.AudioLevels.captureA, ZL.AudioLevels.captureB)
+                    : -100
 
             font.pointSize: 8
 

@@ -48,9 +48,9 @@ QQC2.Button {
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
         border {
             width: 1
-            color: component.down ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor
+            color: component.visible ? (component.down ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor) : ""
         }
-        color: component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor
+        color: component.visible ? (component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor) : ""
     }
     Rectangle {
         id: pressAndHoldVisualiser
@@ -63,7 +63,7 @@ QQC2.Button {
         visible: component.visualPressAndHold
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        color: Kirigami.Theme.focusColor
+        color: visible ? Kirigami.Theme.focusColor : ""
         height: 0
         opacity: 0
         states: [

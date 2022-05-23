@@ -35,7 +35,7 @@ QQC2.ItemDelegate {
     width: ListView.view.width
     text: model.display
 
-    enabled: model.action_id !== undefined
+    enabled: delegate.visible && model.action_id !== undefined
 
     topPadding: Kirigami.Units.largeSpacing
     leftPadding: Kirigami.Units.largeSpacing

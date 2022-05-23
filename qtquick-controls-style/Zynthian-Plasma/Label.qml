@@ -22,8 +22,8 @@ T.Label {
     renderType: Screen.devicePixelRatio % 1 !== 0 ? Text.QtRendering : Text.NativeRendering
 
     //font data is the system one by default
-    color: Kirigami.Theme.textColor
-    linkColor: Kirigami.Theme.linkColor
+    color: control.visible ? Kirigami.Theme.textColor : ""
+    linkColor: control.visible ? Kirigami.Theme.linkColor : ""
 
     opacity: enabled? 1 : 0.6
 

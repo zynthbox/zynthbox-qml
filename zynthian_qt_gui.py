@@ -3194,20 +3194,24 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
+        def task(self):
+            extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 
-        process = None
-        if extro_path.exists():
-            process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+            process = None
+            if extro_path.exists():
+                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
-        with open("/tmp/mplayer-splash-control", "w") as f:
-            f.write("quit\n")
-            f.close()
+            with open("/tmp/mplayer-splash-control", "w") as f:
+                f.write("quit\n")
+                f.close()
 
-        if process is not None:
-            process.wait()
+            if process is not None:
+                process.wait()
 
-        self.displayMainWindow.emit()
+            self.displayMainWindow.emit()
+
+        worker_thread = threading.Thread(target=task, args=(self,))
+        worker_thread.start()
 
     def get_encoder_list_speed_multiplier(self):
         return self.__encoder_list_speed_multiplier
@@ -3846,6 +3850,7 @@ def delete_window():
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    #debug = QQmlDebuggingEnabler()
     ### Tracktion config file `/root/.config/libzl/Settings.xml` sometimes reconfigures and sets
     ### the value <VALUE name="audiosettings_JACK"><AUDIODEVICE outEnabled="0" inEnabled="0" monoChansOut="0" stereoChansIn="0"/></VALUE>
     ### which causes no audio output from libzl. To circumvent this isssue, always remove the following

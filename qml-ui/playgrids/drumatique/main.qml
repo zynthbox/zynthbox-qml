@@ -319,8 +319,8 @@ Zynthian.BasePlayGrid {
         readonly property int activeBarModelWidth: 16
 
         property QtObject sequence
-        property int activePattern: sequence ? sequence.activePattern : -1
-        property QtObject activePatternModel: sequence ? sequence.activePatternObject : null;
+        property int activePattern: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePattern : -1
+        property QtObject activePatternModel: sequence && !sequence.isLoading && sequence.count > 0 ? sequence.activePatternObject : null;
         property QtObject activeBarModel: activePatternModel && activeBar > -1 && activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
             ? activePatternModel.data(activePatternModel.index(activeBar + bankOffset, 0), activePatternModel.roles["rowModel"])
             : null;
@@ -869,7 +869,7 @@ Zynthian.BasePlayGrid {
                                 }
                                 Timer {
                                     id: sequenderPadNoteApplicator
-                                    repeat: false; running: false; interval: 0
+                                    repeat: false; running: false; interval: 1
                                     onTriggered: {
                                         sequencerPad.note = null;
                                         if (_private.activePatternModel) {

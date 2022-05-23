@@ -669,9 +669,9 @@ don't want to have to dig too far...
                     property int sceneIndex: model.index
                     property var sceneNames: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
                     property string connectedSequenceName: "Scene " + sceneNames[model.index]
-                    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName);
+                    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
                     property int sequenceIndex: model.index;
-                    property QtObject pattern: sequence ? trackPartSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackPartDelegate.partIndex) : null;
+                    property QtObject pattern: sequence && sequence.count > 0 ? trackPartSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackPartDelegate.partIndex) : null;
                     property int patternIndex: sequence ? sequence.indexOf(pattern) : -1;
                     onSequenceChanged: {
                         if (trackPartSceneDelegate.sequence) {

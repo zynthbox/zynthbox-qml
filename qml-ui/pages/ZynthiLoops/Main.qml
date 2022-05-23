@@ -716,8 +716,7 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
-                        highlighted: root.displaySceneButtons
-                        highlightOnFocus: false
+                        highlightOnFocus: true
                         text: root.song.name
 //                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSceneIndex).name)
                         // subText: "BPM: " + root.song.bpm
@@ -734,21 +733,16 @@ Zynthian.ScreenPage {
                             if (bottomStack.slotsBar.trackButton.checked) {
                                 bottomStack.slotsBar.bottomBarButton.checked = true
                             }
-
-                            root.displaySceneButtons = !root.displaySceneButtons
                         }
                     }
 
                     Repeater {
-                        model: root.song.scenesModel
+                        model: 10
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
 
                             property QtObject track: root.song.tracksModel.getTrack(index)
 
-                            text: root.displaySceneButtons
-                                    ? model.scene.name
-                                    : ""
                             color: Kirigami.Theme.backgroundColor
 
                             Layout.fillWidth: false
@@ -756,26 +750,15 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: root.displaySceneButtons
-                                            ? root.song.scenesModel.selectedSceneIndex === index
-                                            : zynthian.session_dashboard.selectedTrack === index
+                            highlighted: zynthian.session_dashboard.selectedTrack === index
 
                             onPressed: {
-                                if (root.displaySceneButtons) {
-                                    root.lastSelectedObj = {
-                                        className: "zynthiloops_scene",
-                                        sceneIndex: index
-                                    }
-
-                                    Zynthian.CommonUtils.switchToScene(index);
-                                } else {
-                                    // Always open Sound combinator when clicking any indicator cell
-                                    zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
-                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
-                                    bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
-                                    bottomStack.slotsBar.bottomBarButton.checked = true
-                                    bottomStack.bottomBar.tracksViewSoundsBarAction.trigger()
-                                }
+                                // Always open Sound combinator when clicking any indicator cell
+                                zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
+                                bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
+                                bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
+                                bottomStack.slotsBar.bottomBarButton.checked = true
+                                bottomStack.bottomBar.tracksViewSoundsBarAction.trigger()
                             }
 
                             ColumnLayout {
@@ -783,8 +766,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displaySceneButtons &&
-                                         sceneHeaderDelegate.track.trackAudioType === "synth"
+                                visible: sceneHeaderDelegate.track.trackAudioType === "synth"
 
                                 Repeater {
                                     id: synthsOccupiedIndicatorRepeater
@@ -808,8 +790,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displaySceneButtons &&
-                                         ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
+                                visible: ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
 
                                 Repeater {
                                     id: samplesOccupiedIndicatorRepeater
@@ -831,17 +812,14 @@ Zynthian.ScreenPage {
 
                             QQC2.Label {
                                 anchors.centerIn: parent
-                                visible: !root.displaySceneButtons &&
-                                         sceneHeaderDelegate.track.trackAudioType === "external"
+                                visible: sceneHeaderDelegate.track.trackAudioType === "external"
                                 text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
                             }
 
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: root.displaySceneButtons
-                                            ? root.song.scenesModel.selectedSceneIndex === index
-                                            : zynthian.session_dashboard.selectedTrack === index
+                                visible: zynthian.session_dashboard.selectedTrack === index
                             }
                         }
                     }
@@ -1011,13 +989,18 @@ Zynthian.ScreenPage {
                         model: 1
 
                         delegate: TableHeader {
-//                            text: "Clips"
+                            text: "Scene"
+                            subText: root.song.scenesModel.selectedSceneName
 
                             width: ListView.view.width
                             height: privateProps.headerHeight
 
                             highlightOnFocus: false
-                            highlighted: false
+                            highlighted: root.displaySceneButtons
+
+                            onPressed: {
+                                root.displaySceneButtons = !root.displaySceneButtons
+                            }
                         }
                     }
 
@@ -1046,16 +1029,137 @@ Zynthian.ScreenPage {
                             Repeater {
                                 model: root.song.tracksModel
 
-                                delegate: ClipCell {
-                                    id: clipCell
+                                delegate: Item {
+                                    Layout.preferredWidth: privateProps.cellWidth
+                                    Layout.maximumWidth: privateProps.cellWidth
+                                    Layout.preferredHeight: privateProps.cellHeight
+                                    Layout.maximumHeight: privateProps.cellHeight
 
-                                    backgroundColor: "#000000"
-                                    onHighlightedChanged: {
-                                        Qt.callLater(function () {
-                                            //console.log("Clip : (" + track.sceneClip.row+", "+track.sceneClip.col+")", "Selected Track :"+ zynthian.session_dashboard.selectedTrack)
+                                    TableHeader {
+                                        anchors.fill: parent
+                                        visible: root.displaySceneButtons
+                                        text: String.fromCharCode(65+index).toUpperCase()
+                                        highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                        highlightOnFocus: false
+                                        onPressed: {
+                                            root.lastSelectedObj = {
+                                                className: "zynthiloops_scene",
+                                                sceneIndex: index
+                                            }
 
-                                            // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
-                                            if (highlighted && (bottomBar.controlType === BottomBar.ControlType.Pattern || bottomBar.controlType === BottomBar.ControlType.Clip)) {
+                                            Zynthian.CommonUtils.switchToScene(index);
+                                        }
+                                    }
+
+                                    ClipCell {
+                                        id: clipCell
+
+                                        anchors.fill: parent
+                                        visible: !root.displaySceneButtons
+
+                                        backgroundColor: "#000000"
+                                        onHighlightedChanged: {
+                                            Qt.callLater(function () {
+                                                //console.log("Clip : (" + track.sceneClip.row+", "+track.sceneClip.col+")", "Selected Track :"+ zynthian.session_dashboard.selectedTrack)
+
+                                                // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
+                                                if (highlighted && (bottomBar.controlType === BottomBar.ControlType.Pattern || bottomBar.controlType === BottomBar.ControlType.Clip)) {
+                                                    if (track.connectedPattern >= 0) {
+                                                        bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                        bottomBar.controlObj = track.sceneClip;
+                                                    } else {
+                                                        bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                        bottomBar.controlObj = track.sceneClip;
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        Connections {
+                                            target: track.sceneClip
+                                            onInCurrentSceneChanged: colorTimer.restart()
+                                            onPathChanged: colorTimer.restart()
+                                            onIsPlayingChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: track
+                                            onConnectedPatternChanged: colorTimer.restart()
+                                            onTrackAudioTypeChanged: colorTimer.restart()
+                                            onClipsModelChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: clipCell.pattern
+                                            onLastModifiedChanged: colorTimer.restart()
+                                            onEnabledChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: clipCell.sequence
+                                            onIsPlayingChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: zynthian.zynthiloops
+                                            onIsMetronomeRunningChanged: colorTimer.restart()
+                                        }
+                                        Connections {
+                                            target: root.song.scenesModel
+                                            onSelectedSceneIndexChanged: colorTimer.restart()
+                                        }
+
+                                        Timer {
+                                            id: colorTimer
+                                            interval: 10
+                                            onTriggered: {
+                                                // update color
+                                                if (track.trackAudioType === "sample-loop" && track.sceneClip && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
+                                                    // In scene
+                                                    clipCell.backgroundColor = "#3381d4fa";
+                                                } else if (track.sceneClip && (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col))) {
+                                                    // Not in scene
+                                                    clipCell.backgroundColor = "#33f44336";
+                                                } else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)
+                                                    || (track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0)) {
+                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
+                                                } else {
+                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
+                                                }
+
+                                                // update isPlaying
+                                                if (track.connectedPattern < 0) {
+                                                    clipCell.isPlaying = track.sceneClip.isPlaying;
+                                                } else {
+                                                    var patternIsPlaying = false;
+                                                    if (clipCell.sequence && clipCell.sequence.isPlaying) {
+                                                        if (clipCell.sequence.soloPattern > -1) {
+                                                            patternIsPlaying = (clipCell.sequence.soloPattern == track.connectedPattern)
+                                                        } else if (clipCell.pattern) {
+                                                            patternIsPlaying = clipCell.pattern.enabled
+                                                        }
+                                                    }
+                                                    clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col) && zynthian.zynthiloops.isMetronomeRunning;
+                                                }
+                                            }
+                                        }
+
+                                        sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+                                        pattern: track.connectedPattern >= 0 && sequence ? sequence.getByPart(track.id, track.selectedPart) : null
+
+                                        onPressed: {
+                                            Qt.callLater(function() {
+                                                root.lastSelectedObj = track.sceneClip
+
+                                                // Directly switch to track instead of implementing muting on double click
+                                                // as we probably wont need muting anymore. Muting is handled by partsBar
+                                                // when  none of the parts are selected
+                                                if (zynthian.session_dashboard.selectedTrack === track.id
+                                                    && bottomStack.slotsBar.trackButton.checked) {
+                                                    bottomStack.slotsBar.bottomBarButton.checked = true
+                                                } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                                    bottomStack.slotsBar.trackButton.checked = true
+                                                }
+                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                                zynthian.session_dashboard.selectedTrack = track.id;
+                                                zynthian.zynthiloops.selectedClipCol = track.sceneClip.col
+
                                                 if (track.connectedPattern >= 0) {
                                                     bottomBar.controlType = BottomBar.ControlType.Pattern;
                                                     bottomBar.controlObj = track.sceneClip;
@@ -1063,108 +1167,8 @@ Zynthian.ScreenPage {
                                                     bottomBar.controlType = BottomBar.ControlType.Clip;
                                                     bottomBar.controlObj = track.sceneClip;
                                                 }
-                                            }
-                                        });
-                                    }
-
-                                    Connections {
-                                        target: track.sceneClip
-                                        onInCurrentSceneChanged: colorTimer.restart()
-                                        onPathChanged: colorTimer.restart()
-                                        onIsPlayingChanged: colorTimer.restart()
-                                    }
-                                    Connections {
-                                        target: track
-                                        onConnectedPatternChanged: colorTimer.restart()
-                                        onTrackAudioTypeChanged: colorTimer.restart()
-                                        onClipsModelChanged: colorTimer.restart()
-                                    }
-                                    Connections {
-                                        target: clipCell.pattern
-                                        onLastModifiedChanged: colorTimer.restart()
-                                        onEnabledChanged: colorTimer.restart()
-                                    }
-                                    Connections {
-                                        target: clipCell.sequence
-                                        onIsPlayingChanged: colorTimer.restart()
-                                    }
-                                    Connections {
-                                        target: zynthian.zynthiloops
-                                        onIsMetronomeRunningChanged: colorTimer.restart()
-                                    }
-                                    Connections {
-                                        target: root.song.scenesModel
-                                        onSelectedSceneIndexChanged: colorTimer.restart()
-                                    }
-
-                                    Timer {
-                                        id: colorTimer
-                                        interval: 10
-                                        onTriggered: {
-                                            // update color
-                                            if (track.trackAudioType === "sample-loop" && track.sceneClip && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
-                                                // In scene
-                                                clipCell.backgroundColor = "#3381d4fa";
-                                            } else if (track.sceneClip && (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col))) {
-                                                // Not in scene
-                                                clipCell.backgroundColor = "#33f44336";
-                                            } else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)
-                                                || (track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0)) {
-                                                clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-                                            } else {
-                                                clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
-                                            }
-
-                                            // update isPlaying
-                                            if (track.connectedPattern < 0) {
-                                                clipCell.isPlaying = track.sceneClip.isPlaying;
-                                            } else {
-                                                var patternIsPlaying = false;
-                                                if (clipCell.sequence && clipCell.sequence.isPlaying) {
-                                                    if (clipCell.sequence.soloPattern > -1) {
-                                                        patternIsPlaying = (clipCell.sequence.soloPattern == track.connectedPattern)
-                                                    } else if (clipCell.pattern) {
-                                                        patternIsPlaying = clipCell.pattern.enabled
-                                                    }
-                                                }
-                                                clipCell.isPlaying = patternIsPlaying && root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col) && zynthian.zynthiloops.isMetronomeRunning;
-                                            }
+                                            })
                                         }
-                                    }
-
-                                    sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                                    pattern: track.connectedPattern >= 0 && sequence ? sequence.getByPart(track.id, track.selectedPart) : null
-
-                                    Layout.preferredWidth: privateProps.cellWidth
-                                    Layout.maximumWidth: privateProps.cellWidth
-                                    Layout.preferredHeight: privateProps.cellHeight
-                                    Layout.maximumHeight: privateProps.cellHeight
-
-                                    onPressed: {
-                                        Qt.callLater(function() {
-                                            root.lastSelectedObj = track.sceneClip
-
-                                            // Directly switch to track instead of implementing muting on double click
-                                            // as we probably wont need muting anymore. Muting is handled by partsBar
-                                            // when  none of the parts are selected
-                                            if (zynthian.session_dashboard.selectedTrack === track.id
-                                                && bottomStack.slotsBar.trackButton.checked) {
-                                                bottomStack.slotsBar.bottomBarButton.checked = true
-                                            } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
-                                                bottomStack.slotsBar.trackButton.checked = true
-                                            }
-                                            zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                            zynthian.session_dashboard.selectedTrack = track.id;
-                                            zynthian.zynthiloops.selectedClipCol = track.sceneClip.col
-
-                                            if (track.connectedPattern >= 0) {
-                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                bottomBar.controlObj = track.sceneClip;
-                                            } else {
-                                                bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                bottomBar.controlObj = track.sceneClip;
-                                            }
-                                        })
                                     }
                                 }
                             }

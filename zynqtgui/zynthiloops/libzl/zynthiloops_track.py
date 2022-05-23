@@ -196,27 +196,27 @@ class zynthiloops_track(QObject):
             if c is not None:
                 bank_dir.mkdir(parents=True, exist_ok=True)
                 try:
-                    logging.info(f"Writing to bank.json {bank_dir}/bank.json")
-                    with open(bank_dir / 'bank.json', "w") as f:
+                    logging.info(f"Writing to sample-bank.json {bank_dir}/sample-bank.json")
+                    with open(bank_dir / 'sample-bank.json', "w") as f:
                         json.dump(obj, f)
                         f.truncate()
                         f.flush()
                         os.fsync(f.fileno())
                 except Exception as e:
-                    logging.error(f"Error writing bank.json to {bank_dir} : {str(e)}")
+                    logging.error(f"Error writing sample-bank.json to {bank_dir} : {str(e)}")
 
                 break
 
     def restore_bank(self):
         bank_dir = Path(self.bankDir)
 
-        if not (bank_dir / 'bank.json').exists():
-            logging.info(f"bank.json does not exist for track {self.id + 1}. Skipping restoration")
+        if not (bank_dir / 'sample-bank.json').exists():
+            logging.info(f"sample-bank.json does not exist for track {self.id + 1}. Skipping restoration")
         else:
-            logging.info(f"Restoring bank.json for track {self.id + 1}")
+            logging.info(f"Restoring sample-bank.json for track {self.id + 1}")
 
             try:
-                with open(bank_dir / 'bank.json', "r") as f:
+                with open(bank_dir / 'sample-bank.json', "r") as f:
                     obj = json.loads(f.read())
 
                     for i, clip in enumerate(obj):
@@ -239,7 +239,7 @@ class zynthiloops_track(QObject):
 
                     self.samples_changed.emit()
             except Exception as e:
-                logging.error(f"Error reading bank.json from {bank_dir} : {str(e)}")
+                logging.error(f"Error reading sample-bank.json from {bank_dir} : {str(e)}")
 
     def serialize(self):
         # Save bank when serializing so that bank is saved everytime song is saved
@@ -633,14 +633,14 @@ class zynthiloops_track(QObject):
 
         self_bank_path.mkdir(parents=True, exist_ok=True)
 
-        # Delete existing bank.json if it exists
+        # Delete existing sample-bank.json if it exists
         try:
-            (self_bank_path / "bank.json").unlink()
+            (self_bank_path / "sample-bank.json").unlink()
         except:
             pass
 
         # Copy bank json from selected bank
-        shutil.copy2(bank_path, self_bank_path / "bank.json")
+        shutil.copy2(bank_path, self_bank_path / "sample-bank.json")
 
         # Copy all wavs from selected bank
         for wav in bank_path.parent.glob("*.wav"):

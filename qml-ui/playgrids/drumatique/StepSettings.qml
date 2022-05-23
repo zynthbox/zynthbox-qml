@@ -195,7 +195,7 @@ ColumnLayout {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     font.bold: true
-                    text: modelData ? modelData.name + modelData.octave : ""
+                    text: modelData ? modelData.name + (modelData.octave - 1) : ""
                 }
                 Zynthian.PlayGridButton {
                     anchors {

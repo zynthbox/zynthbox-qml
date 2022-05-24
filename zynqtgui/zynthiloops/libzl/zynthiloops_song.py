@@ -24,6 +24,7 @@
 # ******************************************************************************
 import ctypes as ctypes
 import math
+import shutil
 import traceback
 import uuid
 
@@ -234,13 +235,24 @@ class zynthiloops_song(QObject):
             with open(self.sketch_folder + filename, "r") as f:
                 sketch = json.loads(f.read())
 
-                if "history" in sketch and len(sketch["history"]) > 0:
-                    cache_dir = Path(self.sketch_folder) / ".cache"
-                    with open(cache_dir / (sketch["history"][-1] + ".sketch.json"), "r") as f_cache:
-                        sketch = json.load(f_cache)
+                try:
+                    if "history" in sketch and len(sketch["history"]) > 0:
+                        cache_dir = Path(self.sketch_folder) / ".cache"
+                        with open(cache_dir / (sketch["history"][-1] + ".sketch.json"), "r") as f_cache:
+                            sketch = json.load(f_cache)
+                except:
+                    logging.error(f"Error loading cache file. Continuing with sketch loading")
 
-                if "name" in sketch:
-                    self.__name__ = sketch["name"]
+                if "name" in sketch and sketch["name"] != "":
+                    if self.__name__ != sketch["name"]:
+                        logging.info(f"Sketch filename changed from '{sketch['name']}' to '{self.__name__}'. "
+                                      f"Trying to rename soundset file.")
+                        logging.info(f'Renaming {self.sketch_folder}/soundsets/{sketch["name"]}.zss to {self.sketch_folder}/soundsets/{self.__name__}.zss')
+
+                        try:
+                            shutil.move(f'{self.sketch_folder}/soundsets/{sketch["name"]}.zss', f'{self.sketch_folder}/soundsets/{self.__name__}.zss')
+                        except Exception as e:
+                            logging.error(f"Error renaming old soundset to new name : {str(e)}")
                 if "suggestedName" in sketch:
                     self.__suggested_name__ = sketch["suggestedName"]
                     self.set_suggested_name(self.__suggested_name__, True)

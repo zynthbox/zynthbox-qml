@@ -186,7 +186,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### Checking Sketch : sketch is none ")
 
         if sketch is not None and Path(sketch).exists():
-            self.loadSketch(sketch, _cb)
+            self.loadSketch(sketch, True, _cb)
         else:
             self.newSketch(None, _cb)
 
@@ -890,7 +890,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if base_sketch is not None:
                 logging.info(f"Creating New Sketch from community sketch : {base_sketch}")
 
-                suggested_name = None
                 base_sketch_path = Path(base_sketch)
 
                 # Copy community sketch as temp
@@ -974,7 +973,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             try:
                 with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "w") as f:
                     obj["name"] = name
-                    obj["suggestedName"] = None
 
                     # for i, track in enumerate(obj["tracks"]):
                     #     for j, clip in enumerate(track["clips"]):
@@ -1034,8 +1032,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.zyngui.do_long_task(task)
 
-    @Slot(str)
-    def loadSketch(self, sketch, cb=None):
+    @Slot(str, bool)
+    def loadSketch(self, sketch, load_history, cb=None):
         def task():
             logging.info(f"Loading sketch : {sketch}")
 
@@ -1069,7 +1067,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.newSketch(sketch, _cb)
             else:
                 logging.info(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
-                self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self)
+                self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self, load_history)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
                 # Load snapshot

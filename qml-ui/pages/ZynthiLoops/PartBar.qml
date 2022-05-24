@@ -91,6 +91,20 @@ Rectangle {
                 bottomStack.slotsBar.trackButton.checked = true
                 returnVal = true
                 break
+
+            case "NAVIGATE_LEFT":
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack -= 1;
+                }
+                returnVal = true
+                break
+
+            case "NAVIGATE_RIGHT":
+                if (zynthian.session_dashboard.selectedTrack < 9) {
+                    zynthian.session_dashboard.selectedTrack += 1;
+                }
+                returnVal = true
+                break
         }
 
         console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedSceneIndex, cuia, clip)

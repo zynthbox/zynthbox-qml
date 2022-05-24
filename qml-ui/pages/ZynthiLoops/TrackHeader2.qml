@@ -105,7 +105,8 @@ QQC2.AbstractButton {
                         fillMode: Image.PreserveAspectCrop
                         clip: true
                         opacity: 0.7
-                        source: Qt.resolvedUrl("../../../img/synths/" + String(model.track.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")  + ".png")
+                        property string imageName: String(model.track.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")
+                        source: imageName !== "" ? Qt.resolvedUrl("../../../img/synths/" + imageName  + ".png") : ""
                     }
 
                     Image {

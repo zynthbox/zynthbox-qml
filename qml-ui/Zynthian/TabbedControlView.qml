@@ -304,8 +304,8 @@ Item {
             }
             GridLayout {
                 id: tabsLayout
-                columns: root.orientation === Qt.Horizontal ? 1 : undefined
-                rows: root.orientation === Qt.Horizontal ? undefined : 1
+                columns: root.orientation === Qt.Horizontal ? 1 : Number.MAX_SAFE_INTEGER
+                rows: root.orientation === Qt.Horizontal ? Number.MAX_SAFE_INTEGER : 1
                 anchors.fill: parent
                 QQC2.Control {
                     id: initialItem

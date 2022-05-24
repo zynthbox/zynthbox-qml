@@ -15,7 +15,7 @@ ColumnLayout {
     property real buttonStepSize
     signal doubleClicked()
     onControlObjChanged: {
-        if (controlObj[controlProperty]) {
+        if (controlObj && controlObj[controlProperty]) {
             dial.value = controlObj[controlProperty]
         }
     }

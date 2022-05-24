@@ -707,11 +707,12 @@ Rectangle {
                             target: zynthian.session_dashboard
                             onSelectedTrackChanged: sidebarUpdateTimer.restart()
                         }
-                        Connections {
-                            enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
-                            target: root.selectedSlotRowItem
-                            onSelectedRowChanged: sidebarUpdateTimer.restart()
-                        }
+                        // This depends on an explicitly commented-out property, so let's probably comment this out as well
+                        //Connections {
+                            //enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
+                            //target: root.selectedSlotRowItem
+                            //onSelectedRowChanged: sidebarUpdateTimer.restart()
+                        //}
                         Connections {
                             enabled: root.selectedSlotRowItem != null &&
                                      root.selectedSlotRowItem.track != null &&

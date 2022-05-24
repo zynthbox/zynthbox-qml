@@ -131,8 +131,8 @@ Zynthian.Card {
                         Layout.preferredWidth: Kirigami.Units.gridUnit*1.5
                         Layout.preferredHeight: Kirigami.Units.gridUnit*1.5
 
-                        enabled: controlObj.samples && !controlObj.samples[index].isRecording && zynthian.zynthiloops.clipToRecord == null
-                        icon.name: controlObj.samples && controlObj.samples[index].isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        enabled: (controlObj.samples !== undefined && !controlObj.samples[index].isRecording && zynthian.zynthiloops.clipToRecord == null)
+                        icon.name: controlObj.samples !== undefined && controlObj.samples[index].isRecording ? "media-playback-stop" : "media-record-symbolic"
                         onClicked: {
                             if (!controlObj.samples[index].isRecording) {
                                 controlObj.samples[index].queueRecording(

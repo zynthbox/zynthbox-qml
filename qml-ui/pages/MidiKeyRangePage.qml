@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.ScreenPage {
     id: root
-    title: zynthian.midi_key_range.selector_path
+    title: zynthian.midi_key_range.select_path ? zynthian.midi_key_range.select_path : ""
 
     screenId: "midi_key_range"
     property var cuiaCallback: function(cuia) {

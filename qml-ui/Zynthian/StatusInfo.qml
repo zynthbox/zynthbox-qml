@@ -267,9 +267,24 @@ MouseArea {
             visible: zynthian.status_information.midi_recorder.length > 0
         }
         QQC2.Label {
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 4
-            text: ZynQuick.PlayGridManager.activeNotes.join(",")
-            elide: Text.ElideRight
+            visible: ZynQuick.PlayGridManager.hardwareInActiveNotes.length > 0
+            text: visible
+                ? "<font size=\"1\">I:</font>" + ZynQuick.PlayGridManager.hardwareInActiveNotes[0] + (ZynQuick.PlayGridManager.hardwareInActiveNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.hardwareInActiveNotes.length - 1) : "")
+                : ""
+            font.pointSize: 9
+        }
+        QQC2.Label {
+            visible: ZynQuick.PlayGridManager.activeNotes.length > 0
+            text: visible
+                ? ZynQuick.PlayGridManager.activeNotes[0] + (ZynQuick.PlayGridManager.activeNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.activeNotes.length - 1) : "")
+                : ""
+            font.pointSize: 9
+        }
+        QQC2.Label {
+            visible: ZynQuick.PlayGridManager.hardwareOutActiveNotes.length > 0
+            text: visible
+                ? "<font size=\"1\">O:</font>" + ZynQuick.PlayGridManager.hardwareOutActiveNotes[0] + (ZynQuick.PlayGridManager.hardwareOutActiveNotes.length > 0 ? "+" + (ZynQuick.PlayGridManager.hardwareOutActiveNotes.length - 1) : "")
+                : ""
             font.pointSize: 9
         }
         QQC2.Label {

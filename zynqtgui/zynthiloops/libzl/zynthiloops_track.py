@@ -71,6 +71,7 @@ class zynthiloops_track(QObject):
         self.__selected_slot_row__ = 0
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
+        self.__sound_json_snapshot__ = ""
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)

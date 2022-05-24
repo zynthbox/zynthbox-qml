@@ -163,8 +163,21 @@ while true; do
         matchbox-window-manager -use_titlebar no -use_cursor no -use_super_modal yes -use_dialog_mode free&
         #openbox&
     fi
-# 	python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,block
-	./zynthian_qt_gui.py
+    
+    # Enable qml debuuger if ZYNTHBOX_DEBUG env variable is set
+    if [ -z "$ZYNTHBOX_DEBUG" ]; then
+		./zynthian_qt_gui.py
+    else
+		export ZYNTHIAN_LOG_LEVEL=10
+		extra_args=""
+		
+		if [ "$ZYNTHBOX_DEBUG" = "block" ]; then
+			extra_args="$extra_args,block"
+		fi
+	
+		python3 -X faulthandler ./zynthian_qt_gui.py -qmljsdebugger=port:10002,$extra_args
+	fi
+	
 	status=$?
 
 	# Proccess output status

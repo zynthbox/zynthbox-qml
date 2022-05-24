@@ -106,7 +106,7 @@ QQC2.Button {
                                             if (!removedAtLeastOne) {
                                                 var subNoteIndex = -1;
                                                 for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
-                                                    subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
+                                                    subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
                                                     component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
                                                 }
                                             }
@@ -124,7 +124,7 @@ QQC2.Button {
                                                 component.patternModel.removeSubnote(component.padNoteRow, component.padNoteIndex, subNoteIndex)
                                                 subNoteIndex = subNoteIndex - 1;
                                             } else {
-                                                subNoteIndex = component.patternModel.addSubnote(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
+                                                subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
                                                 component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
                                             }
                                             component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)

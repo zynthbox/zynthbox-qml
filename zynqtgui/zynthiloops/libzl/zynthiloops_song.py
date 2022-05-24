@@ -47,7 +47,7 @@ from pathlib import Path
 class zynthiloops_song(QObject):
     __instance__ = None
 
-    def __init__(self, sketch_folder: str, name, parent=None, suggested_name=None):
+    def __init__(self, sketch_folder: str, name, parent=None, load_history=True):
         super(zynthiloops_song, self).__init__(parent)
 
         self.__metronome_manager__ = parent
@@ -71,11 +71,10 @@ class zynthiloops_song(QObject):
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
         self.__name__ = name
-        self.__suggested_name__ = suggested_name
         self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
 
-        if not self.restore():
+        if not self.restore(load_history):
             # First, clear out any cruft that might have occurred during a failed load attempt
             self.__parts_model__ = zynthiloops_parts_model(self)
             self.__tracks_model__ = zynthiloops_tracks_model(self)
@@ -110,7 +109,6 @@ class zynthiloops_song(QObject):
 
     def serialize(self):
         return {"name": self.__name__,
-                "suggestedName": self.__suggested_name__,
                 "bpm": self.__bpm__,
                 "volume": self.__volume__,
                 "selectedScaleIndex": self.__selected_scale_index__,
@@ -228,19 +226,31 @@ class zynthiloops_song(QObject):
     def schedule_save(self):
         self.__save_timer__.start()
 
-    def restore(self):
+    def restore(self, load_history):
         filename = self.__name__ + ".sketch.json"
 
         try:
-            logging.info(f"Restoring {self.sketch_folder + filename}")
+            logging.info(f"Restoring {self.sketch_folder + filename}, loadHistory({load_history})")
             with open(self.sketch_folder + filename, "r") as f:
                 sketch = json.loads(f.read())
 
                 try:
-                    if "history" in sketch and len(sketch["history"]) > 0:
-                        cache_dir = Path(self.sketch_folder) / ".cache"
+                    cache_dir = Path(self.sketch_folder) / ".cache"
+
+                    if load_history and "history" in sketch and len(sketch["history"]) > 0:
+                        logging.info("Loading History")
                         with open(cache_dir / (sketch["history"][-1] + ".sketch.json"), "r") as f_cache:
                             sketch = json.load(f_cache)
+                    else:
+                        logging.info("Not loading History")
+                        for history in sketch["history"]:
+                            try:
+                                Path(cache_dir / (history + ".sketch.json")).unlink()
+                            except Exception as e:
+                                logging.error(
+                                    f"Error while trying to remove cache file .cache/{history}.sketch.json : {str(e)}")
+
+                        sketch["history"] = []
                 except:
                     logging.error(f"Error loading cache file. Continuing with sketch loading")
 
@@ -254,9 +264,6 @@ class zynthiloops_song(QObject):
                             shutil.move(f'{self.sketch_folder}/soundsets/{sketch["name"]}.zss', f'{self.sketch_folder}/soundsets/{self.__name__}.zss')
                         except Exception as e:
                             logging.error(f"Error renaming old soundset to new name : {str(e)}")
-                if "suggestedName" in sketch:
-                    self.__suggested_name__ = sketch["suggestedName"]
-                    self.set_suggested_name(self.__suggested_name__, True)
                 if "volume" in sketch:
                     self.__volume__ = sketch["volume"]
                     self.set_volume(self.__volume__, True)
@@ -542,17 +549,6 @@ class zynthiloops_song(QObject):
         return self.sketch_folder
     sketchFolder = Property(str, get_sketch_folder, constant=True)
     ### END Property sketchFolder
-
-    ### Property suggestedName
-    def get_suggested_name(self):
-        return self.__suggested_name__
-    def set_suggested_name(self, suggested_name, force_set=False):
-        if self.__suggested_name__ != suggested_name or force_set is True:
-            self.__suggested_name__ = suggested_name
-            self.suggested_name_changed.emit()
-    suggested_name_changed = Signal()
-    suggestedName = Property(str, get_suggested_name, set_suggested_name, notify=suggested_name_changed)
-    ### End Property suggestedName
 
     def stop(self):
         for i in range(0, self.__parts_model__.count):

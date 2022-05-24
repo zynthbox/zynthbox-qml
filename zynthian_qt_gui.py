@@ -3850,7 +3850,10 @@ def delete_window():
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    #debug = QQmlDebuggingEnabler()
+    # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
+    if os.environ.get("ZYNTHBOX_DEBUG"):
+        debug = QQmlDebuggingEnabler()
+
     ### Tracktion config file `/root/.config/libzl/Settings.xml` sometimes reconfigures and sets
     ### the value <VALUE name="audiosettings_JACK"><AUDIODEVICE outEnabled="0" inEnabled="0" monoChansOut="0" stereoChansIn="0"/></VALUE>
     ### which causes no audio output from libzl. To circumvent this isssue, always remove the following

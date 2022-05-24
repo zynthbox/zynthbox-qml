@@ -45,7 +45,7 @@ T.ComboBox {
         }
         svg: PlasmaCore.Svg {
             imagePath: "widgets/arrows"
-            colorGroup: theme.ButtonColorGroup
+            colorGroup: theme.ButtonColorGroup ? theme.ButtonColorGroup : 0
         }
         elementId: "down-arrow"
     }
@@ -70,7 +70,7 @@ T.ComboBox {
         selectedTextColor: Kirigami.Theme.highlightedTextColor
 
         selectByMouse: !Kirigami.Settings.tabletMode
-        cursorDelegate: Kirigami.Settings.tabletMode ? mobileCursor : undefined
+        cursorDelegate: Kirigami.Settings.tabletMode && typeof(mobileCursor) !== "undefined" ? mobileCursor : null
 
         font: control.font
         horizontalAlignment: Text.AlignLeft

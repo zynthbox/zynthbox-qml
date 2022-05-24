@@ -175,6 +175,7 @@ class zynthiloops_song(QObject):
                 except Exception as e:
                     logging.error(f"Error saving snapshot to sketch folder : {str(e)}")
 
+            self.__metronome_manager__.zyngui.screens["session_dashboard"].set_last_selected_sketch(self.sketch_folder + filename)
             self.versions_changed.emit()
         else:
             filename = self.__initial_name__ + ".sketch.json"

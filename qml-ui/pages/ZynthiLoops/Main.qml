@@ -66,7 +66,7 @@ Zynthian.ScreenPage {
                 onTriggered: {
                     if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
-                        fileNameDialog.fileName = zynthian.zynthiloops.song.suggestedName ? zynthian.zynthiloops.song.suggestedName : "Sketch-1";
+                        fileNameDialog.fileName = "Sketch-1";
                         fileNameDialog.open();
                     } else {
                         zynthian.zynthiloops.saveSketch();
@@ -460,7 +460,7 @@ Zynthian.ScreenPage {
         }
         onFileSelected: {
             console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
-            zynthian.zynthiloops.loadSketch(file.filePath)
+            zynthian.zynthiloops.loadSketch(file.filePath, false)
         }
     }
 

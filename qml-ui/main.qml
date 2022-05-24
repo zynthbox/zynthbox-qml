@@ -137,10 +137,7 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 id: homeButton
-                text: zynthian.zynthiloops.song.isTemp
-                      && zynthian.zynthiloops.song.suggestedName
-                        ? zynthian.zynthiloops.song.suggestedName
-                        : zynthian.zynthiloops.song.name
+                text: zynthian.zynthiloops.song.name
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 padding: Kirigami.Units.largeSpacing*1.5
                 rightPadding: Kirigami.Units.largeSpacing*1.5

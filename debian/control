@@ -8,7 +8,7 @@ Homepage: https://github.com/zynthbox/zynthbox-qml
 
 Package: zynthbox-qml
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libzl, zynthian-quick-components, zyncoder, zynthian-webconf, qml-module-qt-labs-handlers
+Depends: ${shlibs:Depends}, ${misc:Depends}, libzl, zynthian-quick-components, zyncoder, zynthian-webconf, qml-module-qt-labs-handlers, ffmpeg
 Replaces: zynthian-qml (<= 1.1)
 Conflicts: zynthian-qml (<= 1.1)
 Description: Zynthbox QML frontend

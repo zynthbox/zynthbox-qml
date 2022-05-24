@@ -24,12 +24,14 @@
 # ******************************************************************************
 import math
 import shutil
+import tempfile
 import traceback
 
 from datetime import datetime
 from pathlib import Path
+from subprocess import check_output
 
-from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtCore import Property, QObject, QTimer, Signal, Slot
 import taglib
 import json
 
@@ -91,6 +93,11 @@ class zynthiloops_clip(QObject):
 
         self.__was_in_current_scene = self.get_in_current_scene()
         self.__song__.scenesModel.selected_scene_index_changed.connect(self.sync_in_current_scene)
+
+        self.saveMetadataTimer = QTimer()
+        self.saveMetadataTimer.setInterval(1000)
+        self.saveMetadataTimer.setSingleShot(True)
+        self.saveMetadataTimer.timeout.connect(self.doSaveMetadata)
 
     @Property(str, constant=True)
     def className(self):
@@ -381,6 +388,7 @@ class zynthiloops_clip(QObject):
             self.__gain__ = gain
             self.gain_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
 
             if self.audioSource is not None:
                 self.audioSource.set_gain(gain)
@@ -401,6 +409,7 @@ class zynthiloops_clip(QObject):
 
             self.length_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
 
             if self.audioSource is not None:
                 self.audioSource.set_length(self.__length__, self.__song__.bpm)
@@ -469,6 +478,8 @@ class zynthiloops_clip(QObject):
 
             self.start_position_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
+
             if self.audioSource is None:
                 return
             self.audioSource.set_start_position(position)
@@ -493,6 +504,8 @@ class zynthiloops_clip(QObject):
             self.__pitch__ = math.floor(pitch)
             self.pitch_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
+
             if self.audioSource is None:
                 return
             self.audioSource.set_pitch(pitch)
@@ -509,6 +522,8 @@ class zynthiloops_clip(QObject):
             self.__time__ = time
             self.time_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
+
             if self.audioSource is None:
                 return
             self.audioSource.set_speed_ratio(time)
@@ -762,22 +777,25 @@ class zynthiloops_clip(QObject):
         pass
 
     def __read_metadata__(self):
-        try:
-            self.audio_metadata = taglib.File(self.path).tags
+        self.audio_metadata = None
 
+        if self.path is not None:
             try:
-                if self.__bpm__ <= 0:
-                    self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
-            except Exception as e:
-                logging.info(f"Error setting BPM from metadata : {str(e)}")
+                self.audio_metadata = taglib.File(self.path).tags
 
-            self.sound_data_changed.emit()
-            self.metadata_bpm_changed.emit()
-            self.metadata_audio_type_changed.emit()
-            self.metadata_midi_recording_changed.emit()
-        except Exception as e:
-            logging.error(f"Cannot read metadata : {str(e)}")
-            self.audio_metadata = None
+                # try:
+                #     if self.__bpm__ <= 0:
+                #         self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
+                # except Exception as e:
+                #     # logging.info(f"Error setting BPM from metadata : {str(e)}")
+                #     pass
+
+                self.sound_data_changed.emit()
+                self.metadata_bpm_changed.emit()
+                self.metadata_audio_type_changed.emit()
+                self.metadata_midi_recording_changed.emit()
+            except Exception as e:
+                logging.error(f"Cannot read metadata : {str(e)}")
 
     def __get_metadata_prop__(self, name, default):
         try:
@@ -798,6 +816,25 @@ class zynthiloops_clip(QObject):
                 file.save()
             except Exception as e:
                 logging.error(f"Error writing metadata : {str(e)}")
+                logging.info(f"Trying to create a new file without metadata")
+
+                try:
+                    with tempfile.TemporaryDirectory() as tmp:
+                        logging.info("Creating new temp file without metadata")
+                        logging.debug(f"ffmpeg -i {self.path} -codec copy {Path(tmp) / 'output.wav'}")
+                        check_output(f"ffmpeg -i {self.path} -codec copy {Path(tmp) / 'output.wav'}", shell=True)
+
+                        logging.info("Replacing old file")
+                        logging.debug(f"mv {Path(tmp) / 'output.wav'} {self.path}")
+                        check_output(f"mv {Path(tmp) / 'output.wav'} {self.path}", shell=True)
+
+                        file = taglib.File(self.path)
+                        file.tags[key] = value
+                        file.save()
+                except Exception as e:
+                    logging.error(f"Error creating new file and writing metadata : {str(e)}")
+
+            logging.debug(f"Writing metadata to {self.path} : {key} -> {value}")
 
         self.__read_metadata__()
 
@@ -876,6 +913,9 @@ class zynthiloops_clip(QObject):
 
     @Slot(None)
     def saveMetadata(self):
+        self.saveMetadataTimer.start()
+
+    def doSaveMetadata(self):
         self.write_metadata("ZYNTHBOX_STARTPOSITION", [str(self.__start_position__)])
         self.write_metadata("ZYNTHBOX_LENGTH", [str(self.__length__)])
         self.write_metadata("ZYNTHBOX_PITCH", [str(self.__pitch__)])
@@ -954,6 +994,7 @@ class zynthiloops_clip(QObject):
             self.__snap_length_to_beat__ = val
             self.snap_length_to_beat_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
 
     snap_length_to_beat_changed = Signal()
 
@@ -974,6 +1015,7 @@ class zynthiloops_clip(QObject):
 
             self.loop_delta_changed.emit()
             self.__song__.schedule_save()
+            self.saveMetadata()
 
     loop_delta_changed = Signal()
 

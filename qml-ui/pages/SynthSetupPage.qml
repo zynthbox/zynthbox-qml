@@ -410,9 +410,26 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 RowLayout {
                     Kirigami.Heading {
+                        id: banksHeading
                         Layout.fillWidth: true
                         level: 2
-                        text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
+                        text: qsTr("Banks (%1)").arg(banksHeading.bankCount);
+                        property int bankCount: 0;
+                        Timer {
+                            id: banksHeadingSetter
+                            repeat: false; running: false; interval: 1
+                            onTriggered: {
+                                if (banksHeading.bankCount !== zynthian.bank.selector_list.count) {
+                                    banksHeading.bankCount = zynthian.bank.selector_list.count;
+                                    //console.log("Updated bank count, which is now", banksHeading.bankCount);
+                                }
+                            }
+                        }
+                        Connections {
+                            target: zynthian.bank.selector_list
+                            onCountChanged: banksHeadingSetter.restart()
+                        }
+                        Component.onCompleted: banksHeadingSetter.restart()
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
                     }
@@ -520,9 +537,26 @@ Zynthian.ScreenPage {
             Layout.preferredWidth: 1
             RowLayout {
                 Kirigami.Heading {
+                    id: presetHeading
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)
+                    text: qsTr("Presets (%1)").arg(presetHeading.presetCount);
+                    property int presetCount: 0;
+                    Timer {
+                        id: presetHeadingSetter
+                        repeat: false; running: false; interval: 1
+                        onTriggered: {
+                            if (presetHeading.presetCount !== zynthian.preset.selector_list.count) {
+                                presetHeading.presetCount = zynthian.preset.selector_list.count;
+                                //console.log("Changing preset heading, which is now", presetHeading.presetCount);
+                            }
+                        }
+                    }
+                    Connections {
+                        target: zynthian.preset.selector_list
+                        onCountChanged: presetHeadingSetter.restart()
+                    }
+                    Component.onCompleted: presetHeadingSetter.restart()
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }

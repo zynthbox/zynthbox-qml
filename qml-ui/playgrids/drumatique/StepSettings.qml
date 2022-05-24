@@ -149,6 +149,10 @@ ColumnLayout {
     Repeater {
         model: component.note ? component.note.subnotes : 0
         RowLayout {
+            id: subnoteDelegate
+            // Inverting the sort order, so the entries are shown bottom-to-top
+            property int subnoteIndex: component.note.subnotes.length - 1 - model.index
+            property QtObject subnote: component.note.subnotes[subnoteIndex]
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Item {
@@ -162,7 +166,7 @@ ColumnLayout {
                         TouchPoint {
                             onPressedChanged: {
                                 if (!pressed && x > -1 && y > -1 && x < noteDelegate.width && y < noteDelegate.height) {
-                                    component.changeSubnote(model.index);
+                                    component.changeSubnote(subnoteDelegate.subnoteIndex);
                                 }
                             }
                         }
@@ -177,7 +181,7 @@ ColumnLayout {
                     }
                     width: Kirigami.Units.largeSpacing
                     color: Kirigami.Theme.highlightColor
-                    visible: model.index === component.currentSubNote
+                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote
                 }
                 Rectangle {
                     anchors {
@@ -189,13 +193,13 @@ ColumnLayout {
                     }
                     width: height
                     radius: height / 2
-                    color: modelData ? component.noteSpecificColor[modelData.name] : "transparent"
+                    color: subnoteDelegate.subnote ? component.noteSpecificColor[subnoteDelegate.subnote.name] : "transparent"
                 }
                 QQC2.Label {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     font.bold: true
-                    text: modelData ? modelData.name + (modelData.octave - 1) : ""
+                    text: subnoteDelegate.subnote ? subnoteDelegate.subnote.name + (subnoteDelegate.subnote.octave - 1) : ""
                 }
                 Zynthian.PlayGridButton {
                     anchors {
@@ -211,10 +215,10 @@ ColumnLayout {
                     onPressAndHold: {
                         // This is a workaround for "this element disappeared for some reason"
                         var rootComponent = component;
-                        if (rootComponent.currentSubNote >= model.index) {
+                        if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {
                             rootComponent.changeSubnote(rootComponent.currentSubNote - 1);
                         }
-                        rootComponent.model.removeSubnote(rootComponent.row, rootComponent.column, model.index);
+                        rootComponent.model.removeSubnote(rootComponent.row, rootComponent.column, subnoteDelegate.subnoteIndex);
                         // Now refetch the note we're displaying
                         var theColumn = rootComponent.column;
                         rootComponent.column = -1;
@@ -229,7 +233,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 model: component.model; row: component.row; column: component.column;
-                paramIndex: index
+                paramIndex: subnoteDelegate.subnoteIndex
                 paramName: "velocity"
                 paramDefaultString: "64"
                 paramValueSuffix: ""
@@ -242,7 +246,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 model: component.model; row: component.row; column: component.column;
-                paramIndex: index
+                paramIndex: subnoteDelegate.subnoteIndex
                 paramName: "duration"
                 paramDefaultString: component.stepDurationName
                 paramValueSuffix: "/32qn"
@@ -269,7 +273,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 model: component.model; row: component.row; column: component.column;
-                paramIndex: index
+                paramIndex: subnoteDelegate.subnoteIndex
                 paramName: "delay"
                 paramDefaultString: "0 (default)"
                 paramValuePrefix: "+"

@@ -35,12 +35,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    property bool isVisible: zynthian.current_screen_id === "layer" ||
-                             zynthian.current_screen_id === "fixed_layers" ||
-                             zynthian.current_screen_id === "main_layers_view" ||
-                             zynthian.current_screen_id === "layers_for_track" ||
-                             zynthian.current_screen_id === "bank" ||
-                             zynthian.current_screen_id === "preset"
+    property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_track", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
 
     backAction: Kirigami.Action {
         text: qsTr("Back")

@@ -76,7 +76,7 @@ Rectangle {
         id: privateProps
 
         //Try to fit exactly 12 mixers + a master mixer
-        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
+        property int cellWidth: (root.width - loopGrid.columnSpacing)/13
     }
 
     GridLayout {

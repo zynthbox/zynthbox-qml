@@ -1143,16 +1143,20 @@ Zynthian.ScreenPage {
                                         sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
-                                        onPressed: {
+                                        onClicked: {
                                             Qt.callLater(function() {
                                                 root.lastSelectedObj = track.sceneClip
 
                                                 // Directly switch to track instead of implementing muting on double click
                                                 // as we probably wont need muting anymore. Muting is handled by partsBar
                                                 // when  none of the parts are selected
-                                                if (zynthian.session_dashboard.selectedTrack === track.id
-                                                    && bottomStack.slotsBar.trackButton.checked) {
-                                                    bottomStack.slotsBar.bottomBarButton.checked = true
+                                                if (zynthian.session_dashboard.selectedTrack === track.id) {
+                                                    if (bottomStack.slotsBar.trackButton.checked) {
+                                                        bottomStack.slotsBar.partButton.checked = true
+                                                    } else {
+                                                        bottomStack.slotsBar.trackButton.checked = true
+                                                    }
+
                                                 } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
                                                     bottomStack.slotsBar.trackButton.checked = true
                                                 }
@@ -1168,6 +1172,21 @@ Zynthian.ScreenPage {
                                                     bottomBar.controlObj = track.sceneClip;
                                                 }
                                             })
+                                        }
+                                        onPressAndHold: {
+                                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                            bottomStack.bottomBar.controlObj = track.sceneClip;
+                                            bottomStack.slotsBar.bottomBarButton.checked = true;
+
+                                            if (track.trackAudioType === "sample-loop") {
+                                                if (track.sceneClip && track.sceneClip.path && track.sceneClip.path.length > 0) {
+                                                    bottomStack.bottomBar.waveEditorAction.trigger();
+                                                } else {
+                                                    bottomStack.bottomBar.recordingAction.trigger();
+                                                }
+                                            } else {
+                                                bottomStack.bottomBar.patternAction.trigger();
+                                            }
                                         }
                                     }
                                 }

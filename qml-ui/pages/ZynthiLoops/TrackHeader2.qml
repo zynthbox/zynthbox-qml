@@ -122,36 +122,6 @@ QQC2.AbstractButton {
                     }
                 }
 
-//                Rectangle {
-//                    anchors {
-//                        left: parent.left
-//                        right: parent.right
-//                        bottom: parent.bottom
-//                    }
-//                    height: Kirigami.Units.gridUnit * 0.5
-
-//                    color: "#66444444"
-//                    visible: detailsLabel.text &&
-//                             detailsLabel.text.length > 0
-
-//                    QQC2.Label {
-//                        id: detailsLabel
-//                        anchors.fill: parent
-//                        elide: "ElideRight"
-//                        horizontalAlignment: "AlignHCenter"
-//                        verticalAlignment: "AlignVCenter"
-//                        font.pointSize: 7
-//                        text: model.track.trackAudioType === "synth"
-//                              ? model.track.connectedSoundName.split(" > ")[0]
-//                              : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
-//                                  ? model.track.samples[0].path.split("/").pop()
-//                                  : model.track.trackAudioType === "sample-loop"
-//                                      ? model.track.sceneClip.path.split("/").pop()
-//                                      : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
-//                    }
-//                }
-
-
                 Rectangle {
                     height: Kirigami.Units.gridUnit * 0.7
                     anchors.left: parent.left

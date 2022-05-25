@@ -26,7 +26,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 import QtQuick.Extras 1.4 as Extras
 import QtQuick.Controls.Styles 1.4
@@ -853,8 +853,9 @@ Rectangle {
     QQC2.Popup {
         id: samplePickerPopup
 
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
+        parent: QQC2.Overlay.overlay
+        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
         width: Kirigami.Units.gridUnit*12
         modal: true
 

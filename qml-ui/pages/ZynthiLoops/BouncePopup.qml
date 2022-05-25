@@ -66,7 +66,7 @@ QQC2.Popup {
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        implicitHeight: Kirigami.Units.gridUnit * 40
         implicitWidth: Kirigami.Units.gridUnit * 30
         Kirigami.Heading {
             Layout.fillWidth: true

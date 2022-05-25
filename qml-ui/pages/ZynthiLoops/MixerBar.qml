@@ -280,6 +280,7 @@ Rectangle {
                                                     onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundLabel.updateSoundName() : false
                                                     onTrackAudioTypeChanged: soundLabel.updateSoundName()
                                                     onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundLabel.updateSoundName() : false
+                                                    onSelectedSampleRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundLabel.updateSoundName() : false
                                                 }
 
                                                 Connections {

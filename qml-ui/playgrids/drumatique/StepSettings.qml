@@ -211,8 +211,8 @@ ColumnLayout {
                     }
                     width: height
                     icon.name: "edit-delete"
-                    visualPressAndHold: true
-                    onPressAndHold: {
+                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote
+                    onClicked: {
                         // This is a workaround for "this element disappeared for some reason"
                         var rootComponent = component;
                         if (rootComponent.currentSubNote >= subnoteDelegate.subnoteIndex) {

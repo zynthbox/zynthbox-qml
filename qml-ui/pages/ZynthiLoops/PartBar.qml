@@ -183,16 +183,16 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartTrack.trackAudioType === "sample-loop"
-                            text: root.selectedPartClip.path.split("/").pop()
+                            visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType === "sample-loop"
+                            text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
                         }
 
                         QQC2.Label {
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartTrack.trackAudioType !== "sample-loop"
-                            text: root.selectedPartPattern.objectName
+                            visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType !== "sample-loop"
+                            text: root.selectedPartPattern ? root.selectedPartPattern.objectName : ""
                         }
 
                         Kirigami.Separator {

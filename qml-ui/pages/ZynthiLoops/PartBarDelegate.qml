@@ -23,6 +23,7 @@ ColumnLayout {
             property int partIndex: index
             property QtObject pattern: root.sequence.getByPart(root.track.id, model.index)
             property QtObject clip: root.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
+            property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -40,7 +41,7 @@ ColumnLayout {
                 source: partDelegate.clip ? partDelegate.clip.path : ""
 
                 visible: root.track.trackAudioType === "sample-loop" &&
-                         partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
+                         partDelegate.clipHasWav
             }
             Image {
                 anchors.fill: parent
@@ -97,6 +98,24 @@ ColumnLayout {
                 anchors.fill: parent
                 onClicked: {
                     partDelegate.clip.enabled = !partDelegate.clip.enabled;
+                }
+                onPressAndHold: {
+                    partDelegate.clip.enabled = true;
+                    root.track.selectedPart = index;
+
+                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                    bottomStack.bottomBar.controlObj = root.track.sceneClip;
+                    bottomStack.slotsBar.bottomBarButton.checked = true;
+
+                    if (root.track.trackAudioType === "sample-loop") {
+                        if (partDelegate.clipHasWav) {
+                            bottomStack.bottomBar.waveEditorAction.trigger();
+                        } else {
+                            bottomStack.bottomBar.recordingAction.trigger();
+                        }
+                    } else {
+                        bottomStack.bottomBar.patternAction.trigger();
+                    }
                 }
             }
         }

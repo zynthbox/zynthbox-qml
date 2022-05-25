@@ -40,6 +40,8 @@ Zynthian.Card {
     property var clipCopySource: null
     property alias tabbedView: tabbedView
 
+    property alias patternAction: patternAction
+    property alias recordingAction: recordingAction
     property alias waveEditorAction: waveEditorAction
     property alias trackWaveEditorAction: trackWaveEditorAction
     property alias tracksViewSoundsBarAction: trackSoundsAction

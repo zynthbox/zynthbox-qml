@@ -656,7 +656,7 @@ Zynthian.ScreenPage {
                         text: qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
                     }
                     QQC2.Label {
-                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[0]
+                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSampleRow]
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter

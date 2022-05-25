@@ -183,7 +183,7 @@ Rectangle {
                                             id: volumeControl
 
                                             property var audioLevelText: model.track.audioLevel.toFixed(2)
-                                            property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.track.samples[0].cppObjId);
+                                            property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.track.samples[model.track.selectedSlotRow].cppObjId);
                                             property real synthAudioLevel
 
                                             anchors.fill: parent
@@ -302,7 +302,7 @@ Rectangle {
                                                     } else if (model.track.trackAudioType === "sample-trig" ||
                                                                model.track.trackAudioType === "sample-slice") {
                                                         try {
-                                                            text = model.track.samples[0].path.split("/").pop()
+                                                            text = model.track.samples[model.track.selectedSampleRow].path.split("/").pop()
                                                         } catch (e) {}
                                                     } else if (model.track.trackAudioType === "sample-loop") {
                                                         try {

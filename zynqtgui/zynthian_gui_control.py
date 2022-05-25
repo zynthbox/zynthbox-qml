@@ -172,7 +172,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 		try:
 			self.__conf = JSONDecoder().decode(json)
 			if self.__single_effect_engine == None:
-				if self.zyngui.curlayer.engine.nickname in self.__conf:
+				if self.zyngui.curlayer is not None and self.zyngui.curlayer.engine.nickname in self.__conf:
 					self.set_custom_control_page(self.__conf[self.zyngui.curlayer.engine.nickname]["custom_control_page"])
 				else:
 					self.set_custom_control_page("")

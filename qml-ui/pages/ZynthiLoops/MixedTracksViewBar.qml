@@ -402,12 +402,14 @@ Rectangle {
                                                 top: parent.top
                                                 bottom: parent.bottom
                                             }
-                                            visible: root.selectedTrack.trackAudioType === "synth"
+                                            visible: root.selectedTrack.trackAudioType === "synth" &&
+                                                     synthNameLabel.text.trim().length > 0
 
                                             color: Kirigami.Theme.highlightColor
                                         }
 
                                         QQC2.Label {
+                                            id: synthNameLabel
                                             anchors {
                                                 verticalCenter: parent.verticalCenter
                                                 left: parent.left

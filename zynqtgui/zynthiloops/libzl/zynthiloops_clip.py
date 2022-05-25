@@ -39,9 +39,14 @@ from .libzl import ClipAudioSource
 
 import logging
 
+from ... import zynthian_gui_config
+
+
 class zynthiloops_clip(QObject):
     def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_track_sample=False):
         super(zynthiloops_clip, self).__init__(parent)
+        self.zyngui = zynthian_gui_config.zyngui
+
         self.is_track_sample = is_track_sample
         self.__row_index__ = row_index
         self.__col_index__ = col_index
@@ -155,7 +160,7 @@ class zynthiloops_clip(QObject):
         self.current_beat_changed.emit()
 
     def track_volume_changed(self):
-        if self.track is not None:
+        if self.track is not None and not self.zyngui.zynthiloops.longOperation:
             self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
             logging.info(f"Track volume changed : {self.track.volume}")
 

@@ -118,6 +118,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__is_init_in_progress__ = True
         self.__long_task_count__ = 0
         self.__big_knob_mode__ = ""
+        self.__long_operation__ = False
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -646,7 +647,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        if self.__song__ is None or (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self):
+        # Hide selectors and return if dependent variables is None or a long operation is in progress
+        if self.__song__ is None or \
+                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
+                self.longOperation:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
             if self.__zselector[1] is not None:
@@ -764,6 +768,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
                                          notify=knob_touch_update_in_progress_changed)
     ### END Property knobTouchUpdateInProgress
+
+    ### Property longOperation
+    def longOperationIncrement(self):
+        self.__long_operation__ += 1
+
+    def longOperationDecrement(self):
+        self.__long_operation__ = max(self.__long_operation__ - 1, 0)
+        self.longOperationChanged.emit()
+
+    def get_longOperation(self):
+        return self.__long_operation__ > 0
+
+    longOperationChanged = Signal()
+
+    longOperation = Property(bool, get_longOperation, notify=longOperationChanged)
+    ### END Property longOperation
 
     @Signal
     def master_volume_changed(self):
@@ -935,8 +955,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
+            self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
+        self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
     @Slot(None)
@@ -995,11 +1017,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
 
             self.song_changed.emit()
+            self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
             # logging.error("### Saving sketch to session")
             # self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
 
+        self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
     @Slot(str)
@@ -1062,6 +1086,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.screens["layer"].load_snapshot(
                         f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
 
+                    self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
                 self.newSketch(sketch, _cb)
@@ -1080,11 +1105,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
 
+                self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)
 
             if cb is not None:
                 cb()
 
+        self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
     @Slot(str)

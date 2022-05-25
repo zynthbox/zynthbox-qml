@@ -987,6 +987,7 @@ Kirigami.AbstractApplicationWindow {
                     enabled: false
                 }
                 QQC2.Button {
+                    id: recordingDestinationButton
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     implicitWidth: 1
@@ -1001,7 +1002,7 @@ Kirigami.AbstractApplicationWindow {
                             bottom: parent.bottom
                             margins: Kirigami.Units.largeSpacing
                         }
-                        parent: parent.background
+                        parent: recordingDestinationButton.background
                         height: Kirigami.Units.smallSpacing
                         color: Kirigami.Theme.highlightColor
                     }

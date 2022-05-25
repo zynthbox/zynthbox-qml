@@ -392,9 +392,11 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.bottom: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
-                            headerText: zynthian.zynthiloops.masterAudioLevel <= -40
-                                            ? ""
-                                            : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
+                            headerText: root.visible
+                                            ? zynthian.zynthiloops.masterAudioLevel <= -40
+                                                ? ""
+                                                : (zynthian.zynthiloops.masterAudioLevel.toFixed(2) + " (dB)")
+                                            : ""
                             footerText: "Master"
                             audioLeveldB: visible ? zynthian.zynthiloops.masterAudioLevel :  -400
                             inputAudioLevelVisible: false

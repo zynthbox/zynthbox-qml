@@ -13,6 +13,10 @@ ColumnLayout {
     id: root
     property QtObject track
     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    property QtObject selectedPartClip
+    property QtObject selectedPartPattern
+
+    signal clicked()
 
     spacing: 1
 
@@ -30,8 +34,7 @@ ColumnLayout {
             color: "#000000"
             border{
                 color: Kirigami.Theme.highlightColor
-                width: (root.track.trackAudioType === "sample-loop" && root.track.selectedPart === partDelegate.partIndex) ||
-                       (partDelegate.clip && partDelegate.clip.enabled)
+                width: partDelegate.clip && partDelegate.clip.enabled
                         ? 1
                         : 0
             }
@@ -98,6 +101,12 @@ ColumnLayout {
                 anchors.fill: parent
                 onClicked: {
                     partDelegate.clip.enabled = !partDelegate.clip.enabled;
+                    root.track.selectedPart = index;
+
+                    root.selectedPartClip = partDelegate.clip
+                    root.selectedPartPattern = partDelegate.pattern
+
+                    root.clicked()
                 }
                 onPressAndHold: {
                     partDelegate.clip.enabled = true;

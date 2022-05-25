@@ -44,6 +44,9 @@ Rectangle {
 
     property QtObject bottomBar: null
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedPartTrack
+    property QtObject selectedPartClip
+    property QtObject selectedPartPattern
 
     function cuiaCallback(cuia) {
         console.log("### Part Bar CUIA Callback :", cuia)
@@ -154,19 +157,54 @@ Rectangle {
                     }
 
                     Repeater {
+                        id: partDelegateRepeater
                         model: 10
                         delegate: PartBarDelegate {
+                            id: partBarDelegate
+
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: privateProps.cellWidth
                             track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index)
+                            onClicked: {
+                                root.selectedPartTrack = partBarDelegate.track
+                                root.selectedPartClip = partBarDelegate.selectedPartClip
+                                root.selectedPartPattern = partBarDelegate.selectedPartPattern
+                            }
                         }
                     }
 
-                    Item {
-                        Layout.fillWidth: false
+                    ColumnLayout {
+                        Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: privateProps.cellWidth*2
+
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            wrapMode: "WrapAtWordBoundaryOrAnywhere"
+                            visible: root.selectedPartTrack.trackAudioType === "sample-loop"
+                            text: root.selectedPartClip.path.split("/").pop()
+                        }
+
+                        QQC2.Label {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            wrapMode: "WrapAtWordBoundaryOrAnywhere"
+                            visible: root.selectedPartTrack.trackAudioType !== "sample-loop"
+                            text: root.selectedPartPattern.objectName
+                        }
+
+                        Kirigami.Separator {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: false
+                            Layout.preferredHeight: 2
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                        }
                     }
                 }
             }

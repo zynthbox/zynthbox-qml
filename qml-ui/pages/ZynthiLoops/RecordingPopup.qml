@@ -83,8 +83,8 @@ QQC2.Popup {
     }
 
     ColumnLayout {
-        implicitWidth: root.width * 0.6
-        implicitHeight: root.height * 0.7
+        implicitWidth: root.parent.width * 0.6
+        implicitHeight: root.parent.height * 0.7
 
         Kirigami.Heading {
             Layout.fillWidth: true

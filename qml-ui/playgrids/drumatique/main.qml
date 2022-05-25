@@ -807,10 +807,10 @@ Zynthian.BasePlayGrid {
                             }
                             // TODO Default value should probably be the current note duration... get that from PatternModel (which need it exposed)
                             function durationUp() {
-                                changeValue("duration", 1, 0, 128, 0);
+                                changeValue("duration", 1, 0, 1024, 0);
                             }
                             function durationDown() {
-                                changeValue("duration", -1, 0, 128, 0);
+                                changeValue("duration", -1, 0, 1024, 0);
                             }
                             function delayUp() {
                                 if (stepSettings.visible) {

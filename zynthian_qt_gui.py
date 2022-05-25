@@ -774,8 +774,13 @@ class zynthian_gui(QObject):
             self.wsleds_blink = False
 
         try:
-            track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-            occupied_slots = track.occupiedSlots
+            track = None
+            if self.zynthiloops.song is not None:
+                track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+            occupied_slots = []
+            # This is not in fact used below... leaving here for now in case we want it back
+            #if track is not None:
+                #occupied_slots = track.occupiedSlots
 
             # Menu
             if self.modal_screen is None and self.active_screen == "main":
@@ -790,7 +795,7 @@ class zynthian_gui(QObject):
                 if self.leftSidebarActive:
                     partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedSceneIndex, i-1)
 
-                    if partClip.enabled:
+                    if partClip.enabled and track is not None:
                         if track.trackAudioType == "synth":
                             self.wsled_blink(i, self.wscolor_red)
                         elif track.trackAudioType in ["sample-trig", "sample-slice"]:
@@ -805,7 +810,7 @@ class zynthian_gui(QObject):
                     continue
 
                 # If slots synths bar is active, light up filled cells otherwise turn off led
-                if track.trackAudioType == "synth":
+                if track is not None and track.trackAudioType == "synth":
                     if track.chainedSounds[i-1] > -1 and \
                             track.checkIfLayerExists(track.chainedSounds[i-1]):
                         self.wsleds.setPixelColor(i, self.wscolor_red)
@@ -815,7 +820,7 @@ class zynthian_gui(QObject):
                     continue
 
                 # If slots samples bar is active, light up filled cells otherwise turn off led
-                if track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice":
+                if track is not None and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
                     if track.samples[i-1].path is not None:
                         self.wsleds.setPixelColor(i, self.wscolor_yellow)
                     else:
@@ -835,7 +840,7 @@ class zynthian_gui(QObject):
                 #     continue
 
                 # light up "1" Button green if clip has a wav otherwise turn off led
-                if track.trackAudioType == "sample-loop":
+                if track is not None and track.trackAudioType == "sample-loop":
                     clip = track.clipsModel.getClip(0)
 
                     if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
@@ -871,12 +876,12 @@ class zynthian_gui(QObject):
             #     self.wsleds.setPixelColor(6, self.wscolor_off)
 
             # 7 : FX Button
-            if track.trackAudioType == "synth":
+            if track is not None and track.trackAudioType == "synth":
                 if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_red)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_red)
-            elif track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice":
+            elif track is not None and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
                 if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_yellow)
                 else:
@@ -886,12 +891,12 @@ class zynthian_gui(QObject):
                     self.wsled_blink(7, self.wscolor_blue)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_blue)
-            elif track.trackAudioType == "sample-loop":
+            elif track is not None and track.trackAudioType == "sample-loop":
                 if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_green)
                 else:
                     self.wsleds.setPixelColor(7, self.wscolor_green)
-            elif track.trackAudioType == "external":
+            elif track is not None and track.trackAudioType == "external":
                 if self.leftSidebarActive:
                     self.wsled_blink(7, self.wscolor_purple)
                 else:

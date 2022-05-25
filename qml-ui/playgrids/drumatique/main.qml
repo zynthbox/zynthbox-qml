@@ -580,10 +580,7 @@ Zynthian.BasePlayGrid {
     Component {
         id: drumsGrid
         Item {
-            anchors {
-                margins: 5
-                fill: parent;
-            }
+            anchors.margins: 5
             objectName: "drumsGrid"
             ColumnLayout {
                 id:gridColumnLayout

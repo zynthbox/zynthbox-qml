@@ -717,7 +717,7 @@ Rectangle {
                             enabled: root.selectedSlotRowItem != null &&
                                      root.selectedSlotRowItem.track != null &&
                                      bottomStack.currentIndex === 2
-                            target: root.selectedSlotRowItem.track
+                            target: enabled ? root.selectedSlotRowItem.track : null
                             onChainedSoundsChanged: sidebarUpdateTimer.restart()
                             onSamplesChanged: sidebarUpdateTimer.restart()
                         }

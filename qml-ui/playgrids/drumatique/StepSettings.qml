@@ -51,13 +51,22 @@ ColumnLayout {
         6: 1
     }
     property int stepDuration: component.model ? noteLengths[component.model.noteLength] : 0
+    // This is going to come back to haunt us - if we don't somehow tell the user the difference between a quantised note and one set to what happens to be the current note length... that will be an issue
+    //property var noteLengthNames: {
+        //1: "1/4 (default)",
+        //2: "1/8 (default)",
+        //3: "1/16 (default)",
+        //4: "1/32 (default)",
+        //5: "1/64 (default)",
+        //6: "1/128 (default)"
+    //}
     property var noteLengthNames: {
-        1: "1qn (default)",
-        2: "1/2qn (default)",
-        3: "1/4qn (default)",
-        4: "1/8qn (default)",
-        5: "1/16qn (default)",
-        6: "1/32qn (default)"
+        1: "1/4",
+        2: "1/8",
+        3: "1/16",
+        4: "1/32",
+        5: "1/64",
+        6: "1/128"
     }
     property string stepDurationName: component.model ? noteLengthNames[component.model.noteLength] : ""
     property var noteSpecificColor: {
@@ -135,7 +144,7 @@ ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
-            text: "Duration"
+            text: "Length"
         }
         QQC2.Label {
             Layout.fillWidth: true
@@ -249,24 +258,31 @@ ColumnLayout {
                 paramIndex: subnoteDelegate.subnoteIndex
                 paramName: "duration"
                 paramDefaultString: component.stepDurationName
-                paramValueSuffix: "/32qn"
+                paramValueSuffix: "/128"
                 paramDefault: undefined
                 paramInterpretedDefault: component.stepDuration
                 paramMin: 0
-                paramMax: 128
+                paramMax: 1024
                 scrollWidth: 128
-                paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128]
+                paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 384, 512, 640, 768, 896, 1024]
                 paramNames: {
                     0: component.stepDurationName,
-                    1: "1/32qn",
-                    2: "1/16qn",
-                    4: "1/8qn",
-                    8: "1/4qn",
-                    16: "1/2qn",
-                    32: "1qn",
-                    64: "2qn",
-                    96: "3qn",
-                    128: "4qn"
+                    1: "1/128",
+                    2: "1/64",
+                    4: "1/32",
+                    8: "1/16",
+                    16: "1/8",
+                    32: "1/4",
+                    64: "1/2",
+                    96: "3/4",
+                    128: "1",
+                    256: "2",
+                    384: "3",
+                    512: "4",
+                    640: "5",
+                    768: "6",
+                    896: "7",
+                    1024: "8"
                 }
             }
             StepSettingsParamDelegate {
@@ -277,7 +293,7 @@ ColumnLayout {
                 paramName: "delay"
                 paramDefaultString: "0 (default)"
                 paramValuePrefix: "+"
-                paramValueSuffix: "/32qn"
+                paramValueSuffix: "/128"
                 paramDefault: undefined
                 paramInterpretedDefault: 0
                 paramMin: 0
@@ -286,15 +302,15 @@ ColumnLayout {
                 Component.onCompleted: {
                     var potentialValues = {
                         0: "0 (default)",
-                        1: "+1/32qn",
-                        2: "+1/16qn",
-                        4: "+1/8qn",
-                        8: "+1/4qn",
-                        16: "+1/2qn",
-                        32: "+1qn",
-                        64: "+2qn",
-                        96: "+3qn",
-                        128: "+4qn"
+                        1: "+1/128",
+                        2: "+1/64",
+                        4: "+1/32",
+                        8: "+1/16",
+                        16: "+1/8",
+                        32: "+1/4",
+                        64: "+1/2",
+                        96: "+3/4",
+                        128: "+1"
                     };
                     var values = [];
                     var names = {};
@@ -329,37 +345,37 @@ ColumnLayout {
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1"
+            text: "1/4"
             checked: component.model ? component.model.noteLength === 1 : false
             onClicked: { component.setDuration(32, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/2"
+            text: "1/8"
             checked: component.model ? component.model.noteLength === 2 : false
             onClicked: { component.setDuration(16, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/4"
+            text: "1/16"
             checked: component.model ? component.model.noteLength === 3 : false
             onClicked: { component.setDuration(8, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/8"
+            text: "1/32"
             checked: component.model ? component.model.noteLength === 4 : false
             onClicked: { component.setDuration(4, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/16"
+            text: "1/64"
             checked: component.model ? component.model.noteLength === 5 : false
             onClicked: { component.setDuration(2, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/32"
+            text: "1/128"
             checked: component.model ? component.model.noteLength === 6 : false
             onClicked: { component.setDuration(1, checked); }
         }

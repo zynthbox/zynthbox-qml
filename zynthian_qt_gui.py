@@ -62,6 +62,9 @@ from soundfile import SoundFile
 
 from pynput.keyboard import Key, Controller
 
+from timeit import default_timer as timer
+from datetime import timedelta
+
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
@@ -3210,6 +3213,10 @@ class zynthian_gui(QObject):
 
             self.displayMainWindow.emit()
 
+            boot_end = timer()
+
+            logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
+
         worker_thread = threading.Thread(target=task, args=(self,))
         worker_thread.start()
 
@@ -3850,6 +3857,8 @@ def delete_window():
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    boot_start = timer()
+
     # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
     if os.environ.get("ZYNTHBOX_DEBUG"):
         debug = QQmlDebuggingEnabler()

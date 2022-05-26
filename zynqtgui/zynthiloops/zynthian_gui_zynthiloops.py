@@ -1097,12 +1097,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
                 if load_snapshot:
+                    snapshot_path = str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'
                     # Load snapshot
-                    logging.info(
-                        f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
-                    self.zyngui.screens["layer"].load_snapshot(
-                        str(sketch_path.parent.absolute()) + "/soundsets/" + str(
-                            sketch_path.stem.replace(".sketch", "")) + ".zss")
+                    logging.info(f"Loading snapshot : {snapshot_path}")
+                    self.zyngui.screens["layer"].load_snapshot(snapshot_path)
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()

@@ -37,8 +37,6 @@ import "pages/ZynthiLoops" as Zynthiloops
 
 Kirigami.AbstractApplicationWindow {
     id: root
-    visible: false
-    flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: {
@@ -50,28 +48,10 @@ Kirigami.AbstractApplicationWindow {
             return screensLayer.currentItem
         }
     }
-    onCurrentPageChanged: zynthian.current_qml_page = currentPage
-
+    readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-
-    function showConfirmationDialog() {
-        confirmDialog.open()
-    }
-    function hideConfirmationDialog() {
-        confirmDialog.close()
-    }
-    function openSoundsDialog() {
-        soundsDialog.open();
-    }
-    function openRecordingPopup() {
-        recordingPopup.open();
-    }
-
-    Component.onCompleted: {
-        displayWindowTimer.start()
-    }
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -84,27 +64,20 @@ Kirigami.AbstractApplicationWindow {
     signal soundsDialogAccepted()
     signal soundsDialogRejected()
 
+    function showConfirmationDialog() { confirmDialog.open() }
+    function hideConfirmationDialog() { confirmDialog.close() }
+    function openSoundsDialog() { soundsDialog.open() }
+    function openRecordingPopup() { recordingPopup.open() }
+
+    visible: false
+    flags: Qt.WindowStaysOnBottomHint|Qt.FramelessWindowHint
     minimumWidth: screen.width
     minimumHeight: screen.height
-
-    Timer {
-        id: displayWindowTimer
-        // This interval makes sure to wait until all the pages are cached before showing window
-        interval: 2000
-        repeat: false
-        onTriggered: {
-            zynthian.stop_splash();
-        }
-    }
-    onWidthChanged: {
-        //FIXME: workaround
-        width = screen.width;
-    }
-    onHeightChanged: {
-        //FIXME: workaround
-        height = screen.height;
-    }
-
+    onCurrentPageChanged: zynthian.current_qml_page = currentPage
+    Component.onCompleted: displayWindowTimer.start()
+    onWidthChanged: width = screen.width
+    onHeightChanged: height = screen.height
+    pageStack: screensLayer
     header: RowLayout {
             spacing: 0
             Zynthian.BreadcrumbButton {
@@ -541,7 +514,29 @@ Kirigami.AbstractApplicationWindow {
 
         Zynthian.StatusInfo {}
     }
-    pageStack: screensLayer
+    background: Rectangle {
+        Kirigami.Theme.inherit: false
+        // TODO: this should eventually go to Window and the panels to View
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        color: Kirigami.Theme.backgroundColor
+    }
+    footer: Zynthian.ActionBar {
+        z: 999999
+        currentPage: root.currentPage
+        visible: root.controlsVisible
+       // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
+    }
+
+    Timer {
+        id: displayWindowTimer
+        // This interval makes sure to wait until all the pages are cached before showing window
+        interval: 2000
+        repeat: false
+        onTriggered: {
+            zynthian.stop_splash();
+        }
+    }
+
     ScreensLayer {
         id: screensLayer
         parent: root.contentItem
@@ -560,16 +555,8 @@ Kirigami.AbstractApplicationWindow {
         visible: root.footer.height > 0 //HACK
     }
 
-
     CustomTheme {
         id: customTheme
-    }
-
-    background: Rectangle {
-        Kirigami.Theme.inherit: false
-        // TODO: this should eventually go to Window and the panels to View
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        color: Kirigami.Theme.backgroundColor
     }
 
     Instantiator {
@@ -636,13 +623,6 @@ Kirigami.AbstractApplicationWindow {
         z: 9999999
     }
 
-    footer: Zynthian.ActionBar {
-        z: 999999
-        currentPage: root.currentPage
-        visible: root.controlsVisible
-       // height: Math.max(implicitHeight, Kirigami.Units.gridUnit * 3)
-    }
-
     Loader {
         parent: root.contentItem.parent
         z: Qt.inputMethod.visible ? 99999999 : 1
@@ -682,7 +662,6 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    readonly property Item playGrids: playGridsRepeater
     Repeater {
         id: playGridsRepeater
         model: ZynQuick.PlayGridManager.playgrids
@@ -698,6 +677,7 @@ Kirigami.AbstractApplicationWindow {
     Zynthiloops.RecordingPopup {
         id: recordingPopup
     }
+
     QQC2.Drawer {
         id: miniPlayGridDrawer
         width: root.width
@@ -707,6 +687,7 @@ Kirigami.AbstractApplicationWindow {
 
         contentItem: MiniPlayGrid {}
     }
+
     QQC2.Drawer {
         id: slotSelectionDrawer
         width: Kirigami.Units.gridUnit * 16
@@ -1033,6 +1014,7 @@ Kirigami.AbstractApplicationWindow {
             }
         }
     }
+
     Window {
         id: clipPickerMenu
         visible: false;
@@ -1068,4 +1050,27 @@ Kirigami.AbstractApplicationWindow {
             ]
         }
     }
+
+//    Window {
+//        id: bootLogWindow
+//        visible: true
+//        flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint
+//        width: 200
+//        height: 200
+
+//        Rectangle {
+//            anchors.fill: parent
+//            color: "#2196f3"
+
+//            QQC2.Label {
+//                anchors {
+//                    left: parent.left
+//                    right: parent.right
+//                    bottom: parent.bottom
+//                }
+//                horizontalAlignment: "AlignHCenter"
+//                text: zynthian.currentTaskMessage
+//            }
+//        }
+//    }
 }

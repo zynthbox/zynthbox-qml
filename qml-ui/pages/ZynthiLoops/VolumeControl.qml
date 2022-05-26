@@ -6,6 +6,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 Rectangle {
+    id: control
     property bool highlight: false
     property alias headerText: headerLabel.text
     property alias footerText: footerLabel.text
@@ -19,7 +20,6 @@ Rectangle {
     signal doubleClicked();
     signal valueChanged();
 
-    id: control
     border.color: Kirigami.Theme.highlightColor
     border.width: highlight ? 1 : 0
     color: "transparent"
@@ -48,7 +48,7 @@ Rectangle {
 
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: parent.width/2
+                Layout.preferredWidth: control.width/2
                 Layout.topMargin: 6
                 Layout.bottomMargin: 6
                 Layout.leftMargin: 30

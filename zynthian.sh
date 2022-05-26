@@ -165,7 +165,8 @@ while true; do
     fi
 
     # Enable qml debuuger if ZYNTHBOX_DEBUG env variable is set
-    if [ -z "$ZYNTHBOX_DEBUG" ]; then
+    if [ -z "$ZYNTHBOX_DEBUG" ]; then    
+        export ZYNTHIAN_LOG_LEVEL=20
         ./zynthian_qt_gui.py
     else
         export ZYNTHIAN_LOG_LEVEL=10

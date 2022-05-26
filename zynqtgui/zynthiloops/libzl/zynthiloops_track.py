@@ -130,8 +130,6 @@ class zynthiloops_track(QObject):
         self.selectedPartNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
-        logging.error(f"### chained_sounds_changed_handler")
-
         self.occupiedSlotsChanged.emit()
         self.update_jack_port()
         self.connectedSoundChanged.emit()
@@ -140,8 +138,6 @@ class zynthiloops_track(QObject):
         self.chainedSoundsNamesChanged.emit()
 
     def fixed_layers_list_updated_handler(self):
-        logging.error(f"### fixed_layers_list_updated_handler")
-
         self.connectedSoundChanged.emit()
         self.connectedSoundNameChanged.emit()
         self.chainedSoundsInfoChanged.emit()

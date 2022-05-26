@@ -1420,7 +1420,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 			#JSON Encode
 			json=JSONEncoder().encode(snapshot)
-			logging.info("Saving snapshot %s => \n%s" % (fpath,json))
+			logging.info(f"Saving snapshot {fpath}")
+			logging.debug(fpath,json)
 
 		except Exception as e:
 			logging.error("Can't generate snapshot: %s" % e)
@@ -1444,8 +1445,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		try:
 			with open(fpath,"r") as fh:
 				json=fh.read()
-				logging.info("Loading snapshot %s => \n%s" % (fpath,json))
-
+				logging.info(f"Loading snapshot {fpath}")
+				logging.debug(json)
 		except Exception as e:
 			logging.error("Can't load snapshot '%s': %s" % (fpath,e))
 			return False

@@ -637,7 +637,7 @@ class zynthiloops_clip(QObject):
             self.audioSource.audioLevelChanged.disconnect()
             self.audioSource.progressChanged.disconnect()
         except Exception as e:
-            logging.error(f"Not connected : {str(e)}")
+            logging.debug(f"Not connected : {str(e)}")
 
         self.audioSource.audioLevelChanged.connect(lambda leveldB: self.audio_level_changed_cb(leveldB))
         self.audioSource.progressChanged.connect(lambda progress: self.progress_changed_cb(progress))
@@ -646,7 +646,7 @@ class zynthiloops_clip(QObject):
             logging.info(f"Setting bpm from metadata : {self.audio_metadata}")
             self.set_bpm(int(self.audio_metadata["ZYNTHBOX_BPM"][0]), True)
         except Exception as e:
-            logging.error(f"Error setting bpm from metadata : {str(e)}")
+            logging.debug(f"Error setting bpm from metadata : {str(e)}")
 
         # self.startPosition = self.__start_position__
         # self.length = self.__length__
@@ -805,7 +805,7 @@ class zynthiloops_clip(QObject):
     def __get_metadata_prop__(self, name, default):
         try:
             value = self.audio_metadata[name][0]
-            logging.info(f"Restoring from metadata : {name}({value})")
+            logging.debug(f"Restoring from metadata : {name}({value})")
             return value
         except:
             return default

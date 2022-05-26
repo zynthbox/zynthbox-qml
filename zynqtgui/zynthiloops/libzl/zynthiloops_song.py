@@ -51,8 +51,9 @@ class zynthiloops_song(QObject):
         super(zynthiloops_song, self).__init__(parent)
 
         self.__metronome_manager__ = parent
-
         self.sketch_folder = sketch_folder
+
+        self.__is_loading__ = True
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__scenes_model__ = zynthiloops_scenes_model(self)
@@ -75,6 +76,7 @@ class zynthiloops_song(QObject):
         self.__to_be_deleted__ = False
 
         if not self.restore(load_history):
+            self.__is_loading__ = True
             # First, clear out any cruft that might have occurred during a failed load attempt
             self.__parts_model__ = zynthiloops_parts_model(self)
             self.__tracks_model__ = zynthiloops_tracks_model(self)
@@ -103,6 +105,8 @@ class zynthiloops_song(QObject):
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
         # Create sampleset dir if not exists
         (Path(self.sketch_folder) / 'wav' / 'sampleset').mkdir(parents=True, exist_ok=True)
+        # Finally, just in case something happened, make sure we're not loading any longer
+        self.__is_loading__ = False
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True
@@ -224,9 +228,11 @@ class zynthiloops_song(QObject):
 
     @Slot(None)
     def schedule_save(self):
-        self.__save_timer__.start()
+        if self.__is_loading__ is False:
+            self.__save_timer__.start()
 
     def restore(self, load_history):
+        self.__is_loading__ = True
         filename = self.__name__ + ".sketch.json"
 
         try:
@@ -282,11 +288,13 @@ class zynthiloops_song(QObject):
                     self.__bpm__ = sketch["bpm"]
                     self.set_bpm(self.__bpm__, True)
 
+                self.__is_loading__ = False
                 return True
         except Exception as e:
             logging.error(f"Error during sketch restoration: {e}")
             traceback.print_exception(None, e, e.__traceback__)
 
+            self.__is_loading__ = False
             return False
 
     @Slot(int, int, result=QObject)

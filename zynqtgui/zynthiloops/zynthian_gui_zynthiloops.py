@@ -80,6 +80,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def __init__(self, parent=None):
         super(zynthian_gui_zynthiloops, self).__init__(parent)
+
+        logging.info(f"Initializing Zynthiloops")
+
         zynthian_gui_zynthiloops.__instance__ = self
         libzl.registerGraphicTypes()
         self.is_set_selector_running = False
@@ -178,6 +181,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.zynthiloops.set_selector()
             self.zyngui.session_dashboard.set_selected_track(0, True)
             self.__is_init_in_progress__ = False
+            logging.info(f"Zynthiloops Initialization Complete")
 
         self.master_audio_level_timer.start()
 

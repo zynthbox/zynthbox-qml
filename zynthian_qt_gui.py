@@ -798,7 +798,7 @@ class zynthian_gui(QObject):
             else:
                 self.wsleds.setPixelColor(0, self.wscolor_light)
 
-            # Light up 1-6 buttons as per opened screen / bottomBar
+            # Light up 1-5 buttons as per opened screen / bottomBar
             for i in range(1, 6):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
@@ -884,6 +884,8 @@ class zynthian_gui(QObject):
             #     self.wsleds.setPixelColor(6, self.wscolor_green)
             # else:
             #     self.wsleds.setPixelColor(6, self.wscolor_blue)
+
+            self.wsleds.setPixelColor(6, self.wscolor_blue)
 
             # 7 : FX Button
             if track is not None and track.trackAudioType == "synth":

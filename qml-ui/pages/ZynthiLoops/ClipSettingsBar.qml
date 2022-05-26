@@ -38,6 +38,7 @@ GridLayout {
     id: root
     rows: 1
     Layout.fillWidth: true
+    Layout.maximumWidth: parent.width
 
     property QtObject bottomBar: null
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
@@ -63,6 +64,9 @@ GridLayout {
         controlProperty: "startPosition"
         valueString: dial.value.toFixed(2)
         buttonStepSize: 0.01
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
         dial {
             stepSize: root.controlObj && root.controlObj.hasOwnProperty("secPerBeat") ? root.controlObj.secPerBeat : 0.01
@@ -81,6 +85,9 @@ GridLayout {
         controlObj: root.controlObj
         controlProperty: "length"
         valueString: dial.value.toFixed(2)
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
         dial {
             stepSize: 1
@@ -98,6 +105,9 @@ GridLayout {
         text: qsTr("Pitch")
         controlObj: root.controlObj
         controlProperty: "pitch"
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
         dial {
             stepSize: 1
@@ -117,6 +127,9 @@ GridLayout {
         controlProperty: "time"
         valueString: dial.value.toFixed(2)
         enabled: root.controlObj ? !root.controlObj.shouldSync : false
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
         dial {
             stepSize: 0.1
@@ -135,6 +148,9 @@ GridLayout {
         controlObj: root.controlObj
         controlProperty: "gain"
         valueString: dial.value.toFixed(1)
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
+        Layout.maximumHeight: Kirigami.Units.gridUnit * 8
 
         dial {
             stepSize: 1
@@ -149,8 +165,8 @@ GridLayout {
 
     ColumnLayout {
         Layout.fillHeight: true
-        Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
         QQC2.Label {
             Layout.alignment: Qt.AlignCenter
@@ -166,7 +182,7 @@ GridLayout {
 
         QQC2.TextField {
             id: objBpmEdit
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             Layout.alignment: Qt.AlignCenter
             horizontalAlignment: TextInput.AlignHCenter
@@ -199,7 +215,8 @@ GridLayout {
         QQC2.Switch {
             id: syncSwitch
             Layout.alignment: Qt.AlignCenter
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+            implicitWidth: Kirigami.Units.gridUnit * 3
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 5
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             checked: root.controlObj && root.controlObj.hasOwnProperty("shouldSync") ? root.controlObj.shouldSync : false
             onToggled: {
@@ -208,7 +225,8 @@ GridLayout {
         }
 
         QQC2.Label {
-            Layout.alignment: Qt.AlignCenter
+            Layout.fillWidth: true
+            horizontalAlignment: TextInput.AlignHCenter
             text: qsTr("Sync")
         }
     }
@@ -216,7 +234,7 @@ GridLayout {
     ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
         QQC2.Button {
             Layout.alignment: Qt.AlignCenter
@@ -243,12 +261,13 @@ GridLayout {
 
     ColumnLayout {
         Layout.fillHeight: true
-        Layout.fillWidth: false
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+        Layout.fillWidth: true
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 5
 
         QQC2.Switch {
             id: snapLengthToBeatSwitch
             Layout.alignment: Qt.AlignCenter
+            implicitWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredWidth: Kirigami.Units.gridUnit * 3
             Layout.preferredHeight: Kirigami.Units.gridUnit * 2
             checked: root.controlObj && root.controlObj.hasOwnProperty("snapLengthToBeat") ? root.controlObj.snapLengthToBeat : true
@@ -258,17 +277,21 @@ GridLayout {
         }
 
         QQC2.Label {
-            Layout.alignment: Qt.AlignCenter
+            Layout.fillWidth: true
+            horizontalAlignment: TextInput.AlignHCenter
+            wrapMode: Text.Wrap
             text: qsTr("Snap Length to beat")
         }
     }
 
-    Item {
-        Layout.fillWidth: true
-    }
+    //Item {
+        //Layout.fillWidth: true
+    //}
 
     ColumnLayout {
+        Layout.fillWidth: true
         Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
         QQC2.Label {
             visible: root.controlObj && root.controlObj.soundData ? root.controlObj.soundData.length <= 0 : false

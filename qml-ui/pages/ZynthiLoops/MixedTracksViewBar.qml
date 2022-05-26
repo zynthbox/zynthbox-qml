@@ -456,9 +456,9 @@ Rectangle {
 
                                 // Take 3/5 th of available width
                                 Rectangle {
-                                    Layout.fillWidth: false
+                                    Layout.fillWidth: true
                                     Layout.fillHeight: true
-                                    Layout.preferredWidth: (parent.width/5) * 3
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                                     color: "#222222"
                                     border.width: 1
                                     border.color: "#ff999999"
@@ -589,6 +589,7 @@ Rectangle {
                                 Rectangle {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
 
                                     border.width: 1
                                     border.color: "#ff999999"

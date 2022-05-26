@@ -187,7 +187,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### Checking Sketch : sketch is none ")
 
         if sketch is not None and Path(sketch).exists():
-            self.loadSketch(sketch, True, _cb)
+            self.loadSketch(sketch, True, False, _cb)
         else:
             self.newSketch(None, _cb)
 
@@ -1057,7 +1057,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.zyngui.do_long_task(task)
 
     @Slot(str, bool)
-    def loadSketch(self, sketch, load_history, cb=None):
+    def loadSketch(self, sketch, load_history, load_snapshot=True, cb=None):
         def task():
             logging.info(f"Loading sketch : {sketch}")
 
@@ -1080,11 +1080,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 def _cb():
                     last_selected_sketch_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketch())
 
-                    # Load snapshot
-                    logging.info(
-                        f"Loading snapshot : '{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss'")
-                    self.zyngui.screens["layer"].load_snapshot(
-                        f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
+                    if load_snapshot:
+                        # Load snapshot
+                        logging.info(
+                            f"Loading snapshot : '{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss'")
+                        self.zyngui.screens["layer"].load_snapshot(
+                            f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
 
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
@@ -1095,12 +1096,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self, load_history)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
-                # Load snapshot
-                logging.info(
-                    f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
-                self.zyngui.screens["layer"].load_snapshot(
-                    str(sketch_path.parent.absolute()) + "/soundsets/" + str(
-                        sketch_path.stem.replace(".sketch", "")) + ".zss")
+                if load_snapshot:
+                    # Load snapshot
+                    logging.info(
+                        f"Loading snapshot : {str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'}")
+                    self.zyngui.screens["layer"].load_snapshot(
+                        str(sketch_path.parent.absolute()) + "/soundsets/" + str(
+                            sketch_path.stem.replace(".sketch", "")) + ".zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()

@@ -396,13 +396,12 @@ class zynthian_gui(QObject):
 
         # Create variables for LED control
         self.wsleds_blink = False
-        # self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
+        self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
         self.wscolor_blue = rpi_ws281x.Color(0, 50, 200)
         self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
         self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
         self.wscolor_yellow = rpi_ws281x.Color(255, 235, 59)
         self.wscolor_purple = rpi_ws281x.Color(142, 36, 170)
-        self.wscolor_off = self.wscolor_blue # Set unlit buttons to blue
         self.wscolor_light = self.wscolor_blue
         self.wscolor_active = self.wscolor_green
         self.wscolor_admin = self.wscolor_red
@@ -748,7 +747,7 @@ class zynthian_gui(QObject):
 
         # Light all LEDs
         for i in range(0,25):
-            self.wsleds.setPixelColor(i, self.wscolor_light)
+            self.wsleds.setPixelColor(i, self.wscolor_off)
         self.wsleds.show()
 
         return self.wsleds_num
@@ -756,7 +755,7 @@ class zynthian_gui(QObject):
     def end_wsleds(self):
         # Light-off all LEDs
         for i in range(0,25):
-            self.wsleds.setPixelColor(i,self.wscolor_off)
+            self.wsleds.setPixelColor(i, self.wscolor_off)
         self.wsleds.show()
 
     # To blink led call this method in update_wsleds
@@ -767,12 +766,21 @@ class zynthian_gui(QObject):
         else:
             self.wsleds.setPixelColor(i, self.wscolor_light)
 
+    counter = 0
+
     def update_wsleds(self):
         if not self.__booting_complete__:
             for i in range(25):
-                self.wsleds.setPixelColor(0, self.wscolor_off)
-                
+                color = QColor.fromHsl((int(self.counter) + i*10) % 359, 242, 127, 127)
+                self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
+            self.wsleds.show()
+            self.counter += 3
+            self.counter = self.counter % 359
+
             return
+        else:
+            for i in range(25):
+                self.wsleds.setPixelColor(i, self.wscolor_active)
 
         if self.wsleds_blink_count % 6 > 2:
             self.wsleds_blink = True
@@ -807,7 +815,7 @@ class zynthian_gui(QObject):
                         elif track.trackAudioType == "external":
                             self.wsled_blink(i, self.wscolor_purple)
                     else:
-                        self.wsled_blink(i, self.wscolor_off)
+                        self.wsled_blink(i, self.wscolor_blue)
 
                     continue
 
@@ -817,7 +825,7 @@ class zynthian_gui(QObject):
                             track.checkIfLayerExists(track.chainedSounds[i-1]):
                         self.wsleds.setPixelColor(i, self.wscolor_red)
                     else:
-                        self.wsleds.setPixelColor(i, self.wscolor_off)
+                        self.wsleds.setPixelColor(i, self.wscolor_blue)
 
                     continue
 
@@ -826,7 +834,7 @@ class zynthian_gui(QObject):
                     if track.samples[i-1].path is not None:
                         self.wsleds.setPixelColor(i, self.wscolor_yellow)
                     else:
-                        self.wsleds.setPixelColor(i, self.wscolor_off)
+                        self.wsleds.setPixelColor(i, self.wscolor_blue)
 
                     continue
 
@@ -837,7 +845,7 @@ class zynthian_gui(QObject):
                 #             len(track.getEffectsNameByMidiChannel(track.chainedSounds[i-1])) > 0:
                 #         self.wsleds.setPixelColor(i, self.wscolor_blue)
                 #     else:
-                #         self.wsleds.setPixelColor(i, self.wscolor_off)
+                #         self.wsleds.setPixelColor(i, self.wscolor_blue)
                 #
                 #     continue
 
@@ -848,7 +856,7 @@ class zynthian_gui(QObject):
                     if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
                         self.wsleds.setPixelColor(i, self.wscolor_green)
                     else:
-                        self.wsleds.setPixelColor(i, self.wscolor_off)
+                        self.wsleds.setPixelColor(i, self.wscolor_blue)
 
                     continue
 
@@ -875,7 +883,7 @@ class zynthian_gui(QObject):
             #         self.tracks_mod_active:
             #     self.wsleds.setPixelColor(6, self.wscolor_green)
             # else:
-            #     self.wsleds.setPixelColor(6, self.wscolor_off)
+            #     self.wsleds.setPixelColor(6, self.wscolor_blue)
 
             # 7 : FX Button
             if track is not None and track.trackAudioType == "synth":
@@ -905,9 +913,9 @@ class zynthian_gui(QObject):
                     self.wsleds.setPixelColor(7, self.wscolor_purple)
             else:
                 if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_off)
+                    self.wsled_blink(7, self.wscolor_blue)
                 else:
-                    self.wsleds.setPixelColor(7, self.wscolor_off)
+                    self.wsleds.setPixelColor(7, self.wscolor_blue)
 
             # Stepseq screen:
             if self.modal_screen is None and self.active_screen == "zynthiloops":

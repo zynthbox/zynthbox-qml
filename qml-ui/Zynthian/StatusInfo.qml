@@ -393,6 +393,7 @@ MouseArea {
 
                     QQC2.Switch {
                         Layout.alignment: Qt.AlignVCenter
+                        implicitWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                         checked: zynthian.zynthiloops.clickTrackEnabled

@@ -34,7 +34,8 @@ import Qt.labs.folderlistmodel 2.11
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
-Zynthian.Card {
+Rectangle {
+    id: root
     property alias filePickerDialog: pickerDialog
     property var trackCopySource: null
     property var clipCopySource: null
@@ -46,12 +47,9 @@ Zynthian.Card {
     property alias trackWaveEditorAction: trackWaveEditorAction
     property alias tracksViewSoundsBarAction: trackSoundsAction
 
-    leftPadding: 0
-    rightPadding: 0
-    topPadding: 0
-    bottomPadding: 0
+    Layout.fillWidth: true
+    color: Kirigami.Theme.backgroundColor
 
-    id: root
     enum ControlType {
         Song,
         Clip,
@@ -80,7 +78,8 @@ Zynthian.Card {
         }
     }
 
-    contentItem: RowLayout {
+    RowLayout {
+        anchors.fill: parent
         spacing: 1
 
         QQC2.ButtonGroup {
@@ -262,6 +261,7 @@ Zynthian.Card {
                 id: tabbedView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 12
                 minimumTabsCount: 4
                 orientation: Qt.Vertical
                 visibleFocusRects: false

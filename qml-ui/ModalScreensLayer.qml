@@ -59,30 +59,39 @@ Zynthian.Stack {
                 if (!root.pageCache) {
                     root.pageCache = {};
                 }
+                console.log("Caching song_arranger")
                 if (!root.pageCache["song_arranger"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
                     var component = Qt.createComponent(file);
                     root.pageCache["song_arranger"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["song_arranger"].visible = false;
                 }
+
+                console.log("Caching playgrid")
                 if (!root.pageCache["playgrid"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
                     var component = Qt.createComponent(file);
                     root.pageCache["playgrid"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["playgrid"].visible = false;
                 }
+
+                console.log("Caching sketch_copier")
                 if (!root.pageCache["sketch_copier"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
                     var component = Qt.createComponent(file);
                     root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["sketch_copier"].visible = false;
                 }
+
+                console.log("Caching midi_key_range")
                 if (!root.pageCache["midi_key_range"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
                     var component = Qt.createComponent(file);
                     root.pageCache["midi_key_range"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["midi_key_range"].visible = false;
                 }
+
+                console.log("Caching sound_categories")
                 if (!root.pageCache["sound_categories"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("sound_categories");
                     var component = Qt.createComponent(file);

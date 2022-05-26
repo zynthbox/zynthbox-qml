@@ -22,7 +22,6 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
-
 import os
 import sys
 import copy
@@ -439,6 +438,7 @@ class zynthian_gui(QObject):
         self.modal_timer.setInterval(3000)
         self.modal_timer.setSingleShot(False)
         self.modal_timer.timeout.connect(self.close_modal)
+        self.__booting_complete__ = False
 
         self.init_wsleds()
 
@@ -768,6 +768,12 @@ class zynthian_gui(QObject):
             self.wsleds.setPixelColor(i, self.wscolor_light)
 
     def update_wsleds(self):
+        if not self.__booting_complete__:
+            for i in range(25):
+                self.wsleds.setPixelColor(0, self.wscolor_off)
+                
+            return
+
         if self.wsleds_blink_count % 6 > 2:
             self.wsleds_blink = True
         else:
@@ -777,10 +783,6 @@ class zynthian_gui(QObject):
             track = None
             if self.zynthiloops.song is not None:
                 track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-            occupied_slots = []
-            # This is not in fact used below... leaving here for now in case we want it back
-            #if track is not None:
-                #occupied_slots = track.occupiedSlots
 
             # Menu
             if self.modal_screen is None and self.active_screen == "main":
@@ -3217,10 +3219,11 @@ class zynthian_gui(QObject):
                 process.wait()
 
             self.displayMainWindow.emit()
-
             boot_end = timer()
 
             logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
+
+            self.__booting_complete__ = True
 
         worker_thread = threading.Thread(target=task, args=(self,))
         worker_thread.start()

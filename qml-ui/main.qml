@@ -530,7 +530,7 @@ Kirigami.AbstractApplicationWindow {
     Timer {
         id: displayWindowTimer
         // This interval makes sure to wait until all the pages are cached before showing window
-        interval: 2000
+        interval: 100
         repeat: false
         onTriggered: {
             zynthian.stop_splash();

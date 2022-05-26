@@ -583,6 +583,7 @@ Zynthian.ScreenPage {
             }
             Zynthian.SelectorView {
                 id: presetView
+                implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "preset"

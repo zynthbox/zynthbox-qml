@@ -3234,6 +3234,7 @@ class zynthian_gui(QObject):
             logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
             self.__booting_complete__ = True
+            self.isBootingCompleteChanged.emit()
 
         worker_thread = threading.Thread(target=task, args=(self,))
         worker_thread.start()
@@ -3661,6 +3662,15 @@ class zynthian_gui(QObject):
     leftSidebar = Property(QObject, get_leftSidebar, set_leftSidebar, notify=leftSidebarChanged)
 
     ### End Property leftSidebar
+
+    ### Property isBootingComplete
+    def get_isBootingComplete(self):
+        return self.__booting_complete__
+
+    isBootingCompleteChanged = Signal()
+
+    isBootingComplete = Property(bool, get_isBootingComplete, notify=isBootingCompleteChanged)
+    ### END Property isBootingComplete
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

@@ -321,7 +321,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				with open(self.__fav_root + f, "r") as fh:
 					json = fh.read()
 					fh.close()
-					logging.info("Loading top sounds %s" % (json))
+					logging.debug("Loading top sounds %s" % (json))
 
 					parsed = JSONDecoder().decode(json)
 					if not isinstance(parsed, dict):

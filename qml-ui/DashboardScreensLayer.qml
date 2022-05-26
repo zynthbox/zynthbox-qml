@@ -61,6 +61,7 @@ Zynthian.Stack {
             running: true
             onTriggered: {
                 let file = ""
+                console.log("Caching zynthiloops")
                 if (!root.pageCache["main"]) {
                     file = applicationWindow().pageScreenMapping.pageForDashboardScreen("main");
                     var component = Qt.createComponent(file);

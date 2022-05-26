@@ -49,6 +49,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     def __init__(self, parent=None):
         super(zynthian_gui_session_dashboard, self).__init__('Session', parent)
+        logging.info(f"Initializing Session Dashboard")
         self.__sessionStartTime = datetime.now()
         self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/sessions/")
         self.__save_timer__ = QTimer(self)
@@ -286,6 +287,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         def sketch_loaded_cb():
             self.selected_track_changed.emit()
             QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+            logging.info(f"Session Dashboard Initialization Complete")
 
         if self.__cache_json_path__.exists():
             logging.info(f"Cache found. Restoring Session from {self.__cache_json_path__}")

@@ -392,8 +392,9 @@ class zynthiloops_clip(QObject):
         if self.__gain__ != gain or force_set is True:
             self.__gain__ = gain
             self.gain_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
             if self.audioSource is not None:
                 self.audioSource.set_gain(gain)
@@ -413,8 +414,9 @@ class zynthiloops_clip(QObject):
             self.__song__.get_metronome_manager().set_selector()
 
             self.length_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
             if self.audioSource is not None:
                 self.audioSource.set_length(self.__length__, self.__song__.bpm)
@@ -482,8 +484,9 @@ class zynthiloops_clip(QObject):
             self.__song__.get_metronome_manager().set_selector()
 
             self.start_position_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
             if self.audioSource is None:
                 return
@@ -508,8 +511,9 @@ class zynthiloops_clip(QObject):
         if self.__pitch__ != math.floor(pitch) or force_set is True:
             self.__pitch__ = math.floor(pitch)
             self.pitch_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
             if self.audioSource is None:
                 return
@@ -526,8 +530,9 @@ class zynthiloops_clip(QObject):
         if self.__time__ != time or force_set is True:
             self.__time__ = time
             self.time_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
             if self.audioSource is None:
                 return
@@ -544,7 +549,8 @@ class zynthiloops_clip(QObject):
         if self.__bpm__ != bpm or force_set is True:
             self.__bpm__ = bpm
             self.bpm_changed.emit()
-            self.__song__.schedule_save()
+            if force_set is False:
+                self.__song__.schedule_save()
             self.reset_beat_count()
 
     bpm = Property(float, bpm, set_bpm, notify=bpm_changed)
@@ -561,7 +567,8 @@ class zynthiloops_clip(QObject):
             self.__should_sync__ = shouldSync
             self.should_sync_changed.emit()
             self.update_synced_values()
-            self.__song__.schedule_save()
+            if force_set is False:
+                self.__song__.schedule_save()
 
             if not shouldSync:
                 self.set_time(1.0)
@@ -998,8 +1005,9 @@ class zynthiloops_clip(QObject):
         if self.__snap_length_to_beat__ != val or force_set is True:
             self.__snap_length_to_beat__ = val
             self.snap_length_to_beat_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
     snap_length_to_beat_changed = Signal()
 
@@ -1019,8 +1027,9 @@ class zynthiloops_clip(QObject):
             self.__song__.get_metronome_manager().set_selector()
 
             self.loop_delta_changed.emit()
-            self.__song__.schedule_save()
-            self.saveMetadata()
+            if force_set is False:
+                self.__song__.schedule_save()
+                self.saveMetadata()
 
     loop_delta_changed = Signal()
 

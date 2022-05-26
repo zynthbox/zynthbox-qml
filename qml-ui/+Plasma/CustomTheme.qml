@@ -67,19 +67,19 @@ QtObject {
 
         Kirigami.Theme.selectionTextColor = theme.highlightedTextColor
         Kirigami.Theme.selectionBackgroundColor = theme.highlightColor
-        Kirigami.Theme.selectionHoverColor = theme.selectionHoverColor
-        Kirigami.Theme.selectionFocusColor = theme.selectionFocusColor
+        Kirigami.Theme.selectionHoverColor = typeof(theme.selectionHoverColor) === "undefined" ? Kirigami.Theme.buttonHoverColor : theme.selectionHoverColor
+        Kirigami.Theme.selectionFocusColor = typeof(theme.selectionFocusColor) === "undefined" ? Kirigami.Theme.buttonFocusColor : theme.selectionFocusColor
         Kirigami.Theme.selectionNegativeTextColor = theme.selectionNegativeTextColor
         Kirigami.Theme.selectionNeutralTextColor = theme.selectionNeutralTextColor
         Kirigami.Theme.selectionPositiveTextColor = theme.selectionPositiveTextColor
 
-        Kirigami.Theme.tooltipTextColor = theme.tooltipTextColor
-        Kirigami.Theme.tooltipBackgroundColor = theme.tooltipBackgroundColor
-        Kirigami.Theme.tooltipHoverColor = theme.tooltipHoverColor
-        Kirigami.Theme.tooltipFocusColor = theme.tooltipFocusColor
-        Kirigami.Theme.tooltipNegativeTextColor = theme.tooltipNegativeTextColor
-        Kirigami.Theme.tooltipNeutralTextColor = theme.tooltipNeutralTextColor
-        Kirigami.Theme.tooltipPositiveTextColor = theme.tooltipPositiveTextColor
+        Kirigami.Theme.tooltipTextColor = typeof(theme.tooltipTextColor) === "undefined" ? Kirigami.Theme.textColor : theme.tooltipTextColor
+        Kirigami.Theme.tooltipBackgroundColor = typeof(theme.tooltipBackgroundColor) === "undefined" ? Kirigami.Theme.backgroundColor : theme.tooltipBackgroundColor
+        Kirigami.Theme.tooltipHoverColor = typeof(theme.tooltipHoverColor) === "undefined" ? Kirigami.Theme.buttonHoverColor : theme.tooltipHoverColor
+        Kirigami.Theme.tooltipFocusColor = typeof(theme.tooltipFocusColor) === "undefined" ? Kirigami.Theme.buttonFocusColor : theme.tooltipFocusColor
+        Kirigami.Theme.tooltipNegativeTextColor = typeof(theme.tooltipNegativeTextColor) === "undefined" ? Kirigami.Theme.buttonNegativeTextColor : theme.tooltipNegativeTextColor
+        Kirigami.Theme.tooltipNeutralTextColor = typeof(theme.tooltipNeutralTextColor) === "undefined" ? Kirigami.Theme.buttonNeutralTextColor : theme.tooltipNeutralTextColor
+        Kirigami.Theme.tooltipPositiveTextColor = typeof(theme.tooltipPositiveTextColor) === "undefined" ? Kirigami.Theme.buttonPositiveTextColor : theme.tooltipPositiveTextColor
 
         Kirigami.Theme.complementaryTextColor = theme.complementaryTextColor
         Kirigami.Theme.complementaryBackgroundColor = theme.complementaryBackgroundColor

@@ -1421,7 +1421,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			#JSON Encode
 			json=JSONEncoder().encode(snapshot)
 			logging.info(f"Saving snapshot {fpath}")
-			logging.debug(fpath,json)
+			logging.debug(json)
 
 		except Exception as e:
 			logging.error("Can't generate snapshot: %s" % e)

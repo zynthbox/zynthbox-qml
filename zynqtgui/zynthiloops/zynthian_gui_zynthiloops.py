@@ -374,7 +374,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__big_knob_mode__ = "preset"
 
-                logging.info(f"### set_selector : Configuring big knob, sound combinator is active.")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is active.")
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 selected_channel = track.get_chained_sounds()[self.zyngui.session_dashboard.selectedSoundRow]
                 logging.debug(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({self.zyngui.session_dashboard.selectedSoundRow}), channel({selected_channel})")
@@ -460,12 +460,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.slotsBarMixerActive and
                     selected_track is not None
                 ):
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 1, showing")
 
             self.__zselector[1].show()
         else:
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 1, hiding")
 
             if self.__zselector[1]:
@@ -584,12 +584,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 2, showing")
 
             self.__zselector[2].show()
         else:
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 2, hiding")
             self.__zselector[2].hide()
 
@@ -630,11 +630,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 3, showing")
             self.__zselector[3].show()
         else:
-            logging.info(
+            logging.debug(
                 f"### set_selector : Configuring small knob 3, hiding")
             self.__zselector[3].hide()
 
@@ -673,10 +673,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
 
         if self.zyngui.trackWaveEditorBarActive:
-            logging.info(f"### set_selector : trackWaveEditorBarActive is active.")
+            logging.debug(f"### set_selector : trackWaveEditorBarActive is active.")
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            logging.info(f"### set_selector : clipWaveEditorBarActive is active.")
+            logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.selectedClipCol)
         ###
 

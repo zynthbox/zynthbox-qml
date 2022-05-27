@@ -2,7 +2,7 @@
 
 function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
     if (sequence) {
 //         // First, explicitly turn off any Patterns which are not assigned a Track - otherwise
 //         // we'll end up confusing people by playing back stuff where we don't know where the
@@ -34,7 +34,7 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     console.log("Stopping Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
     if (sequence) {
         sequence.stopSequencePlayback();
     } else {
@@ -74,20 +74,20 @@ function toggleLayerChaining(layer) {
 }
 
 function switchToScene(index) {
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
     if (sequence) {
         sequence.disconnectSequencePlayback();
     } else {
         console.log("Sequence could not be fetched, and playback could not be stopped");
     }
 
-//    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+//    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
 
     ////////////////////////////
 
     // Disable Existing scene logic as per 250.
     // Current scene implementation might get used later
-    /*zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
+    /*zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index;
     zynthian.zynthiloops.selectedClipCol = index;*/
 
     // New scene logic goes below
@@ -95,7 +95,7 @@ function switchToScene(index) {
 
     ////////////////////////////
 
-    sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+    sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
     if (sequence) {
         sequence.prepareSequencePlayback();
     } else {

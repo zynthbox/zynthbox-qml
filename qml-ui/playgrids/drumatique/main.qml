@@ -340,7 +340,7 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
-        property string sceneName: zynthian.zynthiloops.song.scenesModel.selectedSceneName
+        property string sceneName: zynthian.zynthiloops.song.scenesModel.selectedMixName
         property QtObject associatedTrack;
         property int associatedTrackIndex;
 
@@ -479,7 +479,7 @@ Zynthian.BasePlayGrid {
         }
         function adoptSequence() {
             console.log("Adopting the scene sequence");
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
             if (_private.sequence != sequence) {
                 console.log("Scene has changed, switch places!");
                 _private.sequence = sequence;
@@ -1217,7 +1217,7 @@ Zynthian.BasePlayGrid {
                                                 icon.name: "player-volume"
                                                 onClicked: {
                                                     if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                        var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                                        var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
                                                         // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                         associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                     }
@@ -1577,7 +1577,7 @@ Zynthian.BasePlayGrid {
                                         icon.name: "player-volume"
                                         onClicked: {
                                             if (partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1) {
-                                                var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                                var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                 associatedClip.enabled = !partDelegate.pattern.enabled
                                             }
@@ -1599,7 +1599,7 @@ Zynthian.BasePlayGrid {
                                     readonly property var partNames: ["a", "b", "c", "d", "e"]
                                     text: qsTr("Pick Part %1%2").arg(partPicker.associatedTrackIndex + 1).arg(partNames[model.index])
                                     onClicked: {
-                                        var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
+                                        var associatedClip = partPicker.associatedTrack.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
                                         if (associatedClip.enabled) {
                                             partPicker.associatedTrack.selectedPart = model.index;
                                         } else {

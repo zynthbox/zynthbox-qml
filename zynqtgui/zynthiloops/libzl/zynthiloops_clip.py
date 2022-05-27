@@ -1065,7 +1065,7 @@ class zynthiloops_clip(QObject):
         if self.__enabled__ != enabled or force_set:
             self.__enabled__ = enabled
 
-            if self.col == self.__song__.scenesModel.selectedSceneIndex:
+            if self.col == self.__song__.scenesModel.selectedMixIndex:
                 if self.__enabled__:
                     self.__song__.scenesModel.addClipToCurrentScene(self)
                 else:

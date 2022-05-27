@@ -110,7 +110,7 @@ Rectangle {
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedSceneIndex, cuia, clip)
+        console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedMixIndex, cuia, clip)
 
         return returnVal;
     }

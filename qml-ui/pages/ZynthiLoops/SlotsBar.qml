@@ -130,7 +130,7 @@ Rectangle {
             zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.track.connectedSound);
 
             if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
             }
         }
@@ -179,7 +179,7 @@ Rectangle {
                     backToSelection.enabled = true;
 
                     if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
+                        var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
                         pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
                     }
                 }

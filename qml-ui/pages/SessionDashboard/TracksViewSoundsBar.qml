@@ -20,7 +20,7 @@ Zynthian.Card {
             zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
 
             if (root.selectedTrack.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.selectedTrack.selectedPart);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrackIndex, root.selectedTrack.selectedPart);
                 pattern.midiChannel = root.selectedTrack.connectedSound;
             }
         }
@@ -245,7 +245,7 @@ Zynthian.Card {
                         backToSelection.enabled = true;
 
                         if (root.selectedTrack.connectedPattern >= 0) {
-                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
+                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
                             pattern.midiChannel = root.selectedTrack.connectedSound;
                         }
                     }
@@ -406,7 +406,7 @@ Zynthian.Card {
                                         backToSelection.enabled = true;
 
                                         if (root.selectedTrack.connectedPattern >= 0) {
-                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
+                                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrackIndex, root.track.selectedPart);
                                             pattern.midiChannel = root.selectedTrack.connectedSound;
                                         }
                                     }

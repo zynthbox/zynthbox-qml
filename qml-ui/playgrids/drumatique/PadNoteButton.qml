@@ -50,9 +50,10 @@ QQC2.Button {
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    property color foregroundColor: Kirigami.Theme.backgroundColor
-    property color backgroundColor: Kirigami.Theme.textColor
-    property color borderColor: foregroundColor
+    readonly property color foregroundColor: Kirigami.Theme.backgroundColor
+    readonly property color backgroundColor: Kirigami.Theme.textColor
+    readonly property color borderColor: foregroundColor
+    readonly property color focusColor: Kirigami.Theme.focusColor
 
     background: Rectangle {
         id:padNoteRect
@@ -339,9 +340,7 @@ QQC2.Button {
                 bottomMargin: 1
             }
             width: Kirigami.Units.smallSpacing
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-            color: Kirigami.Theme.focusColor
+            color: component.focusColor
             height: 0
             opacity: 0
             states: [

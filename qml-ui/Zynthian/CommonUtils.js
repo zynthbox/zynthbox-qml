@@ -91,7 +91,7 @@ function switchToScene(index) {
     zynthian.zynthiloops.selectedClipCol = index;*/
 
     // New scene logic goes below
-    zynthian.zynthiloops.song.scenesModel.selectedNewSceneIndex = index
+    zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index
 
     ////////////////////////////
 

@@ -42,15 +42,16 @@ QQC2.Button {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
+    readonly property color borderColor: component.visible ? (component.down ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor) : ""
+    readonly property color backgroundColor: component.visible ? (component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor) : ""
+    readonly property color focusColor: component.visible ? Kirigami.Theme.focusColor : ""
     background: Rectangle {
         radius: 2
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.Button
         border {
             width: 1
-            color: component.visible ? (component.down ? Kirigami.Theme.focusColor : Kirigami.Theme.textColor) : ""
+            color: component.borderColor
         }
-        color: component.visible ? (component.checked ? Kirigami.Theme.focusColor: Kirigami.Theme.backgroundColor) : ""
+        color: component.backgroundColor
     }
     Rectangle {
         id: pressAndHoldVisualiser
@@ -61,9 +62,7 @@ QQC2.Button {
         }
         width: Kirigami.Units.smallSpacing
         visible: component.visualPressAndHold
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-        color: visible ? Kirigami.Theme.focusColor : ""
+        color: component.focusColor
         height: 0
         opacity: 0
         states: [

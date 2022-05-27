@@ -120,7 +120,7 @@ Rectangle {
                         case BottomBar.ControlType.Part:
                             return qsTr("PART: %1").arg(text);
     //                    case BottomBar.ControlType.Pattern:
-    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName)
     //                        var pattern = sequence.getByPart(root.controlObj.clipTrack.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
@@ -299,7 +299,7 @@ Rectangle {
                     }
     //                QQC2.Label {
     //                    visible: controlObj.connectedPattern >= 0
-    //                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    //                    property QtObject sequence: controlObj.connectedPattern >= 0 ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     //                    property QtObject pattern: sequence ? sequence.getByPart(controlObj.id, controlObj.selectedPart) : null
     //                    text: qsTr("Pattern %1").arg(controlObj.connectedPattern+1)
     //                }
@@ -322,7 +322,7 @@ Rectangle {
     //                    onClicked: {
     //                        controlObj.clear()
 
-    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName).getByPart(controlObj.id, controlObj.selectedPart);
+    //                        var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(controlObj.id, controlObj.selectedPart);
     //                        seq.enabled = false;
     //                        controlObj.connectedPattern = -1;
     //                    }

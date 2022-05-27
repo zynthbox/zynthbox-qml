@@ -1246,7 +1246,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startPlayback(self):
-        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex)
+        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedMixIndex)
         self.start_metronome_request()
 
     def start_metronome_request(self):

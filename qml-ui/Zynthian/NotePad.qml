@@ -49,12 +49,12 @@ Item {
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    property color firstNoteBackground: component.highlightOctaveStart ? Kirigami.Theme.focusColor : backgroundColor
-    property color foregroundColor: Kirigami.Theme.backgroundColor
-    property color backgroundColor: Kirigami.Theme.textColor
-    property color borderColor: foregroundColor
-    property color playingBackgroundColor: "#8bc34a"
-    property color playingForegroundColor: foregroundColor
+    property color backgroundColor: component.visible ? (Kirigami.Theme.textColor) : ""
+    property color playingBackgroundColor: component.visible ? ("#8bc34a") : ""
+    readonly property color playingForegroundColor: component.visible ? (foregroundColor) : ""
+    readonly property color firstNoteBackground: component.visible ? (component.highlightOctaveStart ? Kirigami.Theme.focusColor : backgroundColor) : ""
+    readonly property color foregroundColor: component.visible ? (Kirigami.Theme.backgroundColor) : ""
+    readonly property color borderColor: component.visible ? (foregroundColor) : ""
 
     RowLayout {
         visible: component.note.subnotes.length > 0

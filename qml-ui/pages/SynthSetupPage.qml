@@ -205,7 +205,7 @@ Zynthian.ScreenPage {
 
 
     property var screenIds: ["layers_for_track", "bank", "preset"]
-    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
+    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.effective_count), qsTr("Presets (%1)").arg(zynthian.preset.effective_count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
         //don't remove modal screens
@@ -286,10 +286,7 @@ Zynthian.ScreenPage {
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {
-                                text: {
-                                    if (!visible) {
-                                        return "";
-                                    }
+                                function constructText() {
                                     let text = "";
                                     if (model.metadata && model.metadata.note_high < 60) {
                                         text = "L";
@@ -304,6 +301,7 @@ Zynthian.ScreenPage {
                                     }
                                     return text;
                                 }
+                                text: visible ? constructText() : ""
                             }
                             QQC2.Button {
                                 icon.name: "configure"
@@ -408,23 +406,7 @@ Zynthian.ScreenPage {
                         id: banksHeading
                         Layout.fillWidth: true
                         level: 2
-                        text: qsTr("Banks (%1)").arg(banksHeading.bankCount);
-                        property int bankCount: 0;
-                        Timer {
-                            id: banksHeadingSetter
-                            repeat: false; running: false; interval: 1
-                            onTriggered: {
-                                if (banksHeading.bankCount !== zynthian.bank.selector_list.count) {
-                                    banksHeading.bankCount = zynthian.bank.selector_list.count;
-                                    //console.log("Updated bank count, which is now", banksHeading.bankCount);
-                                }
-                            }
-                        }
-                        Connections {
-                            target: zynthian.bank.selector_list
-                            onCountChanged: banksHeadingSetter.restart()
-                        }
-                        Component.onCompleted: banksHeadingSetter.restart()
+                        text: visible ? qsTr("Banks (%1)").arg(zynthian.bank.effective_count) : "";
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
                     }
@@ -535,25 +517,7 @@ Zynthian.ScreenPage {
                     id: presetHeading
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Presets (%1)").arg(presetHeading.presetCount);
-                    property int presetCount: 0;
-                    Timer {
-                        id: presetHeadingSetter
-                        repeat: false; running: false; interval: 1
-                        onTriggered: {
-                            if (!zynthian.isBootingComplete) return
-
-                            if (presetHeading.presetCount !== zynthian.preset.selector_list.count) {
-                                presetHeading.presetCount = zynthian.preset.selector_list.count;
-                                //console.log("Changing preset heading, which is now", presetHeading.presetCount);
-                            }
-                        }
-                    }
-                    Connections {
-                        target: zynthian.preset.selector_list
-                        onCountChanged: presetHeadingSetter.restart()
-                    }
-                    Component.onCompleted: presetHeadingSetter.restart()
+                    text: visible ? qsTr("Presets (%1)").arg(zynthian.preset.effective_count) : "";
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }

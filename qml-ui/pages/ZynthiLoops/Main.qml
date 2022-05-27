@@ -621,39 +621,45 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                  ? qsTr("Preset (%2/%3): %1")
+                        text: visible
+                                ? infoBar.selectedSoundSlotExists
+                                    ? qsTr("Preset (%2/%3): %1")
                                         .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetName)
                                         .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetIndex+1)
                                         .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].presetLength)
-                                  : qsTr("Preset: --")
+                                    : qsTr("Preset: --")
+                                : ""
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                ? qsTr("Bank: %1")
-                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
-                                : qsTr("Bank: --")
+                        text: visible
+                                ? infoBar.selectedSoundSlotExists
+                                    ? qsTr("Bank: %1")
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].bankName)
+                                    : qsTr("Bank: --")
+                                : ""
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "synth"
-                        text: infoBar.selectedSoundSlotExists
-                                ? qsTr("Synth: %1")
-                                    .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
-                                : qsTr("Synth: --")
+                        text: visible
+                                ? infoBar.selectedSoundSlotExists
+                                    ? qsTr("Synth: %1")
+                                        .arg(infoBar.clip.clipTrack.chainedSoundsInfo[infoBar.selectedSoundSlot].synthName)
+                                    : qsTr("Synth: --")
+                                : ""
                     }
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
-                        text: qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--")
+                        text: visible ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
                     }
                     QQC2.Label {
                         property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSampleRow]
@@ -662,7 +668,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
                                  infoBar.clip.clipTrack.trackAudioType === "sample-slice")
-                        text: qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--")
+                        text: visible ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
                     }
 
                     Item {

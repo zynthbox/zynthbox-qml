@@ -58,7 +58,7 @@ Item {
             Repeater {
                 model: 5
                 QQC2.Button {
-                    property var trackSample: component.selectedTrack && component.selectedTrack.samples && component.selectedTrack.samples[index]
+                    property var trackSample: visible ? component.selectedTrack && component.selectedTrack.samples && component.selectedTrack.samples[index] : undefined
                     property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to sample " : "") + (index + 1)

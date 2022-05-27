@@ -180,7 +180,7 @@ Zynthian.ScreenPage {
 
 
     property var screenIds: ["main_layers_view", "bank", "preset"]
-    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count), qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)]
+    //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.effective_count), qsTr("Presets (%1)").arg(zynthian.preset.effective_count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
         //don't remove modal screens
@@ -412,7 +412,7 @@ Zynthian.ScreenPage {
                     Kirigami.Heading {
                         Layout.fillWidth: true
                         level: 2
-                        text: qsTr("Banks (%1)").arg(zynthian.bank.selector_list.count)
+                        text: qsTr("Banks (%1)").arg(zynthian.bank.effective_count)
                         Kirigami.Theme.inherit: false
                         Kirigami.Theme.colorSet: Kirigami.Theme.View
                     }
@@ -517,7 +517,7 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Presets (%1)").arg(zynthian.preset.selector_list.count)
+                    text: qsTr("Presets (%1)").arg(zynthian.preset.effective_count)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                 }

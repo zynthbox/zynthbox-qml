@@ -97,7 +97,7 @@ class zynthiloops_clip(QObject):
             self.track_volume_changed()
 
         self.__was_in_current_scene = self.get_in_current_scene()
-        self.__song__.scenesModel.selected_scene_index_changed.connect(self.sync_in_current_scene)
+        self.__song__.scenesModel.selected_new_scene_index_changed.connect(self.sync_in_current_scene)
 
         self.saveMetadataTimer = QTimer()
         self.saveMetadataTimer.setInterval(1000)
@@ -618,7 +618,6 @@ class zynthiloops_clip(QObject):
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
         if self.clipTrack is not None:
             self.clipTrack.trackAudioType = "sample-loop"
-            self.__song__.scenesModel.addClipToCurrentScene(self)
         self.cpp_obj_changed.emit()
         print(path)
 
@@ -1064,7 +1063,14 @@ class zynthiloops_clip(QObject):
         return self.__enabled__
     def set_enabled(self, enabled, force_set=False):
         if self.__enabled__ != enabled or force_set:
-            self.__enabled__ = enabled;
+            self.__enabled__ = enabled
+
+            if self.col == self.__song__.scenesModel.selectedSceneIndex:
+                if self.__enabled__:
+                    self.__song__.scenesModel.addClipToCurrentScene(self)
+                else:
+                    self.__song__.scenesModel.removeClipFromCurrentScene(self)
+
             self.enabled_changed.emit()
     @Signal
     def enabled_changed(self):

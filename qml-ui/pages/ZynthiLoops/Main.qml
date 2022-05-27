@@ -989,8 +989,8 @@ Zynthian.ScreenPage {
                         model: 1
 
                         delegate: TableHeader {
-                            text: "Scene"
-                            subText: root.song.scenesModel.selectedSceneName
+                            text: qsTr("Scene")
+                            subText: root.song.scenesModel.selectedNewSceneName
 
                             width: ListView.view.width
                             height: privateProps.headerHeight
@@ -1039,13 +1039,15 @@ Zynthian.ScreenPage {
                                         anchors.fill: parent
                                         visible: root.displaySceneButtons
                                         text: String.fromCharCode(65+index).toUpperCase()
-                                        highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                        highlighted: index === root.song.scenesModel.selectedNewSceneIndex
                                         highlightOnFocus: false
                                         onPressed: {
-                                            root.lastSelectedObj = {
+                                            // Disable Existing scene logic as per 250.
+                                            // Current scene implementation might get used later
+                                            /*root.lastSelectedObj = {
                                                 className: "zynthiloops_scene",
                                                 sceneIndex: index
-                                            }
+                                            }*/
 
                                             Zynthian.CommonUtils.switchToScene(index);
                                         }

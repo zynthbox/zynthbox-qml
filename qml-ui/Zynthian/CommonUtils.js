@@ -48,9 +48,9 @@ function stopMetronomeAndPlayback() {
         clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi()
         ZynQuick.MidiRecorder.loadFromBase64Midi(clip.metadataMidiRecording)
 
-        if (!clip.isTrackSample) {
-            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)
-        }
+//        if (!clip.isTrackSample) {
+//            zynthian.zynthiloops.song.scenesModel.addClipToCurrentScene(clip)
+//        }
     }
 
     zynthian.zynthiloops.stopAllPlayback();
@@ -82,8 +82,18 @@ function switchToScene(index) {
     }
 
 //    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex);
-    zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
-    zynthian.zynthiloops.selectedClipCol = index;
+
+    ////////////////////////////
+
+    // Disable Existing scene logic as per 250.
+    // Current scene implementation might get used later
+    /*zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index;
+    zynthian.zynthiloops.selectedClipCol = index;*/
+
+    // New scene logic goes below
+    zynthian.zynthiloops.song.scenesModel.selectedNewSceneIndex = index
+
+    ////////////////////////////
 
     sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName);
     if (sequence) {

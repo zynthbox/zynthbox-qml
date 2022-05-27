@@ -34,7 +34,7 @@ ColumnLayout {
             color: "#000000"
             border{
                 color: Kirigami.Theme.highlightColor
-                width: partDelegate.clip && partDelegate.clip.enabled
+                width: partDelegate.clip && partDelegate.clip.inCurrentScene
                         ? 1
                         : 0
             }

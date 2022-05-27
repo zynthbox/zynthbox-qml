@@ -38,6 +38,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = song
         self.__selected_scene_index__ = 0
+        self.__selected_new_scene_index__ = 0
         self.__scenes__ = {
             "0": {"name": "A", "clips": []},
             "1": {"name": "B", "clips": []},
@@ -49,13 +50,17 @@ class zynthiloops_scenes_model(QAbstractListModel):
             "7": {"name": "H", "clips": []},
             "8": {"name": "I", "clips": []},
             "9": {"name": "J", "clips": []},
-            # "10": {"name": "K", "clips": []},
-            # "11": {"name": "L", "clips": []},
         }
+
         self.__name_change_timer = QTimer(self)
         self.__name_change_timer.setInterval(10)
         self.__name_change_timer.setSingleShot(True)
         self.__name_change_timer.timeout.connect(self.selected_scene_name_changed)
+
+        self.__new_name_change_timer = QTimer(self)
+        self.__new_name_change_timer.setInterval(10)
+        self.__new_name_change_timer.setSingleShot(True)
+        self.__new_name_change_timer.timeout.connect(self.selected_new_scene_name_changed)
 
     def serialize(self):
         logging.debug("### Serializing Scenes")
@@ -75,7 +80,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
         # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
-            "selectedIndex": self.__selected_scene_index__
+            "selectedIndex": self.__selected_scene_index__,
+            "selectedNewIndex": self.__selected_new_scene_index__,
         }
 
     def deserialize(self, obj):
@@ -92,6 +98,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
         if "selectedIndex" in obj:
             self.__selected_scene_index__ = obj["selectedIndex"]
             self.selected_scene_index_changed.emit()
+
+        if "selectedNewIndex" in obj:
+            self.__selected_new_scene_index__ = obj["selectedNewIndex"]
+            self.selected_new_scene_index_changed.emit()
 
     def data(self, index, role=None):
         if not index.isValid():
@@ -146,11 +156,41 @@ class zynthiloops_scenes_model(QAbstractListModel):
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
     ### END Property selectedSceneIndex
 
+    ### Property selectedNewSceneIndex
+    def get_selected_new_scene_index(self):
+        return self.__selected_new_scene_index__
+    def set_selected_new_scene_index(self, index):
+        def task():
+            if self.__song__.get_metronome_manager().isMetronomeRunning:
+                self.stopScene(oldNewSceneIndex)
+                self.playScene(index)
+
+            self.__song__.schedule_save()
+
+        oldNewSceneIndex = self.__selected_new_scene_index__
+        self.__selected_new_scene_index__ = index
+        self.selected_new_scene_index_changed.emit()
+
+        QTimer.singleShot(10, task)
+        self.__new_name_change_timer.start()
+
+    selected_new_scene_index_changed = Signal()
+    selected_new_scene_name_changed = Signal()
+    selectedNewSceneIndex = Property(int, get_selected_new_scene_index, set_selected_new_scene_index, notify=selected_new_scene_index_changed)
+    ### END Property selectedSceneIndex
+
     ### Property selectedSceneName
     def get_selected_scene_name(self):
         return chr(self.__selected_scene_index__ + 65)
 
     selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_name_changed)
+    ### END Property selectedSceneName
+
+    ### Property selectedNewSceneName
+    def get_selected_new_scene_name(self):
+        return chr(self.__selected_new_scene_index__ + 65)
+
+    selectedNewSceneName = Property(str, get_selected_new_scene_name, notify=selected_new_scene_name_changed)
     ### END Property selectedSceneName
 
     @Slot(int)
@@ -179,29 +219,17 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     @Slot(QObject)
     def toggleClipInCurrentScene(self, clip: zynthiloops_clip):
-        if clip in self.getScene(self.__selected_scene_index__)["clips"]:
+        if clip in self.getScene(self.__selected_new_scene_index__)["clips"]:
             self.removeClipFromCurrentScene(clip)
         else:
             self.addClipToCurrentScene(clip)
 
     @Slot(QObject)
     def addClipToCurrentScene(self, clip):
-        if clip in self.getScene(self.__selected_scene_index__)["clips"]:
+        if clip in self.getScene(self.__selected_new_scene_index__)["clips"]:
             self.removeClipFromCurrentScene(clip)
 
-        clips_model = self.__song__.tracksModel.getTrack(clip.row).clipsModel
-
-        # Remove other clips in same track from scene before adding clip to scene
-        for clip_index in range(0, clips_model.count):
-            m_clip: zynthiloops_clip = clips_model.getClip(clip_index)
-
-            if m_clip in self.getScene(self.__selected_scene_index__)["clips"]:
-                self.getScene(self.__selected_scene_index__)["clips"].remove(m_clip)
-                if self.__song__.get_metronome_manager().isMetronomeRunning:
-                    m_clip.stop()
-                m_clip.in_current_scene_changed.emit()
-
-        self.getScene(self.__selected_scene_index__)["clips"].append(clip)
+        self.getScene(self.__selected_new_scene_index__)["clips"].append(clip)
 
         if self.__song__.get_metronome_manager().isMetronomeRunning:
             clip.play()
@@ -213,7 +241,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
     @Slot(QObject)
     def removeClipFromCurrentScene(self, clip):
         try:
-            self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
+            self.getScene(self.__selected_new_scene_index__)["clips"].remove(clip)
         except Exception as e:
             logging.error(f"Error removing clip from scene : {str(e)}")
 
@@ -235,7 +263,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     @Slot(QObject, result=bool)
     def isClipInCurrentScene(self, clip):
-        return self.isClipInScene(clip, self.__selected_scene_index__)
+        return self.isClipInScene(clip, self.__selected_new_scene_index__)
 
     @Slot(int, result=int)
     def clipCountInScene(self, scene_index):

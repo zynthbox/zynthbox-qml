@@ -990,7 +990,7 @@ Zynthian.ScreenPage {
 
                         delegate: TableHeader {
                             text: qsTr("Scene")
-                            subText: root.song.scenesModel.selectedNewSceneName
+                            subText: root.song.scenesModel.selectedSceneName
 
                             width: ListView.view.width
                             height: privateProps.headerHeight
@@ -1039,7 +1039,7 @@ Zynthian.ScreenPage {
                                         anchors.fill: parent
                                         visible: root.displaySceneButtons
                                         text: String.fromCharCode(65+index).toUpperCase()
-                                        highlighted: index === root.song.scenesModel.selectedNewSceneIndex
+                                        highlighted: index === root.song.scenesModel.selectedSceneIndex
                                         highlightOnFocus: false
                                         onPressed: {
                                             // Disable Existing scene logic as per 250.
@@ -1115,10 +1115,10 @@ Zynthian.ScreenPage {
                                                 if (track.trackAudioType === "sample-loop" && track.sceneClip && track.sceneClip.inCurrentScene && track.sceneClip.path && track.sceneClip.path.length > 0) {
                                                     // In scene
                                                     clipCell.backgroundColor = "#3381d4fa";
-                                                } else if (track.sceneClip && (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col))) {
+                                                } /*else if (track.sceneClip && (!track.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col))) {
                                                     // Not in scene
                                                     clipCell.backgroundColor = "#33f44336";
-                                                } else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)
+                                                }*/ else if ((track.connectedPattern >= 0 && clipCell.pattern.hasNotes)
                                                     || (track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0)) {
                                                     clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
                                                 } else {

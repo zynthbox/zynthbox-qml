@@ -97,7 +97,7 @@ class zynthiloops_clip(QObject):
             self.track_volume_changed()
 
         self.__was_in_current_scene = self.get_in_current_scene()
-        self.__song__.scenesModel.selected_new_scene_index_changed.connect(self.sync_in_current_scene)
+        self.__song__.scenesModel.selected_scene_index_changed.connect(self.sync_in_current_scene)
 
         self.saveMetadataTimer = QTimer()
         self.saveMetadataTimer.setInterval(1000)

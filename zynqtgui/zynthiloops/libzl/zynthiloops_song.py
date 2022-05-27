@@ -98,7 +98,6 @@ class zynthiloops_song(QObject):
                         if i == 0:
                             clip.enabled = True
                         clipsModel.add_clip(clip)
-                        self.__scenes_model__.addClipToScene(clip, j)
         self.bpm_changed.emit()
 
         # Create wav dir for recording

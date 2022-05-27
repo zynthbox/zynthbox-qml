@@ -541,7 +541,7 @@ Zynthian.ScreenPage {
                         id: presetHeadingSetter
                         repeat: false; running: false; interval: 1
                         onTriggered: {
-                            if (!zyngui.isBootingComplete) return
+                            if (!zynthian.isBootingComplete) return
 
                             if (presetHeading.presetCount !== zynthian.preset.selector_list.count) {
                                 presetHeading.presetCount = zynthian.preset.selector_list.count;

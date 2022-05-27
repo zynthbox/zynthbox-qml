@@ -803,7 +803,7 @@ class zynthian_gui(QObject):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
                 if self.leftSidebarActive:
-                    partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedSceneIndex, i-1)
+                    partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedMixIndex, i-1)
 
                     if partClip.enabled and track is not None:
                         if track.trackAudioType == "synth":
@@ -1740,13 +1740,13 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCENE_UP":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex - 1)
+                self.screens["zynthiloops"].song.scenesModel.selectedMixIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedMixIndex - 1)
             except:
                 pass
 
         elif cuia == "SCENE_DOWN":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedSceneIndex + 1)
+                self.screens["zynthiloops"].song.scenesModel.selectedMixIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedMixIndex + 1)
             except:
                 pass
 

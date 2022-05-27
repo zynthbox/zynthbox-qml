@@ -51,7 +51,7 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -116,7 +116,7 @@ Kirigami.AbstractApplicationWindow {
                 rightPadding: Kirigami.Units.largeSpacing*1.5
                 onClicked: {
                     zynthian.current_modal_screen_id = 'zynthiloops'
-                    // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                    // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
                 }
                 //onPressAndHold: zynthian.current_screen_id = 'main'
                 highlighted: zynthian.current_screen_id === 'zynthiloops'
@@ -146,8 +146,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Scene %2 ˬ")
-                        .arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSceneIndex).name)
+                text: qsTr("Mix %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: scenesMenu.visible = true
@@ -159,7 +158,8 @@ Kirigami.AbstractApplicationWindow {
 
                     interval: 100
                     repeat: false
-                    onTriggered: Zynthian.CommonUtils.switchToScene(index)
+                    // onTriggered: Zynthian.CommonUtils.switchToScene(index)
+                    onTriggered: zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index
                 }
 
                 QQC2.Menu {
@@ -168,16 +168,16 @@ Kirigami.AbstractApplicationWindow {
                     modal: true
                     dim: false
                     Repeater {
-                        model: zynthian.zynthiloops.song.scenesModel
+                        model: 10
                         delegate: QQC2.MenuItem {
-                            text: qsTr("Scene %1").arg(model.scene.name)
+                            text: qsTr("Mix %1").arg(String.fromCharCode(65 + index).toUpperCase())
                             width: parent.width
                             onClicked: {
                                 scenesMenu.close();
                                 switchTimer.index = index;
                                 switchTimer.restart();
                             }
-                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
+                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedMixIndex === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                         }
                     }

@@ -41,7 +41,7 @@ Rectangle {
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
-    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName) : null
+    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart) : null
 
 
@@ -337,7 +337,7 @@ Rectangle {
                                             Layout.fillHeight: true
                                             text: "Bounce To Loop"
                                             onClicked: {
-                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedSceneName, root.selectedTrack);
+                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedMixName, root.selectedTrack);
                                             }
                                         }
                                         Item {
@@ -639,7 +639,7 @@ Rectangle {
                                                 zynthian.current_modal_screen_id = "playgrid";
                                                 zynthian.forced_screen_back = "zynthiloops";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedSceneName);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName);
                                                 sequence.setActiveTrack(root.selectedTrack.id, root.selectedTrack.selectedPart);
                                             }
                                         }

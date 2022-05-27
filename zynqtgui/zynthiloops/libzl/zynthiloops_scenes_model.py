@@ -37,7 +37,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = song
-        self.__selected_scene_index__ = 0
+        self.__selected_mix_index__ = 0
         self.__selected_new_scene_index__ = 0
         self.__scenes__ = {
             "0": {"name": "A", "clips": []},
@@ -52,10 +52,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
             "9": {"name": "J", "clips": []},
         }
 
-        self.__name_change_timer = QTimer(self)
-        self.__name_change_timer.setInterval(10)
-        self.__name_change_timer.setSingleShot(True)
-        self.__name_change_timer.timeout.connect(self.selected_scene_name_changed)
+        self.__mix_name_change_timer = QTimer(self)
+        self.__mix_name_change_timer.setInterval(10)
+        self.__mix_name_change_timer.setSingleShot(True)
+        self.__mix_name_change_timer.timeout.connect(self.selected_mix_name_changed)
 
         self.__new_name_change_timer = QTimer(self)
         self.__new_name_change_timer.setInterval(10)
@@ -80,7 +80,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
-            "selectedIndex": self.__selected_scene_index__,
+            "selectedIndex": self.__selected_mix_index__,
             "selectedNewIndex": self.__selected_new_scene_index__,
         }
 
@@ -96,8 +96,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
             self.endResetModel()
 
         if "selectedIndex" in obj:
-            self.__selected_scene_index__ = obj["selectedIndex"]
-            self.selected_scene_index_changed.emit()
+            self.__selected_mix_index__ = obj["selectedIndex"]
+            self.selected_mix_index_changed.emit()
 
         if "selectedNewIndex" in obj:
             self.__selected_new_scene_index__ = obj["selectedNewIndex"]
@@ -133,28 +133,28 @@ class zynthiloops_scenes_model(QAbstractListModel):
     count = Property(int, count, notify=countChanged)
     ### END Property count
 
-    ### Property selectedSceneIndex
-    def get_selected_scene_index(self):
-        return self.__selected_scene_index__
-    def set_selected_scene_index(self, index):
-        def task():
-            if self.__song__.get_metronome_manager().isMetronomeRunning:
-                self.stopScene(oldSceneIndex)
-                self.playScene(index)
+    ### Property selectedMixIndex
+    def get_selected_mix_index(self):
+        return self.__selected_mix_index__
+    def set_selected_mix_index(self, index):
+        # def task():
+        #     if self.__song__.get_metronome_manager().isMetronomeRunning:
+        #         self.stopScene(oldSceneIndex)
+        #         self.playScene(index)
+        #
+        #     self.__song__.schedule_save()
 
-            self.__song__.schedule_save()
+        oldSceneIndex = self.__selected_mix_index__
+        self.__selected_mix_index__ = index
+        self.selected_mix_index_changed.emit()
 
-        oldSceneIndex = self.__selected_scene_index__
-        self.__selected_scene_index__ = index
-        self.selected_scene_index_changed.emit()
+        # QTimer.singleShot(10, task)
+        self.__mix_name_change_timer.start()
 
-        QTimer.singleShot(10, task)
-        self.__name_change_timer.start()
-
-    selected_scene_index_changed = Signal()
-    selected_scene_name_changed = Signal()
-    selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
-    ### END Property selectedSceneIndex
+    selected_mix_index_changed = Signal()
+    selected_mix_name_changed = Signal()
+    selectedMixIndex = Property(int, get_selected_mix_index, set_selected_mix_index, notify=selected_mix_index_changed)
+    ### END Property selectedMixIndex
 
     ### Property selectedNewSceneIndex
     def get_selected_new_scene_index(self):
@@ -177,21 +177,21 @@ class zynthiloops_scenes_model(QAbstractListModel):
     selected_new_scene_index_changed = Signal()
     selected_new_scene_name_changed = Signal()
     selectedNewSceneIndex = Property(int, get_selected_new_scene_index, set_selected_new_scene_index, notify=selected_new_scene_index_changed)
-    ### END Property selectedSceneIndex
+    ### END Property selectedMixIndex
 
-    ### Property selectedSceneName
-    def get_selected_scene_name(self):
-        return chr(self.__selected_scene_index__ + 65)
+    ### Property selectedMixName
+    def get_selected_mix_name(self):
+        return chr(self.__selected_mix_index__ + 65)
 
-    selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_name_changed)
-    ### END Property selectedSceneName
+    selectedMixName = Property(str, get_selected_mix_name, notify=selected_mix_name_changed)
+    ### END Property selectedMixName
 
     ### Property selectedNewSceneName
     def get_selected_new_scene_name(self):
         return chr(self.__selected_new_scene_index__ + 65)
 
     selectedNewSceneName = Property(str, get_selected_new_scene_name, notify=selected_new_scene_name_changed)
-    ### END Property selectedSceneName
+    ### END Property selectedMixName
 
     @Slot(int)
     def playScene(self, sceneIndex):

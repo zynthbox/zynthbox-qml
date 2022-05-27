@@ -12,7 +12,7 @@ import JuceGraphics 1.0
 ColumnLayout {
     id: root
     property QtObject track
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName)
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 

@@ -171,6 +171,16 @@ class zynthiloops_scenes_model(QAbstractListModel):
         self.__selected_scene_index__ = index
         self.selected_scene_index_changed.emit()
 
+        # Sync enabled attribute for clips in scene
+        for track in range(10):
+            for part in range(5):
+                clip = self.__song__.getClipByPart(track, self.selectedMixIndex, part)
+
+                if clip is not None and self.isClipInCurrentScene(clip):
+                    clip.enabled = True
+                else:
+                    clip.enabled = False
+
         QTimer.singleShot(10, task)
         self.__new_name_change_timer.start()
 

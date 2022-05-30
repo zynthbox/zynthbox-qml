@@ -101,6 +101,7 @@ class zynthiloops_track(QObject):
             self.__connected_pattern__ = self.__id__
 
         self.__song__.scenesModel.selected_mix_index_changed.connect(lambda: self.scene_clip_changed.emit())
+        self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedPartNamesChanged.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)

@@ -97,6 +97,10 @@ class zynthiloops_song(QObject):
                         # First part is enabled by default, at least for now...
                         if i == 0:
                             clip.enabled = True
+
+                            # Add first clip to scene for all scenes
+                            for scene in range(10):
+                                self.__scenes_model__.addClipToScene(clip, scene)
                         clipsModel.add_clip(clip)
         self.bpm_changed.emit()
 

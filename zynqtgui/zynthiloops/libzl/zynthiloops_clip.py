@@ -96,8 +96,13 @@ class zynthiloops_clip(QObject):
             self.track.volume_changed.connect(lambda: self.track_volume_changed())
             self.track_volume_changed()
 
+        self.__sync_in_current_scene_timer__ = QTimer()
+        self.__sync_in_current_scene_timer__.setSingleShot(True)
+        self.__sync_in_current_scene_timer__.setInterval(50)
+        self.__sync_in_current_scene_timer__.timeout.connect(self.sync_in_current_scene)
+
         self.__was_in_current_scene = self.get_in_current_scene()
-        self.__song__.scenesModel.selected_scene_index_changed.connect(self.sync_in_current_scene)
+        self.__song__.scenesModel.selected_scene_index_changed.connect(self.__sync_in_current_scene_timer__.start)
 
         self.saveMetadataTimer = QTimer()
         self.saveMetadataTimer.setInterval(1000)
@@ -109,10 +114,7 @@ class zynthiloops_clip(QObject):
         return "zynthiloops_clip"
 
     def sync_in_current_scene(self):
-        now_in_scene = self.get_in_current_scene()
-        if now_in_scene != self.__was_in_current_scene:
-            self.in_current_scene_changed.emit()
-        self.__was_in_current_scene = now_in_scene
+        self.in_current_scene_changed.emit()
 
     ### Property initialStartPosition
     def get_initial_start_position(self):

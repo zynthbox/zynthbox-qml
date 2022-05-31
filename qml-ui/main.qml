@@ -899,7 +899,7 @@ Kirigami.AbstractApplicationWindow {
                         Zynthiloops.PartBarDelegate {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            track: root.selectedTrack
+                            track: slotSelectionDelegate.visible ? root.selectedTrack : null
                         }
                     }
                 }

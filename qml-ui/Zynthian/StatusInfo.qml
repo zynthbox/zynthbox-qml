@@ -39,40 +39,6 @@ MouseArea {
 
     onClicked: popup.visible = true
 
-    Connections {
-        target: zynthian.status_information
-        onStatus_changed: {
-            let signalA = Math.max(0, 1 + zynthian.status_information.peakA / zynthian.status_information.rangedB);
-            lowSignalARect.width = Math.min(signalA, zynthian.status_information.high) * root.width;
-            mediumSignalARect.width = Math.min(signalA, zynthian.status_information.over) * root.width;
-            highSignalARect.width = Math.min(signalA, 1) * root.width;
-
-            signalA = Math.max(0, 1 + zynthian.status_information.holdA / zynthian.status_information.rangedB);
-            let holdAX = Math.floor(Math.min(signalA, 1) * root.width);
-            holdSignalARect.x = holdAX;
-            if (holdAX === 0) {
-                holdSignalARect.opacity = 0;
-            } else {
-                holdSignalARect.opacity = 1;
-            }
-
-            let signalB = Math.max(0, 1 + zynthian.status_information.peakB / zynthian.status_information.rangedB);
-            lowSignalBRect.width = Math.min(signalB, zynthian.status_information.high) * root.width;
-            mediumSignalBRect.width = Math.min(signalB, zynthian.status_information.over) * root.width;
-            highSignalBRect.width = Math.min(signalB, 1) * root.width;
-
-
-            signalB = Math.max(0, 1 + zynthian.status_information.holdB / zynthian.status_information.rangedB);
-            let holdBX = Math.floor(Math.min(signalB, 1) * root.width);
-            holdSignalBRect.x = holdBX;
-            if (holdBX === 0) {
-                holdSignalBRect.opacity = 0;
-            } else {
-                holdSignalBRect.opacity = 1;
-            }
-        }
-    }
-
     ColumnLayout {
         anchors {
             left: parent.left
@@ -80,7 +46,6 @@ MouseArea {
             right: parent.right
         }
         height: parent.height / 2
-
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -92,7 +57,8 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                opacity: 0
+                x: Math.floor(zynthian.status_information.holdSignalA * root.width)
+                opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
                 Behavior on x {
@@ -117,6 +83,8 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
+                width: highSignalARect.peakSignalA * root.width
+                property double peakSignalA: zynthian.status_information.peakSignalA
             }
             Rectangle {
                 id: mediumSignalARect
@@ -127,6 +95,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.neutralTextColor
+                width: Math.min(highSignalARect.peakSignalA, zynthian.status_information.over) * root.width
             }
             Rectangle {
                 id: lowSignalARect
@@ -137,6 +106,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.positiveTextColor
+                width: Math.min(highSignalARect.peakSignalA, zynthian.status_information.high) * root.width
             }
         }
 
@@ -151,7 +121,8 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                opacity: 0
+                x: Math.floor(Math.min(zynthian.status_information.holdSignalB, 1) * root.width)
+                opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
                 Behavior on x {
@@ -176,6 +147,8 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
+                width: Math.min(highSignalBRect.peakSignalB, 1) * root.width
+                property double peakSignalB: zynthian.status_information.peakSignalB
             }
             Rectangle {
                 id: mediumSignalBRect
@@ -186,6 +159,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.neutralTextColor
+                width: Math.min(highSignalBRect.peakSignalB, zynthian.status_information.over) * root.width
             }
             Rectangle {
                 id: lowSignalBRect
@@ -196,6 +170,7 @@ MouseArea {
                 }
                 radius: 3
                 color: Kirigami.Theme.positiveTextColor
+                width: Math.min(highSignalBRect.peakSignalB, zynthian.status_information.high) * root.width
             }
         }
     }
@@ -221,18 +196,33 @@ MouseArea {
             visible: zynthian.status_information.undervoltage
         }
         Kirigami.Icon {
+            id: audioRecorderIcon
             Layout.fillHeight: true
             Layout.preferredWidth: height
             color: Kirigami.Theme.textColor
-            source: {
-                switch(zynthian.status_information.audio_recorder) {
-                case "PLAY":
-                    return "media-playback-start-symbolic";
-                case "REC":
-                default:
-                    return "media-record-symbolic";
+            source: "media-playback-start-symbolic";
+            function updateIcon() {
+                if (audioRecorderIcon.visible) {
+                    switch(zynthian.status_information.audio_recorder) {
+                    case "PLAY":
+                        if (audioRecorderIcon.source !== "media-playback-start-symbolic") {
+                            audioRecorderIcon.source = "media-playback-start-symbolic";
+                        }
+                        break;
+                    case "REC":
+                    default:
+                        if (audioRecorderIcon.source !== "media-record-symbolic") {
+                            audioRecorderIcon.source = "media-record-symbolic";
+                        }
+                        break;
+                    }
                 }
             }
+            Connections {
+                target: zynthian.status_information
+                onAudio_recorderChanged: audioRecorderIcon.updateIcon();
+            }
+            onVisibleChanged: audioRecorderIcon.updateIcon();
             QQC2.Label {
                 anchors {
                     right: parent.right
@@ -244,18 +234,33 @@ MouseArea {
             visible: zynthian.status_information.audio_recorder.length > 0
         }
         Kirigami.Icon {
+            id: midiRecorderIcon
             Layout.fillHeight: true
             Layout.preferredWidth: height
             color: Kirigami.Theme.textColor
-            source: {
-                switch(zynthian.status_information.audio_recorder) {
-                case "PLAY":
-                    return "media-playback-start-symbolic";
-                case "REC":
-                default:
-                    return "media-record-symbolic";
+            source: "media-playback-start-symbolic"
+            function updateIcon() {
+                if (midiRecorderIcon.visible) {
+                    switch(zynthian.status_information.midi_recorder) {
+                    case "PLAY":
+                        if (midiRecorderIcon.source !== "media-playback-start-symbolic") {
+                            midiRecorderIcon.source = "media-playback-start-symbolic";
+                        }
+                        break;
+                    case "REC":
+                    default:
+                        if (midiRecorderIcon.source !== "media-record-symbolic") {
+                            midiRecorderIcon.source = "media-record-symbolic";
+                        }
+                        break;
+                    }
                 }
             }
+            Connections {
+                target: zynthian.status_information
+                onMidi_recorderChanged: midiRecorderIcon.updateIcon()
+            }
+            onVisibleChanged: midiRecorderIcon.updateIcon()
             QQC2.Label {
                 anchors {
                     right: parent.right

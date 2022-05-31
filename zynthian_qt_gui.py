@@ -172,8 +172,12 @@ class zynthian_gui_status_data(QObject):
         self.status_info["cpu_load"] = 0
         self.status_info["peakA"] = 0
         self.status_info["peakB"] = 0
+        self.status_info["peakSignalA"] = 0
+        self.status_info["peakSignalB"] = 0
         self.status_info["holdA"] = 0
         self.status_info["holdB"] = 0
+        self.status_info["holdSignalA"] = 0
+        self.status_info["holdSignalB"] = 0
         self.status_info["xrun"] = False
         self.status_info["undervoltage"] = False
         self.status_info["overtemp"] = False
@@ -187,8 +191,48 @@ class zynthian_gui_status_data(QObject):
         self.dpm_over = 1 - self.dpm_overdB / self.dpm_rangedB
 
     def set_status(self, status):
+        midi_recorder_has_changed = False
+        if "midi_recorder" in status and "midi_recorder" in self.status_info and self.status_info["midi_recorder"] is not status["midi_recorder"]:
+            midi_recorder_has_changed = True
+        elif "midi_recorder" in status and "midi_recorder" not in self.status_info:
+            midi_recorder_has_changed = True
+        elif "midi_recorder" not in status and "midi_recorder" in self.status_info:
+            midi_recorder_has_changed = True
+        audio_recorder_has_changed = False
+        if "audio_recorder" in status and "audio_recorder" in self.status_info and self.status_info["audio_recorder"] is not status["audio_recorder"]:
+            audio_recorder_has_changed = True
+        elif "audio_recorder" in status and "audio_recorder" not in self.status_info:
+            audio_recorder_has_changed = True
+        elif "audio_recorder" not in status and "audio_recorder" in self.status_info:
+            audio_recorder_has_changed = True
+        undervoltage_has_changed = False
+        if "undervoltage" in status and "undervoltage" in self.status_info and self.status_info["undervoltage"] is not status["undervoltage"]:
+            undervoltage_has_changed = True
+        xrun_has_changed = False
+        if "xrun" in status and "xrun" in self.status_info and self.status_info["xrun"] is not status["xrun"]:
+            xrun_has_changed = True
+        overtemp_has_changed = False
+        if "overtemp" in status and "overtemp" in self.status_info and self.status_info["overtemp"] is not status["overtemp"]:
+            overtemp_has_changed = True
+
         self.status_info = status
+        # Update a couple of extra bits we need
+        self.status_info["peakSignalA"] = min(max(0, 1 + status["peakA"] / self.dpm_rangedB), 1)
+        self.status_info["peakSignalB"] = min(max(0, 1 + status["peakB"] / self.dpm_rangedB), 1)
+        self.status_info["holdSignalA"] = min(max(0, 1 + status["holdA"] / self.dpm_rangedB), 1)
+        self.status_info["holdSignalB"] = min(max(0, 1 + status["holdB"] / self.dpm_rangedB), 1)
+
         self.status_changed.emit()
+        if midi_recorder_has_changed is True:
+            self.midi_recorder_changed.emit()
+        if audio_recorder_has_changed is True:
+            self.audio_recorder_changed.emit()
+        if undervoltage_has_changed is True:
+            self.undervoltage_changed.emit()
+        if xrun_has_changed is True:
+            self.xrun_changed.emit()
+        if overtemp_has_changed is True:
+            self.overtemp_changed.emit()
 
     def get_cpu_load(self):
         return self.status_info["cpu_load"]
@@ -199,33 +243,50 @@ class zynthian_gui_status_data(QObject):
     def get_peakB(self):
         return self.status_info["peakB"]
 
+    def get_peakSignalA(self):
+        return self.status_info["peakSignalA"]
+
+    def get_peakSignalB(self):
+        return self.status_info["peakSignalB"]
+
     def get_holdA(self):
         return self.status_info["holdA"]
 
     def get_holdB(self):
         return self.status_info["holdB"]
 
+    def get_holdSignalA(self):
+        return self.status_info["holdSignalA"]
+
+    def get_holdSignalB(self):
+        return self.status_info["holdSignalB"]
+
+    xrun_changed = Signal()
     def get_xrun(self):
         return self.status_info["xrun"]
 
+    undervoltage_changed = Signal()
     def get_undervoltage(self):
         if "undervoltage" in self.status_info:
             return self.status_info["undervoltage"]
         else:
             return False
 
+    overtemp_changed = Signal()
     def get_overtemp(self):
         if "overtemp" in self.status_info:
             return self.status_info["overtemp"]
         else:
             return False
 
+    audio_recorder_changed = Signal()
     def get_audio_recorder(self):
         if "audio_recorder" in self.status_info:
             return self.status_info["audio_recorder"]
         else:
             return None
 
+    midi_recorder_changed = Signal()
     def get_midi_recorder(self):
         if "midi_recorder" in self.status_info:
             return self.status_info["midi_recorder"]
@@ -252,13 +313,17 @@ class zynthian_gui_status_data(QObject):
     cpu_load = Property(float, get_cpu_load, notify=status_changed)
     peakA = Property(float, get_peakA, notify=status_changed)
     peakB = Property(float, get_peakB, notify=status_changed)
+    peakSignalA = Property(float, get_peakSignalA, notify=status_changed)
+    peakSignalB = Property(float, get_peakSignalB, notify=status_changed)
     holdA = Property(float, get_holdA, notify=status_changed)
     holdB = Property(float, get_holdB, notify=status_changed)
-    xrun = Property(bool, get_xrun, notify=status_changed)
-    undervoltage = Property(bool, get_undervoltage, notify=status_changed)
-    overtemp = Property(bool, get_overtemp, notify=status_changed)
-    audio_recorder = Property(str, get_audio_recorder, notify=status_changed)
-    midi_recorder = Property(str, get_midi_recorder, notify=status_changed)
+    holdSignalA = Property(float, get_holdSignalA, notify=status_changed)
+    holdSignalB = Property(float, get_holdSignalB, notify=status_changed)
+    xrun = Property(bool, get_xrun, notify=xrun_changed)
+    undervoltage = Property(bool, get_undervoltage, notify=undervoltage_changed)
+    overtemp = Property(bool, get_overtemp, notify=overtemp_changed)
+    audio_recorder = Property(str, get_audio_recorder, notify=audio_recorder_changed)
+    midi_recorder = Property(str, get_midi_recorder, notify=midi_recorder_changed)
 
     rangedB = Property(float, get_rangedB, constant=True)
     highdB = Property(float, get_highdB, constant=True)

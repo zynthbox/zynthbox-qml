@@ -21,7 +21,7 @@ ColumnLayout {
     spacing: 1
 
     Repeater {
-        model: 5
+        model: root.track ? 5 : 0
         delegate: Rectangle {
             id: partDelegate
             property int partIndex: index
@@ -43,14 +43,14 @@ ColumnLayout {
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""
 
-                visible: root.track.trackAudioType === "sample-loop" &&
+                visible: root.visible && root.track.trackAudioType === "sample-loop" &&
                          partDelegate.clipHasWav
             }
             Image {
                 anchors.fill: parent
                 anchors.margins: 2
                 smooth: false
-                visible: root.track.trackAudioType !== "sample-loop" &&
+                visible: root.visible && root.track.trackAudioType !== "sample-loop" &&
                          partDelegate.pattern &&
                          partDelegate.pattern.hasNotes
                 source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
@@ -60,7 +60,7 @@ ColumnLayout {
                         top: parent.top
                         bottom: parent.bottom
                     }
-                    visible: root.visible && parent.visible && partDelegate.pattern ? partDelegate.pattern.isPlaying : false
+                    visible: parent.visible && partDelegate.pattern ? partDelegate.pattern.isPlaying : false
                     color: Kirigami.Theme.highlightColor
                     property double widthFactor: root.visible && parent.visible && partDelegate.pattern ? parent.width / (partDelegate.pattern.width * partDelegate.pattern.bankLength) : 1
                     width: Math.max(1, Math.floor(widthFactor))
@@ -94,7 +94,7 @@ ColumnLayout {
                     elide: "ElideRight"
                     horizontalAlignment: "AlignHCenter"
                     font.pointSize: 8
-                    text: partDelegate.clip.path.split("/").pop()
+                    text: root.visible ? partDelegate.clip.path.split("/").pop() : ""
                 }
             }
             MouseArea {

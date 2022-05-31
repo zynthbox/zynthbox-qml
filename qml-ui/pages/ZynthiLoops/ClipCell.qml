@@ -111,7 +111,7 @@ QQC2.AbstractButton {
 
 //                        label.text = hasNotes
 //                                ? sequence && sequence.isPlaying
-//                                ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
+//                                ? (Math.floor(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
 //                                : (pattern.availableBars*4)
 //                                : ""
 //                    } else {
@@ -144,31 +144,41 @@ QQC2.AbstractButton {
                      track.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&
                      track.sceneClip.path.length > 0
-            text: qsTr("%1%2")
+            text: visible
+                ? qsTr("%1%2")
                     .arg(track.sceneClip.isPlaying &&
                          track.sceneClip.currentBeat >= 0
                             ? (track.sceneClip.currentBeat+1) + "/"
                             : "")
                     .arg(track.sceneClip.length.toFixed(2))
+                : ""
         }
 
         QQC2.Label {
+            id: patternPlaybackLabel
             anchors {
                 right: parent.right
                 bottom: parent.bottom
             }
             visible: root.isInScene &&
                      track.trackAudioType !== "sample-loop" &&
-                     track.connectedPattern >= 0 &&
+                     root.pattern &&
                      root.pattern.hasNotes
-            text: qsTr("%1%2")
-                    .arg(root.pattern.hasNotes &&
-                         sequence && sequence.isPlaying &&
-                         pattern.bankPlaybackPosition >= 0 &&
-                         zynthian.zynthiloops.isMetronomeRunning
-                            ? (parseInt(pattern.bankPlaybackPosition/4) + 1) + "/"
-                            : "")
-                    .arg(pattern.availableBars*4)
+            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
+            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynthian.zynthiloops.isMetronomeRunning
+                    ? patternPlaybackLabel.playbackPosition + "/"
+                    : ""
+            property int playbackPosition: 1
+            Connections {
+                target: root.pattern
+                enabled: patternPlaybackLabel.visible
+                onBankPlaybackPositionChanged: {
+                    let playbackPosition = Math.floor(root.pattern.bankPlaybackPosition/4) + 1
+                    if (patternPlaybackLabel.playbackPosition != playbackPosition) {
+                        patternPlaybackLabel.playbackPosition = playbackPosition
+                    }
+                }
+            }
         }
 
 
@@ -254,7 +264,8 @@ QQC2.AbstractButton {
 
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: visible ? (track.sceneClip.progress - track.sceneClip.startPosition)/(((60/zynthian.zynthiloops.song.bpm) * track.sceneClip.length) / parent.width) : 0
+            width: visible ? (track.sceneClip.progress - track.sceneClip.startPosition)/adjustment : 0
+            property double adjustment: visible ? (((60/zynthian.zynthiloops.song.bpm) * track.sceneClip.length) / parent.width) : 1
         }
         Rectangle {
             id: patternProgressRect

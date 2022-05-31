@@ -240,6 +240,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
+                visible: root.isVisible
 
                 property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
@@ -301,7 +302,7 @@ Zynthian.ScreenPage {
                                     }
                                     return text;
                                 }
-                                text: visible ? constructText() : ""
+                                text: root.isVisible ? constructText() : ""
                             }
                             QQC2.Button {
                                 icon.name: "configure"
@@ -426,6 +427,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     screenId: "bank"
+                    visible: root.isVisible
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -547,6 +549,7 @@ Zynthian.ScreenPage {
             }
             Zynthian.SelectorView {
                 id: presetView
+                visible: root.isVisible
                 implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -557,20 +560,6 @@ Zynthian.ScreenPage {
             }
         }
 
-
-        Connections {
-            target: zynthian
-            onActive_midi_channelChanged: presetSyncPosTimer.restart()
-        }
-        Timer {
-            id: presetSyncPosTimer
-            interval: 100
-            onTriggered: {
-                presetView.view.positionViewAtIndex(presetView.view.currentIndex, ListView.SnapPosition)
-                presetView.view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
-                presetView.view.forceLayout()
-            }
-        }
         Connections {
             target: applicationWindow()
             property int lastCurrentIndex

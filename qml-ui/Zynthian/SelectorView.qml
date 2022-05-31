@@ -74,7 +74,13 @@ QQC2.ScrollView {
         keyNavigationEnabled: true
         keyNavigationWraps: false
         clip: true
-        currentIndex: root.selector.current_index
+        Binding {
+            target: view
+            property: "currentIndex"
+            value: root.selector.current_index
+            when: root.visible
+            delayed: true
+        }
         cacheBuffer: Kirigami.Units.gridUnit*2
         highlightMoveDuration: 0
         highlightMoveVelocity: -1
@@ -91,7 +97,13 @@ QQC2.ScrollView {
         preferredHighlightBegin: Kirigami.Units.gridUnit * 2
         preferredHighlightEnd: Kirigami.Units.gridUnit * 4
 
-        model: root.selector.selector_list
+        Binding {
+            target: view
+            property: "model"
+            value: root.selector.selector_list
+            when: root.visible
+            delayed: true
+        }
 
         delegate: SelectorDelegate {
             screenId: root.screenId
@@ -113,14 +125,18 @@ QQC2.ScrollView {
         }
     }
 
+    function forceViewPosition() {
+        if (root.visible) {
+            root.view.positionViewAtIndex(root.currentIndex, ListView.SnapPosition)
+            root.view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
+            root.view.forceLayout()
+        }
+    }
+    onVisibleChanged: root.forceViewPosition();
     Timer {
         id: syncPosTimer
         interval: 100
-        onTriggered: {
-            view.positionViewAtIndex(currentIndex, ListView.SnapPosition)
-            view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
-            view.forceLayout()
-        }
+        onTriggered: root.forceViewPosition();
     }
 
     Kirigami.Separator {

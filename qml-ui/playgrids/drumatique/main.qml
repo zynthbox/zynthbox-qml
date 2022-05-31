@@ -1105,7 +1105,7 @@ Zynthian.BasePlayGrid {
                                 delegate: BarStep {
                                     availableBars: _private.availableBars
                                     activeBar: _private.activeBar
-                                    playedBar: _private.activePatternModel ? _private.activePatternModel.playingRow - _private.activePatternModel.bankOffset : 0
+                                    playedBar: visible && _private.activePatternModel ? _private.activePatternModel.playingRow - _private.activePatternModel.bankOffset : 0
                                     playgrid: component
                                 }
                             }

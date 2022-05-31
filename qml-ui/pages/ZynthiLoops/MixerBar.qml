@@ -265,53 +265,61 @@ Rectangle {
 
                                                 font.pointSize: 8
 
-                                                text: {
-                                                    soundLabel.updateSoundName();
+                                                Timer {
+                                                    id: soundnameUpdater;
+                                                    repeat: false; running: false; interval: 1;
+                                                    onTriggered: soundLabel.updateSoundName();
                                                 }
-
+                                                Component.onCompleted: soundLabel.updateSoundName();
                                                 Connections {
                                                     target: zynthian.fixed_layers
-                                                    onList_updated: soundLabel.updateSoundName()
+                                                    onList_updated: soundnameUpdater.restart();
                                                 }
 
                                                 Connections {
                                                     target: model.track
-                                                    onChainedSoundsChanged: model.track.trackAudioType === "synth" ? soundLabel.updateSoundName() : false
-                                                    onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundLabel.updateSoundName() : false
-                                                    onTrackAudioTypeChanged: soundLabel.updateSoundName()
-                                                    onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundLabel.updateSoundName() : false
-                                                    onSelectedSampleRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundLabel.updateSoundName() : false
+                                                    onChainedSoundsChanged: model.track.trackAudioType === "synth" ? soundnameUpdater.restart() : false
+                                                    onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
+                                                    onTrackAudioTypeChanged: soundnameUpdater.restart()
+                                                    onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                    onSelectedSampleRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
                                                 }
 
                                                 Connections {
                                                     target: model.track.sceneClip
-                                                    onPathChanged: model.track.trackAudioType === "sample-loop" ? soundLabel.updateSoundName() : false
+                                                    onPathChanged: model.track.trackAudioType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                }
+                                                Connections {
+                                                    target: root
+                                                    onVisibleChanged: root.visible ? soundLabel.updateSoundName() : false
                                                 }
 
                                                 function updateSoundName() {
-                                                    var text = "";
+                                                    if (root.visible) {
+                                                        var text = "";
 
-                                                    if (model.track.trackAudioType === "synth") {
-                                                        for (var id in model.track.chainedSounds) {
-                                                            if (model.track.chainedSounds[id] >= 0 &&
-                                                                model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                                var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
-                                                                text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
-                                                                break;
+                                                        if (model.track.trackAudioType === "synth") {
+                                                            for (var id in model.track.chainedSounds) {
+                                                                if (model.track.chainedSounds[id] >= 0 &&
+                                                                    model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
+                                                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                                    text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
+                                                                    break;
+                                                                }
                                                             }
+                                                        } else if (model.track.trackAudioType === "sample-trig" ||
+                                                                model.track.trackAudioType === "sample-slice") {
+                                                            try {
+                                                                text = model.track.samples[model.track.selectedSampleRow].path.split("/").pop()
+                                                            } catch (e) {}
+                                                        } else if (model.track.trackAudioType === "sample-loop") {
+                                                            try {
+                                                                text = model.track.sceneClip.path.split("/").pop()
+                                                            } catch (e) {}
                                                         }
-                                                    } else if (model.track.trackAudioType === "sample-trig" ||
-                                                               model.track.trackAudioType === "sample-slice") {
-                                                        try {
-                                                            text = model.track.samples[model.track.selectedSampleRow].path.split("/").pop()
-                                                        } catch (e) {}
-                                                    } else if (model.track.trackAudioType === "sample-loop") {
-                                                        try {
-                                                            text = model.track.sceneClip.path.split("/").pop()
-                                                        } catch (e) {}
-                                                    }
 
-                                                    soundLabel.text = text;
+                                                        soundLabel.text = text;
+                                                    }
                                                 }
                                             }
                                         }

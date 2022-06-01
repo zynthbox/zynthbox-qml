@@ -63,7 +63,13 @@ QQC2.Button {
             color: component.borderColor
             width: 1
         }
-        property bool shouldChange: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
+        property bool shouldChange: true
+        Binding {
+            target: padNoteRect
+            property: "shouldChange"
+            value: (component.playgrid.mostRecentlyPlayedNote || component.playgrid.heardNotes.length > 0) ? true : false
+            delayed: true
+        }
         MultiPointTouchArea {
             anchors.fill: parent
 

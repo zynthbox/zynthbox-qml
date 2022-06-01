@@ -409,18 +409,6 @@ ColumnLayout {
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/128"
-            checked: component.model ? component.model.noteLength === 6 : false
-            onClicked: { component.setDuration(1, checked); }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/64"
-            checked: component.model ? component.model.noteLength === 5 : false
-            onClicked: { component.setDuration(2, checked); }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/32"
             checked: component.model ? component.model.noteLength === 4 : false
             onClicked: { component.setDuration(4, checked); }
@@ -442,6 +430,18 @@ ColumnLayout {
             text: "1/4"
             checked: component.model ? component.model.noteLength === 1 : false
             onClicked: { component.setDuration(32, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/2"
+            checked: /*component.model ? component.model.noteLength === 6 :*/ false
+            onClicked: { component.setDuration(64, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1"
+            checked: /*component.model ? component.model.noteLength === 5 :*/ false
+            onClicked: { component.setDuration(128, checked); }
         }
     }
     RowLayout {

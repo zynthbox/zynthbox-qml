@@ -146,7 +146,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Sketch S%1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.selectedMixIndex + 1)
+                text: qsTr("Scene %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.selectedSceneName)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: scenesMenu.visible = true
@@ -159,8 +159,7 @@ Kirigami.AbstractApplicationWindow {
                     interval: 100
                     repeat: false
                     onTriggered: {
-                        zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index
-                        // Zynthian.CommonUtils.switchToScene(index)
+                        Zynthian.CommonUtils.switchToScene(index)
                     }
                 }
 
@@ -172,14 +171,14 @@ Kirigami.AbstractApplicationWindow {
                     Repeater {
                         model: 10
                         delegate: QQC2.MenuItem {
-                            text: qsTr("Sketch S%1").arg(index + 1)
+                            text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
                             width: parent.width
                             onClicked: {
                                 scenesMenu.close();
                                 switchTimer.index = index;
                                 switchTimer.restart();
                             }
-                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedMixIndex === index
+                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                         }
                     }

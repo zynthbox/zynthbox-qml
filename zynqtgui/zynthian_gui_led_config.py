@@ -143,7 +143,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     else:
                         self.button_color_map[i] = {
                             'color': self.led_color_blue,
-                            'blink': True
+                            'blink': False
                         }
 
                     continue
@@ -379,7 +379,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             # Save button
             if self.zyngui.zynthiloops.clickTrackEnabled:
                 self.button_color_map[16] = {
-                    'color': self.led_color_off,
+                    'color': self.led_color_blue,
                     'blink': True
                 }
             else:

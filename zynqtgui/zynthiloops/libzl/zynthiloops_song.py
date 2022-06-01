@@ -43,6 +43,9 @@ import json
 import os
 from pathlib import Path
 
+from ... import zynthian_gui_config
+from ...zynthian_gui_config import zyngui
+
 
 class zynthiloops_song(QObject):
     __instance__ = None
@@ -50,6 +53,7 @@ class zynthiloops_song(QObject):
     def __init__(self, sketch_folder: str, name, parent=None, load_history=True):
         super(zynthiloops_song, self).__init__(parent)
 
+        self.zyngui = zynthian_gui_config.zyngui
         self.__metronome_manager__ = parent
         self.sketch_folder = sketch_folder
 
@@ -470,6 +474,8 @@ class zynthiloops_song(QObject):
     def set_bpm(self, bpm: int, force_set=False):
         if self.__bpm__ != math.floor(bpm) or force_set is True:
             self.__bpm__ = math.floor(bpm)
+            self.zyngui.wsleds_blink_timer.setInterval(60000/bpm)
+            self.zyngui.wsleds_blink_timer.start()
             self.bpm_changed.emit()
             self.schedule_save()
 

@@ -1250,6 +1250,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.click_track_clack.queueClipToStart()
 
                 libzl.startTimer(self.__song__.__bpm__)
+                self.zyngui.wsleds_blink_timer.stop()
                 self.metronome_running_changed.emit()
 
     def stop_metronome_request(self):
@@ -1269,6 +1270,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def metronome_update(self, beat):
         self.__current_beat__ = beat
+        self.zyngui.wsleds_blink_count = (self.zyngui.wsleds_blink_count + 1) % 4
 
         # if self.countInValue > 0:
         #     self.countInValue -= 1
@@ -1277,6 +1279,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_schedule_stop:
             libzl.stopTimer()
 
+            self.zyngui.wsleds_blink_timer.start()
             self.click_track_click.stop()
             self.click_track_clack.stop()
             self.__current_beat__ = -1

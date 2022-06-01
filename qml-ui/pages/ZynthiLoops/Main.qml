@@ -489,7 +489,9 @@ Zynthian.ScreenPage {
         Rectangle {
             id: selectedTrackOutline
             width: privateProps.headerWidth
-            height: privateProps.headerHeight*2 + loopGrid.columnSpacing*2
+
+            // If scene selection buttons are visible, do not show outline over scene buttons
+            height: (privateProps.headerHeight + loopGrid.columnSpacing) * (root.displaySceneButtons ? 1 : 2)
             color: "#2affffff"
             z: 100
         }

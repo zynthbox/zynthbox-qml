@@ -246,7 +246,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         try:
             self.getScene(self.__selected_scene_index__)["clips"].remove(clip)
         except Exception as e:
-            logging.error(f"Error removing clip from scene : {str(e)}")
+            logging.debug(f"Error removing clip from scene : {str(e)}")
 
         if self.__song__.get_metronome_manager().isMetronomeRunning:
             clip.stop()

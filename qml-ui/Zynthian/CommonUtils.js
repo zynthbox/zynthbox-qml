@@ -2,28 +2,14 @@
 
 function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
-    if (sequence) {
-//         // First, explicitly turn off any Patterns which are not assigned a Track - otherwise
-//         // we'll end up confusing people by playing back stuff where we don't know where the
-//         // notes should be going, and that just wouldn't be cool.
-//         for (var j = 0; j < sequence.rowCount(); ++j) {
-//             var pattern = sequence.get(j);
-//             var foundIndex = -1;
-//             for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-//                 var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-//                 if (track && track.connectedPattern === j) {
-//                     foundIndex = i;
-//                     break;
-//                 }
-//             }
-//             if (foundIndex === -1) {
-//                 pattern.enabled = false;
-//             }
-//         }
-        sequence.prepareSequencePlayback();
-    } else {
-        console.debug("Sequence could not be fetched, and playback could not be prepared");
+    let mixNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    for (var i = 0; i < mixNames.length; ++i) {
+        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + mixNames[i]);
+        if (sequence) {
+            sequence.prepareSequencePlayback();
+        } else {
+            console.debug("Sequence could not be fetched, and playback could not be prepared");
+        }
     }
     if (zynthian.zynthiloops.clipToRecord) {
         ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
@@ -34,11 +20,14 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     console.log("Stopping Metronome and Playback");
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
-    if (sequence) {
-        sequence.stopSequencePlayback();
-    } else {
-        console.log("Sequence could not be fetched, and playback could not be stopped");
+    let mixNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    for (var i = 0; i < mixNames.length; ++i) {
+        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + mixNames[i]);
+        if (sequence) {
+            sequence.stopSequencePlayback();
+        } else {
+            console.log("Sequence could not be fetched, and playback could not be stopped");
+        }
     }
 
     if (zynthian.zynthiloops.clipToRecord) {
@@ -74,13 +63,6 @@ function toggleLayerChaining(layer) {
 }
 
 function switchToScene(index) {
-    var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
-    if (sequence) {
-        sequence.disconnectSequencePlayback();
-    } else {
-        console.log("Sequence could not be fetched, and playback could not be stopped");
-    }
-
 //    zynthian.zynthiloops.song.scenesModel.stopScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
 
     ////////////////////////////
@@ -93,13 +75,6 @@ function switchToScene(index) {
     zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index
 
     ////////////////////////////
-
-    sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName);
-    if (sequence) {
-        sequence.prepareSequencePlayback();
-    } else {
-        console.log("Sequence could not be fetched, and playback could not be stopped");
-    }
 }
 
 function cuiaHandler(cuia, selectedTrack, bottomStack) {

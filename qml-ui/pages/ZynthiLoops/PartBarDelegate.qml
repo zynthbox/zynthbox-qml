@@ -12,7 +12,7 @@ import JuceGraphics 1.0
 ColumnLayout {
     id: root
     property QtObject track
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName)
+    property QtObject sequence: root.visible ? ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 
@@ -21,7 +21,7 @@ ColumnLayout {
     spacing: 1
 
     Repeater {
-        model: root.track ? 5 : 0
+        model: root.track && root.sequence ? 5 : 0
         delegate: Rectangle {
             id: partDelegate
             property int partIndex: index

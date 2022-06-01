@@ -137,18 +137,13 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def get_selected_mix_index(self):
         return self.__selected_mix_index__
     def set_selected_mix_index(self, index):
-        # def task():
-        #     if self.__song__.get_metronome_manager().isMetronomeRunning:
-        #         self.stopScene(oldSceneIndex)
-        #         self.playScene(index)
-        #
-        #     self.__song__.schedule_save()
-
-        oldSceneIndex = self.__selected_mix_index__
+        self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
         self.__selected_mix_index__ = index
-        self.selected_mix_index_changed.emit()
+        self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
+        self.__song__.schedule_save()
 
-        # QTimer.singleShot(10, task)
+        self.selected_mix_index_changed.emit()
+        self.syncClipsEnabledFromCurrentScene()
         self.__mix_name_change_timer.start()
 
     selected_mix_index_changed = Signal()
@@ -160,28 +155,13 @@ class zynthiloops_scenes_model(QAbstractListModel):
     def get_selected_scene_index(self):
         return self.__selected_scene_index__
     def set_selected_scene_index(self, index):
-        def task():
-            if self.__song__.get_metronome_manager().isMetronomeRunning:
-                self.stopScene(oldSceneIndex)
-                self.playScene(index)
-
-            self.__song__.schedule_save()
-
-        oldSceneIndex = self.__selected_scene_index__
+        self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
         self.__selected_scene_index__ = index
+        self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
+        self.__song__.schedule_save()
+
         self.selected_scene_index_changed.emit()
-
-        # Sync enabled attribute for clips in scene
-        for track in range(10):
-            for part in range(5):
-                clip = self.__song__.getClipByPart(track, self.selectedMixIndex, part)
-
-                if clip is not None and self.isClipInCurrentScene(clip):
-                    clip.enabled = True
-                else:
-                    clip.enabled = False
-
-        QTimer.singleShot(10, task)
+        self.syncClipsEnabledFromCurrentScene()
         self.__new_name_change_timer.start()
 
     selected_scene_index_changed = Signal()
@@ -203,8 +183,19 @@ class zynthiloops_scenes_model(QAbstractListModel):
     selectedSceneName = Property(str, get_selected_scene_name, notify=selected_scene_name_changed)
     ### END Property selectedSceneName
 
+    def syncClipsEnabledFromCurrentScene(self):
+        # Sync enabled attribute for clips in scene
+        for track in range(10):
+            for part in range(5):
+                clip = self.__song__.getClipByPart(track, self.selectedMixIndex, part)
+
+                if clip is not None and self.isClipInCurrentScene(clip):
+                    clip.enabled = True
+                else:
+                    clip.enabled = False
+
     @Slot(int)
-    def playScene(self, sceneIndex):
+    def playScene(self, sceneIndex, mixIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
@@ -212,16 +203,18 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
             # Start all clips except clip to be recorded
             if clip != self.zyngui.zynthiloops.clipToRecord and \
-                    clip.part == clip.clipTrack.selectedPart:
+                    clip.part == clip.clipTrack.selectedPart and \
+                    (mixIndex < 0 or (0 <= mixIndex == clip.col)):
                 clip.play()
 
     @Slot(int)
-    def stopScene(self, sceneIndex):
+    def stopScene(self, sceneIndex, mixIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
             clip = scene["clips"][i]
-            clip.stop()
+            if mixIndex < 0 or (0 <= mixIndex == clip.col):
+                clip.stop()
 
     @Slot(int, result='QVariantMap')
     def getScene(self, index):

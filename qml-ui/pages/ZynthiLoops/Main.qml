@@ -660,7 +660,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
-                        text: visible ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
+                        text: visible && zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
                     }
                     QQC2.Label {
                         property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSampleRow]
@@ -669,7 +669,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
                                  infoBar.clip.clipTrack.trackAudioType === "sample-slice")
-                        text: visible ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
+                        text: visible && zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
                     }
 
                     Item {
@@ -870,7 +870,7 @@ Zynthian.ScreenPage {
 
                     Repeater {
                         id: tracksHeaderRepeater
-                        model: visible ? root.song.tracksModel : 0
+                        model: visible && zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                         delegate: TrackHeader2 {
                             text: model.track.name
@@ -1044,7 +1044,6 @@ Zynthian.ScreenPage {
 
                             Repeater {
                                 model: visible && zynthian.isBootingComplete ? root.song.tracksModel : 0
-                                onModelChanged: console.log("Loopgrid model changed", model)
 
                                 delegate: Item {
                                     Layout.preferredWidth: privateProps.cellWidth

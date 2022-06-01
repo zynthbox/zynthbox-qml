@@ -508,7 +508,7 @@ Zynthian.BasePlayGrid {
     }
     Connections {
         target: zynthian.zynthiloops.song.scenesModel
-        onSelectedSceneNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
+        onSelectedMixNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
     }
     // on component completed
     onInitialize: {

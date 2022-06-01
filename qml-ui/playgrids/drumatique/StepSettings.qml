@@ -29,6 +29,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
+import org.zynthian.quick 1.0 as ZynQuick
 
 ColumnLayout {
     id: component
@@ -105,6 +106,38 @@ ColumnLayout {
             component.model.setSubnoteMetadata(component.row, component.column, component.currentSubNote, "duration", isDefault ? 0 : duration);
         }
     }
+    function changeAllSubnotesPitch(pitchChange) {
+        var oldNote = component.model.getNote(component.row, component.column);
+        var newSubnotes = [];
+        for (var i = 0; i < oldNote.subnotes.length; ++i) {
+            var oldSubnote = oldNote.subnotes[i];
+            newSubnotes.push(ZynQuick.PlayGridManager.getNote(Math.min(Math.max(oldSubnote.midiNote + pitchChange, 0), 127), oldSubnote.midiChannel));
+        }
+        component.model.setNote(component.row, component.column, ZynQuick.PlayGridManager.getCompoundNote(newSubnotes));
+
+        // Now refetch the note we're displaying
+        var theColumn = component.column;
+        component.column = -1;
+        component.column = theColumn;
+    }
+    function changeSubnotePitch(subnoteIndex, pitchChange) {
+        // First get the old data out
+        var subnote = component.note.subnotes[subnoteIndex];
+        var metadata = component.model.subnoteMetadata(component.row, component.column, subnoteIndex, "");
+        component.model.removeSubnote(component.row, component.column, subnoteIndex);
+        // Now insert the replacement note and set the metadata again
+        subnote = ZynQuick.PlayGridManager.getNote(Math.min(Math.max(subnote.midiNote + pitchChange, 0), 127), subnote.midiChannel)
+        var subnotePosition = component.model.insertSubnoteSorted(component.row, component.column, subnote);
+        for (var key in metadata) {
+            component.model.setSubnoteMetadata(component.row, component.column, subnotePosition, key, metadata[key]);
+        }
+
+        // Finally, refetch the note we're displaying
+        var theColumn = component.column;
+        component.column = -1;
+        component.column = theColumn;
+        component.changeSubnote(subnotePosition);
+    }
 
     RowLayout {
         Layout.fillWidth: true
@@ -113,7 +146,7 @@ ColumnLayout {
             id: noteHeaderLabel
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Note"
@@ -168,7 +201,7 @@ ColumnLayout {
                 id: noteDelegate
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 MultiPointTouchArea {
                     anchors.fill: parent
                     touchPoints: [
@@ -205,6 +238,7 @@ ColumnLayout {
                     color: subnoteDelegate.subnote ? component.noteSpecificColor[subnoteDelegate.subnote.name] : "transparent"
                 }
                 QQC2.Label {
+                    id: subnoteDelegateLabel
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     font.bold: true
@@ -235,6 +269,36 @@ ColumnLayout {
                         if (rootComponent.note.subnotes.count === 0) {
                             rootComponent.close();
                         }
+                    }
+                }
+                Zynthian.PlayGridButton {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        left: parent.horizontalCenter
+                        leftMargin: height / 2
+                        margins: 1
+                    }
+                    width: height
+                    text: "+"
+                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote < 127
+                    onClicked: {
+                        component.changeSubnotePitch(subnoteDelegate.subnoteIndex, 1);
+                    }
+                }
+                Zynthian.PlayGridButton {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.horizontalCenter
+                        rightMargin: height / 2
+                        margins: 1
+                    }
+                    width: height
+                    text: "-"
+                    visible: subnoteDelegate.subnoteIndex === component.currentSubNote && subnoteDelegate.subnote.midiNote > 0
+                    onClicked: {
+                        component.changeSubnotePitch(subnoteDelegate.subnoteIndex, -1);
                     }
                 }
             }
@@ -339,33 +403,15 @@ ColumnLayout {
         QQC2.Label {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
             horizontalAlignment: Text.AlignHCenter
             text: "DEFAULT"
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/4"
-            checked: component.model ? component.model.noteLength === 1 : false
-            onClicked: { component.setDuration(32, checked); }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/8"
-            checked: component.model ? component.model.noteLength === 2 : false
-            onClicked: { component.setDuration(16, checked); }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/16"
-            checked: component.model ? component.model.noteLength === 3 : false
-            onClicked: { component.setDuration(8, checked); }
-        }
-        Zynthian.PlayGridButton {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/32"
-            checked: component.model ? component.model.noteLength === 4 : false
-            onClicked: { component.setDuration(4, checked); }
+            text: "1/128"
+            checked: component.model ? component.model.noteLength === 6 : false
+            onClicked: { component.setDuration(1, checked); }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -375,9 +421,52 @@ ColumnLayout {
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-            text: "1/128"
-            checked: component.model ? component.model.noteLength === 6 : false
-            onClicked: { component.setDuration(1, checked); }
+            text: "1/32"
+            checked: component.model ? component.model.noteLength === 4 : false
+            onClicked: { component.setDuration(4, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/16"
+            checked: component.model ? component.model.noteLength === 3 : false
+            onClicked: { component.setDuration(8, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/8"
+            checked: component.model ? component.model.noteLength === 2 : false
+            onClicked: { component.setDuration(16, checked); }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+            text: "1/4"
+            checked: component.model ? component.model.noteLength === 1 : false
+            onClicked: { component.setDuration(32, checked); }
+        }
+    }
+    RowLayout {
+        Layout.fillWidth: true
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+            horizontalAlignment: Text.AlignHCenter
+            text: "All Notes"
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            text: "Pitch -"
+            onClicked: {
+                component.changeAllSubnotesPitch(-1);
+            }
+        }
+        Zynthian.PlayGridButton {
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            text: "Pitch +"
+            onClicked: {
+                component.changeAllSubnotesPitch(1);
+            }
         }
     }
 }

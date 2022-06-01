@@ -41,6 +41,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property bool displaySceneButtons: false
+    property bool displaySketchButtons: false
 
     // Used to temporarily cache clip/track object to be copied
     property var copySourceObj: null
@@ -722,23 +723,16 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth + 8
                         Layout.fillHeight: true
 
-                        highlightOnFocus: true
+                        highlightOnFocus: false
+                        highlighted: root.displaySketchButtons
                         text: root.song.name
-//                        subText: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedMixIndex).name)
-                        // subText: "BPM: " + root.song.bpm
-                        // subSubText: qsTr("Scale: %1").arg(root.song.selectedScale)
+                        subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedMixIndex + 1)
 
-                        textSize: 11
-//                        subTextSize: 9
-//                        subSubTextSize: 0
+                        textSize: 10
+                        subTextSize: 8
 
                         onPressed: {
-                            bottomBar.controlType = BottomBar.ControlType.Song;
-                            bottomBar.controlObj = root.song;
-
-                            if (bottomStack.slotsBar.trackButton.checked) {
-                                bottomStack.slotsBar.bottomBarButton.checked = true
-                            }
+                            root.displaySketchButtons = !root.displaySketchButtons
                         }
                     }
 
@@ -756,15 +750,26 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: zynthian.session_dashboard.selectedTrack === index
+                            highlighted: root.displaySketchButtons
+                                            ? root.song.scenesModel.selectedMixIndex === index
+                                            : zynthian.session_dashboard.selectedTrack === index
+
+                            text: root.displaySketchButtons
+                                    ? qsTr("S%1").arg(index+1)
+                                    : ""
+                            textSize: 10
 
                             onPressed: {
-                                // Always open Sound combinator when clicking any indicator cell
-                                zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
-                                bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
-                                bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
-                                bottomStack.slotsBar.bottomBarButton.checked = true
-                                bottomStack.bottomBar.tracksViewSoundsBarAction.trigger()
+                                if (root.displaySketchButtons) {
+                                    root.song.scenesModel.selectedMixIndex = index
+                                } else {
+                                    // Always open Sound combinator when clicking any indicator cell
+                                    zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
+                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
+                                    bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
+                                    bottomStack.slotsBar.bottomBarButton.checked = true
+                                    bottomStack.bottomBar.tracksViewSoundsBarAction.trigger()
+                                }
                             }
 
                             ColumnLayout {
@@ -772,7 +777,8 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: sceneHeaderDelegate.track.trackAudioType === "synth"
+                                visible: !root.displaySketchButtons &&
+                                         sceneHeaderDelegate.track.trackAudioType === "synth"
 
                                 Repeater {
                                     id: synthsOccupiedIndicatorRepeater
@@ -796,7 +802,8 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
+                                visible: !root.displaySketchButtons &&
+                                         ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
 
                                 Repeater {
                                     id: samplesOccupiedIndicatorRepeater
@@ -818,15 +825,18 @@ Zynthian.ScreenPage {
 
                             QQC2.Label {
                                 anchors.centerIn: parent
-                                visible: sceneHeaderDelegate.track.trackAudioType === "external"
+                                visible: !root.displaySketchButtons &&
+                                         sceneHeaderDelegate.track.trackAudioType === "external"
                                 text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
                             }
 
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: zynthian.session_dashboard.selectedTrack === index
+                                visible: !root.displaySketchButtons &&
+                                         zynthian.session_dashboard.selectedTrack === index
                             }
+
                         }
                     }
                 }

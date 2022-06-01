@@ -69,6 +69,7 @@ from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
+from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
 from zynqtgui.zynthiloops.libzl import libzl
 
@@ -503,6 +504,7 @@ class zynthian_gui(QObject):
         self.modal_timer.setSingleShot(False)
         self.modal_timer.timeout.connect(self.close_modal)
         self.__booting_complete__ = False
+        self.rainbow_led_counter = 0
 
         self.init_wsleds()
 
@@ -831,226 +833,35 @@ class zynthian_gui(QObject):
         else:
             self.wsleds.setPixelColor(i, self.wscolor_light)
 
-    counter = 0
-
     def update_wsleds(self):
         if not self.__booting_complete__:
             for i in range(25):
-                color = QColor.fromHsl((int(self.counter) + i*10) % 359, 242, 127, 127)
+                color = QColor.fromHsl((int(self.rainbow_led_counter) + i * 10) % 359, 242, 127, 127)
                 self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
             self.wsleds.show()
-            self.counter += 3
-            self.counter = self.counter % 359
+            self.rainbow_led_counter += 3
+            self.rainbow_led_counter = self.rainbow_led_counter % 359
 
             return
         else:
-            for i in range(25):
-                self.wsleds.setPixelColor(i, self.wscolor_active)
+            try:
+                self.led_config.update_button_colors()
 
-        if self.wsleds_blink_count % 6 > 2:
-            self.wsleds_blink = True
-        else:
-            self.wsleds_blink = False
+                if self.wsleds_blink_count % 6 > 2:
+                    self.wsleds_blink = True
+                else:
+                    self.wsleds_blink = False
 
-        try:
-            track = None
-            if self.zynthiloops.song is not None:
-                track = self.zynthiloops.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-
-            # Menu
-            if self.modal_screen is None and self.active_screen == "main":
-                self.wsleds.setPixelColor(0, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(0, self.wscolor_light)
-
-            # Light up 1-5 buttons as per opened screen / bottomBar
-            for i in range(1, 6):
-                # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
-                # This is global (i.e. for all screens)
-                if self.leftSidebarActive:
-                    partClip = self.zynthiloops.song.getClipByPart(track.id, self.zynthiloops.song.scenesModel.selectedMixIndex, i-1)
-
-                    if partClip.enabled and track is not None:
-                        if track.trackAudioType == "synth":
-                            self.wsled_blink(i, self.wscolor_red)
-                        elif track.trackAudioType in ["sample-trig", "sample-slice"]:
-                            self.wsled_blink(i, self.wscolor_yellow)
-                        elif track.trackAudioType == "sample-loop":
-                            self.wsled_blink(i, self.wscolor_green)
-                        elif track.trackAudioType == "external":
-                            self.wsled_blink(i, self.wscolor_purple)
+                for button_id, button in self.led_config.button_color_map.items():
+                    if button["blink"]:
+                        self.wsled_blink(button_id, button["color"])
                     else:
-                        self.wsled_blink(i, self.wscolor_blue)
+                        self.wsleds.setPixelColor(button_id, button["color"])
+            except:
+                pass
 
-                    continue
-
-                # If slots synths bar is active, light up filled cells otherwise turn off led
-                if track is not None and track.trackAudioType == "synth":
-                    if track.chainedSounds[i-1] > -1 and \
-                            track.checkIfLayerExists(track.chainedSounds[i-1]):
-                        self.wsleds.setPixelColor(i, self.wscolor_red)
-                    else:
-                        self.wsleds.setPixelColor(i, self.wscolor_blue)
-
-                    continue
-
-                # If slots samples bar is active, light up filled cells otherwise turn off led
-                if track is not None and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
-                    if track.samples[i-1].path is not None:
-                        self.wsleds.setPixelColor(i, self.wscolor_yellow)
-                    else:
-                        self.wsleds.setPixelColor(i, self.wscolor_blue)
-
-                    continue
-
-                # # If slots fx bar is active, light up filled cells otherwise turn off led
-                # if self.active_screen == "zynthiloops" and self.slotsBarFxActive:
-                #     if track.chainedSounds[i-1] > -1 and \
-                #             track.checkIfLayerExists(track.chainedSounds[i-1]) and \
-                #             len(track.getEffectsNameByMidiChannel(track.chainedSounds[i-1])) > 0:
-                #         self.wsleds.setPixelColor(i, self.wscolor_blue)
-                #     else:
-                #         self.wsleds.setPixelColor(i, self.wscolor_blue)
-                #
-                #     continue
-
-                # light up "1" Button green if clip has a wav otherwise turn off led
-                if track is not None and track.trackAudioType == "sample-loop":
-                    clip = track.clipsModel.getClip(0)
-
-                    if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
-                        self.wsleds.setPixelColor(i, self.wscolor_green)
-                    else:
-                        self.wsleds.setPixelColor(i, self.wscolor_blue)
-
-                    continue
-
-                # If sound combinator is active, light up filled cells with green color otherwise display blue color
-                if self.soundCombinatorActive:
-                    if (i-1) == self.session_dashboard.selectedSoundRow:
-                        # Set active color to selected sound row when combinator is open
-                        self.wsleds.setPixelColor(i, self.wscolor_active)
-                    else:
-                        self.wsleds.setPixelColor(i, self.wscolor_light)
-
-                    continue
-
-                # If none of the above conditions were true, light up button with blue color
-                self.wsleds.setPixelColor(i, self.wscolor_light)
-
-            # # Button 6 will act as modifier key to select track 6-10 when slots bar tabs other than mixer is not open
-            # # Light up when self.tracks_mod_active is true and other tabs are not open except mixer
-            # if self.active_screen == "zynthiloops" and \
-            #         not self.slotsBarTrackActive and \
-            #         not self.slotsBarSynthsActive and \
-            #         not self.slotsBarSamplesActive and \
-            #         not self.slotsBarFxActive and \
-            #         self.tracks_mod_active:
-            #     self.wsleds.setPixelColor(6, self.wscolor_green)
-            # else:
-            #     self.wsleds.setPixelColor(6, self.wscolor_blue)
-
-            self.wsleds.setPixelColor(6, self.wscolor_blue)
-
-            # 7 : FX Button
-            if track is not None and track.trackAudioType == "synth":
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_red)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_red)
-            elif track is not None and (track.trackAudioType == "sample-trig" or track.trackAudioType == "sample-slice"):
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_yellow)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_yellow)
-            elif self.slotsBarFxActive:
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_blue)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_blue)
-            elif track is not None and track.trackAudioType == "sample-loop":
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_green)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_green)
-            elif track is not None and track.trackAudioType == "external":
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_purple)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_purple)
-            else:
-                if self.leftSidebarActive:
-                    self.wsled_blink(7, self.wscolor_blue)
-                else:
-                    self.wsleds.setPixelColor(7, self.wscolor_blue)
-
-            # Stepseq screen:
-            if self.modal_screen is None and self.active_screen == "zynthiloops":
-                self.wsleds.setPixelColor(8, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(8, self.wscolor_light)
-
-            # Audio Recorder screen:
-            if self.modal_screen == "playgrid":
-                self.wsleds.setPixelColor(9, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(9, self.wscolor_light)
-
-            # MIDI Recorder screen:
-            if self.modal_screen is None and (self.active_screen == "layers_for_track" or self.active_screen == "bank" or self.active_screen == "preset"):
-                self.wsleds.setPixelColor(10, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(10, self.wscolor_light)
-
-            # Snapshot screen:
-            if self.modal_screen == "song_arranger":
-                self.wsleds.setPixelColor(11, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(11, self.wscolor_light)
-
-            # Presets screen:
-            if self.modal_screen == "admin":
-                self.wsleds.setPixelColor(12, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(12, self.wscolor_light)
-
-            # Light ALT button
-            self.wsleds.setPixelColor(13, self.wscolor_light)
-
-            if self.screens["zynthiloops"].clipToRecord is None:
-                self.wsleds.setPixelColor(14, self.wscolor_light)
-            else:
-                self.wsleds.setPixelColor(14, self.wscolor_red)
-
-            if self.screens["zynthiloops"].isMetronomeRunning:
-                self.wsleds.setPixelColor(15, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(15, self.wscolor_light)
-
-            # Back/No button
-            self.wsleds.setPixelColor(18, self.wscolor_red)
-
-            # Up button
-            self.wsleds.setPixelColor(19, self.wscolor_light)
-
-            # Select/Yes button
-            self.wsleds.setPixelColor(20, self.wscolor_green)
-
-            # Left, Bottom, Right button
-            for i in range(3):
-                self.wsleds.setPixelColor(21+i, self.wscolor_light)
-
-            # Audio Mixer/Levels screen
-            if self.modal_screen == "audio_settings":
-                self.wsleds.setPixelColor(24, self.wscolor_active)
-            else:
-                self.wsleds.setPixelColor(24, self.wscolor_light)
-
-            # Refresh LEDs
-            self.wsleds.show()
-
-        except Exception as e:
-            logging.error(e)
+        # Refresh LEDs
+        self.wsleds.show()
 
         self.wsleds_blink_count += 1
 
@@ -1264,6 +1075,8 @@ class zynthian_gui(QObject):
 
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
         self.screens["sketch_copier"] = zynthian_gui_sketch_copier(self)
+
+        self.screens["led_config"] = zynthian_gui_led_config(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -3508,6 +3321,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def sound_categories(self):
         return self.screens["sound_categories"]
+
+    @Property(QObject, constant=True)
+    def led_config(self):
+        return self.screens["led_config"]
 
     ### Alternative long task handling than show_loading
     def do_long_task(self, cb):

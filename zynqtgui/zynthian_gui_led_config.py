@@ -366,10 +366,16 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
             # Play button
             if self.zyngui.zynthiloops.isMetronomeRunning:
-                self.button_color_map[15] = {
-                    'color': self.led_color_active,
-                    'blink': False
-                }
+                if self.zyngui.zynthiloops.currentBeat % 2 == 0:
+                    self.button_color_map[15] = {
+                        'color': self.led_color_active,
+                        'blink': False
+                    }
+                else:
+                    self.button_color_map[15] = {
+                        'color': self.led_color_light,
+                        'blink': False
+                    }
             else:
                 self.button_color_map[15] = {
                     'color': self.led_color_light,

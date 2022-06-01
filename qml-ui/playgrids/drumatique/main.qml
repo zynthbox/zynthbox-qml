@@ -864,15 +864,28 @@ Zynthian.BasePlayGrid {
                                         drumPadRepeater.selectedIndex = model.index;
                                     }
                                 }
+                                property bool doUpdate: false
+                                function updatePadNote() {
+                                    sequencerPad.note = null;
+                                    if (_private.activePatternModel) {
+                                        sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                    }
+                                    Qt.callLater(_private.updateUniqueCurrentRowNotes)
+                                }
                                 Timer {
                                     id: sequenderPadNoteApplicator
                                     repeat: false; running: false; interval: 1
                                     onTriggered: {
-                                        sequencerPad.note = null;
-                                        if (_private.activePatternModel) {
-                                            sequencerPad.note = _private.activePatternModel.getNote(_private.activeBar + _private.bankOffset, model.index)
+                                        if (root.visible) {
+                                            sequencerPad.updatePadNote();
+                                        } else {
+                                            sequencerPad.doUpdate = true;
                                         }
-                                        Qt.callLater(_private.updateUniqueCurrentRowNotes)
+                                    }
+                                }
+                                onVisibleChanged: {
+                                    if (doUpdate) {
+                                        sequencerPad.updatePadNote();
                                     }
                                 }
                                 Connections {

@@ -505,7 +505,7 @@ Zynthian.ScreenPage {
                 RowLayout {
                     id: infoBar
 
-                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     property int topLayerIndex: 0
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
@@ -1170,7 +1170,7 @@ Zynthian.ScreenPage {
                                                 }
                                                 zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                                 zynthian.session_dashboard.selectedTrack = track.id;
-                                                zynthian.zynthiloops.selectedClipCol = track.sceneClip.col
+                                                zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
 
                                                 if (track.connectedPattern >= 0) {
                                                     bottomBar.controlType = BottomBar.ControlType.Pattern;
@@ -1269,7 +1269,7 @@ Zynthian.ScreenPage {
 
                                             // Check if source and destination are same
                                             if (root.copySourceObj.className === "zynthiloops_clip" &&
-                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)) {
+                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)) {
                                                 return true
                                             } else if (root.copySourceObj.className === "zynthiloops_track" &&
                                                        root.copySourceObj.id !== zynthian.session_dashboard.selectedTrack) {
@@ -1294,7 +1294,7 @@ Zynthian.ScreenPage {
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
                                             var sourceClip = root.copySourceObj
-                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
 
                                             // Copy Clip
                                             destClip.copyFrom(sourceClip)

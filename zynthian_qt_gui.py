@@ -1970,7 +1970,7 @@ class zynthian_gui(QObject):
                         clip = track.samples[track.selectedSampleRow]
                     else:
                         logging.debug(f"Clip is a not a track sample")
-                        clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.selectedClipCol)
+                        clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.song.scenesModel.selectedMixIndex)
                     logging.info(f"Recording Clip : {clip}")
                     clip.queueRecording("internal", "*")
                     self.run_start_metronome_and_playback.emit()

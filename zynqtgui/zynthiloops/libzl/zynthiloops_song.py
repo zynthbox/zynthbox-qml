@@ -301,7 +301,7 @@ class zynthiloops_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, track: int, scene: int):
+    def getClip(self, track: int, mix: int):
         # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
         if track >= self.__tracks_model__.count:
             return None
@@ -309,15 +309,15 @@ class zynthiloops_song(QObject):
         track = self.__tracks_model__.getTrack(track)
         # logging.error(track.clipsModel.count)
 
-        if scene >= track.clipsModel.count:
+        if mix >= track.clipsModel.count:
             return None
 
-        clip = track.clipsModel.getClip(scene)
+        clip = track.clipsModel.getClip(mix)
         # logging.error(clip)
         return clip
 
     @Slot(int, int, result=QObject)
-    def getClipByPart(self, track: int, scene: int, part: int):
+    def getClipByPart(self, track: int, mix: int, part: int):
         # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
         if track >= self.__tracks_model__.count:
             return None
@@ -325,10 +325,10 @@ class zynthiloops_song(QObject):
         track = self.__tracks_model__.getTrack(track)
         # logging.error(track.clipsModel.count)
 
-        if scene >= track.getClipsModelByPart(part).count:
+        if mix >= track.getClipsModelByPart(part).count:
             return None
 
-        clip = track.getClipsModelByPart(part).getClip(scene)
+        clip = track.getClipsModelByPart(part).getClip(mix)
         # logging.error(clip)
         return clip
 

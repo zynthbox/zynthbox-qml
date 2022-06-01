@@ -362,7 +362,7 @@ Rectangle {
                                               root.selectedTrack.trackAudioType === "sample-slice"
                                                 ? root.selectedTrack.samples
                                                 : root.selectedTrack.trackAudioType === "sample-loop"
-                                                    ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol), null, null, null, null]
+                                                    ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex), null, null, null, null]
                                                     : [])
                                     : null
 
@@ -466,7 +466,7 @@ Rectangle {
 
                                     WaveFormItem {
                                         property QtObject clip: root.selectedTrack.trackAudioType === "sample-loop"
-                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
+                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                                                                     : root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                                         anchors.fill: parent
@@ -563,11 +563,11 @@ Rectangle {
                                         anchors.fill: parent
                                         onClicked: {
                                             if (root.selectedTrack.trackAudioType === "sample-loop") {
-                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
+                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
 
                                                 if (clip && clip.path && clip.path.length > 0) {
                                                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol);
+                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
                                                     bottomStack.slotsBar.bottomBarButton.checked = true;
                                                     bottomStack.bottomBar.waveEditorAction.trigger();
                                                 }

@@ -218,7 +218,7 @@ Rectangle {
             }
         } else if (type === "sample-loop") {
             if (root.selectedTrack.selectedSlotRow === 0) {
-                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol)
+                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
 
                 if (zynthian.backButtonPressed) {
                     clip.clear()
@@ -846,7 +846,7 @@ Rectangle {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.selectedClipCol).path = file.filePath
+            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).path = file.filePath
         }
     }
 

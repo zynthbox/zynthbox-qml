@@ -100,12 +100,15 @@ class zynthiloops_track(QObject):
         if 0 <= self.__id__ <= 9:
             self.__connected_pattern__ = self.__id__
 
-        self.__song__.scenesModel.selected_mix_index_changed.connect(lambda: self.scene_clip_changed.emit())
+        self.__song__.scenesModel.selected_mix_index_changed.connect(self.mix_index_changed_handler)
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedPartNamesChanged.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
-        self.zyngui.zynthiloops.selectedClipColChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+        try:
+            self.zyngui.zynthiloops.song.scenesModel.selectedMixIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+        except:
+            pass
         self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
 
@@ -128,6 +131,11 @@ class zynthiloops_track(QObject):
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
                         clipForDisabling.enabled = False
 
+        self.selectedPartNamesChanged.emit()
+
+    def mix_index_changed_handler(self):
+        logging.error(f"### Mix index changed")
+        self.scene_clip_changed.emit()
         self.selectedPartNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
@@ -1091,7 +1099,7 @@ class zynthiloops_track(QObject):
     def get_selectedPartNames(self):
         partNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.zyngui.zynthiloops.selectedClipCol)
+            clip = self.getClipsModelByPart(i).getClip(self.zyngui.zynthiloops.song.scenesModel.selectedMixIndex)
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())

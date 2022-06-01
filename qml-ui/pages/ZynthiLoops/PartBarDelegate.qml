@@ -26,7 +26,7 @@ ColumnLayout {
             id: partDelegate
             property int partIndex: index
             property QtObject pattern: root.sequence.getByPart(root.track.id, model.index)
-            property QtObject clip: root.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.selectedClipCol)
+            property QtObject clip: root.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 
             Layout.fillWidth: true

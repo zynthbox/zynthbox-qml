@@ -146,7 +146,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: sceneButton
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Scene %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
+                text: qsTr("Mix %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: scenesMenu.visible = true
@@ -158,7 +158,10 @@ Kirigami.AbstractApplicationWindow {
 
                     interval: 100
                     repeat: false
-                    // onTriggered: Zynthian.CommonUtils.switchToScene(index)
+                    onTriggered: {
+                        zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index
+                        // Zynthian.CommonUtils.switchToScene(index)
+                    }
                 }
 
                 QQC2.Menu {
@@ -169,7 +172,7 @@ Kirigami.AbstractApplicationWindow {
                     Repeater {
                         model: 10
                         delegate: QQC2.MenuItem {
-                            text: qsTr("Scene %1").arg(String.fromCharCode(65 + index).toUpperCase())
+                            text: qsTr("Mix %1").arg(String.fromCharCode(65 + index).toUpperCase())
                             width: parent.width
                             onClicked: {
                                 scenesMenu.close();
@@ -242,7 +245,7 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: sampleLoopButton
 
-                property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.selectedClipCol)
+                property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
 
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
@@ -702,7 +705,7 @@ Kirigami.AbstractApplicationWindow {
             switch (cuia) {
                 case "TRACK_1":
                 case "TRACK_6":
-                    clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -710,7 +713,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "TRACK_2":
                 case "TRACK_7":
-                    clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -718,7 +721,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "TRACK_3":
                 case "TRACK_8":
-                    clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -726,7 +729,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "TRACK_4":
                 case "TRACK_9":
-                    clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -734,7 +737,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "TRACK_5":
                 case "TRACK_10":
-                    clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.selectedClipCol)
+                    clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true

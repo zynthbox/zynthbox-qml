@@ -87,8 +87,7 @@ function switchToScene(index) {
 
     // Disable Existing scene logic as per 250.
     // Current scene implementation might get used later
-    /*zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index;
-    zynthian.zynthiloops.selectedClipCol = index;*/
+    /*zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index;*/
 
     // New scene logic goes below
     zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index

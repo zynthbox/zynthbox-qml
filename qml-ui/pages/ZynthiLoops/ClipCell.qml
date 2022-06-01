@@ -40,7 +40,7 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property bool highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack &&
-                               track.sceneClip.col === zynthian.zynthiloops.selectedClipCol // bottomBar.controlObj === track.sceneClip
+                               track.sceneClip.col === zynthian.zynthiloops.song.scenesModel.selectedMixIndex // bottomBar.controlObj === track.sceneClip
     property color highlightColor: !highlighted &&
                                    track.sceneClip.inCurrentScene &&
                                    ((track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0) || pattern.hasNotes)

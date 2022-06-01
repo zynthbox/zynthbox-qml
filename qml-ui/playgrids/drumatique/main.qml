@@ -88,7 +88,7 @@ Zynthian.BasePlayGrid {
                 }
                 return true;
             }
-            return false;
+            return true;
         }
         var returnValue = false;
         switch (cuia) {
@@ -114,25 +114,27 @@ Zynthian.BasePlayGrid {
                 returnValue = true;
                 break;
             case "SELECT_UP":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex - 1;
-                    returnValue = true;
-                }
+                _private.nextBar();
                 break;
             case "SELECT_DOWN":
-                if (zynthian.session_dashboard.selectedTrack < _private.trackCount) {
-                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex + 1;
-                    returnValue = true;
-                }
+                _private.previousBar();
                 break;
-            case "SELECT_LEFT":
+            //case "SELECT_LEFT":
+                //returnValue = true;
+                //break;
+            //case "SELECT_RIGHT":
+                //returnValue = true;
+                //break;
             case "NAVIGATE_LEFT":
-                _private.goLeft();
+                if (zynthian.session_dashboard.selectedTrack > 0) {
+                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex - 1;
+                }
                 returnValue = true;
                 break;
-            case "SELECT_RIGHT":
             case "NAVIGATE_RIGHT":
-                _private.goRight();
+                if (zynthian.session_dashboard.selectedTrack < _private.trackCount) {
+                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex + 1;
+                }
                 returnValue = true;
                 break;
             case "SWITCH_SELECT_SHORT":
@@ -416,7 +418,7 @@ Zynthian.BasePlayGrid {
         signal activateSelectedItem()
         property bool hasSelection: false
         function previousBar() {
-            if (sequence.activePatternObject.activeBar > -1) {
+            if (sequence.activePatternObject.activeBar > 0) {
                 sequence.activePatternObject.activeBar = sequence.activePatternObject.activeBar - 1;
             }
         }

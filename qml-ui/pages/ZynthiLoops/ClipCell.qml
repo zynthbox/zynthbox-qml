@@ -42,85 +42,22 @@ QQC2.AbstractButton {
     property bool highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack &&
                                track.sceneClip.col === zynthian.zynthiloops.song.scenesModel.selectedMixIndex // bottomBar.controlObj === track.sceneClip
     property color highlightColor: !highlighted &&
-                                   track.sceneClip.inCurrentScene &&
+                                   root.isInScene &&
                                    ((track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0) || pattern.hasNotes)
                                        ? Qt.rgba(255,255,255,0.6)
                                        : highlighted
-                                           ? track.sceneClip.inCurrentScene
+                                           ? root.isInScene
                                                ? Kirigami.Theme.highlightColor
                                                : "#aaf44336"
                                            : "transparent"
-    property bool isInScene: track.selectedPartNames.length > 0 // track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
+    property bool isInScene: track.selectedPartNames.length > 0
 
     property QtObject sequence
     property QtObject pattern
 
-    //Binding {
-        //target: root
-        //property: 'isInScene'
-        //value: track.sceneClip.inCurrentScene || root.song.scenesModel.isClipInScene(track.sceneClip, track.sceneClip.col)
-        //delayed: true
-    //}
-
     onPressed: forceActiveFocus()
 
     contentItem: Item {
-//        TableHeaderLabel {
-//            anchors.centerIn: parent
-//            text: track.sceneClip.path.length > 0 ? "W" : ""
-//            // text: "Clip " + (clip.col+1) // clip.name
-//            // text2: clip.length + " Bar"
-//        }
-        // FIXME: why TableHeaderLabel has a size of 0?
-//        QQC2.Label {
-//            id: label
-//            anchors {
-//                right: parent.right
-//                bottom: parent.bottom
-//            }
-
-//            Connections {
-//                target: track.sceneClip
-//                onPathChanged: textTimer.restart()
-//                onIsPlayingChanged: textTimer.restart()
-//            }
-//            Connections {
-//                target: track
-//                onConnectedPatternChanged: textTimer.restart()
-//            }
-//            Connections {
-//                target: sequence
-//                onIsPlayingChanged: textTimer.restart()
-//            }
-//            Connections {
-//                target: pattern
-//                onLastModifiedChanged: textTimer.restart()
-//            }
-//            Timer {
-//                id: textTimer
-//                interval: 250
-//                onTriggered: {
-//                    if (track.sceneClip.path.length > 0) {
-//                        if (track.sceneClip.isPlaying && track.sceneClip.currentBeat >= 0) {
-//                            label.text = (track.sceneClip.currentBeat+1) + "/" + track.sceneClip.length
-//                        } else {
-//                            label.text = track.sceneClip.length
-//                        }
-//                    } else if (track.connectedPattern >= 0) {
-//                        var hasNotes = pattern.bankHasNotes(0)
-
-//                        label.text = hasNotes
-//                                ? sequence && sequence.isPlaying
-//                                ? (Math.floor(pattern.bankPlaybackPosition/4) + 1) + "/" + (pattern.availableBars*4)
-//                                : (pattern.availableBars*4)
-//                                : ""
-//                    } else {
-//                        label.text =  ""
-//                    }
-//                }
-//            }
-//        }
-
         Image {
             id: patternVisualiser
             anchors.fill: parent
@@ -180,17 +117,6 @@ QQC2.AbstractButton {
                 }
             }
         }
-
-
-//        Kirigami.Icon {
-//            width: 24
-//            height: 24
-//            color: "white"
-//            anchors.centerIn: parent
-
-//            source: "media-playback-start"
-//            visible: root.isPlaying
-//        }
 
         QQC2.Label {
             anchors.centerIn: parent

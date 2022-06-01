@@ -80,8 +80,8 @@ class zynthiloops_scenes_model(QAbstractListModel):
         # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
-            "selectedIndex": self.__selected_mix_index__,
-            "selectedNewIndex": self.__selected_scene_index__,
+            "selectedMixIndex": self.__selected_mix_index__,
+            "selectedSceneIndex": self.__selected_scene_index__,
         }
 
     def deserialize(self, obj):
@@ -95,12 +95,12 @@ class zynthiloops_scenes_model(QAbstractListModel):
                                                                                        clip["part"])
             self.endResetModel()
 
-        if "selectedIndex" in obj:
-            self.__selected_mix_index__ = obj["selectedIndex"]
+        if "selectedMixIndex" in obj:
+            self.__selected_mix_index__ = obj["selectedMixIndex"]
             self.selected_mix_index_changed.emit()
 
-        if "selectedNewIndex" in obj:
-            self.__selected_scene_index__ = obj["selectedNewIndex"]
+        if "selectedSceneIndex" in obj:
+            self.__selected_scene_index__ = obj["selectedSceneIndex"]
             self.selected_scene_index_changed.emit()
 
     def data(self, index, role=None):

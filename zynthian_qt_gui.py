@@ -462,19 +462,15 @@ class zynthian_gui(QObject):
 
         # Create variables for LED control
         self.wsleds_blink = False
-        self.wscolor_off = rpi_ws281x.Color(0, 0, 0)
-        self.wscolor_blue = rpi_ws281x.Color(0, 50, 200)
-        self.wscolor_green = rpi_ws281x.Color(0, 255, 0)
-        self.wscolor_red = rpi_ws281x.Color(247, 124, 124)
-        self.wscolor_yellow = rpi_ws281x.Color(255, 235, 59)
-        self.wscolor_purple = rpi_ws281x.Color(142, 36, 170)
-        self.wscolor_light = self.wscolor_blue
-        self.wscolor_active = self.wscolor_green
-        self.wscolor_admin = self.wscolor_red
-
         self.wsleds_num = 25
         self.wsleds = None
         self.wsleds_blink_count = 0
+        self.wsleds_blink_timer = QTimer()
+        # Set a random interval when initializing
+        # Will be updated by zynthiloops when bpm is set or changes
+        self.wsleds_blink_timer.setInterval(500)
+        self.wsleds_blink_timer.setSingleShot(False)
+        self.wsleds_blink_timer.timeout.connect(self.wsleds_blink_timer_handler)
 
         self.song_bar_active = False
         self.slots_bar_part_active = False
@@ -612,6 +608,8 @@ class zynthian_gui(QObject):
             )
             self.libseq.init(True)
 
+    def wsleds_blink_timer_handler(self):
+        self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
 
     # ---------------------------------------------------------------------------
     # WS281X LEDs
@@ -814,7 +812,7 @@ class zynthian_gui(QObject):
 
         # Light all LEDs
         for i in range(0,25):
-            self.wsleds.setPixelColor(i, self.wscolor_off)
+            self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 0, 0))
         self.wsleds.show()
 
         return self.wsleds_num
@@ -822,16 +820,21 @@ class zynthian_gui(QObject):
     def end_wsleds(self):
         # Light-off all LEDs
         for i in range(0,25):
-            self.wsleds.setPixelColor(i, self.wscolor_off)
+            self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 0, 0))
         self.wsleds.show()
 
     # To blink led call this method in update_wsleds
     # self.wsled_blink(0, self.wscolor_active)
     def wsled_blink(self, i, color):
-        if self.wsleds_blink:
-            self.wsleds.setPixelColor(i, color)
-        else:
-            self.wsleds.setPixelColor(i, self.wscolor_light)
+        try:
+            if self.wsleds_blink:
+                self.wsleds.setPixelColor(i, color)
+            else:
+                if color is not self.led_config.led_color_light:
+                    self.wsleds.setPixelColor(i, self.led_config.led_color_light)
+                else:
+                    self.wsleds.setPixelColor(i, self.led_config.led_color_off)
+        except: pass
 
     def update_wsleds(self):
         if not self.__booting_complete__:
@@ -847,7 +850,7 @@ class zynthian_gui(QObject):
             try:
                 self.led_config.update_button_colors()
 
-                if self.wsleds_blink_count % 6 > 2:
+                if self.wsleds_blink_count % 2 == 1:
                     self.wsleds_blink = True
                 else:
                     self.wsleds_blink = False
@@ -862,9 +865,6 @@ class zynthian_gui(QObject):
 
         # Refresh LEDs
         self.wsleds.show()
-
-        self.wsleds_blink_count += 1
-
 
     # ---------------------------------------------------------------------------
     # MIDI Router Init & Config
@@ -2693,7 +2693,7 @@ class zynthian_gui(QObject):
             #self.refresh_status()
             if self.wsleds:
                 self.update_wsleds()
-            time.sleep(0.2)
+            time.sleep(0.1)
         self.end_wsleds()
 
     # ------------------------------------------------------------------

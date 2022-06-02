@@ -129,6 +129,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
         self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
 
+        self.set_selector_timer = QTimer()
+        self.set_selector_timer.setSingleShot(True)
+        self.set_selector_timer.setInterval(10)
+        self.set_selector_timer.timeout.connect(self.set_selector)
+
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)

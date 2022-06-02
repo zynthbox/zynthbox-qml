@@ -1321,13 +1321,15 @@ Zynthian.ScreenPage {
                                             var destTrack = root.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
                                             destTrack.copyFrom(sourceTrack)
 
-                                            for (var i=0; i<sourceTrack.clipsModel.count; i++) {
-                                                var sourceClip = sourceTrack.clipsModel.getClip(i)
-                                                var destClip = destTrack.clipsModel.getClip(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).getByPart(sourceClip.clipTrack.id, sourceClip.clipTrack.selectedPart)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).getByPart(destClip.clipTrack.id, destClip.clipTrack.selectedPart)
+                                            for (var part=0; part<5; part++) {
+                                                for (var i=0; i<sourceTrack.clipsModel.count; i++) {
+                                                    var sourceClip = sourceTrack.parts[part].getClip(i)
+                                                    var destClip = destTrack.parts[part].getClip(i)
+                                                    var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).getByPart(sourceClip.clipTrack.id, part)
+                                                    var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).getByPart(destClip.clipTrack.id, part)
 
-                                                destPattern.cloneOther(sourcePattern)
+                                                    destPattern.cloneOther(sourcePattern)
+                                                }
                                             }
 
                                             root.copySourceObj = null

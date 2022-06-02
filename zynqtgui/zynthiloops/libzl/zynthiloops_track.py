@@ -488,9 +488,10 @@ class zynthiloops_track(QObject):
     # source : Source zynthiloops_track object
     @Slot(QObject)
     def copyFrom(self, source):
-        # Copy all clips from source track to self
-        for clip_index in range(0, self.__clips_model__.count):
-            self.clipsModel.getClip(clip_index).copyFrom(source.clipsModel.getClip(clip_index))
+        for part in range(5):
+            # Copy all clips from source track to self
+            for clip_index in range(0, self.parts[part].count):
+                self.parts[part].getClip(clip_index).copyFrom(source.parts[part].getClip(clip_index))
 
         source_bank_dir = Path(source.bankDir)
         dest_bank_dir = Path(self.bankDir)

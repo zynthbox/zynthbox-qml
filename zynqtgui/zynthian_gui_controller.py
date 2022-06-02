@@ -513,7 +513,7 @@ class zynthian_gui_controller(QObject):
 			return
 		if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
 			val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)
-			logging.error("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))
+			logging.debug("ZYNCODER %d (%s), RAW VALUE => %s" % (self.index,self.title,val))
 			if self.mult>1:
 				val = int((val+1)/self.mult)
 			return self.set_value(val)

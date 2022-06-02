@@ -465,12 +465,16 @@ class zynthian_gui(QObject):
         self.wsleds_num = 25
         self.wsleds = None
         self.wsleds_blink_count = 0
+
+        # This Timer will be used to blink the leds in sync to BPM when metronome is not running.
+        # When metronome is running, we will be using the metronome callback to blink LED as it is more accurate.
+        # It will also allow us to be in sync with metronome when metronome is running
         self.wsleds_blink_timer = QTimer()
         # Set a random interval when initializing
         # Will be updated by zynthiloops when bpm is set or changes
         self.wsleds_blink_timer.setInterval(500)
         self.wsleds_blink_timer.setSingleShot(False)
-        self.wsleds_blink_timer.timeout.connect(self.wsleds_blink_timer_handler)
+        self.wsleds_blink_timer.timeout.connect(self.increment_blink_count)
 
         self.song_bar_active = False
         self.slots_bar_part_active = False
@@ -608,7 +612,7 @@ class zynthian_gui(QObject):
             )
             self.libseq.init(True)
 
-    def wsleds_blink_timer_handler(self):
+    def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
 
     # ---------------------------------------------------------------------------

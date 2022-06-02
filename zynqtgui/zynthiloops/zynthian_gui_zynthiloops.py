@@ -85,6 +85,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         zynthian_gui_zynthiloops.__instance__ = self
         libzl.registerGraphicTypes()
+
+        self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
         self.is_set_selector_running = False
         self.recorder_process = None
         self.clip_to_record = None
@@ -122,6 +124,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__long_task_count__ = 0
         self.__big_knob_mode__ = ""
         self.__long_operation__ = False
+
+        self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -207,9 +211,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
-        if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/10):
-            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/10)}")
-            self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/10))
+        if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/self.big_knob_track_multiplier):
+            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
+            self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/self.big_knob_track_multiplier))
             self.set_selector()
 
     @Slot(None)
@@ -414,15 +418,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "track"
 
                 try:
-                    selected_track = self.zyngui.session_dashboard.get_selected_track() * 10
+                    selected_track = self.zyngui.session_dashboard.get_selected_track() * self.big_knob_track_multiplier
                 except:
                     selected_track = 0
 
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // 10})")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // self.big_knob_track_multiplier})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
-                                                                {'midi_cc': 0, 'value': selected_track})
+                                                                {'midi_cc': 0, 'value': selected_track, 'step': 1})
 
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
                                                                   self)
@@ -430,10 +434,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_track', 'name': 'zynthiloops_track', 'short_name': 'zynthiloops_track', 'midi_cc': 0,
-                     'value_max': 90, 'value': selected_track})
+                     'value_max': 9*self.big_knob_track_multiplier, 'value': selected_track, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
-                self.__zselector[0].custom_encoder_speed = 0
+
+                if not self.isZ2V3:
+                    self.__zselector[0].custom_encoder_speed = 0
         except:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()

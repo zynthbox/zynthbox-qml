@@ -152,6 +152,7 @@ from zynqtgui.zynthian_gui_synth_behaviour import zynthian_gui_synth_behaviour
 from zynqtgui.zynthian_gui_snapshots_menu import zynthian_gui_snapshots_menu
 from zynqtgui.zynthian_gui_network import zynthian_gui_network
 from zynqtgui.zynthian_gui_hardware import zynthian_gui_hardware
+from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 
 from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
@@ -1028,6 +1029,7 @@ class zynthian_gui(QObject):
         self.screens["network"] = zynthian_gui_network(self)
         self.screens["network_info"] = self.screens["network"]
         self.screens["hardware"] = zynthian_gui_hardware(self)
+        self.screens["test_knobs"] = zynthian_gui_test_knobs(self)
 
         # self.screens['touchscreen_calibration'] = zynthian_gui_touchscreen_calibration(self)
         # Create UI Apps Screens
@@ -3289,6 +3291,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def wifi_settings(self):
         return self.screens["wifi_settings"]
+
+    @Property(QObject, constant=True)
+    def test_knobs(self):
+        return self.screens["test_knobs"]
 
     @Property(QObject, constant=True)
     def synth_behaviour(self):

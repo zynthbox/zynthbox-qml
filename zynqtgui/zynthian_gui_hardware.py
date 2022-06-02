@@ -60,6 +60,7 @@ class zynthian_gui_hardware(zynthian_gui_selector):
         self.list_data.append((self.test_midi, 0, "Start Test MIDI"))
         self.list_data.append((self.kill_command, 0, "Stop Test MIDI"))
         self.list_data.append((self.test_touchpoints, 0, "Test Touchpoints"))
+        self.list_data.append((self.test_knobs, 0, "Test Knobs"))
         self.list_data.append(
             (self.zyngui.calibrate_touchscreen, 0, "Calibrate Touchscreen")
         )
@@ -207,6 +208,10 @@ class zynthian_gui_hardware(zynthian_gui_selector):
     def test_touchpoints(self):
         logging.info("Testing Touchpoints")
         self.zyngui.show_modal("test_touchpoints")
+
+    def test_knobs(self):
+        logging.info("Testing Knobs")
+        self.zyngui.show_modal("test_knobs")
 
     def last_state_action(self):
         if (

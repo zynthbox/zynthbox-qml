@@ -116,7 +116,8 @@ QtObject {
         "network_info": "NetworkInfoPage.qml",
         "guioptions" : "GuiOptionsPage.qml",
         "sound_categories": "SoundCategories/Main.qml",
-        "wifi_settings":"WifiSettingsPage.qml"
+        "wifi_settings":"WifiSettingsPage.qml",
+        "test_knobs":"TestKnobsPage.qml"
     }
 
     readonly property var dashboardScreens: {

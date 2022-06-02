@@ -241,7 +241,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                         'color': self.led_color_yellow,
                         'blink': False
                     }
-            elif self.slotsBarFxActive:
+            elif self.zyngui.slotsBarFxActive:
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_blue,

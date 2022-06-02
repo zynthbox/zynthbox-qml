@@ -174,6 +174,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             libzl.registerTimerCallback(libzlCb)
 
             self.metronomeBeatUpdate4th.connect(self.metronome_update)
+            self.metronomeBeatUpdate8th.connect(self.zyngui.increment_blink_count)
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
             self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
@@ -1279,7 +1280,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def metronome_update(self, beat):
         self.__current_beat__ = beat
-        self.zyngui.increment_blink_count()
 
         # if self.countInValue > 0:
         #     self.countInValue -= 1

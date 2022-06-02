@@ -477,7 +477,7 @@ class zynthiloops_song(QObject):
 
             # Update blink timer interval with change in bpm
             self.zyngui.wsleds_blink_timer.stop()
-            self.zyngui.wsleds_blink_timer.setInterval(60000/bpm)
+            self.zyngui.wsleds_blink_timer.setInterval(60000/(2*bpm))
 
             # Start blink timer only if metronome is not running
             # If metronome is running it is already blinking in sync with bpm

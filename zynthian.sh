@@ -154,6 +154,11 @@ while true; do
     export QT_SCREEN_SCALE_FACTORS=1
     export QT_AUTO_SCREEN_SCALE_FACTOR=0
     export QT_QPA_PLATFORMTHEME=generic
+    
+    ############################
+    # FIXME : Temporarily default to debug mode
+    export ZYNTHBOX_DEBUG=1
+    ############################
 
     if command -v kwin_x11 &> /dev/null
     then

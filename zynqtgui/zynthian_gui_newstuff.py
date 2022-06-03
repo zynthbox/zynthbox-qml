@@ -61,10 +61,13 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
                     self.list_data.append((entry_status,index,entry_name))
 
         super().fill_list()
+        self.set_selector()
 
     def select_action(self, i, t='S'):
         if i < 0 or i >= len(self.list_data):
             return
+
+        self.select(i)
 
     def set_select_path(self):
         self.select_path = "Download"

@@ -216,9 +216,14 @@ Kirigami.AbstractApplicationWindow {
             }
             Zynthian.BreadcrumbButton {
                 id: samplesButton
+
+                property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
+
                 icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Sample %1 ˬ").arg(root.selectedTrack.selectedSampleRow + 1)
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                text: qsTr("Sample %1 ˬ %2")
+                        .arg(root.selectedTrack.selectedSampleRow + 1)
+                        .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                 rightPadding: Kirigami.Units.largeSpacing*2
                 onClicked: samplesMenu.visible = true
                 visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0

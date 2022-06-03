@@ -66,6 +66,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def sync_selector_visibility(self):
         self.fill_list()
+        self.set_selector()
 
     def fill_list(self):
         self.list_data = []
@@ -135,7 +136,6 @@ class zynthian_gui_main(zynthian_gui_selector):
                     logging.error(e)
 
         super().fill_list()
-        self.set_selector()
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":

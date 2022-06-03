@@ -509,7 +509,8 @@ class zynthian_gui_controller(QObject):
 	def read_zyncoder(self):
 		#if self.canvas_push_ts:
 		#	return
-		if not self.__visible:
+		is_external_app = hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
+		if not self.__visible or is_external_app:
 			return
 		if self.zctrl and zyncoder.lib_zyncoder.get_value_flag_zynpot(self.index):
 			val=zyncoder.lib_zyncoder.get_value_zynpot(self.index)

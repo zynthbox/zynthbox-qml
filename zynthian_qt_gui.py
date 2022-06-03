@@ -583,6 +583,8 @@ class zynthian_gui(QObject):
 
         self.__fake_keys_pressed = set()
         self.__old_bk_value = 0 # FIXME: hack
+        self.__bk_fake_key = None
+        self.__bk_last_turn_time = None
 
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
@@ -1913,10 +1915,19 @@ class zynthian_gui(QObject):
         if not lib_zyncoder: return
         last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
         i = 0
+        is_external_app = hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
+
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
 
-            if dtus == 0:
+            if is_external_app:
+                if dtus == 0:
+                    if self.fake_key_event_for_zynswitch(i, True):
+                        return
+                elif dtus > 0:
+                    if self.fake_key_event_for_zynswitch(i, False):
+                        return
+            elif dtus == 0:
                 # logging.error("key press: {} {}".format(i, dtus))
 
                 # Handle alt button
@@ -1975,28 +1986,45 @@ class zynthian_gui(QObject):
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 
-            if dtus < 0:
-                pass
-            elif dtus>zynthian_gui_config.zynswitch_long_us:
-                self.zynswitch_long_triggered.emit(i)
-            elif dtus>zynthian_gui_config.zynswitch_bold_us:
-                # Double switches must be bold!!! => by now ...
-                if not self.zynswitch_double(i):
-                    self.zynswitch_bold_triggered.emit(i)
-            elif dtus>0:
-                #print("Switch "+str(i)+" dtus="+str(dtus))
-                self.zynswitch_short_triggered.emit(i)
+            if not is_external_app:
+                if dtus < 0:
+                    pass
+                elif dtus>zynthian_gui_config.zynswitch_long_us:
+                    self.zynswitch_long_triggered.emit(i)
+                elif dtus>zynthian_gui_config.zynswitch_bold_us:
+                    # Double switches must be bold!!! => by now ...
+                    if not self.zynswitch_double(i):
+                        self.zynswitch_bold_triggered.emit(i)
+                elif dtus>0:
+                    #print("Switch "+str(i)+" dtus="+str(dtus))
+                    self.zynswitch_short_triggered.emit(i)
             i += 1;
 
-        bk_value = zyncoder.lib_zyncoder.get_value_zynpot(2)
-        if zynthian_gui_config.top.isActive() != True and self.__old_bk_value != bk_value:
+        bk_value = zyncoder.lib_zyncoder.get_value_zynpot(3)
+        delta = 0
+        if self.__bk_last_turn_time != None and self.__bk_last_turn_time > 0:
+            delta = time.time() * 1000 - self.__bk_last_turn_time
+        if is_external_app and self.__old_bk_value != bk_value:
             fake_key = None
             if self.__old_bk_value > bk_value:
                 fake_key = Key.left
             else:
                 fake_key = Key.right
-            self.fakeKeyboard.press(fake_key)
-            self.fakeKeyboard.release(fake_key)
+            if fake_key != self.__bk_fake_key and self.__bk_fake_key != None:
+                self.fakeKeyboard.release(self.__bk_fake_key)
+                self.__bk_fake_key = None
+            elif self.__bk_fake_key != None:
+                self.fakeKeyboard.press(fake_key)
+            self.__bk_fake_key = fake_key
+            if bk_value == 0 or bk_value >= 40:
+                zyncoder.lib_zyncoder.set_value_zynpot(3, 20, 1)
+                self.__old_bk_value = bk_value = 20
+            self.__bk_last_turn_time = time.time() * 1000
+        elif delta > 50 and self.__bk_fake_key != None:
+            self.fakeKeyboard.release(self.__bk_fake_key)
+            self.__bk_fake_key = None
+            self.__bk_last_turn_time = None
+
         self.__old_bk_value = bk_value;
 
     zynswitch_short_triggered = Signal(int)
@@ -2007,7 +2035,7 @@ class zynthian_gui(QObject):
         fake_key = None
 
         # ALT
-        if i == 17:
+        if hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False and i == 17:
             fake_key = Key.space
 
         # NAV CLUSTER

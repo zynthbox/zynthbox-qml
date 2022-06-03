@@ -37,7 +37,7 @@ MouseArea {
     Layout.minimumWidth: Kirigami.Units.gridUnit * 10
     Layout.fillHeight: true
 
-    onClicked: popup.visible = true
+    onClicked: zynthian.globalPopupOpened = true
 
     ColumnLayout {
         anchors {
@@ -322,12 +322,14 @@ MouseArea {
 
     QQC2.Popup {
         id: popup
+        visible: zynthian.globalPopupOpened
         exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
         y: parent.height
         modal: true
         width: Kirigami.Units.gridUnit * 20
         height: Kirigami.Units.gridUnit * 15
         x: parent.width - width
+        onClosed: zynthian.globalPopupOpened = false
         contentItem: GridLayout {
             columns: 3
             Card {

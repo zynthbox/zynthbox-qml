@@ -581,6 +581,7 @@ class zynthian_gui(QObject):
         self.jackd_options = zynconf.get_jackd_options()
 
         self.__fake_keys_pressed = set()
+        self.__old_bk_value = 0 # FIXME: hack
 
         # Initialize peakmeter audio monitor if needed
         if not zynthian_gui_config.show_cpu_status:
@@ -1984,6 +1985,17 @@ class zynthian_gui(QObject):
                 self.zynswitch_short_triggered.emit(i)
             i += 1;
 
+        bk_value = zyncoder.lib_zyncoder.get_value_zynpot(2)
+        if zynthian_gui_config.top.isActive() != True and self.__old_bk_value != bk_value:
+            fake_key = None
+            if self.__old_bk_value > bk_value:
+                fake_key = Key.left
+            else:
+                fake_key = Key.right
+            self.fakeKeyboard.press(fake_key)
+            self.fakeKeyboard.release(fake_key)
+        self.__old_bk_value = bk_value;
+
     zynswitch_short_triggered = Signal(int)
     zynswitch_long_triggered = Signal(int)
     zynswitch_bold_triggered = Signal(int)
@@ -1992,8 +2004,8 @@ class zynthian_gui(QObject):
         fake_key = None
 
         # ALT
-        # if i == 17:
-        #     fake_key = Key.ctrl
+        if i == 17:
+            fake_key = Key.space
 
         # NAV CLUSTER
         if i == 23:

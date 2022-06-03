@@ -61,6 +61,9 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
                     self.list_data.append((entry_status,index,entry_name))
 
         super().fill_list()
+
+    def update_list(self):
+        self.fill_list()
         self.set_selector()
 
     def select_action(self, i, t='S'):
@@ -82,10 +85,10 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
 
     def set_newstuff_model(self,new_model):
         self.newstuff_model_data = new_model
-        self.newstuff_model_data.rowsInserted.connect(self.fill_list)
-        self.newstuff_model_data.rowsRemoved.connect(self.fill_list)
-        self.newstuff_model_data.dataChanged.connect(self.fill_list)
-        self.newstuff_model_data.modelReset.connect(self.fill_list)
+        self.newstuff_model_data.rowsInserted.connect(self.update_list)
+        self.newstuff_model_data.rowsRemoved.connect(self.update_list)
+        self.newstuff_model_data.dataChanged.connect(self.update_list)
+        self.newstuff_model_data.modelReset.connect(self.update_list)
         self.newstuff_model_data.destroyed.connect(self.background_model_deleted)
         self.newstuff_model_changed.emit()
 

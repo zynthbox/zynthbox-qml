@@ -367,81 +367,91 @@ Rectangle {
                                     : null
 
                                     delegate: Rectangle {
-                                        id: delegate
-
                                         property bool highlighted: root.selectedTrack.selectedSlotRow === index
-                                        property QtObject volumeControlObj: zynthian.layers_for_track.volume_controls[index]
-                                        property real volumePercent: volumeControlObj
-                                                                        ? (volumeControlObj.value - volumeControlObj.value_min)/(volumeControlObj.value_max - volumeControlObj.value_min)
-                                                                        : 0
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
                                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-
-                                        Kirigami.Theme.inherit: false
-                                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                        color: Kirigami.Theme.backgroundColor
-
-                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "#ff999999"
-                                        border.width: 1
+                                        border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
+                                        border.width: 2
+                                        color: "transparent"
                                         radius: 4
 
-                                        // For loop and slice modes only first slot is visible.
-                                        // For other modes all slots are visible
-                                        enabled: root.selectedTrack.trackAudioType === "sample-loop" ||
-                                                 root.selectedTrack.trackAudioType === "sample-slice"
-                                                    ? index === 0
-                                                    : true
-                                        opacity: enabled ? 1 : 0
-
                                         Rectangle {
-                                            width: parent.width * delegate.volumePercent
-                                            anchors {
-                                                left: parent.left
-                                                top: parent.top
-                                                bottom: parent.bottom
-                                            }
-                                            visible: root.selectedTrack.trackAudioType === "synth" &&
-                                                     synthNameLabel.text.trim().length > 0
+                                            id: delegate
 
-                                            color: Kirigami.Theme.highlightColor
-                                        }
+                                            property QtObject volumeControlObj: zynthian.layers_for_track.volume_controls[index]
+                                            property real volumePercent: volumeControlObj
+                                                                            ? (volumeControlObj.value - volumeControlObj.value_min)/(volumeControlObj.value_max - volumeControlObj.value_min)
+                                                                            : 0
 
-                                        QQC2.Label {
-                                            id: synthNameLabel
-                                            anchors {
-                                                verticalCenter: parent.verticalCenter
-                                                left: parent.left
-                                                right: parent.right
-                                                leftMargin: Kirigami.Units.gridUnit*0.5
-                                                rightMargin: Kirigami.Units.gridUnit*0.5
-                                            }
-                                            horizontalAlignment: Text.AlignLeft
-                                            text: root.selectedTrack.trackAudioType === "synth"
-                                                    ? modelData
-                                                    : (root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                      root.selectedTrack.trackAudioType === "sample-slice" ||
-                                                      root.selectedTrack.trackAudioType === "sample-loop") &&
-                                                      modelData
-                                                        ? modelData.path.split("/").pop()
-                                                        : ""
-
-                                            elide: "ElideRight"
-                                        }
-
-                                        MouseArea {
                                             anchors.fill: parent
-                                            onClicked: {
-                                                if (index !== root.selectedTrack.selectedSlotRow) {
-                                                    root.selectedTrack.selectedSlotRow = index
+                                            anchors.margins: 4
 
-                                                    // Also set the selectedSampleRow to index when trackAudioType is not sample-loop
-                                                    if (root.selectedTrack.trackAudioType !== "sample-loop") {
-                                                        root.selectedTrack.selectedSampleRow = index
+                                            Kirigami.Theme.inherit: false
+                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                            color: Kirigami.Theme.backgroundColor
+
+                                            border.color: "#ff999999"
+                                            border.width: 1
+                                            radius: 4
+
+                                            // For loop and slice modes only first slot is visible.
+                                            // For other modes all slots are visible
+                                            enabled: root.selectedTrack.trackAudioType === "sample-loop" ||
+                                                     root.selectedTrack.trackAudioType === "sample-slice"
+                                                        ? index === 0
+                                                        : true
+                                            opacity: enabled ? 1 : 0
+
+                                            Rectangle {
+                                                width: parent.width * delegate.volumePercent
+                                                anchors {
+                                                    left: parent.left
+                                                    top: parent.top
+                                                    bottom: parent.bottom
+                                                }
+                                                visible: root.selectedTrack.trackAudioType === "synth" &&
+                                                         synthNameLabel.text.trim().length > 0
+
+                                                color: Kirigami.Theme.highlightColor
+                                            }
+
+                                            QQC2.Label {
+                                                id: synthNameLabel
+                                                anchors {
+                                                    verticalCenter: parent.verticalCenter
+                                                    left: parent.left
+                                                    right: parent.right
+                                                    leftMargin: Kirigami.Units.gridUnit*0.5
+                                                    rightMargin: Kirigami.Units.gridUnit*0.5
+                                                }
+                                                horizontalAlignment: Text.AlignLeft
+                                                text: root.selectedTrack.trackAudioType === "synth"
+                                                        ? modelData
+                                                        : (root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                          root.selectedTrack.trackAudioType === "sample-slice" ||
+                                                          root.selectedTrack.trackAudioType === "sample-loop") &&
+                                                          modelData
+                                                            ? modelData.path.split("/").pop()
+                                                            : ""
+
+                                                elide: "ElideRight"
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                    if (index !== root.selectedTrack.selectedSlotRow) {
+                                                        root.selectedTrack.selectedSlotRow = index
+
+                                                        // Also set the selectedSampleRow to index when trackAudioType is not sample-loop
+                                                        if (root.selectedTrack.trackAudioType !== "sample-loop") {
+                                                            root.selectedTrack.selectedSampleRow = index
+                                                        }
+                                                    } else {
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                                                     }
-                                                } else {
-                                                    bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                                                 }
                                             }
                                         }

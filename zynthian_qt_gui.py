@@ -457,6 +457,7 @@ class zynthian_gui(QObject):
         self.__left_button_pressed__ = False
         self.__down_button_pressed__ = False
         self.__right_button_pressed__ = False
+        self.__global_popup_opened__ = False
 
         # When true, 1-5 buttons selects track 6-10
         self.tracks_mod_active = False
@@ -1708,7 +1709,9 @@ class zynthian_gui(QObject):
             self.show_modal("playgrid")
 
         elif cuia == "SCREEN_AUDIO_SETTINGS":
-            self.toggle_modal("audio_settings")
+            # Toggle global top right popup instead of opening audio settings page
+            # self.toggle_modal("audio_settings")
+            self.globalPopupOpened = not self.globalPopupOpened
 
         elif cuia == "MODAL_SNAPSHOT_LOAD":
             self.toggle_modal("snapshot", "LOAD")
@@ -3575,6 +3578,20 @@ class zynthian_gui(QObject):
 
     isBootingComplete = Property(bool, get_isBootingComplete, notify=isBootingCompleteChanged)
     ### END Property isBootingComplete
+
+    ### Property globalPopupOpened
+    def get_globalPopupOpened(self):
+        return self.__global_popup_opened__
+
+    def set_globalPopupOpened(self, opened):
+        if self.__global_popup_opened__ != opened:
+            self.__global_popup_opened__ = opened
+            self.globalPopupOpenedChanged.emit()
+
+    globalPopupOpenedChanged = Signal()
+
+    globalPopupOpened = Property(bool, get_globalPopupOpened, set_globalPopupOpened, notify=globalPopupOpenedChanged)
+    ### END Property globalPopupOpened
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

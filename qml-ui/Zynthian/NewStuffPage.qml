@@ -39,14 +39,14 @@ Zynthian.SelectorPage {
     cuiaCallback: function(cuia) {
         switch (cuia) {
             case "SELECT_UP":
-                if (mainView.currentIndex > 0) {
-                    mainView.currentIndex -= 1
+                if (selector.current_index > 0) {
+                    selector.current_index -= 1
                 }
                 return true;
 
             case "SELECT_DOWN":
-                if (mainView.currentIndex < mainView.count - 1) {
-                    mainView.currentIndex += 1
+                if (selector.current_index < mainView.count - 1) {
+                    selector.current_index += 1
                 }
                 return true;
         }
@@ -187,6 +187,7 @@ Zynthian.SelectorPage {
                 rightMargin: proxyView.width + Kirigami.Units.smallSpacing + Kirigami.Units.largeSpacing
             }
             model: newStuffModel
+            currentIndex: selector.current_index
             delegate: newStuffDelegate
             clip: true
             onCurrentIndexChanged: {
@@ -206,7 +207,7 @@ Zynthian.SelectorPage {
         pixelAligned: true
         clip: true
         model: newStuffModel
-        currentIndex: mainView.currentIndex
+        currentIndex: selector.current_index
         onCurrentIndexChanged: {
             positionViewAtIndex(currentIndex, ListView.Beginning);
         }

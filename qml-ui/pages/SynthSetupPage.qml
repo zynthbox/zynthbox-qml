@@ -35,6 +35,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
+    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_track", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
 
     backAction: Kirigami.Action {
@@ -241,8 +242,6 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
                 visible: root.isVisible
-
-                property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
@@ -600,11 +599,9 @@ Zynthian.ScreenPage {
                         }
                     }
                     QQC2.Button {
-                        property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        visible: selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
                         text: qsTr("Change preset")
                         onClicked: {
                             zynthian.current_screen_id = "preset"
@@ -624,6 +621,24 @@ Zynthian.ScreenPage {
 
                             layerSetupDialog.accept();
                             applicationWindow().layerSetupDialogLoadSoundClicked();
+                        }
+                    }
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                    }
+                    QQC2.Button {
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        text: qsTr("Remove Synth")
+                        onClicked: {
+                            layerSetupDialog.accept();
+                            if (root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)) {
+                                root.selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+                            }
                         }
                     }
                     // As per #299 Hide "Pick Existing.." from new synth popup

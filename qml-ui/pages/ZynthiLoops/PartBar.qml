@@ -48,6 +48,8 @@ Rectangle {
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 
+    signal clicked()
+
     function cuiaCallback(cuia) {
         console.log("### Part Bar CUIA Callback :", cuia)
 
@@ -170,6 +172,7 @@ Rectangle {
                                 root.selectedPartTrack = partBarDelegate.track
                                 root.selectedPartClip = partBarDelegate.selectedPartClip
                                 root.selectedPartPattern = partBarDelegate.selectedPartPattern
+                                root.clicked()
                             }
                         }
                     }

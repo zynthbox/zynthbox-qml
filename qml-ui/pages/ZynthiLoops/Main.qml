@@ -1240,7 +1240,9 @@ Zynthian.ScreenPage {
                                                                     ? qsTr("Track")
                                                                     : root.lastSelectedObj.className === "zynthiloops_mix"
                                                                         ? qsTr("Sketch")
-                                                                        : ""
+                                                                        : root.lastSelectedObj.className === "zynthiloops_part"
+                                                                          ? qsTr("Part")
+                                                                          : ""
                                                               : "")
                                     visible: root.copySourceObj == null
                                     onClicked: {
@@ -1284,7 +1286,11 @@ Zynthian.ScreenPage {
                                             } else if (root.copySourceObj.className === "zynthiloops_mix" &&
                                                        root.copySourceObj.mixIndex !== root.song.scenesModel.selectedMixIndex) {
                                                 return true
-                                            }
+                                            } else if (root.copySourceObj.className === "zynthiloops_part" &&
+                                                       root.copySourceObj.partClip !== root.lastSelectedObj.partClip &&
+                                                       root.lastSelectedObj.className === "zynthiloops_part") {
+                                               return true
+                                           }
                                         }
 
                                         return false
@@ -1296,7 +1302,9 @@ Zynthian.ScreenPage {
                                                                            ? qsTr("Track")
                                                                            : root.copySourceObj.className === "zynthiloops_mix"
                                                                                ? qsTr("Sketch")
-                                                                               : ""
+                                                                               : root.lastSelectedObj.className === "zynthiloops_part"
+                                                                                 ? qsTr("Part")
+                                                                                 : ""
                                                                    : "")
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
@@ -1350,6 +1358,18 @@ Zynthian.ScreenPage {
                                             root.copySourceObj = null
 
                                             zynthian.stop_loading()
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_part") {
+                                            var sourceClip = root.copySourceObj.partClip
+                                            var destClip = root.lastSelectedObj.partClip
+
+                                            // Copy Clip
+                                            destClip.copyFrom(sourceClip)
+                                            // Copy pattern
+                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(sourceClip.col + 65)).getByPart(sourceClip.clipTrack.id, sourceClip.clipTrack.selectedPart)
+                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(destClip.col + 65)).getByPart(destClip.clipTrack.id, destClip.clipTrack.selectedPart)
+                                            destPattern.cloneOther(sourcePattern)
+
+                                            root.copySourceObj = null
                                         }
                                     }
                                 }
@@ -1418,6 +1438,12 @@ Zynthian.ScreenPage {
                     id: partBar
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    onClicked: {
+                        root.lastSelectedObj = {
+                            className: "zynthiloops_part",
+                            partClip: partBar.selectedPartClip
+                        }
+                    }
                 }
             }
         }

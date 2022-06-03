@@ -523,8 +523,6 @@ Zynthian.ScreenPage {
                     onClipChanged: updateSoundNameTimer.restart()
 
                     function updateInfoBar() {
-                        console.log("### Updating info bar :", Date.now())
-
                         var layerIndex = -1;
                         var count = 0;
 
@@ -698,7 +696,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         text: qsTr("%1 %2")
-                                .arg(infoBar.clip ? infoBar.clip.name : "")
+                                .arg("T" + (zynthian.session_dashboard.selectedTrack+1))
                                 .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
                     }
                 }

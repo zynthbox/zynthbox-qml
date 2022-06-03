@@ -109,7 +109,8 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            enabled: false
+            text: qsTr("Close")
+            onTriggered: Qt.callLater(function() { zynthian.show_modal("zynthiloops") })
         },
         Kirigami.Action {
             enabled: false

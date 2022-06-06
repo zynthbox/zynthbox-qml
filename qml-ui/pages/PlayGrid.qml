@@ -631,6 +631,15 @@ don't want to have to dig too far...
      * works (it's a single instance location which is always loaded)
      */
 
+    Connections {
+        target: ZynQuick.PlayGridManager.syncTimer
+        onAddedHardwareInputDevice: {
+            applicationWindow().showPassiveNotification("New Midi Input Detected: " + humanReadableName);
+        }
+        onRemovedHardwareInputDevice: {
+            applicationWindow().showPassiveNotification("Removed Midi Input Device: " + humanReadableName);
+        }
+    }
     Binding {
         target: ZynQuick.PlayGridManager
         property: "zlDashboard"

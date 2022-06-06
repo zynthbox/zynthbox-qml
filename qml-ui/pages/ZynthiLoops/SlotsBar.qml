@@ -44,6 +44,7 @@ Rectangle {
     property alias synthsButton: synthsButton
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
+    property alias soundCombinatorButton: soundCombinatorButton
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
@@ -357,6 +358,8 @@ Rectangle {
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
 
+                        //// INVISIBLE BUTTONS
+
                         QQC2.Button {
                             id: bottomBarButton
                             Layout.fillWidth: true
@@ -374,21 +377,6 @@ Rectangle {
                         }
 
                         QQC2.Button {
-                            id: trackButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            checked: true
-                            text: qsTr("Track")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 3
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
                             id: mixerButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -398,6 +386,38 @@ Rectangle {
                             onCheckedChanged: {
                                 if (checked) {
                                     bottomStack.currentIndex = 1
+                                    updateLedVariablesTimer.restart()
+                                }
+                            }
+                        }
+
+                        QQC2.Button {
+                            id: soundCombinatorButton
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            visible: false
+                            text: qsTr("Sound Combinator")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    bottomStack.currentIndex = 5
+                                    updateLedVariablesTimer.restart()
+                                }
+                            }
+                        }
+
+                        //// INVISIBLE BUTTONS
+
+                        QQC2.Button {
+                            id: trackButton
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            checkable: true
+                            checked: true
+                            text: qsTr("Track")
+                            onCheckedChanged: {
+                                if (checked) {
+                                    bottomStack.currentIndex = 3
                                     updateLedVariablesTimer.restart()
                                 }
                             }

@@ -51,7 +51,7 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()

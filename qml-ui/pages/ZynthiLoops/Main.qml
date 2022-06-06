@@ -768,7 +768,7 @@ Zynthian.ScreenPage {
                         highlightOnFocus: false
                         highlighted: root.displayMixButtons
                         text: root.song.name
-                        subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedMixIndex + 1)
+                        subText: qsTr("Sketch %1").arg(root.song.scenesModel.selectedMixName)
 
                         textSize: 10
                         subTextSize: 8
@@ -900,8 +900,6 @@ Zynthian.ScreenPage {
                         Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
                         Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
-
-//                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedMixIndex).name)
 
                         textSize: 11
                         subTextSize: 9
@@ -1197,7 +1195,7 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        sequence: root.visible && zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+                                        sequence: root.visible && zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                         onClicked: {
@@ -1391,8 +1389,8 @@ Zynthian.ScreenPage {
 
                                             for (var i=0; i<root.song.tracksModel.count; i++) {
                                                 var track = root.song.tracksModel.getTrack(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.copySourceObj.mixIndex + 65)).getByPart(track.id, track.selectedPart)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedMixIndex + 65)).getByPart(track.id, track.selectedPart)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(root.copySourceObj.mixIndex+1)).getByPart(track.id, track.selectedPart)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedMixName).getByPart(track.id, track.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)
                                             }
@@ -1430,7 +1428,7 @@ Zynthian.ScreenPage {
                                         // Try clearing pattern if exists.
                                         try {
                                             if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("Scene "+String.fromCharCode(root.song.scenesModel.selectedMixIndex + 65)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
+                                                ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedMixName).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
                                             }
                                         } catch(e) {}
                                     }

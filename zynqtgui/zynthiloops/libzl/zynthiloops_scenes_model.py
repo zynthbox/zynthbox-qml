@@ -171,7 +171,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     ### Property selectedMixName
     def get_selected_mix_name(self):
-        return chr(self.__selected_mix_index__ + 65)
+        return f"S{self.__selected_mix_index__ + 1}"
 
     selectedMixName = Property(str, get_selected_mix_name, notify=selected_mix_name_changed)
     ### END Property selectedMixName

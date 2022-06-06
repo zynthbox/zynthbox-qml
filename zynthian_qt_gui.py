@@ -1690,7 +1690,10 @@ class zynthian_gui(QObject):
                 self.show_screen("main")
 
         elif cuia == "SCREEN_ADMIN":
-            self.show_modal("admin")
+            # Do not handle 5th under screen button globally.
+            # This button has specific behaviour for ZL page. Not sure about other pages
+            # self.show_modal("admin")
+            pass
 
         elif cuia == "SCREEN_LAYER":
             self.show_screen("layers_for_track")

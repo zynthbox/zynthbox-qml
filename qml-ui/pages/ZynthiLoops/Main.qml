@@ -719,8 +719,8 @@ Zynthian.ScreenPage {
 
                     TableHeader {
                         id: songCell
-                        Layout.preferredWidth: privateProps.headerWidth + 8
-                        Layout.maximumWidth: privateProps.headerWidth + 8
+                        Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
+                        Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
 
                         highlightOnFocus: false
@@ -855,8 +855,8 @@ Zynthian.ScreenPage {
                     spacing: 1
 
                     TableHeader {
-                        Layout.preferredWidth: privateProps.headerWidth + 8
-                        Layout.maximumWidth: privateProps.headerWidth + 8
+                        Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
+                        Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
 
 //                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedMixIndex).name)
@@ -997,8 +997,8 @@ Zynthian.ScreenPage {
                     spacing: 1
 
                     ListView {
-                        Layout.preferredWidth: privateProps.headerWidth + 8
-                        Layout.maximumWidth: privateProps.headerWidth + 8
+                        Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
+                        Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
 
                         clip: true
@@ -1213,13 +1213,13 @@ Zynthian.ScreenPage {
                     Item {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
-                        Layout.preferredWidth: privateProps.headerWidth*2
+                        Layout.preferredWidth: privateProps.headerWidth*1.5
 
                         // Create a rectangle with 2 header cell width and 3 cell height to cover the entire empty header space
                         Rectangle {
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            width: privateProps.headerWidth*2
+                            width: privateProps.headerWidth*1.5
                             height: privateProps.headerHeight*3 + 2 // 3 cell height + 2 spacing height in between
                             color: Kirigami.Theme.backgroundColor
 

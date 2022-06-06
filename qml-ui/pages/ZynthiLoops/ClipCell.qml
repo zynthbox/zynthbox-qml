@@ -87,7 +87,9 @@ QQC2.AbstractButton {
                          track.sceneClip.currentBeat >= 0
                             ? (track.sceneClip.currentBeat+1) + "/"
                             : "")
-                    .arg(track.sceneClip.length.toFixed(2))
+                    .arg(track.sceneClip.snapLengthToBeat
+                            ? track.sceneClip.length.toFixed(0)
+                            : track.sceneClip.length.toFixed(2))
                 : ""
         }
 

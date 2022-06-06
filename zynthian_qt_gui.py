@@ -855,7 +855,7 @@ class zynthian_gui(QObject):
             self.rainbow_led_counter = self.rainbow_led_counter % 359
 
             return
-        else:
+        elif not self.is_external_app_active():
             try:
                 self.led_config.update_button_colors()
 
@@ -871,6 +871,9 @@ class zynthian_gui(QObject):
                         self.wsleds.setPixelColor(button_id, button["color"])
             except:
                 pass
+        else:
+            for i in range(0, 25):
+                self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 50, 200))
 
         # Refresh LEDs
         self.wsleds.show()
@@ -1459,6 +1462,9 @@ class zynthian_gui(QObject):
     def is_single_active_channel(self):
         return zynthian_gui_config.midi_single_active_channel
 
+    def is_external_app_active(self):
+        return hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
+
     # -------------------------------------------------------------------
     # Callable UI Actions
     # -------------------------------------------------------------------
@@ -1915,12 +1921,11 @@ class zynthian_gui(QObject):
         if not lib_zyncoder: return
         last_zynswitch_index = lib_zyncoder.get_last_zynswitch_index()
         i = 0
-        is_external_app = hasattr(zynthian_gui_config, 'top') and zynthian_gui_config.top.isActive() == False
 
         while i<=last_zynswitch_index:
             dtus = lib_zyncoder.get_zynswitch(i, zynthian_gui_config.zynswitch_long_us)
 
-            if is_external_app:
+            if self.is_external_app_active():
                 if dtus == 0:
                     if self.fake_key_event_for_zynswitch(i, True):
                         return
@@ -1986,7 +1991,7 @@ class zynthian_gui(QObject):
                 if self.fake_key_event_for_zynswitch(i, False):
                     return
 
-            if not is_external_app:
+            if not self.is_external_app_active():
                 if dtus < 0:
                     pass
                 elif dtus>zynthian_gui_config.zynswitch_long_us:
@@ -2004,7 +2009,7 @@ class zynthian_gui(QObject):
         delta = 0
         if self.__bk_last_turn_time != None and self.__bk_last_turn_time > 0:
             delta = time.time() * 1000 - self.__bk_last_turn_time
-        if is_external_app and self.__old_bk_value != bk_value:
+        if self.is_external_app_active() and self.__old_bk_value != bk_value:
             fake_key = None
             if self.__old_bk_value > bk_value:
                 fake_key = Key.left

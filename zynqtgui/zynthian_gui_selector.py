@@ -235,18 +235,26 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.set_selector()
 		self.set_select_path()
 
-
 	def set_selector(self, zs_hiden=False):
-		if self.zselector:
-			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
-			self.zselector.config(self.zselector_ctrl)
-			if self.zyngui.get_current_screen_id() != None and self.zyngui.get_current_screen() == self:
+		if self.zselector is not None:
+			if self.zyngui.get_current_screen_id() is not None and \
+				self.zyngui.get_current_screen() == self:
 				self.zselector.show()
 			else:
 				self.zselector.hide()
+
+		if self.zselector:
+			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
+			self.zselector.config(self.zselector_ctrl)
 		else:
-			self.zselector_ctrl=zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
-			self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
+			self.zselector_ctrl = zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
+			self.zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
+
+			if self.zyngui.get_current_screen_id() is not None and \
+					self.zyngui.get_current_screen() == self:
+				self.zselector.show()
+			else:
+				self.zselector.hide()
 
 	def get_caption(self):
 		return self.selector_caption

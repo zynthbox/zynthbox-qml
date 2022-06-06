@@ -10,7 +10,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 Zynthian.Card {
     id: root
 
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedTrack: applicationWindow().selectedTrack
     property int selectedTrackIndex: zynthian.session_dashboard.selectedTrack;
     property var chainedSounds: selectedTrack ? selectedTrack.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
@@ -212,6 +212,10 @@ Zynthian.Card {
     padding: Kirigami.Units.gridUnit
     contentItem: ColumnLayout {
         anchors.margins: Kirigami.Units.gridUnit
+
+        Kirigami.Heading {
+            text: qsTr("Track : %1").arg(root.selectedTrack.name)
+        }
 
         Repeater {
             id: chainedSoundsRepeater

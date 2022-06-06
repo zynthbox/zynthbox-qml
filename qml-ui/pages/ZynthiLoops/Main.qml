@@ -224,6 +224,48 @@ Zynthian.ScreenPage {
 
 //                    return true;
                 }
+
+                case "SCREEN_ADMIN":
+                    if (root.selectedTrack && root.selectedTrack.trackAudioType === "synth") {
+                        var sound = root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]
+
+                        // when synth and slot is active, edit that sound or show popup when empty
+                        if (sound >= 0 && root.selectedTrack.checkIfLayerExists(sound)) {
+                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                            zynthian.layer.select_engine(sound)
+                        } else {
+                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                        }
+                    } else if (root.selectedTrack && ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0) {
+                        var sample = root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
+
+                        // when sample and slot is active, goto wave editor or show popup when empty
+                        if (sample && sample.path && sample.path.length > 0) {
+                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
+                            bottomStack.bottomBar.controlObj = root.selectedTrack;
+                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                            bottomStack.bottomBar.trackWaveEditorAction.trigger();
+                        } else {
+                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                        }
+                    } else if (root.selectedTrack && root.selectedTrack.trackAudioType === "sample-loop") {
+                        var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+
+                        // when loop and slot is active, goto wave editor or show popup when empty
+                        if (clip && clip.path && clip.path.length > 0) {
+                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                            bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
+                            bottomStack.slotsBar.bottomBarButton.checked = true;
+                            bottomStack.bottomBar.waveEditorAction.trigger();
+                        } else {
+                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                        }
+                    } else {
+                        // do nothing for other cases
+                        return false
+                    }
+
+                    return true
         }
 
         // If cuia is not handled by any bottomBars or the switch block

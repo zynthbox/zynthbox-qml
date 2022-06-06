@@ -32,6 +32,7 @@ import org.kde.kirigami 2.4 as Kirigami
 import org.zynthian.quick 1.0 as ZynQuick
 
 import '../../Zynthian' 1.0 as Zynthian
+import '../SessionDashboard'
 
 Zynthian.ScreenPage {
     id: root
@@ -39,7 +40,7 @@ Zynthian.ScreenPage {
     property alias zlScreen: root
     property alias bottomStack: bottomStack
     readonly property QtObject song: zynthian.zynthiloops.song
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedTrack: applicationWindow().selectedTrack
     property bool displaySceneButtons: false
     property bool displayMixButtons: false
 
@@ -225,47 +226,49 @@ Zynthian.ScreenPage {
 //                    return true;
                 }
 
-                case "SCREEN_ADMIN":
-                    if (root.selectedTrack && root.selectedTrack.trackAudioType === "synth") {
-                        var sound = root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]
+                return false;
 
-                        // when synth and slot is active, edit that sound or show popup when empty
-                        if (sound >= 0 && root.selectedTrack.checkIfLayerExists(sound)) {
-                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
-                            zynthian.layer.select_engine(sound)
-                        } else {
-                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
-                        }
-                    } else if (root.selectedTrack && ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0) {
-                        var sample = root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
+            case "SCREEN_ADMIN":
+                if (root.selectedTrack && root.selectedTrack.trackAudioType === "synth") {
+                    var sound = root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]
 
-                        // when sample and slot is active, goto wave editor or show popup when empty
-                        if (sample && sample.path && sample.path.length > 0) {
-                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
-                            bottomStack.bottomBar.controlObj = root.selectedTrack;
-                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                            bottomStack.bottomBar.trackWaveEditorAction.trigger();
-                        } else {
-                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
-                        }
-                    } else if (root.selectedTrack && root.selectedTrack.trackAudioType === "sample-loop") {
-                        var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
-
-                        // when loop and slot is active, goto wave editor or show popup when empty
-                        if (clip && clip.path && clip.path.length > 0) {
-                            bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                            bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
-                            bottomStack.slotsBar.bottomBarButton.checked = true;
-                            bottomStack.bottomBar.waveEditorAction.trigger();
-                        } else {
-                            bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
-                        }
+                    // when synth and slot is active, edit that sound or show popup when empty
+                    if (sound >= 0 && root.selectedTrack.checkIfLayerExists(sound)) {
+                        zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                        zynthian.layer.select_engine(sound)
                     } else {
-                        // do nothing for other cases
-                        return false
+                        bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                     }
+                } else if (root.selectedTrack && ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0) {
+                    var sample = root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
 
-                    return true
+                    // when sample and slot is active, goto wave editor or show popup when empty
+                    if (sample && sample.path && sample.path.length > 0) {
+                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
+                        bottomStack.bottomBar.controlObj = root.selectedTrack;
+                        bottomStack.slotsBar.bottomBarButton.checked = true;
+                        bottomStack.bottomBar.trackWaveEditorAction.trigger();
+                    } else {
+                        bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                    }
+                } else if (root.selectedTrack && root.selectedTrack.trackAudioType === "sample-loop") {
+                    var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+
+                    // when loop and slot is active, goto wave editor or show popup when empty
+                    if (clip && clip.path && clip.path.length > 0) {
+                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
+                        bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
+                        bottomStack.slotsBar.bottomBarButton.checked = true;
+                        bottomStack.bottomBar.waveEditorAction.trigger();
+                    } else {
+                        bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                    }
+                } else {
+                    // do nothing for other cases
+                    return false
+                }
+
+                return true
         }
 
         // If cuia is not handled by any bottomBars or the switch block
@@ -292,14 +295,14 @@ Zynthian.ScreenPage {
                 zynthian.songBarActive = false;
             }
 
-            // Check if sound combinator is active
-            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
-                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
-            ) {
-                zynthian.soundCombinatorActive = true;
-            } else {
-                zynthian.soundCombinatorActive = false;
-            }
+//            // Check if sound combinator is active
+//            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+//                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
+//            ) {
+//                zynthian.soundCombinatorActive = true;
+//            } else {
+//                zynthian.soundCombinatorActive = false;
+//            }
 
             // Check if sound combinator is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
@@ -338,6 +341,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.mixerButton.checked) {
                 console.log("LED : Slots Mixer Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -346,6 +350,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.partButton.checked) {
                 console.log("LED : Slots Part Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -354,6 +359,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -362,6 +368,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -370,6 +377,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -378,6 +386,16 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = true;
+                zynthian.soundCombinatorActive = false;
+            } else if (bottomStack.slotsBar.soundCombinatorButton.checked) {
+                console.log("LED : Slots FX Bar active")
+                zynthian.slotsBarTrackActive = false;
+                zynthian.slotsBarPartActive = false;
+                zynthian.slotsBarMixerActive = false;
+                zynthian.slotsBarSynthsActive = false;
+                zynthian.slotsBarSamplesActive = false;
+                zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = true;
             } else {
                 console.log("LED : No Slots Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -386,6 +404,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
+                zynthian.soundCombinatorActive = false;
             }
         }
     }
@@ -813,8 +832,7 @@ Zynthian.ScreenPage {
                                     zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
                                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
                                     bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
-                                    bottomStack.slotsBar.bottomBarButton.checked = true
-                                    bottomStack.bottomBar.tracksViewSoundsBarAction.trigger()
+                                    bottomStack.slotsBar.soundCombinatorButton.checked = true
                                 }
                             }
 
@@ -1486,6 +1504,12 @@ Zynthian.ScreenPage {
                             partClip: partBar.selectedPartClip
                         }
                     }
+                }
+
+                TracksViewSoundsBar {
+                    id: soundCombinatorBar
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                 }
             }
         }

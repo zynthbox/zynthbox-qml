@@ -110,8 +110,8 @@ Rectangle {
 
                     BottomStackTabs {
                         id: buttonsColumn
-                        Layout.minimumWidth: privateProps.cellWidth + 6
-                        Layout.maximumWidth: privateProps.cellWidth + 6
+                        Layout.minimumWidth: privateProps.cellWidth*1.5 + 6
+                        Layout.maximumWidth: privateProps.cellWidth*1.5 + 6
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
                     }
@@ -392,7 +392,7 @@ Rectangle {
                         Layout.fillWidth: false
                         Layout.fillHeight: true
                         Layout.leftMargin: 2
-                        Layout.preferredWidth: privateProps.cellWidth*2 - 10
+                        Layout.preferredWidth: privateProps.cellWidth*1.5 - 10
                         Layout.bottomMargin: 5
 
                         VolumeControl {

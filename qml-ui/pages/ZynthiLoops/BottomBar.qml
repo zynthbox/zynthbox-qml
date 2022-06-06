@@ -88,8 +88,8 @@ Rectangle {
 
         BottomStackTabs {
             id: buttonsColumn
-            Layout.minimumWidth: privateProps.cellWidth + 6
-            Layout.maximumWidth: privateProps.cellWidth + 6
+            Layout.minimumWidth: privateProps.cellWidth*1.5 + 6
+            Layout.maximumWidth: privateProps.cellWidth*1.5 + 6
             Layout.bottomMargin: 5
             Layout.fillHeight: true
         }

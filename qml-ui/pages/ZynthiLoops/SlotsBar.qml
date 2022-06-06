@@ -352,8 +352,8 @@ Rectangle {
 
                     ColumnLayout {
                         id: buttonsColumn
-                        Layout.preferredWidth: privateProps.cellWidth + 6
-                        Layout.maximumWidth: privateProps.cellWidth + 6
+                        Layout.preferredWidth: privateProps.cellWidth*1.5 + 6
+                        Layout.maximumWidth: privateProps.cellWidth*1.5 + 6
                         Layout.bottomMargin: 5
                         Layout.fillHeight: true
 
@@ -593,7 +593,7 @@ Rectangle {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignTop
                         Layout.leftMargin: 2
-                        Layout.preferredWidth: privateProps.cellWidth*2 - 10
+                        Layout.preferredWidth: privateProps.cellWidth*1.5 - 10
                         Layout.bottomMargin: 5
 
                         QQC2.Label {

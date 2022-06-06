@@ -86,6 +86,7 @@ class zynthiloops_clip(QObject):
         self.track = None
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
+        self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
@@ -726,8 +727,6 @@ class zynthiloops_clip(QObject):
             if self.audioSource is None:
                 return
 
-            self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
-
             self.__is_playing__ = True
             self.__is_playing_changed__.emit()
 
@@ -738,11 +737,6 @@ class zynthiloops_clip(QObject):
     @Slot(None)
     def stop(self):
         if self.__is_playing__:
-            try:
-                self.__song__.get_metronome_manager().current_beat_changed.disconnect(self.update_current_beat)
-            except:
-                logging.error(f"Error disconnecting from current_beat_changed signal. Not yet connected maybe?")
-
             self.reset_beat_count()
 
             if self.audioSource is None:

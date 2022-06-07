@@ -53,8 +53,13 @@ T.ScrollBar {
     }
 
     onPositionChanged: {
-        disappearTimer.restart();
-        handleGraphics.handleState = Math.min(1, handleGraphics.handleState + 0.1)
+        if (disappearTimer) {
+            disappearTimer.restart();
+        }
+
+        if (handleGraphics.handleState) {
+            handleGraphics.handleState = Math.min(1, handleGraphics.handleState + 0.1)
+        }
     }
 
     contentItem: Item {

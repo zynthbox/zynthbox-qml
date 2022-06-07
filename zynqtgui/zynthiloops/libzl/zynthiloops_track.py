@@ -524,10 +524,12 @@ class zynthiloops_track(QObject):
             logging.debug(f"Next free layer : {next_free_layer}")
             zyngui.screens["fixed_layers"].activate_index(next_free_layer)
 
-            self.__chained_sounds__ = [-1 if x == next_free_layer else x for x in self.__chained_sounds__]
+            for track_id in range(self.__song__.tracksModel.count):
+                track = self.__song__.tracksModel.getTrack(track_id)
+                track.__chained_sounds__ = [-1 if x == next_free_layer else x for x in track.__chained_sounds__]
+
             self.__chained_sounds__[index] = next_free_layer
             self.__song__.schedule_save()
-            # self.chained_sounds_changed.emit()
 
             return True
 

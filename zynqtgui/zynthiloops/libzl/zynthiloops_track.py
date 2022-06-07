@@ -738,6 +738,10 @@ class zynthiloops_track(QObject):
                             _zyngui.screens['layer'].clone_midi(i, j)
                             _zyngui.screens['layer'].clone_midi(j, i)
 
+        # Stop all playing notes
+        for old_chan in self.__chained_sounds__:
+            self.zyngui.raw_all_notes_off_chan(old_chan)
+
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
             if not sound in self.__chained_sounds__:

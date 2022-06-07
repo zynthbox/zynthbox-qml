@@ -123,7 +123,7 @@ Zynthian.SelectorPage {
             rightPadding: Kirigami.Units.largeSpacing
             highlighted: ListView.view.activeFocus
             onClicked: {
-                mainView.currentIndex = index;
+                selector.current_index = index;
             }
             background: Private.DelegateBackground {
                 delegate: nsDelegate

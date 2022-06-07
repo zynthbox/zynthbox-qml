@@ -47,6 +47,8 @@ class zynthian_gui_newstuff(zynthian_gui_selector):
         self.newstuff_model_changed.connect(self.fill_list)
         self.newstuff_model_data = None
 
+        self.current_index_changed.connect(self.set_selector)
+
     def fill_list(self):
         self.list_data=[]
         if self.newstuff_model_data:

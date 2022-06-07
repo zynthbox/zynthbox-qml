@@ -47,7 +47,7 @@ Rectangle {
     property alias soundCombinatorButton: soundCombinatorButton
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    readonly property QtObject selectedTrack: applicationWindow().selectedTrack
     property QtObject selectedSlotRowItem
 
     Layout.fillWidth: true
@@ -158,32 +158,7 @@ Rectangle {
                     root.selectedSlotRowItem.track.remove_and_unchain_sound(chainedSound)
                 }
             } else {
-                if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
-                    // Enable layer popup rejected handler to re-select connected sound if any
-                    layerPopupRejectedConnections.enabled = true;
-
-                    zynthian.layer.page_after_layer_creation = "session_dashboard";
-                    applicationWindow().requestOpenLayerSetupDialog();
-                    //this depends on requirements
-                    backToSelection.screenToGetBack = zynthian.current_screen_id;
-                    backToSelection.enabled = true;
-                } else if (!root.selectedSlotRowItem.track.createChainedSoundInNextFreeLayer(root.selectedSlotRowItem.track.selectedSlotRow)) {
-                    noFreeSlotsPopup.open();
-                } else {
-                    // Enable layer popup rejected handler to re-select connected sound if any
-                    layerPopupRejectedConnections.enabled = true;
-
-                    zynthian.layer.page_after_layer_creation = "session_dashboard";
-                    applicationWindow().requestOpenLayerSetupDialog();
-                    //this depends on requirements
-                    backToSelection.screenToGetBack = zynthian.current_screen_id;
-                    backToSelection.enabled = true;
-
-                    if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
-                        pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
-                    }
-                }
+                layerSetupDialog.open()
             }
         } else if (fxButton.checked) {
             // Clicked entry is fx
@@ -231,18 +206,6 @@ Rectangle {
         }
     }
 
-    // When enabled, listen for layer popup rejected to re-select connected sound if any
-    Connections {
-        id: layerPopupRejectedConnections
-        enabled: false
-        target: applicationWindow()
-        onLayerSetupDialogRejected: {
-            console.log("Layer Popup Rejected");
-
-            selectConnectedSound();
-            layerPopupRejectedConnections.enabled = false;
-        }
-    }
     //NOTE: enable this if shouldn't switch to library
     Connections {
         id: backToSelection
@@ -272,48 +235,6 @@ Rectangle {
                 backToSelection.enabled = false
             }
             oldScreen = zynthian.current_screen_id
-        }
-    }
-
-    // When enabled, listen for sound dialog rejected to re-select connected sound if any
-    Connections {
-        id: soundsDialogRejectedConnections
-        enabled: false
-        target: applicationWindow()
-        onSoundsDialogAccepted: {
-            console.log("Sounds Dialog Accepted");
-            soundsDialogRejectedConnections.enabled = false;
-        }
-        onSoundsDialogRejected: {
-            console.log("Sounds Dialog Rejected");
-
-            selectConnectedSound();
-            soundsDialogRejectedConnections.enabled = false;
-        }
-    }
-
-    Connections {
-        target: applicationWindow()
-        onLayerSetupDialogLoadSoundClicked: {
-            // Disable Rejected handler as popup is accepted
-            layerPopupRejectedConnections.enabled = false;
-        }
-        onLayerSetupDialogNewSynthClicked: {
-            // Disable Rejected handler as popup is accepted
-            layerPopupRejectedConnections.enabled = false;
-        }
-        onLayerSetupDialogChangePresetClicked: {
-            // Disable Rejected handler as popup is accepted
-            layerPopupRejectedConnections.enabled = false;
-        }
-        onLayerSetupDialogPickSoundClicked: {
-            console.log("Sound Dialog Opened");
-
-            // Enable Sounds dialog rejected handler to select sound if any on close
-            soundsDialogRejectedConnections.enabled = true;
-
-            // Disable Rejected handler as popup is accepted
-            layerPopupRejectedConnections.enabled = false;
         }
     }
 
@@ -918,6 +839,105 @@ Rectangle {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'
                     bankPickerDialog.open()
                     samplePickerPopup.close()
+                }
+            }
+        }
+    }
+
+    QQC2.Dialog {
+        id: layerSetupDialog
+        parent: QQC2.Overlay.overlay
+        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
+        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
+        height: footer.implicitHeight + topMargin + bottomMargin
+        modal: true
+
+        onAccepted: {
+        }
+        onRejected: {
+        }
+
+        footer: QQC2.Control {
+            leftPadding: layerSetupDialog.leftPadding
+            topPadding: layerSetupDialog.topPadding
+            rightPadding: layerSetupDialog.rightPadding
+            bottomPadding: layerSetupDialog.bottomPadding
+            contentItem: ColumnLayout {
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Pick a Synth")
+                    onClicked: {
+                        layerSetupDialog.accept();
+
+                        console.log("%%% chainedSound:", root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow], root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]))
+
+                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
+                            zynthian.layer.page_after_layer_creation = "zynthiloops";
+                            layerSetupDialog.accept()
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            newSynthWorkaroundTimer.restart()
+                        } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
+                            layerSetupDialog.reject();
+                            noFreeSlotsPopup.open();
+                        } else {
+                            zynthian.layer.page_after_layer_creation = "zynthiloops";
+                            layerSetupDialog.accept()
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            newSynthWorkaroundTimer.restart()
+                        }
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                    text: qsTr("Change preset")
+                    onClicked: {
+                        zynthian.current_screen_id = "preset"
+                        layerSetupDialog.accept();
+                    }
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    text: qsTr("Load A Sound")
+                    onClicked: {
+                        zynthian.show_modal("sound_categories")
+                        layerSetupDialog.accept();
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                }
+                QQC2.Button {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                    text: qsTr("Remove Synth")
+                    onClicked: {
+                        layerSetupDialog.accept();
+                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
+                            root.selectedTrack.remove_and_unchain_sound(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                        }
+                    }
+                }
+                Timer { //HACK why is this necessary?
+                    id: newSynthWorkaroundTimer
+                    interval: 200
+                    onTriggered: {
+                        backToSelection.screenToGetBack = zynthian.current_screen_id;
+                        backToSelection.enabled = true;
+                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+
+                        if (root.selectedTrack.connectedPattern >= 0) {
+                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart);
+                            pattern.midiChannel = root.selectedTrack.connectedSound;
+                        }
+                    }
                 }
             }
         }

@@ -740,7 +740,8 @@ class zynthiloops_track(QObject):
 
         # Stop all playing notes
         for old_chan in self.__chained_sounds__:
-            self.zyngui.raw_all_notes_off_chan(old_chan)
+            if old_chan > -1:
+                self.zyngui.raw_all_notes_off_chan(old_chan)
 
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):

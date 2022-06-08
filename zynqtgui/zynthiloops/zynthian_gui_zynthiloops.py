@@ -288,7 +288,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         selected_clip = None
 
         if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
 
@@ -307,7 +307,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         selected_clip = None
 
         if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
 
@@ -326,7 +326,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         selected_clip = None
 
         if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
 
@@ -688,7 +688,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.trackWaveEditorBarActive:
             logging.debug(f"### set_selector : trackWaveEditorBarActive is active.")
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSampleRow]
+            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
             selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)

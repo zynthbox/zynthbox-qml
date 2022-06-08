@@ -16,14 +16,14 @@ Zynthian.Card {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SELECT_UP":
-                if (controlObj.selectedSampleRow > 0) {
-                    controlObj.selectedSampleRow -= 1
+                if (controlObj.selectedSlotRow > 0) {
+                    controlObj.selectedSlotRow -= 1
                 }
                 return true;
 
             case "SELECT_DOWN":
-                if (controlObj.selectedSampleRow < 4) {
-                    controlObj.selectedSampleRow += 1
+                if (controlObj.selectedSlotRow < 4) {
+                    controlObj.selectedSlotRow += 1
                 }
                 return true;
 
@@ -53,7 +53,7 @@ Zynthian.Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                border.width: controlObj.selectedSampleRow === index ? 1 : 0
+                border.width: controlObj.selectedSlotRow === index ? 1 : 0
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
@@ -61,12 +61,12 @@ Zynthian.Card {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        controlObj.selectedSampleRow = index;
+                        controlObj.selectedSlotRow = index;
                     }
                 }
 
                 RowLayout {
-                    opacity: controlObj.selectedSampleRow === index ? 1 : 0.5
+                    opacity: controlObj.selectedSlotRow === index ? 1 : 0.5
                     anchors.fill: parent
 
                     QQC2.Label {
@@ -115,8 +115,8 @@ Zynthian.Card {
                             anchors.fill: parent
 
                             onClicked: {
-                                if (controlObj.selectedSampleRow !== index) {
-                                    controlObj.selectedSampleRow = index
+                                if (controlObj.selectedSlotRow !== index) {
+                                    controlObj.selectedSlotRow = index
                                 } else {
                                     samplePickerDialog.folderModel.folder = controlObj.recordingDir;
                                     samplePickerDialog.open();
@@ -170,7 +170,7 @@ Zynthian.Card {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            controlObj.set_sample(file.filePath, controlObj.selectedSampleRow)
+            controlObj.set_sample(file.filePath, controlObj.selectedSlotRow)
         }
     }
 } 

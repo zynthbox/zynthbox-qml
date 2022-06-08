@@ -44,7 +44,7 @@ GridLayout {
     property QtObject bottomBar: null
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj.samples[bottomBar.controlObj.selectedSampleRow] // selected bottomBar object is not clip/pattern and hence it is a track
+                                    : bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a track
     property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     Connections {

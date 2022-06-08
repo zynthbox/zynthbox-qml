@@ -461,7 +461,7 @@ Rectangle {
                     Zynthian.TabbedControlViewAction {
                         id: trackclipSettingsAction
 
-                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
+                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSlotRow] : null
 
                         text: qsTr("Smp. Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
@@ -473,7 +473,7 @@ Rectangle {
                     Zynthian.TabbedControlViewAction {
                         id: trackWaveEditorAction
 
-                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSampleRow] : null
+                        property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSlotRow] : null
 
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")

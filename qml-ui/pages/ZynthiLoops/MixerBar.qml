@@ -310,7 +310,7 @@ Rectangle {
                                                         } else if (model.track.trackAudioType === "sample-trig" ||
                                                                 model.track.trackAudioType === "sample-slice") {
                                                             try {
-                                                                text = model.track.samples[model.track.selectedSampleRow].path.split("/").pop()
+                                                                text = model.track.samples[model.track.selectedSlotRow].path.split("/").pop()
                                                             } catch (e) {}
                                                         } else if (model.track.trackAudioType === "sample-loop") {
                                                             try {

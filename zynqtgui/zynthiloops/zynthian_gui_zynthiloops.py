@@ -1322,7 +1322,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
         logging.debug(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
 
-        self.clip_to_record.path = self.clip_to_record_path
+        self.clip_to_record.set_path(self.clip_to_record_path, False)
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])

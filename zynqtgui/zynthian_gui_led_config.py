@@ -198,7 +198,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
                 # If sound combinator is active, light up filled cells with green color otherwise display blue color
                 if self.zyngui.soundCombinatorActive:
-                    if (i-1) == self.zyngui.session_dashboard.selectedSoundRow:
+                    if track is not None and \
+                            (i-1) == track.selectedSlotRow:
                         # Set active color to selected sound row when combinator is open
                         self.button_color_map[i] = {
                             'color': self.led_color_active,

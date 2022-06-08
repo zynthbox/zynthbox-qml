@@ -36,3 +36,4 @@ TableHeaderLabel 1.0 TableHeaderLabel.qml
 CommonUtils 1.0 CommonUtils.js
 LayerReplaceDialog 1.0 LayerReplaceDialog.qml
 SequenceLoader 1.0 SequenceLoader.qml
+LayerSetupDialog 1.0 LayerSetupDialog.qml

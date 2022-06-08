@@ -820,8 +820,9 @@ class zynthian_gui(QObject):
         self.wsleds.begin()
 
         # Light all LEDs
-        for i in range(0,25):
-            self.wsleds.setPixelColor(i, rpi_ws281x.Color(0, 0, 0))
+        for i in range(25):
+            color = QColor.fromHsl((i * 10) % 359, 242, 127, 127)
+            self.wsleds.setPixelColor(i, rpi_ws281x.Color(color.red(), color.green(), color.blue()))
         self.wsleds.show()
 
         return self.wsleds_num

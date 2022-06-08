@@ -282,7 +282,7 @@ Rectangle {
                                                     onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
                                                     onTrackAudioTypeChanged: soundnameUpdater.restart()
                                                     onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundnameUpdater.restart() : false
-                                                    onSelectedSampleRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
+                                                    onSelectedSlotRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
                                                 }
 
                                                 Connections {

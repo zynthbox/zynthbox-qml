@@ -291,28 +291,6 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    property var noteSpecificColor: {
-        "C":"#f08080", 
-        "C#":"#4b0082",
-        "D":"#8a2be2",
-        "D#":"#a52a2a" ,
-        "E":"#deb887",
-        "F":"#5f9ea0",
-        "F#":"#7fff00",
-        "G":"#d2691e",
-        "G#":"#6495ed",
-        "A":"#dc143c",
-        "A#":"#008b8b",
-        "B":"#b8860b"
-    }
-
-    function getNoteSpecificColor(name,number){
-        var color = noteSpecificColor[name];
-        var num = number * 3
-        var finalColor = color.substring(0,3) + num + color.substring(3 + parseInt(num.toString().length));
-        return finalColor;
-    }
-
     QtObject {
         id:_private;
         // Yes, this is a hack - if we don't do this, we'll forever be rebuilding the patterns popup etc when the sequence and pattern changes, which is all manner of expensive

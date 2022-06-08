@@ -50,7 +50,7 @@ ColumnLayout {
                     note: component.model.data(component.model.index(row, index), component.model.roles['note'])
                     property var metadata: component.model.data(component.model.index(row, index), component.model.roles['metadata'])
                     text: metadata != undefined && metadata["displayText"] != undefined ? metadata["displayText"] : ""
-                    property color noteColor: component.playgrid.getNoteSpecificColor(note.name,note.octave)
+                    property color noteColor: note ? zynthian.theme_chooser.noteColors[note.midiNote] : ""
                     property color tintedNoteColor: Qt.lighter(noteColor, 1.2)
                     property bool weAreChosen: component.playgrid.mostRecentlyPlayedNote === note
                         || component.playgrid.heardNotes.indexOf(note) > -1

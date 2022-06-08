@@ -76,8 +76,8 @@ Rectangle {
 
                 case "SELECT_UP":
                     if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        if (root.selectedTrack.selectedSampleRow > 0) {
-                            root.selectedTrack.selectedSampleRow -= 1;
+                        if (root.selectedTrack.selectedSlotRow > 0) {
+                            root.selectedTrack.selectedSlotRow -= 1;
                         }
                         returnValue = true;
                     }
@@ -85,8 +85,8 @@ Rectangle {
 
                 case "SELECT_DOWN":
                     if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        if (root.selectedTrack.selectedSampleRow < 4) {
-                            root.selectedTrack.selectedSampleRow += 1;
+                        if (root.selectedTrack.selectedSlotRow < 4) {
+                            root.selectedTrack.selectedSlotRow += 1;
                         }
                         returnValue = true;
                     }
@@ -444,11 +444,6 @@ Rectangle {
                                                 onClicked: {
                                                     if (index !== root.selectedTrack.selectedSlotRow) {
                                                         root.selectedTrack.selectedSlotRow = index
-
-                                                        // Also set the selectedSampleRow to index when trackAudioType is not sample-loop
-                                                        if (root.selectedTrack.trackAudioType !== "sample-loop") {
-                                                            root.selectedTrack.selectedSampleRow = index
-                                                        }
                                                     } else {
                                                         bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                                                     }

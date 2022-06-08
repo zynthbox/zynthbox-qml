@@ -1801,7 +1801,7 @@ class zynthian_gui(QObject):
                     if self.trackSamplesBarActive:
                         logging.debug(f"Clip is a track sample")
                         track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-                        clip = track.samples[track.selectedSampleRow]
+                        clip = track.samples[track.selectedSlotRow]
                     else:
                         logging.debug(f"Clip is a not a track sample")
                         clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.song.scenesModel.selectedMixIndex)

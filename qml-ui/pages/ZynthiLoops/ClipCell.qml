@@ -163,7 +163,7 @@ QQC2.AbstractButton {
                           ? presetText
                           : ""
                       : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
-                          ? model.track.samples[model.track.selectedSampleRow].path.split("/").pop()
+                          ? model.track.samples[model.track.selectedSlotRow].path.split("/").pop()
                           : model.track.trackAudioType === "sample-loop"
                               ? model.track.sceneClip.path.split("/").pop()
                               : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)

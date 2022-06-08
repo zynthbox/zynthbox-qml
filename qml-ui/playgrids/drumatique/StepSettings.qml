@@ -70,20 +70,6 @@ ColumnLayout {
         6: "1/128"
     }
     property string stepDurationName: component.model ? noteLengthNames[component.model.noteLength] : ""
-    property var noteSpecificColor: {
-        "C":"#f08080",
-        "C#":"#4b0082",
-        "D":"#8a2be2",
-        "D#":"#a52a2a" ,
-        "E":"#deb887",
-        "F":"#5f9ea0",
-        "F#":"#7fff00",
-        "G":"#d2691e",
-        "G#":"#6495ed",
-        "A":"#dc143c",
-        "A#":"#008b8b",
-        "B":"#b8860b"
-    }
 
     onVisibleChanged: {
         if (!visible) {
@@ -235,7 +221,7 @@ ColumnLayout {
                     }
                     width: height
                     radius: height / 2
-                    color: subnoteDelegate.subnote ? component.noteSpecificColor[subnoteDelegate.subnote.name] : "transparent"
+                    color: subnoteDelegate.subnote ? zynthian.theme_chooser.noteColors[subnoteDelegate.subnote.midiNote] : "transparent"
                 }
                 QQC2.Label {
                     id: subnoteDelegateLabel

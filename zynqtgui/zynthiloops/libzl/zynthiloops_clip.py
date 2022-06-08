@@ -23,6 +23,7 @@
 #
 # ******************************************************************************
 import math
+import re
 import shutil
 import tempfile
 import traceback
@@ -109,6 +110,29 @@ class zynthiloops_clip(QObject):
         self.saveMetadataTimer.setInterval(1000)
         self.saveMetadataTimer.setSingleShot(True)
         self.saveMetadataTimer.timeout.connect(self.doSaveMetadata)
+
+    # A helper method to generate unique name when copying a clip file into a folder
+    # Arg file : Full Path of file to be copied
+    # Arg copy_dir : Full Path of destination dir where the file will be copied
+    # Returns : An unique filename as string in the format f"{file_basename}-{counter}.clip.wav"
+    @staticmethod
+    def generate_unique_filename(file, copy_dir):
+        file_path = Path(file)
+        copy_dir_path = Path(copy_dir)
+        counter = 1
+
+        # Find the base filename excluding .clip.wav
+        file_basename = file_path.name.split(".wav")[0].split(".clip")[0]
+        # Remove the `counter` part from the string if exists
+        file_basename = re.sub('-\d*$', '', file_basename)
+
+        if not (copy_dir_path / f"{file_basename}.clip.wav").exists():
+            return f"{file_basename}.clip.wav"
+        else:
+            while Path(copy_dir_path / f"{file_basename}-{counter}.clip.wav").exists():
+                counter += 1
+
+            return f"{file_basename}-{counter}.clip.wav"
 
     @Property(str, constant=True)
     def className(self):
@@ -221,9 +245,9 @@ class zynthiloops_clip(QObject):
                     self.__path__ = None
                 else:
                     if self.is_track_sample:
-                        self.path = str(self.bank_path / obj["path"])
+                        self.set_path(str(self.bank_path / obj["path"]), False)
                     else:
-                        self.path = str(self.wav_path / obj["path"])
+                        self.set_path(str(self.wav_path / obj["path"]), False)
             if "start" in obj:
                 self.__start_position__ = obj["start"]
                 self.set_start_position(self.__start_position__, True)
@@ -594,25 +618,31 @@ class zynthiloops_clip(QObject):
             else:
                 return str(self.wav_path / self.__path__)
 
-    def set_path(self, path):
+    # Arg path : Set path of the wav to clip
+    # Arg should_copy : Controls where the selected clip should be copied under a unique name when setting.
+    #                   should_copy should be set to False when restoring to avoid copying the same clip under
+    #                   a different name. Otherwise when path is set from UI, it makes sure to always create a new file
+    #                   when first selecting a wav for a clip.
+    def set_path(self, path, should_copy=True):
         selected_path = Path(path)
+        new_filename = ""
 
         if self.is_track_sample:
-            if selected_path.parent != self.bank_path:
-                logging.info(
-                    f"Sample({path}) is not from same track/sketch. Copying into bank folder ({self.bank_path / selected_path.name})")
+            if should_copy:
+                new_filename = self.generate_unique_filename(selected_path, self.bank_path)
+                logging.info(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
                 self.bank_path.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(selected_path, self.bank_path / selected_path.name)
-            else:
-                logging.info(f"Sample({self.bank_path / selected_path.name}) is from same bank")
+                shutil.copy2(selected_path, self.bank_path / new_filename)
         else:
-            if selected_path.parent != self.wav_path:
-                logging.info(f"Clip({path}) is not from same sketch. Copying into sketch folder ({self.wav_path / selected_path.name})")
-                shutil.copy2(selected_path, self.wav_path / selected_path.name)
-            else:
-                logging.info(f"Clip({self.wav_path / selected_path.name}) is from same sketch")
+            if should_copy:
+                new_filename = self.generate_unique_filename(selected_path, self.wav_path)
+                logging.info(f"Copying clip({path}) into sketch folder ({self.wav_path / new_filename})")
+                shutil.copy2(selected_path, self.wav_path / new_filename)
 
-        self.__path__ = str(selected_path.name)
+        if new_filename == "" :
+            self.__path__ = str(selected_path.name)
+        else:
+            self.__path__ = str(new_filename)
         self.stop()
 
         if self.audioSource is not None:

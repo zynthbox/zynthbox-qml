@@ -215,7 +215,7 @@ QQC2.Button {
                     }
                     Rectangle {
                         anchors.fill: parent;
-                        color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
+                        color: zynthian.theme_chooser.noteColors[subNote.midiNote]
                         opacity: 0.3
                     }
                     Rectangle {
@@ -225,7 +225,7 @@ QQC2.Button {
                             bottom: parent.bottom
                         }
                         height: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
-                        color: playgrid.getNoteSpecificColor(subNote.name,subNote.octave)
+                        color: zynthian.theme_chooser.noteColors[subNote.midiNote]
                     }
                     Item {
                         anchors {

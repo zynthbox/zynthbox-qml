@@ -699,24 +699,11 @@ class zynthiloops_track(QObject):
         zyngui = self.__song__.get_metronome_manager().zyngui
 
         def task():
-            for i in range (16):
-                for j in range(16):
-                    if i != j and i in self.__chained_sounds__ and j in self.__chained_sounds__ and self.checkIfLayerExists(i) and self.checkIfLayerExists(j):
-                        zyngui.screens['layer'].remove_clone_midi(i, j)
-                        zyngui.screens['layer'].remove_clone_midi(j, i)
-
-            for i, sound in enumerate(self.__chained_sounds__):
-                logging.debug("AAAA {} {}".format(sound, chan))
-                if sound == chan:
-                    self.__chained_sounds__[i] = -1
             zyngui.screens['layers_for_track'].fill_list()
 
             zyngui.layer.remove_root_layer(chan)
-
             self.select_correct_layer()
-
             self.__song__.schedule_save()
-
             self.chained_sounds_changed.emit()
 
             if cb is not None:
@@ -727,16 +714,6 @@ class zynthiloops_track(QObject):
         zyngui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
-        class Worker:
-            def run(self, parent, _zyngui, _sounds):
-                # Update midi clone
-                for i in range(16):
-                    for j in range(16):
-                        if i != j and i in _sounds and j in sounds and parent.checkIfLayerExists(
-                                i) and parent.checkIfLayerExists(j):
-                            _zyngui.screens['layer'].clone_midi(i, j)
-                            _zyngui.screens['layer'].clone_midi(j, i)
-
         # Stop all playing notes
         for old_chan in self.__chained_sounds__:
             if old_chan > -1:
@@ -744,20 +721,14 @@ class zynthiloops_track(QObject):
 
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         for i, sound in enumerate(sounds):
-            if not sound in self.__chained_sounds__:
+            if sound not in self.__chained_sounds__:
                 self.__chained_sounds__[i] = sound
 
         self.__song__.schedule_save()
-        zyngui = self.__song__.get_metronome_manager().zyngui
-
-        worker = Worker()
-        worker_thread = threading.Thread(target=worker.run, args=(self, zyngui, sounds))
-        worker_thread.start()
 
         try: #can be called before creation
             self.zyngui.screens['layers_for_track'].fill_list()
             if self.connectedSound >= 0:
-                #self.zyngui.screens['fixed_layers'].activate_index(self.connectedSound)
                 self.zyngui.screens['layers_for_track'].layer_selection_consistency_check()
             else:
                 self.zyngui.screens['layers_for_track'].select_action(

@@ -161,7 +161,7 @@ Zynthian.ScreenPage {
 
         switch (cuia) {
             case "SELECT_UP":
-                var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+                var selectedMidiChannel = root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectPrevPreset(selectedMidiChannel);
                     infoBar.updateInfoBar();
@@ -169,7 +169,7 @@ Zynthian.ScreenPage {
                 return true;
 
             case "SELECT_DOWN":
-                var selectedMidiChannel = root.selectedTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow];
+                var selectedMidiChannel = root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow];
                 if (root.selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
                     zynthian.layer.selectNextPreset(selectedMidiChannel);
                     infoBar.updateInfoBar();
@@ -573,7 +573,7 @@ Zynthian.ScreenPage {
                     property int topLayerIndex: 0
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
-                                                    ? zynthian.session_dashboard.selectedSoundRow
+                                                    ? root.selectedTrack.selectedSlotRow
                                                     : root.selectedTrack.selectedSlotRow
                     property int selectedSoundSlotExists: clip.clipTrack.checkIfLayerExists(clip.clipTrack.chainedSounds[selectedSoundSlot])
 
@@ -604,7 +604,7 @@ Zynthian.ScreenPage {
                         infoBar.topLayer = layerIndex == -1 ? -1 : infoBar.clip.clipTrack.chainedSounds[layerIndex]
                         layerLabel.layerCount = count
 //                        infoBar.selectedChannel = zynthian.soundCombinatorActive
-//                                                    ? infoBar.clip.clipTrack.chainedSounds[zynthian.session_dashboard.selectedSoundRow]
+//                                                    ? infoBar.clip.clipTrack.chainedSounds[root.selectedTrack.selectedSlotRow]
 //                                                    : infoBar.clip.clipTrack.connectedSound
 
                         infoBar.clip.clipTrack.updateChainedSoundsInfo()

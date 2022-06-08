@@ -106,7 +106,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             if self.zyngui.screens['layer'].is_channel_valid(element[1]):
                 self.select_action(i)
                 return
-        selft.select_action(0)
+        self.select_action(0)
 
     def index_supports_immediate_activation(self, index=None):
         if index is None:
@@ -140,9 +140,6 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
                 self.zyngui.screens["layer"].activate_midichan_layer(track.connectedSound)
             else:
                 self.select_action(0)
-
-            # Force set chained sounds to ensure correct cloning
-            track.set_chained_sounds(track.chainedSounds)
 
     def select(self, index=None):
         super().select(index)

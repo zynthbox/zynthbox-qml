@@ -414,7 +414,7 @@ class zynthiloops_clip(QObject):
 
             # Make a call to set selector to update knob values so that on drag value doesn't
             # flicker back to the knob values
-            self.zyngui.zynthiloops.set_selector_timer.start()
+            self.zyngui.zynthiloops.set_selector_throttled()
 
             self.length_changed.emit()
             if force_set is False:

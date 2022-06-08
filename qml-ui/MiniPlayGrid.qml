@@ -198,10 +198,8 @@ RowLayout {
             Layout.maximumHeight: width
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
-                if (playGridStack.currentPlayGridItem.octave + 1 < 11){
+                if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
                     playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
-                } else {
-                    playGridStack.currentPlayGridItem.octave =  10;
                 }
             }
         }
@@ -217,10 +215,8 @@ RowLayout {
             Layout.maximumHeight: width
             enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
             onClicked: {
-                if (playGridStack.currentPlayGridItem.octave - 1 > 0) {
+                if (playGridStack.currentPlayGridItem.octave > 0) {
                     playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
-                } else {
-                    playGridStack.currentPlayGridItem.octave = 0;
                 }
             }
         }

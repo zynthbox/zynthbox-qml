@@ -549,10 +549,8 @@ don't want to have to dig too far...
                 icon.name: "arrow-up"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
-                    if (playGridStack.currentPlayGridItem.octave + 1 < 11){
+                    if (playGridStack.currentPlayGridItem.octave < playGridStack.currentPlayGridItem.gridRowStartNotes.length - 2) {
                         playGridStack.currentPlayGridItem.octave =  playGridStack.currentPlayGridItem.octave + 1;
-                    } else {
-                        playGridStack.currentPlayGridItem.octave =  10;
                     }
                 }
             }
@@ -566,10 +564,8 @@ don't want to have to dig too far...
                 icon.name: "arrow-down"
                 enabled: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.useOctaves ? playGridStack.currentPlayGridItem.useOctaves : false
                 onClicked: {
-                    if (playGridStack.currentPlayGridItem.octave - 1 > 0) {
+                    if (playGridStack.currentPlayGridItem.octave > 0) {
                         playGridStack.currentPlayGridItem.octave = playGridStack.currentPlayGridItem.octave - 1;
-                    } else {
-                        playGridStack.currentPlayGridItem.octave = 0;
                     }
                 }
             }

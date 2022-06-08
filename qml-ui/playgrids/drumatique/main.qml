@@ -43,7 +43,6 @@ Zynthian.BasePlayGrid {
     name:'Drumatique'
     dashboardModel: _private.sequence
     isSequencer: true
-    useOctaves: true
     defaults: {
         "positionalVelocity": true
     }
@@ -311,7 +310,7 @@ Zynthian.BasePlayGrid {
         // This is the top bank we have available in any pattern (that is, the upper limit for any pattern's bankOffset value)
         property int bankLimit: 1
         property var clipBoard
-        property int octave: 4
+        property int gridStartNote: 48
 
         // Properties inherent to the active pattern (set these through component.setPatternProperty)
         property int noteLength: sequence && sequence.activePatternObject ? sequence.activePatternObject.noteLength : 0
@@ -361,22 +360,10 @@ Zynthian.BasePlayGrid {
             //filterRowEnd: activeBar
         //}
 
-        onOctaveChanged: {
-            if (activePatternModel) {
-                activePatternModel.gridModelStartNote = _private.octave * 12;
-                activePatternModel.gridModelEndNote = activePatternModel.gridModelStartNote + 16;
-            }
-        }
-
         onActivePatternChanged:{
             updateTrack();
             while (hasSelection) {
                 deselectSelectedItem();
-            }
-        }
-        onActivePatternModelChanged: {
-            if (activePatternModel) {
-                _private.octave = activePatternModel.gridModelStartNote / 12;
             }
         }
 
@@ -1679,10 +1666,11 @@ Zynthian.BasePlayGrid {
                     icon.name: "arrow-up"
                     onClicked: {
                         sidebarRoot.hideAllMenus();
-                        if (_private.octave + 1 < 11){
-                            _private.octave =  _private.octave + 1;
-                        } else {
-                            _private.octave =  10;
+                        // Don't scroll past the end
+                        if (_private.activePatternModel.gridModelStartNote < 112) {
+                            // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                            _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote + 4;
+                            _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
                         }
                     }
                 }
@@ -1696,10 +1684,11 @@ Zynthian.BasePlayGrid {
                     icon.name: "arrow-down"
                     onClicked: {
                         sidebarRoot.hideAllMenus();
-                        if (_private.octave - 1 > 0) {
-                            _private.octave = _private.octave - 1;
-                        } else {
-                            _private.octave = 0;
+                        // Don't scroll past the end
+                        if (_private.activePatternModel.gridModelStartNote > 0) {
+                            // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
+                            _private.activePatternModel.gridModelStartNote = _private.activePatternModel.gridModelStartNote - 4;
+                            _private.activePatternModel.gridModelEndNote = _private.activePatternModel.gridModelStartNote + 16;
                         }
                     }
                 }

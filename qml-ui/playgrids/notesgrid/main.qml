@@ -39,7 +39,7 @@ Zynthian.BasePlayGrid {
     settings: notesGridSettings
     name:'Notes Grid'
     octave: 3
-    useOctaves: true
+    useOctaves: _private.alternativeModel === null
 
     defaults: {
         "startingNote": component.octave * 12,
@@ -59,13 +59,27 @@ Zynthian.BasePlayGrid {
         property QtObject model
         property QtObject miniGridModel
         property int channel: ZynQuick.PlayGridManager.currentMidiChannel
-        property int startingNote: component.octave * 12
+        property int startingNote: component.gridRowStartNotes[component.octave]
         property string scale
         property int rows
         property int columns
         property bool positionalVelocity
     }
 
+    gridRowStartNotes: startNotes[_private.scale] !== undefined ? startNotes[_private.scale] : [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
+    onGridRowStartNotesChanged: {
+        populateGridTimer.restart();
+    }
+    property var startNotes: ({
+        "chromatic": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "ionian": [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115],
+        "dorian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "phrygian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "lydian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "mixolydian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "aeolian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
+        "aeolian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
+    })
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
         console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
         var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
@@ -78,7 +92,7 @@ Zynthian.BasePlayGrid {
             "lydian": [2, 2, 2, 1, 2, 2, 1],
             "mixolydian": [2, 2, 1, 2, 2, 1, 2],
             "aeolian": [2, 1, 2, 2, 1, 2, 2],
-            "locrian": [1, 2, 2, 1, 2, 2, 2],
+            "aeolian": [1, 2, 2, 1, 2, 2, 2],
         }
 
         var col = startingNote;
@@ -106,8 +120,8 @@ Zynthian.BasePlayGrid {
             }
 
             if (scale !== "chromatic"){ 
-                col = notes[0].midiNote;
-                scale_index = notes[0].scaleIndex;
+                col = notes[0] ? notes[0].midiNote : -1;
+                scale_index = notes[0] ? notes[0].scaleIndex : 0;
                 for (var x = 0; x < 3; ++x){
                     col += scaleArray[ scale_index % scaleArray.length ];
                     scale_index = (scale_index + 1) %  scaleArray.length;
@@ -119,8 +133,10 @@ Zynthian.BasePlayGrid {
     }
 
     function populateGrid(){
-        fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
-        fillModel(_private.miniGridModel, _private.startingNote + 12, _private.scale, 4, _private.columns, _private.positionalVelocity)
+        if (_private.model && _private.miniGridModel) {
+            fillModel(_private.model, _private.startingNote, _private.scale, _private.rows, _private.columns, _private.positionalVelocity)
+            fillModel(_private.miniGridModel, _private.startingNote, _private.scale, 4, _private.columns, _private.positionalVelocity)
+        }
     }
 
     onInitialize: {
@@ -181,7 +197,7 @@ Zynthian.BasePlayGrid {
     }
 
     onOctaveChanged: {
-        component.setProperty("startingNote", component.octave * 12);
+        component.setProperty("startingNote", component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]);
     }
 
     Component {

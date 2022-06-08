@@ -629,9 +629,6 @@ Zynthian.ScreenPage {
                         onSelectedTrackChanged: {
                             updateSoundNameTimer.restart()
                         }
-                        onSelectedSoundRowChanged: {
-                            updateSoundNameTimer.restart()
-                        }
                     }
 
                     Connections {
@@ -644,6 +641,9 @@ Zynthian.ScreenPage {
                     Connections {
                         target: infoBar.clip ? infoBar.clip.clipTrack : null
                         onChainedSoundsChanged: {
+                            updateSoundNameTimer.restart()
+                        }
+                        onSelectedSlotRowChanged: {
                             updateSoundNameTimer.restart()
                         }
                     }

@@ -832,7 +832,9 @@ Zynthian.ScreenPage {
                                     zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
                                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
                                     bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
-                                    bottomStack.slotsBar.soundCombinatorButton.checked = true
+
+                                    bottomStack.slotsBar.bottomBarButton.checked = true
+                                    // bottomStack.slotsBar.soundCombinatorButton.checked = true
                                 }
                             }
 

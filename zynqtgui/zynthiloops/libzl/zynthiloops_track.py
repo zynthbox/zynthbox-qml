@@ -227,7 +227,7 @@ class zynthiloops_track(QObject):
                     for i, clip in enumerate(obj):
                         if clip is not None:
                             if (bank_dir / clip["path"]).exists():
-                                self.__samples__[i].path = str(bank_dir / clip["path"])
+                                self.__samples__[i].set_path(str(bank_dir / clip["path"]), False) # Do not copy file when restoring
                             if self.__samples__[i].audioSource:
                                 if "keyZoneStart" in clip:
                                     self.__samples__[i].audioSource.setKeyZoneStart(clip["keyZoneStart"])

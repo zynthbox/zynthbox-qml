@@ -183,13 +183,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.metronomeBeatUpdate8th.connect(self.zyngui.increment_blink_count)
             self.zyngui.master_alsa_mixer.volume_changed.connect(lambda: self.master_volume_changed.emit())
             self.update_timer_bpm()
-            self.zyngui.trackWaveEditorBarActiveChanged.connect(self.set_selector)
-            self.zyngui.clipWaveEditorBarActiveChanged.connect(self.set_selector)
-            self.zyngui.session_dashboard.selected_sound_row_changed.connect(self.set_selector)
 
             if cb is not None:
                 cb()
 
+            self.zyngui.layers_for_track.fill_list()
             self.zyngui.zynthiloops.set_selector()
             self.zyngui.session_dashboard.set_selected_track(0, True)
             self.__is_init_in_progress__ = False
@@ -464,7 +462,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 ) or (
                     self.zyngui.sound_combinator_active and
                     selected_track is not None and
-                    selected_track.checkIfLayerExists(selected_track.selectedSlotRow)
+                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])
                 ) or (
                     ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and
                     selected_track is not None and

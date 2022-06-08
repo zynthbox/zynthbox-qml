@@ -209,6 +209,20 @@ ZynQuick.PlayGrid {
      * ignore this, but if you do, you should set `useOctaves` to false.
      */
     property int octave: 3
+    /**
+     * \brief Whether or not to scroll grids by row (as opposed to octave)
+     *
+     * This will force scrolling to happen using scrolling logic (that is, scrolling by row)
+     * instead of changing out a full octave (which might arguably be considered more like a
+     * page up/down style logic).
+     *
+     * @see gridRowStartNotes
+     */
+    property bool useGridScrolling: true
+    /**
+     * \brief The notes used as the start notes for generating grids from a given row
+     */
+    property var gridRowStartNotes: [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
 
     /**
      * \brief The default values of properties you wish to interact with

@@ -206,38 +206,6 @@ Rectangle {
         }
     }
 
-    //NOTE: enable this if shouldn't switch to library
-    Connections {
-        id: backToSelection
-        target: zynthian.layer
-        enabled: false
-        property string screenToGetBack: "session_dashboard"
-        onLayer_created: {
-            zynthian.current_modal_screen_id = screenToGetBack
-            backToSelection.enabled = false
-            backToSelectionTimer.restart()
-        }
-    }
-    Timer {
-        id: backToSelectionTimer
-        interval: 250
-        onTriggered: {
-            zynthian.current_modal_screen_id = backToSelection.screenToGetBack
-        }
-    }
-
-    Connections {
-        id: currentScreenConnection
-        property string oldScreen: "session_dashboard"
-        target: zynthian
-        onCurrent_screen_idChanged: {
-            if (oldScreen === "engine") {
-                backToSelection.enabled = false
-            }
-            oldScreen = zynthian.current_screen_id
-        }
-    }
-
     QtObject {
         id: privateProps
 
@@ -711,24 +679,6 @@ Rectangle {
         }
     }
 
-    QQC2.Popup {
-        id: noFreeSlotsPopup
-        x: Math.round(parent.width/2 - width/2)
-        y: Math.round(parent.height/2 - height/2)
-        width: Kirigami.Units.gridUnit*12
-        height: Kirigami.Units.gridUnit*4
-        modal: true
-
-        QQC2.Label {
-            width: parent.width
-            height: parent.height
-            horizontalAlignment: "AlignHCenter"
-            verticalAlignment: "AlignVCenter"
-            text: qsTr("No free slots remaining")
-            font.italic: true
-        }
-    }
-
     Zynthian.FilePickerDialog {
         id: samplePickerDialog
         parent: zlScreen.parent
@@ -844,102 +794,7 @@ Rectangle {
         }
     }
 
-    QQC2.Dialog {
+    Zynthian.LayerSetupDialog {
         id: layerSetupDialog
-        parent: QQC2.Overlay.overlay
-        y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
-        x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-        height: footer.implicitHeight + topMargin + bottomMargin
-        modal: true
-
-        onAccepted: {
-        }
-        onRejected: {
-        }
-
-        footer: QQC2.Control {
-            leftPadding: layerSetupDialog.leftPadding
-            topPadding: layerSetupDialog.topPadding
-            rightPadding: layerSetupDialog.rightPadding
-            bottomPadding: layerSetupDialog.bottomPadding
-            contentItem: ColumnLayout {
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("Pick a Synth")
-                    onClicked: {
-                        layerSetupDialog.accept();
-
-                        console.log("%%% chainedSound:", root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow], root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]))
-
-                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
-                            zynthian.layer.page_after_layer_creation = "zynthiloops";
-                            layerSetupDialog.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
-                            newSynthWorkaroundTimer.restart()
-                        } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
-                            layerSetupDialog.reject();
-                            noFreeSlotsPopup.open();
-                        } else {
-                            zynthian.layer.page_after_layer_creation = "zynthiloops";
-                            layerSetupDialog.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
-                            newSynthWorkaroundTimer.restart()
-                        }
-                    }
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                    text: qsTr("Change preset")
-                    onClicked: {
-                        zynthian.current_screen_id = "preset"
-                        layerSetupDialog.accept();
-                    }
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    text: qsTr("Load A Sound")
-                    onClicked: {
-                        zynthian.show_modal("sound_categories")
-                        layerSetupDialog.accept();
-                    }
-                }
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                }
-                QQC2.Button {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                    text: qsTr("Remove Synth")
-                    onClicked: {
-                        layerSetupDialog.accept();
-                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
-                            root.selectedTrack.remove_and_unchain_sound(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                        }
-                    }
-                }
-                Timer { //HACK why is this necessary?
-                    id: newSynthWorkaroundTimer
-                    interval: 200
-                    onTriggered: {
-                        backToSelection.screenToGetBack = zynthian.current_screen_id;
-                        backToSelection.enabled = true;
-                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-
-                        if (root.selectedTrack.connectedPattern >= 0) {
-                            var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart);
-                            pattern.midiChannel = root.selectedTrack.connectedSound;
-                        }
-                    }
-                }
-            }
-        }
     }
 }

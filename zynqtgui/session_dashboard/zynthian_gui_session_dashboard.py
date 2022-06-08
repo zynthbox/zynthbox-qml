@@ -100,22 +100,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
-        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        logging.debug(f"Layer created : {index}, Selected Track Chained Sounds : {selected_track.chainedSounds}")
-
-        sounds_to_clone = []
-        for sound in selected_track.chainedSounds:
-            if sound > -1:
-                sounds_to_clone.append(sound)
-
-        logging.debug(f"Sounds to clone : {sounds_to_clone}")
-
-        for index in range(0, len(sounds_to_clone)-1):
-            logging.debug(f"Cloning layers {sounds_to_clone[index], sounds_to_clone[index+1]}")
-            self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index], sounds_to_clone[index+1])
-            self.zyngui.screens['layer'].clone_midi(sounds_to_clone[index+1], sounds_to_clone[index])
-
-        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
+       QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
 
     def fx_layers_changed(self):
         logging.debug(f"FX Layer Changed")

@@ -57,11 +57,11 @@ Item {
     readonly property color borderColor: component.visible ? (foregroundColor) : ""
 
     RowLayout {
-        visible: component.note.subnotes.length > 0
+        visible: typeof(component.note) !== "undefined" && component.note != null && component.note.subnotes.length > 0
         anchors.fill: parent
         spacing: 0
         Repeater {
-            model: component.note.subnotes
+            model: component.note ? component.note.subnotes : 0
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -77,7 +77,7 @@ Item {
         }
     }
     Rectangle {
-        visible: component.note.subnotes.length === 0
+        visible: typeof(component.note) !== "undefined" && component.note != null && component.note.subnotes.length === 0
         anchors.fill: parent
         color: {
             var color = component.backgroundColor;

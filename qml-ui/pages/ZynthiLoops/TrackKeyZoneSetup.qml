@@ -83,7 +83,7 @@ Item {
                         clipObj.keyZoneStart = 0;
                         clipObj.keyZoneEnd = 127;
                         clipObj.rootNote = 60;
-                        component.selectedTrack.selectedSampleRow = index;
+                        component.selectedTrack.selectedSlotRow = index;
                     }
                 }
             }
@@ -144,7 +144,7 @@ Item {
                     }
                     height: parent.height;
                     width: 1
-                    property bool isCurrent: component.selectedTrack.selectedSampleRow === index
+                    property bool isCurrent: component.selectedTrack.selectedSlotRow === index
                     z: isCurrent ? 99 : 0
                     property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null

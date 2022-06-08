@@ -63,7 +63,6 @@ class zynthiloops_track(QObject):
         self.__chained_sounds__ = [-1, -1, -1, -1, -1]
         self.zyngui.screens["layer"].layer_deleted.connect(self.layer_deleted)
         self.__muted__ = False
-        self.__selected_sample_row__ = 0
         self.__samples__ = []
         self.__keyzone_mode__ = "all-full"
         self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
@@ -917,19 +916,6 @@ class zynthiloops_track(QObject):
 
     bankDir = Property(str, get_bank_dir, constant=True)
     ### END Property bankDir
-
-    ### Property selectedSampleRow
-    def get_selected_sample_row(self):
-        return self.__selected_sample_row__
-
-    def set_selected_sample_row(self, row):
-        self.__selected_sample_row__ = row
-        self.selected_sample_row_changed.emit()
-
-    selected_sample_row_changed = Signal()
-
-    selectedSampleRow = Property(int, get_selected_sample_row, set_selected_sample_row, notify=selected_sample_row_changed)
-    ### END Property selectedSampleRow
 
     ### Property sceneClip
     def get_scene_clip(self):

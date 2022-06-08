@@ -217,11 +217,11 @@ Kirigami.AbstractApplicationWindow {
             Zynthian.BreadcrumbButton {
                 id: samplesButton
 
-                property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
+                property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                 icon.color: customTheme.Kirigami.Theme.textColor
                 text: qsTr("Sample %1 ˬ %2")
-                        .arg(root.selectedTrack.selectedSampleRow + 1)
+                        .arg(root.selectedTrack.selectedSlotRow + 1)
                         .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 11
                 rightPadding: Kirigami.Units.largeSpacing*2
@@ -239,9 +239,9 @@ Kirigami.AbstractApplicationWindow {
                             text: qsTr("Sample %1").arg(index + 1)
                             width: parent.width
                             onClicked: {
-                                root.selectedTrack.selectedSampleRow = index
+                                root.selectedTrack.selectedSlotRow = index
                             }
-                            highlighted: root.selectedTrack.selectedSampleRow === index
+                            highlighted: root.selectedTrack.selectedSlotRow === index
                         }
                     }
                 }

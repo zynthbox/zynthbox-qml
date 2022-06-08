@@ -240,7 +240,7 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                     }
                 } else if (root.selectedTrack && ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0) {
-                    var sample = root.selectedTrack.samples[root.selectedTrack.selectedSampleRow]
+                    var sample = root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                     // when sample and slot is active, goto wave editor or show popup when empty
                     if (sample && sample.path && sample.path.length > 0) {
@@ -724,7 +724,7 @@ Zynthian.ScreenPage {
                         text: visible && zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
                     }
                     QQC2.Label {
-                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSampleRow]
+                        property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSlotRow]
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter

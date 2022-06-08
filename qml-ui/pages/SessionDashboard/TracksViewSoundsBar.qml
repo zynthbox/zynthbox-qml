@@ -454,6 +454,7 @@ Zynthian.Card {
                                  soundDelegate.chainedSound >= 0 &&
                                  root.selectedTrack &&
                                  root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
+                                 volumeControlObject != null &&
                                  volumeControlObject.controllable
                         value: volumeControlObject ? volumeControlObject.value : 0
                         stepSize: volumeControlObject ? volumeControlObject.step_size : 1

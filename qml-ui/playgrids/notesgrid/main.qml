@@ -38,17 +38,17 @@ Zynthian.BasePlayGrid {
     miniGrid: notesMiniGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    octave: 3
+    octave: 8
     useOctaves: _private.alternativeModel === null
 
     defaults: {
-        "startingNote": component.octave * 12,
         "scale": "ionian",
         "rows": 5,
         "columns": 8,
-        "positionalVelocity": true
+        "positionalVelocity": true,
+        "transposeAmount": 7 // Default value to make C3 be our first note bottom-left at "octave" step 8 ionian
     }
-    persist: ["scale", "rows", "columns", "positionalVelocity"]
+    persist: ["scale", "rows", "columns", "positionalVelocity", "transposeAmount"]
 
     QtObject {
         id: _private
@@ -59,32 +59,15 @@ Zynthian.BasePlayGrid {
         property QtObject model
         property QtObject miniGridModel
         property int channel: ZynQuick.PlayGridManager.currentMidiChannel
-        property int startingNote: component.gridRowStartNotes[component.octave]
-        property string scale
-        property int rows
-        property int columns
-        property bool positionalVelocity
-    }
-
-    gridRowStartNotes: startNotes[_private.scale] !== undefined ? startNotes[_private.scale] : [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
-    onGridRowStartNotesChanged: {
-        populateGridTimer.restart();
-    }
-    property var startNotes: ({
-        "chromatic": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "ionian": [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115],
-        "dorian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "phrygian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "lydian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "mixolydian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "aeolian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120],
-        "aeolian": [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
-    })
-    function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
-        console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
-        var note_int_to_str_map = ["C", "C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-
-        var scale_mode_map = {
+        property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
+        property int transposeAmount: 7
+        property string scale: "ionian"
+        property int rows: 5
+        property int columns: 8
+        property bool positionalVelocity: true
+        property var startNotes: ({ "chromatic": [0], "ionian": [0], "dorian": [0], "phrygian": [0], "lydian": [0], "mixolydian": [0], "aeolian": [0], "locrian": [0] })
+        property var startIndices: ({ "chromatic": [0], "ionian": [0], "dorian": [0], "phrygian": [0], "lydian": [0], "mixolydian": [0], "aeolian": [0], "locrian": [0] })
+        property var scale_mode_map: ({
             "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             "ionian": [2, 2, 1, 2, 2, 2, 1],
             "dorian": [2, 1, 2, 2, 2, 1, 2],
@@ -92,42 +75,43 @@ Zynthian.BasePlayGrid {
             "lydian": [2, 2, 2, 1, 2, 2, 1],
             "mixolydian": [2, 2, 1, 2, 2, 1, 2],
             "aeolian": [2, 1, 2, 2, 1, 2, 2],
-            "aeolian": [1, 2, 2, 1, 2, 2, 2],
-        }
+            "locrian": [1, 2, 2, 1, 2, 2, 2],
+        })
 
+        onStartingNoteChanged: {
+            populateGridTimer.restart();
+        }
+    }
+
+    gridRowStartNotes: typeof _private.startNotes[_private.scale] === "undefined" ? [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120] : _private.startNotes[_private.scale]
+    function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
+        console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
         var col = startingNote;
-        var scaleArray = scale_mode_map[scale];
-        var scale_index = 0;
+        var scaleArray = _private.scale_mode_map[scale];
+        // Octave is not the correct term here, rather it's the position in the start note
+        // array - but the variable is called octave, at least at the moment
+        var scale_index = ((component.octave * 4) % scaleArray.length);
+        var row_first_scale_index = 0;
+        var row_first_note = 0;
 
         model.clear();
         for (var row = 0; row < rows; ++row){
-
             var notes = [];
-            
-            for (var i = 0; i < columns; ++i) {
-
-                var note = component.getNote(
-                    col,
-                    _private.channel
-                );
-                if (scale_index >= scaleArray.length){
-                    scale_index = 0;
+            scale_index = _private.startIndices[_private.scale][component.octave + row];
+            col = _private.startNotes[_private.scale][component.octave + row];
+            // Minor hack here, but as we want the rows to be filled, this wants to be a thing
+            if (typeof(col) === "undefined") {
+                for (var i = 0; i < columns; ++i) {
+                    notes.push(null);
                 }
-                col += scaleArray[scale_index];
-                scale_index += 1;
-                notes.push(note);
-
-            }
-
-            if (scale !== "chromatic"){ 
-                col = notes[0] ? notes[0].midiNote : -1;
-                scale_index = notes[0] ? notes[0].scaleIndex : 0;
-                for (var x = 0; x < 3; ++x){
-                    col += scaleArray[ scale_index % scaleArray.length ];
-                    scale_index = (scale_index + 1) %  scaleArray.length;
+            } else {
+                for (var i = 0; i < columns; ++i) {
+                    var note = component.getNote(col, _private.channel);
+                    notes.push(note);
+                    col += scaleArray[scale_index];
+                    scale_index = (scale_index + 1) % scaleArray.length;
                 }
             }
-
             model.addRow(notes);
         }
     }
@@ -139,8 +123,44 @@ Zynthian.BasePlayGrid {
         }
     }
 
+    function populateStartNotes() {
+        var startNotes = [];
+        var startIndices = [];
+        for (var scale in _private.scale_mode_map) {
+            var scaleStartNotes = [];
+            var scaleStartIndices = [];
+            var scale_index = 0;
+            var col = _private.transposeAmount;
+            var scaleArray = _private.scale_mode_map[scale];
+            if (scale === "chromatic") {
+                // chromatic's a bit of a special case, that one just keeps going, so might as well just do that simple:
+                var i = 0;
+                while (col < 128) {
+                    scaleStartNotes.push(col);
+                    scaleStartIndices.push(i);
+                    col += (_private.columns > 0 ? _private.columns : 8);
+                    i = (i + 1) % 12;
+                }
+            } else {
+                while (col < 128) {
+                    // Each row progresses by four positions in the scale (except chromatic, handled separately above)
+                    scaleStartNotes.push(col);
+                    scaleStartIndices.push(scale_index);
+                    for (var x = 0; x < 3; ++x){
+                        col += scaleArray[scale_index];
+                        scale_index = (scale_index + 1) %  scaleArray.length;
+                    }
+                }
+            }
+            startNotes[scale] = scaleStartNotes;
+            startIndices[scale] = scaleStartIndices;
+        }
+        _private.startNotes = startNotes;
+        _private.startIndices = startIndices;
+    }
+
     onInitialize: {
-        _private.startingNote = component.getProperty("startingNote")
+        _private.transposeAmount = component.getProperty("transposeAmount")
         _private.scale = component.getProperty("scale")
         _private.rows = component.getProperty("rows")
         _private.columns = component.getProperty("columns")
@@ -149,15 +169,16 @@ Zynthian.BasePlayGrid {
         _private.model = component.getModel("main")
         _private.miniGridModel = component.getModel("mini")
         if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
+            populateStartNotesTimer.restart()
             populateGridTimer.restart()
         }
     }
 
     onPropertyChanged: {
-        //console.log("A property named " + property + " has changed to " + value);
+        console.log("A property named " + property + " has changed to " + value);
         var gridContentsChanged = true;
-        if (property === "startingNote") {
-            _private.startingNote = value;
+        if (property === "transposeAmount") {
+            _private.transposeAmount = value;
         } else if (property === "scale") {
             _private.scale = value;
         } else if (property === "rows") {
@@ -171,7 +192,7 @@ Zynthian.BasePlayGrid {
             gridContentsChanged = false;
         }
         if (gridContentsChanged) {
-            populateGridTimer.restart()
+            populateStartNotesTimer.restart();
         }
     }
 
@@ -188,16 +209,18 @@ Zynthian.BasePlayGrid {
     }
 
     Timer {
+        id: populateStartNotesTimer
+        interval: 1; repeat: false; running: false;
+        onTriggered: {
+            component.populateStartNotes();
+        }
+    }
+    Timer {
         id: populateGridTimer
-        interval: 1
-        repeat: false
+        interval: 1; repeat: false; running: false;
         onTriggered: {
             component.populateGrid();
         }
-    }
-
-    onOctaveChanged: {
-        component.setProperty("startingNote", component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]);
     }
 
     Component {
@@ -290,102 +313,37 @@ Zynthian.BasePlayGrid {
                 currentIndex: 1
 
                 onActivated: {
-                    component.setProperty("startingNote", 36);
-                    component.setProperty("scale", scaleModel.get(currentIndex).scale);
-                }
-            }
-            QQC2.ComboBox {
-                id: comboKey
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Key"
-                visible: component.getProperty("scale") == "chromatic"
-                model: keyModel
-                textRole: "text"
-                displayText: currentText
-                currentIndex: 0
-
-                onActivated: {
-                    component.setProperty("startingNote", keyModel.get(currentIndex).note);
-                }
-                ListModel {
-                    id: keyModel
-                    function getName(note) {
-                        for(var i = 0; i < keyModel.rowCount(); ++i) {
-                            var le = keyModel.get(i);
-                            if (le.note = note) {
-                                return le.text;
-                            }
-                        }
-                        return "C";
-                    }
-
-                    ListElement { note: 36; text: "C" }
-                    ListElement { note: 37; text: "C#" }
-                    ListElement { note: 38; text: "D" }
-                    ListElement { note: 39; text: "D#" }
-                    ListElement { note: 40; text: "E" }
-                    ListElement { note: 41; text: "F" }
-                    ListElement { note: 42; text: "F#" }
-                    ListElement { note: 43; text: "G" }
-                    ListElement { note: 44; text: "G#" }
-                    ListElement { note: 45; text: "A" }
-                    ListElement { note: 46; text: "A#" }
-                    ListElement { note: 47; text: "B" }
+                    var scale = scaleModel.get(currentIndex).scale;
+                    component.setProperty("scale", scale);
+                    component.octave = (scale === "chromatic") ? 4 : 7
                 }
             }
 
             QQC2.Button {
                 Layout.fillWidth: true
                 Kirigami.FormData.label: "Transpose"
-                visible: component.getProperty("scale") === "chromatic"
                 text: "-"
+                enabled: _private.transposeAmount > 0
                 onClicked: {
-                    var startingNote = component.getProperty("startingNote")
-                    if (startingNote - 1 > 0) {
-                        component.setProperty("startingNote", startingNote - 1);
-                    } else {
-                        startingNote = 0;
-                        component.setProperty("startingNote", 0);
+                    var transposeAmount = component.getProperty("transposeAmount")
+                    if (transposeAmount > 0) {
+                        component.setProperty("transposeAmount", transposeAmount - 1);
                     }
                 }
             }
             QQC2.Button {
+                Kirigami.FormData.label: _private.transposeAmount
                 Layout.fillWidth: true
-                visible: component.getProperty("scale") === "chromatic"
                 text: "+"
+                enabled: _private.transposeAmount < 11
                 onClicked: {
-                    var startingNote = component.getProperty("startingNote")
-                    component.setProperty("startingNote", startingNote + 1);
+                    var transposeAmount = component.getProperty("transposeAmount")
+                    if (transposeAmount < 11) {
+                        component.setProperty("transposeAmount", transposeAmount + 1);
+                    }
                 }
             }
 
-            QQC2.Button {
-                Layout.fillWidth: true
-                Kirigami.FormData.label: "Octave"
-                visible: component.getProperty("scale") !== "chromatic"
-                text: "-"
-                onClicked: {
-                    var startingNote = component.getProperty("startingNote")
-                    if (startingNote - 12 > 0) {
-                        component.setProperty("startingNote", startingNote - 12);
-                    } else {
-                        component.setProperty("startingNote",0);
-                    }
-                }
-            }
-            QQC2.Button {
-                Layout.fillWidth: true
-                visible: component.getProperty("scale") != "chromatic"
-                text: "+"
-                onClicked: {
-                    var startingNote = component.getProperty("startingNote")
-                    if (startingNote + 12 < 127){
-                        component.setProperty("startingNote", startingNote + 12);
-                    } else {
-                        component.setProperty("startingNote", 120);
-                    }
-                }
-            }
             QQC2.ComboBox {
                 id: optionGrid
                 Layout.fillWidth: true

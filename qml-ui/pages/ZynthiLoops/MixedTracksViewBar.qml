@@ -367,7 +367,9 @@ Rectangle {
                                     : null
 
                                     delegate: Rectangle {
-                                        property bool highlighted: root.selectedTrack.selectedSlotRow === index
+                                        property bool highlighted: root.selectedTrack.trackAudioType === "sample-loop"
+                                                                    ? index === 0
+                                                                    : root.selectedTrack.selectedSlotRow === index
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true

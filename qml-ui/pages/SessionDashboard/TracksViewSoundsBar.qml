@@ -108,9 +108,9 @@ Zynthian.Card {
     contentItem: ColumnLayout {
         anchors.margins: Kirigami.Units.gridUnit
 
-        Kirigami.Heading {
-            text: qsTr("Track : %1").arg(root.selectedTrack.name)
-        }
+//        Kirigami.Heading {
+//            text: qsTr("Track : %1").arg(root.selectedTrack.name)
+//        }
 
         Repeater {
             id: chainedSoundsRepeater

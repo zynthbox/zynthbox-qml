@@ -101,6 +101,9 @@ Rectangle {
         }
 
         ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
             RowLayout {
                 Layout.fillWidth: true
                 Layout.maximumHeight: Kirigami.Units.gridUnit * 2
@@ -261,7 +264,6 @@ Rectangle {
                 id: tabbedView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.maximumHeight: Kirigami.Units.gridUnit * 12
                 minimumTabsCount: 4
                 orientation: Qt.Vertical
                 visibleFocusRects: false

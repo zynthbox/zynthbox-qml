@@ -49,8 +49,8 @@ QQC2.Popup {
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: !root.selectedTrack.sceneClip.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
 
-    onVisibleChanged: {
-        if (visible) {
+    onOpenedChanged: {
+        if (opened) {
             // Report dialog open to zynthian for passing cuia events to dialog
             zynthian.openedDialog = root
         } else {

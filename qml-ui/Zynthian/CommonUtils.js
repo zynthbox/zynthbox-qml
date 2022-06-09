@@ -71,8 +71,16 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
         case "TRACK_1":
         case "TRACK_6":
             if (selectedTrack.trackAudioType === "sample-loop") {
+                if (selectedTrack.connectedPattern >= 0) {
+                    bottomStack.bottomBar.setControlObjByType(selectedTrack.sceneClip, "pattern")
+                } else {
+                    bottomStack.bottomBar.setControlObjByType(selectedTrack.sceneClip, "clip")
+                }
+
                 bottomStack.bottomBar.filePickerDialog.folderModel.folder = bottomStack.bottomBar.controlObj.recordingDir;
                 bottomStack.bottomBar.filePickerDialog.open();
+                bottomStack.bottomBar.filePickerDialog.open();
+
                 return true
             } else if (selectedTrack.trackAudioType === "synth" ||
                 selectedTrack.trackAudioType === "sample-trig" ||

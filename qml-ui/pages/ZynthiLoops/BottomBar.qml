@@ -62,6 +62,22 @@ Rectangle {
     property int controlType: BottomBar.ControlType.None
     property QtObject controlObj: null
 
+    function setControlObjByType(obj, type) {
+        if (type === "song") {
+            root.controlType = BottomBar.ControlType.Song
+        } else if (type === "clip") {
+            root.controlType = BottomBar.ControlType.Clip
+        } else if (type === "track") {
+            root.controlType = BottomBar.ControlType.Track
+        } else if (type === "part") {
+            root.controlType = BottomBar.ControlType.Part
+        } else if (type === "pattern") {
+            root.controlType = BottomBar.ControlType.Pattern
+        }
+
+        root.controlObj = obj
+    }
+
     onControlObjChanged: {
         if (root.controlType === BottomBar.ControlType.Pattern) {
             patternAction.trigger();

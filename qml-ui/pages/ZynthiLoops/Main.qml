@@ -295,14 +295,14 @@ Zynthian.ScreenPage {
                 zynthian.songBarActive = false;
             }
 
-//            // Check if sound combinator is active
-//            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
-//                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
-//            ) {
-//                zynthian.soundCombinatorActive = true;
-//            } else {
-//                zynthian.soundCombinatorActive = false;
-//            }
+            // Check if sound combinator is active
+            if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
+                bottomBar.tabbedView.activeAction.page.search("TracksViewSoundsBar") >= 0 // Checks if current active page is sound combinator or not
+            ) {
+                zynthian.soundCombinatorActive = true;
+            } else {
+                zynthian.soundCombinatorActive = false;
+            }
 
             // Check if sound combinator is active
             if (bottomStack.slotsBar.bottomBarButton.checked && // Checks if bottombar is visible
@@ -341,7 +341,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.mixerButton.checked) {
                 console.log("LED : Slots Mixer Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -350,7 +350,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.partButton.checked) {
                 console.log("LED : Slots Part Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -359,7 +359,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.synthsButton.checked) {
                 console.log("LED : Slots Synths Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -368,7 +368,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = true;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.samplesButton.checked) {
                 console.log("LED : Slots Samples Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -377,7 +377,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = true;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.fxButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -386,7 +386,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = true;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             } else if (bottomStack.slotsBar.soundCombinatorButton.checked) {
                 console.log("LED : Slots FX Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -395,7 +395,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = true;
+                // zynthian.soundCombinatorActive = true;
             } else {
                 console.log("LED : No Slots Bar active")
                 zynthian.slotsBarTrackActive = false;
@@ -404,7 +404,7 @@ Zynthian.ScreenPage {
                 zynthian.slotsBarSynthsActive = false;
                 zynthian.slotsBarSamplesActive = false;
                 zynthian.slotsBarFxActive = false;
-                zynthian.soundCombinatorActive = false;
+                // zynthian.soundCombinatorActive = false;
             }
         }
     }

@@ -98,115 +98,268 @@ QQC2.Popup {
             opacity: 0.5
         }
         RowLayout {
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 12
             Layout.fillWidth: true
 
-            QQC2.Label {
-                text: "Source"
+            ColumnLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Audio Source")
+                    }
+
+                    QQC2.ComboBox {
+                        id: sourceCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: sourceComboModel
+
+                            ListElement { text: "Internal (Active Layer)"; value: "internal" }
+                            ListElement { text: "External (Audio In)"; value: "external" }
+                        }
+                        textRole: "text"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    visible: sourceCombo.currentIndex === 0 // Visible when source is internal
+
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        enabled: parent.enabled
+                        text: qsTr("Source Track")
+                    }
+
+                    QQC2.ComboBox {
+                        id: trackCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: trackComboModel
+
+                            ListElement { text: "Track 1"; value: 0 }
+                            ListElement { text: "Track 2"; value: 1 }
+                            ListElement { text: "Track 3"; value: 2 }
+                            ListElement { text: "Track 4"; value: 3 }
+                            ListElement { text: "Track 5"; value: 4 }
+                            ListElement { text: "Track 6"; value: 5 }
+                            ListElement { text: "Track 7"; value: 6 }
+                            ListElement { text: "Track 8"; value: 7 }
+                            ListElement { text: "Track 9"; value: 8 }
+                            ListElement { text: "Track 10"; value: 9 }
+                        }
+                        textRole: "text"
+                        currentIndex: zynthian.session_dashboard.selectedTrack
+                        onActivated: {
+                            zynthian.session_dashboard.selectedTrack = trackComboModel.get(index).value
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    visible: sourceCombo.currentIndex === 1 // Visible when source is external
+
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Channel")
+                    }
+
+                    QQC2.ComboBox {
+                        id: channelCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: channelComboModel
+
+                            ListElement { text: "Left Channel"; value: "1" }
+                            ListElement { text: "Right Channel"; value: "2" }
+                            ListElement { text: "Stereo"; value: "*" }
+                        }
+                        textRole: "text"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Count In (Bars)")
+                    }
+
+                    QQC2.ComboBox {
+                        id: countInCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: countInComboModel
+                            ListElement { value: 1 }
+                            ListElement { value: 2 }
+                            ListElement { value: 4 }
+                        }
+                        textRole: "value"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Record Master Output")
+                    }
+
+                    QQC2.CheckBox {
+                        checked: zynthian.zynthiloops.recordMasterOutput
+                        onToggled: {
+                            zynthian.zynthiloops.recordMasterOutput = checked
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Metronome")
+                    }
+
+                    QQC2.Switch {
+                        Layout.alignment: Qt.AlignVCenter
+                        implicitWidth: Kirigami.Units.gridUnit * 3
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        onToggled: {
+                            zynthian.zynthiloops.clickTrackEnabled = checked
+                        }
+                    }
+                }
             }
 
-            QQC2.ComboBox {
-                id: sourceCombo
-
+            ColumnLayout {
+                Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignCenter
-                model: ListModel {
-                    id: sourceComboModel
+            }
 
-                    ListElement { text: "Internal (Active Layer)"; value: "internal" }
-                    ListElement { text: "External (Audio In)"; value: "external" }
+            ColumnLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    RowLayout {
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                            horizontalCenter: parent.horizontalCenter
+                        }
+
+                        Extras.Gauge {
+                            Layout.fillHeight: true
+
+                            minimumValue: -100
+                            maximumValue: 20
+                            value: visible
+                                   ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                      ? ZL.AudioLevels.tracks[root.selectedTrack.id]
+                                      : ZL.AudioLevels.captureA
+                                   : -100
+
+                            font.pointSize: 8
+
+                            style: GaugeStyle {
+                                valueBar: Rectangle {
+                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                    implicitWidth: 6
+                                }
+                                minorTickmark: null
+                                tickmark: null
+                                tickmarkLabel: null
+                            }
+                        }
+
+                        Extras.Gauge {
+                            Layout.fillHeight: true
+
+                            minimumValue: -100
+                            maximumValue: 20
+                            value: visible
+                                    ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                                       ? ZL.AudioLevels.tracks[root.selectedTrack.id]
+                                       : ZL.AudioLevels.captureB
+                                    : -100
+
+                            font.pointSize: 8
+
+                            style: GaugeStyle {
+                                valueBar: Rectangle {
+                                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
+                                    implicitWidth: 6
+                                }
+                                minorTickmark: null
+                                tickmark: null
+                                tickmarkLabel: null
+                            }
+                        }
+                    }
                 }
-                textRole: "text"
-            }
-        }
-        RowLayout {
-            Layout.fillWidth: true
-            visible: sourceComboModel.get(sourceCombo.currentIndex).value === "external"
 
-            QQC2.Label {
-                text: "Channel"
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Audio Level"
+                }
             }
 
-            QQC2.ComboBox {
-                id: channelCombo
+            ColumnLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 8
 
+                QQC2.Button {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+                    Layout.alignment: Qt.AlignCenter
+
+                    icon.name: root.selectedTrack.sceneClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+
+                    onClicked: {
+                        if (!root.selectedTrack.sceneClip.isRecording) {
+                            // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
+                            root.selectedTrack.sceneClip.queueRecording(
+                                sourceComboModel.get(sourceCombo.currentIndex).value,
+                                channelComboModel.get(channelCombo.currentIndex).value
+                            );
+                            Zynthian.CommonUtils.startMetronomeAndPlayback();
+                        } else {
+                            Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                            bottomBar.tabbedView.initialAction.trigger()
+                        }
+                    }
+                }
+            }
+
+            Item {
+                Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignCenter
-                model: ListModel {
-                    id: channelComboModel
-
-                    ListElement { text: "Left Channel"; value: "1" }
-                    ListElement { text: "Right Channel"; value: "2" }
-                    ListElement { text: "Stereo"; value: "*" }
-                }
-                textRole: "text"
-            }
-        }
-        RowLayout {
-            Layout.fillWidth: true
-            visible: false
-
-            QQC2.Label {
-                text: "Count In (Bars)"
-            }
-
-            QQC2.ComboBox {
-                id: countInCombo
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignCenter
-                model: ListModel {
-                    id: countInComboModel
-                    ListElement { value: 1 }
-                    ListElement { value: 2 }
-                    ListElement { value: 4 }
-                }
-                textRole: "value"
-            }
-        }
-
-        Extras.Gauge {
-            Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.gridUnit
-            Layout.bottomMargin: Kirigami.Units.gridUnit
-
-            orientation: Qt.Horizontal
-            minimumValue: -100
-            maximumValue: 20
-            value: root.visible
-                    ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                        ? ZL.AudioLevels.tracks[root.selectedTrack.id]
-                        : ZL.AudioLevels.add(ZL.AudioLevels.captureA, ZL.AudioLevels.captureB)
-                    : -100
-
-            font.pointSize: 8
-
-            style: GaugeStyle {
-                valueBar: Rectangle {
-                    color: Qt.lighter(Kirigami.Theme.highlightColor, 1.6)
-                    implicitWidth: 6
-                }
-                minorTickmark: null
-                tickmark: null
-                tickmarkLabel: null
-            }
-        }
-
-
-        QQC2.Button {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-            icon.name: root.selectedTrack.sceneClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
-            onClicked: {
-                if (!root.selectedTrack.sceneClip.isRecording) {
-                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-                    root.selectedTrack.sceneClip.queueRecording(
-                        sourceComboModel.get(sourceCombo.currentIndex).value,
-                        channelComboModel.get(channelCombo.currentIndex).value
-                    );
-                    Zynthian.CommonUtils.startMetronomeAndPlayback();
-                } else {
-                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                    bottomBar.tabbedView.initialAction.trigger()
-                }
             }
         }
     }

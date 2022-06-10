@@ -45,6 +45,13 @@ Item {
     property int modulationValue: Math.max(-127, Math.min(slidePoint.slideY * 127 / width, 127))
     onModulationValueChanged: ZynQuick.PlayGridManager.modulation = modulationValue;
 
+    // Whether or not pressing and holding the button should be visualised
+    property bool visualPressAndHold: false
+    // Whether or not we are currently holding the button down and are past the press and hold threshold
+    property bool pressingAndHolding: false
+    // Fired when the press and hold timeout is reached
+    signal pressAndHold();
+
     Layout.fillWidth: true
     Layout.fillHeight: true
     Kirigami.Theme.inherit: false
@@ -128,6 +135,43 @@ Item {
         }
         color: "transparent"
     }
+    Rectangle {
+        id: pressAndHoldVisualiser
+        anchors {
+            right: parent.right
+            leftMargin: width / 2
+            bottom: parent.bottom
+        }
+        width: Kirigami.Units.smallSpacing
+        visible: component.visualPressAndHold
+        color: component.borderColor
+        height: 0
+        opacity: 0
+        states: [
+            State {
+                name: "held"; when: (component.visualPressAndHold && longPressTimer.running || component.pressingAndHolding);
+                PropertyChanges { target: pressAndHoldVisualiser; height: component.height; opacity: 1 }
+            }
+        ]
+        transitions: [
+            Transition {
+                from: ""; to: "held";
+                NumberAnimation { property: "height"; duration: longPressTimer.interval; }
+                NumberAnimation { property: "opacity"; duration: longPressTimer.interval; }
+            }
+        ]
+        Timer {
+            id: longPressTimer;
+            interval: 3000; repeat: false; running: false
+            property bool insideBounds: false;
+            onTriggered: {
+                if (insideBounds) {
+                    component.pressAndHold();
+                }
+                component.pressingAndHolding = true;
+            }
+        }
+    }
 
     MultiPointTouchArea {
         anchors.fill: parent
@@ -137,6 +181,17 @@ Item {
                 property double slideX: x < 0 ? Math.floor(x) : (x > component.width ? x - component.width : 0)
                 property double slideY: y < 0 ? -Math.floor(y) : (y > component.height ? -(y - component.height) : 0)
                 property var playingNote;
+                function updateInsideBounds() {
+                    if (pressed) {
+                        if (x > -1 && y > -1 && x < component.width && y < component.height) {
+                            longPressTimer.insideBounds = true;
+                        } else {
+                            longPressTimer.insideBounds = false;
+                        }
+                    }
+                }
+                onXChanged: updateInsideBounds();
+                onYChanged: updateInsideBounds();
                 onPressedChanged: {
                     if (pressed) {
                         var velocityValue = 64;
@@ -152,12 +207,16 @@ Item {
                         }
                         component.notePlayed(playingNote, velocityValue);
                         component.focus = true;
+                        updateInsideBounds();
+                        longPressTimer.restart();
                     } else {
                         if (component.note.midiChannel < 15) {
                             ZynQuick.PlayGridManager.setNoteOff(playingNote)
                         }
                         ZynQuick.PlayGridManager.pitch = 0;
                         ZynQuick.PlayGridManager.modulation = 0;
+                        component.pressingAndHolding = false;
+                        longPressTimer.stop();
                     }
                 }
             }

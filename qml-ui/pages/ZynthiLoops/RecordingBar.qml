@@ -175,9 +175,11 @@ GridLayout {
 
                     minimumValue: -100
                     maximumValue: 20
-                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.synthA
+                    value: visible
+                           ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                              ? ZL.AudioLevels.tracks[bottomBar.controlObj.clipTrack.id]
                               : ZL.AudioLevels.captureA
+                           : -100
 
                     font.pointSize: 8
 
@@ -197,9 +199,11 @@ GridLayout {
 
                     minimumValue: -100
                     maximumValue: 20
-                    value: sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.synthB
-                              : ZL.AudioLevels.captureB
+                    value: visible
+                            ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
+                               ? ZL.AudioLevels.tracks[bottomBar.controlObj.clipTrack.id]
+                               : ZL.AudioLevels.captureB
+                            : -100
 
                     font.pointSize: 8
 

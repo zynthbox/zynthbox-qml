@@ -38,6 +38,7 @@ ColumnLayout {
     property bool positionalVelocity
     property Item playgrid
     signal removeNote(QtObject note)
+    signal notePressAndHold(QtObject note)
 
     Repeater {
         model: visible ? component.model : null
@@ -58,6 +59,10 @@ ColumnLayout {
                     backgroundColor: weAreChosen ? noteColor : Kirigami.Theme.textColor
                     playingBackgroundColor: weAreChosen ? tintedNoteColor : noteColor
                     highlightOctaveStart: false
+                    visualPressAndHold: note !== null
+                   onPressAndHold: {
+                        component.notePressAndHold(note);
+                    }
                     onNotePlayed: {
                         if (!component.playgrid.listenForNotes) {
                             if (zynthian.backButtonPressed) {

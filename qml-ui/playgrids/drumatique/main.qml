@@ -578,6 +578,11 @@ Zynthian.BasePlayGrid {
                             }
                         }
                     }
+                    onNotePressAndHold: {
+                        if (note) {
+                            noteSettingsPopup.showSettings(_private.activePatternModel, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, _private.activePatternModel.activeBar + _private.activePatternModel.bankOffset, [note.midiNote]);
+                        }
+                    }
                 }
 
                 // drum pad & sequencer
@@ -607,6 +612,37 @@ Zynthian.BasePlayGrid {
                             if (seqPad) {
                                 seqPad.currentSubNote = newSubnote;
                                 Qt.callLater(drumPadRepeater.updateMostRecentFromSelection);
+                            }
+                        }
+                    }
+                    Connections {
+                        target: noteSettings
+                        onChangeStep: {
+                            var drumPadStartStep = ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count);
+                            if (newStep === -1) {
+                                var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                if (seqPad.currentSubNote > -1) {
+                                    seqPad.currentSubNote = -1;
+                                }
+                                drumPadRepeater.selectedIndex = -1;
+                            } else if (newStep >= drumPadStartStep && newStep < drumPadStartStep + drumPadRepeater.count) {
+                                var seqPad = drumPadRepeater.itemAt(newStep - drumPadStartStep);
+                                if (seqPad) {
+                                    seqPad.setSelected(-1);
+                                    Qt.callLater(drumPadRepeater.updateMostRecentFromSelection);
+                                }
+                            }
+                        }
+                        onChangeSubnote: {
+                            var drumPadStartStep = ((_private.activeBar + _private.bankOffset) * drumPadRepeater.count);
+                            var selectedStep = noteSettings.currentStep;
+                            console.log("Subnote changed for selected step", selectedStep, "with drumpad start step", drumPadStartStep, "and new subnote", newSubNote);
+                            if (selectedStep === -1 || (selectedStep >= drumPadStartStep && selectedStep < drumPadStartStep + drumPadRepeater.count)) {
+                                var seqPad = drumPadRepeater.itemAt(selectedStep - drumPadStartStep);
+                                if (seqPad) {
+                                    seqPad.currentSubNote = newSubNote;
+                                    Qt.callLater(drumPadRepeater.updateMostRecentFromSelection);
+                                }
                             }
                         }
                     }
@@ -648,69 +684,78 @@ Zynthian.BasePlayGrid {
                                     component.mostRecentlyPlayedNote = undefined;
                                 }
                                 stepSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
+                                if (noteSettings.visible) {
+                                    noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
+                                }
                             }
                             function goNext() {
-                                var changeStep = true;
-                                if (selectedIndex > -1) {
-                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                    if (seqPad.currentSubNote < seqPad.subNoteCount - 1) {
-                                        seqPad.currentSubNote = seqPad.currentSubNote + 1;
-                                        changeStep = false;
-                                    } else {
-                                        seqPad.currentSubNote = -1;
-                                    }
-                                }
-                                if (stepSettings.visible) {
-                                    changeStep = false;
-                                }
-                                if (changeStep) {
-                                    if (selectedIndex < _private.activeBarModelWidth - 1) {
-                                        selectedIndex = selectedIndex + 1;
-                                    } else {
-                                        // go next bar and reset - don't loop to the start, just block at the end
-                                        if (_private.sequence.activePatternObject.activeBar < _private.sequence.activePatternObject.availableBars - 1) {
-                                            _private.nextBar();
-                                            selectedIndex = 0;
+                                if (!noteSettings.visible) {
+                                    var changeStep = true;
+                                    if (selectedIndex > -1) {
+                                        var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                        if (seqPad.currentSubNote < seqPad.subNoteCount - 1) {
+                                            seqPad.currentSubNote = seqPad.currentSubNote + 1;
+                                            changeStep = false;
+                                        } else {
+                                            seqPad.currentSubNote = -1;
                                         }
                                     }
+                                    if (stepSettings.visible) {
+                                        changeStep = false;
+                                    }
+                                    if (changeStep) {
+                                        if (selectedIndex < _private.activeBarModelWidth - 1) {
+                                            selectedIndex = selectedIndex + 1;
+                                        } else {
+                                            // go next bar and reset - don't loop to the start, just block at the end
+                                            if (_private.sequence.activePatternObject.activeBar < _private.sequence.activePatternObject.availableBars - 1) {
+                                                _private.nextBar();
+                                                selectedIndex = 0;
+                                            }
+                                        }
+                                    }
+                                    Qt.callLater(updateMostRecentFromSelection);
                                 }
-                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function goPrevious() {
-                                var changeStep = true;
-                                if (selectedIndex > -1) {
-                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                    if (seqPad.currentSubNote > -1) {
-                                        seqPad.currentSubNote = seqPad.currentSubNote - 1;
+                                if (!noteSettings.visible) {
+                                    var changeStep = true;
+                                    if (selectedIndex > -1) {
+                                        var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                         if (seqPad.currentSubNote > -1) {
+                                            seqPad.currentSubNote = seqPad.currentSubNote - 1;
+                                            if (seqPad.currentSubNote > -1) {
+                                                changeStep = false;
+                                            }
+                                        } else if (seqPad.subNoteCount > 0 && seqPad.currentSubNote === -1) {
+                                            seqPad.currentSubNote = seqPad.subNoteCount - 1;
                                             changeStep = false;
                                         }
-                                    } else if (seqPad.subNoteCount > 0 && seqPad.currentSubNote === -1) {
-                                        seqPad.currentSubNote = seqPad.subNoteCount - 1;
+                                    }
+                                    if (stepSettings.visible) {
                                         changeStep = false;
                                     }
-                                }
-                                if (stepSettings.visible) {
-                                    changeStep = false;
-                                }
-                                if (changeStep) {
-                                    if (selectedIndex > 0) {
-                                        selectedIndex = selectedIndex - 1;
-                                    } else {
-                                        if (_private.sequence.activePatternObject.activeBar == 0) {
-                                            // if first bar, reset to no selection
-                                            selectedIndex = -1;
+                                    if (changeStep) {
+                                        if (selectedIndex > 0) {
+                                            selectedIndex = selectedIndex - 1;
                                         } else {
-                                            // otherwise go to the last step of the previous bar
-                                            _private.previousBar();
-                                            selectedIndex = _private.activeBarModelWidth - 1;
+                                            if (_private.sequence.activePatternObject.activeBar == 0) {
+                                                // if first bar, reset to no selection
+                                                selectedIndex = -1;
+                                            } else {
+                                                // otherwise go to the last step of the previous bar
+                                                _private.previousBar();
+                                                selectedIndex = _private.activeBarModelWidth - 1;
+                                            }
                                         }
                                     }
+                                    Qt.callLater(updateMostRecentFromSelection);
                                 }
-                                Qt.callLater(updateMostRecentFromSelection);
                             }
                             function deselectSelectedItem() {
-                                if (stepSettingsPopup.visible) {
+                                if (noteSettingsPopup.visible) {
+                                    noteSettingsPopup.close();
+                                } else if (stepSettingsPopup.visible) {
                                     stepSettingsPopup.close();
                                 } else if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
@@ -722,24 +767,40 @@ Zynthian.BasePlayGrid {
                                 }
                             }
                             function activateSelectedItem() {
-                                var seqPad = drumPadRepeater.itemAt(selectedIndex);
-                                if (seqPad) {
-                                    if (seqPad.currentSubNote === -1) {
-                                        console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
-                                        // Then we're handling the position itself
-                                        if (stepSettingsPopup.visible) {
-                                            stepSettingsPopup.close();
+                                if (noteSettingsPopup.visible) {
+                                    // do something? or no? probably no
+                                } else {
+                                    var seqPad = drumPadRepeater.itemAt(selectedIndex);
+                                    if (seqPad) {
+                                        if (seqPad.currentSubNote === -1) {
+                                            console.log("Activating position", selectedIndex, "on bar", _private.activeBar);
+                                            // Then we're handling the position itself
+                                            if (stepSettingsPopup.visible) {
+                                                stepSettingsPopup.close();
+                                            } else {
+                                                stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                            }
                                         } else {
-                                            stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                            console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
+                                            // Then we're handling the specific subnote
+                                            if (stepSettingsPopup.visible) {
+                                                stepSettingsPopup.close();
+                                            } else {
+                                                stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
+                                            }
                                         }
-                                    } else {
-                                        console.log("Activating subnote", seqPad.currentSubNote, "on position", selectedIndex, "on bar", _private.activeBar);
-                                        // Then we're handling the specific subnote
-                                        if (stepSettingsPopup.visible) {
-                                            stepSettingsPopup.close();
-                                        } else {
-                                            stepSettingsPopup.showStepSettings(_private.activePatternModel, _private.activeBar + _private.bankOffset, selectedIndex);
-                                        }
+                                    }
+                                }
+                            }
+                            function changeStepValue(barIndex, stepIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue) {
+                                for (var i = 0; i < indicesToChange.length; ++i) {
+                                    var currentValue = _private.activePatternModel.subnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName);
+                                    if (currentValue === undefined || currentValue === 0 || isNaN(currentValue)) {
+                                        currentValue = defaultValue;
+                                    }
+                                    //console.log("Current", valueName, currentValue);
+                                    if (currentValue + howMuch >= minValue && currentValue + howMuch <= maxValue) {
+                                        _private.activePatternModel.setSubnoteMetadata(barIndex, stepIndex, indicesToChange[i], valueName, currentValue + howMuch);
                                     }
                                 }
                             }
@@ -754,14 +815,17 @@ Zynthian.BasePlayGrid {
                                     } else {
                                         indicesToChange.push(seqPad.currentSubNote);
                                     }
-                                    for (var i = 0; i < indicesToChange.length; ++i) {
-                                        var currentValue = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, indicesToChange[i], valueName);
-                                        if (currentValue === undefined || currentValue === 0 || isNaN(currentValue)) {
-                                            currentValue = defaultValue;
-                                        }
-                                        //console.log("Current", valueName, currentValue);
-                                        if (currentValue + howMuch >= minValue && currentValue + howMuch <= maxValue) {
-                                            _private.activePatternModel.setSubnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, indicesToChange[i], valueName, currentValue + howMuch);
+                                    changeStepValue(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue);
+                                } else if (noteSettings.visible) {
+                                    // Only do the "change all the things" if note settings is visible... could otherwise, but confusion...
+                                    var visibleStepIndices = noteSettings.visibleStepIndices();
+                                    for (var barIndex in visibleStepIndices) {
+                                        var barArray = visibleStepIndices[barIndex];
+                                        for (var stepIndex in barArray) {
+                                            var visibleSubNotes = barArray[stepIndex];
+                                            if (visibleSubNotes && visibleSubNotes.length > 0) {
+                                                changeStepValue(barIndex, stepIndex, visibleSubNotes, valueName, howMuch, minValue, maxValue, defaultValue);
+                                            }
                                         }
                                     }
                                 }
@@ -782,11 +846,15 @@ Zynthian.BasePlayGrid {
                             function delayUp() {
                                 if (stepSettings.visible) {
                                     changeValue("delay", 1, 0, stepSettings.stepDuration - 1, 0);
+                                } else if (noteSettings.visible) {
+                                    changeValue("delay", 1, 0, noteSettings.stepDuration - 1, 0);
                                 }
                             }
                             function delayDown() {
                                 if (stepSettings.visible) {
                                     changeValue("delay", -1, 0, stepSettings.stepDuration - 1, 0);
+                                } else if (noteSettings.visible) {
+                                    changeValue("delay", -1, 0, noteSettings.stepDuration - 1, 0);
                                 }
                             }
                             PadNoteButton {
@@ -1489,6 +1557,32 @@ Zynthian.BasePlayGrid {
                     anchors.fill: parent
                     implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
                     onClose: stepSettingsPopup.close();
+                }
+            }
+            QQC2.Popup {
+                id: noteSettingsPopup
+                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+                y: drumPad.y - height - Kirigami.Units.largeSpacing
+                x: Kirigami.Units.largeSpacing
+                modal: true
+                focus: true
+                function showSettings(patternModel, firstBar, lastBar, midiNoteFilter) {
+                    noteSettings.midiNoteFilter = midiNoteFilter;
+                    noteSettings.firstBar = firstBar;
+                    noteSettings.lastBar = lastBar;
+                    noteSettings.patternModel = patternModel;
+                    noteSettingsPopup.open();
+                }
+                onClosed: {
+                    noteSettings.patternModel = null;
+                    noteSettings.firstBar = -1;
+                    noteSettings.lastBar = -1;
+                }
+                NoteSettings {
+                    id: noteSettings
+                    anchors.fill: parent
+                    implicitWidth: drumPad.width - Kirigami.Units.largeSpacing * 2
+                    onClose: noteSettingsPopup.close();
                 }
             }
             QQC2.Drawer {

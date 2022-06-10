@@ -46,7 +46,7 @@ Zynthian.BasePlayGrid {
         "rows": 5,
         "columns": 8,
         "positionalVelocity": true,
-        "transposeAmount": 7 // Default value to make C3 be our first note bottom-left at "octave" step 8 ionian
+        "transposeAmount": 0
     }
     persist: ["scale", "rows", "columns", "positionalVelocity", "transposeAmount"]
 
@@ -60,7 +60,7 @@ Zynthian.BasePlayGrid {
         property QtObject miniGridModel
         property int channel: ZynQuick.PlayGridManager.currentMidiChannel
         property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
-        property int transposeAmount: 7
+        property int transposeAmount: 0
         property string scale: "ionian"
         property int rows: 5
         property int columns: 8

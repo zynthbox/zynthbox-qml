@@ -38,11 +38,11 @@ Zynthian.BasePlayGrid {
     miniGrid: notesMiniGrid
     settings: notesGridSettings
     name:'Notes Grid'
-    octave: 8
+    octave: 4
     useOctaves: _private.alternativeModel === null
 
     defaults: {
-        "scale": "ionian",
+        "scale": "chromatic",
         "rows": 5,
         "columns": 8,
         "positionalVelocity": true,
@@ -61,7 +61,7 @@ Zynthian.BasePlayGrid {
         property int channel: ZynQuick.PlayGridManager.currentMidiChannel
         property int startingNote: component.gridRowStartNotes[Math.min(Math.max(0, component.octave), component.gridRowStartNotes.length - 1)]
         property int transposeAmount: 0
-        property string scale: "ionian"
+        property string scale: "chromatic"
         property int rows: 5
         property int columns: 8
         property bool positionalVelocity: true
@@ -83,7 +83,7 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    gridRowStartNotes: typeof _private.startNotes[_private.scale] === "undefined" ? [0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120] : _private.startNotes[_private.scale]
+    gridRowStartNotes: typeof _private.startNotes[_private.scale] === "undefined" ? [0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120] : _private.startNotes[_private.scale]
     function fillModel(model, startingNote, scale, rows, columns, positionalVelocity) {
         console.log("Filling notes model " + model + " with notes on channel " + _private.channel)
         var col = startingNote;
@@ -175,7 +175,7 @@ Zynthian.BasePlayGrid {
     }
 
     onPropertyChanged: {
-        console.log("A property named " + property + " has changed to " + value);
+        //console.log("A property named " + property + " has changed to " + value);
         var gridContentsChanged = true;
         if (property === "transposeAmount") {
             _private.transposeAmount = value;

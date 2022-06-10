@@ -124,6 +124,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__long_task_count__ = 0
         self.__big_knob_mode__ = ""
         self.__long_operation__ = False
+        self.__record_master_output__ = False
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -731,6 +732,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except:
             self.set_master_audio_level(0)
 
+    ### Property recordMasterOutput
+    def get_recordMasterOutput(self):
+        return self.__record_master_output__
+
+    def set_recordMasterOutput(self, value):
+        self.__record_master_output__ = value
+        self.recordMasterOutputChanged.emit()
+
+    recordMasterOutputChanged = Signal()
+
+    recordMasterOutput = Property(float, get_recordMasterOutput, set_recordMasterOutput, notify=recordMasterOutputChanged)
+    ### END Property recordMasterOutput
+
     ### Property masterAudioLevel
     def get_master_audio_level(self):
         return self.__master_audio_level__
@@ -1199,18 +1213,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
+            if self.recordMasterOutput:
+                base_ports = ["--port", "system:playback_1", "--port", "system:playback_2"]
+            else:
+                base_ports = ["--port", f"zynthiloops_audio_levels_client:T{track.id + 1}A",
+                              "--port", f"zynthiloops_audio_levels_client:T{track.id + 1}B"]
+
             #self.countInValue = countInBars * 4
             logging.debug(
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} \
-                --port zynthiloops_audio_levels_client:T{track.id + 1}A \
-                --port zynthiloops_audio_levels_client:T{track.id + 1}B \
+                {base_ports} \
                 {self.clip_to_record_path}")
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture", *self.recorder_process_internal_arguments,
-                                               "--port", f"zynthiloops_audio_levels_client:T{track.id + 1}A", "--port",
-                                               f"zynthiloops_audio_levels_client:T{track.id + 1}B",
+                self.recorder_process = Popen(("/usr/local/bin/jack_capture",
+                                               *self.recorder_process_internal_arguments,
+                                               *base_ports,
                                                self.clip_to_record_path), stdout=PIPE, stderr=PIPE)
             else:
                 if channel == "1":

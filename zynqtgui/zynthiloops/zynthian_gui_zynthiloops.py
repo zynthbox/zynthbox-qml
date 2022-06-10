@@ -125,6 +125,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__big_knob_mode__ = ""
         self.__long_operation__ = False
         self.__record_master_output__ = False
+        self.__count_in_bars__ = 0
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -732,6 +733,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         except:
             self.set_master_audio_level(0)
 
+    ### Property countInBars
+    def get_countInBars(self):
+        return self.__count_in_bars__
+
+    def set_countInBars(self, value):
+        self.__count_in_bars__ = value
+        self.countInBarsChanged.emit()
+
+    countInBarsChanged = Signal()
+
+    countInBars = Property(float, get_countInBars, set_countInBars, notify=countInBarsChanged)
+    ### END Property countInBars
+
     ### Property recordMasterOutput
     def get_recordMasterOutput(self):
         return self.__record_master_output__
@@ -857,18 +871,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
         self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.tracksModel.getTrack(tid).get_layers_snapshot(), 5, 9)
 
-    # @Signal
-    # def count_in_value_changed(self):
-    #     pass
-    #
-    # def get_countInValue(self):
-    #     return self.recording_count_in_value
-    #
-    # def set_countInValue(self, value):
-    #     self.recording_count_in_value = value
-    #     self.count_in_value_changed.emit()
-    #
-    # countInValue = Property(int, get_countInValue, set_countInValue, notify=count_in_value_changed)
+    @Signal
+    def ongoingCountInChanged(self):
+        pass
+
+    def get_ongoingCountIn(self):
+        return self.recording_count_in_value
+
+    def set_ongoingCountIn(self, value):
+        self.recording_count_in_value = value
+        self.ongoingCountInChanged.emit()
+
+    ongoingCountIn = Property(int, get_ongoingCountIn, set_ongoingCountIn, notify=ongoingCountInChanged)
 
     def recording_process_stopped(self, exitCode, exitStatus):
         logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
@@ -1219,7 +1233,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 base_ports = ["--port", f"zynthiloops_audio_levels_client:T{track.id + 1}A",
                               "--port", f"zynthiloops_audio_levels_client:T{track.id + 1}B"]
 
-            #self.countInValue = countInBars * 4
+            self.ongoingCountIn = self.countInBars + 1
+
             logging.debug(
                 f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} \
                 {base_ports} \
@@ -1306,9 +1321,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def metronome_update(self, beat):
         self.__current_beat__ = beat
 
-        # if self.countInValue > 0:
-        #     self.countInValue -= 1
-
         # Immediately stop clips when scheduled to stop
         if self.metronome_schedule_stop:
             libzl.stopTimer()
@@ -1327,6 +1339,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.__current_beat__ == 0:
             self.__current_bar__ += 1
+            if self.ongoingCountIn > 0:
+                self.ongoingCountIn -= 1
             self.current_bar_changed.emit()
 
         self.current_beat_changed.emit()

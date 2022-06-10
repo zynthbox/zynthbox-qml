@@ -629,6 +629,29 @@ Kirigami.AbstractApplicationWindow {
         z: 9999999
     }
 
+    Rectangle {
+        id: countInOverlay
+        parent: root.contentItem.parent
+        anchors.fill: parent
+        visible: zynthian.zynthiloops.ongoingCountIn > 0 &&
+                 root.selectedTrack.sceneClip.isRecording
+        z: 9999999
+        color: "#cc000000"
+
+        RowLayout {
+            anchors.centerIn: parent
+            QQC2.Label {
+                font.pointSize: 35
+                text: zynthian.zynthiloops.ongoingCountIn
+            }
+            QQC2.Label {
+                Layout.alignment: Qt.AlignBottom
+                Layout.bottomMargin: 8
+                text: "/" + (4 - zynthian.zynthiloops.currentBeat)
+            }
+        }
+    }
+
     Loader {
         parent: root.contentItem.parent
         z: Qt.inputMethod.visible ? 99999999 : 1

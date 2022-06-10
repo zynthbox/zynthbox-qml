@@ -104,6 +104,7 @@ QQC2.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: false
+                enabled: !root.selectedTrack.sceneClip.isRecording
 
                 RowLayout {
                     Layout.fillWidth: false
@@ -207,11 +208,14 @@ QQC2.Popup {
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
                             id: countInComboModel
-                            ListElement { value: 1 }
-                            ListElement { value: 2 }
-                            ListElement { value: 4 }
+
+                            ListElement { text: "Off"; value: 0 }
+                            ListElement { text: "1"; value: 1 }
+                            ListElement { text: "2"; value: 2 }
+                            ListElement { text: "4"; value: 4 }
                         }
-                        textRole: "value"
+                        textRole: "text"
+                        onActivated: zynthian.zynthiloops.countInBars = countInComboModel.get(index).value
                     }
                 }
 

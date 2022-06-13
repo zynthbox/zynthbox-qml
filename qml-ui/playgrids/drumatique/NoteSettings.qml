@@ -103,22 +103,22 @@ ColumnLayout {
     }
     property int stepDuration: component.patternModel ? noteLengths[component.patternModel.noteLength] : 0
     // This is going to come back to haunt us - if we don't somehow tell the user the difference between a quantised note and one set to what happens to be the current note length... that will be an issue
-    //property var noteLengthNames: {
-        //1: "1/4 (default)",
-        //2: "1/8 (default)",
-        //3: "1/16 (default)",
-        //4: "1/32 (default)",
-        //5: "1/64 (default)",
-        //6: "1/128 (default)"
-    //}
     property var noteLengthNames: {
-        1: "1/4",
-        2: "1/8",
-        3: "1/16",
-        4: "1/32",
-        5: "1/64",
-        6: "1/128"
+        1: "1/4 (auto)",
+        2: "1/8 (auto)",
+        3: "1/16 (auto)",
+        4: "1/32 (auto)",
+        5: "1/64 (auto)",
+        6: "1/128 (auto)"
     }
+    //property var noteLengthNames: {
+        //1: "1/4",
+        //2: "1/8",
+        //3: "1/16",
+        //4: "1/32",
+        //5: "1/64",
+        //6: "1/128"
+    //}
     property string stepDurationName: component.patternModel ? noteLengthNames[component.patternModel.noteLength] : ""
 
     onVisibleChanged: {
@@ -366,7 +366,7 @@ ColumnLayout {
                         paramMin: 0
                         paramMax: 1024
                         scrollWidth: 128
-                        paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 384, 512, 640, 768, 896, 1024]
+                        paramList: [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, /*384,*/ 512, /*640, 768, 896,*/ 1024]
                         paramNames: {
                             0: component.stepDurationName,
                             1: "1/128",

@@ -115,6 +115,9 @@ QQC2.Button {
                                                 for (var i = 0; i < component.playgrid.heardNotes.length; ++i) {
                                                     subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.heardNotes[i]);
                                                     component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", component.playgrid.heardVelocities[i]);
+                                                    if (component.patternModel.defaultNoteDuration > 0) {
+                                                        component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.defaultNoteDuration);
+                                                    }
                                                 }
                                             }
                                             component.currentSubNote = -1;
@@ -133,6 +136,9 @@ QQC2.Button {
                                             } else {
                                                 subNoteIndex = component.patternModel.insertSubnoteSorted(component.padNoteRow, component.padNoteIndex, component.playgrid.getNote(aNoteData["note"], aNoteData["channel"]));
                                                 component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "velocity", aNoteData["velocity"]);
+                                                if (component.patternModel.defaultNoteDuration > 0) {
+                                                    component.patternModel.setSubnoteMetadata(component.padNoteRow, component.padNoteIndex, subNoteIndex, "duration", component.patternModel.defaultNoteDuration);
+                                                }
                                             }
                                             component.note = component.patternModel.getNote(component.padNoteRow, component.padNoteIndex)
                                             component.currentSubNote = subNoteIndex;

@@ -41,6 +41,12 @@ Zynthian.BasePlayGrid {
     octave: 4
     useOctaves: _private.alternativeModel === null
 
+    // TODO Make sure when generating the start notes and indices that we start with our preferred note
+    // and octave (given by zl.song), and then count backwards from there to find what C-1 should be,
+    // and then move forward with that index instead of 0. Also ensure that the root note is at an actual
+    // left-hand position (and maybe store that somewhere useful so it can be that whenever we switch),
+    // and then fill the first row with negative notes, so they can be invalid notes and our alignment
+    // is as expected.
     defaults: {
         "scale": "chromatic",
         "rows": 5,

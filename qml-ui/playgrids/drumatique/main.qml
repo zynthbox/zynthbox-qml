@@ -845,16 +845,16 @@ Zynthian.BasePlayGrid {
                             }
                             function delayUp() {
                                 if (stepSettings.visible) {
-                                    changeValue("delay", 1, 0, stepSettings.stepDuration - 1, 0);
+                                    changeValue("delay", 1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
                                 } else if (noteSettings.visible) {
-                                    changeValue("delay", 1, 0, noteSettings.stepDuration - 1, 0);
+                                    changeValue("delay", 1, 0, -noteSettings.stepDuration + 1, 0);
                                 }
                             }
                             function delayDown() {
                                 if (stepSettings.visible) {
-                                    changeValue("delay", -1, 0, stepSettings.stepDuration - 1, 0);
+                                    changeValue("delay", -1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
                                 } else if (noteSettings.visible) {
-                                    changeValue("delay", -1, 0, noteSettings.stepDuration - 1, 0);
+                                    changeValue("delay", -1, -noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
                                 }
                             }
                             PadNoteButton {

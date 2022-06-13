@@ -336,40 +336,51 @@ ColumnLayout {
                 }
             }
             StepSettingsParamDelegate {
+                id: delayParamDelegate
                 Layout.fillWidth: true
                 Layout.preferredWidth: Kirigami.Units.gridUnit * 20
                 model: component.model; row: component.row; column: component.column;
                 paramIndex: subnoteDelegate.subnoteIndex
                 paramName: "delay"
                 paramDefaultString: "0 (default)"
-                paramValuePrefix: "+"
+                paramValuePrefix: paramValue > 0 ? "+" : ""
                 paramValueSuffix: "/128"
                 paramDefault: undefined
                 paramInterpretedDefault: 0
-                paramMin: 0
+                paramMin: -component.stepDuration + 1
                 paramMax: component.stepDuration - 1
                 scrollWidth: component.stepDuration
                 Component.onCompleted: {
                     var potentialValues = {
-                        0: "0 (default)",
-                        1: "+1/128",
-                        2: "+1/64",
-                        4: "+1/32",
-                        8: "+1/16",
-                        16: "+1/8",
-                        32: "+1/4",
-                        64: "+1/2",
-                        96: "+3/4",
-                        128: "+1"
+                        "-128": "-1",
+                        "-96": "-3/4",
+                        "-64": "-1/2:",
+                        "-32": "-1/4",
+                        "-16": "-1/8",
+                        "-8": "-1/16",
+                        "-4": "-1/32",
+                        "-2": "-1/64",
+                        "-1": "-1/128",
+                        "0": "0 (default)",
+                        "1": "+1/128",
+                        "2": "+1/64",
+                        "4": "+1/32",
+                        "8": "+1/16",
+                        "16": "+1/8",
+                        "32": "+1/4",
+                        "64": "+1/2",
+                        "96": "+3/4",
+                        "128": "+1"
                     };
                     var values = [];
                     var names = {};
                     for (var key in potentialValues) {
-                        if (potentialValues.hasOwnProperty(key) && key < component.stepDuration) {
+                        if (potentialValues.hasOwnProperty(key) && key <= delayParamDelegate.paramMax && key >= delayParamDelegate.paramMin) {
                             values.push(key);
                             names[key] = potentialValues[key];
                         }
                     }
+                    values.sort(function(a, b) { return a - b; });
                     paramList = values;
                     paramNames = names;
                 }

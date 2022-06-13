@@ -2009,16 +2009,23 @@ class zynthian_gui(QObject):
                     self.zynswitch_short_triggered.emit(i)
             i += 1;
 
-        bk_value = zyncoder.lib_zyncoder.get_value_zynpot(3)
+        self.fake_key_event_for_zynpot(3, Key.left, Key.right)
+
+    zynswitch_short_triggered = Signal(int)
+    zynswitch_long_triggered = Signal(int)
+    zynswitch_bold_triggered = Signal(int)
+
+    def fake_key_event_for_zynpot(self, npot, key_left, key_right):
+        bk_value = zyncoder.lib_zyncoder.get_value_zynpot(npot)
         delta = 0
         if self.__bk_last_turn_time != None and self.__bk_last_turn_time > 0:
             delta = time.time() * 1000 - self.__bk_last_turn_time
         if self.is_external_app_active() and self.__old_bk_value != bk_value:
             fake_key = None
             if self.__old_bk_value > bk_value:
-                fake_key = Key.left
+                fake_key = key_left
             else:
-                fake_key = Key.right
+                fake_key = key_right
             if fake_key != self.__bk_fake_key and self.__bk_fake_key != None:
                 self.fakeKeyboard.release(self.__bk_fake_key)
                 self.__bk_fake_key = None
@@ -2026,19 +2033,19 @@ class zynthian_gui(QObject):
                 self.fakeKeyboard.press(fake_key)
             self.__bk_fake_key = fake_key
             if bk_value == 0 or bk_value >= 40:
-                zyncoder.lib_zyncoder.set_value_zynpot(3, 20, 1)
+                zyncoder.lib_zyncoder.set_value_zynpot(npot, 20, 1)
                 self.__old_bk_value = bk_value = 20
             self.__bk_last_turn_time = time.time() * 1000
         elif delta > 50 and self.__bk_fake_key != None:
             self.fakeKeyboard.release(self.__bk_fake_key)
             self.__bk_fake_key = None
             self.__bk_last_turn_time = None
+        elif self.is_external_app_active() and bk_value == 0 and self.__old_bk_value == 0:
+            zyncoder.lib_zyncoder.set_value_zynpot(npot, 20, 1)
+            self.__old_bk_value = bk_value = 20
 
         self.__old_bk_value = bk_value;
 
-    zynswitch_short_triggered = Signal(int)
-    zynswitch_long_triggered = Signal(int)
-    zynswitch_bold_triggered = Signal(int)
 
     def fake_key_event_for_zynswitch(self, i : int, press : bool):
         fake_key = None

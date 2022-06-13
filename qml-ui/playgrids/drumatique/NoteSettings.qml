@@ -437,6 +437,7 @@ ColumnLayout {
         color: Kirigami.Theme.textColor
         opacity: 0.5
     }
+    // TODO This is super in the wrong place, as it sets a setting for the entire pattern, which isn't even used in this dialog... but where would it go?
     RowLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
@@ -450,38 +451,38 @@ ColumnLayout {
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/32"
-            checked: component.patternModel ? component.patternModel.noteLength === 4 : false
-            onClicked: { component.setDuration(4, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 4 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 4; }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/16"
-            checked: component.patternModel ? component.patternModel.noteLength === 3 : false
-            onClicked: { component.setDuration(8, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 8 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 8; }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/8"
-            checked: component.patternModel ? component.patternModel.noteLength === 2 : false
-            onClicked: { component.setDuration(16, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 16 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 16; }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/4"
-            checked: component.patternModel ? component.patternModel.noteLength === 1 : false
-            onClicked: { component.setDuration(32, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 32 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 32; }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1/2"
-            checked: /*component.patternModel ? component.patternModel.noteLength === 6 :*/ false
-            onClicked: { component.setDuration(64, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 64 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 64; }
         }
         Zynthian.PlayGridButton {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             text: "1"
-            checked: /*component.patternModel ? component.patternModel.noteLength === 5 :*/ false
-            onClicked: { component.setDuration(128, checked); }
+            checked: component.patternModel ? component.patternModel.defaultNoteDuration === 128 : false
+            onClicked: { component.patternModel.defaultNoteDuration = checked ? 0 : 128; }
         }
     }
     RowLayout {

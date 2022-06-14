@@ -178,13 +178,14 @@ class zynthiloops_clip(QObject):
     ### END Property initialGain
 
     def update_current_beat(self):
-        if not self.__playing_started__:
-            if self.__song__.get_metronome_manager().currentBeat == 0:
-                self.__current_beat__ = 0
-                self.__playing_started__ = True
-        else:
-            self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
-        self.current_beat_changed.emit()
+        if self.audioSource is not None:
+            if not self.__playing_started__:
+                if self.__song__.get_metronome_manager().currentBeat == 0:
+                    self.__current_beat__ = 0
+                    self.__playing_started__ = True
+            else:
+                self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
+            self.current_beat_changed.emit()
 
     def track_volume_changed(self):
         if self.track is not None and not self.zyngui.zynthiloops.longOperation:

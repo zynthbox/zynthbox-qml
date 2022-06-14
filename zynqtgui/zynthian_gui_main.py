@@ -34,7 +34,7 @@ from subprocess import check_output, Popen, PIPE, STDOUT
 from . import zynthian_gui_selector
 from zyngui import zynthian_gui_config
 from zynlibs.zynseq import zynseq
-from PySide2.QtCore import Property, Signal, Slot
+from PySide2.QtCore import Property, QTimer, Signal, Slot
 
 from json import JSONDecoder
 
@@ -147,6 +147,9 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             Popen([self.list_data[i][1]])
+
+            # Open zynthiloops after opening appimage to mimic closing of menu after opening an app like other modules in main page
+            QTimer.singleShot(5000, lambda: self.zyngui.show_modal("zynthiloops"))
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()

@@ -41,12 +41,6 @@ Zynthian.BasePlayGrid {
     octave: 4
     useOctaves: _private.alternativeModel === null
 
-    // TODO Make sure when generating the start notes and indices that we start with our preferred note
-    // and octave (given by zl.song), and then count backwards from there to find what C-1 should be,
-    // and then move forward with that index instead of 0. Also ensure that the root note is at an actual
-    // left-hand position (and maybe store that somewhere useful so it can be that whenever we switch),
-    // and then fill the first row with negative notes, so they can be invalid notes and our alignment
-    // is as expected.
     defaults: {
         "scale": "chromatic",
         "rows": 5,
@@ -73,6 +67,7 @@ Zynthian.BasePlayGrid {
         property bool positionalVelocity: true
         property var startNotes: ({ "chromatic": [0], "ionian": [0], "dorian": [0], "phrygian": [0], "lydian": [0], "mixolydian": [0], "aeolian": [0], "locrian": [0] })
         property var startIndices: ({ "chromatic": [0], "ionian": [0], "dorian": [0], "phrygian": [0], "lydian": [0], "mixolydian": [0], "aeolian": [0], "locrian": [0] })
+        property var startNoteRoots: ({"chromatic": 0, "ionian": 0, "dorian": 0, "phrygian": 0, "lydian": 0, "mixolydian": 0, "aeolian": 0, "locrian": 0 })
         property var scale_mode_map: ({
             "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             "ionian": [2, 2, 1, 2, 2, 2, 1],
@@ -129,25 +124,39 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    function populateStartNotes() {
+    function populateStartNotes(rootNote) {
         var startNotes = [];
         var startIndices = [];
+        var startNoteRoots = [];
         for (var scale in _private.scale_mode_map) {
             var scaleStartNotes = [];
             var scaleStartIndices = [];
             var scale_index = 0;
-            var col = _private.transposeAmount;
+            var col = rootNote + _private.transposeAmount;
             var scaleArray = _private.scale_mode_map[scale];
             if (scale === "chromatic") {
                 // chromatic's a bit of a special case, that one just keeps going, so might as well just do that simple:
                 var i = 0;
+                var increment = (_private.columns > 0 ? _private.columns : 8);
+                var remnant = col % increment;
+                col = -(increment-remnant);
                 while (col < 128) {
                     scaleStartNotes.push(col);
                     scaleStartIndices.push(i);
-                    col += (_private.columns > 0 ? _private.columns : 8);
+                    col += increment;
                     i = (i + 1) % 12;
                 }
             } else {
+                // First, roll backwards until we're past the zero point
+                //console.log("Starting off with a note value of", col, "and scale index", scale_index);
+                while (col > 0) {
+                    for (var x = 0; x < 3; ++x) {
+                        scale_index = (scale_index > 0) ? scale_index - 1 : scaleArray.length - 1;
+                        col -= scaleArray[scale_index];
+                    }
+                    //console.log("We've rolled backwards, to a start note of value", col, "with scale index", scale_index);
+                }
+                // Now go forward, until we reach the end
                 while (col < 128) {
                     // Each row progresses by four positions in the scale (except chromatic, handled separately above)
                     scaleStartNotes.push(col);
@@ -160,9 +169,15 @@ Zynthian.BasePlayGrid {
             }
             startNotes[scale] = scaleStartNotes;
             startIndices[scale] = scaleStartIndices;
+            startNoteRoots[scale] = scaleStartNotes.indexOf(rootNote);
+            //console.log("Start notes for", scale, "are", scaleStartNotes, "with the root note position at", startNoteRoots[scale]);
         }
         _private.startNotes = startNotes;
         _private.startIndices = startIndices;
+        _private.startNoteRoots = startNoteRoots;
+        if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
+            component.octave = _private.startNoteRoots[_private.scale];
+        }
     }
 
     onInitialize: {
@@ -187,6 +202,7 @@ Zynthian.BasePlayGrid {
             _private.transposeAmount = value;
         } else if (property === "scale") {
             _private.scale = value;
+            component.octave = _private.startNoteRoots[scale];
         } else if (property === "rows") {
             _private.rows = value;
         } else if (property === "columns") {
@@ -218,7 +234,8 @@ Zynthian.BasePlayGrid {
         id: populateStartNotesTimer
         interval: 1; repeat: false; running: false;
         onTriggered: {
-            component.populateStartNotes();
+            // TODO Deduce what our root note is supposed to be, instead of just assuming 36 (C2)
+            component.populateStartNotes(36);
         }
     }
     Timer {
@@ -321,7 +338,7 @@ Zynthian.BasePlayGrid {
                 onActivated: {
                     var scale = scaleModel.get(currentIndex).scale;
                     component.setProperty("scale", scale);
-                    component.octave = (scale === "chromatic") ? 4 : 7
+                    component.octave = _private.startNoteRoots[scale];
                 }
             }
 

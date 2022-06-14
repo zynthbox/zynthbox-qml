@@ -61,46 +61,107 @@ Zynthian.ScreenPage {
         }
     }
 
+    contentItem: RowLayout {
+        spacing: Kirigami.Units.gridUnit
 
-    contentItem: GridView {
-        id: mainviewGridId
+        QQC2.ButtonGroup {
+            buttons: categoryButtons.children
+        }
 
-        property int gridWidth: screen.width - (Kirigami.Units.gridUnit * 2) - 4
-        property int gridHeight: screen.height - (Kirigami.Units.gridUnit * 8) - 4
+        ColumnLayout {
+            id: categoryButtons
 
-        property int iconWidth: (gridWidth / 6)
-        property int iconHeight:  (gridHeight / 2)
+            Layout.fillWidth: false
+            Layout.fillHeight: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
 
-        clip: true
-        width: gridWidth
-        height: gridHeight
-        Layout.fillWidth: true
-        cellWidth:iconWidth
-        cellHeight:iconHeight
-        currentIndex: zynthian.main.current_index
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checkable: true
+                checked: zynthian.main.visibleCategory === "modules"
+                text: qsTr("Modules")
+                onClicked: zynthian.main.visibleCategory = "modules"
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checkable: true
+                checked: zynthian.main.visibleCategory === "appimages"
+                text: qsTr("Apps")
+                onClicked: zynthian.main.visibleCategory = "appimages"
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checkable: true
+                checked: zynthian.main.visibleCategory === "sessions"
+                text: qsTr("Sessions")
+                onClicked: zynthian.main.visibleCategory = "sessions"
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checkable: true
+                checked: zynthian.main.visibleCategory === "templates"
+                text: qsTr("Templates")
+                onClicked: zynthian.main.visibleCategory = "templates"
+            }
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                checkable: true
+                checked: zynthian.main.visibleCategory === "discover"
+                text: qsTr("Discover")
+                onClicked: zynthian.main.visibleCategory = "discover"
+            }
+        }
 
-        model:zynthian.main.selector_list
-        delegate: HomeScreenIcon {
-            readonly property bool isCurrent: mainviewGridId.currentIndex === index
-            width: mainviewGridId.iconWidth
-            height:  mainviewGridId.iconHeight
-            imgSrc: model.icon
-            highlighted: isCurrent
-            onIsCurrentChanged: {
-                if (isCurrent) {
-                    zynthian.main.current_index = index;
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            GridView {
+                id: mainviewGridId
+
+                property int iconWidth: (parent.width / 5)
+                property int iconHeight:  (parent.height / 2.1)
+
+                clip: true
+                anchors.fill: parent
+                cellWidth:iconWidth
+                cellHeight:iconHeight
+                currentIndex: zynthian.main.current_index
+                visible: ["modules", "appimages"].indexOf(zynthian.main.visibleCategory) >= 0
+
+                model:zynthian.main.selector_list
+                delegate: HomeScreenIcon {
+                    readonly property bool isCurrent: mainviewGridId.currentIndex === index
+
+                    // Set width and heignt to 0 if not visible to not take up a cell's size
+                    width: mainviewGridId.iconWidth
+                    height: mainviewGridId.iconHeight
+
+                    imgSrc: model.icon
+                    highlighted: isCurrent
+                    onIsCurrentChanged: {
+                        if (isCurrent) {
+                            zynthian.main.current_index = index;
+                        }
+                    }
+                    onClicked: {
+                        zynthian.main.activate_index(model.index);
+                        if (model.action_id === "appimage") {
+                            zynthian.start_loading();
+                            stopLoadingTimer.restart();
+                        }
+                    }
+                    text: model.display
                 }
             }
-            onClicked: {
-                zynthian.main.activate_index(model.index);
-                if (model.action_id === "appimage") {
-                    zynthian.start_loading();
-                    stopLoadingTimer.restart();
-                }
-            }
-            text: model.display
         }
     }
+
     Timer {
         id: stopLoadingTimer
         interval: 30000

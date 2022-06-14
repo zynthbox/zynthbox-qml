@@ -921,6 +921,7 @@ Zynthian.BasePlayGrid {
                                 onVisibleChanged: {
                                     if (doUpdate) {
                                         sequencerPad.updatePadNote();
+                                        sequencerPad.doUpdate = false;
                                     }
                                 }
                                 Connections {

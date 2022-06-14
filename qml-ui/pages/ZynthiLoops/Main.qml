@@ -724,7 +724,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
-                        text: visible && zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
+                        text: zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
                     }
                     QQC2.Label {
                         property QtObject sample: infoBar.clip && infoBar.clip.clipTrack.samples[infoBar.clip.clipTrack.selectedSlotRow]
@@ -733,7 +733,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
                                  infoBar.clip.clipTrack.trackAudioType === "sample-slice")
-                        text: visible && zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
+                        text: zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
                     }
 
                     Item {
@@ -801,7 +801,7 @@ Zynthian.ScreenPage {
                     }
 
                     Repeater {
-                        model: visible && zynthian.isBootingComplete ? 10 : 0
+                        model: zynthian.isBootingComplete ? 10 : 0
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
 
@@ -851,7 +851,7 @@ Zynthian.ScreenPage {
 
                                 Repeater {
                                     id: synthsOccupiedIndicatorRepeater
-                                    model: visible && zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
+                                    model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
                                     delegate: Rectangle {
                                         width: 50
@@ -876,7 +876,7 @@ Zynthian.ScreenPage {
 
                                 Repeater {
                                     id: samplesOccupiedIndicatorRepeater
-                                    model: visible && zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
+                                    model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
                                     delegate: Rectangle {
                                         width: 3
@@ -939,7 +939,7 @@ Zynthian.ScreenPage {
 
                     Repeater {
                         id: tracksHeaderRepeater
-                        model: visible && zynthian.isBootingComplete ? root.song.tracksModel : 0
+                        model: zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                         delegate: TrackHeader2 {
                             text: model.track.name
@@ -1112,7 +1112,7 @@ Zynthian.ScreenPage {
                             columnSpacing: 1
 
                             Repeater {
-                                model: visible && zynthian.isBootingComplete ? root.song.tracksModel : 0
+                                model: zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                                 delegate: Item {
                                     Layout.preferredWidth: privateProps.cellWidth
@@ -1220,7 +1220,7 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
-                                        sequence: root.visible && zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+                                        sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                         onClicked: {

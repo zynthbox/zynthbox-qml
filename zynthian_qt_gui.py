@@ -838,12 +838,12 @@ class zynthian_gui(QObject):
     def wsled_blink(self, i, color):
         try:
             if self.wsleds_blink:
-                self.wsleds.setPixelColor(i, color)
-            else:
                 if color is not self.led_config.led_color_light:
                     self.wsleds.setPixelColor(i, self.led_config.led_color_light)
                 else:
                     self.wsleds.setPixelColor(i, self.led_config.led_color_off)
+            else:
+                self.wsleds.setPixelColor(i, color)
         except: pass
 
     def update_wsleds(self):

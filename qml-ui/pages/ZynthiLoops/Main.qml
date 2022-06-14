@@ -724,6 +724,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && infoBar.clip.clipTrack.trackAudioType === "sample-loop"
+                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         text: zynthian.isBootingComplete ? qsTr("Clip: %1").arg(infoBar.clip && infoBar.clip.path && infoBar.clip.path.length > 0 ? infoBar.clip.path.split("/").pop() : "--") : ""
                     }
                     QQC2.Label {
@@ -733,6 +734,7 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignVCenter
                         visible: infoBar.clip && (infoBar.clip.clipTrack.trackAudioType === "sample-trig" ||
                                  infoBar.clip.clipTrack.trackAudioType === "sample-slice")
+                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         text: zynthian.isBootingComplete ? qsTr("Sample (1): %1").arg(sample && sample.path.length > 0 ? sample.path.split("/").pop() : "--") : ""
                     }
 
@@ -801,6 +803,7 @@ Zynthian.ScreenPage {
                     }
 
                     Repeater {
+                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         model: zynthian.isBootingComplete ? 10 : 0
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
@@ -851,6 +854,7 @@ Zynthian.ScreenPage {
 
                                 Repeater {
                                     id: synthsOccupiedIndicatorRepeater
+                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                     model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
                                     delegate: Rectangle {
@@ -876,6 +880,7 @@ Zynthian.ScreenPage {
 
                                 Repeater {
                                     id: samplesOccupiedIndicatorRepeater
+                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                     model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
                                     delegate: Rectangle {
@@ -937,6 +942,7 @@ Zynthian.ScreenPage {
 
                     Repeater {
                         id: tracksHeaderRepeater
+                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         model: zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                         delegate: TrackHeader2 {
@@ -1110,6 +1116,7 @@ Zynthian.ScreenPage {
                             columnSpacing: 1
 
                             Repeater {
+                                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                 model: zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                                 delegate: Item {
@@ -1218,6 +1225,7 @@ Zynthian.ScreenPage {
                                             }
                                         }
 
+                                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                         sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 

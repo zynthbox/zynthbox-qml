@@ -70,6 +70,7 @@ QQC2.Dialog {
                         root.accept()
                         zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
                         newSynthWorkaroundTimer.restart()
+                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
                     } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
                         root.reject();
                         noFreeSlotsPopup.open();
@@ -78,6 +79,7 @@ QQC2.Dialog {
                         root.accept()
                         zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
                         newSynthWorkaroundTimer.restart()
+                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
                     }
                 }
             }
@@ -122,8 +124,6 @@ QQC2.Dialog {
                 id: newSynthWorkaroundTimer
                 interval: 200
                 onTriggered: {
-                    zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-
                     if (root.selectedTrack.connectedPattern >= 0) {
                         var pattern = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart);
                         pattern.midiChannel = root.selectedTrack.connectedSound;

@@ -36,7 +36,6 @@ Zynthian.ScreenPage {
     id: root
 
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_track", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -241,7 +240,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
-                visible: root.isVisible
+                visible: zynthian.isBootingComplete
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
@@ -301,7 +300,7 @@ Zynthian.ScreenPage {
                                     }
                                     return text;
                                 }
-                                text: root.isVisible ? constructText() : ""
+                                text: zynthian.isBootingComplete ? constructText() : ""
                             }
                             QQC2.Button {
                                 icon.name: "configure"
@@ -426,7 +425,7 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     screenId: "bank"
-                    visible: root.isVisible
+                    visible: zynthian.isBootingComplete
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -464,7 +463,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: root.isVisible ? zynthian.layers_for_track.volume_controls : []
+                            model: zynthian.isBootingComplete ? zynthian.layers_for_track.volume_controls : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing
@@ -548,7 +547,7 @@ Zynthian.ScreenPage {
             }
             Zynthian.SelectorView {
                 id: presetView
-                visible: root.isVisible
+                visible: zynthian.isBootingComplete
                 implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true

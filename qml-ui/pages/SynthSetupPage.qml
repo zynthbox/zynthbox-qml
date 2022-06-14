@@ -240,6 +240,7 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 visible: zynthian.isBootingComplete
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
@@ -300,6 +301,7 @@ Zynthian.ScreenPage {
                                     }
                                     return text;
                                 }
+                                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                                 text: zynthian.isBootingComplete ? constructText() : ""
                             }
                             QQC2.Button {
@@ -425,6 +427,8 @@ Zynthian.ScreenPage {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     screenId: "bank"
+
+                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                     visible: zynthian.isBootingComplete
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
@@ -463,6 +467,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
+                            // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                             model: zynthian.isBootingComplete ? zynthian.layers_for_track.volume_controls : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
@@ -547,6 +552,8 @@ Zynthian.ScreenPage {
             }
             Zynthian.SelectorView {
                 id: presetView
+
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 visible: zynthian.isBootingComplete
                 implicitHeight: 0
                 Layout.fillWidth: true

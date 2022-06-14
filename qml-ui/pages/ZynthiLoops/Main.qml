@@ -234,8 +234,11 @@ Zynthian.ScreenPage {
 
                     // when synth and slot is active, edit that sound or show popup when empty
                     if (sound >= 0 && root.selectedTrack.checkIfLayerExists(sound)) {
-                        zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
-                        zynthian.layer.select_engine(sound)
+//                        zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+//                        zynthian.layer.select_engine(sound)
+                        zynthian.fixed_layers.activate_index(sound)
+                        zynthian.control.single_effect_engine = null;
+                        zynthian.current_screen_id = "control";
                     } else {
                         bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                     }

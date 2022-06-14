@@ -57,6 +57,8 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.playback_process = None
         self.__most_recent_recording_file__ = ""
         self.__recording_file__ = ""
+        # Possible values : modules, appimages, sessions, templates, discover
+        self.__visible_category__ = "modules"
         self.recorder_process = None
         self.show()
 
@@ -72,68 +74,70 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.list_data = []
         self.list_metadata = []
 
-        # Main Apps
-        self.list_data.append((self.zynthiloops, 0, "Looper"))
-        self.list_metadata.append({"icon":"../../img/clipsview.svg"})
-        
-        self.list_data.append((self.playgrid, 0, "Playground"))
-        self.list_metadata.append({"icon":"../../img/playground.svg"})
+        if self.visibleCategory == "modules":
+            # Main Apps
+            self.list_data.append((self.zynthiloops, 0, "Looper"))
+            self.list_metadata.append({"icon":"../../img/clipsview.svg"})
 
-        self.list_data.append((self.layers, 0, "Library"))
-        self.list_metadata.append({"icon":"../../img/library.svg"})
-        
-        self.list_data.append((self.song_arranger, 0, "Song Arranger"))
-        self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
-        
-        self.list_data.append((self.admin, 0, "Settings"))
-        self.list_metadata.append({"icon":"../../img/settings.svg"})
+            self.list_data.append((self.playgrid, 0, "Playground"))
+            self.list_metadata.append({"icon":"../../img/playground.svg"})
 
-        # As per #299, rename Snapshots to Soundsets
-        self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
-        self.list_metadata.append({"icon":"../../img/snapshots.svg"})
-        
-        self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
-        self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
+            self.list_data.append((self.layers, 0, "Library"))
+            self.list_metadata.append({"icon":"../../img/library.svg"})
 
-        #self.list_data.append((self.session_dashboard, 0, "Tracks"))
-        #self.list_metadata.append({"icon":"../../img/tracks.svg"})
-        
-        #if "zynseq" in zynthian_gui_config.experimental_features:
-            # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
-        # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
+            self.list_data.append((self.song_arranger, 0, "Song Arranger"))
+            self.list_metadata.append({"icon":"../../img/song_arranger.svg"})
 
-        #self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
-        #self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
+            self.list_data.append((self.admin, 0, "Settings"))
+            self.list_metadata.append({"icon":"../../img/settings.svg"})
 
-        #self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
-        #self.list_metadata.append({"icon":"../../img/rec.svg"})
+            # As per #299, rename Snapshots to Soundsets
+            self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
+            self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
-        # if "autoeq" in zynthian_gui_config.experimental_features:
-        #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
+            self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
+            self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
 
-        # Snapshot Management
-        # self.list_data.append((None, 0, ""))
-        
-        # if len(self.zyngui.screens["layer"].layers) > 0:
-            # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
-            # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
+            #self.list_data.append((self.session_dashboard, 0, "Tracks"))
+            #self.list_metadata.append({"icon":"../../img/tracks.svg"})
 
-        # self.list_data.append((None, 0, ""))
+            #if "zynseq" in zynthian_gui_config.experimental_features:
+                # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
+            # self.list_data.append((self.alsa_mixer, 0, "Audio Levels"))
 
-        apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
-        if Path(apps_folder).exists():
-            for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
-                try:
-                    f = open(apps_folder + appimage_dir + "/metadata.json", "r")
-                    metadata = JSONDecoder().decode(f.read())
-                    if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
-                        continue
-                    self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
-                    # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
-                    # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
-                    self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"]})
-                except Exception as e:
-                    logging.error(e)
+            #self.list_data.append((self.audio_recorder, 0, "Audio Recorder"))
+            #self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
+
+            #self.list_data.append((self.midi_recorder, 0, "MIDI Recorder"))
+            #self.list_metadata.append({"icon":"../../img/rec.svg"})
+
+            # if "autoeq" in zynthian_gui_config.experimental_features:
+            #    self.list_data.append((self.auto_eq, 0, "Auto EQ (alpha)"))
+
+            # Snapshot Management
+            # self.list_data.append((None, 0, ""))
+
+            # if len(self.zyngui.screens["layer"].layers) > 0:
+                # self.list_data.append((self.save_snapshot, 0, "Save Snapshot"))
+                # self.list_data.append((self.clean_all, 0, "CLEAN ALL"))
+
+            # self.list_data.append((None, 0, ""))
+
+        if self.visibleCategory == "modules" or self.visibleCategory == "appimages":
+            apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
+            if Path(apps_folder).exists():
+                for appimage_dir in [f.name for f in os.scandir(apps_folder) if f.is_dir()]:
+                    try:
+                        f = open(apps_folder + appimage_dir + "/metadata.json", "r")
+                        metadata = JSONDecoder().decode(f.read())
+                        if (not "Exec" in metadata) or (not "Name" in metadata) or (not "Icon" in metadata):
+                            continue
+                        self.list_data.append(("appimage", apps_folder + "/" + appimage_dir + "/" + metadata["Exec"], metadata["Name"]))
+                        # the recordings_file_base thing might seem potentially clashy, but it's only the base filename anyway
+                        # and we'll de-clash the filename in start_recording (by putting an increasing number at the end)
+                        self.list_metadata.append({"icon": apps_folder + "/" + appimage_dir + "/" + metadata["Icon"], "recordings_file_base" : metadata["Name"]})
+                    except Exception as e:
+                        logging.error(e)
 
         super().fill_list()
 
@@ -399,5 +403,19 @@ class zynthian_gui_main(zynthian_gui_selector):
         else:
             self.zyngui.screens["snapshot"].delete_last_state_snapshot()
 
+    ### Property visibleCategory
+    def get_visibleCategory(self):
+        return self.__visible_category__
+
+    def set_visibleCategory(self, category):
+        if self.__visible_category__ != category:
+            self.__visible_category__ = category
+            self.visibleCategoryChanged.emit()
+            self.fill_list()
+
+    visibleCategoryChanged = Signal()
+
+    visibleCategory = Property(str, get_visibleCategory, set_visibleCategory, notify=visibleCategoryChanged)
+    ### END Property visibleCategory
 
 # ------------------------------------------------------------------------------

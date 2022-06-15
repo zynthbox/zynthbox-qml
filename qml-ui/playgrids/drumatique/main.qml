@@ -99,8 +99,8 @@ Zynthian.BasePlayGrid {
                     // Remember to set this, or things will look a bit weird
                     ignoreNextBack = false;
                 } else {
-                    if (component.showPatternsMenu) {
-                        component.showPatternsMenu = false;
+                    if (component.patternsMenuVisible) {
+                        component.hidePatternsMenu();
                     } else if (_private.hasSelection) {
                         _private.deselectSelectedItem();
                     } else if (component.mostRecentlyPlayedNote) {
@@ -229,7 +229,9 @@ Zynthian.BasePlayGrid {
         }
     }
 
-    property bool showPatternsMenu: false
+    property bool patternsMenuVisible: false
+    signal hidePatternsMenu();
+    signal showPatternsMenu();
     property bool showPatternSettings: false
 
     property var mostRecentlyPlayedNote
@@ -547,6 +549,7 @@ Zynthian.BasePlayGrid {
     Component {
         id: drumsGrid
         Item {
+            id: drumsGridContainer
             anchors.margins: 5
             objectName: "drumsGrid"
             ColumnLayout {
@@ -1162,371 +1165,377 @@ Zynthian.BasePlayGrid {
                     }
                 }
             }
-            Item {
-                id: patternsMenu
-                visible: component.showPatternsMenu
-                anchors {
-                    fill: parent
-                    leftMargin: -5
-                    topMargin: Kirigami.Units.largeSpacing
-                    bottomMargin: Kirigami.Units.largeSpacing
-                    rightMargin: Kirigami.Units.largeSpacing * 2
-                }
-                Zynthian.Card {
-                    anchors.fill: parent
-                }
-                MouseArea {
-                    anchors {
-                        fill: parent;
-                        // Could use screen height, but also like... eh
-                        margins: -2000
+            QQC2.Popup {
+                id: patternMenuPopup
+                exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+                y: Kirigami.Units.largeSpacing
+                x: -Kirigami.Units.largeSpacing * 2
+                width: drumsGridContainer.width - Kirigami.Units.largeSpacing * 2
+                height: drumsGridContainer.height - Kirigami.Units.largeSpacing * 3
+                modal: true
+                focus: true
+                Connections {
+                    target: component
+                    onShowPatternsMenu: {
+                        patternMenuPopup.open();
                     }
-                    enabled: component.showPatternsMenu
-                    onClicked: {
-                        component.showPatternsMenu = false;
+                    onHidePatternsMenu: {
+                        patternMenuPopup.close();
                     }
                 }
-                QQC2.ScrollView {
-                    id:patternsMenuList
-                    anchors {
-                        fill: parent
-                        margins: Kirigami.Units.smallSpacing
+                Binding {
+                    target: component
+                    property: "patternsMenuVisible"
+                    value: patternMenuPopup.opened
+                }
+                Item {
+                    id: patternsMenu
+                    anchors.fill: parent;
+                    Zynthian.Card {
+                        anchors.fill: parent
                     }
-                    QQC2.ScrollBar.horizontal.visible: false
-                    QQC2.ScrollBar.vertical.x: patternsMenuListView.x + patternsMenuListView.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
-                    contentItem: ListView {
-                        id: patternsMenuListView
-                        clip: true
-                        cacheBuffer: height * 2 // a little brutish, but it means all our delegates always exist, which is what we're actually after here
-                        model: _private.trackCount
-                        Connections {
-                            target: _private
-                            onActivePatternModelChanged: {
-                                if (_private.activePatternModel) {
-                                    patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.trackIndex / 5), ListView.Beginning);
+                    QQC2.ScrollView {
+                        id:patternsMenuList
+                        anchors {
+                            fill: parent
+                            margins: Kirigami.Units.smallSpacing
+                        }
+                        QQC2.ScrollBar.horizontal.visible: false
+                        QQC2.ScrollBar.vertical.x: patternsMenuListView.x + patternsMenuListView.width  - QQC2.ScrollBar.vertical.width// - root.rightPadding
+                        contentItem: ListView {
+                            id: patternsMenuListView
+                            clip: true
+                            cacheBuffer: height * 2 // a little brutish, but it means all our delegates always exist, which is what we're actually after here
+                            model: _private.trackCount
+                            Connections {
+                                target: _private
+                                onActivePatternModelChanged: {
+                                    if (_private.activePatternModel) {
+                                        patternsMenuListView.positionViewAtIndex(5 * Math.floor(_private.activePatternModel.trackIndex / 5), ListView.Beginning);
+                                    }
                                 }
                             }
-                        }
 
-                        delegate: Rectangle {
-                            id: patternsMenuItem
-                            property QtObject thisPattern: _private.sequence && associatedTrack ? _private.sequence.getByPart(model.index, associatedTrack.selectedPart) : null
-                            property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
-                            property int activePattern: _private.activePattern
-                            property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
-                            property QtObject associatedTrack: zynthian.zynthiloops.song && zynthian.zynthiloops.song.tracksModel ? zynthian.zynthiloops.song.tracksModel.getTrack(model.index) : null
-                            property int associatedTrackIndex: model.index
-                            height: ListView.view.height * 0.2
-                            width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: _private.activePatternModel && _private.activePatternModel.trackIndex === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
-                            border.color: Kirigami.Theme.textColor
-                            function pickThisPattern() {
-                                component.pickPattern(patternsMenuItem.thisPatternIndex)
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: patternsMenuItem.pickThisPattern();
-                                RowLayout {
+                            delegate: Rectangle {
+                                id: patternsMenuItem
+                                property QtObject thisPattern: _private.sequence && associatedTrack ? _private.sequence.getByPart(model.index, associatedTrack.selectedPart) : null
+                                property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
+                                property int activePattern: _private.activePattern
+                                property QtObject trackClipsModel: associatedTrack == null ? null : associatedTrack.clipsModel
+                                property QtObject associatedTrack: zynthian.zynthiloops.song && zynthian.zynthiloops.song.tracksModel ? zynthian.zynthiloops.song.tracksModel.getTrack(model.index) : null
+                                property int associatedTrackIndex: model.index
+                                height: ListView.view.height * 0.2
+                                width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
+                                Kirigami.Theme.inherit: false
+                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                color: _private.activePatternModel && _private.activePatternModel.trackIndex === index ? Kirigami.Theme.focusColor : Kirigami.Theme.backgroundColor
+                                border.color: Kirigami.Theme.textColor
+                                function pickThisPattern() {
+                                    component.pickPattern(patternsMenuItem.thisPatternIndex)
+                                }
+                                MouseArea {
                                     anchors.fill: parent
-                                    anchors.margins: 5
-                                    spacing: 5
+                                    onClicked: patternsMenuItem.pickThisPattern();
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: 5
+                                        spacing: 5
 
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Layout.minimumWidth: height
-                                        Layout.maximumWidth: height
-                                        Zynthian.PlayGridButton {
+                                        ColumnLayout {
                                             Layout.fillHeight: true
-                                            Layout.fillWidth: true
-                                            Layout.margins: Kirigami.Units.largeSpacing
-                                            text: qsTr("Solo")
-                                            checked: _private.sequence && _private.sequence.soloPattern === patternsMenuItem.thisPatternIndex
-                                            onClicked: {
-                                                if (_private.sequence.soloPattern === patternsMenuItem.thisPatternIndex) {
-                                                    _private.sequence.soloPattern = -1;
-                                                } else {
-                                                    _private.sequence.soloPattern = patternsMenuItem.thisPatternIndex;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Layout.minimumWidth: height
-                                        Layout.maximumWidth: height
-                                        Item {
-                                            Layout.fillHeight: true
-                                            Layout.fillWidth: true
-                                            Layout.margins: Kirigami.Units.largeSpacing
+                                            Layout.minimumWidth: height
+                                            Layout.maximumWidth: height
                                             Zynthian.PlayGridButton {
-                                                anchors.fill: parent
-                                                opacity: _private.sequence && _private.sequence.soloPattern === -1 ? 1 : 0.5
-                                                icon.name: "player-volume"
-                                                onClicked: {
-                                                    if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                        var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
-                                                        // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
-                                                        associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
-                                                    }
-                                                }
-                                            }
-                                            Rectangle {
-                                                visible: patternsMenuItem.thisPattern ? !patternsMenuItem.thisPattern.enabled : false
-                                                anchors.centerIn: parent
-                                                rotation: 45
-                                                width: parent.width
-                                                height: Kirigami.Units.smallSpacing
-                                                color: "red"
-                                            }
-                                        }
-                                    }
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Layout.minimumWidth: (parent.width / 7);
-                                        Layout.maximumWidth: (parent.width / 7);
-                                        QQC2.Label {
-                                            Layout.fillHeight: true
-                                            Layout.preferredHeight: patternsMenuItem.height / 2
-                                            Layout.fillWidth: true
-                                            text: patternsMenuItem.associatedTrack ? "Track " + patternsMenuItem.associatedTrack.name : "(no track)"
-                                            font.pixelSize: 15
-                                            Kirigami.Theme.inherit: false
-                                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                                            color: Kirigami.Theme.textColor
-                                            horizontalAlignment: Text.AlignHCenter
-                                        }
-                                        Zynthian.PlayGridButton {
-                                            Layout.fillHeight: true
-                                            Layout.preferredHeight: patternsMenuItem.height / 2
-                                            text: patternsMenuItem.thisPattern ? qsTr("Part %1%2").arg(patternsMenuItem.associatedTrackIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            onClicked: {
-                                                partPicker.pickPart(patternsMenuItem.associatedTrackIndex);
-                                            }
-                                        }
-                                    }
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Layout.minimumWidth: (parent.width / 8) * 3;
-                                        Layout.maximumWidth: (parent.width / 8) * 3;
-
-                                        RowLayout {
-                                            Layout.fillWidth: true
-                                            Layout.preferredHeight: patternsMenuItem.height / 2
-                                            Image {
                                                 Layout.fillHeight: true
                                                 Layout.fillWidth: true
-                                                source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
+                                                Layout.margins: Kirigami.Units.largeSpacing
+                                                text: qsTr("Solo")
+                                                checked: _private.sequence && _private.sequence.soloPattern === patternsMenuItem.thisPatternIndex
+                                                onClicked: {
+                                                    if (_private.sequence.soloPattern === patternsMenuItem.thisPatternIndex) {
+                                                        _private.sequence.soloPattern = -1;
+                                                    } else {
+                                                        _private.sequence.soloPattern = patternsMenuItem.thisPatternIndex;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: height
+                                            Layout.maximumWidth: height
+                                            Item {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
+                                                Layout.margins: Kirigami.Units.largeSpacing
+                                                Zynthian.PlayGridButton {
+                                                    anchors.fill: parent
+                                                    opacity: _private.sequence && _private.sequence.soloPattern === -1 ? 1 : 0.5
+                                                    icon.name: "player-volume"
+                                                    onClicked: {
+                                                        if (_private.sequence && _private.sequence.soloPattern === -1) {
+                                                            var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
+                                                            // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
+                                                            associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
+                                                        }
+                                                    }
+                                                }
                                                 Rectangle {
-                                                    anchors {
-                                                        top: parent.top
-                                                        bottom: parent.bottom
-                                                    }
-                                                    visible: parent.visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
-                                                    color: Kirigami.Theme.highlightColor
-                                                    width: Math.max(1, Math.floor(widthFactor))
-                                                    property double widthFactor: visible && patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
-                                                    x: visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
-                                                }
-                                                Kirigami.Heading {
-                                                    anchors {
-                                                        fill: parent
-                                                        margins: Kirigami.Units.smallSpacing
-                                                    }
-                                                    horizontalAlignment: Text.AlignRight
-                                                    verticalAlignment: Text.AlignBottom
-                                                    level: 4
-                                                    text: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.name + (patternsMenuItem.thisPattern.unsavedChanges === true ? " *" : "") : ""
+                                                    visible: patternsMenuItem.thisPattern ? !patternsMenuItem.thisPattern.enabled : false
+                                                    anchors.centerIn: parent
+                                                    rotation: 45
+                                                    width: parent.width
+                                                    height: Kirigami.Units.smallSpacing
+                                                    color: "red"
                                                 }
                                             }
                                         }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: (parent.width / 7);
+                                            Layout.maximumWidth: (parent.width / 7);
+                                            QQC2.Label {
+                                                Layout.fillHeight: true
+                                                Layout.preferredHeight: patternsMenuItem.height / 2
+                                                Layout.fillWidth: true
+                                                text: patternsMenuItem.associatedTrack ? "Track " + patternsMenuItem.associatedTrack.name : "(no track)"
+                                                font.pixelSize: 15
+                                                Kirigami.Theme.inherit: false
+                                                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                                                color: Kirigami.Theme.textColor
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+                                            Zynthian.PlayGridButton {
+                                                Layout.fillHeight: true
+                                                Layout.preferredHeight: patternsMenuItem.height / 2
+                                                text: patternsMenuItem.thisPattern ? qsTr("Part %1%2").arg(patternsMenuItem.associatedTrackIndex + 1).arg(patternsMenuItem.thisPattern.partName) : "(no part)"
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                onClicked: {
+                                                    partPicker.pickPart(patternsMenuItem.associatedTrackIndex);
+                                                }
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: (parent.width / 8) * 3;
+                                            Layout.maximumWidth: (parent.width / 8) * 3;
 
-                                        Zynthian.PlayGridButton {
-                                            id: soundButton
-                                            Layout.fillWidth: true
-                                            Layout.preferredHeight: patternsMenuItem.height / 2
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
-                                            opacity: enabled ? 1 : 0.7
-                                            property string soundName
-                                            Component.onCompleted: {
-                                                updateSoundNameTimer.restart();
+                                            RowLayout {
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: patternsMenuItem.height / 2
+                                                Image {
+                                                    Layout.fillHeight: true
+                                                    Layout.fillWidth: true
+                                                    source: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.thumbnailUrl : ""
+                                                    Rectangle {
+                                                        anchors {
+                                                            top: parent.top
+                                                            bottom: parent.bottom
+                                                        }
+                                                        visible: parent.visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.isPlaying : false
+                                                        color: Kirigami.Theme.highlightColor
+                                                        width: Math.max(1, Math.floor(widthFactor))
+                                                        property double widthFactor: visible && patternsMenuItem.thisPattern ? parent.width / (patternsMenuItem.thisPattern.width * patternsMenuItem.thisPattern.bankLength) : 1
+                                                        x: visible && patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.bankPlaybackPosition * widthFactor : 0
+                                                    }
+                                                    Kirigami.Heading {
+                                                        anchors {
+                                                            fill: parent
+                                                            margins: Kirigami.Units.smallSpacing
+                                                        }
+                                                        horizontalAlignment: Text.AlignRight
+                                                        verticalAlignment: Text.AlignBottom
+                                                        level: 4
+                                                        text: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.name + (patternsMenuItem.thisPattern.unsavedChanges === true ? " *" : "") : ""
+                                                    }
+                                                }
                                             }
-                                            Timer {
-                                                id: updateSoundNameTimer
-                                                interval: 100
-                                                repeat: false
-                                                onTriggered: soundButton.updateSoundName()
-                                            }
-                                            Connections {
-                                                target: patternsMenuItem
-                                                onAssociatedTrackChanged: updateSoundNameTimer.restart();
-                                            }
-                                            Connections {
-                                                target: zynthian.fixed_layers
-                                                onList_updated: updateSoundNameTimer.restart();
-                                            }
-                                            Connections {
-                                                target: patternsMenuItem.associatedTrack
-                                                onChainedSoundsChanged: updateSoundNameTimer.restart();
-                                                onConnectedSoundChanged: updateSoundNameTimer.restart();
-                                            }
-                                            function updateSoundName() {
-                                                var text = "";
 
-                                                if (patternsMenuItem.associatedTrack) {
-                                                    for (var id in patternsMenuItem.associatedTrack.chainedSounds) {
-                                                        if (patternsMenuItem.associatedTrack.chainedSounds[id] >= 0 &&
-                                                            patternsMenuItem.associatedTrack.checkIfLayerExists(patternsMenuItem.associatedTrack.chainedSounds[id])) {
-                                                            text = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.associatedTrack.chainedSounds[id]);
-                                                            break;
+                                            Zynthian.PlayGridButton {
+                                                id: soundButton
+                                                Layout.fillWidth: true
+                                                Layout.preferredHeight: patternsMenuItem.height / 2
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && patternsMenuItem.associatedTrack && patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination
+                                                opacity: enabled ? 1 : 0.7
+                                                property string soundName
+                                                Component.onCompleted: {
+                                                    updateSoundNameTimer.restart();
+                                                }
+                                                Timer {
+                                                    id: updateSoundNameTimer
+                                                    interval: 100
+                                                    repeat: false
+                                                    onTriggered: soundButton.updateSoundName()
+                                                }
+                                                Connections {
+                                                    target: patternsMenuItem
+                                                    onAssociatedTrackChanged: updateSoundNameTimer.restart();
+                                                }
+                                                Connections {
+                                                    target: zynthian.fixed_layers
+                                                    onList_updated: updateSoundNameTimer.restart();
+                                                }
+                                                Connections {
+                                                    target: patternsMenuItem.associatedTrack
+                                                    onChainedSoundsChanged: updateSoundNameTimer.restart();
+                                                    onConnectedSoundChanged: updateSoundNameTimer.restart();
+                                                }
+                                                function updateSoundName() {
+                                                    var text = "";
+
+                                                    if (patternsMenuItem.associatedTrack) {
+                                                        for (var id in patternsMenuItem.associatedTrack.chainedSounds) {
+                                                            if (patternsMenuItem.associatedTrack.chainedSounds[id] >= 0 &&
+                                                                patternsMenuItem.associatedTrack.checkIfLayerExists(patternsMenuItem.associatedTrack.chainedSounds[id])) {
+                                                                text = zynthian.fixed_layers.selector_list.getDisplayValue(patternsMenuItem.associatedTrack.chainedSounds[id]);
+                                                                break;
+                                                            }
                                                         }
                                                     }
-                                                }
 
-                                                soundName = text;
-                                            }
-                                            function clipShorthands(clipIds) {
-                                                var names = [];
-                                                if (patternsMenuItem.associatedTrack) {
-                                                    for (var i = 0; i < patternsMenuItem.associatedTrack.samples.length; ++i) {
-                                                        var sample = patternsMenuItem.associatedTrack.samples[i];
-                                                        if (sample && clipIds.indexOf(sample.cppObjId) > -1) {
-                                                            names.push("S" + i);
+                                                    soundName = text;
+                                                }
+                                                function clipShorthands(clipIds) {
+                                                    var names = [];
+                                                    if (patternsMenuItem.associatedTrack) {
+                                                        for (var i = 0; i < patternsMenuItem.associatedTrack.samples.length; ++i) {
+                                                            var sample = patternsMenuItem.associatedTrack.samples[i];
+                                                            if (sample && clipIds.indexOf(sample.cppObjId) > -1) {
+                                                                names.push("S" + i);
+                                                            }
                                                         }
                                                     }
+                                                    if (names.length > 0) {
+                                                        return names.join(",");
+                                                    }
+                                                    return "(no sample)";
                                                 }
-                                                if (names.length > 0) {
-                                                    return names.join(",");
+                                                text: visible
+                                                    ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
+                                                        ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
+                                                        : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
+                                                            ? "Sample Slice Mode"
+                                                            : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
+                                                                ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
+                                                                : patternsMenuItem.associatedTrack
+                                                                    ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
+                                                                        ? "Sound: " + soundName
+                                                                        : "No sound assigned - tap to select one"
+                                                            : "Unassigned - playing to: " + _private.currentSoundName
+                                                    : ""
+                                                onClicked: {
+                                                    if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
+                                                        zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
+                                                    }
+                                                    tracksViewDrawer.open();
                                                 }
-                                                return "(no sample)";
-                                            }
-                                            text: visible
-                                                ? patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination
-                                                    ? qsTr("Sample Trigger Mode: %1").arg(clipShorthands(patternsMenuItem.thisPattern.clipIds))
-                                                    : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination
-                                                        ? "Sample Slice Mode"
-                                                        : patternsMenuItem.thisPattern && patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.ExternalDestination
-                                                            ? qsTr("External Midi Mode: Channel %1").arg(patternsMenuItem.thisPattern.externalMidiChannel > -1 ? patternsMenuItem.thisPattern.externalMidiChannel + 1 : patternsMenuItem.thisPattern.midiChannel + 1)
-                                                            : patternsMenuItem.associatedTrack
-                                                                ? patternsMenuItem.associatedTrack.connectedSound > -1 && soundName.length > 2
-                                                                    ? "Sound: " + soundName
-                                                                    : "No sound assigned - tap to select one"
-                                                        : "Unassigned - playing to: " + _private.currentSoundName
-                                                : ""
-                                            onClicked: {
-                                                if (zynthian.session_dashboard.selectedTrack !== patternsMenuItem.associatedTrackIndex) {
-                                                    zynthian.session_dashboard.selectedTrack = patternsMenuItem.associatedTrackIndex;
-                                                }
-                                                tracksViewDrawer.open();
                                             }
                                         }
-                                    }
-                                    //ColumnLayout {
-                                        //Layout.fillHeight: true
-                                        //Zynthian.PlayGridButton {
-                                            //text: "part I"
-                                            //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            //checked: patternsMenuItem.thisPattern.bankOffset === 0
-                                            //onClicked: {
-                                                //component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
+                                        //ColumnLayout {
+                                            //Layout.fillHeight: true
+                                            //Zynthian.PlayGridButton {
+                                                //text: "part I"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern.bankOffset === 0
+                                                //onClicked: {
+                                                    //component.setPatternProperty("bankOffset", 0, patternsMenuItem.thisPatternIndex)
+                                                //}
+                                            //}
+                                            //Zynthian.PlayGridButton {
+                                                //text: "part II"
+                                                //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                //checked: patternsMenuItem.thisPattern.bankOffset === 8
+                                                //onClicked: {
+                                                    //component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
+                                                //}
                                             //}
                                         //}
-                                        //Zynthian.PlayGridButton {
-                                            //text: "part II"
-                                            //enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            //checked: patternsMenuItem.thisPattern.bankOffset === 8
-                                            //onClicked: {
-                                                //component.setPatternProperty("bankOffset", 8, patternsMenuItem.thisPatternIndex)
-                                            //}
-                                        //}
-                                    //}
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Zynthian.PlayGridButton {
-                                            text: "TRIG"
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
-                                            onClicked: {
-                                                if (checked) {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
-                                                } else {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-trig";
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Zynthian.PlayGridButton {
+                                                text: "TRIG"
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleTriggerDestination : false
+                                                onClicked: {
+                                                    if (checked) {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "external";
+                                                    } else {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "sample-trig";
+                                                    }
+                                                }
+                                            }
+                                            Zynthian.PlayGridButton {
+                                                text: "SYNTH"
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
+                                                onClicked: {
+                                                    if (checked) {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "external";
+                                                    } else {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "synth";
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        ColumnLayout {
+                                            Layout.fillHeight: true
+                                            Zynthian.PlayGridButton {
+                                                text: "SLICE"
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
+                                                onClicked: {
+                                                    if (checked) {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "external";
+                                                    } else {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "sample-slice";
+                                                    }
+                                                }
+                                            }
+                                            Zynthian.PlayGridButton {
+                                                text: "LOOP"
+                                                enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
+                                                checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
+                                                onClicked: {
+                                                    if (checked) {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "external";
+                                                    } else {
+                                                        patternsMenuItem.associatedTrack.trackAudioType = "sample-loop";
+                                                    }
                                                 }
                                             }
                                         }
                                         Zynthian.PlayGridButton {
-                                            text: "SYNTH"
+                                            text: "copy\n"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SynthDestination : false
                                             onClicked: {
-                                                if (checked) {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
-                                                } else {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "synth";
-                                                }
+                                                _private.copyRange(
+                                                    (patternsMenuItem.thisPatternIndex + 1) + " " + _private.sceneName,
+                                                    patternsMenuItem.thisPattern,
+                                                    patternsMenuItem.thisPattern.bankOffset,
+                                                    patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.bankLength
+                                                );
                                             }
                                         }
-                                    }
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
                                         Zynthian.PlayGridButton {
-                                            text: "SLICE"
-                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleSlicedDestination : false
+                                            text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
+                                            enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && _private.clipBoard !== undefined
                                             onClicked: {
-                                                if (checked) {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
-                                                } else {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-slice";
+                                                _private.pasteInPlace(patternsMenuItem.thisPattern, patternsMenuItem.thisPattern.bankOffset, _private.bankOffset + patternsMenuItem.thisPattern.bankLength);
+                                                if (_private.activePatternModel == patternsMenuItem.thisPattern) {
+                                                    component.refreshSteps();
+                                                    component.setActiveBar(_private.activeBar)
                                                 }
                                             }
                                         }
                                         Zynthian.PlayGridButton {
-                                            text: "LOOP"
+                                            text: "clear\n"
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                            checked: patternsMenuItem.thisPattern ? patternsMenuItem.thisPattern.noteDestination === ZynQuick.PatternModel.SampleLoopedDestination : false
                                             onClicked: {
-                                                if (checked) {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "external";
-                                                } else {
-                                                    patternsMenuItem.associatedTrack.trackAudioType = "sample-loop";
+                                                patternsMenuItem.thisPattern.clear();
+                                                patternsMenuItem.thisPattern.availableBars = 1;
+                                                if (_private.activePatternModel == patternsMenuItem.thisPattern) {
+                                                    component.refreshSteps();
                                                 }
-                                            }
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "copy\n"
-                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                        onClicked: {
-                                            _private.copyRange(
-                                                (patternsMenuItem.thisPatternIndex + 1) + " " + _private.sceneName,
-                                                patternsMenuItem.thisPattern,
-                                                patternsMenuItem.thisPattern.bankOffset,
-                                                patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.bankLength
-                                            );
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
-                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && _private.clipBoard !== undefined
-                                        onClicked: {
-                                            _private.pasteInPlace(patternsMenuItem.thisPattern, patternsMenuItem.thisPattern.bankOffset, _private.bankOffset + patternsMenuItem.thisPattern.bankLength);
-                                            if (_private.activePatternModel == patternsMenuItem.thisPattern) {
-                                                component.refreshSteps();
-                                                component.setActiveBar(_private.activeBar)
-                                            }
-                                        }
-                                    }
-                                    Zynthian.PlayGridButton {
-                                        text: "clear\n"
-                                        enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex
-                                        onClicked: {
-                                            patternsMenuItem.thisPattern.clear();
-                                            patternsMenuItem.thisPattern.availableBars = 1;
-                                            if (_private.activePatternModel == patternsMenuItem.thisPattern) {
-                                                component.refreshSteps();
                                             }
                                         }
                                     }
@@ -1737,10 +1746,6 @@ Zynthian.BasePlayGrid {
             ColumnLayout {
                 id: sidebarRoot
                 anchors.fill: parent
-
-                function hideAllMenus() {
-                    component.showPatternsMenu = false;
-                }
                 Kirigami.Separator { Layout.fillWidth: true; Layout.fillHeight: true; }
 
                 Zynthian.PlayGridButton {
@@ -1750,8 +1755,7 @@ Zynthian.BasePlayGrid {
                             ? "Pattern:\n" + (_private.associatedTrack ? _private.associatedTrack.name : "(none)") + "\n" + _private.sceneName + "-" + (_private.activePatternModel.trackIndex + 1) + _private.activePatternModel.partName
                             : "";
                     onClicked: {
-                        sidebarRoot.hideAllMenus();
-                        component.showPatternsMenu = !component.showPatternsMenu;
+                        component.showPatternsMenu();
                     }
                 }
 
@@ -1760,7 +1764,6 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     icon.name: "arrow-up"
                     onClicked: {
-                        sidebarRoot.hideAllMenus();
                         // Don't scroll past the end
                         if (_private.activePatternModel.gridModelStartNote < 112) {
                             // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
@@ -1778,7 +1781,6 @@ Zynthian.BasePlayGrid {
                 Zynthian.PlayGridButton {
                     icon.name: "arrow-down"
                     onClicked: {
-                        sidebarRoot.hideAllMenus();
                         // Don't scroll past the end
                         if (_private.activePatternModel.gridModelStartNote > 0) {
                             // 4 being the width of the grid - heuristics are a go, but also the thing is 16 long so...
@@ -1795,7 +1797,6 @@ Zynthian.BasePlayGrid {
                     property var timeOnPressed
                     text: _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
                     onPressed: {
-                        sidebarRoot.hideAllMenus();
                         playPauseBtn.timeOnPressed = new Date();
                     }
                     onReleased: {
@@ -1829,7 +1830,6 @@ Zynthian.BasePlayGrid {
                             : component.heardNotes.length + " ♫")
                     visualPressAndHold: true
                     onClicked: {
-                        sidebarRoot.hideAllMenus();
                         if (!pressingAndHolding) {
                             if (zynthian.backButtonPressed && _private.activePatternModel) {
                                 component.ignoreNextBack = true;
@@ -1868,19 +1868,8 @@ Zynthian.BasePlayGrid {
                     id:sequencerSettingsBtn
                     icon.name: "configure"
                     onClicked: {
-                        sidebarRoot.hideAllMenus();
                         component.showPatternSettings = !component.showPatternSettings;
                     }
-                }
-            }
-            MouseArea {
-                anchors {
-                    fill: parent;
-                    margins: -Kirigami.Units.largeSpacing
-                }
-                enabled: component.showPatternsMenu
-                onClicked: {
-                    component.showPatternsMenu = false;
                 }
             }
         }

@@ -51,13 +51,13 @@ Zynthian.BasePlayGrid {
         Kirigami.Action {
             text: qsTr("Load Sequence or Pattern...")
             onTriggered: {
-                sequenceLoader.loadSequenceFromFile();
+                sequenceLoader.loadSequenceFromFile(_private.sequence.objectName);
             }
         },
         Kirigami.Action {
             text: qsTr("Export Sequence...")
             onTriggered: {
-                sequenceLoader.saveSequenceToFile();
+                sequenceLoader.saveSequenceToFile(_private.sequence.objectName);
             }
         },
         Kirigami.Action {

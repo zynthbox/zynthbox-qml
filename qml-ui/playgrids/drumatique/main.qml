@@ -426,6 +426,7 @@ Zynthian.BasePlayGrid {
          */
         function pasteInPlace(model, startRow, endRow) {
             var noteIndex = 0;
+            model.startLongOperation();
             for (var row = startRow; row < endRow + 1; ++row) {
                 for (var column = 0; column < model.width; ++column) {
                     var oldCompound = (noteIndex < _private.clipBoard.notes.length) ? _private.clipBoard.notes[noteIndex] : null;
@@ -444,6 +445,7 @@ Zynthian.BasePlayGrid {
                     ++noteIndex;
                 }
             }
+            model.endLongOperation();
             component.refreshSteps();
         }
         function adoptSequence() {
@@ -1512,7 +1514,7 @@ Zynthian.BasePlayGrid {
                                                     (patternsMenuItem.thisPatternIndex + 1) + " " + _private.sceneName,
                                                     patternsMenuItem.thisPattern,
                                                     patternsMenuItem.thisPattern.bankOffset,
-                                                    patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.bankLength
+                                                    patternsMenuItem.thisPattern.bankOffset + patternsMenuItem.thisPattern.availableBars
                                                 );
                                             }
                                         }
@@ -1520,6 +1522,8 @@ Zynthian.BasePlayGrid {
                                             text: "paste\n" + (_private.clipBoard && _private.clipBoard.description !== "" ? _private.clipBoard.description : "")
                                             enabled: patternsMenuItem.activePattern === patternsMenuItem.thisPatternIndex && _private.clipBoard !== undefined
                                             onClicked: {
+                                                // Resize the pattern's banks to match what we're pasting
+                                                patternsMenuItem.thisPattern.availableBars = Math.floor(_private.clipBoard.notes.length / patternsMenuItem.thisPattern.width) - 1;
                                                 _private.pasteInPlace(patternsMenuItem.thisPattern, patternsMenuItem.thisPattern.bankOffset, _private.bankOffset + patternsMenuItem.thisPattern.bankLength);
                                                 if (_private.activePatternModel == patternsMenuItem.thisPattern) {
                                                     component.refreshSteps();

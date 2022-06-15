@@ -178,6 +178,7 @@ Zynthian.BasePlayGrid {
         if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
             component.octave = _private.startNoteRoots[_private.scale];
         }
+        populateGridTimer.restart();
     }
 
     onInitialize: {
@@ -191,7 +192,6 @@ Zynthian.BasePlayGrid {
         _private.miniGridModel = component.getModel("mini")
         if (_private.model.rows == 0 || _private.miniGridModel.rows == 0) {
             populateStartNotesTimer.restart()
-            populateGridTimer.restart()
         }
     }
 
@@ -229,13 +229,33 @@ Zynthian.BasePlayGrid {
             }
         }
     }
+    Connections {
+        target: zynthian.zynthiloops.song
+        onSelected_scale_index_changed: {
+            populateStartNotesTimer.restart();
+        }
+        onOctave_changed: {
+            populateStartNotesTimer.restart();
+        }
+    }
+    Connections {
+        target: zynthian.zynthiloops
+        onSongChanged: {
+            populateStartNotesTimer.restart();
+        }
+    }
 
     Timer {
         id: populateStartNotesTimer
         interval: 1; repeat: false; running: false;
         onTriggered: {
-            // TODO Deduce what our root note is supposed to be, instead of just assuming 36 (C2)
-            component.populateStartNotes(36);
+            // The logical octave is basically -1 indexed, because we go with 60 == C4 (in turn meaning that midi note 0 == C-1)
+            var songOctave = zynthian.zynthiloops.song.octave;
+            // The index here is really an offset in an array, but also it's equivalent to the notes from C through F inside one octave
+            var songScale = zynthian.zynthiloops.song.selectedScaleIndex;
+            var rootNote = (12 * (songOctave + 1)) + songScale;
+            //console.log("Filling start notes with root note", rootNote, "based on song octave", songOctave, "and scale", songScale);
+            component.populateStartNotes(rootNote);
         }
     }
     Timer {

@@ -72,6 +72,8 @@ class zynthiloops_song(QObject):
         self.__history_length__ = 0
         self.__scale_model__ = ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F']
         self.__selected_scale_index__ = 0
+        # The octave is -1 indexed, as we operate with C4 == midi note 60, so this makes our default a key of C2
+        self.__octave__ = 2
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -123,6 +125,7 @@ class zynthiloops_song(QObject):
                 "bpm": self.__bpm__,
                 "volume": self.__volume__,
                 "selectedScaleIndex": self.__selected_scale_index__,
+                "octave": self.__octave__,
                 "tracks": self.__tracks_model__.serialize(),
                 "parts": self.__parts_model__.serialize(),
                 "scenes": self.__scenes_model__.serialize()}
@@ -285,6 +288,8 @@ class zynthiloops_song(QObject):
                     self.__metronome_manager__.zyngui.screens["master_alsa_mixer"].volume = self.__volume__
                 if "selectedScaleIndex" in sketch:
                     self.set_selected_scale_index(sketch["selectedScaleIndex"], True)
+                if "octave" in sketch:
+                    self.set_octave(sketch["octave"], True)
                 if "parts" in sketch:
                     self.__parts_model__.deserialize(sketch["parts"])
                 if "tracks" in sketch:
@@ -562,6 +567,23 @@ class zynthiloops_song(QObject):
         return self.__scale_model__[self.__selected_scale_index__]
     selectedScale = Property(str, get_selected_scale, notify=selected_scale_index_changed)
     ### END Property selectedScale
+
+    ### Property octave
+    # The octave is -1 indexed, as we operate with C4 == midi note 60
+    # The song's octave can be combined with the scaleIndex to work out what the song's key is as a midi note value:
+    # Multiply the octave's value plus one with twelve, and add the scaleIndex, or:
+    # (octave + 1) * 12 + scaleIndex
+    def get_octave(self):
+        return self.__octave__
+    def set_octave(self, octave, force_set=False):
+        if self.__octave__ != octave or force_set is True:
+            self.__octave__ = octave
+            if force_set is not True:
+                self.octave_changed.emit()
+                self.schedule_save()
+    octave_changed = Signal()
+    octave = Property(int, get_octave, set_octave, notify=octave_changed)
+    ### END Property octave
 
     ### Property sketchFolderName
     def get_sketch_folder_name(self):

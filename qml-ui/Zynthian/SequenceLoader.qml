@@ -46,7 +46,7 @@ Item {
      */
     function loadSequenceFromFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = "Scene";
+            sequenceFilePicker.sequenceName = "Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -61,7 +61,7 @@ Item {
      */
     function saveSequenceToFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = "Scene";
+            sequenceFilePicker.sequenceName = "Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }

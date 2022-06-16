@@ -814,7 +814,7 @@ Zynthian.BasePlayGrid {
                                 if (drumPadRepeater.selectedIndex > -1) {
                                     var seqPad = drumPadRepeater.itemAt(selectedIndex);
                                     var indicesToChange = []
-                                    if (seqPad.currentSubNote === -1) {
+                                    if (seqPad.note && seqPad.currentSubNote === -1) {
                                         for (var i = 0; i < seqPad.note.subnotes.length; ++i) {
                                             indicesToChange.push(i);
                                         }

@@ -57,8 +57,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.playback_process = None
         self.__most_recent_recording_file__ = ""
         self.__recording_file__ = ""
-        # Possible values : modules, appimages, sessions, templates, discover
+        # Possible values : modules(all zynthian modules + appimages), appimages(only appimages), sessions(sketch folders), sessions-versions(sketch files inside sketch folders), templates, discover
         self.__visible_category__ = "modules"
+        self.__selected_sketch_folder__ = None
         self.recorder_process = None
         self.show()
 
@@ -139,6 +140,16 @@ class zynthian_gui_main(zynthian_gui_selector):
                     except Exception as e:
                         logging.error(e)
 
+        if self.visibleCategory == "sessions":
+            for sketch in self.zyngui.zynthiloops.get_sketch_folders():
+                self.list_data.append(("sketch", str(sketch), sketch.stem))
+                self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/folder.svg"})
+
+        if self.visibleCategory == "sessions-versions":
+            for version in self.zyngui.zynthiloops.get_sketch_versions(self.__selected_sketch_folder__):
+                self.list_data.append(("sketch-version", str(version), version.name.replace(".sketch.json", "")))
+                self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/file.svg"})
+
         super().fill_list()
 
     def select_action(self, i, t="S"):
@@ -150,6 +161,12 @@ class zynthian_gui_main(zynthian_gui_selector):
 
             # Open zynthiloops after opening appimage to mimic closing of menu after opening an app like other modules in main page
             QTimer.singleShot(5000, lambda: self.zyngui.show_modal("zynthiloops"))
+        elif self.list_data[i][0] and self.list_data[i][0] == "sketch":
+            self.__selected_sketch_folder__ = self.list_data[i][1]
+            self.visibleCategory = "sessions-versions"
+        elif self.list_data[i][0] and self.list_data[i][0] == "sketch-version":
+            self.zyngui.zynthiloops.loadSketch(self.list_data[i][1], False)
+            self.zyngui.show_modal("zynthiloops")
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()

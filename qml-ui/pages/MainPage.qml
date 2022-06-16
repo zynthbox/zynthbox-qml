@@ -37,27 +37,37 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         switch (cuia) {
-        case "SWITCH_SELECT_BOLD":
-            zynthian.main.power_off()
-            return true
-        case "SELECT_UP":
-            mainviewGridId.moveCurrentIndexUp();
-            return true;
-        case "SELECT_DOWN":
-            if (mainviewGridId.currentIndex === -1) {
-                mainviewGridId.currentIndex = 0;
-            } else {
-                mainviewGridId.moveCurrentIndexDown();
-            }
-            return true;
-        case "NAVIGATE_LEFT":
-            mainviewGridId.moveCurrentIndexLeft();
-            return true;
-        case "NAVIGATE_RIGHT":
-            mainviewGridId.moveCurrentIndexRight();
-            return true;
-        default:
-            return false;
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_LONG":
+            case "SWITCH_BACK_BOLD":
+                if (zynthian.main.visibleCategory === "sessions-versions") {
+                    // Mimic back to return to sketch folder view when versions are being displayed
+                    zynthian.main.visibleCategory = "sessions"
+                    return true
+                }
+                return false
+
+            case "SWITCH_SELECT_BOLD":
+                zynthian.main.power_off()
+                return true
+            case "SELECT_UP":
+                mainviewGridId.moveCurrentIndexUp();
+                return true;
+            case "SELECT_DOWN":
+                if (mainviewGridId.currentIndex === -1) {
+                    mainviewGridId.currentIndex = 0;
+                } else {
+                    mainviewGridId.moveCurrentIndexDown();
+                }
+                return true;
+            case "NAVIGATE_LEFT":
+                mainviewGridId.moveCurrentIndexLeft();
+                return true;
+            case "NAVIGATE_RIGHT":
+                mainviewGridId.moveCurrentIndexRight();
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -95,7 +105,8 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 checkable: true
-                checked: zynthian.main.visibleCategory === "sessions"
+                checked: zynthian.main.visibleCategory === "sessions" ||
+                         zynthian.main.visibleCategory === "sessions-versions"
                 text: qsTr("Sessions")
                 onClicked: zynthian.main.visibleCategory = "sessions"
             }
@@ -132,8 +143,6 @@ Zynthian.ScreenPage {
                 cellWidth:iconWidth
                 cellHeight:iconHeight
                 currentIndex: zynthian.main.current_index
-                visible: ["modules", "appimages"].indexOf(zynthian.main.visibleCategory) >= 0
-
                 model:zynthian.main.selector_list
                 delegate: HomeScreenIcon {
                     readonly property bool isCurrent: mainviewGridId.currentIndex === index

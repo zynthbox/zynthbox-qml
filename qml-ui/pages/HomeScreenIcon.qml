@@ -32,10 +32,14 @@ Rectangle {
         Kirigami.Heading {
             id:heading
             anchors {
-                horizontalCenter: parent.horizontalCenter
                 bottom: parent.bottom
-                bottomMargin: Kirigami.Units.smallSpacing
+                left: parent.left
+                right: parent.right
+                margins: Kirigami.Units.smallSpacing
             }
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            elide: "ElideRight"
             text: "Layers"
             font.pointSize: 12
         }

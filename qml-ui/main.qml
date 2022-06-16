@@ -896,6 +896,8 @@ Kirigami.AbstractApplicationWindow {
                                             font.pointSize: 7
                                             text: slotsColumnDelegate.soundName.length > 0
                                                     ? slotsColumnDelegate.soundName.split(" > ")[1]
+                                                        ? slotsColumnDelegate.soundName.split(" > ")[1]
+                                                        : ""
                                                     : ""
                                         }
                                     }

@@ -47,6 +47,10 @@ RowLayout {
     property int paramMax
     property int scrollWidth
 
+    // Couple of things directly related to the knob indicator contained within
+    property bool currentlySelected: false
+    property int knobId: 0
+
     // Set to an ordered list of values, which the -/+ buttons should flick
     // through in place of just switching numbers (that is still possible using
     // the tap-and-slide functionality)
@@ -145,6 +149,17 @@ RowLayout {
                 }
                 color: Kirigami.Theme.textColor
             }
+        }
+        Zynthian.KnobIndicator {
+            anchors {
+                left: parent.horizontalCenter
+                leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
+                verticalCenter: parent.verticalCenter
+            }
+            height: component.height / 2
+            width: height
+            visible: component.currentlySelected
+            knobId: component.knobId
         }
     }
     Zynthian.PlayGridButton {

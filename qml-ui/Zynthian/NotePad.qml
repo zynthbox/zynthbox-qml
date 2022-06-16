@@ -194,12 +194,12 @@ Item {
                 onYChanged: updateInsideBounds();
                 onPressedChanged: {
                     if (pressed) {
-                        var velocityValue = 64;
+                        var velocityValue = 127;
                         if (component.positionalVelocity) {
                             velocityValue = 127 - Math.floor(slidePoint.y * 127 / height);
                         } else {
-                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 64, so...
-                            velocityValue = slidePoint.pressure > 0.99999 ? 64 : Math.floor(slidePoint.pressure * 127);
+                            // This seems slightly odd - but 1 is the very highest possible, and default is supposed to be a velocity of 127, so...
+                            velocityValue = slidePoint.pressure > 0.99999 ? 127 : Math.floor(slidePoint.pressure * 127);
                         }
                         playingNote = component.note;
                         if (component.note.midiChannel < 15) {

@@ -214,6 +214,27 @@ don't want to have to dig too far...
                         }
                     }
                     Item {
+                        anchors {
+                            top: settingsPopup.top
+                            left: settingsPopup.right
+                            leftMargin: Kirigami.Units.largeSpacing
+                            bottom: settingsPopup.bottom
+                        }
+                        width: component.width - settingsPopup.width - settingsPopup.x - Kirigami.Units.largeSpacing * 4
+                        visible: settingsPopup.visible && gridSettingsPopup.item !== null
+                        Zynthian.Card {
+                            anchors.fill: parent
+                        }
+                        Loader {
+                            id: gridSettingsPopup
+                            anchors {
+                                fill: parent
+                                margins: Kirigami.Units.largeSpacing * 2
+                            }
+                            sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
+                        }
+                    }
+                    Item {
                         id: settingsPopup
                         visible: false
                         anchors {
@@ -326,25 +347,6 @@ don't want to have to dig too far...
                                     }
                                 }
                             }
-                        }
-                    }
-                    Item {
-                        anchors {
-                            top: settingsPopup.top
-                            left: settingsPopup.right
-                            leftMargin: Kirigami.Units.largeSpacing
-                            bottom: settingsPopup.bottom
-                        }
-                        width: component.width - settingsPopup.mapToGlobal(settingsPopup.width, 0).x - Kirigami.Units.largeSpacing * 3
-                        visible: settingsPopup.visible && gridSettingsPopup.item !== null
-                        Zynthian.Card {
-                            anchors.fill: parent
-                        }
-                        Loader {
-                            id: gridSettingsPopup
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            sourceComponent: playGridStack.currentPlayGridItem && playGridStack.currentPlayGridItem.popup ? playGridStack.currentPlayGridItem.popup : null
                         }
                     }
                     Row {

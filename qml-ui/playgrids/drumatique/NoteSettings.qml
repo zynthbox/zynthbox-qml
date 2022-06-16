@@ -194,6 +194,17 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Velocity"
+            Zynthian.KnobIndicator {
+                anchors {
+                    left: parent.horizontalCenter
+                    leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
+                    verticalCenter: parent.verticalCenter
+                }
+                height: parent.height / 2
+                width: height
+                visible: component.currentSubNote === -1
+                knobId: 1
+            }
         }
         QQC2.Label {
             Layout.fillWidth: true
@@ -202,6 +213,17 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Length"
+            Zynthian.KnobIndicator {
+                anchors {
+                    left: parent.horizontalCenter
+                    leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
+                    verticalCenter: parent.verticalCenter
+                }
+                height: parent.height / 2
+                width: height
+                visible: component.currentSubNote === -1
+                knobId: 2
+            }
         }
         QQC2.Label {
             Layout.fillWidth: true
@@ -210,6 +232,17 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Position"
+            Zynthian.KnobIndicator {
+                anchors {
+                    left: parent.horizontalCenter
+                    leftMargin: -(parent.paintedWidth / 2) - width - Kirigami.Units.smallSpacing
+                    verticalCenter: parent.verticalCenter
+                }
+                height: parent.height / 2
+                width: height
+                visible: component.currentSubNote === -1
+                knobId: 3
+            }
         }
     }
     Repeater {
@@ -352,6 +385,8 @@ ColumnLayout {
                         paramMin: 0
                         paramMax: 127
                         scrollWidth: 128
+                        knobId: 1
+                        currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
                     }
                     StepSettingsParamDelegate {
                         Layout.fillWidth: true
@@ -386,6 +421,8 @@ ColumnLayout {
                             896: "7",
                             1024: "8"
                         }
+                        knobId: 2
+                        currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
                     }
                     StepSettingsParamDelegate {
                         id: delayParamDelegate
@@ -436,6 +473,8 @@ ColumnLayout {
                             paramList = values;
                             paramNames = names;
                         }
+                        knobId: 3
+                        currentlySelected: (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex === component.currentStep && subnoteDelegate.subnoteIndex === component.currentSubNote
                     }
                 }
             }

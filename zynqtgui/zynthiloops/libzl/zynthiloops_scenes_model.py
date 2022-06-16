@@ -136,15 +136,16 @@ class zynthiloops_scenes_model(QAbstractListModel):
     ### Property selectedMixIndex
     def get_selected_mix_index(self):
         return self.__selected_mix_index__
-    def set_selected_mix_index(self, index):
-        self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
-        self.__selected_mix_index__ = index
-        self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
-        self.__song__.schedule_save()
+    def set_selected_mix_index(self, index, force_set=False):
+        if self.__selected_mix_index__ != index or force_set is True:
+            self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
+            self.__selected_mix_index__ = index
+            self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
+            self.__song__.schedule_save()
 
-        self.selected_mix_index_changed.emit()
-        self.syncClipsEnabledFromCurrentScene()
-        self.__mix_name_change_timer.start()
+            self.selected_mix_index_changed.emit()
+            self.syncClipsEnabledFromCurrentScene()
+            self.__mix_name_change_timer.start()
 
     selected_mix_index_changed = Signal()
     selected_mix_name_changed = Signal()

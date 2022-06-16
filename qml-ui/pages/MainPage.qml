@@ -150,7 +150,10 @@ Zynthian.ScreenPage {
                         }
                     }
                     onClicked: {
+                        // activate_index will start the appimage process and open zynthiloops after 5 seconds
+                        // to mimic closing of menu after opening an app like other modules in main page
                         zynthian.main.activate_index(model.index);
+
                         if (model.action_id === "appimage") {
                             zynthian.start_loading();
                             stopLoadingTimer.restart();

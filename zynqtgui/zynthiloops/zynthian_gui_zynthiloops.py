@@ -1374,6 +1374,24 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def get_next_free_layer(self):
         logging.debug(self.zyngui.screens["layers"].layers)
 
+    def get_sketch_folders(self):
+        sketch_folders = []
+
+        for item in self.__sketch_basepath__.glob("./*"):
+            if item.is_dir():
+                sketch_folders.append(item)
+
+        return sketch_folders
+
+    @staticmethod
+    def get_sketch_versions(sketch_folder):
+        sketch_versions = []
+
+        for item in Path(sketch_folder).glob("./*.sketch.json"):
+            sketch_versions.append(item)
+
+        return sketch_versions
+
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):
         return self.__current_beat__

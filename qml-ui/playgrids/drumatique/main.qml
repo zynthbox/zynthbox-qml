@@ -39,6 +39,7 @@ Zynthian.BasePlayGrid {
     id: component
     grid: drumsGrid
     settings: drumsGridSettings
+    popup: drumsPopup
     sidebar: drumsGridSidebar
     name:'Drumatique'
     dashboardModel: _private.sequence
@@ -1912,6 +1913,34 @@ Zynthian.BasePlayGrid {
                     var positionalVelocity = component.getProperty("positionalVelocity")
                     component.setProperty("positionalVelocity", !positionalVelocity);
                 }
+            }
+        }
+    }
+    Component {
+        id: drumsPopup
+        ColumnLayout {
+            Kirigami.Heading {
+                Layout.fillWidth: true;
+                text: "Drumatique Quick Settings"
+            }
+            Kirigami.FormLayout {
+                objectName: "drumsPopup"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Item { Layout.fillWidth: true; Layout.fillHeight: true }
+                QQC2.Switch {
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: Kirigami.Units.gridUnit * 5
+                    Layout.minimumHeight: Kirigami.Units.gridUnit * 2
+                    implicitWidth: Kirigami.Units.gridUnit * 5
+                    Kirigami.FormData.label: "Use Tap Position As Velocity"
+                    checked: component.getProperty("positionalVelocity")
+                    onClicked: {
+                        var positionalVelocity = component.getProperty("positionalVelocity")
+                        component.setProperty("positionalVelocity", !positionalVelocity);
+                    }
+                }
+                Item { Layout.fillWidth: true; Layout.fillHeight: true }
             }
         }
     }

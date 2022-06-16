@@ -722,7 +722,7 @@ Kirigami.AbstractApplicationWindow {
         width: Kirigami.Units.gridUnit * 16
         height: root.height
         edge: Qt.LeftEdge
-        dragMargin: Kirigami.Units.gridUnit * 1.5
+        dragMargin: Kirigami.Units.gridUnit * 0.9
         modal: true
 
         property var cuiaCallback: function(cuia) {

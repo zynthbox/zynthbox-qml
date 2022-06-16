@@ -173,7 +173,6 @@ Zynthian.ScreenPage {
                 delegate: HomeScreenIcon {
                     readonly property bool isCurrent: mainviewGridId.currentIndex === index
 
-                    // Set width and heignt to 0 if not visible to not take up a cell's size
                     width: mainviewGridId.iconWidth
                     height: mainviewGridId.iconHeight
 

@@ -83,13 +83,13 @@ def get_fixed_midi_port_name(port_name):
 def midi_autoconnect(force=False):
 	global last_hw_str
 
-	#Get Mutex Lock 
+	#Get Mutex Lock
 	acquire_lock()
 
 	logger.info("ZynAutoConnect: MIDI ...")
 
 	#------------------------------------
-	# Get Input/Output MIDI Ports: 
+	# Get Input/Output MIDI Ports:
 	#  - outputs are inputs for jack
 	#  - inputs are outputs for jack
 	#------------------------------------
@@ -127,7 +127,7 @@ def midi_autoconnect(force=False):
 			try:
 				hw_out.append(port)
 			except:
-				pass                    
+				pass
 
 	#logger.debug("Input Device Ports: {}".format(hw_out))
 	#logger.debug("Output Device Ports: {}".format(hw_in))
@@ -313,7 +313,7 @@ def midi_autoconnect(force=False):
 				jclient.connect(zmr_out['main_out'], info['port'])
 			except:
 				pass
-		
+
 		else:
 			for ch in range(0,16):
 				try:
@@ -328,7 +328,7 @@ def midi_autoconnect(force=False):
 	for layer in zynthian_gui_config.zyngui.screens["layer"].root_layers:
 		if layer.midi_chan is None:
 			continue
-		
+
 		# Set "Drop Program Change" flag for each MIDI chan
 		zyncoder.lib_zyncoder.zmop_chan_set_flag_droppc(layer.midi_chan, int(layer.engine.options['drop_pc']))
 
@@ -448,7 +448,7 @@ def audio_autoconnect(force=False):
 		logger.info("ZynAutoConnect: Audio Escaped ...")
 		return
 
-	#Get Mutex Lock 
+	#Get Mutex Lock
 	acquire_lock()
 
 	logger.info("ZynAutoConnect: Audio ...")
@@ -476,15 +476,18 @@ def audio_autoconnect(force=False):
 
 	# Connect SamplerSynth to global FX ports
 	try:
-		for port in zip(jclient.get_ports("JUCEJack:out", is_audio=True, is_output=True), jclient.get_ports(zynthian_gui_config.zyngui.global_fx_engine.jackname, is_audio=True, is_input=True)):
-			jclient.connect(port[0], port[1])
+		for engine in zynthian_gui_config.zyngui.global_fx_engines:
+			for port in zip(jclient.get_ports("JUCEJack:out", is_audio=True, is_output=True),
+							jclient.get_ports(engine.jackname, is_audio=True, is_input=True)):
+				jclient.connect(port[0], port[1])
 	except: pass
 	###
 
 	# Connect global FX ports to system playback
 	try:
-		for port in zip(jclient.get_ports(zynthian_gui_config.zyngui.global_fx_engine.jackname, is_audio=True, is_output=True), playback_ports):
-			jclient.connect(port[0], port[1])
+		for engine in zynthian_gui_config.zyngui.global_fx_engines:
+			for port in zip(jclient.get_ports(engine.jackname, is_audio=True, is_output=True), playback_ports):
+				jclient.connect(port[0], port[1])
 	except: pass
 	###
 
@@ -646,7 +649,7 @@ def audio_autoconnect(force=False):
 				rlp_in = jclient.get_ports(rlp.get_audio_jackname(), is_input=True, is_audio=True)
 				if len(rlp_in)>0:
 					nsc = min(len(rlp.get_audio_in()),len(rlp_in))
-		
+
 					#Connect System Capture to Root Layer ports
 					for j, scp in enumerate(capture_ports):
 						if scp.name in rlp.get_audio_in():
@@ -662,7 +665,7 @@ def audio_autoconnect(force=False):
 										jclient.disconnect(scp, rlp_inp)
 									except:
 										pass
-								# Limit to 2 input ports 
+								# Limit to 2 input ports
 								#if k>=1:
 								#	break
 

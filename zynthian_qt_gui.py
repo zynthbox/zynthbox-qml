@@ -446,6 +446,7 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+        self.global_fx_engine = None
         self.__alt_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -926,6 +927,10 @@ class zynthian_gui(QObject):
             self.init_midi_services()
             self.zynautoconnect()
 
+    def init_global_fx(self):
+        self.global_fx_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
+        self.zynautoconnect()
+
     # ---------------------------------------------------------------------------
     # OSC Management
     # ---------------------------------------------------------------------------
@@ -1128,6 +1133,9 @@ class zynthian_gui(QObject):
 
         # Initialize MPE Zones
         # self.init_mpe_zones(0, 2)
+
+        # Init GlobalFX
+        self.init_global_fx()
 
     def stop(self):
         logging.info("STOPPING ZYNTHIAN-UI ...")

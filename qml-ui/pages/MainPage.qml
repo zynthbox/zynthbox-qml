@@ -195,6 +195,29 @@ Zynthian.ScreenPage {
                     }
                     text: model.display
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    propagateComposedEvents: true
+
+                    // FIXME : The following implementation is a bit HACKY but works for now.
+                    //         Would be good if it could be implemented in a better way
+                    //
+                    // When a flick is happening, it seems to not call onReleased handler, rather only onPressed is being called.
+                    // onReleased seems to be called only when pressed and released without flicking.
+                    onReleased: {
+                        var mappedPos = {x: mouse.x + mainviewGridId.contentX, y: mouse.y + mainviewGridId.contentY}
+                        var delegate = mainviewGridId.itemAt(mappedPos.x, mappedPos.y)
+
+                        // If delegate is not null, click the item otherwise open zynthiloops to mimic
+                        // closing of main menu when clicked on empty area
+                        if (delegate != null && delegate.clicked) {
+                            delegate.clicked()
+                        } else {
+                            zynthian.show_modal("zynthiloops")
+                        }
+                    }
+                }
             }
         }
     }

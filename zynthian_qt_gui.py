@@ -927,6 +927,11 @@ class zynthian_gui(QObject):
             self.init_midi_services()
             self.zynautoconnect()
 
+    """
+    Initialize Global FX Engines
+    This method, when called, will create all the fx engines that and store them in the list self.global_fx_engines
+    Zynautoconnect will use this list of engines and connect samplersynth to these engines
+    """
     def init_global_fx(self):
         self.global_fx_engines = [self.engine.start_engine("JV/Gxdigital_delay_st")]
         self.zynautoconnect()

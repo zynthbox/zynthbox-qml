@@ -10,17 +10,18 @@ Rectangle {
     id: rectId
     property alias imgSrc: imageId.source
     property alias text: heading.text
-    signal clicked
     property bool highlighted: false
-
 
     color: highlighted ? Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.3) : "transparent"
 
-    QQC2.Button {
+    Rectangle {
         id: buttonId
         z: -1
         anchors.fill: parent
-        onClicked: rectId.clicked();
+        anchors.margins: 2
+        radius: 2
+        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+        color: Kirigami.Theme.backgroundColor
 
         Image {
             id:imageId

@@ -58,13 +58,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         # 1: Drums
         # 2: Bass
         # 3: Leads
-        # 4: Keys/Pads
-        # 99: Other
+        # 4: Synth/Keys
+        # 5: Strings/Pads
+        # 99: FX/Other
         self.__my_sounds__ = {
             "1": [],
             "2": [],
             "3": [],
             "4": [],
+            "5": [],
             "99": [],
         }
         self.__community_sounds__ = {
@@ -72,6 +74,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             "2": [],
             "3": [],
             "4": [],
+            "5": [],
             "99": [],
         }
 
@@ -81,8 +84,9 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             "1": "Drums",
             "2": "Bass",
             "3": "Leads",
-            "4": "Keys/Pads",
-            "99": "Others",
+            "4": "Synth/Keys",
+            "5": "Strings/Pads",
+            "99": "FX/Other",
         }
 
         self.load_sounds_model()

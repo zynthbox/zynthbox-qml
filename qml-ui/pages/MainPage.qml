@@ -158,63 +158,64 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            GridView {
-                id: mainviewGridId
+            MouseArea {
+                id: gridMouseArea
+                property bool blocked: false
 
-                property int iconWidth: (parent.width / 5)
-                property int iconHeight:  (parent.height / 2.1)
-
-                clip: true
                 anchors.fill: parent
-                cellWidth:iconWidth
-                cellHeight:iconHeight
-                currentIndex: zynthian.main.current_index
-                model:zynthian.main.selector_list
-                delegate: HomeScreenIcon {
-                    readonly property bool isCurrent: mainviewGridId.currentIndex === index
-
-                    width: mainviewGridId.iconWidth
-                    height: mainviewGridId.iconHeight
-
-                    imgSrc: model.icon
-                    highlighted: isCurrent
-                    onIsCurrentChanged: {
-                        if (isCurrent) {
-                            zynthian.main.current_index = index;
-                        }
+                drag.filterChildren: true
+                onClicked: {
+                    if (!gridMouseArea.blocked) {
+                        zynthian.show_modal("zynthiloops")
                     }
-                    onClicked: {
-                        // activate_index will start the appimage process and open zynthiloops after 5 seconds
-                        // to mimic closing of menu after opening an app like other modules in main page
-                        zynthian.main.activate_index(model.index);
-
-                        if (model.action_id === "appimage") {
-                            zynthian.start_loading();
-                            stopLoadingTimer.restart();
-                        }
-                    }
-                    text: model.display
                 }
 
-                MouseArea {
+                GridView {
+                    id: mainviewGridId
+
+                    property int iconWidth: (parent.width / 5)
+                    property int iconHeight:  (parent.height / 2.1)
+
+                    clip: true
                     anchors.fill: parent
-                    propagateComposedEvents: true
+                    cellWidth:iconWidth
+                    cellHeight:iconHeight
+                    currentIndex: zynthian.main.current_index
+                    model:zynthian.main.selector_list
+                    delegate: MouseArea {
+                        width: mainviewGridId.iconWidth
+                        height: mainviewGridId.iconHeight
+                        onPressed: {
+                            gridMouseArea.blocked = true
+                            mainviewGridId.currentIndex = index
+                        }
+                        onReleased: gridMouseArea.blocked = false
+                        onCanceled: gridMouseArea.blocked = false
+                        onClicked: {
+                            // activate_index will start the appimage process and open zynthiloops after 5 seconds
+                            // to mimic closing of menu after opening an app like other modules in main page
+                            zynthian.main.activate_index(model.index);
 
-                    // FIXME : The following implementation is a bit HACKY but works for now.
-                    //         Would be good if it could be implemented in a better way
-                    //
-                    // When a flick is happening, it seems to not call onReleased handler, rather only onPressed is being called.
-                    // onReleased seems to be called only when pressed and released without flicking.
-                    onReleased: {
-                        var mappedPos = {x: mouse.x + mainviewGridId.contentX, y: mouse.y + mainviewGridId.contentY}
-                        var delegate = mainviewGridId.itemAt(mappedPos.x, mappedPos.y)
+                            if (model.action_id === "appimage") {
+                                zynthian.start_loading();
+                                stopLoadingTimer.restart();
+                            }
+                        }
 
-                        // If delegate is not null, click the item otherwise open zynthiloops to mimic
-                        // closing of main menu when clicked on empty area
-                        if (delegate != null && delegate.clicked) {
-                            delegate.clicked()
-                        } else {
-                            zynthian.show_modal("zynthiloops")
+                        HomeScreenIcon {
+                            id: delegateIconButton
+                            readonly property bool isCurrent: mainviewGridId.currentIndex === index
+
+                            anchors.fill: parent
+                            imgSrc: model.icon
+                            highlighted: isCurrent
+                            onIsCurrentChanged: {
+                                if (isCurrent) {
+                                    zynthian.main.current_index = index;
+                                }
+                            }
+
+                            text: model.display
                         }
                     }
                 }

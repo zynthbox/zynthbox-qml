@@ -34,6 +34,7 @@ from pathlib import Path
 from subprocess import Popen
 
 import jack
+import numpy as np
 from PySide2.QtCore import Property, QGenericArgument, QMetaObject, QObject, QThread, QTimer, Qt, Signal, Slot
 
 from . import libzl
@@ -419,6 +420,17 @@ class zynthiloops_track(QObject):
         if self.__volume__ != math.floor(volume) or force_set is True:
             self.__volume__ = math.floor(volume)
             logging.debug(f"Track : Setting volume {self.__volume__}")
+
+            # Update synth volume when track volume changes
+            for sound in self.chainedSounds:
+                if sound >= 0 and self.checkIfLayerExists(sound):
+                    volume_control_obj = self.zyngui.fixed_layers.volume_controls[sound]
+
+                    # Interpolate track volume (-40 -> 20) to volume control object's range
+                    if volume_control_obj is not None and \
+                            volume_control_obj.value != np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max]):
+                        volume_control_obj.value = np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max])
+
             self.volume_changed.emit()
             self.__song__.schedule_save()
             self.zyngui.zynthiloops.set_selector()

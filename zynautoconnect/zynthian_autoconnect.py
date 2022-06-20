@@ -476,7 +476,7 @@ def audio_autoconnect(force=False):
 
 	# Connect SamplerSynth to global FX ports
 	try:
-		for engine in zynthian_gui_config.zyngui.global_fx_engines:
+		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
 			for port in zip(jclient.get_ports("JUCEJack:out", is_audio=True, is_output=True),
 							jclient.get_ports(engine.jackname, is_audio=True, is_input=True)):
 				jclient.connect(port[0], port[1])
@@ -485,7 +485,7 @@ def audio_autoconnect(force=False):
 
 	# Connect global FX ports to system playback
 	try:
-		for engine in zynthian_gui_config.zyngui.global_fx_engines:
+		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
 			for port in zip(jclient.get_ports(engine.jackname, is_audio=True, is_output=True), playback_ports):
 				jclient.connect(port[0], port[1])
 	except: pass

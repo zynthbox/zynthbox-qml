@@ -126,6 +126,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__long_operation__ = False
         self.__record_master_output__ = False
         self.__count_in_bars__ = 0
+        self.__global_fx_knob_value__ = 50
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -347,11 +348,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.info(f"Set selector in progress. Not setting value with encoder")
             return
 
-        fx_engine_controller = self.zyngui.global_fx_engines[0][1]
+        value_updated = False
 
-        if fx_engine_controller is not None and \
-                fx_engine_controller.value != self.__zselector[3].value//100:
-            fx_engine_controller.set_value(self.__zselector[3].value//100, True)
+        for _, controller in self.zyngui.global_fx_engines:
+            volume_val = np.interp(self.__zselector[3].value // 100, [0, 100], [controller.value_min, controller.value_max])
+            if controller is not None and \
+                    controller.value != volume_val:
+                controller.set_value(volume_val, True)
+                self.__global_fx_knob_value__ = self.__zselector[3].value // 100
+                value_updated = True
+
+        if value_updated:
             self.set_selector()
 
     def zyncoder_read(self):
@@ -638,7 +645,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         value = 0
         min_value = 0
         max_value = 0
-        fx_engine_controller = self.zyngui.global_fx_engines[0][1]
 
         try:
             if self.zyngui.get_current_screen_id() is not None and \
@@ -652,11 +658,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 min_value = 0
             elif self.zyngui.get_current_screen_id() is not None and \
                     self.zyngui.get_current_screen() == self and \
-                    (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive) and \
-                    fx_engine_controller is not None:
-                value = fx_engine_controller.value * 100
-                max_value = fx_engine_controller.value_max * 100
-                min_value = fx_engine_controller.value_min * 100
+                    (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive):
+                value = self.__global_fx_knob_value__ * 100
+                max_value = 100 * 100
+                min_value = 0 * 100
         except Exception as e:
             logging.error(f"Error configuring knob 3 : {str(e)}")
 
@@ -680,8 +685,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[3].show()
         elif self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
-                (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive)  and \
-                fx_engine_controller is not None:
+                (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive):
             logging.debug(
                 f"### set_selector : Configuring small knob 3, showing")
             self.__zselector[3].show()

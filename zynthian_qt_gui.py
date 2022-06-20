@@ -446,7 +446,12 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+
+        # global_fx_engines is a list of a set of 2 elements.
+        # 1st element of the set is the engine instance
+        # 2nd element of the set is the zynthian controller to control fx
         self.global_fx_engines = []
+
         self.__alt_button_pressed__ = False
         self.__startRecord_button_pressed__ = False
         self.__play_button_pressed__ = False
@@ -933,7 +938,12 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
-        self.global_fx_engines = [self.engine.start_engine("JV/Gxdigital_delay_st")]
+        delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
+
+        # global_fx_engines is a list of a set of 2 elements.
+        # 1st element of the set is the engine instance
+        # 2nd element of the set is the zynthian controller to control fx
+        self.global_fx_engines = [(delay_engine, delay_engine.get_lv2_controllers_dict()["LEVEL"])]
         self.zynautoconnect()
 
     # ---------------------------------------------------------------------------

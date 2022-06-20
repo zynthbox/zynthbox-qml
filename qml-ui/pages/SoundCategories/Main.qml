@@ -166,16 +166,6 @@ Zynthian.ScreenPage {
                 anchors.fill: parent
                 spacing: 0
 
-                QQC2.Label {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: Kirigami.Units.gridUnit*3
-                    horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
-                    font.pointSize: 16
-                    text: qsTr("Categories")
-                }
-
                 Kirigami.Separator {
                     Layout.fillWidth: true
                     Layout.fillHeight: false
@@ -211,7 +201,7 @@ Zynthian.ScreenPage {
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        category: "1"
+                        category: "3"
                     }
 
                     CategoryButton {
@@ -223,13 +213,19 @@ Zynthian.ScreenPage {
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        category: "3"
+                        category: "4"
                     }
 
                     CategoryButton {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        category: "4"
+                        category: "5"
+                    }
+
+                    CategoryButton {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        category: "1"
                     }
 
                     CategoryButton {

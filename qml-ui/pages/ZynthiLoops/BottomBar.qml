@@ -399,7 +399,7 @@ Rectangle {
                     }
                 }
 
-                onInitialActionChanged: initialAction.trigger()
+                onInitialActionChanged: Qt.callLater(initialAction.trigger)
 
                 tabActions: [
                     Zynthian.TabbedControlViewAction {

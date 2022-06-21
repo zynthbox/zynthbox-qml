@@ -30,6 +30,7 @@ import uuid
 
 from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
+import zynautoconnect
 from . import libzl
 from .zynthiloops_scenes_model import zynthiloops_scenes_model
 from .zynthiloops_track import zynthiloops_track
@@ -81,6 +82,11 @@ class zynthiloops_song(QObject):
         self.__initial_name__ = name # To be used while storing cache details when name changes
         self.__to_be_deleted__ = False
 
+        self.updateAutoconnectedSoundsThrottle = QTimer()
+        self.updateAutoconnectedSoundsThrottle.setInterval(100)
+        self.updateAutoconnectedSoundsThrottle.setSingleShot(True)
+        self.updateAutoconnectedSoundsThrottle.timeout.connect(self.doUpdateAutoconnectedSounds)
+
         if not self.restore(load_history):
             self.__is_loading__ = True
             # First, clear out any cruft that might have occurred during a failed load attempt
@@ -116,6 +122,16 @@ class zynthiloops_song(QObject):
         (Path(self.sketch_folder) / 'wav' / 'sampleset').mkdir(parents=True, exist_ok=True)
         # Finally, just in case something happened, make sure we're not loading any longer
         self.__is_loading__ = False
+
+    ###
+    # Sometimes you just need to force-update the graph layout. Call this function to make that happen kind of soonish
+    @Slot(None)
+    def updateAutoconnectedSounds(self):
+        self.updateAutoconnectedSoundsThrottle.start()
+
+    @Slot(None)
+    def doUpdateAutoconnectedSounds(self):
+        zynautoconnect.audio_autoconnect(True)
 
     def to_be_deleted(self):
         self.__to_be_deleted__ = True

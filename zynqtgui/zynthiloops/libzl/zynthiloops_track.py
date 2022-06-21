@@ -139,6 +139,7 @@ class zynthiloops_track(QObject):
         self.selectedPartNamesChanged.emit()
 
     def chained_sounds_changed_handler(self):
+        self.__song__.updateAutoconnectedSounds()
         self.occupiedSlotsChanged.emit()
         self.update_jack_port()
         self.connectedSoundChanged.emit()

@@ -354,23 +354,25 @@ Rectangle {
                                 Layout.fillHeight: false
                                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
+                                Binding { //Optimization
+                                    target: synthRepeater
+                                    property: "model"
+                                    delayed: true
+                                    value: synthRepeater.visible
+                                        ? (root.selectedTrack.trackAudioType === "synth"
+                                                ? root.selectedTrack.chainedSoundsNames
+                                                : root.selectedTrack.trackAudioType === "sample-trig" ||
+                                                root.selectedTrack.trackAudioType === "sample-slice"
+                                                    ? root.selectedTrack.samples
+                                                    : root.selectedTrack.trackAudioType === "sample-loop"
+                                                        ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex), null, null, null, null]
+                                                        : [])
+                                        : null
+
+                                }
+
                                 Repeater {
                                     id: synthRepeater
-                                    Binding {
-                                        target: synthRepeater
-                                        property: "model"
-                                        delayed: true
-                                        value: synthRepeater.visible
-                                            ? (root.selectedTrack.trackAudioType === "synth"
-                                                    ? root.selectedTrack.chainedSoundsNames
-                                                    : root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                    root.selectedTrack.trackAudioType === "sample-slice"
-                                                        ? root.selectedTrack.samples
-                                                        : root.selectedTrack.trackAudioType === "sample-loop"
-                                                            ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex), null, null, null, null]
-                                                            : [])
-                                            : null
-                                    }
 
                                     delegate: Rectangle {
                                         property bool highlighted: root.selectedTrack.trackAudioType === "sample-loop"

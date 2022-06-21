@@ -160,7 +160,7 @@ QQC2.Popup {
                             ListElement { text: "Track 10"; value: 9 }
                         }
                         textRole: "text"
-                        currentIndex: zynthian.session_dashboard.selectedTrack
+                        currentIndex: visible ? zynthian.session_dashboard.selectedTrack : -1
                         onActivated: {
                             zynthian.session_dashboard.selectedTrack = trackComboModel.get(index).value
                         }

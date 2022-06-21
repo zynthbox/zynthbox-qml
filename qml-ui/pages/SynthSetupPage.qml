@@ -281,9 +281,14 @@ Zynthian.ScreenPage {
                             QQC2.Label {
                                 id: mainLabel
                                 Layout.fillWidth: true
-                                text: visible
-                                    ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
-                                    : ""
+                                Binding { // Optimization
+                                    target: mainLabel
+                                    property: "text"
+                                    delayed: true
+                                    value: mainLabel.visible
+                                        ? (model.metadata ? model.metadata.midi_channel + 1 + " - " + model.display : "")
+                                        : ""
+                                }
                                 elide: Text.ElideRight
                             }
                             QQC2.Label {

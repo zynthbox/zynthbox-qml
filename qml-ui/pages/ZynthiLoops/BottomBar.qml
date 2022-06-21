@@ -420,6 +420,7 @@ Rectangle {
                         id: partAction
                         text: qsTr("Part")
                         page: Qt.resolvedUrl("PartBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Part
                         initialProperties: {"bottomBar": root}
                     },
@@ -427,12 +428,14 @@ Rectangle {
                         id: recordingAction
                         text: qsTr("Audio")
                         page: Qt.resolvedUrl("RecordingBar.qml")
+                        preload: true
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.recordable && !controlObj.path
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
                         text: qsTr("Clip Info")
                         page: Qt.resolvedUrl("ClipInfoBar.qml")
+                        preload: true
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
@@ -448,6 +451,7 @@ Rectangle {
                         id: waveEditorAction
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
+                        preload: true
                         visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) && controlObj.path !== undefined && controlObj.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
@@ -455,6 +459,7 @@ Rectangle {
                         id: patternAction
                         text: qsTr("Pattern")
                         page: Qt.resolvedUrl("PatternBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Pattern
                         initialProperties: {"bottomBar": root}
                     },
@@ -462,6 +467,7 @@ Rectangle {
                         id: trackAction
                         text: qsTr("Track")
                         page: Qt.resolvedUrl("TrackBar.qml")
+                        preload: true
                         visible: root.controlType === BottomBar.ControlType.Track
                         initialProperties: {"bottomBar": root}
                     },

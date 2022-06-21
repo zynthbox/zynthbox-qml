@@ -763,7 +763,7 @@ class zynthiloops_clip(QObject):
 
             if self.clipTrack is not None and self.clipTrack.trackAudioType == "sample-loop":
                 logging.info(f"Playing Clip {self}")
-                self.audioSource.queueClipToStart()
+                self.audioSource.queueClipToStartOnChannel(self.track.id)
 
     @Slot(None)
     def stop(self):
@@ -782,7 +782,7 @@ class zynthiloops_clip(QObject):
 
             # self.audioSource.stop()
             logging.info(f"Stopping Clip {self}")
-            self.audioSource.queueClipToStop()
+            self.audioSource.queueClipToStopOnChannel(self.track.id)
 
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 

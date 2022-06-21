@@ -1238,34 +1238,32 @@ Zynthian.ScreenPage {
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                         onPressed: {
-                                            Qt.callLater(function() {
-                                                root.lastSelectedObj = track.sceneClip
+                                            root.lastSelectedObj = track.sceneClip
 
-                                                // Directly switch to track instead of implementing muting on double click
-                                                // as we probably wont need muting anymore. Muting is handled by partsBar
-                                                // when  none of the parts are selected
-                                                if (zynthian.session_dashboard.selectedTrack === track.id) {
-                                                    if (bottomStack.slotsBar.trackButton.checked) {
-                                                        bottomStack.slotsBar.partButton.checked = true
-                                                    } else {
-                                                        bottomStack.slotsBar.trackButton.checked = true
-                                                    }
-
-                                                } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                            // Directly switch to track instead of implementing muting on double click
+                                            // as we probably wont need muting anymore. Muting is handled by partsBar
+                                            // when  none of the parts are selected
+                                            if (zynthian.session_dashboard.selectedTrack === track.id) {
+                                                if (bottomStack.slotsBar.trackButton.checked) {
+                                                    bottomStack.slotsBar.partButton.checked = true
+                                                } else {
                                                     bottomStack.slotsBar.trackButton.checked = true
                                                 }
-//                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                                zynthian.session_dashboard.selectedTrack = track.id;
-                                                zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
 
-                                                if (track.connectedPattern >= 0) {
-                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomBar.controlObj = track.sceneClip;
-                                                } else {
-                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                    bottomBar.controlObj = track.sceneClip;
-                                                }
-                                            })
+                                            } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                                                bottomStack.slotsBar.trackButton.checked = true
+                                            }
+//                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                            zynthian.session_dashboard.selectedTrack = track.id;
+                                            zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
+
+                                            if (track.connectedPattern >= 0) {
+                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                bottomBar.controlObj = track.sceneClip;
+                                            } else {
+                                                bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                bottomBar.controlObj = track.sceneClip;
+                                            }
                                         }
                                         onPressAndHold: {
                                             bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;

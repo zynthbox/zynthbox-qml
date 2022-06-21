@@ -293,6 +293,8 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		return self.get_effective_count()
 
 	def get_effective_count(self):
+		if self.list_model is None:
+		    return 0
 		return self.list_model.get_count()
 
 	# TODO: remove?

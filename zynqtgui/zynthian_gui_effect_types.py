@@ -97,7 +97,7 @@ class zynthian_gui_effect_types(zynthian_gui_engine):
 		self.select_path = ''
 		self.select_path_element = ''
 
-		if self.zyngui.screens[self.effects_screen].fx_layer != None:
+		if self.zyngui.screens[self.effects_screen].fx_layer != None and self.zyngui.curlayer != None:
 			self.select_path_element = self.engine_info[self.zyngui.screens[self.effects_screen].fx_layer.engine.get_path(self.zyngui.screens[self.effects_screen].fx_layer)][3]
 			self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX > " + str(self.select_path_element)
 

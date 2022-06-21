@@ -56,7 +56,11 @@ def init():
 
             libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
 
+            libzl.SyncTimer_queueClipToStartOnChannel.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
             libzl.SyncTimer_queueClipToStop.argtypes = [ctypes.c_void_p]
+
+            libzl.SyncTimer_queueClipToStopOnChannel.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             # libzl.SyncTimer_addToPart.argtypes = [ctypes.c_int, ctypes.c_void_p]
             #
@@ -70,6 +74,10 @@ def init():
             libzl.ClipAudioSource_play.argtypes = [ctypes.c_void_p, ctypes.c_bool]
 
             libzl.ClipAudioSource_stop.argtypes = [ctypes.c_void_p]
+
+            libzl.ClipAudioSource_playOnChannel.argtypes = [ctypes.c_void_p, ctypes.c_bool, ctypes.c_int]
+
+            libzl.ClipAudioSource_stopOnChannel.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_getDuration.argtypes = [ctypes.c_void_p]
             libzl.ClipAudioSource_getDuration.restype = ctypes.c_float
@@ -202,6 +210,16 @@ class ClipAudioSource(QObject):
         if libzl:
             libzl.ClipAudioSource_stop(self.obj)
 
+    def playOnChannel(self, loop=True, midiChannel=-2):
+        if libzl:
+            libzl.ClipAudioSource_playOnChannel(self.obj, loop, midiChannel)
+
+    def stopOnChannel(self, midiChannel=-2):
+        logging.debug(f"Stopping Audio Source : {self.obj}, {libzl}")
+
+        if libzl:
+            libzl.ClipAudioSource_stopOnChannel(self.obj, midiChannel)
+
     def get_id(self):
         if libzl:
             return libzl.ClipAudioSource_id(self.obj)
@@ -242,9 +260,17 @@ class ClipAudioSource(QObject):
         if libzl:
             libzl.SyncTimer_queueClipToStart(self.obj)
 
+    def queueClipToStartOnChannel(self, midiChannel):
+        if libzl:
+            libzl.SyncTimer_queueClipToStartOnChannel(self.obj, midiChannel)
+
     def queueClipToStop(self):
         if libzl:
             libzl.SyncTimer_queueClipToStop(self.obj)
+
+    def queueClipToStopOnChannel(self, midiChannel):
+        if libzl:
+            libzl.SyncTimer_queueClipToStopOnChannel(self.obj, midiChannel)
 
     def setSlices(self, slices : int):
         if libzl:

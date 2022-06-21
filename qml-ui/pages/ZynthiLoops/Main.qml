@@ -1229,7 +1229,7 @@ Zynthian.ScreenPage {
                                         sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
-                                        onClicked: {
+                                        onPressed: {
                                             Qt.callLater(function() {
                                                 root.lastSelectedObj = track.sceneClip
 
@@ -1246,7 +1246,7 @@ Zynthian.ScreenPage {
                                                 } else if (zynthian.session_dashboard.selectedTrack !== track.id) {
                                                     bottomStack.slotsBar.trackButton.checked = true
                                                 }
-                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
+//                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                                 zynthian.session_dashboard.selectedTrack = track.id;
                                                 zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
 

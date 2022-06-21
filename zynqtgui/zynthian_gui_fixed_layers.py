@@ -189,14 +189,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
                     first = False
                     sl0 = sl
                 metadata["effects_label"] = effects_label
-
-                ctrl = None
-
-                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    self.__volume_ctrls.append(MixerControl(self))
-                else:
-                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(None)
-
             else:
                 self.list_data.append((str(i+1),i, "-"))
                 metadata["effects_label"] = ""

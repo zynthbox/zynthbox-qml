@@ -242,7 +242,7 @@ Zynthian.ScreenPage {
                 Layout.fillHeight: true
                 screenId: "layers_for_track"
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                visible: zynthian.isBootingComplete
+                active: zynthian.isBootingComplete
 
                 onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                 onItemActivated: root.itemActivated(screenId, index)
@@ -428,7 +428,7 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                     screenId: "bank"
 
-                    visible: zynthian.isBootingComplete && root.isVisible
+                    active: zynthian.isBootingComplete && root.isVisible
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -551,7 +551,7 @@ Zynthian.ScreenPage {
             Zynthian.SelectorView {
                 id: presetView
 
-                visible: zynthian.isBootingComplete && root.isVisible
+                active: zynthian.isBootingComplete && root.isVisible
                 implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true

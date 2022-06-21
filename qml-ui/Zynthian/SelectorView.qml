@@ -40,6 +40,7 @@ QQC2.ScrollView {
     property alias delegate: view.delegate
     property alias currentIndex: view.currentIndex
     property alias highlighted: background.highlighted
+    property bool active: true
 
     property string screenId
     //TODO: Bind the base selector type to qml?
@@ -78,7 +79,7 @@ QQC2.ScrollView {
             target: view
             property: "currentIndex"
             value: root.selector.current_index
-            when: root.visible
+            when: root.active
             delayed: true
         }
         cacheBuffer: Kirigami.Units.gridUnit*2
@@ -101,7 +102,7 @@ QQC2.ScrollView {
             target: view
             property: "model"
             value: root.selector.selector_list
-            when: root.visible
+            when: root.active
             delayed: true
         }
 

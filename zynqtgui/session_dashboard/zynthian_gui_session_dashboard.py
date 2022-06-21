@@ -84,20 +84,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.zyngui.screens["layer"].layer_created.connect(self.layer_created)
         self.zyngui.screens["layer_effects"].fx_layers_changed.connect(self.fx_layers_changed)
 
-        self.selected_track_changed.connect(self.selected_track_changed_handler)
-
         self.show()
 
     def back_action(self):
         return "zynthiloops"
-
-    def selected_track_changed_handler(self):
-        self.zyngui.fixed_layers.fill_list()
-        self.selected_track_name_changed.emit()
-        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        if selected_track != None:
-            selected_track.chained_sounds_changed.connect(lambda: logging.debug(f"Chained Sounds Changed"))
-            selected_track.chained_sounds_changed.connect(lambda: self.selected_track_name_changed.emit())
 
     def layer_created(self, index):
        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
@@ -117,6 +107,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             selected_track.set_chained_sounds(selected_track.get_chained_sounds())
         self.zyngui.screens['zynthiloops'].song.tracksModel.connected_sounds_count_changed.emit()
         # self.set_selected_track(self.selectedTrack, True)
+
+    @Slot(None)
+    def do_fixed_layers_fill_list(self):
+        self.zyngui.fixed_layers.fill_list()
 
     ### Property name
     def get_name(self):
@@ -166,6 +160,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             #         selected_track_changed signal on ZL side but it has a delay which resets the selectedTrack
             #         to previous value
             self.zyngui.zynthiloops.set_selector()
+
+            QMetaObject.invokeMethod(self, "do_fixed_layers_fill_list", Qt.QueuedConnection)
 
             self.selected_track_changed.emit()
             self.__change_track_sound_timer__.start()

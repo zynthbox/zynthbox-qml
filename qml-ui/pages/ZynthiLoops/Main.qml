@@ -946,6 +946,7 @@ Zynthian.ScreenPage {
                         model: zynthian.isBootingComplete ? root.song.tracksModel : 0
 
                         delegate: TrackHeader2 {
+                            id: delegateTrackHeader2
                             text: model.track.name
 
                             Connections {
@@ -1016,21 +1017,28 @@ Zynthian.ScreenPage {
 
                             subSubTextSize: 7
 
-                            color: {
-                                if (root.copySourceObj === model.track)
-                                    return "#ff2196f3"
-                                else if (model.track.trackAudioType === "synth" && model.track.occupiedSlotsCount > 0)
-                                    return "#66ff0000"
-                                else if (model.track.trackAudioType === "sample-loop" && model.track.sceneClip.path && model.track.sceneClip.path.length > 0)
-                                    return "#6600ff00"
-                                else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlotsCount > 0)
-                                    return "#66ffff00"
-                                else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlotsCount > 0)
-                                    return "#66ffff00"
-                                else if (model.track.trackAudioType === "external")
-                                    return "#998e24aa"
-                                else
-                                    return "#66888888"
+                            Binding {
+                                target: delegateTrackHeader2
+                                property: "color"
+                                when: root.active
+                                delayed: true
+
+                                value: {
+                                    if (root.copySourceObj === model.track)
+                                        return "#ff2196f3"
+                                    else if (model.track.trackAudioType === "synth" && model.track.occupiedSlotsCount > 0)
+                                        return "#66ff0000"
+                                    else if (model.track.trackAudioType === "sample-loop" && model.track.sceneClip.path && model.track.sceneClip.path.length > 0)
+                                        return "#6600ff00"
+                                    else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlotsCount > 0)
+                                        return "#66ffff00"
+                                    else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlotsCount > 0)
+                                        return "#66ffff00"
+                                    else if (model.track.trackAudioType === "external")
+                                        return "#998e24aa"
+                                    else
+                                        return "#66888888"
+                                }
                             }
 
                             highlightOnFocus: false

@@ -1221,8 +1221,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def stopAllPlayback(self):
-        self.click_track_click.queueClipToStop()
-        self.click_track_clack.queueClipToStop()
+        # The click track wants to not have any effects added at all, so use the magic channel -2, which is our uneffected global channel
+        self.click_track_click.queueClipToStopOnChannel(-2)
+        self.click_track_clack.queueClipToStopOnChannel(-2)
 
         for track_index in range(self.__song__.tracksModel.count):
             self.__song__.tracksModel.getTrack(track_index).stopAllClips()
@@ -1336,8 +1337,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.metronome_schedule_stop = False
             else:
                 if self.click_track_enabled:
-                    self.click_track_click.queueClipToStart()
-                    self.click_track_clack.queueClipToStart()
+                    # The click track wants to not have any effects added at all, so play it on the magic channel -2, which is our uneffected global channel
+                    self.click_track_click.queueClipToStartOnChannel(-2)
+                    self.click_track_clack.queueClipToStartOnChannel(-2)
 
                 libzl.startTimer(self.__song__.__bpm__)
 

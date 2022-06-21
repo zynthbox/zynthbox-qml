@@ -287,22 +287,28 @@ Rectangle {
                 initialHeaderItem: RowLayout {
                     visible: root.controlType === BottomBar.ControlType.Track
                     EditableHeader {
-                        text: {
-                            let text = root.controlObj ? root.controlObj.name : "";
-                            switch (root.controlType) {
-                            case BottomBar.ControlType.Song:
-                                return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
-                            case BottomBar.ControlType.Clip:
-                            case BottomBar.ControlType.Pattern:
-                                return qsTr("CLIP: %1").arg(text);
-                            case BottomBar.ControlType.Track:
-                                return qsTr("TRACK: %1").arg(text);
-                            case BottomBar.ControlType.Part:
-                                return qsTr("PART: %1").arg(text);
-    //                        case BottomBar.ControlType.Pattern:
-    //                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
-                            default:
-                                return text;
+                        id: tabbedViewHeader
+                        Binding {
+                            target: tabbedViewHeader
+                            property: "text"
+                            delayed: true
+                            value: {
+                                let text = root.controlObj ? root.controlObj.name : "";
+                                switch (root.controlType) {
+                                case BottomBar.ControlType.Song:
+                                    return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                                case BottomBar.ControlType.Clip:
+                                case BottomBar.ControlType.Pattern:
+                                    return qsTr("CLIP: %1").arg(text);
+                                case BottomBar.ControlType.Track:
+                                    return qsTr("TRACK: %1").arg(text);
+                                case BottomBar.ControlType.Part:
+                                    return qsTr("PART: %1").arg(text);
+        //                        case BottomBar.ControlType.Pattern:
+        //                            return qsTr("PATTERN: %1").arg(root.controlObj.col+1);
+                                default:
+                                    return text;
+                                }
                             }
                         }
                     }

@@ -467,21 +467,41 @@ def audio_autoconnect(force=False):
 	except:
 		pass
 
-	# Disconnect SamplerSynth from system playback ports
-	try:
-		for port in zip(jclient.get_ports("JUCEJack:out", is_audio=True, is_output=True), playback_ports):
-			jclient.disconnect(port[0], port[1])
-	except: pass
 	###
+	# Handle SamplerSynth ports:
+	# - Always leave the global uneffected port alone (as that should just
+	#   always be connected to system playback, which SamplerSynth does by default)
+	# - If the global effects stack is empty, connect the global effected port to
+	#   system playback, otherwise connect to the effects
+	# - For each track, check whether the effects stack is empty. It it is, connect
+	#   the SamplerSynth output for that track to system playback, otherwise connect
+	#   to the effects
 
-	# Connect SamplerSynth to global FX ports
-	try:
+	# Connect SamplerSynth's global efected to either the global effects, or to system out, depending on whether or not there are any global effects
+	hasGlobalEffects = False
+	if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-			for port in zip(jclient.get_ports("JUCEJack:out", is_audio=True, is_output=True),
-							jclient.get_ports(engine.jackname, is_audio=True, is_input=True)):
+			engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+			# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
+			if len(engineInPorts) == 1:
+				engineInPorts[1] = engineInPorts[0];
+			for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), engineInPorts):
+				try:
+				    jclient.connect(port[0], port[1])
+				    hasGlobalEffects = True
+				except: pass
+	if hasGlobalEffects:
+		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
+		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
+			try:
+				jclient.disconnect(port[0], port[1])
+			except: pass
+	else:
+		# If there are no global effects, connect the effected global ports directly to system playback
+		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
+			try:
 				jclient.connect(port[0], port[1])
-	except: pass
-	###
+			except: pass
 
 	# Connect global FX ports to system playback
 	try:
@@ -489,6 +509,48 @@ def audio_autoconnect(force=False):
 			for port in zip(jclient.get_ports(engine.jackname, is_audio=True, is_output=True), playback_ports):
 				jclient.connect(port[0], port[1])
 	except: pass
+
+	# Connect each track's ports to either that track's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the track
+	# If there's no song yet, we can't do a lot...
+	song = zynthian_gui_config.zyngui.screens["zynthiloops"].song
+	if not song:
+		pass
+	else:
+		for trackId in range(0, 10):
+			track = song.tracksModel.getTrack(trackId)
+			if track is not None:
+				trackPorts = jclient.get_ports(f"SamplerSynth:track_{trackId + 1}_", is_audio=True, is_output=True)
+				trackHasEffects = False
+				if len(track.chainedSounds) > 0:
+					for chainedSound in track.chainedSounds:
+						if chainedSound > -1:
+							layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
+							effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
+							if effectsLayers != None and len(effectsLayers) > 0:
+								# As there are effects, connect the track's outputs to their inputs
+								for sl in effectsLayers:
+									if sl.engine.type == "Audio Effect":
+										engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
+										if len(engineInPorts) == 1:
+											engineInPorts.append(engineInPorts[0]);
+										for port in zip(trackPorts, engineInPorts):
+											trackHasEffects = True
+											try:
+												jclient.connect(port[0], port[1])
+											except: pass
+								pass
+				if trackHasEffects:
+					# If there are no effects attached to this track, connect its outputs to system playback
+					for port in zip(trackPorts, playback_ports):
+						try:
+							jclient.disconnect(port[0], port[1])
+						except: pass
+				else:
+					# If there are no effects attached to this track, connect its outputs to system playback
+					for port in zip(trackPorts, playback_ports):
+						try:
+							jclient.connect(port[0], port[1])
+						except: pass
 	###
 
 	#Get layers list from UI

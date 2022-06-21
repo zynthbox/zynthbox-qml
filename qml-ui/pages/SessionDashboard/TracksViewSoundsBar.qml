@@ -10,7 +10,16 @@ import org.zynthian.quick 1.0 as ZynQuick
 Zynthian.Card {
     id: root
 
-    property QtObject selectedTrack: applicationWindow().selectedTrack
+    property QtObject selectedTrack
+    //: applicationWindow().selectedTrack
+
+    Binding {
+        target: root
+        property: "selectedTrack"
+        delayed: true
+        value: applicationWindow().selectedTrack
+    }
+
     property int selectedTrackIndex: zynthian.session_dashboard.selectedTrack;
     property var chainedSounds: selectedTrack ? selectedTrack.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
@@ -450,12 +459,18 @@ Zynthian.Card {
                         Layout.rightMargin: Kirigami.Units.gridUnit
 
                         orientation: Qt.Horizontal
-                        enabled: root.selectedTrack.selectedSlotRow === index &&
+
+                        Binding {
+                            target: parent
+                            property: "enabled"
+                            delayed: true
+                            value: root.selectedTrack.selectedSlotRow === index &&
                                  soundDelegate.chainedSound >= 0 &&
                                  root.selectedTrack &&
                                  root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
                                  volumeControlObject != null &&
                                  volumeControlObject.controllable
+                        }
                         value: volumeControlObject ? volumeControlObject.value : 0
                         stepSize: volumeControlObject ? volumeControlObject.step_size : 1
                         from: volumeControlObject ? volumeControlObject.value_min : 0

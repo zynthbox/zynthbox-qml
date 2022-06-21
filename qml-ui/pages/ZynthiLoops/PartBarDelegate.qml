@@ -12,7 +12,8 @@ import JuceGraphics 1.0
 ColumnLayout {
     id: root
     property QtObject track
-    property QtObject sequence: root.visible ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
+    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 

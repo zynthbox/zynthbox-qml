@@ -35,6 +35,7 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
+    property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_track", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
 
     backAction: Kirigami.Action {
@@ -429,7 +430,7 @@ Zynthian.ScreenPage {
                     screenId: "bank"
 
                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                    visible: zynthian.isBootingComplete
+                    visible: zynthian.isBootingComplete && root.isVisible
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -468,7 +469,7 @@ Zynthian.ScreenPage {
                         spacing: 0
                         Repeater {
                             // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                            model: zynthian.isBootingComplete ? zynthian.layers_for_track.volume_controls : []
+                            model: zynthian.isBootingComplete && visible ? zynthian.layers_for_track.volume_controls : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing
@@ -554,7 +555,7 @@ Zynthian.ScreenPage {
                 id: presetView
 
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                visible: zynthian.isBootingComplete
+                visible: zynthian.isBootingComplete && root.isVisible
                 implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true

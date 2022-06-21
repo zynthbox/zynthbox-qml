@@ -119,6 +119,8 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		super().fill_list()
 
 	def get_effective_count(self):
+		if self.fx_layers == None:
+		    return 0
 		return len(self.fx_layers)
 
 	def back_action(self):
@@ -140,7 +142,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 		elif self.list_data[i][0] == 'ADD-PARALLEL-FX':
 			self.zyngui.screens[self.effect_chooser_screen].layer_chain_parallel = True
 
-		if i < len(self.fx_layers):
+		if self.fx_layers != None and i < len(self.fx_layers):
 			self.fx_layer = self.fx_layers[i]
 			if t is 'B':
 				self.zyngui.show_confirm("Do you really want to remove This effect?", self.fx_remove_confirmed)
@@ -153,13 +155,13 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 
 
 	def get_current_effect_engine(self):
-		if self.index < 0 or len(self.fx_layers) <= self.index:
+		if self.fx_layers == None or self.index < 0 or len(self.fx_layers) <= self.index:
 			return None
 		return self.fx_layers[self.index].engine.nickname
 
 
 	def index_supports_immediate_activation(self, index=None):
-		return index >= 0 and index < len(self.fx_layers)
+		return self.fx_layers != None and index >= 0 and index < len(self.fx_layers)
 
 	def fx_layer_action(self, layer, t='S'):
 		self.fx_layer = layer
@@ -214,7 +216,7 @@ class zynthian_gui_layer_effects(zynthian_gui_selector):
 				self.select_path = self.zyngui.curlayer.get_basepath() + " Audio-FX"
 			else:
 				self.select_path = "Audio-FX"
-		if len(self.fx_layers) > 0:
+		if self.fx_layers != None and len(self.fx_layers) > 0:
 			self.select_path_element = "FX {}".format(min(self.index, len(self.fx_layers) - 1) + 1)
 		else:
 			if self.midi_mode:

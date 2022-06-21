@@ -761,9 +761,14 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("%1 %2")
+                        Binding {
+                            target: parent
+                            property: "text"
+                            delayed: true
+                            value: qsTr("%1 %2")
                                 .arg("T" + (zynthian.session_dashboard.selectedTrack+1))
                                 .arg(infoBar.clip && infoBar.clip.inCurrentScene ? "(Active)" : "")
+                        }
                     }
                 }
             }

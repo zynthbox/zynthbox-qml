@@ -817,7 +817,7 @@ Kirigami.AbstractApplicationWindow {
 
                     ColumnLayout {
                         id: slotsColumn
-                        property bool slotsColumnVisible: ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+                        property bool slotsColumnVisible: slotSelectionDrawer.visible && ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
 
                         anchors.fill: parent
                         anchors.margins: slotSelectionDelegate.margin

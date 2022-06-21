@@ -230,7 +230,6 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         super().fill_list()
 
     def __update_mixers(self):
-        logging.error("DELAYED MIXERS")
         for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 layer = self.zyngui.screens['layer'].layer_midi_map[i]

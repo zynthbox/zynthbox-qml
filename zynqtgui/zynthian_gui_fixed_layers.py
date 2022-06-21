@@ -33,7 +33,7 @@ from . import zynthian_gui_selector
 
 from zyncoder import *
 
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import Qt, QObject, QTimer, Slot, Signal, Property
 
 #------------------------------------------------------------------------------
 # minimal controller proxy for the mixer: TODO: port all the controllers to this?
@@ -135,6 +135,11 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.__start_midi_chan = 0
         self.__volume_ctrls = []
 
+        self.__mixer_timer = QTimer()
+        self.__mixer_timer.setInterval(250)
+        self.__mixer_timer.setSingleShot(True)
+        self.__mixer_timer.timeout.connect(self.__update_mixers)
+
         # Load engine config
         try:
             with open("/zynthian/zynthian-ui/config/engine_config.json", "r") as f:
@@ -187,35 +192,10 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
                 ctrl = None
 
-                # Find volume control as per self.__engine_config__
-                for name in layer.controllers_dict:
-                    # Check if engine has specific mapping of volume controller name
-                    # otherwise use global `*` controller mapping name from self.__engine_config__
-                    if layer.engine.nickname in self.__engine_config__ and \
-                       "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
-                       name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
-                        # Check if config has engine specific volume controller name
-                        logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
-                        ctrl = layer.controllers_dict[name]
-                    elif "default" in self.__engine_config__ and \
-                         "volumeControl" in self.__engine_config__['default'] and \
-                         name in self.__engine_config__['default']['volumeControl']:
-                        # Check if config has global volume controller name
-                        logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
-                        ctrl = layer.controllers_dict[name]
-                    elif name in ['volume', 'Volume']:
-                        logging.debug(f"### VOLUME : Default config not found. Using fallback config for '{layer.engine.nickname}'")
-                        # Fallback when config does not have global volume controller name
-                        ctrl = layer.controllers_dict[name]
-                    else:
-                        logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
-
                 if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
-                    gctrl = MixerControl(self)
-                    gctrl.set_zctrl(ctrl)
-                    self.__volume_ctrls.append(gctrl)
+                    self.__volume_ctrls.append(MixerControl(self))
                 else:
-                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
+                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(None)
 
             else:
                 self.list_data.append((str(i+1),i, "-"))
@@ -246,8 +226,44 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()
         self.zyngui.screens['layers_for_track'].fill_list()
+        self.__mixer_timer.start()
         super().fill_list()
 
+    def __update_mixers(self):
+        logging.error("DELAYED MIXERS")
+        for i in range(self.__start_midi_chan, self.__start_midi_chan + self.__layers_count):
+            if i in self.zyngui.screens['layer'].layer_midi_map:
+                layer = self.zyngui.screens['layer'].layer_midi_map[i]
+                # Find volume control as per self.__engine_config__
+                for name in layer.controllers_dict:
+                    # Check if engine has specific mapping of volume controller name
+                    # otherwise use global `*` controller mapping name from self.__engine_config__
+                    if layer.engine.nickname in self.__engine_config__ and \
+                       "volumeControl" in self.__engine_config__[layer.engine.nickname] and \
+                       name in self.__engine_config__[layer.engine.nickname]['volumeControl']:
+                        # Check if config has engine specific volume controller name
+                        logging.debug(f"### VOLUME : Found volume control for engine '{layer.engine.nickname}'")
+                        ctrl = layer.controllers_dict[name]
+                    elif "default" in self.__engine_config__ and \
+                         "volumeControl" in self.__engine_config__['default'] and \
+                         name in self.__engine_config__['default']['volumeControl']:
+                        # Check if config has global volume controller name
+                        logging.debug(f"### VOLUME : Volume control for engine '{layer.engine.nickname}' not found. Using default config")
+                        ctrl = layer.controllers_dict[name]
+                    elif name in ['volume', 'Volume']:
+                        logging.debug(f"### VOLUME : Default config not found. Using fallback config for '{layer.engine.nickname}'")
+                        # Fallback when config does not have global volume controller name
+                        ctrl = layer.controllers_dict[name]
+                    else:
+                        logging.debug(f"### VOLUME : Volume Control for engine '{layer.engine.nickname}' not found. Skipping")
+
+                if len(self.__volume_ctrls) <= i - self.__start_midi_chan:
+                    gctrl = MixerControl(self)
+                    gctrl.set_zctrl(ctrl)
+                    self.__volume_ctrls.append(gctrl)
+                else:
+                    self.__volume_ctrls[i - self.__start_midi_chan].set_zctrl(ctrl)
+        self.volume_controls_changed.emit()
 
     def select(self, index=None):
         super().select(index)

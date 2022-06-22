@@ -351,6 +351,17 @@ Rectangle {
     //                        controlObj.connectedPattern = -1;
     //                    }
     //                }
+
+                    Binding {
+                        target: trackAudioTypeDropdown
+                        property: "currentIndex"
+                        delayed: true
+                        value: controlObj &&
+                               controlObj.trackAudioType
+                                 ? trackAudioTypeDropdown.findCurrentIndex(controlObj.trackAudioType)
+                                 : -1
+                    }
+
                     QQC2.ComboBox {
                         id: trackAudioTypeDropdown
 
@@ -373,10 +384,7 @@ Rectangle {
                             ListElement { text: "External"; value: "external" }
                         }
                         textRole: "text"
-                        currentIndex: controlObj &&
-                                      controlObj.trackAudioType
-                                        ? findCurrentIndex(controlObj.trackAudioType)
-                                        : -1
+                        currentIndex:  -1
                         onActivated: {
                             controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
                         }

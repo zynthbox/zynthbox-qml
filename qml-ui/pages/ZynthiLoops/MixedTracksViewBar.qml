@@ -435,13 +435,15 @@ Rectangle {
                                                     rightMargin: Kirigami.Units.gridUnit*0.5
                                                 }
                                                 horizontalAlignment: Text.AlignLeft
-                                                text: root.selectedTrack.trackAudioType === "synth"
+                                                text: root.selectedTrack.trackAudioType === "synth" && modelData && modelData.className == null // Check if modelData is not a track/clip object by checking if it has the className property
                                                         ? modelData
                                                         : (root.selectedTrack.trackAudioType === "sample-trig" ||
                                                           root.selectedTrack.trackAudioType === "sample-slice" ||
                                                           root.selectedTrack.trackAudioType === "sample-loop") &&
                                                           modelData
-                                                            ? modelData.path.split("/").pop()
+                                                            ? modelData.path
+                                                              ? modelData.path.split("/").pop()
+                                                              : ""
                                                             : ""
 
                                                 elide: "ElideRight"

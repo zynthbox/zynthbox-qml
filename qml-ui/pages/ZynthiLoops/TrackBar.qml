@@ -69,13 +69,14 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit*2
 
-            headerText: bottomBar.controlObj.audioLevel <= -40
+            headerText: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ||
+                        bottomBar.controlObj.audioLevel <= -40
                             ? ""
                             : (bottomBar.controlObj.audioLevel.toFixed(2) + " (dB)")
             footerText: bottomBar.controlObj.name
-            audioLeveldB: bottomBar.controlObj.audioLevel
+            audioLeveldB: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ? bottomBar.controlObj.audioLevel : -400
 
-            slider.value: bottomBar.controlObj.volume
+            slider.value: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ? bottomBar.controlObj.volume : 0
             onValueChanged: {
                 bottomBar.controlObj.volume = slider.value
             }
@@ -90,7 +91,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-        visible: !bottomBar.controlObj.isEmpty()
+        visible: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" && !bottomBar.controlObj.isEmpty()
 
         QQC2.Button {
             // As per #299 disable this button

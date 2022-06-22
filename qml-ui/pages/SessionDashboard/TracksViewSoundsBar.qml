@@ -465,11 +465,11 @@ Zynthian.Card {
                             property: "enabled"
                             delayed: true
                             value: root.selectedTrack.selectedSlotRow === index &&
-                                 soundDelegate.chainedSound >= 0 &&
-                                 root.selectedTrack &&
-                                 root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
-                                 volumeControlObject != null &&
-                                 volumeControlObject.controllable
+                                   soundDelegate.chainedSound >= 0 &&
+                                   root.selectedTrack &&
+                                   root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
+                                   parent.volumeControlObject != null &&
+                                   parent.volumeControlObject.controllable
                         }
                         value: volumeControlObject ? volumeControlObject.value : 0
                         stepSize: volumeControlObject ? volumeControlObject.step_size : 1

@@ -44,21 +44,10 @@ GridLayout {
     property QtObject bottomBar: null
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
-                                    : bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a track
+                                    : bottomBar.controlObj != null && bottomBar.controlObj.samples != null
+                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a track
+                                        : null
     property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-
-    Connections {
-        target: bottomBar
-        onControlObjChanged: {
-            console.log("Handling bottombar control obj changed")
-            console.log(bottomBar.controlType, bottomBar.controlObj)
-            if (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern) {
-                console.log("Clip/pattern")
-            } else {
-                console.log("Track")
-            }
-        }
-    }
 
     function cuiaCallback(cuia) {
         switch (cuia) {
@@ -83,7 +72,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.margins: Kirigami.Units.gridUnit
         color: Kirigami.Theme.textColor
-        source: waveBar.controlObj.path
+        source: waveBar.controlObj && waveBar.controlObj.path != null ? waveBar.controlObj.path : ""
 //        clip: true
         PinchArea {
             anchors.fill: parent
@@ -315,7 +304,9 @@ GridLayout {
                 color: Kirigami.Theme.positiveTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: (waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width
+                x: waveBar.controlObj
+                    ? (waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width
+                    : 0
             }
 
             // Loop line
@@ -326,7 +317,9 @@ GridLayout {
                     top: parent.top
                     bottom: parent.bottom
                 }
-                x: startLoopLine.x + waveBar.controlObj.loopDelta/wav.pixelToSecs
+                x: waveBar.controlObj
+                    ? startLoopLine.x + waveBar.controlObj.loopDelta/wav.pixelToSecs
+                    : 0
                 color: Kirigami.Theme.highlightColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
@@ -347,7 +340,9 @@ GridLayout {
                 color: Kirigami.Theme.neutralTextColor
                 opacity: 0.6
                 width: Kirigami.Units.smallSpacing
-                x: ((((60/zynthian.zynthiloops.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                x: waveBar.controlObj
+                    ? ((((60/zynthian.zynthiloops.song.bpm) * waveBar.controlObj.length) / waveBar.controlObj.duration) * parent.width) + ((waveBar.controlObj.startPosition / waveBar.controlObj.duration) * parent.width)
+                    : 0
                 onXChanged: {
                     if (!endHandleDragHandler.active) {
                        endHandle.x = endLoopLine.x - endHandle.width
@@ -369,10 +364,12 @@ GridLayout {
 
             // Slice progress lines
             Repeater {
-                property QtObject cppClipObject: ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId);
+                property QtObject cppClipObject: waveBar.controlObj
+                                                    ? ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
+                                                    : null
                 model: (waveBar.visible && waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
-                    ? cppClipObject.playbackPositions
-                    : 0
+                        ? cppClipObject.playbackPositions
+                        : 0
                 delegate: Item {
                     Rectangle {
                         anchors.centerIn: parent
@@ -454,7 +451,7 @@ GridLayout {
             // Slightly odd check - sometimes this will return a longer string, but as it's a
             // base64 encoding of a midi file, it'll be at least the header size of that if
             // it's useful, so... just check for bigger than 10, that'll do
-            visible: waveBar.controlObj.metadataMidiRecording.length > 10
+            visible: waveBar.controlObj != null && waveBar.controlObj.metadataMidiRecording != null && waveBar.controlObj.metadataMidiRecording.length > 10
             text: ZynQuick.MidiRecorder.isPlaying ? "Stop playing midi" : "Play embedded midi"
             onClicked: {
                 if (ZynQuick.MidiRecorder.isPlaying) {

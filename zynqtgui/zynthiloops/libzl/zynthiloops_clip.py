@@ -884,7 +884,7 @@ class zynthiloops_clip(QObject):
                 for layer in jsondata["layers"]:
                     data.append(f"{layer['engine_name']} > {layer['preset_name']}")
             except Exception as e:
-                logging.info(f"Error retrieving from metadata : {str(e)}")
+                logging.debug(f"Error retrieving from metadata : {str(e)}")
 
         return data
 
@@ -907,7 +907,7 @@ class zynthiloops_clip(QObject):
         try:
             return int(self.audio_metadata["ZYNTHBOX_BPM"][0])
         except Exception as e:
-            logging.info(f"Error retrieving from metadata : {str(e)}")
+            logging.debug(f"Error retrieving from metadata : {str(e)}")
 
         return None
 
@@ -921,7 +921,7 @@ class zynthiloops_clip(QObject):
         try:
             return str(self.audio_metadata["ZYNTHBOX_MIDI_RECORDING"][0])
         except Exception as e:
-            logging.info(f"Error retrieving from metadata : {str(e)}")
+            logging.debug(f"Error retrieving from metadata : {str(e)}")
 
         return None
 
@@ -979,7 +979,7 @@ class zynthiloops_clip(QObject):
         try:
             return self.audio_metadata["ZYNTHBOX_AUDIO_TYPE"][0]
         except Exception as e:
-            logging.info(f"Error retrieving from metadata : {str(e)}")
+            logging.debug(f"Error retrieving from metadata : {str(e)}")
         return None
     metadata_audio_type_changed = Signal()
     metadataAudioType = Property(str, get_metadata_audio_type, notify=metadata_audio_type_changed)

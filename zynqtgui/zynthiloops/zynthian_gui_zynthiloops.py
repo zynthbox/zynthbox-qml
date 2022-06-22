@@ -707,6 +707,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def set_selector_throttled(self):
         self.set_selector_timer.start()
 
+    def set_set_selector_active(self):
+        self.is_set_selector_running = True
+
     @Slot(None)
     def set_selector(self, zs_hiden=False):
         # Hide selectors and return if dependent variables is None or a long operation is in progress

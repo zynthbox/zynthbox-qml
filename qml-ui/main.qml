@@ -50,7 +50,21 @@ Kirigami.AbstractApplicationWindow {
     }
     readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property var tracks: [
+        zynthian.zynthiloops.song.tracksModel.getTrack(0),
+        zynthian.zynthiloops.song.tracksModel.getTrack(1),
+        zynthian.zynthiloops.song.tracksModel.getTrack(2),
+        zynthian.zynthiloops.song.tracksModel.getTrack(3),
+        zynthian.zynthiloops.song.tracksModel.getTrack(4),
+        zynthian.zynthiloops.song.tracksModel.getTrack(5),
+        zynthian.zynthiloops.song.tracksModel.getTrack(6),
+        zynthian.zynthiloops.song.tracksModel.getTrack(7),
+        zynthian.zynthiloops.song.tracksModel.getTrack(8),
+        zynthian.zynthiloops.song.tracksModel.getTrack(9),
+    ]
+    property QtObject selectedTrack: {
+        return root.tracks[0]
+    }
     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName)
 
     signal requestOpenLayerSetupDialog()
@@ -541,6 +555,12 @@ Kirigami.AbstractApplicationWindow {
         onTriggered: {
             zynthian.stop_splash();
         }
+    }
+
+    // Listen to selected_track_changed signal to
+    Connections {
+        target: zynthian.session_dashboard
+        onSelected_track_changed: root.selectedTrack = root.tracks[zynthian.session_dashboard.selectedTrack]
     }
 
     ScreensLayer {

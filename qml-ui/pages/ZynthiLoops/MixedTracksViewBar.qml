@@ -359,16 +359,14 @@ Rectangle {
                                     target: synthRepeater
                                     property: "model"
                                     delayed: true
-                                    value: synthRepeater.visible
-                                        ? (root.selectedTrack.trackAudioType === "synth"
+                                    value: root.selectedTrack.trackAudioType === "synth"
                                                 ? root.selectedTrack.chainedSoundsNames
                                                 : root.selectedTrack.trackAudioType === "sample-trig" ||
                                                 root.selectedTrack.trackAudioType === "sample-slice"
                                                     ? root.selectedTrack.samples
                                                     : root.selectedTrack.trackAudioType === "sample-loop"
                                                         ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex), null, null, null, null]
-                                                        : [])
-                                        : null
+                                                        : []
 
                                 }
 

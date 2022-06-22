@@ -156,10 +156,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             logging.debug(f"### Setting selected track : track({track})")
             self.__selected_track__ = track
 
-            # FIXME : A good way to implement this without explicitly calling set_selector would be to connect to
-            #         selected_track_changed signal on ZL side but it has a delay which resets the selectedTrack
-            #         to previous value
-            self.zyngui.zynthiloops.set_selector()
+            # Set is_set_selector_running way before set_selector is called so that
+            # knob values are discarded. set_selector will be called by change_to_track_sound
+            # after 1000ms when active midi channel is switched
+            self.zyngui.zynthiloops.set_set_selector_active()
 
             QMetaObject.invokeMethod(self, "do_fixed_layers_fill_list", Qt.QueuedConnection)
 

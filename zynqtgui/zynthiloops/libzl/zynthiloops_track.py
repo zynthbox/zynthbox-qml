@@ -489,8 +489,8 @@ class zynthiloops_track(QObject):
     def isEmpty(self):
         is_empty = True
 
-        for clip_index in range(0, self.__clips_model__.count):
-            clip: zynthiloops_clip = self.__clips_model__.getClip(clip_index)
+        for clip_index in range(0, self.clipsModel.count):
+            clip: zynthiloops_clip = self.clipsModel.getClip(clip_index)
             if clip.path is not None and len(clip.path) > 0:
                 is_empty = False
                 break

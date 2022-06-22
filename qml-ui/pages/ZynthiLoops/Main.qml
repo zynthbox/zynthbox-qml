@@ -1025,7 +1025,7 @@ Zynthian.ScreenPage {
                             Binding {
                                 target: delegateTrackHeader2
                                 property: "color"
-                                when: root.active
+                                when: root.visible
                                 delayed: true
 
                                 value: {

@@ -30,7 +30,7 @@ import logging
 from zyncoder import *
 from . import zynthian_gui_selector
 
-from PySide2.QtCore import Qt, QObject, Slot, Signal, Property
+from PySide2.QtCore import QMetaObject, Qt, QObject, Slot, Signal, Property
 
 #------------------------------------------------------------------------------
 # basically a proxy model to zynthian_fixed:tracks
@@ -133,7 +133,12 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         self.fill_list()
         if not self.zyngui.screens["zynthiloops"].song:
             return
-        track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].get_selected_track())
+        QMetaObject.invokeMethod(self, "do_activate_midich_layer", Qt.QueuedConnection)
+
+    @Slot(None)
+    def do_activate_midich_layer(self):
+        track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(
+            self.zyngui.screens['session_dashboard'].get_selected_track())
         if track is not None:
             logging.debug(f"Update Track Sounds : {track.connectedSound}")
             if track.connectedSound >= 0:

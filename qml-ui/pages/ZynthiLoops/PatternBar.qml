@@ -77,6 +77,7 @@ GridLayout {
 
             SidebarButton {
                 icon.name: "edit-clear-all"
+                active: true
 
                 onClicked: {
                     if (root.pattern) {

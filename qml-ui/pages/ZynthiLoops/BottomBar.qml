@@ -177,7 +177,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "document-save-symbolic"
-                    visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
+                    active: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                              && controlObj.hasOwnProperty("path")
                              && controlObj.path.length > 0
 
@@ -188,7 +188,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "document-open"
-                    visible: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
+                    active: root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern
                     enabled: controlObj ? !controlObj.isPlaying : false
 
                     onClicked: {
@@ -199,7 +199,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "delete"
-                    visible: (controlObj != null) && controlObj.deletable
+                    active: (controlObj != null) && controlObj.deletable
 
                     onClicked: {
                         controlObj.delete();
@@ -208,7 +208,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "edit-clear-all"
-                    visible: (controlObj != null) && controlObj.clearable
+                    active: (controlObj != null) && controlObj.clearable
                     enabled: controlObj ? !controlObj.isPlaying : false
 
                     onClicked: {
@@ -218,7 +218,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "user-trash-symbolic"
-                    visible: controlObj != null && controlObj.path != null && controlObj.path.length > 0
+                    active: controlObj != null && controlObj.path != null && controlObj.path.length > 0
 
                     onClicked: {
                         controlObj.deleteClip()
@@ -227,7 +227,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: controlObj && controlObj.isPlaying ? "media-playback-stop" : "media-playback-start"
-                    visible: root.controlType !== BottomBar.ControlType.Part &&
+                    active: root.controlType !== BottomBar.ControlType.Part &&
                              (controlObj != null) && controlObj.playable && controlObj.path
 
                     onClicked: {
@@ -243,7 +243,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "media-playback-start"
-                    visible: root.controlType === BottomBar.ControlType.Part &&
+                    active: root.controlType === BottomBar.ControlType.Part &&
                              (controlObj != null) && controlObj.playable
 
                     onClicked: {
@@ -254,7 +254,7 @@ Rectangle {
 
                 SidebarButton {
                     icon.name: "media-playback-stop"
-                    visible: root.controlType === BottomBar.ControlType.Part &&
+                    active: root.controlType === BottomBar.ControlType.Part &&
                              (controlObj != null) && controlObj.playable
 
                     onClicked: {
@@ -266,7 +266,7 @@ Rectangle {
     //            SidebarButton {
     //                icon.name: "media-record-symbolic"
     //                icon.color: "#f44336"
-    //                visible: (controlObj != null) && controlObj.recordable && !controlObj.path
+    //                active: (controlObj != null) && controlObj.recordable && !controlObj.path
     //                enabled: !controlObj.isRecording
 
     //                onClicked: {
@@ -340,7 +340,7 @@ Rectangle {
                     }
     //                SidebarButton {
     //                    icon.name: "edit-clear-all"
-    //                    visible: (controlObj != null) && controlObj.clearable
+    //                    active: (controlObj != null) && controlObj.clearable
     //                    enabled: controlObj ? !controlObj.isPlaying : false
 
     //                    onClicked: {

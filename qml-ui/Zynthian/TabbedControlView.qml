@@ -278,8 +278,10 @@ Item {
         }
         onWidthChanged: {
             for (var i in pageCache) {
-                pageCache[i].width = width;
-                pageCache[i].height = height;
+                Qt.callLater(function() {
+                    pageCache[i].width = width;
+                    pageCache[i].height = height;
+                })
             }
         }
         FocusScope {

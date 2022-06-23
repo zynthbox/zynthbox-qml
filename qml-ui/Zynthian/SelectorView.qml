@@ -127,7 +127,14 @@ QQC2.ScrollView {
     }
 
     function forceViewPosition() {
-        if (root.visible) {
+        // Force view position only when current visible page has this selectorview
+        //
+        // Check if current page is SelectorView's page
+        // For all other pages except "layers_for_track", zynthian.current_screen_id and root.screenId should be same for a SelectorView
+        // In "layers_for_track" page, there are 2 SelectorViews (preset and bank) which belong to layers_for_track page
+        if (zynthian.current_screen_id === root.screenId ||
+            (['bank', 'preset'].indexOf(root.screenId) >= 0 && zynthian.current_screen_id === "layers_for_track")) {
+
             root.view.positionViewAtIndex(root.currentIndex, ListView.SnapPosition)
             root.view.contentY-- //HACK: workaround for Qt 5.11 ListView sometimes not reloading its items after positionViewAtIndex
             root.view.forceLayout()

@@ -109,8 +109,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         # self.set_selected_track(self.selectedTrack, True)
 
     @Slot(None)
-    def do_fixed_layers_fill_list(self):
+    def set_selected_track_complete(self):
         self.zyngui.fixed_layers.fill_list()
+        self.selected_track_changed.emit()
+        self.__change_track_sound_timer__.start()
 
     ### Property name
     def get_name(self):
@@ -161,10 +163,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             # after 1000ms when active midi channel is switched
             self.zyngui.zynthiloops.set_set_selector_active()
 
-            QMetaObject.invokeMethod(self, "do_fixed_layers_fill_list", Qt.QueuedConnection)
-
-            self.selected_track_changed.emit()
-            self.__change_track_sound_timer__.start()
+            # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when track changes
+            # fill_list and emitting selected_track_changed event is a bit on the heavier side and hence should go
+            # in the set_selected_track_complete slot
+            QMetaObject.invokeMethod(self, "set_selected_track_complete", Qt.QueuedConnection)
     selected_track_changed = Signal()
     selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
     ### END Property selectedTrack

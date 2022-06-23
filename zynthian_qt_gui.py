@@ -1401,7 +1401,10 @@ class zynthian_gui(QObject):
                 self.show_screen("control")
             else:
                 if self.curlayer.get_preset_name():
-                    self.add_screen_to_show_queue(self.screens["control"])
+                    if self.isBootingComplete:
+                        self.add_screen_to_show_queue(self.screens["control"])
+                    else:
+                        self.screens["control"].show()
 
                 if self.screens["layer"].auto_next_screen:
                     if modal:
@@ -1414,12 +1417,23 @@ class zynthian_gui(QObject):
                     else:
                         self.show_screen("layer")
                 else:
-                    self.add_screen_to_show_queue(self.screens["layer"])
+                    if self.isBootingComplete:
+                        self.add_screen_to_show_queue(self.screens["layer"])
+                    else:
+                        self.screens["layer"].show()
+
                 # If there is only one bank, jump to preset selection
                 if len(self.curlayer.bank_list) <= 1:
                     self.screens["bank"].select_action(0)
-                self.add_screen_to_show_queue(self.screens["layer_effects"], True)
-                self.add_screen_to_show_queue(self.screens["layer_midi_effects"], True)
+
+                if self.isBootingComplete:
+                    self.add_screen_to_show_queue(self.screens["layer_effects"], True)
+                    self.add_screen_to_show_queue(self.screens["layer_midi_effects"], True)
+                else:
+                    self.screens["layer_effects"].show()
+                    self.screens["layer_effects"].select_action(0)
+                    self.screens["layer_midi_effects"].show()
+                    self.screens["layer_midi_effects"].select_action(0)
 
     def show_control(self):
         self.restore_curlayer()

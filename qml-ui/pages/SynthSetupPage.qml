@@ -433,7 +433,8 @@ Zynthian.ScreenPage {
                     Layout.fillHeight: true
                     screenId: "bank"
 
-                    active: zynthian.isBootingComplete && root.isVisible
+                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                    active: zynthian.isBootingComplete
                     onCurrentScreenIdRequested: root.currentScreenIdRequested(screenId)
                     onItemActivated: root.itemActivated(screenId, index)
                     onItemActivatedSecondary: root.itemActivatedSecondary(screenId, index)
@@ -555,8 +556,8 @@ Zynthian.ScreenPage {
             }
             Zynthian.SelectorView {
                 id: presetView
-
-                active: zynthian.isBootingComplete && root.isVisible
+                // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                active: zynthian.isBootingComplete
                 implicitHeight: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true

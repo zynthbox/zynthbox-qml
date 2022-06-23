@@ -587,6 +587,23 @@ class zynthian_gui(QObject):
         # Get Jackd Options
         self.jackd_options = zynconf.get_jackd_options()
 
+        ### SCREEN SHOW QUEUE
+        '''
+        This list will be used as a queue to call `show` method of the screen objects in the list
+        '''
+        self.show_screens_queue = []
+
+        '''
+        self.show_screens_queue_timer will process once screen at a time from self.show_screens_queue and call the respective show method
+        If there are more screens left in the queue, the timer will restart itself otherwise not
+        This will make sure to not call show methods of the screens together and hence blocking event processing (causes stutter in UI)
+        '''
+        self.show_screens_queue_timer = QTimer()
+        self.show_screens_queue_timer.setSingleShot(True)
+        self.show_screens_queue_timer.setInterval(500)
+        self.show_screens_queue_timer.timeout.connect(self.show_screens_queue_timer_timeout, Qt.QueuedConnection)
+        ### END SCREEN SHOW QUEUE
+
         self.__fake_keys_pressed = set()
         self.__old_bk_value = 0 # FIXME: hack
         self.__bk_fake_key = None
@@ -625,6 +642,35 @@ class zynthian_gui(QObject):
 
     def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4
+
+    ### SHOW SCREEN QUEUE
+    '''
+    Add a screen to queue for processing and start timer
+    Always enqueue show screen with this method to make sure timer is started when a screen is queued
+    '''
+    def add_screen_to_show_queue(self, screen, select_first_action=False):
+        self.show_screens_queue.append((screen, select_first_action))
+        self.show_screens_queue_timer.start()
+
+    '''
+    Show screen queue timer timeout when invoked will process 1 screen from the queue.
+    If there are more screens left to be processed, the timer will restart itself otherwise timer will stop      
+    '''
+    def show_screens_queue_timer_timeout(self):
+        # Try calling show method of the screen and select first action if told to do so
+        try:
+            screen, select_first_action = self.show_screens_queue.pop()
+            logging.debug(f"Showing screen : {screen}")
+            screen.show()
+            if select_first_action:
+                logging.debug(f"Selection first action for screen : {screen}")
+                screen.select_action(0)
+        except: pass
+
+        # If self.show_screens_queue has some screens left to be processed, restart timer
+        if len(self.show_screens_queue) > 0:
+            self.show_screens_queue_timer.start()
+    ### END SHOW SCREEN QUEUE
 
     # ---------------------------------------------------------------------------
     # WS281X LEDs
@@ -1355,7 +1401,7 @@ class zynthian_gui(QObject):
                 self.show_screen("control")
             else:
                 if self.curlayer.get_preset_name():
-                    self.screens["control"].show()
+                    self.add_screen_to_show_queue(self.screens["control"])
 
                 if self.screens["layer"].auto_next_screen:
                     if modal:
@@ -1368,14 +1414,12 @@ class zynthian_gui(QObject):
                     else:
                         self.show_screen("layer")
                 else:
-                    self.screens["layer"].show()
+                    self.add_screen_to_show_queue(self.screens["layer"])
                 # If there is only one bank, jump to preset selection
                 if len(self.curlayer.bank_list) <= 1:
                     self.screens["bank"].select_action(0)
-                self.screens["layer_effects"].show()
-                self.screens["layer_effects"].select_action(0)
-                self.screens["layer_midi_effects"].show()
-                self.screens["layer_midi_effects"].select_action(0)
+                self.add_screen_to_show_queue(self.screens["layer_effects"], True)
+                self.add_screen_to_show_queue(self.screens["layer_midi_effects"], True)
 
     def show_control(self):
         self.restore_curlayer()

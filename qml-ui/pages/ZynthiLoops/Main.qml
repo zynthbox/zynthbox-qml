@@ -841,11 +841,13 @@ Zynthian.ScreenPage {
                                 } else {
                                     // Always open Sound combinator when clicking any indicator cell
                                     zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
-                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
-                                    bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
+                                    Qt.callLater(function() {
+                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
+                                        bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
 
-                                    bottomStack.slotsBar.bottomBarButton.checked = true
-                                    // bottomStack.slotsBar.soundCombinatorButton.checked = true
+                                        bottomStack.slotsBar.bottomBarButton.checked = true
+                                        // bottomStack.slotsBar.soundCombinatorButton.checked = true
+                                    })
                                 }
                             }
 
@@ -1052,14 +1054,14 @@ Zynthian.ScreenPage {
                             highlighted: index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
+                                root.lastSelectedObj = model.track
+
+                                // Open MixedTracksViewBar and switch to track
+                                bottomStack.slotsBar.trackButton.checked = true
+
+                                // zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                zynthian.session_dashboard.selectedTrack = index;
                                 Qt.callLater(function() {
-                                    root.lastSelectedObj = model.track
-
-                                    // Open MixedTracksViewBar and switch to track
-                                    bottomStack.slotsBar.trackButton.checked = true
-
-                                    // zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                    zynthian.session_dashboard.selectedTrack = index;
                                     bottomBar.controlType = BottomBar.ControlType.Track;
                                     bottomBar.controlObj = model.track;
                                 })
@@ -1264,13 +1266,15 @@ Zynthian.ScreenPage {
                                             zynthian.session_dashboard.selectedTrack = track.id;
                                             zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
 
-                                            if (track.connectedPattern >= 0) {
-                                                bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                bottomBar.controlObj = track.sceneClip;
-                                            } else {
-                                                bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                bottomBar.controlObj = track.sceneClip;
-                                            }
+                                            Qt.callLater(function() {
+                                                if (track.connectedPattern >= 0) {
+                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
+                                                    bottomBar.controlObj = track.sceneClip;
+                                                } else {
+                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
+                                                    bottomBar.controlObj = track.sceneClip;
+                                                }
+                                            })
                                         }
                                         onPressAndHold: {
                                             bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;

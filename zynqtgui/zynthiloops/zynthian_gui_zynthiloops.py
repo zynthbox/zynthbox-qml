@@ -141,6 +141,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.set_selector_timer.setInterval(10)
         self.set_selector_timer.timeout.connect(self.set_selector)
 
+        self.update_timer_bpm_timer = QTimer()
+        self.update_timer_bpm_timer.setInterval(100)
+        self.update_timer_bpm_timer.setSingleShot(True)
+        self.update_timer_bpm_timer.timeout.connect(self.update_timer_bpm)
+
         self.__volume_control_obj = None
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
@@ -1002,7 +1007,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     logging.info(f"Loading default snapshot")
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                self.__song__.bpm_changed.connect(self.update_timer_bpm)
+                self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
             else:

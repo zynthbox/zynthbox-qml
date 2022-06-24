@@ -54,6 +54,8 @@ def init():
 
             libzl.SyncTimer_startTimer.argtypes = [ctypes.c_int]
 
+            libzl.SyncTimer_setBpm.argtypes = [ctypes.c_uint]
+
             libzl.SyncTimer_queueClipToStart.argtypes = [ctypes.c_void_p]
 
             libzl.SyncTimer_queueClipToStartOnChannel.argtypes = [ctypes.c_void_p, ctypes.c_int]
@@ -148,6 +150,10 @@ def startTimer(interval: int):
     if libzl:
         libzl.SyncTimer_startTimer(interval)
 
+
+def setBpm(bpm: int):
+    if libzl:
+        libzl.SyncTimer_setBpm(bpm)
 
 def stopTimer():
     if libzl:

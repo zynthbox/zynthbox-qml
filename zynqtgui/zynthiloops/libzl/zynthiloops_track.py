@@ -352,6 +352,7 @@ class zynthiloops_track(QObject):
         def task(zyngui, track):
             jack_basenames = []
 
+            trackHasEffects = False
             for channel in track.chainedSounds:
                 if channel >= 0 and track.checkIfLayerExists(channel):
                     layer = zyngui.screens['layer'].layer_midi_map[channel]
@@ -359,8 +360,23 @@ class zynthiloops_track(QObject):
                     for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
                         try:
                             jack_basenames.append(fxlayer.jackname.split(":")[0])
+                            trackHasEffects = True
                         except Exception as e:
                             logging.error(f"### update_jack_port Error : {str(e)}")
+
+            try:
+                for port in zip([f"SamplerSynth:track_{self.id + 1}_left", f"SamplerSynth:track_{self.id + 1}_right"], [f"zynthiloops_audio_levels_client:T{self.id + 1}A", f"zynthiloops_audio_levels_client:T{self.id + 1}B"]):
+                    try:
+                        if (trackHasEffects):
+                            p = Popen(("jack_disconnect", port[1], port[0]))
+                            p.wait()
+                        else:
+                            p = Popen(("jack_connect", port[1], port[0]))
+                            p.wait()
+                    except Exception as e:
+                        logging.error(f"Error processing SamplerSynth jack port for T{self.id + 1} : {port}({str(e)})")
+            except Exception as e:
+                logging.error(f"Error processing SamplerSynth jack ports for T{self.id + 1}: {str(e)}")
 
             for port_name in jack_basenames:
                 try:

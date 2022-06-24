@@ -524,7 +524,7 @@ def audio_autoconnect(force=False):
 				trackHasEffects = False
 				if len(track.chainedSounds) > 0:
 					for chainedSound in track.chainedSounds:
-						if chainedSound > -1:
+						if chainedSound > -1 and track.checkIfLayerExists(chainedSound):
 							layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
 							effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
 							if effectsLayers != None and len(effectsLayers) > 0:

@@ -520,6 +520,7 @@ def audio_autoconnect(force=False):
 			track = song.tracksModel.getTrack(trackId)
 			if track is not None:
 				trackPorts = jclient.get_ports(f"SamplerSynth:track_{trackId + 1}_", is_audio=True, is_output=True)
+				# Firstly, attempt to connect the track to any effects attached to the track
 				trackHasEffects = False
 				if len(track.chainedSounds) > 0:
 					for chainedSound in track.chainedSounds:
@@ -539,18 +540,31 @@ def audio_autoconnect(force=False):
 												jclient.connect(port[0], port[1])
 											except: pass
 								pass
-				if trackHasEffects:
-					# If there are no effects attached to this track, connect its outputs to system playback
+				# If there are no effects attached to this track, connect its outputs to the global effects if there are any
+				hasGlobalEffects = False
+				if trackHasEffects == False and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
+					for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+						engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+						# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
+						if len(engineInPorts) == 1:
+							engineInPorts[1] = engineInPorts[0];
+						for port in zip(trackPorts, engineInPorts):
+							try:
+								jclient.connect(port[0], port[1])
+								hasGlobalEffects = True
+							except: pass
+				# If there are still no effects attached to this track after taking global into account, connect its outputs to system playback
+				if trackHasEffects or hasGlobalEffects:
 					for port in zip(trackPorts, playback_ports):
 						try:
 							jclient.disconnect(port[0], port[1])
 						except: pass
+				# If there were no global effects or track effects, make sure that the track is connected to system playback
 				else:
-					# If there are no effects attached to this track, connect its outputs to system playback
-					for port in zip(trackPorts, playback_ports):
-						try:
-							jclient.connect(port[0], port[1])
-						except: pass
+				    for port in zip(trackPorts, playback_ports):
+					    try:
+						    jclient.connect(port[0], port[1])
+					    except: pass
 	###
 
 	#Get layers list from UI

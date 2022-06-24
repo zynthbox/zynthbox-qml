@@ -887,11 +887,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.click_track_click.set_length(4, self.__song__.bpm)
             self.click_track_clack.set_length(1, self.__song__.bpm)
 
-            self.click_track_click.queueClipToStart()
-            self.click_track_clack.queueClipToStart()
+            self.click_track_click.queueClipToStartOnChannel(-2)
+            self.click_track_clack.queueClipToStartOnChannel(-2)
         else:
-            self.click_track_click.queueClipToStop()
-            self.click_track_clack.queueClipToStop()
+            self.click_track_click.queueClipToStopOnChannel(-2)
+            self.click_track_clack.queueClipToStopOnChannel(-2)
 
         self.click_track_enabled_changed.emit()
 
@@ -1382,8 +1382,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # Start blink timer when metronome stops to keep blinking in sync with bpm
             self.zyngui.wsleds_blink_timer.start()
 
-            self.click_track_click.stop()
-            self.click_track_clack.stop()
+            self.click_track_click.stopOnChannel(-2)
+            self.click_track_clack.stopOnChannel(-2)
             self.__current_beat__ = -1
             self.__current_bar__ = -1
             self.current_beat_changed.emit()

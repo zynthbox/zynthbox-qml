@@ -505,6 +505,7 @@ class zynthiloops_song(QObject):
             if not self.zyngui.zynthiloops.isMetronomeRunning:
                 self.zyngui.wsleds_blink_timer.start()
 
+            libzl.setBpm(self.__bpm__)
             self.bpm_changed.emit()
             self.schedule_save()
 

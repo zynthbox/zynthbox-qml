@@ -1238,7 +1238,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)
 
-            libzl.startTimer(self.__song__.__bpm__)
+            libzl.startTimer(self.__song__.bpm)
 
     def queue_clip_record(self, clip, source, channel):
         if self.zyngui.curlayer is not None:
@@ -1344,7 +1344,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.click_track_click.queueClipToStartOnChannel(-2)
                     self.click_track_clack.queueClipToStartOnChannel(-2)
 
-                libzl.startTimer(self.__song__.__bpm__)
+                libzl.startTimer(self.__song__.bpm)
 
                 # Stop blink timer when metronome starts as blink will be handled by metronome update callback
                 # to have more accurate representation of bpm

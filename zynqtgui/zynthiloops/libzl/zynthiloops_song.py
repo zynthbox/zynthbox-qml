@@ -62,7 +62,7 @@ class zynthiloops_song(QObject):
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__scenes_model__ = zynthiloops_scenes_model(self)
-        self.__bpm__ = 120
+        self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
         self.__volume__ = 100
         self.__index__ = 0
         self.__is_playing__ = False
@@ -115,6 +115,8 @@ class zynthiloops_song(QObject):
                                 self.__scenes_model__.addClipToScene(clip, scene)
                         clipsModel.add_clip(clip)
         self.bpm_changed.emit()
+        # Emit bpm changed to get bpm of selectedMix
+        self.__scenes_model__.selected_mix_index_changed.connect(self.bpm_changed.emit)
 
         # Create wav dir for recording
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
@@ -313,8 +315,15 @@ class zynthiloops_song(QObject):
                 if "scenes" in sketch:
                     self.__scenes_model__.deserialize(sketch["scenes"])
                 if "bpm" in sketch:
-                    self.__bpm__ = sketch["bpm"]
-                    self.set_bpm(self.__bpm__, True)
+                    # In older sketch files, bpm would still be an int instead of a list
+                    # So if bpm is not a list, then generate a list and store it
+                    if isinstance(sketch["bpm"], list):
+                        self.__bpm__ = sketch["bpm"]
+                    else:
+                        self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
+                        self.__bpm__[self.__scenes_model__.selectedMixIndex] = sketch["bpm"]
+
+                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedMixIndex], True)
 
                 self.__is_loading__ = False
                 return True
@@ -490,11 +499,11 @@ class zynthiloops_song(QObject):
     #     self.schedule_save()
 
     def bpm(self):
-        return self.__bpm__
+        return self.__bpm__[self.__scenes_model__.selectedMixIndex]
 
     def set_bpm(self, bpm: int, force_set=False):
-        if self.__bpm__ != math.floor(bpm) or force_set is True:
-            self.__bpm__ = math.floor(bpm)
+        if self.__bpm__[self.__scenes_model__.selectedMixIndex] != math.floor(bpm) or force_set is True:
+            self.__bpm__[self.__scenes_model__.selectedMixIndex] = math.floor(bpm)
 
             # Update blink timer interval with change in bpm
             self.zyngui.wsleds_blink_timer.stop()
@@ -505,7 +514,7 @@ class zynthiloops_song(QObject):
             if not self.zyngui.zynthiloops.isMetronomeRunning:
                 self.zyngui.wsleds_blink_timer.start()
 
-            libzl.setBpm(self.__bpm__)
+            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedMixIndex])
             self.bpm_changed.emit()
             self.schedule_save()
 

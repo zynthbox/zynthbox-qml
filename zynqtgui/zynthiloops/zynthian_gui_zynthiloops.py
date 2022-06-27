@@ -1033,6 +1033,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.zyngui.fixed_layers.fill_list()
             self.set_selector()
 
+            # Connect all jack ports of respective track after jack client initialization is done.
+            for i in range(0, self.__song__.tracksModel.count):
+                track = self.__song__.tracksModel.getTrack(i)
+                track.update_jack_port()
+
             if cb is not None:
                 cb()
 
@@ -1185,6 +1190,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
+
+                # Connect all jack ports of respective track after jack client initialization is done.
+                for i in range(0, self.__song__.tracksModel.count):
+                    track = self.__song__.tracksModel.getTrack(i)
+                    track.update_jack_port()
 
                 self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)

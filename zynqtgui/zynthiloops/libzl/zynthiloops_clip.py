@@ -80,11 +80,18 @@ class zynthiloops_clip(QObject):
         self.recording_basepath = song.sketch_folder
         self.__started_solo__ = False
         self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
-        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'sample-bank.{self.row + 1}'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.__enabled__ = False
         self.track = None
+
+        try:
+            # Check if a dir named <somerandomname>.<track_id> exists.
+            # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
+            bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
+        except:
+            bank_name = "sample-bank"
+        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
         self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)

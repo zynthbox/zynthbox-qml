@@ -883,15 +883,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def set_clickTrackEnabled(self, enabled: bool):
         self.click_track_enabled = enabled
 
+        self.click_track_click.stopOnChannel(-2)
+        self.click_track_clack.stopOnChannel(-2)
+        self.click_track_click.set_length(4, self.__song__.bpm)
+        self.click_track_clack.set_length(1, self.__song__.bpm)
         if enabled:
-            self.click_track_click.set_length(4, self.__song__.bpm)
-            self.click_track_clack.set_length(1, self.__song__.bpm)
-
             self.click_track_click.queueClipToStartOnChannel(-2)
             self.click_track_clack.queueClipToStartOnChannel(-2)
-        else:
-            self.click_track_click.queueClipToStopOnChannel(-2)
-            self.click_track_clack.queueClipToStopOnChannel(-2)
 
         self.click_track_enabled_changed.emit()
 
@@ -1240,8 +1238,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def stopAllPlayback(self):
         # The click track wants to not have any effects added at all, so use the magic channel -2, which is our uneffected global channel
-        self.click_track_click.queueClipToStopOnChannel(-2)
-        self.click_track_clack.queueClipToStopOnChannel(-2)
+        self.click_track_click.stopOnChannel(-2)
+        self.click_track_clack.stopOnChannel(-2)
 
         for track_index in range(self.__song__.tracksModel.count):
             self.__song__.tracksModel.getTrack(track_index).stopAllClips()
@@ -1250,10 +1248,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_click.set_length(4, self.__song__.bpm)
         self.click_track_clack.set_length(1, self.__song__.bpm)
 
+        libzl.setBpm(self.__song__.bpm)
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)
 
-            libzl.startTimer(self.__song__.bpm)
 
     def queue_clip_record(self, clip, source, channel):
         if self.zyngui.curlayer is not None:

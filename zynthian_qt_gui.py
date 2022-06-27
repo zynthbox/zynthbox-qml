@@ -1880,13 +1880,8 @@ class zynthian_gui(QObject):
                 if zl.clipToRecord is None:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
-                    if self.trackSamplesBarActive:
-                        logging.debug(f"Clip is a track sample")
-                        track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-                        clip = track.samples[track.selectedSlotRow]
-                    else:
-                        logging.debug(f"Clip is a not a track sample")
-                        clip = zl.song.getClip(self.session_dashboard.selectedTrack, zl.song.scenesModel.selectedMixIndex)
+                    track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
+                    clip = track.getClipToRecord()
                     logging.info(f"Recording Clip : {clip}")
                     clip.queueRecording("internal", "*")
                     self.run_start_metronome_and_playback.emit()

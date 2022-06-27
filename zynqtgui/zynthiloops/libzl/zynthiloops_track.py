@@ -116,6 +116,9 @@ class zynthiloops_track(QObject):
         self.selectedPartChanged.connect(lambda: self.scene_clip_changed.emit())
         self.zyngui.fixed_layers.list_updated.connect(self.fixed_layers_list_updated_handler_throttle.start)
 
+        ### Proxy recordingPopupActive from zynthian_qt_gui
+        self.zyngui.recordingPopupActiveChanged.connect(self.recordingPopupActiveChanged.emit)
+
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, sceneIndex, partNum):
         clip = self.__song__.getClipByPart(self.__id__, sceneIndex, partNum)
@@ -904,10 +907,10 @@ class zynthiloops_track(QObject):
     def get_bank_dir(self):
         try:
             # Check if a dir named <somerandomname>.<track_id> exists.
-            # If exists, use that name as the bank dir name otherwise use default name `bank`
+            # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
             bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
         except:
-            bank_name = "bank"
+            bank_name = "sample-bank"
         path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
 
         logging.debug(f"get_bank_dir track{self.id + 1} : bankDir({path})")
@@ -1104,6 +1107,24 @@ class zynthiloops_track(QObject):
 
     selectedPartNames = Property(str, get_selectedPartNames, notify=selectedPartNamesChanged)
     ### Property selectedPartNames
+
+    ### Property recordingPopupActive
+    ### Proxy recordingPopupActive from zynthian_qt_gui
+
+    def get_recordingPopupActive(self):
+        return self.zyngui.recordingPopupActive
+
+    recordingPopupActiveChanged = Signal()
+
+    recordingPopupActive = Property(bool, get_recordingPopupActive, notify=recordingPopupActiveChanged)
+    ### END Property recordingPopupActive
+
+    @Slot(None, result=QObject)
+    def getClipToRecord(self):
+        if self.trackAudioType in ["sample-trig", "sample-slice"]:
+            return self.samples[self.selectedSlotRow]
+        else:
+            return self.sceneClip
 
     @Slot(None, result=str)
     def getTrackSoundSnapshotJson(self):

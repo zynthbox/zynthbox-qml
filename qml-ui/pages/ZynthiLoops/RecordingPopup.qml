@@ -40,6 +40,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 QQC2.Popup {
     id: root
     property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject clipToRecord
 
     exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true
@@ -47,12 +48,14 @@ QQC2.Popup {
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    closePolicy: !root.selectedTrack.sceneClip.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
+    closePolicy: root.clipToRecord && !root.clipToRecord.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
 
     onOpenedChanged: {
         if (opened) {
             // Report dialog open to zynthian for passing cuia events to dialog
             zynthian.openedDialog = root
+            // Assign clip to record on open so that correct clip is fetched
+            root.clipToRecord = root.selectedTrack.getClipToRecord()
         } else {
             // Report dialog close to zynthian to stop receiving cuia events
             if (zynthian.openedDialog === root) {
@@ -104,7 +107,7 @@ QQC2.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: false
-                enabled: !root.selectedTrack.sceneClip.isRecording
+                enabled: root.clipToRecord && !root.clipToRecord.isRecording
 
                 RowLayout {
                     Layout.fillWidth: false
@@ -190,6 +193,39 @@ QQC2.Popup {
                             ListElement { text: "Stereo"; value: "*" }
                         }
                         textRole: "text"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0 // Visible when track mode is trig/slice
+
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        enabled: parent.enabled
+                        text: qsTr("Target Slot")
+                    }
+
+                    QQC2.ComboBox {
+                        id: slotCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: slotComboModel
+
+                            ListElement { text: "Slot 1"; value: 0 }
+                            ListElement { text: "Slot 2"; value: 1 }
+                            ListElement { text: "Slot 3"; value: 2 }
+                            ListElement { text: "Slot 4"; value: 3 }
+                            ListElement { text: "Slot 5"; value: 4 }
+                        }
+                        textRole: "text"
+                        currentIndex: root.selectedTrack.selectedSlotRow
+                        onActivated: {
+                            root.selectedTrack.selectedSlotRow = slotComboModel.get(index).value
+                        }
                     }
                 }
 
@@ -343,12 +379,11 @@ QQC2.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignCenter
 
-                    icon.name: root.selectedTrack.sceneClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                    icon.name: root.clipToRecord && root.clipToRecord.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
                     onClicked: {
-                        if (!root.selectedTrack.sceneClip.isRecording) {
-                            // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-                            root.selectedTrack.sceneClip.queueRecording(
+                        if (root.clipToRecord && !root.clipToRecord.isRecording) {
+                            root.clipToRecord.queueRecording(
                                 sourceComboModel.get(sourceCombo.currentIndex).value,
                                 channelComboModel.get(channelCombo.currentIndex).value
                             );

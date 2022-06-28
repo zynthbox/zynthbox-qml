@@ -64,7 +64,7 @@ class zynthian_gui_midi_key_range(zynthian_qt_gui_base.ZynGui):
 		self.replot = True
 
 		self.__was_current_page = False
-		self.zyngui.current_screen_id_changed.connect(self.check_current_screen)
+		self.zyngui.current_screen_id_changed.connect(self.check_current_screen, Qt.QueuedConnection)
 
 		## TODO: Heuristics to automatically split keyboard
 		#if self.note_high < 127:

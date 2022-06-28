@@ -134,7 +134,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.master_audio_level_timer = QTimer()
         self.master_audio_level_timer.setInterval(50)
         self.master_audio_level_timer.timeout.connect(self.master_volume_level_timer_timeout)
-        self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
+        self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
 
         self.set_selector_timer = QTimer()
         self.set_selector_timer.setSingleShot(True)

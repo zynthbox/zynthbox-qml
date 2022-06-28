@@ -534,7 +534,7 @@ class zynthian_gui(QObject):
         self.info_timer.setSingleShot(False)
         self.info_timer.timeout.connect(self.hide_info)
         # HACK: in order to start the timer from the proper thread
-        self.current_modal_screen_id_changed.connect(self.info_timer.start)
+        self.current_modal_screen_id_changed.connect(self.info_timer.start, Qt.QueuedConnection)
         self.current_qml_page_prop = None
 
         #FIXME HACK: this spams is_loading_changed on the proper thread until the ui gets it, can it be done properly?

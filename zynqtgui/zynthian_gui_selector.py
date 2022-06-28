@@ -187,7 +187,7 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 		self.screen_at_timer_start = None
 		self.auto_activation_timer_requested.connect(self.schedule_activation, Qt.QueuedConnection)
 
-		self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility)
+		self.zyngui.current_screen_id_changed.connect(self.sync_selector_visibility, Qt.QueuedConnection)
 		self.zyngui.encoder_list_speed_multiplier_changed.connect(self.adjust_knob_speed)
 
 	auto_activation_timer_requested = Signal(int)

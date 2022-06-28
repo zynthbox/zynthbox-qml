@@ -98,6 +98,14 @@ Zynthian.Stack {
                     root.pageCache["sound_categories"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["sound_categories"].visible = false;
                 }
+
+                console.log("Caching engine")
+                if (!root.pageCache["engine"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("engine");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["engine"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["engine"].visible = false;
+                }
             }
         },
         Connections {

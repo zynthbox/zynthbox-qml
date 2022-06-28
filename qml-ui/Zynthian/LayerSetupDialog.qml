@@ -60,27 +60,25 @@ QQC2.Dialog {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 text: qsTr("Pick a Synth")
-                onClicked: {
-                    root.accept();
-
-                    console.log("%%% chainedSound:", root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow], root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]))
-
-                    if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
-                        zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
-                        root.accept()
-                        zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
-                        newSynthWorkaroundTimer.restart()
-                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                    } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
-                        root.reject();
-                        noFreeSlotsPopup.open();
-                    } else {
-                        zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
-                        root.accept()
-                        zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
-                        newSynthWorkaroundTimer.restart()
-                        zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                    }
+                onPressed: {
+                    Qt.callLater(function() {
+                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
+                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                            root.accept()
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            newSynthWorkaroundTimer.restart()
+                            zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                        } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
+                            root.reject();
+                            noFreeSlotsPopup.open();
+                        } else {
+                            zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
+                            root.accept()
+                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            newSynthWorkaroundTimer.restart()
+                            zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                        }
+                    })
                 }
             }
             QQC2.Button {

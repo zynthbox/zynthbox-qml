@@ -39,7 +39,33 @@ Zynthian.Stack {
         zynthian.current_screen_id_changed()
     }
 
+    property var pageCache: {}
+    onWidthChanged: {
+        for (var i in pageCache) {
+            root.pageCache[i].width = width;
+            root.pageCache[i].height = height;
+        }
+    }
+
     data: [
+        Timer {
+            id: preloadTimer
+            interval: 0
+            running: true
+            onTriggered: {
+                let file = ""
+                if (!root.pageCache) {
+                    root.pageCache = {};
+                }
+                console.log("Caching control")
+                if (!root.pageCache["control"]) {
+                    file = applicationWindow().pageScreenMapping.pageForScreen("control");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["control"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
+                    root.pageCache["control"].visible = false;
+                }
+            }
+        },
         Connections {
             target: zynthian
             property string lastScreen

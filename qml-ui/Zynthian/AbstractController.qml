@@ -50,7 +50,9 @@ Card {
     visible: controller.ctrl !== null
 
     onVisibleChanged: {
-        controller.ctrl.visible = visible
+        if (controller.ctrl) {
+            controller.ctrl.visible = visible;
+        }
     }
     Component.onCompleted: {
         controller.ctrl.visible = root.visible

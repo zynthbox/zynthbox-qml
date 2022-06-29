@@ -41,7 +41,7 @@ from . import zynthian_gui_selector
 
 # Qt modules
 from PySide2.QtCore import Qt, QObject, Slot, Signal, Property, QAbstractListModel, QModelIndex, QByteArray
-
+import time
 #------------------------------------------------------------------------------
 # Zynthian Instrument Controller GUI Class
 #------------------------------------------------------------------------------
@@ -219,6 +219,7 @@ class zynthian_gui_control(zynthian_gui_selector):
 	def show(self):
 		super().show()
 		self.click_listbox()
+		logging.error("SHOWING {}".format(time.time() * 1000))
 		if self.zyngui.curlayer:
 			path = "/root/.local/share/zynthian/engineeditpages/"
 			entries = []
@@ -249,6 +250,9 @@ class zynthian_gui_control(zynthian_gui_selector):
 			self.__control_pages_model.set_entries(entries)
 		else:
 			self.__control_pages_model.set_entries([])
+		logging.error("SHOWed {}".format(time.time() * 1000))
+		self.sync_selectors_visibility()
+		self.set_mode_control()
 
 
 	def hide(self):

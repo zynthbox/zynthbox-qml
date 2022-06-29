@@ -13,7 +13,7 @@ ColumnLayout {
     id: root
     property QtObject track
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
-    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 

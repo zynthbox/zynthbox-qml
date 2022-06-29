@@ -66,7 +66,7 @@ Kirigami.AbstractApplicationWindow {
         return root.tracks[0]
     }
 
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel("Scene " + zynthian.zynthiloops.song.scenesModel.selectedMixName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()

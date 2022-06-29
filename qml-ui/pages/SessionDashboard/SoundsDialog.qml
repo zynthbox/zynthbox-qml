@@ -126,7 +126,7 @@ QQC2.Dialog {
 //                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
                 soundsDialog.selectedTrack.clearChainedSoundsWithoutCloning();
 //                if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-//                    var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
+//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
 //                    seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
 //                }
                 soundsDialog.accept();
@@ -314,7 +314,7 @@ QQC2.Dialog {
                         soundsDialog.selectedTrack.selectSound(index);
 
                         if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-                            var seq = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
+                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
                             seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
                         }
 

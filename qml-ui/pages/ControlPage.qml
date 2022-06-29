@@ -110,19 +110,26 @@ Zynthian.ScreenPage {
        // mainView.forceActiveFocus()
         //HACK
         if (zynthian.control.custom_control_page.length > 0) {
-            stack.push(zynthian.control.custom_control_page);
+            stack.replace(zynthian.control.custom_control_page);
+            root.currentControlPage = zynthian.control.custom_control_page;
         } else {
-            stack.push(defaultPage);
+            stack.replace(defaultPage);
+            root.currentControlPage = "defaultPage";
         }
-        zynthian.current_screen_id = "control"
     }
+
+    property string currentControlPage
     Connections {
         target: zynthian.control
         onCustom_control_pageChanged: {
             if (zynthian.control.custom_control_page.length > 0) {
-                stack.replace(zynthian.control.custom_control_page);
+                if (root.currentControlPage !== zynthian.control.custom_control_page) {
+                    stack.replace(zynthian.control.custom_control_page);
+                    root.currentControlPage = zynthian.control.custom_control_page;
+                }
             } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
                 stack.replace(defaultPage);
+                root.currentControlPage = "defaultPage";
             }
         }
     }
@@ -130,20 +137,10 @@ Zynthian.ScreenPage {
         id: currentConnection
         target: zynthian
         onCurrent_screen_idChanged: {
-            if (zynthian.current_screen_id !== "control" && zynthian.current_screen_id.indexOf("control_downloader") === -1 && applicationWindow().pageStack.currentItem === root) {
-                pageRemoveTimer.restart()
-            }
+            root.visible = zynthian.current_screen_id === "control";
         }
     }
-    Timer {
-        id: pageRemoveTimer
-        interval: Kirigami.Units.longDuration
-        onTriggered: {
-            if (zynthian.current_screen_id !== "control" && zynthian.current_screen_id.indexOf("control_downloader") === -1 && applicationWindow().pageStack.currentItem === root) {
-                applicationWindow().pageStack.pop();
-            }
-        }
-    }
+
     onFocusChanged: {
         if (focus) {
             mainView.forceActiveFocus()
@@ -160,6 +157,13 @@ Zynthian.ScreenPage {
         RowLayout {
             id: defaultPage
             objectName: "defaultPage"
+            onVisibleChanged: {
+                if (visible) {
+                    // FIXME: why needed?
+                    zynthian.control.activate_index(zynthian.control.current_index)
+                }
+            }
+
             function topLevelFocusItem(item) {
                 if (!item) {
                     return null;

@@ -117,11 +117,17 @@ Zynthian.Stack {
                         }
                     }
                 }
-                let file = applicationWindow().pageScreenMapping.pageForScreen(screenId);
-                if (file.length > 0) {
-                    root.push(file);
+                if (root.pageCache && root.pageCache[screenId]) {
+                    console.log("ScreensLayer : Page cache found for", screenId)
+                    root.replace(root.pageCache[screenId]);
                 } else {
-                    print("Non managed screen " + screenId);
+                    console.log("ScreensLayer : Page cache not found for", screenId)
+                    let file = applicationWindow().pageScreenMapping.pageForScreen(screenId);
+                    if (file.length > 0) {
+                        root.push(file);
+                    } else {
+                        print("Non managed screen " + screenId);
+                    }
                 }
             }
         }

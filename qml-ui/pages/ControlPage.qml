@@ -109,6 +109,9 @@ Zynthian.ScreenPage {
     Component.onCompleted: {
        // mainView.forceActiveFocus()
         //HACK
+        if (!root.visible) {
+            return;
+        }
         if (zynthian.control.custom_control_page.length > 0) {
             stack.replace(zynthian.control.custom_control_page);
             root.currentControlPage = zynthian.control.custom_control_page;
@@ -118,10 +121,24 @@ Zynthian.ScreenPage {
         }
     }
 
+    onVisibleChanged: {
+        if (zynthian.control.custom_control_page.length > 0) {
+            if (root.currentControlPage !== zynthian.control.custom_control_page) {
+                stack.replace(zynthian.control.custom_control_page);
+                root.currentControlPage = zynthian.control.custom_control_page;
+            }
+        } else if (!stack.currentItem || stack.currentItem.objectName !== "defaultPage") {
+            stack.replace(defaultPage);
+            root.currentControlPage = "defaultPage";
+        }
+    }
     property string currentControlPage
     Connections {
         target: zynthian.control
         onCustom_control_pageChanged: {
+            if (!root.visible) {
+                return;
+            }
             if (zynthian.control.custom_control_page.length > 0) {
                 if (root.currentControlPage !== zynthian.control.custom_control_page) {
                     stack.replace(zynthian.control.custom_control_page);

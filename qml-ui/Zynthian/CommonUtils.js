@@ -2,9 +2,8 @@
 
 function startMetronomeAndPlayback() {
     console.log("Starting Metronome and Playback");
-    let mixNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    for (var i = 0; i < mixNames.length; ++i) {
-        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + mixNames[i]);
+    for (var i = 0; i < 10; ++i) {
+        var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
         if (sequence) {
             sequence.prepareSequencePlayback();
         } else {
@@ -20,9 +19,8 @@ function startMetronomeAndPlayback() {
 
 function stopMetronomeAndPlayback() {
     console.log("Stopping Metronome and Playback");
-    let mixNames = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    for (var i = 0; i < mixNames.length; ++i) {
-        var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene " + mixNames[i]);
+    for (var i = 0; i < 10; ++i) {
+        var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
         if (sequence) {
             sequence.stopSequencePlayback();
         } else {

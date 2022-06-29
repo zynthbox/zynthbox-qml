@@ -656,7 +656,7 @@ don't want to have to dig too far...
     //   Each scene/part/track combination is corresponds to one specific pattern
     // Synchronising the states means matching each pattern with the scene/part/track leaf in the track's tree of data
     // The specific pattern for a leaf can be deduced through the name of the scene, the track's index, and the part's index in that track
-    // and fetched from PlayGridManager by asking for the sequence by name ("Scene A" for example), and then
+    // and fetched from PlayGridManager by asking for the sequence by name ("S1" for example), and then
     // calling getByPart(trackIndex, partIndex) to fetch the specific pattern
     Repeater {
         model: zynthian.zynthiloops.song.tracksModel
@@ -674,8 +674,7 @@ don't want to have to dig too far...
                     id: trackPartSceneDelegate
                     property QtObject sceneClip: model.clip
                     property int sceneIndex: model.index
-                    property var sceneNames: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-                    property string connectedSequenceName: "Scene " + sceneNames[model.index]
+                    property string connectedSequenceName: "S" + (model.index + 1)
                     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence && sequence.count > 0 ? trackPartSceneDelegate.sequence.getByPart(baseTrackDelegate.trackIndex, trackPartDelegate.partIndex) : null;

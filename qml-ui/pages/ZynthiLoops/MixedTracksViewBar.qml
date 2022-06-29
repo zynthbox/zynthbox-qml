@@ -42,7 +42,7 @@ Rectangle {
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
 
-    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
     property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart) : null
 
 
@@ -655,7 +655,7 @@ Rectangle {
                                                 zynthian.current_modal_screen_id = "playgrid";
                                                 zynthian.forced_screen_back = "zynthiloops";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel("Scene "+zynthian.zynthiloops.song.scenesModel.selectedMixName);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName);
                                                 sequence.setActiveTrack(root.selectedTrack.id, root.selectedTrack.selectedPart);
                                             }
                                         }

@@ -279,11 +279,8 @@ Kirigami.AbstractApplicationWindow {
                 rightPadding: Kirigami.Units.largeSpacing*2
                 visible: root.selectedTrack.trackAudioType === "synth"
 
-                onClicked: {
-                    // As per #299, open library instead
-                    // soundsDialog.visible = true
-                    zynthian.current_screen_id = "bank"
-                }
+                // Open preset screen on clicking this synth button
+                onClicked: zynthian.current_screen_id = "preset"
 
                 text: {
                     synthButton.updateSoundName();
@@ -327,7 +324,16 @@ Kirigami.AbstractApplicationWindow {
                 icon.color: customTheme.Kirigami.Theme.textColor
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                 rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: zynthian.current_screen_id = "preset"
+
+                // Open synth edit page whjen preset button is clicked
+                onClicked: {
+                    if (root.selectedTrack) {
+                        zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound)
+                        zynthian.control.single_effect_engine = null;
+                        zynthian.current_screen_id = "control";
+                    }
+                }
+
                 visible: root.selectedTrack.trackAudioType === "synth"
 
                 text: {

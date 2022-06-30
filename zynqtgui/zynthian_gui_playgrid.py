@@ -190,7 +190,8 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        if self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self:
+        if self.zyngui.globalPopupOpened or \
+                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self):
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
             if self.__zselector[1] is not None:

@@ -33,11 +33,14 @@ import re
 #------------------------------------------------------------------------------
 # Base QObject wrapper for alsaaudio import
 #------------------------------------------------------------------------------
+from zynqtgui import zynthian_gui_config
+
 
 class zynthian_gui_master_alsa_mixer(QObject):
     def __init__(self, parent=None):
         super(zynthian_gui_master_alsa_mixer, self).__init__(parent)
         self.audio_device = ""
+        self.zyngui = zynthian_gui_config.zyngui
 
         # Read jack2.service file to find selected card name
         with open("/etc/systemd/system/jack2.service", "r") as f:
@@ -89,6 +92,11 @@ class zynthian_gui_master_alsa_mixer(QObject):
         if self.__mixer is None:
             return
         self.__mixer.setvolume(max(0, min(100, vol)))
+
+        # Call zyngui global set_selector when volume changes as
+        # volume is controlled by Small Knob 1 when global popup is opened
+        self.zyngui.set_selector()
+
         self.volume_changed.emit()
 
     volume = Property(int, get_volume, set_volume, notify = volume_changed)

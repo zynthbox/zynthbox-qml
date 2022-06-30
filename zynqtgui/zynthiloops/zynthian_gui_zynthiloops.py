@@ -215,10 +215,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_track(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/self.big_knob_track_multiplier):
             logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
             self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/self.big_knob_track_multiplier))
@@ -226,10 +222,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_preset(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
         selected_channel = track.get_chained_sounds()[track.selectedSlotRow]
 
@@ -245,10 +237,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
 
         try:
@@ -271,10 +259,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_track_volume(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
         volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
 
@@ -286,10 +270,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
         selected_clip = None
 
@@ -305,10 +285,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
         selected_clip = None
 
@@ -324,10 +300,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
         selected_clip = None
 
@@ -349,10 +321,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_fx(self):
-        if self.is_set_selector_running:
-            logging.info(f"Set selector in progress. Not setting value with encoder")
-            return
-
         value_updated = False
 
         for _, controller in self.zyngui.global_fx_engines:
@@ -368,6 +336,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def zyncoder_read(self):
         if self.__knob_touch_update_in_progress__:
+            return
+        if self.is_set_selector_running:
+            logging.debug(f"Set selector in progress. Not setting value with encoder")
             return
 
         if self.__zselector[0] and self.__song__:
@@ -719,6 +690,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def set_selector(self, zs_hiden=False):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
         if self.__song__ is None or \
+                self.zyngui.globalPopupOpened or \
                 (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
                 self.longOperation:
             if self.__zselector[0] is not None:

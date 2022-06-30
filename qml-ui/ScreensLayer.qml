@@ -57,12 +57,21 @@ Zynthian.Stack {
                 if (!root.pageCache) {
                     root.pageCache = {};
                 }
+
                 console.log("Caching control")
                 if (!root.pageCache["control"]) {
                     file = applicationWindow().pageScreenMapping.pageForScreen("control");
                     var component = Qt.createComponent(file);
                     root.pageCache["control"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
                     root.pageCache["control"].visible = false;
+                }
+
+                console.log("Caching layers_for_track")
+                if (!root.pageCache["layers_for_track"]) {
+                    file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_track");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["layers_for_track"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
+                    root.pageCache["layers_for_track"].visible = false;
                 }
             }
         },
@@ -86,7 +95,8 @@ Zynthian.Stack {
                 }
 
                 // Skipping modal screen requests
-                if (screenId === zynthian.current_modal_screen_id) {
+                if (screenId === zynthian.current_modal_screen_id ||
+                    applicationWindow().pageScreenMapping.pageForScreen(screenId).length === 0) {
                     return;
                 }
                 //if (root.layers.depth > 1) {
@@ -124,7 +134,9 @@ Zynthian.Stack {
                     console.log("ScreensLayer : Page cache not found for", screenId)
                     let file = applicationWindow().pageScreenMapping.pageForScreen(screenId);
                     if (file.length > 0) {
-                        root.push(file);
+                        var component = Qt.createComponent(file);
+                        root.pageCache[screenId] = component.createObject(root, {"width": root.width, "height": root.height});
+                        root.replace(root.pageCache[screenId]);
                     } else {
                         print("Non managed screen " + screenId);
                     }

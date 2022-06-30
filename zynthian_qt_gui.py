@@ -68,6 +68,7 @@ from datetime import timedelta
 
 from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
+from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
 from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
@@ -1386,6 +1387,7 @@ class zynthian_gui(QObject):
         self.screens["miniplaygrid"] = zynthian_gui_playgrid(self)
 
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
+        self.screens["song_player"] = zynthian_gui_song_player(self)
         self.screens["sketch_copier"] = zynthian_gui_sketch_copier(self)
 
         self.screens["led_config"] = zynthian_gui_led_config(self)
@@ -2029,6 +2031,9 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCREEN_ARRANGER":
             self.show_modal("song_arranger")
+
+        elif cuia == "SCREEN_SONG_PLAYER":
+            self.show_modal("song_player")
 
         elif cuia == "SCREEN_PLAYGRID":
             self.show_modal("playgrid")
@@ -3718,6 +3723,10 @@ class zynthian_gui(QObject):
     @Property(QObject, constant=True)
     def song_arranger(self):
         return self.screens["song_arranger"]
+
+    @Property(QObject, constant=True)
+    def song_player(self):
+        return self.screens["song_player"]
 
     @Property(QObject, constant=True)
     def sketch_copier(self):

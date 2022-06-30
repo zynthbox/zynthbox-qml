@@ -105,6 +105,7 @@ QtObject {
         "playgrid_downloader": "PlayGridDownloaderPage.qml",
         "track": "TrackPage.qml",
         "song_arranger": "SongArranger/main.qml",
+        "song_player": "SongPlayerPage.qml",
         "sketch_copier": "SketchCopier/main.qml",
         "sound_downloader": "SoundDownloaderPage.qml",
         "soundfont_downloader": "SoundfontDownloaderPage.qml",

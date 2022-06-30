@@ -67,6 +67,14 @@ Zynthian.Stack {
                     root.pageCache["song_arranger"].visible = false;
                 }
 
+                console.log("Caching song_player")
+                if (!root.pageCache["song_player"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("song_player");
+                    var component = Qt.createComponent(file);
+                    root.pageCache["song_player"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["song_player"].visible = false;
+                }
+
                 console.log("Caching playgrid")
                 if (!root.pageCache["playgrid"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");

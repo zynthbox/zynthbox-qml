@@ -332,6 +332,7 @@ Kirigami.AbstractApplicationWindow {
                         zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound)
                         zynthian.control.single_effect_engine = null;
                         zynthian.current_screen_id = "control";
+                        zynthian.forced_screen_back = "zynthiloops"
                     }
                 }
 

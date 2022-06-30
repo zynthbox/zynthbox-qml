@@ -165,13 +165,15 @@ Zynthian.Stack {
                 }
 
                 if (root.pageCache && root.pageCache[zynthian.current_modal_screen_id]) {
-                    console.log("ScreensLayer : Page cache found for", zynthian.current_modal_screen_id)
+                    console.log("ModalScreensLayer : Page cache found for", zynthian.current_modal_screen_id)
                     root.replace(root.pageCache[zynthian.current_modal_screen_id]);
                 } else {
-                    console.log("ScreensLayer : Page cache not found for", zynthian.current_modal_screen_id)
+                    console.log("ModalScreensLayer : Page cache not found for", zynthian.current_modal_screen_id)
                     let file = applicationWindow().pageScreenMapping.pageForModalScreen(zynthian.current_modal_screen_id);
                     if (file.length > 0) {
-                        root.push(file);
+                        var component = Qt.createComponent(file);
+                        root.pageCache[zynthian.current_modal_screen_id] = component.createObject(root, {"width": root.width, "height": root.height});
+                        root.replace(root.pageCache[zynthian.current_modal_screen_id]);
                     } else {
                         print("Non managed modal screen " + zynthian.current_modal_screen_id);
                     }

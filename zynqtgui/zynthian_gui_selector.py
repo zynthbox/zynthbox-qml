@@ -237,8 +237,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 
 	def set_selector(self, zs_hiden=False):
 		if self.zselector is not None:
-			if self.zyngui.get_current_screen_id() is not None and \
-				self.zyngui.get_current_screen() == self:
+			if not self.zyngui.globalPopupOpened and \
+					self.zyngui.get_current_screen_id() is not None and \
+					self.zyngui.get_current_screen() == self:
 				self.zselector.show()
 			else:
 				self.zselector.hide()
@@ -250,8 +251,9 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 			self.zselector_ctrl = zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':len(self.list_data), 'value':self.index })
 			self.zselector = zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.zselector_ctrl, self)
 
-			if self.zyngui.get_current_screen_id() is not None and \
-					self.zyngui.get_current_screen() == self:
+			if not self.zyngui.globalPopupOpened and \
+				self.zyngui.get_current_screen_id() is not None and \
+				self.zyngui.get_current_screen() == self:
 				self.zselector.show()
 			else:
 				self.zselector.hide()

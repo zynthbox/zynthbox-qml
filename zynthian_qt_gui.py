@@ -82,11 +82,11 @@ import zynautoconnect
 from zynlibs.jackpeak import lib_jackpeak_init
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
-from zyngine import zynthian_zcmidi
+from zyngine import zynthian_controller, zynthian_zcmidi
 from zyngine import zynthian_midi_filter
 
 # from zyngine import zynthian_engine_transport
-from zynqtgui import zynthian_gui_config
+from zynqtgui import zynthian_gui_config, zynthian_gui_controller
 from zynqtgui.zynthian_gui_selector import zynthian_gui_selector
 from zynqtgui.zynthian_gui_info import zynthian_gui_info
 from zynqtgui.zynthian_gui_about import zynthian_gui_about
@@ -577,6 +577,13 @@ class zynthian_gui(QObject):
         self.zynautoconnect_audio_flag = False
         self.zynautoconnect_midi_flag = False
 
+        # Global zselectors
+        self.__zselector = [None, None, None, None]
+        self.__zselector_ctrl = [None, None, None, None]
+        # This variable will decide if zyncoder_read should be called or not depending on whether
+        # global set_selector is in progress or not
+        self.is_global_set_selector_running = False
+
         # Create Lock object to avoid concurrence problems
         self.lock = Lock()
         self.osc_server = None
@@ -671,6 +678,70 @@ class zynthian_gui(QObject):
         if len(self.show_screens_queue) > 0:
             self.show_screens_queue_timer.start()
     ### END SHOW SCREEN QUEUE
+
+    ### Global controller and selector
+    @Slot(None)
+    def zyncoder_set_bpm(self):
+        """
+        Set song bpm when global popup is active
+        """
+
+        if self.globalPopupOpened:
+            song = self.zynthiloops.song
+
+            if song is not None and \
+                    song.bpm != self.__zselector[0].value:
+                song.bpm = self.__zselector[0].value
+                self.set_selector()
+
+    def set_selector(self):
+        if self.globalPopupOpened:
+            # Configure Big Knob to set BPM
+            try:
+                if self.__zselector[0] is not None:
+                    self.__zselector[0].show()
+
+                logging.debug(f"### set_selector : Configuring big knob to set bpm")
+
+                value = 0
+                min_value = 0
+                max_value = 0
+
+                song = self.zynthiloops.song
+                if song is not None:
+                    value = song.bpm
+                    min_value = 50
+                    max_value = 200
+
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
+                                                                   {'midi_cc': 0, 'value': value,
+                                                                    'step': 1})
+
+                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+                                                                  self.__zselector_ctrl[0],
+                                                                  self)
+                    self.__zselector[0].show()
+
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
+                     'midi_cc': 0,
+                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
+
+                self.__zselector[0].config(self.__zselector_ctrl[0])
+            except:
+                if self.__zselector[0] is not None:
+                    self.__zselector[0].hide()
+        else:
+            if self.__zselector[0] is not None:
+                self.__zselector[0].hide()
+            if self.__zselector[1] is not None:
+                self.__zselector[1].hide()
+            if self.__zselector[2] is not None:
+                self.__zselector[2].hide()
+            if self.__zselector[3] is not None:
+                self.__zselector[3].hide()
+    ### END Global controller and selector
 
     # ---------------------------------------------------------------------------
     # WS281X LEDs
@@ -2518,17 +2589,30 @@ class zynthian_gui(QObject):
 
                 # Read Zyncoders
                 self.lock.acquire()
-                if self.modal_screen:
-                    free_zyncoders = self.screens[
-                        self.modal_screen
-                    ].zyncoder_read()
-                else:
-                    free_zyncoders = self.screens[
-                        self.active_screen
-                    ].zyncoder_read()
 
-                if free_zyncoders:
-                    self.screens["control"].zyncoder_read(free_zyncoders)
+                if self.is_global_set_selector_running:
+                    # If Global set_selector is in progress, do not call zyncoder_read methods
+                    # This will make sure none of the gui updates while set_selector is in progress
+                    logging.debug(f"Set selector in progress. Not setting value with encoder")
+                else:
+                    if self.globalPopupOpened:
+                        # When global popup is open, set song bpm with big knob
+                        if self.__zselector[0] and self.zynthiloops.song is not None:
+                            self.__zselector[0].read_zyncoder()
+                            QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
+                    else:
+                        # When global popop is not open, call zyncoder_read of active screen/modal
+                        if self.modal_screen:
+                            free_zyncoders = self.screens[
+                                self.modal_screen
+                            ].zyncoder_read()
+                        else:
+                            free_zyncoders = self.screens[
+                                self.active_screen
+                            ].zyncoder_read()
+
+                        if free_zyncoders:
+                            self.screens["control"].zyncoder_read(free_zyncoders)
 
                 self.lock.release()
 
@@ -3706,7 +3790,35 @@ class zynthian_gui(QObject):
     def set_globalPopupOpened(self, opened):
         if self.__global_popup_opened__ != opened:
             self.__global_popup_opened__ = opened
+
+            # Set is_global_set_selector_running to True, which will disable any gui updates with knobs
+            # while set_selector is in progress
+            self.is_global_set_selector_running = True
+
+            # Queue call to running set_selector of all pages to make sure opening global popus is fast
+            QMetaObject.invokeMethod(self, "run_set_selectors", Qt.QueuedConnection)
+
+            # Emit globalPopupOpenedChanged immediately and not wait for set_selector calls to complete
+            # to make sure global popup is opened instantly
             self.globalPopupOpenedChanged.emit()
+
+    @Slot(None)
+    def run_set_selectors(self):
+        """
+        Run set_selector for all pages when global popop opens/closes
+        """
+
+        for page_id in self.screens:
+            if hasattr(self.screens[page_id], "set_selector"):
+                self.screens[page_id].set_selector()
+
+        # Run global set_selector at last to bypass the weird error when ran first.
+        # When set_selector is called first self.__zselector[0] reports wrong value of 0
+        # while trying to set bpm even though set_selector was called and sets the range and value correctly
+        # The error seems to not happen when global set_selector is called last
+        self.set_selector()
+
+        self.is_global_set_selector_running = False
 
     globalPopupOpenedChanged = Signal()
 

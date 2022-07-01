@@ -516,8 +516,8 @@ def audio_autoconnect(force=False):
 	try:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
 			try:
-				engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-				for port in zip(engineInPorts, playback_ports):
+				engineOutPorts = jclient.get_ports(engine.jackname, is_audio=True, is_output=True);
+				for port in zip(engineOutPorts, playback_ports):
 					try:
 						jclient.connect(port[0], port[1])
 					except: pass

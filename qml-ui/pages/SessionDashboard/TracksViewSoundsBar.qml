@@ -128,14 +128,17 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
-                property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
+                property QtObject volumeControlObject: zynthian.fixed_layers.volume_controls[chainedSound] ? zynthian.fixed_layers.volume_controls[chainedSound] : null
                 property real volumePercent: volumeControlObject
                                                 ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
                                                 : 0
 
                 Connections {
                     target: root
-                    onChainedSoundsChanged: soundDelegate.chainedSound = root.chainedSounds[index]
+                    onChainedSoundsChanged: {
+                        soundDelegate.chainedSound = root.chainedSounds[index]
+                        update()
+                    }
                 }
 
                 Layout.fillWidth: true

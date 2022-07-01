@@ -25,7 +25,7 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 
 import QtQuick 2.10
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.2 as QQC2
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
@@ -323,12 +323,14 @@ MouseArea {
     QQC2.Popup {
         id: popup
         visible: zynthian.globalPopupOpened
-        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+
         y: parent.height
-        modal: true
-        width: Kirigami.Units.gridUnit * 20
-        height: Kirigami.Units.gridUnit * 15
         x: parent.width - width
+        width: Kirigami.Units.gridUnit * 20
+        height: Kirigami.Units.gridUnit * 25
+
+        exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+        modal: true
         onClosed: zynthian.globalPopupOpened = false
         contentItem: GridLayout {
             columns: 3
@@ -379,6 +381,47 @@ MouseArea {
                     text: qsTr("Volume")
                     controlObj: zynthian.master_alsa_mixer
                     controlProperty: "volume"
+                    valueString: qsTr("%1%").arg(dial.value)
+
+                    dial {
+                        stepSize: 1
+                        from: 0
+                        to: 100
+                    }
+                }
+            }
+
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                contentItem: ZynthiloopsDial {
+                    text: qsTr("Delay")
+                    controlObj: zynthian
+                    controlProperty: "delayKnobValue"
+                    valueString: qsTr("%1%").arg(dial.value)
+
+                    dial {
+                        stepSize: 1
+                        from: 0
+                        to: 100
+                    }
+                }
+            }
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                contentItem: Item {}
+            }
+            Card {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                contentItem: ZynthiloopsDial {
+                    text: qsTr("Reverb")
+                    controlObj: zynthian
+                    controlProperty: "reverbKnobValue"
                     valueString: qsTr("%1%").arg(dial.value)
 
                     dial {

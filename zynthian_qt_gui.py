@@ -844,6 +844,7 @@ class zynthian_gui(QObject):
                  'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
 
             self.__zselector[2].config(self.__zselector_ctrl[2])
+            self.delayKnobValueChanged.emit()
         except:
             if self.__zselector[2] is not None:
                 self.__zselector[2].hide()
@@ -880,6 +881,7 @@ class zynthian_gui(QObject):
                  'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
 
             self.__zselector[3].config(self.__zselector_ctrl[3])
+            self.reverbKnobValueChanged.emit()
         except:
             if self.__zselector[3] is not None:
                 self.__zselector[3].hide()
@@ -1223,6 +1225,10 @@ class zynthian_gui(QObject):
             (delay_engine, delay_engine.get_lv2_controllers_dict()["LEVEL"]),
             (reverb_engine, reverb_engine.get_lv2_controllers_dict()["dry_wet"])
         ]
+
+        self.delayKnobValueChanged.emit()
+        self.reverbKnobValueChanged.emit()
+
         self.zynautoconnect()
 
     # ---------------------------------------------------------------------------
@@ -4006,6 +4012,45 @@ class zynthian_gui(QObject):
 
     globalPopupOpened = Property(bool, get_globalPopupOpened, set_globalPopupOpened, notify=globalPopupOpenedChanged)
     ### END Property globalPopupOpened
+
+    ### Property delayKnobValue
+    def get_delayKnobValue(self):
+        controller = self.global_fx_engines[0][1]
+        if controller is not None:
+            return np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
+        else:
+            return 0
+
+    def set_delayKnobValue(self, percentage):
+        controller = self.global_fx_engines[0][1]
+        if controller is not None:
+            value = np.interp(percentage, [0, 100], [controller.value_min, controller.value_max])
+            self.run_set_selectors()
+
+    delayKnobValueChanged = Signal()
+
+    delayKnobValue = Property(int, get_delayKnobValue, set_delayKnobValue, notify=delayKnobValueChanged)
+    ### END Property delayKnobValue
+
+    ### Property reverbKnobValue
+    def get_reverbKnobValue(self):
+        controller = self.global_fx_engines[1][1]
+        if controller is not None:
+            return np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
+        else:
+            return 0
+
+    def set_reverbKnobValue(self, percentage):
+        controller = self.global_fx_engines[1][1]
+        if controller is not None:
+            value = np.interp(percentage, [0, 100], [controller.value_min, controller.value_max])
+            self.global_fx_engines[1][1].set_value(value, True)
+            self.run_set_selectors()
+
+    reverbKnobValueChanged = Signal()
+
+    reverbKnobValue = Property(int, get_reverbKnobValue, set_reverbKnobValue, notify=reverbKnobValueChanged)
+    ### END Property reverbKnobValue
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

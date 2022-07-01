@@ -128,6 +128,11 @@ Zynthian.Card {
                 id: soundDelegate
 
                 property int chainedSound: root.chainedSounds[index]
+                property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
+                property real volumePercent: volumeControlObject
+                                                ? (volumeControlObject.value - volumeControlObject.value_min)/(volumeControlObject.value_max - volumeControlObject.value_min)
+                                                : 0
+
                 Connections {
                     target: root
                     onChainedSoundsChanged: soundDelegate.chainedSound = root.chainedSounds[index]
@@ -140,6 +145,8 @@ Zynthian.Card {
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
+                enabled: true
+
                 function update() {
                     soundLabelSynth.updateName();
                     soundLabelPreset.updateName();
@@ -240,6 +247,19 @@ Zynthian.Card {
                         border.color: "#ff999999"
                         border.width: 1
                         radius: 4
+
+                        Rectangle {
+                            width: parent.width * soundDelegate.volumePercent
+                            anchors {
+                                left: parent.left
+                                top: parent.top
+                                bottom: parent.bottom
+                            }
+                            visible: root.selectedTrack.trackAudioType === "synth" &&
+                                     soundLabelSynth.text.trim().length > 0
+
+                            color: Kirigami.Theme.highlightColor
+                        }
 
                         QQC2.Label {
                             id: soundLabelSynth
@@ -445,38 +465,6 @@ Zynthian.Card {
                             anchors.centerIn: parent
                             source: "edit-clear-all"
                             color: Kirigami.Theme.textColor
-                        }
-                    }
-
-                    QQC2.Slider {
-                        property QtObject volumeControlObject: zynthian.layers_for_track.volume_controls[index] ? zynthian.layers_for_track.volume_controls[index] : null
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: false
-                        Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.leftMargin: Kirigami.Units.gridUnit
-                        Layout.rightMargin: Kirigami.Units.gridUnit
-
-                        orientation: Qt.Horizontal
-
-                        Binding {
-                            target: parent
-                            property: "enabled"
-                            delayed: true
-                            value: root.selectedTrack.selectedSlotRow === index &&
-                                   soundDelegate.chainedSound >= 0 &&
-                                   root.selectedTrack &&
-                                   root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound) &&
-                                   parent.volumeControlObject != null &&
-                                   parent.volumeControlObject.controllable
-                        }
-                        value: volumeControlObject ? volumeControlObject.value : 0
-                        stepSize: volumeControlObject ? volumeControlObject.step_size : 1
-                        from: volumeControlObject ? volumeControlObject.value_min : 0
-                        to: volumeControlObject ? volumeControlObject.value_max : 1
-                        onMoved: {
-                            zynthian.layers_for_track.volume_controls[index].value = value;
                         }
                     }
                 }

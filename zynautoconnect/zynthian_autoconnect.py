@@ -35,6 +35,8 @@ from collections import OrderedDict
 from zyncoder import *
 from zynqtgui import zynthian_gui_config
 
+from PySide2.QtCore import QTimer
+
 #-------------------------------------------------------------------------------
 # Configure logging
 #-------------------------------------------------------------------------------
@@ -441,6 +443,9 @@ def midi_autoconnect(force=False):
 	#Release Mutex Lock
 	release_lock()
 
+# This seems a bit silly, but it's easier to do it like this so we can just pass this to any timers that want it
+def force_audio_autoconnect():
+	audio_autoconnect(True)
 
 def audio_autoconnect(force=False):
 
@@ -481,15 +486,19 @@ def audio_autoconnect(force=False):
 	hasGlobalEffects = False
 	if len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-			engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-			# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
-			if len(engineInPorts) == 1:
-				engineInPorts[1] = engineInPorts[0];
-			for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), engineInPorts):
-				try:
-				    jclient.connect(port[0], port[1])
-				    hasGlobalEffects = True
-				except: pass
+			try:
+				engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+				# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
+				if len(engineInPorts) == 1:
+					engineInPorts[1] = engineInPorts[0];
+				for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), engineInPorts):
+					try:
+					    jclient.connect(port[0], port[1])
+					    hasGlobalEffects = True
+					except: pass
+			except Exception as e:
+				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
+				QTimer.singleShot(1000, force_audio_autoconnect)
 	if hasGlobalEffects:
 		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
 		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
@@ -506,8 +515,15 @@ def audio_autoconnect(force=False):
 	# Connect global FX ports to system playback
 	try:
 		for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-			for port in zip(jclient.get_ports(engine.jackname, is_audio=True, is_output=True), playback_ports):
-				jclient.connect(port[0], port[1])
+			try:
+				engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+				for port in zip(engineInPorts, playback_ports):
+					try:
+						jclient.connect(port[0], port[1])
+					except: pass
+			except Exception as e:
+				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
+				QTimer.singleShot(1000, force_audio_autoconnect)
 	except: pass
 
 	# Connect each track's ports to either that track's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the track
@@ -531,28 +547,36 @@ def audio_autoconnect(force=False):
 								# As there are effects, connect the track's outputs to their inputs
 								for sl in effectsLayers:
 									if sl.engine.type == "Audio Effect":
-										engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
-										if len(engineInPorts) == 1:
-											engineInPorts.append(engineInPorts[0]);
-										for port in zip(trackPorts, engineInPorts):
-											trackHasEffects = True
-											try:
-												jclient.connect(port[0], port[1])
-											except: pass
+										try:
+											engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
+											if len(engineInPorts) == 1:
+												engineInPorts.append(engineInPorts[0]);
+											for port in zip(trackPorts, engineInPorts):
+												trackHasEffects = True
+												try:
+													jclient.connect(port[0], port[1])
+												except: pass
+										except Exception as e:
+											logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
+											QTimer.singleShot(1000, force_audio_autoconnect)
 								pass
 				# If there are no effects attached to this track, connect its outputs to the global effects if there are any
 				hasGlobalEffects = False
 				if trackHasEffects == False and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 					for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
-						engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
-						# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
-						if len(engineInPorts) == 1:
-							engineInPorts[1] = engineInPorts[0];
-						for port in zip(trackPorts, engineInPorts):
-							try:
-								jclient.connect(port[0], port[1])
-								hasGlobalEffects = True
-							except: pass
+						try:
+							engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
+							# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
+							if len(engineInPorts) == 1:
+								engineInPorts[1] = engineInPorts[0];
+							for port in zip(trackPorts, engineInPorts):
+								try:
+									jclient.connect(port[0], port[1])
+									hasGlobalEffects = True
+								except: pass
+						except Exception as e:
+							logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
+							QTimer.singleShot(1000, force_audio_autoconnect)
 				# If there are still no effects attached to this track after taking global into account, connect its outputs to system playback
 				if trackHasEffects or hasGlobalEffects:
 					for port in zip(trackPorts, playback_ports):

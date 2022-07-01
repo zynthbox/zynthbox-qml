@@ -137,7 +137,6 @@ class zynthiloops_track(QObject):
         self.selectedPartNamesChanged.emit()
 
     def mix_index_changed_handler(self):
-        logging.error(f"### Mix index changed")
         self.scene_clip_changed.emit()
         self.selectedPartNamesChanged.emit()
 

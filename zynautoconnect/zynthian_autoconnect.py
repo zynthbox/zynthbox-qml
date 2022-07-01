@@ -54,7 +54,7 @@ logger.setLevel(log_level)
 #-------------------------------------------------------------------------------
 
 refresh_time = 2
-jclient = None
+jclient: jack.Client = None
 thread = None
 exit_flag = False
 
@@ -449,7 +449,7 @@ def force_audio_autoconnect():
 
 def audio_autoconnect(force=False):
 
-	if not force:
+	if not force or not zynthian_gui_config.zyngui.isBootingComplete:
 		logger.info("ZynAutoConnect: Audio Escaped ...")
 		return
 
@@ -560,9 +560,9 @@ def audio_autoconnect(force=False):
 											logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
 											QTimer.singleShot(1000, force_audio_autoconnect)
 								pass
-				# If there are no effects attached to this track, connect its outputs to the global effects if there are any
+				# If track wants to route through global FX, connect its outputs to the global effects if there are any
 				hasGlobalEffects = False
-				if trackHasEffects == False and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
+				if track.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 					for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
 						try:
 							engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
@@ -585,10 +585,10 @@ def audio_autoconnect(force=False):
 						except: pass
 				# If there were no global effects or track effects, make sure that the track is connected to system playback
 				else:
-				    for port in zip(trackPorts, playback_ports):
-					    try:
-						    jclient.connect(port[0], port[1])
-					    except: pass
+					for port in zip(trackPorts, playback_ports):
+						try:
+							jclient.connect(port[0], port[1])
+						except: pass
 	###
 
 	#Get layers list from UI
@@ -661,6 +661,60 @@ def audio_autoconnect(force=False):
 					jclient.connect("ZynMidiRouter:ch{}_out".format(layer.midi_chan), midi_ports[0])
 				except:
 					pass
+
+	### Connect synth engines to global effects
+	try:
+		if zynthian_gui_config.zyngui.zynthiloops.song:
+			for midi_channel in zynthian_gui_config.zyngui.layer.layer_midi_map:
+				synth_engine = zynthian_gui_config.zyngui.layer.layer_midi_map[midi_channel]
+				for track_index in range(0, 10):
+					track = zynthian_gui_config.zyngui.zynthiloops.song.tracksModel.getTrack(track_index)
+
+					# Find which track midichannel belongs to
+					if track is not None and midi_channel in track.chainedSounds:
+						# Check if track wants to route through global FX
+						if track.routeThroughGlobalFX:
+							is_synth_engine_connected_to_system = False
+							synth_engine_output_ports = jclient.get_ports(synth_engine.jackname, is_output=True, is_audio=True)
+
+							if len(synth_engine_output_ports) < 2:
+								synth_engine_output_ports[1] = synth_engine_output_ports[0]
+
+							for audio_output_port in synth_engine.get_audio_out():
+								if audio_output_port.startswith("system"):
+									is_synth_engine_connected_to_system = True
+									break
+
+							if is_synth_engine_connected_to_system:
+								# Synth engine is connected to system playback, disconnect from system playback and
+								# connect synth engine output to global effects
+
+								# Disconnect synth engine from playback port
+								for port in zip(synth_engine_output_ports, playback_ports):
+									try:
+										jclient.disconnect(port[0], port[1])
+									except:
+										pass
+
+							for fx_engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
+								fx_engine_input_ports = jclient.get_ports(fx_engine.jackname, is_input=True, is_audio=True)
+
+								# Handle case when fx_engine has less than 2 channels
+								if len(fx_engine_input_ports) < 2:
+									fx_engine_input_ports[1] = fx_engine_input_ports[0]
+
+								# Connect synth engine to global fx ports
+								for port in zip(synth_engine_output_ports, fx_engine_input_ports):
+									try:
+										jclient.connect(port[0], port[1])
+									except:
+										pass
+						else:
+							# Track does not want to route through Global FX. Break out of loop carry on with next midi channel
+							break
+	except:
+		QTimer.singleShot(1000, force_audio_autoconnect)
+	### END Connect synth engines to global effects
 
 	headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)
 

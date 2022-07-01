@@ -72,6 +72,7 @@ class zynthiloops_track(QObject):
         self.__selected_part__ = 0
         self.__externalMidiChannel__ = -1
         self.__sound_json_snapshot__ = ""
+        self.route_through_global_fx = True
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -265,7 +266,8 @@ class zynthiloops_track(QObject):
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
                 "layers_snapshot": self.__layers_snapshot,
-                "keyzone_mode": self.__keyzone_mode__}
+                "keyzone_mode": self.__keyzone_mode__,
+                "routeThroughGlobalFX": self.route_through_global_fx}
 
     def deserialize(self, obj):
         try:
@@ -301,6 +303,10 @@ class zynthiloops_track(QObject):
                 self.keyZoneModeChanged.emit();
             if "selectedPart" in obj:
                 self.set_selected_part(obj["selectedPart"])
+            if "routeThroughGlobalFX" in obj:
+                self.set_routeThroughGlobalFX(obj["routeThroughGlobalFX"], True)
+                # Run autoconnect to update jack connections when routeThrouGlobalFX is set
+                self.zyngui.zynautoconnect()
         except Exception as e:
             logging.error(f"Error during track deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
@@ -1117,6 +1123,21 @@ class zynthiloops_track(QObject):
 
     recordingPopupActive = Property(bool, get_recordingPopupActive, notify=recordingPopupActiveChanged)
     ### END Property recordingPopupActive
+
+    ### Property routeThroughGlobalFX
+    def get_routeThroughGlobalFX(self):
+        return self.route_through_global_fx
+
+    def set_routeThroughGlobalFX(self, val, force_set=False):
+        if self.route_through_global_fx != val or force_set is True:
+            self.route_through_global_fx = val
+            self.routeThroughGlobalFXChanged.emit()
+            self.zyngui.zynautoconnect()
+
+    routeThroughGlobalFXChanged = Signal()
+
+    routeThroughGlobalFX = Property(bool, get_routeThroughGlobalFX, set_routeThroughGlobalFX, notify=routeThroughGlobalFXChanged)
+    ### END Property routeThroughGlobalFX
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):

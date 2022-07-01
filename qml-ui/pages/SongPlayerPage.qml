@@ -34,4 +34,16 @@ Zynthian.ScreenPage {
     id: component
     screenId: "song_player"
     title: qsTr("Song Player")
+
+    ColumnLayout {
+        anchors.fill: parent;
+        Kirigami.Heading {
+            Layout.fillWidth: true
+            text: component.title
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+        }
+    }
 }

@@ -94,414 +94,329 @@ Kirigami.AbstractApplicationWindow {
     onHeightChanged: height = screen.height
     pageStack: screensLayer
     header: RowLayout {
-            spacing: 0
-            Zynthian.BreadcrumbButton {
-                id: menuButton
-                icon.name: "application-menu"
-                icon.color: customTheme.Kirigami.Theme.textColor
-                padding: Kirigami.Units.largeSpacing*1.5
-                rightPadding: Kirigami.Units.largeSpacing*1.5
-                property string oldPage: "zynthiloops"
-                property string oldModalPage: "zynthiloops"
-                onClicked: {
-                    if (zynthian.current_screen_id === 'main') {
-                        if (oldModalPage !== "") {
-                            zynthian.current_modal_screen_id = oldModalPage;
-                        } else if (oldPage !== "") {
-                            zynthian.current_screen_id = oldPage;
-                        }
+        spacing: 0
+        Zynthian.BreadcrumbButton {
+            id: menuButton
+            icon.name: "application-menu"
+            icon.color: customTheme.Kirigami.Theme.textColor
+            padding: Kirigami.Units.largeSpacing*1.5
+            rightPadding: Kirigami.Units.largeSpacing*1.5
+            property string oldPage: "zynthiloops"
+            property string oldModalPage: "zynthiloops"
+            onClicked: {
+                if (zynthian.current_screen_id === 'main') {
+                    if (oldModalPage !== "") {
+                        zynthian.current_modal_screen_id = oldModalPage;
+                    } else if (oldPage !== "") {
+                        zynthian.current_screen_id = oldPage;
+                    }
+                } else {
+                    if (zynthian.current_screen_id === "control") {
+                        oldModalPage = "";
+                        oldPage = "preset"
                     } else {
-                        if (zynthian.current_screen_id === "control") {
-                            oldModalPage = "";
-                            oldPage = "preset"
-                        } else {
-                            oldModalPage = zynthian.current_modal_screen_id;
-                            oldPage = zynthian.current_screen_id;
+                        oldModalPage = zynthian.current_modal_screen_id;
+                        oldPage = zynthian.current_screen_id;
+                    }
+                    zynthian.current_screen_id = 'main';
+                }
+            }
+            highlighted: zynthian.current_screen_id === 'main'
+        }
+        Zynthian.BreadcrumbButton {
+            id: homeButton
+            text: zynthian.zynthiloops.song.name
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            padding: Kirigami.Units.largeSpacing*1.5
+            rightPadding: Kirigami.Units.largeSpacing*1.5
+            onClicked: {
+                zynthian.current_modal_screen_id = 'zynthiloops'
+                // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
+            }
+            //onPressAndHold: zynthian.current_screen_id = 'main'
+            highlighted: zynthian.current_screen_id === 'zynthiloops'
+        }
+       /* Zynthian.BreadcrumbButton {
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("1-6")
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+            onClicked: {
+                zynthian.current_screen_id = 'session_dashboard';
+                zynthian.session_dashboard.visibleTracksStart = 0;
+                zynthian.session_dashboard.visibleTracksEnd = 5;
+            }
+        }
+        Zynthian.BreadcrumbButton {
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("7-12")
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+            onClicked: {
+                zynthian.current_screen_id = 'session_dashboard';
+                zynthian.session_dashboard.visibleTracksStart = 6;
+                zynthian.session_dashboard.visibleTracksEnd = 11;
+            }
+        }*/
+        Zynthian.BreadcrumbButton {
+            id: sceneButton
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("Scene %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+            onClicked: scenesMenu.visible = true
+
+            Timer {
+                id: switchTimer
+
+                property int index
+
+                interval: 100
+                repeat: false
+                onTriggered: {
+                    Zynthian.CommonUtils.switchToScene(index)
+                }
+            }
+
+            QQC2.Menu {
+                id: scenesMenu
+                y: parent.height
+                modal: true
+                dim: false
+                Repeater {
+                    model: 10
+                    delegate: QQC2.MenuItem {
+                        text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
+                        width: parent.width
+                        onClicked: {
+                            scenesMenu.close();
+                            switchTimer.index = index;
+                            switchTimer.restart();
                         }
-                        zynthian.current_screen_id = 'main';
-                    }
-                }
-                highlighted: zynthian.current_screen_id === 'main'
-            }
-            Zynthian.BreadcrumbButton {
-                id: homeButton
-                text: zynthian.zynthiloops.song.name
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                padding: Kirigami.Units.largeSpacing*1.5
-                rightPadding: Kirigami.Units.largeSpacing*1.5
-                onClicked: {
-                    zynthian.current_modal_screen_id = 'zynthiloops'
-                    // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).name)
-                }
-                //onPressAndHold: zynthian.current_screen_id = 'main'
-                highlighted: zynthian.current_screen_id === 'zynthiloops'
-            }
-           /* Zynthian.BreadcrumbButton {
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("1-6")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: {
-                    zynthian.current_screen_id = 'session_dashboard';
-                    zynthian.session_dashboard.visibleTracksStart = 0;
-                    zynthian.session_dashboard.visibleTracksEnd = 5;
-                }
-            }
-            Zynthian.BreadcrumbButton {
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("7-12")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: {
-                    zynthian.current_screen_id = 'session_dashboard';
-                    zynthian.session_dashboard.visibleTracksStart = 6;
-                    zynthian.session_dashboard.visibleTracksEnd = 11;
-                }
-            }*/
-            Zynthian.BreadcrumbButton {
-                id: sceneButton
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Scene %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.selectedSceneName)
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: scenesMenu.visible = true
-
-                Timer {
-                    id: switchTimer
-
-                    property int index
-
-                    interval: 100
-                    repeat: false
-                    onTriggered: {
-                        Zynthian.CommonUtils.switchToScene(index)
-                    }
-                }
-
-                QQC2.Menu {
-                    id: scenesMenu
-                    y: parent.height
-                    modal: true
-                    dim: false
-                    Repeater {
-                        model: 10
-                        delegate: QQC2.MenuItem {
-                            text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
-                            width: parent.width
-                            onClicked: {
-                                scenesMenu.close();
-                                switchTimer.index = index;
-                                switchTimer.restart();
-                            }
-                            highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
+                        highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
-                        }
                     }
                 }
             }
-            Zynthian.BreadcrumbButton {
-                id: trackButton
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Track %1 ˬ")
-                        .arg(zynthian.session_dashboard.selectedTrack+1)
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: tracksMenu.visible = true
-                QQC2.Menu {
-                    id: tracksMenu
-                    y: parent.height
-                    modal: true
-                    dim: false
-                    Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
-                    Repeater {
-                        model: zynthian.zynthiloops.song.tracksModel
-                        delegate: QQC2.MenuItem {
-                            text: qsTr("Track %1").arg(index + 1)
-                            width: parent.width
-                            //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
-                            //height: visible ? implicitHeight : 0
-                            onClicked: {
-                                zynthian.session_dashboard.selectedTrack = index;
-                            }
-                            highlighted: zynthian.session_dashboard.selectedTrack === index
+        }
+        Zynthian.BreadcrumbButton {
+            id: trackButton
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("Track %1 ˬ")
+                    .arg(zynthian.session_dashboard.selectedTrack+1)
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+            onClicked: tracksMenu.visible = true
+            QQC2.Menu {
+                id: tracksMenu
+                y: parent.height
+                modal: true
+                dim: false
+                Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
+                Repeater {
+                    model: zynthian.zynthiloops.song.tracksModel
+                    delegate: QQC2.MenuItem {
+                        text: qsTr("Track %1").arg(index + 1)
+                        width: parent.width
+                        //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
+                        //height: visible ? implicitHeight : 0
+                        onClicked: {
+                            zynthian.session_dashboard.selectedTrack = index;
+                        }
+                        highlighted: zynthian.session_dashboard.selectedTrack === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
-                        }
                     }
                 }
             }
-            Zynthian.BreadcrumbButton {
-                id: samplesButton
+        }
+        Zynthian.BreadcrumbButton {
+            id: samplesButton
 
-                property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+            property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("Sample %1 ˬ %2")
-                        .arg(root.selectedTrack.selectedSlotRow + 1)
-                        .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 11
-                rightPadding: Kirigami.Units.largeSpacing*2
-                onClicked: samplesMenu.visible = true
-                visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("Sample %1 ˬ %2")
+                    .arg(root.selectedTrack.selectedSlotRow + 1)
+                    .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 11
+            rightPadding: Kirigami.Units.largeSpacing*2
+            onClicked: samplesMenu.visible = true
+            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
 
-                QQC2.Menu {
-                    id: samplesMenu
-                    y: parent.height
-                    modal: true
-                    dim: false
-                    Repeater {
-                        model: 5
-                        delegate: QQC2.MenuItem {
-                            text: qsTr("Sample %1").arg(index + 1)
-                            width: parent.width
-                            onClicked: {
-                                root.selectedTrack.selectedSlotRow = index
-                            }
-                            highlighted: root.selectedTrack.selectedSlotRow === index
+            QQC2.Menu {
+                id: samplesMenu
+                y: parent.height
+                modal: true
+                dim: false
+                Repeater {
+                    model: 5
+                    delegate: QQC2.MenuItem {
+                        text: qsTr("Sample %1").arg(index + 1)
+                        width: parent.width
+                        onClicked: {
+                            root.selectedTrack.selectedSlotRow = index
                         }
+                        highlighted: root.selectedTrack.selectedSlotRow === index
                     }
                 }
             }
-            Zynthian.BreadcrumbButton {
-                id: sampleLoopButton
+        }
+        Zynthian.BreadcrumbButton {
+            id: sampleLoopButton
 
-                property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+            property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
 
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 14
-                rightPadding: Kirigami.Units.largeSpacing*2
-                visible: root.selectedTrack.trackAudioType === "sample-loop" &&
-                         clip && clip.path && clip.path.length >= 0
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 10
+            rightPadding: Kirigami.Units.largeSpacing*2
+            visible: root.selectedTrack.trackAudioType === "sample-loop" &&
+                     clip && clip.path && clip.path.length >= 0
+        }
+        Zynthian.BreadcrumbButton {
+            id: synthButton
+            icon.color: customTheme.Kirigami.Theme.textColor
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+            visible: root.selectedTrack.trackAudioType === "synth"
+
+            // Open preset screen on clicking this synth button
+            onClicked: zynthian.current_screen_id = "preset"
+
+            text: {
+                synthButton.updateSoundName();
             }
-            Zynthian.BreadcrumbButton {
-                id: synthButton
-                icon.color: customTheme.Kirigami.Theme.textColor
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-                visible: root.selectedTrack.trackAudioType === "synth"
 
-                // Open preset screen on clicking this synth button
-                onClicked: zynthian.current_screen_id = "preset"
-
-                text: {
+            Connections {
+                target: zynthian.fixed_layers
+                onList_updated: {
                     synthButton.updateSoundName();
                 }
+            }
 
-                Connections {
-                    target: zynthian.fixed_layers
-                    onList_updated: {
-                        synthButton.updateSoundName();
-                    }
-                }
+            function updateSoundName() {
+                var text = "";
 
-                function updateSoundName() {
-                    var text = "";
-
-                    if (root.selectedTrack) {
-                        for (var id in root.selectedTrack.chainedSounds) {
-                            if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                                root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                                text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
-                                break;
-                            }
+                if (root.selectedTrack) {
+                    for (var id in root.selectedTrack.chainedSounds) {
+                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
+                            break;
                         }
                     }
-
-                    synthButton.text = text == "" ? qsTr("Sounds") : text;
                 }
 
-                SessionDashboard.SoundsDialog {
-                    id: soundsDialog
-                    width: Screen.width
-                    height: Screen.height - synthButton.height - Kirigami.Units.gridUnit
-                    onVisibleChanged: {
-                        x = synthButton.mapFromGlobal(0, 0).x
-                        y = synthButton.height + Kirigami.Units.smallSpacing
-                    }
+                synthButton.text = text == "" ? qsTr("Sounds") : text;
+            }
+
+            SessionDashboard.SoundsDialog {
+                id: soundsDialog
+                width: Screen.width
+                height: Screen.height - synthButton.height - Kirigami.Units.gridUnit
+                onVisibleChanged: {
+                    x = synthButton.mapFromGlobal(0, 0).x
+                    y = synthButton.height + Kirigami.Units.smallSpacing
                 }
             }
-            Zynthian.BreadcrumbButton {
-                id: presetButton
-                icon.color: customTheme.Kirigami.Theme.textColor
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
+        }
+        Zynthian.BreadcrumbButton {
+            id: presetButton
+            icon.color: customTheme.Kirigami.Theme.textColor
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
 
-                // Open synth edit page whjen preset button is clicked
-                onClicked: {
-                    if (root.selectedTrack) {
-                        zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound)
-                        zynthian.control.single_effect_engine = null;
-                        zynthian.current_screen_id = "control";
-                        zynthian.forced_screen_back = "zynthiloops"
-                    }
+            // Open synth edit page whjen preset button is clicked
+            onClicked: {
+                if (root.selectedTrack) {
+                    zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound)
+                    zynthian.control.single_effect_engine = null;
+                    zynthian.current_screen_id = "control";
+                    zynthian.forced_screen_back = "zynthiloops"
                 }
+            }
 
-                visible: root.selectedTrack.trackAudioType === "synth"
+            visible: root.selectedTrack.trackAudioType === "synth"
 
-                text: {
+            text: {
+                presetButton.updateSoundName();
+            }
+
+            Connections {
+                target: zynthian.fixed_layers
+                onList_updated: {
                     presetButton.updateSoundName();
                 }
-
-                Connections {
-                    target: zynthian.fixed_layers
-                    onList_updated: {
-                        presetButton.updateSoundName();
-                    }
-                }
-
-                function updateSoundName() {
-                    var text = "";
-
-                    if (root.selectedTrack) {
-                        for (var id in root.selectedTrack.chainedSounds) {
-                            if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                                root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                                text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
-                                text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
-                                break;
-                            }
-                        }
-                    }
-
-                    presetButton.text = text == "" ? qsTr("Presets") : text;
-                }
             }
-            Zynthian.BreadcrumbButton {
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: {
-                    switch (effectScreen) {
-                    case "layer_midi_effects":
-                    case "midi_effect_types":
-                    case "layer_midi_effect_chooser":
-                        return "MIDI FX";
-                    default:
-                        "Audio FX";
-                    }
-                }
-                visible: {
-                    switch (zynthian.current_screen_id) {
-                    case "layer_effects":
-                    case "effect_types":
-                    case "layer_effect_chooser":
-                    case "layer_midi_effects":
-                    case "midi_effect_types":
-                    case "layer_midi_effect_chooser":
-                        return true;
-                    default:
-                        return screensLayer.depth > 2
-                    }
-                }
-                property string effectScreen: ""
-                readonly property string screenId: zynthian.current_screen_id
-                onScreenIdChanged: {
-                    switch (zynthian.current_screen_id) {
-                    case "layer_effects":
-                    case "effect_types":
-                    case "layer_effect_chooser":
-                    case "layer_midi_effects":
-                    case "midi_effect_types":
-                    case "layer_midi_effect_chooser":
-                        effectScreen = zynthian.current_screen_id;
-                    default:
-                        break;
-                    }
-                }
-                onClicked: zynthian.current_screen_id = effectScreen
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-            }
-            Zynthian.BreadcrumbButton {
-                icon.color: customTheme.Kirigami.Theme.textColor
-                text: "EDIT"
-                visible: zynthian.current_screen_id === "control"
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 8
-                rightPadding: Kirigami.Units.largeSpacing*2
-            }
-            /*Zynthian.BreadcrumbButton {
-                id: layersButton
-                text: {
-                    if (zynthian.engine.midi_channel !== null && zynthian.current_screen_id === 'engine') {
-                        if (zynthian.engine.midi_channel > 10) {
-                            return "7." + (zynthian.engine.midi_channel - 10) + "ˬ";
-                        } else if (zynthian.engine.midi_channel > 5) {
-                            return  "6." + (zynthian.engine.midi_channel - 5) + "ˬ";
-                        } else {
-                            return zynthian.engine.midi_channel + 1 + "ˬ";
-                        }
-                    } else if (zynthian.main_layers_view.selector_path_element > 5 && zynthian.main_layers_view.selector_path_element <= 10) {
-                        return "6." + (zynthian.main_layers_view.selector_path_element - 5) + "ˬ";
-                    } else {
-                        return (zynthian.active_midi_channel + 1) + "ˬ";
-                    }
-                }
-                onTextChanged: zynthian.fixed_layers.start_midi_chan = 0;
-                onClicked: layersMenu.visible = true
-                highlighted: zynthian.current_screen_id === 'layer' || zynthian.current_screen_id === 'fixed_layers' || zynthian.current_screen_id === 'main_layers_view'
-                QQC2.Menu {
-                    id: layersMenu
-                    y: parent.height
-                    modal: true
-                    dim: false
-                    Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
-                    Repeater {
-                        model: zynthian.fixed_layers.selector_list
-                        delegate: QQC2.MenuItem {
-                            height: visible ? implicitHeight : 0
-                            visible: zynthian.main_layers_view.active_midi_channel < 10
-                                    ? index < 10
-                                    : index >= 10
-                            //enabled: index < 5 || model.display.indexOf("- -") === -1
-                            text: ""
-                            //index === 6 ? qsTr("6 - T-RACK:") + model.display : (index > 6 ? "                  " +model.display : model.display )
-                            width: parent.width
-                            onClicked: {
-                                zynthian.fixed_layers.activate_index(index);
-                                zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack).connectedSound = index;
-                            }
-                            highlighted: zynthian.main_layers_view.active_midi_channel === model.metadata.midi_channel
-                            implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
-                            contentItem: RowLayout {
-                                id: menuItemLayout
-                                QQC2.Label {
-                                    Layout.alignment: Qt.AlignLeft
-                                    Layout.maximumWidth: implicitWidth
-                                    text: qsTr("6 - T-RACK:")
-                                    visible: model.metadata.midi_channel >= 5 && model.metadata.midi_channel < 10
-                                    opacity: index === 5
-                                }
-                                QQC2.Label {
-                                    Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignLeft
-                                    text: {
-                                        let numPrefix = model.metadata.midi_channel + 1;
-                                        if (numPrefix > 5 && numPrefix <= 10) {
-                                            numPrefix = "6." + (numPrefix - 5);
-                                        }
-                                        return numPrefix + " - " + model.display
-                                    }
-                                }
-                                QQC2.Label {
-                                    text: {
-                                        let text = "";
-                                        if (model.metadata.note_high < 60) {
-                                            text = "L";
-                                        } else if (model.metadata.note_low >= 60) {
-                                            text = "H";
-                                        }
-                                        if (model.metadata.octave_transpose !== 0) {
-                                            if (model.metadata.octave_transpose > 0) {
-                                                text += "+"
-                                            }
-                                            text += model.metadata.octave_transpose;
-                                        }
-                                        return text;
-                                    }
-                                }
-                            }
+
+            function updateSoundName() {
+                var text = "";
+
+                if (root.selectedTrack) {
+                    for (var id in root.selectedTrack.chainedSounds) {
+                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
+                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
+                            text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
+                            break;
                         }
                     }
                 }
-            }*/
+
+                presetButton.text = text == "" ? qsTr("Presets") : text;
+            }
+        }
+        Zynthian.BreadcrumbButton {
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: {
+                switch (effectScreen) {
+                case "layer_midi_effects":
+                case "midi_effect_types":
+                case "layer_midi_effect_chooser":
+                    return "MIDI FX";
+                default:
+                    "Audio FX";
+                }
+            }
+            visible: {
+                switch (zynthian.current_screen_id) {
+                case "layer_effects":
+                case "effect_types":
+                case "layer_effect_chooser":
+                case "layer_midi_effects":
+                case "midi_effect_types":
+                case "layer_midi_effect_chooser":
+                    return true;
+                default:
+                    return screensLayer.depth > 2
+                }
+            }
+            property string effectScreen: ""
+            readonly property string screenId: zynthian.current_screen_id
+            onScreenIdChanged: {
+                switch (zynthian.current_screen_id) {
+                case "layer_effects":
+                case "effect_types":
+                case "layer_effect_chooser":
+                case "layer_midi_effects":
+                case "midi_effect_types":
+                case "layer_midi_effect_chooser":
+                    effectScreen = zynthian.current_screen_id;
+                default:
+                    break;
+                }
+            }
+            onClicked: zynthian.current_screen_id = effectScreen
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+        }
+        Zynthian.BreadcrumbButton {
+            icon.color: customTheme.Kirigami.Theme.textColor
+            text: "EDIT"
+            visible: zynthian.current_screen_id === "control"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            rightPadding: Kirigami.Units.largeSpacing*2
+        }
         Item {
             Layout.fillWidth: true
         }

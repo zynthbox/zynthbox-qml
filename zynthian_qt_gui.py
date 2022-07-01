@@ -763,9 +763,7 @@ class zynthian_gui(QObject):
                                                                {'midi_cc': 0, 'value': value,
                                                                 'step': 1})
 
-                self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                              self.__zselector_ctrl[0],
-                                                              self)
+                self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
                 self.__zselector[0].show()
 
             self.__zselector_ctrl[0].set_options(
@@ -800,10 +798,7 @@ class zynthian_gui(QObject):
                                                                {'midi_cc': 0, 'value': value,
                                                                 'step': 1})
 
-                self.__zselector[1] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                              self.__zselector_ctrl[1],
-                                                              self)
-                self.__zselector[1].index = 0
+                self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
                 self.__zselector[1].show()
 
             self.__zselector_ctrl[1].set_options(
@@ -839,10 +834,7 @@ class zynthian_gui(QObject):
                                                                {'midi_cc': 0, 'value': value,
                                                                 'step': 1})
 
-                self.__zselector[2] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                              self.__zselector_ctrl[2],
-                                                              self)
-                self.__zselector[2].index = 1
+                self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
                 self.__zselector[2].show()
 
             self.__zselector_ctrl[2].set_options(
@@ -878,10 +870,7 @@ class zynthian_gui(QObject):
                                                                {'midi_cc': 0, 'value': value,
                                                                 'step': 1})
 
-                self.__zselector[3] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
-                                                              self.__zselector_ctrl[3],
-                                                              self)
-                self.__zselector[3].index = 2
+                self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
                 self.__zselector[3].show()
 
             self.__zselector_ctrl[3].set_options(
@@ -3995,15 +3984,12 @@ class zynthian_gui(QObject):
         Run set_selector for all pages when global popop opens/closes
         """
 
-        for page_id in self.screens:
-            if hasattr(self.screens[page_id], "set_selector"):
-                self.screens[page_id].set_selector()
-
-        # Run global set_selector at last to bypass the weird error when ran first.
-        # When set_selector is called first self.__zselector[0] reports wrong value of 0
-        # while trying to set bpm even though set_selector was called and sets the range and value correctly
-        # The error seems to not happen when global set_selector is called last
         self.set_selector()
+
+        # Since set_selector of a page is called when show() method is called so run set selector of current page
+        # along with global set_selector to update knob settings as it is already being shown
+        if hasattr(self.get_current_screen(), "set_selector"):
+            self.get_current_screen().set_selector()
 
         self.is_global_set_selector_running = False
 

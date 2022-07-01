@@ -319,21 +319,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
 
-    @Slot(None)
-    def zyncoder_update_fx(self):
-        value_updated = False
-
-        for _, controller in self.zyngui.global_fx_engines:
-            volume_val = np.interp(self.__zselector[3].value // 100, [0, 100], [controller.value_min, controller.value_max])
-            if controller is not None and \
-                    controller.value != volume_val:
-                controller.set_value(volume_val, True)
-                self.__global_fx_knob_value__ = self.__zselector[3].value // 100
-                value_updated = True
-
-        if value_updated:
-            self.set_selector()
-
     def zyncoder_read(self):
         if self.__knob_touch_update_in_progress__:
             return
@@ -370,8 +355,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
-            elif self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_fx", Qt.QueuedConnection)
 
         return [0, 1, 2, 3]
 
@@ -632,12 +615,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 value = selected_clip.length * 100
                 max_value = 64 * 100
                 min_value = 0
-            elif self.zyngui.get_current_screen_id() is not None and \
-                    self.zyngui.get_current_screen() == self and \
-                    (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive):
-                value = self.__global_fx_knob_value__ * 100
-                max_value = 100 * 100
-                min_value = 0 * 100
         except Exception as e:
             logging.error(f"Error configuring knob 3 : {str(e)}")
 
@@ -656,12 +633,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
-            logging.debug(
-                f"### set_selector : Configuring small knob 3, showing")
-            self.__zselector[3].show()
-        elif self.zyngui.get_current_screen_id() is not None and \
-                self.zyngui.get_current_screen() == self and \
-                (self.zyngui.slotsBarMixerActive or self.zyngui.slotsBarTrackActive):
             logging.debug(
                 f"### set_selector : Configuring small knob 3, showing")
             self.__zselector[3].show()

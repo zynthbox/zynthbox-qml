@@ -3524,6 +3524,7 @@ class zynthian_gui(QObject):
             logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
             self.__booting_complete__ = True
+            self.zynautoconnect()
             self.isBootingCompleteChanged.emit()
 
         worker_thread = threading.Thread(target=task, args=(self,))

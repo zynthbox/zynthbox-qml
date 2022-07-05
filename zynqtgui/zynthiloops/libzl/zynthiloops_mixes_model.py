@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, Qt, Property, Signal
+from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthiloops.libzl.zynthiloops_mix import zynthiloops_mix
 
@@ -37,14 +37,14 @@ class zynthiloops_mixes_model(QAbstractListModel):
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = self.zyngui.zynthiloops.song
         self.__selected_mix_index = 0
-        self.__mixes = []
+        self.__mixes: dict[int, zynthiloops_mix] = {}
 
     def serialize(self):
         logging.debug("### Serializing Mixes Model")
 
         return {
             "selectedMixIndex": self.__selected_mix_index,
-            "mixes": [mix.serialize() for mix in self.__mixes],
+            "mixes": [self.__mixes[mix_index].serialize() for mix_index in self.__mixes],
         }
 
     def deserialize(self, obj):
@@ -60,7 +60,7 @@ class zynthiloops_mixes_model(QAbstractListModel):
                 mix = zynthiloops_mix(-1, self)
                 mix.deserialize(mix_obj)
 
-                self.__mixes[mix.mixId] = mix
+                self.add_mix(mix.mixId, mix)
 
             self.endResetModel()
 
@@ -87,8 +87,8 @@ class zynthiloops_mixes_model(QAbstractListModel):
     def rowCount(self, index):
         return self.get_count()
 
-    def add_mix(self, mix: zynthiloops_mix):
-        self.__mixes.append(mix)
+    def add_mix(self, mix_index, mix: zynthiloops_mix):
+        self.__mixes[mix_index] = mix
 
     ### Property count
     def get_count(self):
@@ -112,3 +112,10 @@ class zynthiloops_mixes_model(QAbstractListModel):
 
     selectedMixIndex = Property(int, get_selectedMixIndex, set_selectedMixIndex, notify=selectedMixIndexChanged)
     ### END Property selectedMixIndex
+
+    @Slot(int, result=QObject)
+    def getMix(self, mix_index):
+        try:
+            return self.__mixes[mix_index]
+        except:
+            return None

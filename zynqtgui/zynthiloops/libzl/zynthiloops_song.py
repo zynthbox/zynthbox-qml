@@ -127,9 +127,9 @@ class zynthiloops_song(QObject):
 
                 for segment_index in range(10):
                     segment = zynthiloops_segment(mix_index, segment_index, self)
-                    mix.segmentsModel.add_segment(segment)
+                    mix.segmentsModel.add_segment(segment_index, segment)
 
-                self.__mixes_model__.add_mix(mix)
+                self.__mixes_model__.add_mix(mix_index, mix)
 
         self.bpm_changed.emit()
         # Emit bpm changed to get bpm of selectedMix
@@ -505,6 +505,15 @@ class zynthiloops_song(QObject):
     def scenesModel(self):
         return self.__scenes_model__
     scenesModel = Property(QObject, scenesModel, notify=__scenes_model_changed__)
+
+    ### Property mixesModel
+    def get_mixesModel(self):
+        return self.__mixes_model__
+
+    mixesModelChanged = Signal()
+
+    mixesModel = Property(QObject, get_mixesModel, notify=mixesModelChanged)
+    ### END Property mixesModel
 
     def isPlaying(self):
         return self.__is_playing__

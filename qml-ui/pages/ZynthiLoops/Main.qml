@@ -43,6 +43,7 @@ Zynthian.ScreenPage {
     property QtObject selectedTrack: applicationWindow().selectedTrack
     property bool displaySceneButtons: false
     property bool displaySketchButtons: false
+    property bool songMode: false
 
     // Used to temporarily cache clip/track object to be copied
     property var copySourceObj: null
@@ -808,11 +809,14 @@ Zynthian.ScreenPage {
 
                     Repeater {
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                        model: zynthian.isBootingComplete ? 10 : 0
+                        model: zynthian.isBootingComplete
+                                ? 10
+                                : 0
                         delegate: TableHeader {
                             id: sceneHeaderDelegate
 
                             property QtObject track: root.song.tracksModel.getTrack(index)
+                            property QtObject mix: root.song.mixesModel.getMix(index)
 
                             color: Kirigami.Theme.backgroundColor
 
@@ -821,17 +825,23 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: root.displaySketchButtons
-                                            ? root.song.scenesModel.selectedSketchIndex === index
-                                            : zynthian.session_dashboard.selectedTrack === index
+                            highlighted: root.songMode
+                                            ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
+                                            : root.displaySketchButtons
+                                                ? root.song.scenesModel.selectedSketchIndex === index
+                                                : zynthian.session_dashboard.selectedTrack === index
 
-                            text: root.displaySketchButtons
-                                    ? qsTr("S%1").arg(index+1)
-                                    : ""
+                            text: root.songMode
+                                    ? sceneHeaderDelegate.mix.name
+                                    : root.displaySketchButtons
+                                        ? qsTr("S%1").arg(index+1)
+                                        : ""
                             textSize: 10
 
                             onPressed: {
-                                if (root.displaySketchButtons) {
+                                if (root.songMode) {
+                                    root.song.mixesModel.selectedMixIndex = index
+                                } else if (root.displaySketchButtons) {
                                     root.lastSelectedObj = {
                                         className: "zynthiloops_sketch",
                                         sketchIndex: index
@@ -855,7 +865,8 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displaySketchButtons &&
+                                visible: !root.songMode &&
+                                         !root.displaySketchButtons &&
                                          sceneHeaderDelegate.track.trackAudioType === "synth"
 
                                 Repeater {
@@ -881,7 +892,8 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displaySketchButtons &&
+                                visible: !root.songMode &&
+                                         !root.displaySketchButtons &&
                                          ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
 
                                 Repeater {
@@ -905,7 +917,8 @@ Zynthian.ScreenPage {
 
                             QQC2.Label {
                                 anchors.centerIn: parent
-                                visible: !root.displaySketchButtons &&
+                                visible: !root.songMode &&
+                                         !root.displaySketchButtons &&
                                          sceneHeaderDelegate.track.trackAudioType === "external"
                                 text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
                             }
@@ -913,7 +926,8 @@ Zynthian.ScreenPage {
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: !root.displaySketchButtons &&
+                                visible: !root.songMode &&
+                                         !root.displaySketchButtons &&
                                          zynthian.session_dashboard.selectedTrack === index
                             }
 
@@ -935,16 +949,18 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
 
-//                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSketchIndex).name)
+                        text: qsTr("Song Mode")
 
                         textSize: 11
                         subTextSize: 9
                         subSubTextSize: 0
 
                         highlightOnFocus: false
-                        highlighted: false
+                        highlighted: root.songMode
+                        opacity: root.songMode ? 1 : 0.3
 
                         onPressed: {
+                            root.songMode = !root.songMode
                         }
                     }
 

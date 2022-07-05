@@ -101,13 +101,13 @@ class zynthiloops_track(QObject):
         if 0 <= self.__id__ <= 9:
             self.__connected_pattern__ = self.__id__
 
-        self.__song__.scenesModel.selected_mix_index_changed.connect(self.mix_index_changed_handler)
+        self.__song__.scenesModel.selected_sketch_index_changed.connect(self.sketch_index_changed_handler)
         self.__song__.scenesModel.selected_scene_index_changed.connect(lambda: self.selectedPartNamesChanged.emit())
 
         # Emit occupiedSlotsChanged on dependant property changes
         self.chained_sounds_changed.connect(self.chained_sounds_changed_handler)
         try:
-            self.zyngui.zynthiloops.song.scenesModel.selectedMixIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
+            self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
         self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
@@ -137,7 +137,7 @@ class zynthiloops_track(QObject):
 
         self.selectedPartNamesChanged.emit()
 
-    def mix_index_changed_handler(self):
+    def sketch_index_changed_handler(self):
         self.scene_clip_changed.emit()
         self.selectedPartNamesChanged.emit()
 
@@ -927,7 +927,7 @@ class zynthiloops_track(QObject):
 
     ### Property sceneClip
     def get_scene_clip(self):
-        return self.__song__.getClip(self.id, self.__song__.scenesModel.selectedMixIndex)
+        return self.__song__.getClip(self.id, self.__song__.scenesModel.selectedSketchIndex)
 
     scene_clip_changed = Signal()
 
@@ -1066,11 +1066,11 @@ class zynthiloops_track(QObject):
             old_selected_part = self.__selected_part__
             self.__selected_part__ = selected_part
 
-            old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedMixIndex, old_selected_part)
+            old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchIndex, old_selected_part)
             if old_clip is not None:
                 old_clip.stop()
 
-            clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedMixIndex, selected_part)
+            clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedSketchIndex, selected_part)
             if clip is not None and clip.inCurrentScene:
                 clip.play()
 
@@ -1101,7 +1101,7 @@ class zynthiloops_track(QObject):
     def get_selectedPartNames(self):
         partNames = []
         for i in range(5):
-            clip = self.getClipsModelByPart(i).getClip(self.zyngui.zynthiloops.song.scenesModel.selectedMixIndex)
+            clip = self.getClipsModelByPart(i).getClip(self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex)
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())

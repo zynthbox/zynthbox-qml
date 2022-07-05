@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: applicationWindow().selectedTrack
     property bool displaySceneButtons: false
-    property bool displayMixButtons: false
+    property bool displaySketchButtons: false
 
     // Used to temporarily cache clip/track object to be copied
     property var copySourceObj: null
@@ -254,12 +254,12 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
                     }
                 } else if (root.selectedTrack && root.selectedTrack.trackAudioType === "sample-loop") {
-                    var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                    var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                     // when loop and slot is active, goto wave editor or show popup when empty
                     if (clip && clip.path && clip.path.length > 0) {
                         bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                        bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
+                        bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.waveEditorAction.trigger();
                     } else {
@@ -571,7 +571,7 @@ Zynthian.ScreenPage {
                 RowLayout {
                     id: infoBar
 
-                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     property int topLayerIndex: 0
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
@@ -794,15 +794,15 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
 
                         highlightOnFocus: false
-                        highlighted: root.displayMixButtons
+                        highlighted: root.displaySketchButtons
                         text: root.song.name
-                        subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedMixIndex + 1)
+                        subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
 
                         textSize: 10
                         subTextSize: 8
 
                         onPressed: {
-                            root.displayMixButtons = !root.displayMixButtons
+                            root.displaySketchButtons = !root.displaySketchButtons
                         }
                     }
 
@@ -821,22 +821,22 @@ Zynthian.ScreenPage {
                             Layout.preferredWidth: privateProps.headerWidth
 
                             highlightOnFocus: false
-                            highlighted: root.displayMixButtons
-                                            ? root.song.scenesModel.selectedMixIndex === index
+                            highlighted: root.displaySketchButtons
+                                            ? root.song.scenesModel.selectedSketchIndex === index
                                             : zynthian.session_dashboard.selectedTrack === index
 
-                            text: root.displayMixButtons
+                            text: root.displaySketchButtons
                                     ? qsTr("S%1").arg(index+1)
                                     : ""
                             textSize: 10
 
                             onPressed: {
-                                if (root.displayMixButtons) {
+                                if (root.displaySketchButtons) {
                                     root.lastSelectedObj = {
-                                        className: "zynthiloops_mix",
-                                        mixIndex: index
+                                        className: "zynthiloops_sketch",
+                                        sketchIndex: index
                                     }
-                                    root.song.scenesModel.selectedMixIndex = index
+                                    root.song.scenesModel.selectedSketchIndex = index
                                 } else {
                                     // Always open Sound combinator when clicking any indicator cell
                                     zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
@@ -855,7 +855,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displayMixButtons &&
+                                visible: !root.displaySketchButtons &&
                                          sceneHeaderDelegate.track.trackAudioType === "synth"
 
                                 Repeater {
@@ -881,7 +881,7 @@ Zynthian.ScreenPage {
                                     centerIn: parent
                                     margins: Kirigami.Units.gridUnit
                                 }
-                                visible: !root.displayMixButtons &&
+                                visible: !root.displaySketchButtons &&
                                          ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
 
                                 Repeater {
@@ -905,7 +905,7 @@ Zynthian.ScreenPage {
 
                             QQC2.Label {
                                 anchors.centerIn: parent
-                                visible: !root.displayMixButtons &&
+                                visible: !root.displaySketchButtons &&
                                          sceneHeaderDelegate.track.trackAudioType === "external"
                                 text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
                             }
@@ -913,7 +913,7 @@ Zynthian.ScreenPage {
                             Rectangle {
                                 anchors.fill: parent
                                 color: "#2affffff"
-                                visible: !root.displayMixButtons &&
+                                visible: !root.displaySketchButtons &&
                                          zynthian.session_dashboard.selectedTrack === index
                             }
 
@@ -935,7 +935,7 @@ Zynthian.ScreenPage {
                         Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
                         Layout.fillHeight: true
 
-//                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedMixIndex).name)
+//                        text: qsTr("Scene %1").arg(root.song.scenesModel.getScene(root.song.scenesModel.selectedSketchIndex).name)
 
                         textSize: 11
                         subTextSize: 9
@@ -1203,7 +1203,7 @@ Zynthian.ScreenPage {
                                         }
                                         Connections {
                                             target: root.song.scenesModel
-                                            onSelectedMixIndexChanged: colorTimer.restart()
+                                            onSelectedSketchIndexChanged: colorTimer.restart()
                                         }
 
                                         Timer {
@@ -1242,7 +1242,7 @@ Zynthian.ScreenPage {
                                         }
 
                                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                        sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+                                        sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
                                         pattern: track.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(track.id, track.selectedPart) : null
 
                                         onPressed: {
@@ -1263,7 +1263,7 @@ Zynthian.ScreenPage {
                                             }
 //                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedTrack = track.id;
-                                            zynthian.zynthiloops.song.scenesModel.selectedMixIndex = track.sceneClip.col
+                                            zynthian.zynthiloops.song.scenesModel.selectedSketchIndex = track.sceneClip.col
 
                                             Qt.callLater(function() {
                                                 if (track.connectedPattern >= 0) {
@@ -1325,7 +1325,7 @@ Zynthian.ScreenPage {
                                                                 ? qsTr("Clip")
                                                                 : root.lastSelectedObj.className === "zynthiloops_track"
                                                                     ? qsTr("Track")
-                                                                    : root.lastSelectedObj.className === "zynthiloops_mix"
+                                                                    : root.lastSelectedObj.className === "zynthiloops_sketch"
                                                                         ? qsTr("Sketch")
                                                                         : root.lastSelectedObj.className === "zynthiloops_part"
                                                                           ? qsTr("Part")
@@ -1365,13 +1365,13 @@ Zynthian.ScreenPage {
 
                                             // Check if source and destination are same
                                             if (root.copySourceObj.className === "zynthiloops_clip" &&
-                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)) {
+                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)) {
                                                 return true
                                             } else if (root.copySourceObj.className === "zynthiloops_track" &&
                                                        root.copySourceObj.id !== zynthian.session_dashboard.selectedTrack) {
                                                 return true
-                                            } else if (root.copySourceObj.className === "zynthiloops_mix" &&
-                                                       root.copySourceObj.mixIndex !== root.song.scenesModel.selectedMixIndex) {
+                                            } else if (root.copySourceObj.className === "zynthiloops_sketch" &&
+                                                       root.copySourceObj.sketchIndex !== root.song.scenesModel.selectedSketchIndex) {
                                                 return true
                                             } else if (root.copySourceObj.className === "zynthiloops_part" &&
                                                        root.copySourceObj.partClip !== root.lastSelectedObj.partClip &&
@@ -1387,7 +1387,7 @@ Zynthian.ScreenPage {
                                                                        ? qsTr("Clip")
                                                                        : root.copySourceObj.className === "zynthiloops_track"
                                                                            ? qsTr("Track")
-                                                                           : root.copySourceObj.className === "zynthiloops_mix"
+                                                                           : root.copySourceObj.className === "zynthiloops_sketch"
                                                                                ? qsTr("Sketch")
                                                                                : root.lastSelectedObj.className === "zynthiloops_part"
                                                                                  ? qsTr("Part")
@@ -1396,7 +1396,7 @@ Zynthian.ScreenPage {
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
                                             var sourceClip = root.copySourceObj
-                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                                             // Copy Clip
                                             destClip.copyFrom(sourceClip)
@@ -1428,16 +1428,16 @@ Zynthian.ScreenPage {
                                             root.copySourceObj = null
 
                                             zynthian.stop_loading()
-                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_mix") {
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_sketch") {
                                             zynthian.start_loading()
 
-                                            // Copy Mix
-                                            root.song.scenesModel.copyMix(root.copySourceObj.mixIndex, root.song.scenesModel.selectedMixIndex)
+                                            // Copy Sketch
+                                            root.song.scenesModel.copySketch(root.copySourceObj.sketchIndex, root.song.scenesModel.selectedSketchIndex)
 
                                             for (var i=0; i<root.song.tracksModel.count; i++) {
                                                 var track = root.song.tracksModel.getTrack(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"(root.copySourceObj.mixIndex + 1)).getByPart(track.id, track.selectedPart)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedMixName).getByPart(track.id, track.selectedPart)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"(root.copySourceObj.sketchIndex + 1)).getByPart(track.id, track.selectedPart)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSketchName).getByPart(track.id, track.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)
                                             }
@@ -1475,7 +1475,7 @@ Zynthian.ScreenPage {
                                         // Try clearing pattern if exists.
                                         try {
                                             if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("S"+(root.song.scenesModel.selectedMixIndex + 1)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
+                                                ZynQuick.PlayGridManager.getSequenceModel("S"+(root.song.scenesModel.selectedSketchIndex + 1)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
                                             }
                                         } catch(e) {}
                                     }

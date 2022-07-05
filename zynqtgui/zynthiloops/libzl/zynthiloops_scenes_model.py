@@ -37,7 +37,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = song
-        self.__selected_mix_index__ = 0
+        self.__selected_sketch_index__ = 0
         self.__selected_scene_index__ = 0
         self.__scenes__ = {
             "0": {"name": "A", "clips": []},
@@ -52,10 +52,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
             "9": {"name": "J", "clips": []},
         }
 
-        self.__mix_name_change_timer = QTimer(self)
-        self.__mix_name_change_timer.setInterval(10)
-        self.__mix_name_change_timer.setSingleShot(True)
-        self.__mix_name_change_timer.timeout.connect(self.selected_mix_name_changed)
+        self.__sketch_name_change_timer = QTimer(self)
+        self.__sketch_name_change_timer.setInterval(10)
+        self.__sketch_name_change_timer.setSingleShot(True)
+        self.__sketch_name_change_timer.timeout.connect(self.selected_sketch_name_changed)
 
         self.__new_name_change_timer = QTimer(self)
         self.__new_name_change_timer.setInterval(10)
@@ -80,7 +80,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
-            "selectedMixIndex": self.__selected_mix_index__,
+            "selectedSketchIndex": self.__selected_sketch_index__,
             "selectedSceneIndex": self.__selected_scene_index__,
         }
 
@@ -95,9 +95,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
                                                                                        clip["part"])
             self.endResetModel()
 
-        if "selectedMixIndex" in obj:
-            self.__selected_mix_index__ = obj["selectedMixIndex"]
-            self.selected_mix_index_changed.emit()
+        if "selectedSketchIndex" in obj:
+            self.__selected_sketch_index__ = obj["selectedSketchIndex"]
+            self.selected_sketch_index_changed.emit()
 
         if "selectedSceneIndex" in obj:
             self.__selected_scene_index__ = obj["selectedSceneIndex"]
@@ -133,32 +133,32 @@ class zynthiloops_scenes_model(QAbstractListModel):
     count = Property(int, count, notify=countChanged)
     ### END Property count
 
-    ### Property selectedMixIndex
-    def get_selected_mix_index(self):
-        return self.__selected_mix_index__
-    def set_selected_mix_index(self, index, force_set=False):
-        if self.__selected_mix_index__ != index or force_set is True:
-            self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
-            self.__selected_mix_index__ = index
-            self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
+    ### Property selectedSketchIndex
+    def get_selected_sketch_index(self):
+        return self.__selected_sketch_index__
+    def set_selected_sketch_index(self, index, force_set=False):
+        if self.__selected_sketch_index__ != index or force_set is True:
+            self.stopScene(self.selectedSceneIndex, self.selectedSketchIndex)
+            self.__selected_sketch_index__ = index
+            self.playScene(self.selectedSceneIndex, self.selectedSketchIndex)
             self.__song__.schedule_save()
 
-            self.selected_mix_index_changed.emit()
+            self.selected_sketch_index_changed.emit()
             self.syncClipsEnabledFromCurrentScene()
-            self.__mix_name_change_timer.start()
+            self.__sketch_name_change_timer.start()
 
-    selected_mix_index_changed = Signal()
-    selected_mix_name_changed = Signal()
-    selectedMixIndex = Property(int, get_selected_mix_index, set_selected_mix_index, notify=selected_mix_index_changed)
-    ### END Property selectedMixIndex
+    selected_sketch_index_changed = Signal()
+    selected_sketch_name_changed = Signal()
+    selectedSketchIndex = Property(int, get_selected_sketch_index, set_selected_sketch_index, notify=selected_sketch_index_changed)
+    ### END Property selectedSketchIndex
 
     ### Property selectedSceneIndex
     def get_selected_scene_index(self):
         return self.__selected_scene_index__
     def set_selected_scene_index(self, index):
-        self.stopScene(self.selectedSceneIndex, self.selectedMixIndex)
+        self.stopScene(self.selectedSceneIndex, self.selectedSketchIndex)
         self.__selected_scene_index__ = index
-        self.playScene(self.selectedSceneIndex, self.selectedMixIndex)
+        self.playScene(self.selectedSceneIndex, self.selectedSketchIndex)
         self.__song__.schedule_save()
 
         self.selected_scene_index_changed.emit()
@@ -168,14 +168,14 @@ class zynthiloops_scenes_model(QAbstractListModel):
     selected_scene_index_changed = Signal()
     selected_scene_name_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
-    ### END Property selectedMixIndex
+    ### END Property selectedSketchIndex
 
-    ### Property selectedMixName
-    def get_selected_mix_name(self):
-        return f"S{self.__selected_mix_index__ + 1}"
+    ### Property selectedSketchName
+    def get_selected_sketch_name(self):
+        return f"S{self.__selected_sketch_index__ + 1}"
 
-    selectedMixName = Property(str, get_selected_mix_name, notify=selected_mix_name_changed)
-    ### END Property selectedMixName
+    selectedSketchName = Property(str, get_selected_sketch_name, notify=selected_sketch_name_changed)
+    ### END Property selectedSketchName
 
     ### Property selectedSceneName
     def get_selected_scene_name(self):
@@ -188,7 +188,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
         # Sync enabled attribute for clips in scene
         for track in range(10):
             for part in range(5):
-                clip = self.__song__.getClipByPart(track, self.selectedMixIndex, part)
+                clip = self.__song__.getClipByPart(track, self.selectedSketchIndex, part)
 
                 if clip is not None and self.isClipInCurrentScene(clip):
                     clip.enabled = True
@@ -196,7 +196,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
                     clip.enabled = False
 
     @Slot(int)
-    def playScene(self, sceneIndex, mixIndex=-1):
+    def playScene(self, sceneIndex, sketchIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
@@ -205,16 +205,16 @@ class zynthiloops_scenes_model(QAbstractListModel):
             # Start all clips except clip to be recorded
             if clip != self.zyngui.zynthiloops.clipToRecord and \
                     clip.part == clip.clipTrack.selectedPart and \
-                    (mixIndex < 0 or (0 <= mixIndex == clip.col)):
+                    (sketchIndex < 0 or (0 <= sketchIndex == clip.col)):
                 clip.play()
 
     @Slot(int)
-    def stopScene(self, sceneIndex, mixIndex=-1):
+    def stopScene(self, sceneIndex, sketchIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
             clip = scene["clips"][i]
-            if mixIndex < 0 or (0 <= mixIndex == clip.col):
+            if sketchIndex < 0 or (0 <= sketchIndex == clip.col):
                 clip.stop()
 
     @Slot(int, result='QVariantMap')
@@ -274,10 +274,10 @@ class zynthiloops_scenes_model(QAbstractListModel):
         return len(self.getScene(scene_index)["clips"])
 
     @Slot(int, int, result=None)
-    def copyMix(self, from_mix, to_mix):
+    def copyMix(self, from_sketch, to_sketch):
         for i in range(0, self.__song__.tracksModel.count):
             track = self.__song__.tracksModel.getTrack(i)
             for part in range(5):
-                track.parts[part].getClip(to_mix).copyFrom(track.parts[part].getClip(from_mix))
+                track.parts[part].getClip(to_sketch).copyFrom(track.parts[part].getClip(from_sketch))
 
     clipCountChanged = Signal()

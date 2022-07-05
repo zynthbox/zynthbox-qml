@@ -276,7 +276,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.trackWaveEditorBarActive:
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
             selected_clip.startPosition = self.__zselector[1].value / 1000
@@ -291,7 +291,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.trackWaveEditorBarActive:
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
             selected_clip.loopDelta = self.__zselector[2].value/1000
@@ -306,7 +306,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.trackWaveEditorBarActive:
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value//100:
@@ -686,7 +686,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedMixIndex)
+            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
         ###
 
         # Configure Big Knob
@@ -1281,7 +1281,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startPlayback(self):
-        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex, self.__song__.scenesModel.selectedMixIndex)
+        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex, self.__song__.scenesModel.selectedSketchIndex)
         self.start_metronome_request()
 
     def start_metronome_request(self):

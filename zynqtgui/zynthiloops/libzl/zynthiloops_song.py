@@ -32,7 +32,10 @@ from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
 import zynautoconnect
 from . import libzl
+from .zynthiloops_mix import zynthiloops_mix
+from .zynthiloops_mixes_model import zynthiloops_mixes_model
 from .zynthiloops_scenes_model import zynthiloops_scenes_model
+from .zynthiloops_segment import zynthiloops_segment
 from .zynthiloops_track import zynthiloops_track
 from .zynthiloops_part import zynthiloops_part
 from .zynthiloops_clip import zynthiloops_clip
@@ -62,6 +65,7 @@ class zynthiloops_song(QObject):
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__scenes_model__ = zynthiloops_scenes_model(self)
+        self.__mixes_model__ = zynthiloops_mixes_model(self)
         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
         self.__volume__ = 100
         self.__index__ = 0
@@ -93,6 +97,8 @@ class zynthiloops_song(QObject):
             self.__parts_model__ = zynthiloops_parts_model(self)
             self.__tracks_model__ = zynthiloops_tracks_model(self)
             self.__scenes_model__ = zynthiloops_scenes_model(self)
+            self.__mixes_model__ = zynthiloops_mixes_model(self)
+
             # Add default parts
             for i in range(0, 10):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
@@ -114,6 +120,17 @@ class zynthiloops_song(QObject):
                             for scene in range(10):
                                 self.__scenes_model__.addClipToScene(clip, scene)
                         clipsModel.add_clip(clip)
+
+            # Add default Mixes and Segments
+            for mix_index in range(10):
+                mix = zynthiloops_mix(mix_index, self)
+
+                for segment_index in range(10):
+                    segment = zynthiloops_segment(mix_index, segment_index, self)
+                    mix.segmentsModel.add_segment(segment)
+
+                self.__mixes_model__.add_mix(mix)
+
         self.bpm_changed.emit()
         # Emit bpm changed to get bpm of selectedMix
         self.__scenes_model__.selected_sketch_index_changed.connect(self.bpm_changed.emit)
@@ -139,14 +156,17 @@ class zynthiloops_song(QObject):
         self.__to_be_deleted__ = True
 
     def serialize(self):
-        return {"name": self.__name__,
-                "bpm": self.__bpm__,
-                "volume": self.__volume__,
-                "selectedScaleIndex": self.__selected_scale_index__,
-                "octave": self.__octave__,
-                "tracks": self.__tracks_model__.serialize(),
-                "parts": self.__parts_model__.serialize(),
-                "scenes": self.__scenes_model__.serialize()}
+        return {
+            "name": self.__name__,
+            "bpm": self.__bpm__,
+            "volume": self.__volume__,
+            "selectedScaleIndex": self.__selected_scale_index__,
+            "octave": self.__octave__,
+            "tracks": self.__tracks_model__.serialize(),
+            "parts": self.__parts_model__.serialize(),
+            "scenes": self.__scenes_model__.serialize(),
+            "mixes": self.__mixes_model__.serialize()
+        }
 
     def save(self, cache=True):
         if self.__to_be_deleted__:
@@ -314,6 +334,8 @@ class zynthiloops_song(QObject):
                     self.__tracks_model__.deserialize(sketch["tracks"])
                 if "scenes" in sketch:
                     self.__scenes_model__.deserialize(sketch["scenes"])
+                if "mixes" in sketch:
+                    self.__mixes_model__.deserialize(sketch["mixes"])
                 if "bpm" in sketch:
                     # In older sketch files, bpm would still be an int instead of a list
                     # So if bpm is not a list, then generate a list and store it

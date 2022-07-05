@@ -70,11 +70,11 @@ ColumnLayout {
                         separatorVisible: false
                         width: scenesView.width
                         height: root.itemHeight
-                        highlighted: index === zynthian.zynthiloops.song.scenesModel.selectedMixIndex
+                        highlighted: index === zynthian.zynthiloops.song.scenesModel.selectedSketchIndex
                         contentItem: QQC2.Label {
                             text: model.scene.name
                         }
-                        onClicked: zynthian.zynthiloops.song.scenesModel.selectedMixIndex = index
+                        onClicked: zynthian.zynthiloops.song.scenesModel.selectedSketchIndex = index
                     }
                 }
             }

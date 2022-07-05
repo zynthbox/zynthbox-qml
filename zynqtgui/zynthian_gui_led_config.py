@@ -117,7 +117,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
                 if self.zyngui.leftSidebarActive:
-                    partClip = self.zyngui.zynthiloops.song.getClipByPart(track.id, self.zyngui.zynthiloops.song.scenesModel.selectedMixIndex, i-1)
+                    partClip = self.zyngui.zynthiloops.song.getClipByPart(track.id, self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex, i-1)
 
                     if track is not None and partClip.enabled:
                         if track.trackAudioType == "synth":

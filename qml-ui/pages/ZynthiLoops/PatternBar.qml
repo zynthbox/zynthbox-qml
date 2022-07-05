@@ -40,7 +40,7 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject sequence: controlObj.clipTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+    property QtObject sequence: controlObj.clipTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
     property QtObject pattern: root.sequence && controlObj.clipTrack ? root.sequence.getByPart(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart) : null
     property QtObject bottomBar: null
 
@@ -117,7 +117,7 @@ GridLayout {
                     zynthian.current_modal_screen_id = "playgrid";
                     zynthian.forced_screen_back = "zynthiloops";
                     ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName);
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
                     sequence.setActiveTrack(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart);
                 }
             }

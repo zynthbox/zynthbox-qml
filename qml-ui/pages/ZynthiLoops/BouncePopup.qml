@@ -34,8 +34,8 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 QQC2.Popup {
     id: root
-    function bounce(mixName, track) {
-        _private.mixName = mixName;
+    function bounce(sketchName, track) {
+        _private.sketchName = sketchName;
         _private.selectedTrack = track;
         open();
     }
@@ -75,7 +75,7 @@ QQC2.Popup {
  
             QtObject {
                 id: _private
-                property string mixName
+                property string sketchName
                 property QtObject selectedTrack
                 property double bounceProgress: -1
 
@@ -93,7 +93,7 @@ QQC2.Popup {
                 function performBounce() {
                     _private.bounceProgress = 0;
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
-                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.mixName);
+                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.sketchName);
                     if (_private.sequence) {
                         _private.pattern = sequence.getByPart(_private.selectedTrack.connectedPattern, _private.selectedTrack.selectedPart);
                         if (_private.pattern) {
@@ -129,7 +129,7 @@ QQC2.Popup {
                             _private.cumulativeBeats = 0;
                             _private.isRecording = true;
                             var sceneIndices = { "S1": 0, "S2": 1, "S3": 2, "S4": 3, "S5": 4, "S6": 5, "S7": 6, "S8": 7, "S9": 8, "S10": 9};
-                            var clip = _private.selectedTrack.clipsModel.getClip(sceneIndices[_private.mixName]);
+                            var clip = _private.selectedTrack.clipsModel.getClip(sceneIndices[_private.sketchName]);
                             clip.queueRecording("internal", "*");
                             ZynQuick.MidiRecorder.startRecording(_private.pattern.midiChannel, true);
                             _private.sequence.startSequencePlayback();

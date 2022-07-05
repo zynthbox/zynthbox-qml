@@ -46,7 +46,7 @@ Item {
      */
     function loadSequenceFromFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedMixName;
+            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedSketchName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -61,7 +61,7 @@ Item {
      */
     function saveSequenceToFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedMixName;
+            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedSketchName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -76,7 +76,7 @@ Item {
      */
     function savePatternToFile(patternName) {
         if (patternName == undefined || patternName == "") {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName);
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
             if (sequence.activePattern > -1) {
                 sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
             }
@@ -340,7 +340,7 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
-        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName);
+        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
         if (repeaterObject.model.hasOwnProperty("patterns")) {
             // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;

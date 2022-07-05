@@ -169,7 +169,7 @@ while true; do
         export ZYNTHIAN_LOG_LEVEL=20
         ./zynthian_qt_gui.py
     else
-        export ZYNTHIAN_LOG_LEVEL=10
+        export ZYNTHIAN_LOG_LEVEL=20
         extra_args=""
 
         if [ "$ZYNTHBOX_DEBUG" = "block" ]; then

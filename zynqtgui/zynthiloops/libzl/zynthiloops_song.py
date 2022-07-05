@@ -116,7 +116,7 @@ class zynthiloops_song(QObject):
                         clipsModel.add_clip(clip)
         self.bpm_changed.emit()
         # Emit bpm changed to get bpm of selectedMix
-        self.__scenes_model__.selected_mix_index_changed.connect(self.bpm_changed.emit)
+        self.__scenes_model__.selected_sketch_index_changed.connect(self.bpm_changed.emit)
 
         # Create wav dir for recording
         (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
@@ -321,9 +321,9 @@ class zynthiloops_song(QObject):
                         self.__bpm__ = sketch["bpm"]
                     else:
                         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-                        self.__bpm__[self.__scenes_model__.selectedMixIndex] = sketch["bpm"]
+                        self.__bpm__[self.__scenes_model__.selectedSketchIndex] = sketch["bpm"]
 
-                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedMixIndex], True)
+                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex], True)
 
                 self.__is_loading__ = False
                 return True
@@ -335,7 +335,7 @@ class zynthiloops_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, track: int, mix: int):
+    def getClip(self, track: int, sketch: int):
         # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
         if track >= self.__tracks_model__.count:
             return None
@@ -343,15 +343,15 @@ class zynthiloops_song(QObject):
         track = self.__tracks_model__.getTrack(track)
         # logging.error(track.clipsModel.count)
 
-        if mix >= track.clipsModel.count:
+        if sketch >= track.clipsModel.count:
             return None
 
-        clip = track.clipsModel.getClip(mix)
+        clip = track.clipsModel.getClip(sketch)
         # logging.error(clip)
         return clip
 
     @Slot(int, int, result=QObject)
-    def getClipByPart(self, track: int, mix: int, part: int):
+    def getClipByPart(self, track: int, sketch: int, part: int):
         # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
         if track >= self.__tracks_model__.count:
             return None
@@ -359,10 +359,10 @@ class zynthiloops_song(QObject):
         track = self.__tracks_model__.getTrack(track)
         # logging.error(track.clipsModel.count)
 
-        if mix >= track.getClipsModelByPart(part).count:
+        if sketch >= track.getClipsModelByPart(part).count:
             return None
 
-        clip = track.getClipsModelByPart(part).getClip(mix)
+        clip = track.getClipsModelByPart(part).getClip(sketch)
         # logging.error(clip)
         return clip
 
@@ -499,11 +499,11 @@ class zynthiloops_song(QObject):
     #     self.schedule_save()
 
     def bpm(self):
-        return self.__bpm__[self.__scenes_model__.selectedMixIndex]
+        return self.__bpm__[self.__scenes_model__.selectedSketchIndex]
 
     def set_bpm(self, bpm: int, force_set=False):
-        if self.__bpm__[self.__scenes_model__.selectedMixIndex] != math.floor(bpm) or force_set is True:
-            self.__bpm__[self.__scenes_model__.selectedMixIndex] = math.floor(bpm)
+        if self.__bpm__[self.__scenes_model__.selectedSketchIndex] != math.floor(bpm) or force_set is True:
+            self.__bpm__[self.__scenes_model__.selectedSketchIndex] = math.floor(bpm)
 
             # Update blink timer interval with change in bpm
             self.zyngui.wsleds_blink_timer.stop()
@@ -514,7 +514,7 @@ class zynthiloops_song(QObject):
             if not self.zyngui.zynthiloops.isMetronomeRunning:
                 self.zyngui.wsleds_blink_timer.start()
 
-            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedMixIndex])
+            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex])
             # Call zyngui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
             self.zyngui.set_selector()

@@ -757,7 +757,7 @@ class zynthian_gui(QObject):
             if song is not None:
                 value = song.bpm
                 min_value = 50
-                max_value = 200
+                max_value = 200 + 1
 
             if self.__zselector[0] is None:
                 self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
@@ -792,7 +792,7 @@ class zynthian_gui(QObject):
             if self.master_alsa_mixer is not None:
                 value = self.master_alsa_mixer.volume
                 min_value = 0
-                max_value = 100
+                max_value = 100 + 1
 
             if self.__zselector[1] is None:
                 self.__zselector_ctrl[1] = zynthian_controller(None, 'global_small_knob_1', 'global_small_knob_1',
@@ -828,7 +828,7 @@ class zynthian_gui(QObject):
                 controller = self.global_fx_engines[0][1]
                 value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
                 min_value = 0
-                max_value = 100
+                max_value = 100 + 1
 
             if self.__zselector[2] is None:
                 self.__zselector_ctrl[2] = zynthian_controller(None, 'global_small_knob_2', 'global_small_knob_2',
@@ -865,7 +865,7 @@ class zynthian_gui(QObject):
                 controller = self.global_fx_engines[1][1]
                 value = np.interp(controller.value, [controller.value_min, controller.value_max], [0, 100])
                 min_value = 0
-                max_value = 100
+                max_value = 100 + 1
 
             if self.__zselector[3] is None:
                 self.__zselector_ctrl[3] = zynthian_controller(None, 'global_small_knob_3', 'global_small_knob_3',

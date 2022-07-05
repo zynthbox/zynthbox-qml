@@ -36,8 +36,10 @@ class zynthiloops_mixes_model(QAbstractListModel):
         super().__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = self.zyngui.zynthiloops.song
+
         self.__selected_mix_index = 0
         self.__mixes: dict[int, zynthiloops_mix] = {}
+        self.__song_mode = False
 
     def serialize(self):
         logging.debug("### Serializing Mixes Model")
@@ -112,6 +114,27 @@ class zynthiloops_mixes_model(QAbstractListModel):
 
     selectedMixIndex = Property(int, get_selectedMixIndex, set_selectedMixIndex, notify=selectedMixIndexChanged)
     ### END Property selectedMixIndex
+
+    ### Property selectedMix
+    def get_selectedMix(self):
+        return self.__mixes[self.__selected_mix_index]
+
+    selectedMix = Property(QObject, get_selectedMix, notify=selectedMixIndexChanged)
+    ### END Property selectedMix
+
+    ### Property songMode
+    def get_songMode(self):
+        return self.__song_mode
+
+    def set_songMode(self, value):
+        if value != self.__song_mode:
+            self.__song_mode = value
+            self.songModeChanged.emit()
+
+    songModeChanged = Signal()
+
+    songMode = Property(bool, get_songMode, set_songMode, notify=songModeChanged)
+    ### END Property songMode
 
     @Slot(int, result=QObject)
     def getMix(self, mix_index):

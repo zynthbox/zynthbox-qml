@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from .zynthiloops_segments_model import zynthiloops_segments_model
 from ... import zynthian_gui_config
@@ -84,3 +84,7 @@ class zynthiloops_mix(QObject):
 
     segmentsModel = Property(QObject, get_segmentsModel, notify=segmentsModelChanged)
     ### END Property segmentsModel
+
+    @Slot(int, result=QObject)
+    def getSegment(self, segmentIndex):
+        return self.segmentsModel.get_segment(segmentIndex)

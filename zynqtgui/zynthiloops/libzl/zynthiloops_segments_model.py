@@ -108,3 +108,9 @@ class zynthiloops_segments_model(QAbstractListModel):
     selectedSegmentIndex = Property(int, get_selectedSegmentIndex, set_selectedSegmentIndex,
                                     notify=selectedSegmentIndexChanged)
     ### END Property selectedSegmentIndex
+
+    def get_segment(self, segment_index):
+        try:
+            return self.__segments[segment_index]
+        except:
+            return None

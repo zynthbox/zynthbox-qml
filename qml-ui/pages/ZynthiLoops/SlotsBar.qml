@@ -45,10 +45,19 @@ Rectangle {
     property alias samplesButton: samplesButton
     property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
+    property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
     property QtObject selectedSlotRowItem
+
+    onSongModeChanged: {
+        if (root.songMode) {
+            partButton.checked = true
+        } else {
+            trackButton.checked = true
+        }
+    }
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -255,6 +264,7 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             checked: bottomStack.currentIndex === 0
+                            enabled: !root.songMode
                             text: qsTr("BottomBar")
                             visible: false
                             onCheckedChanged: {
@@ -270,6 +280,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             visible: false
                             text: qsTr("Mixer")
                             onCheckedChanged: {
@@ -285,6 +296,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             visible: false
                             text: qsTr("Sound Combinator")
                             onCheckedChanged: {
@@ -303,6 +315,7 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             checked: true
+                            enabled: !root.songMode
                             text: qsTr("Track")
                             onCheckedChanged: {
                                 if (checked) {
@@ -317,6 +330,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             text: qsTr("Parts")
                             onCheckedChanged: {
                                 if (checked) {
@@ -331,6 +345,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             text: qsTr("Synths")
                             onCheckedChanged: {
                                 if (checked) {
@@ -345,6 +360,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             text: qsTr("Samples")
                             onCheckedChanged: {
                                 if (checked) {
@@ -359,6 +375,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
+                            enabled: !root.songMode
                             text: qsTr("FX")
                             onCheckedChanged: {
                                 if (checked) {

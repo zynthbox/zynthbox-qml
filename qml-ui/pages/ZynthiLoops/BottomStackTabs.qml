@@ -27,11 +27,16 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.6 as Kirigami
 
 ColumnLayout {
+    id: root
+
+    property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
+
     QQC2.Button {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.trackButton.checked : false
+        enabled: !root.songMode
         text: qsTr("Track")
         onClicked: {
             bottomStack.slotsBar.trackButton.checked = true
@@ -43,6 +48,7 @@ ColumnLayout {
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.partButton.checked : false
+        enabled: !root.songMode
         text: qsTr("Parts")
         onClicked: {
             bottomStack.slotsBar.partButton.checked = true
@@ -54,6 +60,7 @@ ColumnLayout {
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.synthsButton.checked : false
+        enabled: !root.songMode
         text: qsTr("Synths")
         onClicked: {
             bottomStack.slotsBar.synthsButton.checked = true
@@ -65,6 +72,7 @@ ColumnLayout {
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.samplesButton.checked : false
+        enabled: !root.songMode
         text: qsTr("Samples")
         onClicked: {
             bottomStack.slotsBar.samplesButton.checked = true
@@ -76,6 +84,7 @@ ColumnLayout {
         Layout.fillHeight: true
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.fxButton.checked : false
+        enabled: !root.songMode
         text: qsTr("FX")
         onClicked: {
             bottomStack.slotsBar.fxButton.checked = true

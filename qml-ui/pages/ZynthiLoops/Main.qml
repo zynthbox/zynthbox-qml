@@ -43,7 +43,7 @@ Zynthian.ScreenPage {
     property QtObject selectedTrack: applicationWindow().selectedTrack
     property bool displaySceneButtons: false
     property bool displaySketchButtons: false
-    property bool songMode: false
+    property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
 
     // Used to temporarily cache clip/track object to be copied
     property var copySourceObj: null
@@ -553,6 +553,7 @@ Zynthian.ScreenPage {
         Rectangle {
             id: selectedTrackOutline
             width: privateProps.headerWidth
+            visible: !root.songMode
 
             // If scene selection buttons are visible, do not show outline over scene buttons
             height: (privateProps.headerHeight + loopGrid.columnSpacing) * (root.displaySceneButtons ? 1 : 2)
@@ -960,25 +961,38 @@ Zynthian.ScreenPage {
                         opacity: root.songMode ? 1 : 0.3
 
                         onPressed: {
-                            root.songMode = !root.songMode
+                            zynthian.zynthiloops.song.mixesModel.songMode = !zynthian.zynthiloops.song.mixesModel.songMode
                         }
                     }
 
                     Repeater {
                         id: tracksHeaderRepeater
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                        model: zynthian.isBootingComplete ? root.song.tracksModel : 0
+                        model: zynthian.isBootingComplete
+                                ? 10
+                                : 0
 
                         delegate: TrackHeader2 {
-                            id: delegateTrackHeader2
-                            text: model.track.name
+                            id: trackHeaderDelegate
+
+                            property QtObject segment: root.song.mixesModel.selectedMix.getSegment(index)
+
+                            track: root.song.tracksModel.getTrack(index)
+                            text: root.songMode
+                                    ? trackHeaderDelegate.segment.name
+                                    : trackHeaderDelegate.track.name
+                            active: root.songMode &&
+                                    trackHeaderDelegate.segment.isEmpty
+                                        ? false
+                                        : true
+                            synthDetailsVisible: !root.songMode
 
                             Connections {
-                                target: model.track
+                                target: trackHeaderDelegate.track
                                 function updateKeyZones() {
                                     // all-full is the default, but "manual" is an option and we should leave things alone in that case, so that's this function's default
                                     var sampleSettings = [];
-                                    if (model.track.keyZoneMode == "all-full") {
+                                    if (trackHeaderDelegate.track.keyZoneMode == "all-full") {
                                         sampleSettings = [
                                             [0, 127, 0],
                                             [0, 127, 0],
@@ -986,7 +1000,7 @@ Zynthian.ScreenPage {
                                             [0, 127, 0],
                                             [0, 127, 0]
                                         ];
-                                    } else if (model.track.keyZoneMode == "split-full") {
+                                    } else if (trackHeaderDelegate.track.keyZoneMode == "split-full") {
                                         // auto-split keyzones: SLOT 4 c-1 - b1, SLOT 2 c1-b3, SLOT 1 c3-b5, SLOT 3 c5-b7, SLOT 5 c7-c9
                                         // root key transpose in semtitones: +48, +24 ,0 , -24, -48
                                         sampleSettings = [
@@ -996,7 +1010,7 @@ Zynthian.ScreenPage {
                                             [0, 23, -48], // slot 4
                                             [96, 119, 48] // slot 5
                                         ];
-                                    } else if (model.track.keyZoneMode == "split-narrow") {
+                                    } else if (trackHeaderDelegate.track.keyZoneMode == "split-narrow") {
                                         // Narrow split puts the samples on the keys C4, D4, E4, F4, G4, and plays them as C4 on those notes
                                         sampleSettings = [
                                             [60, 60, 0], // slot 1
@@ -1007,8 +1021,8 @@ Zynthian.ScreenPage {
                                         ];
                                     }
                                     if (sampleSettings.length > 0) {
-                                        for (var i = 0; i < model.track.samples.length; ++i) {
-                                            var sample = model.track.samples[i];
+                                        for (var i = 0; i < trackHeaderDelegate.track.samples.length; ++i) {
+                                            var sample = trackHeaderDelegate.track.samples[i];
                                             var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
                                             if (clip && i < sampleSettings.length) {
                                                 clip.keyZoneStart = sampleSettings[i][0];
@@ -1022,19 +1036,21 @@ Zynthian.ScreenPage {
                                 onSamplesChanged: updateKeyZones();
                             }
                             // hide "Pat.1" info in the track header cells, as Track 1 will be Pat.1, to T10 - Pat.10
-//                            subText: model.track.connectedPattern >= 0
-//                                      ? "Pat. " + (model.track.connectedPattern+1)
+//                            subText: trackHeaderDelegate.track.connectedPattern >= 0
+//                                      ? "Pat. " + (trackHeaderDelegate.track.connectedPattern+1)
 //                                      : ""
                             subSubText: {
-                                if (model.track.trackAudioType === "sample-loop") {
+                                if (root.songMode) {
+                                    return ""
+                                } else if (trackHeaderDelegate.track.trackAudioType === "sample-loop") {
                                     return qsTr("Loop")
-                                } else if (model.track.trackAudioType === "sample-trig") {
+                                } else if (trackHeaderDelegate.track.trackAudioType === "sample-trig") {
                                     return qsTr("Smp: Trig")
-                                } else if (model.track.trackAudioType === "sample-slice") {
+                                } else if (trackHeaderDelegate.track.trackAudioType === "sample-slice") {
                                     return qsTr("Smp: Slice")
-                                } else if (model.track.trackAudioType === "synth") {
+                                } else if (trackHeaderDelegate.track.trackAudioType === "synth") {
                                     return qsTr("Synth")
-                                } else if (model.track.trackAudioType === "external") {
+                                } else if (trackHeaderDelegate.track.trackAudioType === "external") {
                                     return qsTr("External")
                                 }
                             }
@@ -1042,7 +1058,7 @@ Zynthian.ScreenPage {
                             subSubTextSize: 7
 
                             Binding {
-                                target: delegateTrackHeader2
+                                target: trackHeaderDelegate
                                 property: "color"
                                 when: root.visible
                                 delayed: true
@@ -1050,15 +1066,15 @@ Zynthian.ScreenPage {
                                 value: {
                                     if (root.copySourceObj === model.track)
                                         return "#ff2196f3"
-                                    else if (model.track.trackAudioType === "synth" && model.track.occupiedSlotsCount > 0)
+                                    else if (trackHeaderDelegate.track.trackAudioType === "synth" && trackHeaderDelegate.track.occupiedSlotsCount > 0)
                                         return "#66ff0000"
-                                    else if (model.track.trackAudioType === "sample-loop" && model.track.sceneClip.path && model.track.sceneClip.path.length > 0)
+                                    else if (trackHeaderDelegate.track.trackAudioType === "sample-loop" && trackHeaderDelegate.track.sceneClip.path && trackHeaderDelegate.track.sceneClip.path.length > 0)
                                         return "#6600ff00"
-                                    else if (model.track.trackAudioType === "sample-trig" && model.track.occupiedSlotsCount > 0)
+                                    else if (trackHeaderDelegate.track.trackAudioType === "sample-trig" && trackHeaderDelegate.track.occupiedSlotsCount > 0)
                                         return "#66ffff00"
-                                    else if (model.track.trackAudioType === "sample-slice" && model.track.occupiedSlotsCount > 0)
+                                    else if (trackHeaderDelegate.track.trackAudioType === "sample-slice" && trackHeaderDelegate.track.occupiedSlotsCount > 0)
                                         return "#66ffff00"
-                                    else if (model.track.trackAudioType === "external")
+                                    else if (trackHeaderDelegate.track.trackAudioType === "external")
                                         return "#998e24aa"
                                     else
                                         return "#66888888"
@@ -1066,24 +1082,33 @@ Zynthian.ScreenPage {
                             }
 
                             highlightOnFocus: false
-                            highlighted: index === zynthian.session_dashboard.selectedTrack
+                            highlighted: root.songMode
+                                            ? index === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                            : index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
-                                root.lastSelectedObj = model.track
+                                if (root.songMode) {
+                                    if (trackHeaderDelegate.segment.segmentId === 0 ||
+                                        !trackHeaderDelegate.segment.isEmpty) {
+                                        root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = index
+                                    }
+                                } else {
+                                    root.lastSelectedObj = trackHeaderDelegate.track
 
-                                // Open MixedTracksViewBar and switch to track
-                                bottomStack.slotsBar.trackButton.checked = true
+                                    // Open MixedTracksViewBar and switch to track
+                                    bottomStack.slotsBar.trackButton.checked = true
 
-                                // zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                zynthian.session_dashboard.selectedTrack = index;
-                                Qt.callLater(function() {
-                                    bottomBar.controlType = BottomBar.ControlType.Track;
-                                    bottomBar.controlObj = model.track;
-                                })
+                                    // zynthian.session_dashboard.disableNextSoundSwitchTimer();
+                                    zynthian.session_dashboard.selectedTrack = index;
+                                    Qt.callLater(function() {
+                                        bottomBar.controlType = BottomBar.ControlType.Track;
+                                        bottomBar.controlObj = trackHeaderDelegate.track;
+                                    })
+                                }
                             }
 
                             onPressAndHold: {
-                                zynthian.track.trackId = model.track.id
+                                zynthian.track.trackId = trackHeaderDelegate.track.id
                                 //zynthian.current_modal_screen_id = "track"
                             }
                         }
@@ -1159,7 +1184,7 @@ Zynthian.ScreenPage {
 
                                     TableHeader {
                                         anchors.fill: parent
-                                        visible: root.displaySceneButtons
+                                        visible: root.displaySceneButtons || root.songMode
                                         text: String.fromCharCode(65+index).toUpperCase()
                                         highlighted: index === root.song.scenesModel.selectedSceneIndex
                                         highlightOnFocus: false
@@ -1172,7 +1197,7 @@ Zynthian.ScreenPage {
                                         id: clipCell
 
                                         anchors.fill: parent
-                                        visible: !root.displaySceneButtons
+                                        visible: !root.displaySceneButtons && !root.songMode
 
                                         backgroundColor: "#000000"
                                         onHighlightedChanged: {

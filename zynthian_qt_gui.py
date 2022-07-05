@@ -1225,7 +1225,7 @@ class zynthian_gui(QObject):
             (delay_engine, delay_engine.get_lv2_controllers_dict()["LEVEL"]),
             (reverb_engine, reverb_engine.get_lv2_controllers_dict()["dry_wet"])
         ]
-
+        dir = Path()
         self.delayKnobValueChanged.emit()
         self.reverbKnobValueChanged.emit()
 
@@ -1956,13 +1956,13 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCENE_UP":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedMixIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedMixIndex - 1)
+                self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex - 1)
             except:
                 pass
 
         elif cuia == "SCENE_DOWN":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedMixIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedMixIndex + 1)
+                self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex + 1)
             except:
                 pass
 

@@ -42,7 +42,7 @@ Rectangle {
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
 
-    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName) : null
+    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
     property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart) : null
 
 
@@ -338,7 +338,7 @@ Rectangle {
                                             Layout.fillHeight: true
                                             text: "Bounce To Loop"
                                             onClicked: {
-                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedMixName, root.selectedTrack);
+                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedSketchName, root.selectedTrack);
                                             }
                                         }
                                         Item {
@@ -365,7 +365,7 @@ Rectangle {
                                                 root.selectedTrack.trackAudioType === "sample-slice"
                                                     ? root.selectedTrack.samples
                                                     : root.selectedTrack.trackAudioType === "sample-loop"
-                                                        ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex), null, null, null, null]
+                                                        ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex), null, null, null, null]
                                                         : []
 
                                 }
@@ -482,7 +482,7 @@ Rectangle {
 
                                     WaveFormItem {
                                         property QtObject clip: root.selectedTrack.trackAudioType === "sample-loop"
-                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                                                                     : root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
 
                                         anchors.fill: parent
@@ -579,11 +579,11 @@ Rectangle {
                                         anchors.fill: parent
                                         onClicked: {
                                             if (root.selectedTrack.trackAudioType === "sample-loop") {
-                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                                                 if (clip && clip.path && clip.path.length > 0) {
                                                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex);
+                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
                                                     bottomStack.slotsBar.bottomBarButton.checked = true;
                                                     bottomStack.bottomBar.waveEditorAction.trigger();
                                                 }
@@ -655,7 +655,7 @@ Rectangle {
                                                 zynthian.current_modal_screen_id = "playgrid";
                                                 zynthian.forced_screen_back = "zynthiloops";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName);
+                                                var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
                                                 sequence.setActiveTrack(root.selectedTrack.id, root.selectedTrack.selectedPart);
                                             }
                                         }

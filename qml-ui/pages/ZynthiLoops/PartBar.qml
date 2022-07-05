@@ -59,35 +59,35 @@ Rectangle {
         switch (cuia) {
             case "TRACK_1":
             case "TRACK_6":
-                clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
             case "TRACK_2":
             case "TRACK_7":
-                clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
             case "TRACK_3":
             case "TRACK_8":
-                clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
             case "TRACK_4":
             case "TRACK_9":
-                clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
             case "TRACK_5":
             case "TRACK_10":
-                clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
@@ -112,7 +112,7 @@ Rectangle {
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedMixIndex, cuia, clip)
+        console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex, cuia, clip)
 
         return returnVal;
     }

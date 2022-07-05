@@ -131,7 +131,7 @@ Rectangle {
             zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.track.connectedSound);
 
             if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedMixName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
             }
         }
@@ -194,7 +194,7 @@ Rectangle {
             }
         } else if (type === "sample-loop") {
             if (root.selectedTrack.selectedSlotRow === 0) {
-                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex)
+                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                 if (zynthian.backButtonPressed) {
                     clip.clear()
@@ -737,7 +737,7 @@ Rectangle {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedMixIndex).path = file.filePath
+            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex).path = file.filePath
         }
     }
 

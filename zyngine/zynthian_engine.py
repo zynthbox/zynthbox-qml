@@ -499,8 +499,11 @@ class zynthian_engine(zynthian_basic_engine):
 
 	# Get zynthian controllers dictionary:
 	# + Default implementation uses a static controller definition array
-	def get_controllers_dict(self, layer):
-		midich=layer.get_midi_chan()
+	def get_controllers_dict(self, layer=None):
+		if layer is not None:
+			midich=layer.get_midi_chan()
+		else:
+			midich = -1
 		zctrls=OrderedDict()
 
 		if self._ctrls is not None:
@@ -508,7 +511,7 @@ class zynthian_engine(zynthian_basic_engine):
 				options={}
 
 				#OSC control =>
-				if isinstance(ctrl[1],str):
+				if layer is not None and isinstance(ctrl[1], str):
 					#replace variables ...
 					tpl=Template(ctrl[1])
 					cc=tpl.safe_substitute(ch=midich)
@@ -547,6 +550,15 @@ class zynthian_engine(zynthian_basic_engine):
 				zctrls[zctrl.symbol]=zctrl
 		return zctrls
 
+	def get_controllers_dict_without_layer(self):
+		"""
+		Get controllers dict for an engine when you dont have a layer instance.
+		This would be helpful to get controllers for engines not associated to any layer like global FX
+
+		Note : If an engine is associated to a layer, make sure to call get_controllers_dict instead with layer object
+		"""
+
+		return self.get_controllers_dict(None)
 
 	def generate_ctrl_screens(self, zctrl_dict=None):
 		if zctrl_dict is None:

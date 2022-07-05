@@ -38,12 +38,12 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.__song = self.zyngui.zynthiloops.song
 
         self.__selected_segment_index = 0
-        self.__segments: list[zynthiloops_segment] = []
+        self.__segments: dict[int, zynthiloops_segment] = {}
 
     def serialize(self):
         logging.debug("### Serializing Segments Model")
 
-        return [segment.serialize() for segment in self.__segments]
+        return [self.__segments[segment_index].serialize() for segment_index in self.__segments]
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Segments Model")
@@ -55,7 +55,7 @@ class zynthiloops_segments_model(QAbstractListModel):
             segment = zynthiloops_segment(-1, -1, self.__song)
             segment.deserialize(segment_obj)
 
-            self.__segments[segment.segmentId] = segment
+            self.add_segment(segment.segmentId, segment)
 
         self.endResetModel()
 
@@ -82,8 +82,8 @@ class zynthiloops_segments_model(QAbstractListModel):
     def rowCount(self, index):
         return self.get_count()
 
-    def add_segment(self, segment: zynthiloops_segment):
-        self.__segments.append(segment)
+    def add_segment(self, segment_index, segment: zynthiloops_segment):
+        self.__segments[segment_index] = segment
 
     ### Property count
     def get_count(self):

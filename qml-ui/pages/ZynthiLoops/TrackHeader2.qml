@@ -87,16 +87,28 @@ QQC2.AbstractButton {
 
                 QQC2.Label {
                     id: contents
+                    anchors.verticalCenter: parent.verticalCenter
                     width: root.synthDetailsVisible
                             ? parent.width * 0.4
                             : parent.width
-                    height: parent.height
-
                     horizontalAlignment: "AlignHCenter"
-                    verticalAlignment: "AlignVCenter"
                     elide: "ElideRight"
                     text: root.text
                     font.pointSize: 8
+                }
+
+                QQC2.Label {
+                    id: subContents
+                    anchors.top: contents.bottom
+                    width: root.synthDetailsVisible
+                            ? parent.width * 0.4
+                            : parent.width
+                    visible: root.subText != null
+                    horizontalAlignment: "AlignHCenter"
+                    verticalAlignment: "AlignVCenter"
+                    elide: "ElideRight"
+                    text: root.subText ? root.subText : ""
+                    font.pointSize: 7
                 }
 
                 Item {

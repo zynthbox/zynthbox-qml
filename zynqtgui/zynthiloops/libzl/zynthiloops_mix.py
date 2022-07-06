@@ -34,7 +34,6 @@ class zynthiloops_mix(QObject):
     def __init__(self, mix_id, parent=None):
         super().__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
-        self.__song = self.zyngui.zynthiloops.song
 
         self.__mix_id = mix_id
         self.__segments_model = zynthiloops_segments_model(self)

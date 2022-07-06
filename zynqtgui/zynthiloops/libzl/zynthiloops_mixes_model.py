@@ -35,7 +35,6 @@ class zynthiloops_mixes_model(QAbstractListModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
-        self.__song__ = self.zyngui.zynthiloops.song
 
         self.__selected_mix_index = 0
         self.__mixes: dict[int, zynthiloops_mix] = {}

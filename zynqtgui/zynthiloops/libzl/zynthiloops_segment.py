@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import Property, QObject, Signal, Slot
+from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
 from ... import zynthian_gui_config
 
 
@@ -43,6 +43,14 @@ class zynthiloops_segment(QObject):
         self.barLengthChanged.connect(self.isEmptyChanged.emit)
         self.beatLengthChanged.connect(self.isEmptyChanged.emit)
         self.clipsChanged.connect(self.isEmptyChanged.emit)
+
+        # Create a timer to run until zyngui is available as zyngui will be None
+        # in ctor while restoration is in progress
+        self.check_zyngui_timer = QTimer()
+        self.check_zyngui_timer.setInterval(500)
+        self.check_zyngui_timer.setSingleShot(True)
+        self.check_zyngui_timer.timeout.connect(self.connect_track_signal, Qt.QueuedConnection)
+        self.check_zyngui_timer.start()
 
     def serialize(self):
         logging.debug("### Serializing Segment")
@@ -65,6 +73,25 @@ class zynthiloops_segment(QObject):
             self.set_barLength(obj["barLength"], True)
         if "beatLength" in obj:
             self.set_beatLength(obj["beatLength"], True)
+
+    def connect_track_signal(self):
+        if self.zyngui is None:
+            # zyngui is not yet available. Restart timer.
+            self.check_zyngui_timer.start()
+        else:
+            # zyngui is not None. Hence connect to trackAudioTypeChanged signal
+            for track_index in range(10):
+                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(track_index)
+                track.track_audio_type_changed.connect(self.sync_clips_for_track_audio_type_change, Qt.QueuedConnection)
+
+    def sync_clips_for_track_audio_type_change(self):
+        # When any of the track changes trackAudioType, this method will be called to adjust.
+        # Iterate over all clips in segment to remove and add them. Removing and adding back will make sure any
+        # other clips in same part are not selected when track mode is not sample-trig
+        # This will make sure there are no discrepencies when a track mode changes from sample-trig to something else
+        for clip in self.__clips:
+            self.removeClip(clip)
+            self.addClip(clip)
 
     ### Property name
     def get_name(self):
@@ -174,6 +201,16 @@ class zynthiloops_segment(QObject):
         """
 
         if clip not in self.__clips:
+            track = self.zyngui.zynthiloops.song.tracksModel.getTrack(clip.row)
+
+            # If track mode is not sample-trig, remove all other part clips from segment
+            # This is required because only sample-trig can have multiple selectable parts while
+            # all other track mode can have only 1 part active at a time
+            if track.trackAudioType != "sample-trig":
+                for part_index in range(5):
+                    _clip = track.getClipsModelByPart(part_index).getClip(clip.col)
+                    self.removeClip(_clip)
+
             self.__clips.append(clip)
             self.clipsChanged.emit()
 

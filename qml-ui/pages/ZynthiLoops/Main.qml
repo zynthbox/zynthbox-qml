@@ -977,6 +977,7 @@ Zynthian.ScreenPage {
                         delegate: TrackHeader2 {
                             id: trackHeaderDelegate
 
+                            property QtObject previousSegment: index > 0 ? root.song.mixesModel.selectedMix.getSegment(index - 1) : null
                             property QtObject segment: root.song.mixesModel.selectedMix.getSegment(index)
 
                             track: root.song.tracksModel.getTrack(index)
@@ -1037,10 +1038,18 @@ Zynthian.ScreenPage {
                                 onKeyZoneModeChanged: updateKeyZones();
                                 onSamplesChanged: updateKeyZones();
                             }
-                            // hide "Pat.1" info in the track header cells, as Track 1 will be Pat.1, to T10 - Pat.10
-//                            subText: trackHeaderDelegate.track.connectedPattern >= 0
-//                                      ? "Pat. " + (trackHeaderDelegate.track.connectedPattern+1)
-//                                      : ""
+                            subText: {
+                                if (root.songMode) {
+                                    if (trackHeaderDelegate.segment.barLength === 0 && trackHeaderDelegate.segment.beatLength === 0) {
+                                        return ""
+                                    } else {
+                                        return trackHeaderDelegate.segment.barLength + "." + trackHeaderDelegate.segment.beatLength
+                                    }
+                                } else {
+                                    return null
+                                }
+                            }
+
                             subSubText: {
                                 if (root.songMode) {
                                     return ""
@@ -1091,7 +1100,8 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 if (root.songMode) {
                                     if (trackHeaderDelegate.segment.segmentId === 0 ||
-                                        !trackHeaderDelegate.segment.isEmpty) {
+                                        !trackHeaderDelegate.segment.isEmpty ||
+                                        (trackHeaderDelegate.previousSegment && trackHeaderDelegate.segment.isEmpty && !trackHeaderDelegate.previousSegment.isEmpty)) {
                                         root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = index
                                     }
                                 } else {

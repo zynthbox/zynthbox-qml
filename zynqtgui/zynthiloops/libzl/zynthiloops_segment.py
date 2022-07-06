@@ -118,7 +118,10 @@ class zynthiloops_segment(QObject):
     def set_barLength(self, length, force_set=False):
         if self.__bar_length != length or force_set:
             self.__bar_length = length
-            self.zyngui.zynthiloops.song.schedule_save()
+
+            if self.zyngui.zynthiloops.song is not None:
+                self.zyngui.zynthiloops.song.schedule_save()
+
             self.barLengthChanged.emit()
 
     barLengthChanged = Signal()
@@ -133,7 +136,10 @@ class zynthiloops_segment(QObject):
     def set_beatLength(self, length, force_set=False):
         if self.__beat_length != length or force_set:
             self.__beat_length = length
-            self.zyngui.zynthiloops.song.schedule_save()
+
+            if self.zyngui.zynthiloops.song is not None:
+                self.zyngui.zynthiloops.song.schedule_save()
+
             self.beatLengthChanged.emit()
 
     beatLengthChanged = Signal()

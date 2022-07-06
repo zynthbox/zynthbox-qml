@@ -32,6 +32,17 @@ import org.kde.kirigami 2.4 as Kirigami
 Item {
     visible: Qt.inputMethod.visible
 
+    Connections {
+        target: Qt.inputMethod
+        onVisibleChanged: {
+            Qt.callLater(function() {
+                if (active && applicationWindow().activeFocusItem.selectAll) {
+                    applicationWindow().activeFocusItem.selectAll()
+                }
+            })
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "#cc222222"
@@ -62,12 +73,6 @@ Item {
             bottom: parent.bottom
         }
         height: 250
-
-        onVisibleChanged: {
-            if (visible) {
-                console.log("Current focused Item", applicationWindow().activeFocusItem)
-            }
-        }
 
         onHeightChanged: resizeKeyboard();
         onWidthChanged: resizeKeyboard();

@@ -171,10 +171,12 @@ Rectangle {
                             Layout.preferredWidth: privateProps.cellWidth
                             track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index)
                             onClicked: {
-                                root.selectedPartTrack = partBarDelegate.track
-                                root.selectedPartClip = partBarDelegate.selectedPartClip
-                                root.selectedPartPattern = partBarDelegate.selectedPartPattern
-                                root.clicked()
+                                if (!root.songMode) {
+                                    root.selectedPartTrack = partBarDelegate.track
+                                    root.selectedPartClip = partBarDelegate.selectedPartClip
+                                    root.selectedPartPattern = partBarDelegate.selectedPartPattern
+                                    root.clicked()
+                                }
                             }
                         }
                     }

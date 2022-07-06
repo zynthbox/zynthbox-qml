@@ -16,6 +16,7 @@ ColumnLayout {
     property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
+    property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
 
     signal clicked()
 
@@ -35,9 +36,13 @@ ColumnLayout {
             color: "#000000"
             border{
                 color: Kirigami.Theme.highlightColor
-                width: partDelegate.clip && partDelegate.clip.inCurrentScene
-                        ? 1
-                        : 0
+                width: root.songMode
+                        ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
+                            ? 1
+                            : 0
+                        : partDelegate.clip && partDelegate.clip.inCurrentScene
+                            ? 1
+                            : 0
             }
             WaveFormItem {
                 anchors.fill: parent
@@ -101,11 +106,15 @@ ColumnLayout {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    partDelegate.clip.enabled = !partDelegate.clip.enabled;
-                    root.track.selectedPart = index;
+                    if (root.songMode) {
+                        zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
+                    } else {
+                        partDelegate.clip.enabled = !partDelegate.clip.enabled;
+                        root.track.selectedPart = index;
 
-                    root.selectedPartClip = partDelegate.clip
-                    root.selectedPartPattern = partDelegate.pattern
+                        root.selectedPartClip = partDelegate.clip
+                        root.selectedPartPattern = partDelegate.pattern
+                    }
 
                     root.clicked()
                 }

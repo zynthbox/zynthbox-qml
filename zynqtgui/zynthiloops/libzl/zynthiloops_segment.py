@@ -38,6 +38,10 @@ class zynthiloops_segment(QObject):
         self.__bar_length = 0
         self.__beat_length = 0
 
+        # Update isEmpty when bar/beat length changes
+        self.barLengthChanged.connect(self.isEmptyChanged.emit)
+        self.beatLengthChanged.connect(self.isEmptyChanged.emit)
+
     def serialize(self):
         logging.debug("### Serializing Segment")
 
@@ -104,7 +108,10 @@ class zynthiloops_segment(QObject):
 
     ### Property isEmpty
     def get_isEmpty(self):
-        return True
+        if self.__bar_length == 0 and self.__beat_length == 0:
+            return True
+        else:
+            return False
 
     isEmptyChanged = Signal()
 

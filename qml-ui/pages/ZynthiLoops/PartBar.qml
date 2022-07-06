@@ -48,6 +48,8 @@ Rectangle {
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 
+    property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
+
     signal clicked()
 
     function cuiaCallback(cuia) {
@@ -177,36 +179,135 @@ Rectangle {
                         }
                     }
 
-                    ColumnLayout {
+                    Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.preferredWidth: privateProps.cellWidth*1.5
 
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType === "sample-loop"
-                            text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
+                        // Part details colume, visible when not in song mode
+                        ColumnLayout {
+                            anchors.fill: parent
+                            visible: !root.songMode
+
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                wrapMode: "WrapAtWordBoundaryOrAnywhere"
+                                visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType === "sample-loop"
+                                text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
+                            }
+
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                wrapMode: "WrapAtWordBoundaryOrAnywhere"
+                                visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType !== "sample-loop"
+                                text: root.selectedPartPattern ? root.selectedPartPattern.objectName : ""
+                            }
+
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: 2
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
                         }
 
-                        QQC2.Label {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                            visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType !== "sample-loop"
-                            text: root.selectedPartPattern ? root.selectedPartPattern.objectName : ""
-                        }
+                        // Segment details colume, visible when in song mode
+                        ColumnLayout {
+                            id: segmentDetails
 
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: 2
-                        }
+                            property QtObject selectedSegment: zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegment
 
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            anchors.fill: parent
+                            visible: root.songMode
+
+                            QQC2.Label {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                                horizontalAlignment: "AlignHCenter"
+                                verticalAlignment: "AlignVCenter"
+                                text: segmentDetails.selectedSegment.name
+                            }
+
+                            Kirigami.Separator {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: 2
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    text: qsTr("Bar")
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: false
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    text: "/"
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: false
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    text: qsTr("Beat")
+                                }
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+
+                                QQC2.TextField {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    text: segmentDetails.selectedSegment.barLength
+                                    onAccepted: {
+                                        segmentDetails.selectedSegment.barLength = parseInt(text)
+                                    }
+                                }
+                                QQC2.Label {
+                                    Layout.fillWidth: false
+                                    Layout.fillHeight: true
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    text: "/"
+                                }
+                                QQC2.TextField {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    horizontalAlignment: "AlignHCenter"
+                                    verticalAlignment: "AlignVCenter"
+                                    inputMethodHints: Qt.ImhDigitsOnly
+                                    text: segmentDetails.selectedSegment.beatLength
+                                    onAccepted: {
+                                        segmentDetails.selectedSegment.beatLength = parseInt(text)
+                                    }
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
                         }
                     }
                 }

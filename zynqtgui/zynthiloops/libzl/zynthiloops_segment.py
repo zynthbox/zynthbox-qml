@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import Property, QObject, Signal
+from PySide2.QtCore import Property, QObject, Signal, Slot
 from ... import zynthian_gui_config
 
 
@@ -37,10 +37,12 @@ class zynthiloops_segment(QObject):
         self.__mix_id = mix_id
         self.__bar_length = 0
         self.__beat_length = 0
+        self.__clips = []
 
         # Update isEmpty when bar/beat length changes
         self.barLengthChanged.connect(self.isEmptyChanged.emit)
         self.beatLengthChanged.connect(self.isEmptyChanged.emit)
+        self.clipsChanged.connect(self.isEmptyChanged.emit)
 
     def serialize(self):
         logging.debug("### Serializing Segment")
@@ -108,7 +110,9 @@ class zynthiloops_segment(QObject):
 
     ### Property isEmpty
     def get_isEmpty(self):
-        if self.__bar_length == 0 and self.__beat_length == 0:
+        if self.__bar_length == 0 and \
+                self.__beat_length == 0 and \
+                len(self.__clips) == 0:
             return True
         else:
             return False
@@ -154,3 +158,42 @@ class zynthiloops_segment(QObject):
     beatLength = Property(int, get_beatLength, set_beatLength, notify=beatLengthChanged)
     ### END Property beatLength
 
+    ### Property clips
+    def get_clips(self):
+        return self.__clips
+
+    clipsChanged = Signal()
+
+    clips = Property('QVariantList', get_clips, notify=clipsChanged)
+    ### END Property clips
+
+    @Slot(QObject, result=None)
+    def addClip(self, clip):
+        """
+        Add clip to a segment
+        """
+
+        if clip not in self.__clips:
+            self.__clips.append(clip)
+            self.clipsChanged.emit()
+
+    @Slot(QObject, result=None)
+    def removeClip(self, clip):
+        """
+        Remove clip from a segment
+        """
+
+        if clip in self.__clips:
+            self.__clips.remove(clip)
+            self.clipsChanged.emit()
+
+    @Slot(QObject, result=None)
+    def toggleClip(self, clip):
+        """
+        Toggle clip in a segment
+        """
+
+        if clip in self.__clips:
+            self.removeClip(clip)
+        else:
+            self.addClip(clip)

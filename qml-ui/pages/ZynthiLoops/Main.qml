@@ -796,7 +796,7 @@ Zynthian.ScreenPage {
                         Layout.fillHeight: true
 
                         highlightOnFocus: false
-                        highlighted: root.displaySketchButtons
+                        highlighted: !root.songMode && root.displaySketchButtons
                         text: root.song.name
                         subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
 
@@ -804,7 +804,9 @@ Zynthian.ScreenPage {
                         subTextSize: 8
 
                         onPressed: {
-                            root.displaySketchButtons = !root.displaySketchButtons
+                            if (!root.songMode) {
+                                root.displaySketchButtons = !root.displaySketchButtons
+                            }
                         }
                     }
 
@@ -1351,6 +1353,7 @@ Zynthian.ScreenPage {
                             height: privateProps.headerHeight*3 + 2 // 3 cell height + 2 spacing height in between
                             color: Kirigami.Theme.backgroundColor
 
+                            // Copy/paste/clear buttons container
                             ColumnLayout {
                                 anchors.fill: parent
                                 spacing: 1

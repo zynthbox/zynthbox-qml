@@ -26,17 +26,55 @@ For a full copy of the GNU General Public License see the LICENSE.txt file.
 import QtQuick 2.6
 import QtQuick.VirtualKeyboard 2.2
 
-InputPanel {
-    id: inputPanel
-    active:  Qt.inputMethod.visible
-    visible: active
-    width: parent.width
+import QtQuick.Controls 2.2 as QQC2
+import org.kde.kirigami 2.4 as Kirigami
 
-    onHeightChanged: resizeKeyboard();
-    onWidthChanged: resizeKeyboard();
-    function resizeKeyboard() {
-        keyboard.style.keyboardDesignWidth = width*3
-        keyboard.style.keyboardDesignHeight = height*3
+Item {
+    visible: Qt.inputMethod.visible
+
+    Rectangle {
+        anchors.fill: parent
+        color: "#cc222222"
+
+        QQC2.TextField {
+            anchors.centerIn: parent
+            width: parent.width * 0.4
+            height: Kirigami.Units.gridUnit * 2
+            horizontalAlignment: "AlignHCenter"
+            verticalAlignment: "AlignVCenter"
+            text: applicationWindow().activeFocusItem.text ? applicationWindow().activeFocusItem.text : ""
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                Qt.inputMethod.hide()
+            }
+        }
     }
-    Component.onCompleted: resizeKeyboard()
+
+    InputPanel {
+        id: inputPanel
+        active: Qt.inputMethod.visible
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: 250
+
+        onVisibleChanged: {
+            if (visible) {
+                console.log("Current focused Item", applicationWindow().activeFocusItem)
+            }
+        }
+
+        onHeightChanged: resizeKeyboard();
+        onWidthChanged: resizeKeyboard();
+        function resizeKeyboard() {
+            keyboard.style.keyboardDesignWidth = width*3
+            keyboard.style.keyboardDesignHeight = height*3
+        }
+        Component.onCompleted: resizeKeyboard()
+    }
 }

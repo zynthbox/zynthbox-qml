@@ -206,7 +206,7 @@ class zynthiloops_segment(QObject):
             # If track mode is not sample-trig, remove all other part clips from segment
             # This is required because only sample-trig can have multiple selectable parts while
             # all other track mode can have only 1 part active at a time
-            if track.trackAudioType != "sample-trig":
+            if not (track.trackAudioType == "sample-trig" and track.keyZoneMode == "all-full"):
                 for part_index in range(5):
                     _clip = track.getClipsModelByPart(part_index).getClip(clip.col)
                     self.removeClip(_clip)

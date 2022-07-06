@@ -598,13 +598,7 @@ Kirigami.AbstractApplicationWindow {
     Loader {
         parent: root.contentItem.parent
         z: Qt.inputMethod.visible ? 99999999 : 1
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
-            right: parent.right
-            //bottomMargin: -root.footer.height
-        }
-        height: Math.min(parent.height / 2, Math.max(parent.height/3, Kirigami.Units.gridUnit * 15))
+        anchors.fill: parent
         source: "./VirtualKeyboard.qml"
     }
 

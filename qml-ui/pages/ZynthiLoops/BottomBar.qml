@@ -84,10 +84,6 @@ Rectangle {
         }
     }
 
-    transform: Translate {
-        y: Qt.inputMethod.visible ? -Kirigami.Units.gridUnit * 6 : 0
-    }
-
     onVisibleChanged: {
         if (visible) {
             tabbedView.initialAction.trigger()

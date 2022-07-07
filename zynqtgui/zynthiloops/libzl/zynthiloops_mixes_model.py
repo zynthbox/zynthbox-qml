@@ -32,10 +32,11 @@ from zynqtgui.zynthiloops.libzl.zynthiloops_mix import zynthiloops_mix
 class zynthiloops_mixes_model(QAbstractListModel):
     MixRole = Qt.UserRole + 1
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, song):
+        super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
+        self.__song = song
         self.__selected_mix_index = 0
         self.__mixes: dict[int, zynthiloops_mix] = {}
         self.__song_mode = False
@@ -58,7 +59,7 @@ class zynthiloops_mixes_model(QAbstractListModel):
             self.__mixes.clear()
 
             for mix_obj in obj["mixes"]:
-                mix = zynthiloops_mix(-1, self)
+                mix = zynthiloops_mix(-1, self.__song)
                 mix.deserialize(mix_obj)
 
                 self.add_mix(mix.mixId, mix)

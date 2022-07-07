@@ -29,10 +29,11 @@ from ... import zynthian_gui_config
 
 
 class zynthiloops_segment(QObject):
-    def __init__(self, mix_id, segment_id, parent=None):
-        super().__init__(parent)
+    def __init__(self, mix_id, segment_id, song):
+        super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
+        self.__song = song
         self.__segment_id = segment_id
         self.__mix_id = mix_id
         self.__bar_length = 0
@@ -44,13 +45,10 @@ class zynthiloops_segment(QObject):
         self.beatLengthChanged.connect(self.isEmptyChanged.emit)
         self.clipsChanged.connect(self.isEmptyChanged.emit)
 
-        # Create a timer to run until zyngui is available as zyngui will be None
-        # in ctor while restoration is in progress
-        self.__check_zyngui_timer = QTimer()
-        self.__check_zyngui_timer.setInterval(500)
-        self.__check_zyngui_timer.setSingleShot(True)
-        self.__check_zyngui_timer.timeout.connect(self.check_zyngui_timer_timeout, Qt.QueuedConnection)
-        self.__check_zyngui_timer.start()
+        self.__song.scenesModel.selected_sketch_index_changed.connect(self.clipsChanged.emit)
+        for track_index in range(10):
+            track = self.__song.tracksModel.getTrack(track_index)
+            track.track_audio_type_changed.connect(self.sync_clips_for_track_audio_type_change, Qt.QueuedConnection)
 
     def serialize(self):
         logging.debug("### Serializing Segment")
@@ -60,6 +58,13 @@ class zynthiloops_segment(QObject):
             "segmentId": self.__segment_id,
             "barLength": self.__bar_length,
             "beatLength": self.__beat_length,
+            "clips": [
+                {
+                    "row": clip.row,
+                    "col": clip.col,
+                    "part": clip.part
+                } for clip in self.__clips
+            ]
         }
 
     def deserialize(self, obj):
@@ -73,18 +78,9 @@ class zynthiloops_segment(QObject):
             self.set_barLength(obj["barLength"], True)
         if "beatLength" in obj:
             self.set_beatLength(obj["beatLength"], True)
-
-    def check_zyngui_timer_timeout(self):
-        if self.zyngui is None:
-            # zyngui is not yet available. Restart timer.
-            self.__check_zyngui_timer.start()
-        else:
-            self.zyngui.zynthiloops.song.scenesModel.selected_sketch_index_changed.connect(self.clipsChanged.emit)
-
-            # zyngui is not None. Hence connect to trackAudioTypeChanged signal
-            for track_index in range(10):
-                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(track_index)
-                track.track_audio_type_changed.connect(self.sync_clips_for_track_audio_type_change, Qt.QueuedConnection)
+        if "clips" in obj:
+            for clip in obj["clips"]:
+                self.__clips.append(self.__song.getClipByPart(clip["row"], clip["col"], clip["part"]))
 
     def sync_clips_for_track_audio_type_change(self):
         # When any of the track changes trackAudioType, this method will be called to adjust.
@@ -217,6 +213,9 @@ class zynthiloops_segment(QObject):
             self.__clips.append(clip)
             self.clipsChanged.emit()
 
+            if self.zyngui.zynthiloops.song is not None:
+                self.zyngui.zynthiloops.song.schedule_save()
+
     @Slot(QObject, result=None)
     def removeClip(self, clip):
         """
@@ -227,6 +226,9 @@ class zynthiloops_segment(QObject):
             logging.debug(f"Removing clip(row: {clip.row}, col: {clip.col}) from segment {self.segmentId}")
             self.__clips.remove(clip)
             self.clipsChanged.emit()
+
+            if self.zyngui.zynthiloops.song is not None:
+                self.zyngui.zynthiloops.song.schedule_save()
 
     @Slot(QObject, result=None)
     def toggleClip(self, clip):
@@ -251,6 +253,4 @@ class zynthiloops_segment(QObject):
         # Add all clips of current sketch from selected scene to this segment
         for scene_clip in self.zyngui.zynthiloops.song.scenesModel.getScene(sceneIndex)["clips"]:
             if scene_clip.col == self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex:
-                self.__clips.append(scene_clip)
-
-        self.clipsChanged.emit()
+                self.addClip(scene_clip)

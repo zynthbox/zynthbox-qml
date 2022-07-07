@@ -49,13 +49,13 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         clip: true
-        model: zynthian.zynthiloops.song.tracksModel
+        model: 10
         delegate: QQC2.ItemDelegate {
             width: ListView.view.width
             property QtObject selectedClip: contentItem.selectedClip
             contentItem: RowLayout {
                 id: delegate
-                property QtObject track: model.track
+                property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
                 property QtObject selectedClip: null
                 property int thisIndex: index
                 QQC2.Label {
@@ -64,13 +64,14 @@ ColumnLayout {
                     text: "Track " + (index+1)
                 }
                 Repeater {
-                    model: delegate.track.clipsModel
+                    model: 10
                     QQC2.Button {
+                        property QtObject clip: delegate.track.clipsModel.getClip(index)
                         Layout.fillHeight: true
-                        text: model.display
-                        checked: ListView.isCurrentItem && delegate.selectedClip === model.clip
+                        text: clip.name
+                        checked: ListView.isCurrentItem && delegate.selectedClip === clip
                         onClicked: {
-                            delegate.selectedClip = model.clip;
+                            delegate.selectedClip = clip;
                             tracksList.currentIndex = delegate.thisIndex;
                         }
                     }

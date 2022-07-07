@@ -1201,7 +1201,11 @@ Zynthian.ScreenPage {
                                         highlighted: index === root.song.scenesModel.selectedSceneIndex
                                         highlightOnFocus: false
                                         onPressed: {
-                                            Zynthian.CommonUtils.switchToScene(index);
+                                            if (root.songMode) {
+                                                root.song.mixesModel.selectedMix.segmentsModel.selectedSegment.copyClipsFromScene(index)
+                                            } else {
+                                                Zynthian.CommonUtils.switchToScene(index);
+                                            }
                                         }
                                     }
 

@@ -49,10 +49,12 @@ QQC2.AbstractButton {
     property color color: Kirigami.Theme.backgroundColor
     property bool highlighted: false
     property bool highlightOnFocus: true
+    property bool active: true
 
     contentItem: TableHeaderLabel {
         id: contents
         text: root.text
+        opacity: root.active ? 1 : 0.3
     }
 
     onPressed: root.forceActiveFocus()

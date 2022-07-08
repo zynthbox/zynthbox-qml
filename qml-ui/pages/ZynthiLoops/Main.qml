@@ -822,6 +822,7 @@ Zynthian.ScreenPage {
                             property QtObject mix: root.song.mixesModel.getMix(index)
 
                             color: Kirigami.Theme.backgroundColor
+                            active: !sceneHeaderDelegate.mix.isEmpty
 
                             Layout.fillWidth: false
                             Layout.fillHeight: true

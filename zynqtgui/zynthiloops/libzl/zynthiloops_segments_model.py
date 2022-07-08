@@ -117,6 +117,7 @@ class zynthiloops_segments_model(QAbstractListModel):
     selectedSegment = Property(QObject, get_selectedSegment, notify=selectedSegmentIndexChanged)
     ### END Property selectedSegment
 
+    @Slot(int, result=QObject)
     def get_segment(self, segment_index):
         try:
             return self.__segments[segment_index]

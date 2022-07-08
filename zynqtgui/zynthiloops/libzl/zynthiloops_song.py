@@ -126,7 +126,7 @@ class zynthiloops_song(QObject):
                 mix = zynthiloops_mix(mix_index, self)
 
                 for segment_index in range(10):
-                    segment = zynthiloops_segment(mix_index, segment_index, self)
+                    segment = zynthiloops_segment(mix, segment_index, self)
                     mix.segmentsModel.add_segment(segment_index, segment)
 
                 self.__mixes_model__.add_mix(mix_index, mix)

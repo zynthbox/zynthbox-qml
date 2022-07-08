@@ -1155,10 +1155,13 @@ Zynthian.ScreenPage {
                             height: privateProps.headerHeight
 
                             highlightOnFocus: false
-                            highlighted: root.displaySceneButtons
+                            highlighted: !root.songMode &&
+                                         root.displaySceneButtons
 
                             onPressed: {
-                                root.displaySceneButtons = !root.displaySceneButtons
+                                if (!root.songMode) {
+                                    root.displaySceneButtons = !root.displaySceneButtons
+                                }
                             }
                         }
                     }

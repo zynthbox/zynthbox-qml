@@ -1198,7 +1198,8 @@ Zynthian.ScreenPage {
                                         anchors.fill: parent
                                         visible: root.displaySceneButtons || root.songMode
                                         text: String.fromCharCode(65+index).toUpperCase()
-                                        highlighted: index === root.song.scenesModel.selectedSceneIndex
+                                        highlighted: !root.songMode &&
+                                                     index === root.song.scenesModel.selectedSceneIndex
                                         highlightOnFocus: false
                                         onPressed: {
                                             if (root.songMode) {

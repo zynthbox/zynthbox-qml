@@ -37,7 +37,8 @@ class zynthiloops_mix(QObject):
 
         self.__song = song
         self.__mix_id = mix_id
-        self.__segments_model = zynthiloops_segments_model(song)
+        self.__segments_model = zynthiloops_segments_model(song, self)
+        self.__is_empty = True
 
     def serialize(self):
         logging.debug("### Serializing Mix")
@@ -85,6 +86,31 @@ class zynthiloops_mix(QObject):
     segmentsModel = Property(QObject, get_segmentsModel, notify=segmentsModelChanged)
     ### END Property segmentsModel
 
+    ### Property isEmpty
+    def get_isEmpty(self):
+        return self.__is_empty
+
+    def set_isEmpty(self, val):
+        if self.__is_empty != val:
+            self.__is_empty = val
+            self.isEmptyChanged.emit()
+
+    isEmptyChanged = Signal()
+
+    isEmpty = Property(bool, get_isEmpty, notify=isEmptyChanged)
+    ### END Property isEmpty
+
     @Slot(int, result=QObject)
     def getSegment(self, segmentIndex):
         return self.segmentsModel.get_segment(segmentIndex)
+
+    @Slot()
+    def segment_is_empty_changed_handler(self):
+        is_empty = True
+        for segment_index in range(self.segmentsModel.count):
+            segment = self.segmentsModel.get_segment(segment_index)
+            if not segment.isEmpty:
+                is_empty = False
+                break
+
+        self.set_isEmpty(is_empty)

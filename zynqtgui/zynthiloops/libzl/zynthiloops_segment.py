@@ -29,13 +29,13 @@ from ... import zynthian_gui_config
 
 
 class zynthiloops_segment(QObject):
-    def __init__(self, mix_id, segment_id, song):
+    def __init__(self, mix, segment_id, song):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
         self.__segment_id = segment_id
-        self.__mix_id = mix_id
+        self.__mix = mix
         self.__bar_length = 0
         self.__beat_length = 0
         self.__clips = []
@@ -44,6 +44,9 @@ class zynthiloops_segment(QObject):
         self.barLengthChanged.connect(self.isEmptyChanged.emit)
         self.beatLengthChanged.connect(self.isEmptyChanged.emit)
         self.clipsChanged.connect(self.isEmptyChanged.emit)
+
+        # Update mix isEmpty when segment isEmpty is updated
+        self.isEmptyChanged.connect(self.__mix.segment_is_empty_changed_handler, Qt.QueuedConnection)
 
         self.__song.scenesModel.selected_sketch_index_changed.connect(self.clipsChanged.emit)
         for track_index in range(10):
@@ -54,7 +57,7 @@ class zynthiloops_segment(QObject):
         logging.debug("### Serializing Segment")
 
         return {
-            "mixId": self.__mix_id,
+            "mixId": self.__mix.mixId,
             "segmentId": self.__segment_id,
             "barLength": self.__bar_length,
             "beatLength": self.__beat_length,
@@ -100,11 +103,11 @@ class zynthiloops_segment(QObject):
 
     ### Property mixId
     def get_mixId(self):
-        return self.__mix_id
+        return self.__mix.mixId
 
     def set_mixId(self, mix_id, force_set=False):
-        if self.__mix_id != mix_id or force_set:
-            self.__mix_id = mix_id
+        if self.__mix.mixId != mix_id or force_set:
+            self.__mix.mixId = mix_id
             self.mixIdChanged.emit()
 
     mixIdChanged = Signal()

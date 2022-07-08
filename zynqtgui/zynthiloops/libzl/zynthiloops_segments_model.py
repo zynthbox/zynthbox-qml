@@ -32,11 +32,12 @@ from zynqtgui.zynthiloops.libzl.zynthiloops_segment import zynthiloops_segment
 class zynthiloops_segments_model(QAbstractListModel):
     SegmentRole = Qt.UserRole + 1
 
-    def __init__(self, song):
+    def __init__(self, song, mix):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
+        self.__mix = mix
         self.__selected_segment_index = 0
         self.__segments: dict[int, zynthiloops_segment] = {}
 
@@ -52,7 +53,7 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.__segments.clear()
 
         for index, segment_obj in enumerate(obj):
-            segment = zynthiloops_segment(-1, -1, self.__song)
+            segment = zynthiloops_segment(self.__mix, -1, self.__song)
             segment.deserialize(segment_obj)
 
             self.add_segment(segment.segmentId, segment)

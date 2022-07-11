@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal
+from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthiloops.libzl.zynthiloops_segment import zynthiloops_segment
 

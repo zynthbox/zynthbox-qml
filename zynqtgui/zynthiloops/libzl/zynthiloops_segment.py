@@ -57,7 +57,6 @@ class zynthiloops_segment(QObject):
         logging.debug("### Serializing Segment")
 
         return {
-            "mixId": self.__mix.mixId,
             "segmentId": self.__segment_id,
             "barLength": self.__bar_length,
             "beatLength": self.__beat_length,
@@ -73,8 +72,6 @@ class zynthiloops_segment(QObject):
     def deserialize(self, obj):
         logging.debug("### Deserializing Segment")
 
-        if "mixId" in obj:
-            self.set_mixId(obj["mixId"], True)
         if "segmentId" in obj:
             self.set_segmentId(obj["segmentId"], True)
         if "barLength" in obj:
@@ -104,11 +101,6 @@ class zynthiloops_segment(QObject):
     ### Property mixId
     def get_mixId(self):
         return self.__mix.mixId
-
-    def set_mixId(self, mix_id, force_set=False):
-        if self.__mix.mixId != mix_id or force_set:
-            self.__mix.mixId = mix_id
-            self.mixIdChanged.emit()
 
     mixIdChanged = Signal()
 

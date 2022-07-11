@@ -142,6 +142,9 @@ class zynthiloops_song(QObject):
         # Finally, just in case something happened, make sure we're not loading any longer
         self.__is_loading__ = False
 
+        # Schedule a save after a sketch loads/restores to ensure sketch file is available after creating a new sketch
+        self.schedule_save()
+
     ###
     # Sometimes you just need to force-update the graph layout. Call this function to make that happen kind of soonish
     @Slot(None)

@@ -85,6 +85,23 @@ QQC2.Popup {
         return returnValue;
     }
 
+    Connections {
+        target: root
+        onSelectedTrackChanged: {
+            if (root.opened) {
+                root.clipToRecord = root.selectedTrack.getClipToRecord()
+            }
+        }
+    }
+    Connections {
+        target: root.selectedTrack
+        onSelectedSlotRowChanged: {
+            if (root.opened) {
+                root.clipToRecord = root.selectedTrack.getClipToRecord()
+            }
+        }
+    }
+
     ColumnLayout {
         implicitWidth: root.parent.width * 0.6
         implicitHeight: root.parent.height * 0.7
@@ -283,6 +300,7 @@ QQC2.Popup {
 
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
+                                                enabled: clip && clip !== root.clipToRecord
                                                 checked: clip && (zynthian.zynthiloops.clipsToRecord.indexOf(clip) >= 0 || clip === root.clipToRecord)
                                                 opacity: checked ? 1 : 0.5
                                                 text: qsTr("Slot %1").arg(index+1)

@@ -783,9 +783,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def get_clips_to_record(self):
         return self.clips_to_record
 
+    def set_clips_to_record(self, clips):
+        if clips != self.clips_to_record:
+            self.clips_to_record = clips
+            self.clipsToRecordChanged.emit()
+
     clipsToRecordChanged = Signal()
 
-    clipsToRecord = Property('QVariantList', get_clips_to_record, notify=clipsToRecordChanged)
+    clipsToRecord = Property('QVariantList', get_clips_to_record, set_clips_to_record, notify=clipsToRecordChanged)
     ### END Property clipsToRecord
 
     ### Property isRecording
@@ -1390,10 +1395,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
 
         for clip in self.clips_to_record:
-            clip.set_path(self.clip_to_record_path, True)
-            clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-            clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
-            clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+            if clip != self.clip_to_record:
+                clip.set_path(self.clip_to_record_path, True)
+                clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
+                clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+                clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
 
         if self.clip_to_record.isTrackSample:
             logging.info(f"Recorded clip is a sample")

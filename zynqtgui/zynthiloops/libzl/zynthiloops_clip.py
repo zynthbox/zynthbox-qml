@@ -695,7 +695,11 @@ class zynthiloops_clip(QObject):
         self.path_changed.emit()
         self.sound_data_changed.emit()
         self.duration_changed.emit()
+        if self.is_track_sample:
+            self.__song__.tracksModel.getTrack(self.row).samples_changed.emit()
+
         self.__song__.schedule_save()
+
     path = Property(str, path, set_path, notify=path_changed)
 
     def audio_level_changed_cb(self, leveldB):
@@ -731,6 +735,9 @@ class zynthiloops_clip(QObject):
 
         self.__path__ = None
         self.path_changed.emit()
+        if self.is_track_sample:
+            self.__song__.tracksModel.getTrack(self.row).samples_changed.emit()
+
         self.__song__.schedule_save()
 
     @Slot(None)

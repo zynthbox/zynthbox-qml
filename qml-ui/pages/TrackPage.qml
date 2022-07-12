@@ -322,11 +322,11 @@ Zynthian.ScreenPage {
                 contentItem: ColumnLayout {
                     QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter
-                        icon.name: root.clip.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        icon.name: zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            if (!root.clip.isRecording) {
+                            if (!zynthian.zynthiloops.isRecording) {
                                 root.clip.clear();
                                 root.clip.queueRecording(
                                     sourceComboModel.get(sourceCombo.currentIndex).value,

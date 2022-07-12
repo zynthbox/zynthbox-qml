@@ -370,7 +370,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             }
 
             # Recording Button
-            if self.zyngui.zynthiloops.clipToRecord is None:
+            if not self.zyngui.zynthiloops.isRecording:
                 self.button_color_map[14] = {
                     'color': self.led_color_light,
                     'blink': False

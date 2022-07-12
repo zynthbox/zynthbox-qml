@@ -73,7 +73,6 @@ class zynthiloops_clip(QObject):
         self.__current_beat__ = -1
         self.__should_sync__ = False
         self.__playing_started__ = False
-        self.__is_recording__ = False
         self.__arranger_bar_positions__ = []
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
@@ -344,10 +343,6 @@ class zynthiloops_clip(QObject):
     def __is_playing_changed__(self):
         pass
 
-    @Signal
-    def __is_recording_changed__(self):
-        pass
-
     def playable(self):
         return True
     playable = Property(bool, playable, constant=True)
@@ -404,16 +399,6 @@ class zynthiloops_clip(QObject):
         return self.__progress__
 
     progress = Property(float, get_progress, notify=progressChanged)
-
-
-    def get_isRecording(self):
-        return self.__is_recording__
-
-    def set_isRecording(self, is_recording):
-        self.__is_recording__ = is_recording
-        self.__is_recording_changed__.emit()
-
-    isRecording = Property(bool, get_isRecording, set_isRecording, notify=__is_recording_changed__)
 
 
     @Signal
@@ -666,7 +651,6 @@ class zynthiloops_clip(QObject):
 
         self.__length__ = float(self.__get_metadata_prop__("ZYNTHBOX_LENGTH", self.__initial_length__))
         self.__is_playing__ = False
-        self.__is_recording__ = False
         self.__start_position__ = float(self.__get_metadata_prop__("ZYNTHBOX_STARTPOSITION", self.__initial_start_position__))
         self.__loop_delta__ = float(self.__get_metadata_prop__("ZYNTHBOX_LOOPDELTA", 0.0))
         self.__pitch__ = int(self.__get_metadata_prop__("ZYNTHBOX_PITCH", self.__initial_pitch__))

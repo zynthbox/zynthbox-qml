@@ -275,11 +275,20 @@ QQC2.Popup {
                                                     ? 5
                                                     : 1
                                             delegate: QQC2.Button {
+                                                property QtObject clip: targetTracksDelegate.track
+                                                                            ? ["sample-trig", "sample-slice"].indexOf(targetTracksDelegate.track.trackAudioType) >= 0
+                                                                                ? targetTracksDelegate.track.samples[index]
+                                                                                : targetTracksDelegate.track.sceneClip
+                                                                            : null
+
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
-                                                checkable: true
+                                                checked: clip && zynthian.zynthiloops.clipsToRecord.indexOf(clip) >= 0
                                                 opacity: checked ? 1 : 0.5
                                                 text: qsTr("Slot %1").arg(index+1)
+                                                onClicked: {
+                                                    zynthian.zynthiloops.toggleFromClipsToRecord(clip)
+                                                }
                                             }
                                         }
 

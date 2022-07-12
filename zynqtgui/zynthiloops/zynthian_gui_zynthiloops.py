@@ -127,6 +127,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__record_master_output__ = False
         self.__count_in_bars__ = 0
         self.__global_fx_knob_value__ = 50
+        self.clips_to_record = []
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -778,6 +779,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     clipToRecord = Property(QObject, get_clip_to_record, set_clip_to_record, notify=clipToRecordChanged)
     ### END Property clipToRecord
 
+    ### Property clipsToRecord
+    def get_clips_to_record(self):
+        return self.clips_to_record
+
+    clipsToRecordChanged = Signal()
+
+    clipsToRecord = Property('QVariantList', get_clips_to_record, notify=clipsToRecordChanged)
+    ### END Property clipsToRecord
+
     ### Property knobTouchUpdateInProgress
     def get_knob_touch_update_in_progress(self):
         return self.__knob_touch_update_in_progress__
@@ -1413,6 +1423,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             return True
         else:
             return False
+
+    @Slot(QObject)
+    def toggleFromClipsToRecord(self, clip):
+        if clip in self.clips_to_record:
+            self.clips_to_record.remove(clip)
+        else:
+            self.clips_to_record.append(clip)
+
+        self.clipsToRecordChanged.emit()
 
     metronomeBeatUpdate4th = Signal(int)
     metronomeBeatUpdate8th = Signal(int)

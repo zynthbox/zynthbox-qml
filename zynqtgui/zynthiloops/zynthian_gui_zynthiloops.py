@@ -790,6 +790,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     clipsToRecordChanged = Signal()
 
+    # This property is used by recording popup to determine which additional clips should also have the recorded clip
     clipsToRecord = Property('QVariantList', get_clips_to_record, set_clips_to_record, notify=clipsToRecordChanged)
     ### END Property clipsToRecord
 
@@ -1394,7 +1395,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
 
+        # Set same recorded clip to other additional clips
         for clip in self.clips_to_record:
+            # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
+            # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
             if clip != self.clip_to_record:
                 clip.set_path(self.clip_to_record_path, True)
                 clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])

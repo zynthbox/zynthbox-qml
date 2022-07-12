@@ -463,6 +463,7 @@ QQC2.Popup {
                     onClicked: {
                         if (zynthian.zynthiloops.clipsToRecord[0]) {
                             if (!zynthian.zynthiloops.isRecording) {
+                                // Start recording with first clip in clipsToRecord
                                 zynthian.zynthiloops.clipsToRecord[0].queueRecording(
                                     sourceComboModel.get(sourceCombo.currentIndex).value,
                                     channelComboModel.get(channelCombo.currentIndex).value

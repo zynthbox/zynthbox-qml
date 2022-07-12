@@ -1389,6 +1389,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
 
+        for clip in self.clips_to_record:
+            clip.set_path(self.clip_to_record_path, True)
+            clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
+            clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+            clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+
         if self.clip_to_record.isTrackSample:
             logging.info(f"Recorded clip is a sample")
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
@@ -1398,6 +1404,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record_path = None
         self.recorder_process = None
         self.__last_recording_type__ = ""
+
+        self.clips_to_record.clear()
+        self.clipsToRecordChanged.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):

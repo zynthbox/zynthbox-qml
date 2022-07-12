@@ -263,7 +263,7 @@ Rectangle {
     //                icon.name: "media-record-symbolic"
     //                icon.color: "#f44336"
     //                active: (controlObj != null) && controlObj.recordable && !controlObj.path
-    //                enabled: !controlObj.isRecording
+    //                enabled: !zynthian.zynthiloops.isRecording
 
     //                onClicked: {
     //                    controlObj.queueRecording();

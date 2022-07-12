@@ -48,7 +48,7 @@ QQC2.Popup {
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
-    closePolicy: root.clipToRecord && !root.clipToRecord.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
+    closePolicy: root.clipToRecord && !zynthian.zynthiloops.isRecording ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
 
     onOpenedChanged: {
         if (opened) {
@@ -106,7 +106,7 @@ QQC2.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: false
-                enabled: root.clipToRecord && !root.clipToRecord.isRecording
+                enabled: root.clipToRecord && !zynthian.zynthiloops.isRecording
 
                 RowLayout {
                     Layout.fillWidth: false
@@ -283,7 +283,7 @@ QQC2.Popup {
 
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
-                                                checked: clip && zynthian.zynthiloops.clipsToRecord.indexOf(clip) >= 0
+                                                checked: clip && (zynthian.zynthiloops.clipsToRecord.indexOf(clip) >= 0 || clip === root.clipToRecord)
                                                 opacity: checked ? 1 : 0.5
                                                 text: qsTr("Slot %1").arg(index+1)
                                                 onClicked: {
@@ -492,10 +492,10 @@ QQC2.Popup {
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignCenter
 
-                    icon.name: root.clipToRecord && root.clipToRecord.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                    icon.name: root.clipToRecord && zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
                     onClicked: {
-                        if (root.clipToRecord && !root.clipToRecord.isRecording) {
+                        if (root.clipToRecord && !zynthian.zynthiloops.isRecording) {
                             root.clipToRecord.queueRecording(
                                 sourceComboModel.get(sourceCombo.currentIndex).value,
                                 channelComboModel.get(channelCombo.currentIndex).value

@@ -2120,7 +2120,7 @@ class zynthian_gui(QObject):
         elif cuia == "START_RECORD":
             if self.recording_popup_active or self.altButtonPressed:
                 zl = self.screens["zynthiloops"]
-                if zl.clipToRecord is None:
+                if not zl.isRecording:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
                     track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)

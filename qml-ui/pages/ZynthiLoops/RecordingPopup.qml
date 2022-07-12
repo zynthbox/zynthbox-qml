@@ -101,7 +101,6 @@ QQC2.Popup {
             opacity: 0.5
         }
         RowLayout {
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 12
             Layout.fillWidth: true
 
             ColumnLayout {
@@ -193,6 +192,111 @@ QQC2.Popup {
                             ListElement { text: "Stereo"; value: "*" }
                         }
                         textRole: "text"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        enabled: parent.enabled
+                        text: qsTr("Target Tracks")
+                    }
+
+                    QQC2.Button {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Select target tracks")
+                        onClicked: {
+                            targetTracksPopup.open()
+                        }
+
+                        QQC2.Popup {
+                            id: targetTracksPopup
+                            exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
+                            modal: true
+                            focus: true
+                            parent: QQC2.Overlay.overlay
+                            y: root.parent.mapFromGlobal(0, Math.round(root.parent.height/2 - height/2)).y
+                            x: root.parent.mapFromGlobal(Math.round(root.parent.width/2 - width/2), 0).x
+                            closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+
+                            ColumnLayout {
+                                implicitWidth: root.parent.width * 0.6
+                                implicitHeight: root.parent.height * 0.7
+
+                                Kirigami.Heading {
+                                    Layout.fillWidth: true
+                                    text: qsTr("Select slots to record")
+                                }
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    Layout.minimumHeight: 1
+                                    Layout.maximumHeight: 1
+                                    color: Kirigami.Theme.textColor
+                                    opacity: 0.5
+                                }
+
+                                Repeater {
+                                    model: 10
+                                    delegate: RowLayout {
+                                        id: targetTracksDelegate
+                                        property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
+
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+
+                                        QQC2.Label {
+                                            Layout.fillWidth: false
+                                            Layout.fillHeight: true
+                                            Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+                                            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+                                            elide: "ElideRight"
+                                            text: qsTr("Track %1 (%2)")
+                                                    .arg(targetTracksDelegate.track.name)
+                                                    .arg(targetTracksDelegate.track.trackAudioType === "sample-loop"
+                                                            ? "Loop"
+                                                            : targetTracksDelegate.track.trackAudioType === "sample-trig"
+                                                                ? "Smp: Trig"
+                                                                : targetTracksDelegate.track.trackAudioType === "sample-slice"
+                                                                    ? "Smp: Slice"
+                                                                    : targetTracksDelegate.track.trackAudioType === "synth"
+                                                                      ? "Synth"
+                                                                      : targetTracksDelegate.track.trackAudioType === "external"
+                                                                            ? "External"
+                                                                            : "")
+                                        }
+
+                                        Repeater {
+                                            id: targetTracksSlotsRepeater
+                                            model: ["sample-trig", "sample-slice"].indexOf(targetTracksDelegate.track.trackAudioType) >= 0
+                                                    ? 5
+                                                    : 1
+                                            delegate: QQC2.Button {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                checkable: true
+                                                opacity: checked ? 1 : 0.5
+                                                text: qsTr("Slot %1").arg(index+1)
+                                            }
+                                        }
+
+                                        // Filler to always have the button take 1/5th of remaining space instead of filling entire width
+                                        Repeater {
+                                            model: 5 - targetTracksSlotsRepeater.model
+                                            delegate: QQC2.Button {
+                                                Layout.fillWidth: true
+                                                Layout.fillHeight: true
+                                                text: "Slot 0" // Same text as the actual buttons to have same width
+                                                opacity: 0
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 

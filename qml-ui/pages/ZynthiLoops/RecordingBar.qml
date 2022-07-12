@@ -150,7 +150,7 @@ GridLayout {
 
 //        QQC2.Label {
 //            text: zynthian.zynthiloops.countInValue
-//            visible: controlObj.isRecording && zynthian.zynthiloops.countInValue > 0
+//            visible: zynthian.zynthiloops.isRecording && zynthian.zynthiloops.countInValue > 0
 //        }
     }
 
@@ -236,11 +236,11 @@ GridLayout {
             Layout.preferredHeight: Kirigami.Units.gridUnit * 6
             Layout.alignment: Qt.AlignCenter
 
-            icon.name: controlObj.isRecording ? "media-playback-stop" : "media-record-symbolic"
+            icon.name: zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
 
             onClicked: {
                 applicationWindow().openRecordingPopup()
-//                if (!controlObj.isRecording) {
+//                if (!zynthian.zynthiloops.isRecording) {
 //                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
 //                    controlObj.queueRecording(
 //                        sourceComboModel.get(sourceCombo.currentIndex).value,

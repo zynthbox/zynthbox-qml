@@ -98,7 +98,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.metronome_running_refcount = 0
         self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/my-sketches/")
         self.__clips_queue__: list[zynthiloops_clip] = []
-        self.is_recording_complete = False
+        self.is_recording = False
         self.recording_count_in_value = 0
         self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
@@ -788,6 +788,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     clipsToRecord = Property('QVariantList', get_clips_to_record, notify=clipsToRecordChanged)
     ### END Property clipsToRecord
 
+    ### Property isRecording
+    def get_isRecording(self):
+        return self.is_recording
+
+    def set_isRecording(self, value):
+        if self.is_recording != value:
+            self.is_recording = value
+            self.isRecordingChanged.emit()
+
+    isRecordingChanged = Signal()
+
+    isRecording = Property(bool, get_isRecording, set_isRecording, notify=isRecordingChanged)
+    ### END Property isRecording
+
     ### Property knobTouchUpdateInProgress
     def get_knob_touch_update_in_progress(self):
         return self.__knob_touch_update_in_progress__
@@ -1274,15 +1288,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
             logging.info("Output get! Continue.")
 
-            self.clip_to_record.isRecording = True
+            self.isRecording = True
         else:
             logging.error("Empty layer selected. Cannot record.")
             self.cannotRecordEmptyLayer.emit()
 
     @Slot(None)
     def stopRecording(self):
-        if self.clip_to_record is not None and self.clip_to_record.isRecording:
-            self.clip_to_record.isRecording = False
+        if self.clip_to_record is not None and self.isRecording:
+            self.isRecording = False
 
         if self.recorder_process is not None:
             self.recorder_process.terminate()

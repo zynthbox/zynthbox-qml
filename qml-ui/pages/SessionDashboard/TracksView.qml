@@ -532,7 +532,7 @@ ColumnLayout {
                                         if (zynthian.session_dashboard.selectedTrack !== index) {
                                             zynthian.session_dashboard.selectedTrack = index;
                                         } else {
-                                            if (!trackDelegate.selectedClip.isRecording) {
+                                            if (!zynthian.zynthiloops.isRecording) {
                                                 trackDelegate.selectedClip.queueRecording("internal", "");
                                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
                                             } else {
@@ -546,8 +546,8 @@ ColumnLayout {
                                         width: Kirigami.Units.gridUnit
                                         height: Kirigami.Units.gridUnit
                                         anchors.centerIn: parent
-                                        source: trackDelegate.selectedClip.isRecording ? "media-playback-stop" : "media-record-symbolic"
-                                        color: zynthian.session_dashboard.selectedTrack === trackIndex && !trackDelegate.selectedClip.isRecording ? "#f44336" : Kirigami.Theme.textColor
+                                        source: zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                                        color: zynthian.session_dashboard.selectedTrack === trackIndex && !zynthian.zynthiloops.isRecording ? "#f44336" : Kirigami.Theme.textColor
                                         opacity: zynthian.session_dashboard.selectedTrack === trackIndex ? 1 : 0.6
                                     }
                                 }

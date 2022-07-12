@@ -134,15 +134,7 @@ Zynthian.Card {
                         enabled: (controlObj.samples !== undefined && !zynthian.zynthiloops.isRecording)
                         icon.name: controlObj.samples !== undefined && zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         onClicked: {
-                            if (!zynthian.zynthiloops.isRecording) {
-                                controlObj.samples[index].queueRecording(
-                                    "internal",
-                                    "*"
-                                );
-                                Zynthian.CommonUtils.startMetronomeAndPlayback();
-                            } else {
-                                Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                            }
+                            applicationWindow().openRecordingPopup()
                         }
                     }
 

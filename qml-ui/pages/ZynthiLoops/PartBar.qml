@@ -306,6 +306,16 @@ Rectangle {
                                 }
                             }
 
+                            QQC2.Button {
+                                text: qsTr("Play Segment")
+                                onClicked: {
+                                    ZynQuick.SegmentHandler.startPlayback(
+                                        ZynQuick.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
+                                        ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                                    )
+                                }
+                            }
+
                             Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true

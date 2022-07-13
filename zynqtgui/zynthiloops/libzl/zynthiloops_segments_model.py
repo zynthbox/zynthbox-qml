@@ -24,7 +24,7 @@
 # ******************************************************************************
 import logging
 
-from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
+from PySide2.QtCore import QAbstractListModel, QObject, Qt, QTimer, Property, Signal, Slot
 from zynqtgui import zynthian_gui_config
 from zynqtgui.zynthiloops.libzl.zynthiloops_segment import zynthiloops_segment
 
@@ -40,6 +40,10 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.__mix = mix
         self.__selected_segment_index = 0
         self.__segments: dict[int, zynthiloops_segment] = {}
+        self.totalBeatDurationThrottle = QTimer()
+        self.totalBeatDurationThrottle.setInterval(1)
+        self.totalBeatDurationThrottle.setSingleShot(True)
+        self.totalBeatDurationThrottle.timeout.connect(self.totalBeatDurationChanged.emit)
 
     def serialize(self):
         logging.debug("### Serializing Segments Model")
@@ -85,6 +89,9 @@ class zynthiloops_segments_model(QAbstractListModel):
 
     def add_segment(self, segment_index, segment: zynthiloops_segment):
         self.__segments[segment_index] = segment
+        segment.barLengthChanged.connect(self.totalBeatDurationThrottle.start)
+        segment.beatLengthChanged.connect(self.totalBeatDurationThrottle.start)
+        self.totalBeatDurationThrottle.start()
 
     ### Property count
     def get_count(self):
@@ -94,6 +101,19 @@ class zynthiloops_segments_model(QAbstractListModel):
 
     count = Property(int, get_count, notify=countChanged)
     ### END Property count
+
+    ### Property totalBeatDuration
+    def get_totalBeatDuration(self):
+        totalDuration = 0
+        for segmentIndex in self.__segments:
+            segment = self.__segments[segmentIndex]
+            totalDuration += segment.barLength * 4 + segment.beatLength
+        return totalDuration
+
+    totalBeatDurationChanged = Signal()
+
+    totalBeatDuration = Property(int, get_totalBeatDuration, notify=totalBeatDurationChanged)
+    ### END Property totalBeatDuration
 
     ### Property selectedSegmentIndex
     def get_selectedSegmentIndex(self):

@@ -271,9 +271,11 @@ class zynthiloops_segment(QObject):
         self.barLength = dest_segment.barLength
         self.beatLength = dest_segment.beatLength
         self.clips = dest_segment.clips.copy()
+        self.zyngui.zynthiloops.song.schedule_save()
 
     @Slot()
     def clear(self):
         self.barLength = 0
         self.beatLength = 0
         self.clear_clips()
+        self.zyngui.zynthiloops.song.schedule_save()

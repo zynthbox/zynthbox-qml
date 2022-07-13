@@ -92,8 +92,8 @@ class zynthiloops_segment(QObject):
             self.addClip(clip)
 
     def clear_clips(self):
-        self.__clips.clear()
-        self.clipsChanged.emit()
+        for clip in self.clips:
+            self.removeClip(clip)
 
     ### Property className
     def get_className(self):
@@ -222,6 +222,7 @@ class zynthiloops_segment(QObject):
 
             logging.debug(f"Adding clip(row: {clip.row}, col: {clip.col}) to segment {self.segmentId}")
             self.__clips.append(clip)
+            self.zyngui.zynthiloops.song.mixesModel.clipAdded.emit(self.__mix.mixId, self.__segment_id, clip)
             self.clipsChanged.emit()
 
             if self.zyngui.zynthiloops.song is not None:
@@ -236,6 +237,7 @@ class zynthiloops_segment(QObject):
         if clip in self.__clips:
             logging.debug(f"Removing clip(row: {clip.row}, col: {clip.col}) from segment {self.segmentId}")
             self.__clips.remove(clip)
+            self.zyngui.zynthiloops.song.mixesModel.clipRemoved.emit(self.__mix.mixId, self.__segment_id, clip)
             self.clipsChanged.emit()
 
             if self.zyngui.zynthiloops.song is not None:
@@ -270,12 +272,13 @@ class zynthiloops_segment(QObject):
     def copyFrom(self, dest_segment):
         self.barLength = dest_segment.barLength
         self.beatLength = dest_segment.beatLength
-        self.clips = dest_segment.clips.copy()
-        self.zyngui.zynthiloops.song.schedule_save()
+        self.clear_clips()
+
+        for clip in dest_segment.clips.copy():
+            self.addClip(clip)
 
     @Slot()
     def clear(self):
         self.barLength = 0
         self.beatLength = 0
         self.clear_clips()
-        self.zyngui.zynthiloops.song.schedule_save()

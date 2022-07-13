@@ -142,3 +142,6 @@ class zynthiloops_mixes_model(QAbstractListModel):
             return self.__mixes[mix_index]
         except:
             return None
+
+    clipAdded = Signal(int, int, QObject)
+    clipRemoved = Signal(int, int, QObject)

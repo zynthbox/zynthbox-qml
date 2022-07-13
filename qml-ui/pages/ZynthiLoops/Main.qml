@@ -1104,6 +1104,7 @@ Zynthian.ScreenPage {
                                         !trackHeaderDelegate.segment.isEmpty ||
                                         (trackHeaderDelegate.previousSegment && trackHeaderDelegate.segment.isEmpty && !trackHeaderDelegate.previousSegment.isEmpty)) {
                                         root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = index
+                                        root.lastSelectedObj = trackHeaderDelegate.segment
                                     }
                                 } else {
                                     root.lastSelectedObj = trackHeaderDelegate.track
@@ -1382,6 +1383,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    font.pointSize: 10
                                     enabled: root.lastSelectedObj && root.lastSelectedObj.className
                                     text: qsTr("Copy %1").arg(root.lastSelectedObj && root.lastSelectedObj.className
                                                               ? root.lastSelectedObj.className === "zynthiloops_clip"
@@ -1392,7 +1394,9 @@ Zynthian.ScreenPage {
                                                                         ? qsTr("Sketch")
                                                                         : root.lastSelectedObj.className === "zynthiloops_part"
                                                                           ? qsTr("Part")
-                                                                          : ""
+                                                                          : root.lastSelectedObj.className === "zynthiloops_segment"
+                                                                            ? qsTr("Segment")
+                                                                            : ""
                                                               : "")
                                     visible: root.copySourceObj == null
                                     onClicked: {
@@ -1409,6 +1413,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    font.pointSize: 10
                                     text: qsTr("Cancel Copy")
                                     visible: root.copySourceObj != null
                                     onClicked: {
@@ -1421,6 +1426,7 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    font.pointSize: 10
                                     enabled: {
                                         if (root.copySourceObj != null &&
                                             root.copySourceObj &&
@@ -1440,7 +1446,12 @@ Zynthian.ScreenPage {
                                                        root.copySourceObj.partClip !== root.lastSelectedObj.partClip &&
                                                        root.lastSelectedObj.className === "zynthiloops_part") {
                                                return true
-                                           }
+                                           } else if (root.copySourceObj.className === "zynthiloops_segment" &&
+                                                      root.copySourceObj !== root.lastSelectedObj &&
+                                                      root.lastSelectedObj.className === "zynthiloops_segment" &&
+                                                      root.copySourceObj.mixId === root.lastSelectedObj.mixId) {
+                                              return true
+                                          }
                                         }
 
                                         return false
@@ -1454,7 +1465,9 @@ Zynthian.ScreenPage {
                                                                                ? qsTr("Sketch")
                                                                                : root.lastSelectedObj.className === "zynthiloops_part"
                                                                                  ? qsTr("Part")
-                                                                                 : ""
+                                                                                 : root.lastSelectedObj.className === "zynthiloops_segment"
+                                                                                   ? qsTr("Segment")
+                                                                                   : ""
                                                                    : "")
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
@@ -1520,6 +1533,9 @@ Zynthian.ScreenPage {
                                             destPattern.cloneOther(sourcePattern)
 
                                             root.copySourceObj = null
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_segment") {
+                                            root.lastSelectedObj.copyFrom(root.copySourceObj)
+                                            root.copySourceObj = null
                                         }
                                     }
                                 }
@@ -1528,19 +1544,25 @@ Zynthian.ScreenPage {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: false
                                     Layout.preferredHeight: privateProps.cellHeight
+                                    font.pointSize: 10
                                     enabled: root.lastSelectedObj != null &&
                                              root.lastSelectedObj.className != null &&
-                                             root.lastSelectedObj.className === "zynthiloops_clip"
+                                             (root.lastSelectedObj.className === "zynthiloops_clip" ||
+                                              root.lastSelectedObj.className === "zynthiloops_segment")
                                     text: qsTr("Clear")
                                     onClicked: {
-                                        root.lastSelectedObj.clear()
+                                        if (root.lastSelectedObj.clear) {
+                                            root.lastSelectedObj.clear()
+                                        }
 
-                                        // Try clearing pattern if exists.
-                                        try {
-                                            if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
-                                                ZynQuick.PlayGridManager.getSequenceModel("S"+(root.song.scenesModel.selectedSketchIndex + 1)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
-                                            }
-                                        } catch(e) {}
+                                        if (root.lastSelectedObj.className === "zynthiloops_clip") {
+                                            // Try clearing pattern if exists.
+                                            try {
+                                                if (root.lastSelectedObj.clipTrack.connectedPattern >= 0) {
+                                                    ZynQuick.PlayGridManager.getSequenceModel("S"+(root.song.scenesModel.selectedSketchIndex + 1)).getByPart(root.lastSelectedObj.clipTrack.id, root.lastSelectedObj.clipTrack.selectedPart).clear()
+                                                }
+                                            } catch(e) {}
+                                        }
                                     }
                                 }
                             }

@@ -282,3 +282,14 @@ class zynthiloops_segment(QObject):
         self.barLength = 0
         self.beatLength = 0
         self.clear_clips()
+
+    @Slot(result=int)
+    def getOffsetInBeats(self):
+        offset = 0
+
+        # Iterate all segments till current to determine offset in beats
+        for segment_index in range(self.segmentId):
+            segment = self.__mix.segmentsModel.get_segment(segment_index)
+            offset += segment.barLength * 4 + segment.beatLength
+
+        return offset

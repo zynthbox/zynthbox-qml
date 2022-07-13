@@ -1,47 +1,57 @@
 .import org.zynthian.quick 1.0 as ZynQuick
 
 function startMetronomeAndPlayback() {
-    console.log("Starting Metronome and Playback");
-    for (var i = 0; i < 10; ++i) {
-        var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
-        if (sequence) {
-            sequence.prepareSequencePlayback();
-        } else {
-            console.debug("Sequence could not be fetched, and playback could not be prepared");
+    if (zynthian.zynthiloops.song.mixesModel.songMode) {
+        ZynQuick.SegmentHandler.startPlayback(0, 0);
+    } else {
+        console.log("Starting Metronome and Playback");
+        for (var i = 0; i < 10; ++i) {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
+            if (sequence) {
+                sequence.prepareSequencePlayback();
+            } else {
+                console.debug("Sequence could not be fetched, and playback could not be prepared");
+            }
         }
+        if (zynthian.zynthiloops.clipToRecord) {
+            ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
+        }
+        zynthian.zynthiloops.startPlayback();
+        console.log("Metronome and Playback Started");
     }
-    if (zynthian.zynthiloops.clipToRecord) {
-        ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
-    }
-    zynthian.zynthiloops.startPlayback();
-    console.log("Metronome and Playback Started");
 }
 
 function stopMetronomeAndPlayback() {
-    console.log("Stopping Metronome and Playback");
-    for (var i = 0; i < 10; ++i) {
-        var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
-        if (sequence) {
-            sequence.stopSequencePlayback();
-        } else {
-            console.log("Sequence could not be fetched, and playback could not be stopped");
+    if (zynthian.zynthiloops.song.mixesModel.songMode) {
+        zynthian.zynthiloops.stopAllPlayback();
+        ZynQuick.SegmentHandler.stopPlayback();
+        zynthian.zynthiloops.resetMetronome();
+    } else {
+        console.log("Stopping Metronome and Playback");
+        for (var i = 0; i < 10; ++i) {
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
+            if (sequence) {
+                sequence.stopSequencePlayback();
+            } else {
+                console.log("Sequence could not be fetched, and playback could not be stopped");
+            }
         }
-    }
 
-    if (zynthian.zynthiloops.clipToRecord) {
-        ZynQuick.MidiRecorder.stopRecording()
-        var clip = zynthian.zynthiloops.clipToRecord
-        clip.stopRecording()
-        clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi()
-        ZynQuick.MidiRecorder.loadFromBase64Midi(clip.metadataMidiRecording)
-    }
+        if (zynthian.zynthiloops.clipToRecord) {
+            ZynQuick.MidiRecorder.stopRecording()
+            var clip = zynthian.zynthiloops.clipToRecord
+            clip.stopRecording()
+            clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi()
+            ZynQuick.MidiRecorder.loadFromBase64Midi(clip.metadataMidiRecording)
+        }
 
-    zynthian.zynthiloops.stopAllPlayback();
-//    zynthian.zynthiloops.stopRecording();
-    zynthian.playgrid.stopMetronomeRequest();
-    zynthian.song_arranger.stop();
-    zynthian.zynthiloops.resetMetronome();
-    console.log("Metronome and Playback Stopped");
+        zynthian.zynthiloops.stopAllPlayback();
+    //    zynthian.zynthiloops.stopRecording();
+        zynthian.playgrid.stopMetronomeRequest();
+        zynthian.song_arranger.stop();
+        zynthian.zynthiloops.resetMetronome();
+        console.log("Metronome and Playback Stopped");
+    }
 }
 
 function toggleLayerChaining(layer) {

@@ -822,7 +822,7 @@ Zynthian.ScreenPage {
                             property QtObject mix: root.song.mixesModel.getMix(index)
 
                             color: Kirigami.Theme.backgroundColor
-                            active: !sceneHeaderDelegate.mix.isEmpty
+                            active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
 
                             Layout.fillWidth: false
                             Layout.fillHeight: true
@@ -1521,7 +1521,7 @@ Zynthian.ScreenPage {
 
                                             for (var i=0; i<root.song.tracksModel.count; i++) {
                                                 var track = root.song.tracksModel.getTrack(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"(root.copySourceObj.sketchIndex + 1)).getByPart(track.id, track.selectedPart)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(root.copySourceObj.sketchIndex + 1)).getByPart(track.id, track.selectedPart)
                                                 var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSketchName).getByPart(track.id, track.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)

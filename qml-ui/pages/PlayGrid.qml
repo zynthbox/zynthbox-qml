@@ -643,6 +643,11 @@ don't want to have to dig too far...
         property: "zlDashboard"
         value: zynthian.session_dashboard
     }
+    Binding {
+        target: ZynQuick.SegmentHandler
+        property: "song"
+        value: zynthian.zynthiloops.song
+    }
     // Our basic structure is logically scene contains tracks which contain patterns, and accessing them is done through the song's inverted-structure tracks model
     // the tracks contain clips models (each of which holds information for all track/part combinations for that track), and each clip in that model holds the data pertaining to one scene/part/track
     // there is further a set of sequence models which are partnered each to a scene, and inside each sequence is a pattern, which is paired with a track

@@ -56,6 +56,13 @@ class zynthiloops_mix(QObject):
         if "segments" in obj:
             self.__segments_model.deserialize(obj["segments"])
 
+    ### Property className
+    def get_className(self):
+        return "zynthiloops_mix"
+
+    className = Property(str, get_className, constant=True)
+    ### END Property className
+
     ### Property name
     def get_name(self):
         return f"Mix {self.__mix_id + 1}"
@@ -114,3 +121,11 @@ class zynthiloops_mix(QObject):
                 break
 
         self.set_isEmpty(is_empty)
+
+    @Slot(QObject)
+    def copyFrom(self, dest_mix):
+        self.segmentsModel.copyFrom(dest_mix.segmentsModel)
+
+    @Slot()
+    def clear(self):
+        self.segmentsModel.clear()

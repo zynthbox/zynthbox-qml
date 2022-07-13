@@ -845,6 +845,7 @@ Zynthian.ScreenPage {
                             onPressed: {
                                 if (root.songMode) {
                                     root.song.mixesModel.selectedMixIndex = index
+                                    root.lastSelectedObj = sceneHeaderDelegate.mix
                                 } else if (root.displaySketchButtons) {
                                     root.lastSelectedObj = {
                                         className: "zynthiloops_sketch",
@@ -1396,7 +1397,9 @@ Zynthian.ScreenPage {
                                                                           ? qsTr("Part")
                                                                           : root.lastSelectedObj.className === "zynthiloops_segment"
                                                                             ? qsTr("Segment")
-                                                                            : ""
+                                                                            : root.lastSelectedObj.className === "zynthiloops_mix"
+                                                                              ? qsTr("Mix")
+                                                                              : ""
                                                               : "")
                                     visible: root.copySourceObj == null
                                     onClicked: {
@@ -1446,12 +1449,16 @@ Zynthian.ScreenPage {
                                                        root.copySourceObj.partClip !== root.lastSelectedObj.partClip &&
                                                        root.lastSelectedObj.className === "zynthiloops_part") {
                                                return true
-                                           } else if (root.copySourceObj.className === "zynthiloops_segment" &&
-                                                      root.copySourceObj !== root.lastSelectedObj &&
-                                                      root.lastSelectedObj.className === "zynthiloops_segment" &&
-                                                      root.copySourceObj.mixId === root.lastSelectedObj.mixId) {
-                                              return true
-                                          }
+                                            } else if (root.copySourceObj.className === "zynthiloops_segment" &&
+                                                       root.copySourceObj !== root.lastSelectedObj &&
+                                                       root.lastSelectedObj.className === "zynthiloops_segment" &&
+                                                       root.copySourceObj.mixId === root.lastSelectedObj.mixId) {
+                                               return true
+                                            } else if (root.copySourceObj.className === "zynthiloops_mix" &&
+                                                       root.copySourceObj !== root.lastSelectedObj &&
+                                                       root.lastSelectedObj.className === "zynthiloops_mix") {
+                                               return true
+                                            }
                                         }
 
                                         return false
@@ -1467,7 +1474,9 @@ Zynthian.ScreenPage {
                                                                                  ? qsTr("Part")
                                                                                  : root.lastSelectedObj.className === "zynthiloops_segment"
                                                                                    ? qsTr("Segment")
-                                                                                   : ""
+                                                                                   : root.lastSelectedObj.className === "zynthiloops_mix"
+                                                                                     ? qsTr("Mix")
+                                                                                     : ""
                                                                    : "")
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_clip") {
@@ -1536,6 +1545,9 @@ Zynthian.ScreenPage {
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_segment") {
                                             root.lastSelectedObj.copyFrom(root.copySourceObj)
                                             root.copySourceObj = null
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "zynthiloops_mix") {
+                                            root.lastSelectedObj.copyFrom(root.copySourceObj)
+                                            root.copySourceObj = null
                                         }
                                     }
                                 }
@@ -1548,7 +1560,8 @@ Zynthian.ScreenPage {
                                     enabled: root.lastSelectedObj != null &&
                                              root.lastSelectedObj.className != null &&
                                              (root.lastSelectedObj.className === "zynthiloops_clip" ||
-                                              root.lastSelectedObj.className === "zynthiloops_segment")
+                                              root.lastSelectedObj.className === "zynthiloops_segment" ||
+                                              root.lastSelectedObj.className === "zynthiloops_mix")
                                     text: qsTr("Clear")
                                     onClicked: {
                                         if (root.lastSelectedObj.clear) {

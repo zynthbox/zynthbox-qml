@@ -1225,7 +1225,15 @@ class zynthian_gui(QObject):
             (delay_engine, delay_engine.get_lv2_controllers_dict()["LEVEL"]),
             (reverb_engine, reverb_engine.get_lv2_controllers_dict()["dry_wet"])
         ]
-        dir = Path()
+
+        self.global_fx_engines[0][1].set_value(
+            np.interp(10, [0, 100], [self.global_fx_engines[0][1].value_min, self.global_fx_engines[0][1].value_max]),
+            True)
+
+        self.global_fx_engines[1][1].set_value(
+            np.interp(10, [0, 100], [self.global_fx_engines[1][1].value_min, self.global_fx_engines[1][1].value_max]),
+            True)
+
         self.delayKnobValueChanged.emit()
         self.reverbKnobValueChanged.emit()
 
@@ -4026,6 +4034,7 @@ class zynthian_gui(QObject):
         controller = self.global_fx_engines[0][1]
         if controller is not None:
             value = np.interp(percentage, [0, 100], [controller.value_min, controller.value_max])
+            self.global_fx_engines[0][1].set_value(value, True)
             self.run_set_selectors()
 
     delayKnobValueChanged = Signal()

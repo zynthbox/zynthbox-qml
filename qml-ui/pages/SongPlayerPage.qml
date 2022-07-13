@@ -69,6 +69,60 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             text: component.title
         }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+            spacing: 0
+            Kirigami.Theme.inherit: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Button
+            Repeater {
+                id: segmentsRepeater
+                model: component.visible ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel : 0
+                property int totalDuration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration
+                delegate: Item {
+                    id: segmentDelegate
+                    property QtObject segment: model.segment
+                    property int duration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: component.width * (segmentDelegate.duration / segmentsRepeater.totalDuration)
+                    Layout.preferredHeight: Kirigami.Units.gridUnit
+                    Rectangle {
+                        anchors {
+                            fill: parent;
+                            margins: 1
+                        }
+                        border {
+                            width: 1
+                            color: Kirigami.Theme.focusColor
+                        }
+                        color: Kirigami.Theme.backgroundColor
+                    }
+                }
+            }
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.minimumHeight: 1
+            Layout.maximumHeight: 1
+            Item {
+                height: 1
+                width: 1
+                y: 0
+                x: component.visible ? parent.width * (ZynQuick.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                //onXChanged: console.log("New position", x, parent.width, ZynQuick.SegmentHandler.playhead, segmentsRepeater.totalDuration);
+                Rectangle {
+                    anchors {
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    height: Kirigami.Units.gridUnit
+                    width: 3
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: Kirigami.Theme.focusColor
+                }
+            }
+        }
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true

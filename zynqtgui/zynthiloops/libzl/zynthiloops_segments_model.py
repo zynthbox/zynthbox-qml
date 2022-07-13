@@ -123,3 +123,13 @@ class zynthiloops_segments_model(QAbstractListModel):
             return self.__segments[segment_index]
         except:
             return None
+
+    @Slot(QObject)
+    def copyFrom(self, dest_segments_model):
+        for segment_index in range(self.count):
+            self.get_segment(segment_index).copyFrom(dest_segments_model.get_segment(segment_index))
+
+    @Slot()
+    def clear(self):
+        for segment_index in range(self.count):
+            self.get_segment(segment_index).clear()

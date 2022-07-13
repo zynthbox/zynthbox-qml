@@ -91,6 +91,17 @@ class zynthiloops_segment(QObject):
             self.removeClip(clip)
             self.addClip(clip)
 
+    def clear_clips(self):
+        self.__clips.clear()
+        self.clipsChanged.emit()
+
+    ### Property className
+    def get_className(self):
+        return "zynthiloops_segment"
+
+    className = Property(str, get_className, constant=True)
+    ### END Property className
+
     ### Property name
     def get_name(self):
         return f"Segment {self.__segment_id + 1}"
@@ -182,9 +193,14 @@ class zynthiloops_segment(QObject):
     def get_clips(self):
         return self.__clips
 
+    def set_clips(self, clips):
+        self.__clips.clear()
+        self.__clips = clips
+        self.clipsChanged.emit()
+
     clipsChanged = Signal()
 
-    clips = Property('QVariantList', get_clips, notify=clipsChanged)
+    clips = Property('QVariantList', get_clips, set_clips, notify=clipsChanged)
     ### END Property clips
 
     @Slot(QObject, result=None)
@@ -249,3 +265,15 @@ class zynthiloops_segment(QObject):
         for scene_clip in self.zyngui.zynthiloops.song.scenesModel.getScene(sceneIndex)["clips"]:
             if scene_clip.col == self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex:
                 self.addClip(scene_clip)
+
+    @Slot(QObject)
+    def copyFrom(self, dest_segment):
+        self.barLength = dest_segment.barLength
+        self.beatLength = dest_segment.beatLength
+        self.clips = dest_segment.clips.copy()
+
+    @Slot()
+    def clear(self):
+        self.barLength = 0
+        self.beatLength = 0
+        self.clear_clips()

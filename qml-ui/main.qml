@@ -576,7 +576,8 @@ Kirigami.AbstractApplicationWindow {
         id: countInOverlay
         parent: root.contentItem.parent
         anchors.fill: parent
-        visible: zynthian.zynthiloops.ongoingCountIn > 0 &&
+        visible: zynthian.zynthiloops.countInBars > 0 &&
+                 zynthian.zynthiloops.ongoingCountIn > 0 &&
                  zynthian.zynthiloops.isRecording
         z: 9999999
         color: "#cc000000"

@@ -1376,6 +1376,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         # Immediately stop clips when scheduled to stop
         if self.metronome_schedule_stop:
+            logging.debug(f"Stopping timer as it was scheduled to stop.")
             libzl.stopTimer()
 
             # Start blink timer when metronome stops to keep blinking in sync with bpm
@@ -1389,14 +1390,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.current_bar_changed.emit()
             self.metronome_schedule_stop = False
             self.metronome_running_changed.emit()
+        else:
+            if self.__current_beat__ == 0:
+                self.__current_bar__ += 1
+                if self.ongoingCountIn > 0:
+                    self.ongoingCountIn -= 1
+                self.current_bar_changed.emit()
 
-        if self.__current_beat__ == 0:
-            self.__current_bar__ += 1
-            if self.ongoingCountIn > 0:
-                self.ongoingCountIn -= 1
-            self.current_bar_changed.emit()
-
-        self.current_beat_changed.emit()
+            self.current_beat_changed.emit()
 
     def load_recorded_file_to_clip(self):
         logging.info("Loading recorded clip - but first, wait for the recorder to exit")

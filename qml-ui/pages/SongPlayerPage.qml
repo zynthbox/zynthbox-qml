@@ -85,7 +85,8 @@ Zynthian.ScreenPage {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: component.width / 12
-                    text: qsTr("S%1").arg(model.index + 1)
+                    property QtObject mixObject: zynthian.zynthiloops.song.mixesModel.getMix(model.index)
+                    text: mixObject.name
                     checked: zynthian.zynthiloops.song.mixesModel.selectedMixIndex == model.index
                     onClicked: {
                         zynthian.zynthiloops.song.mixesModel.selectedMixIndex = model.index;

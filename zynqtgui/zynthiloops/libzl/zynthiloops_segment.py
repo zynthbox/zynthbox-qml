@@ -87,12 +87,12 @@ class zynthiloops_segment(QObject):
         # Iterate over all clips in segment to remove and add them. Removing and adding back will make sure any
         # other clips in same part are not selected when track mode is not sample-trig
         # This will make sure there are no discrepencies when a track mode changes from sample-trig to something else
-        for clip in self.__clips:
+        for clip in self.__clips.copy():
             self.removeClip(clip)
             self.addClip(clip)
 
     def clear_clips(self):
-        for clip in self.clips:
+        for clip in self.clips.copy():
             self.removeClip(clip)
 
     ### Property className

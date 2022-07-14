@@ -355,6 +355,22 @@ QQC2.Popup {
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Record Solo")
+                    }
+
+                    QQC2.CheckBox {
+                        checked: zynthian.zynthiloops.recordSolo
+                        onToggled: {
+                            zynthian.zynthiloops.recordSolo = checked
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
                         text: qsTr("Metronome")
                     }
 

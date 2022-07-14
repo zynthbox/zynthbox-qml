@@ -55,6 +55,9 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Record Song")
+            enabled: zynthian.zynthiloops.song.mixesModel.songMode
+                ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0
+                : true
             onTriggered: {
                 multitrackRecorderPopup.recordSong(zynthian.zynthiloops.song)
             }

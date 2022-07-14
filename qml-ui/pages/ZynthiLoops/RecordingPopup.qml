@@ -128,6 +128,22 @@ QQC2.Popup {
                         }
                         textRole: "text"
                     }
+
+                    QQC2.Label {
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Solo")
+                    }
+
+                    QQC2.Switch {
+                        Layout.alignment: Qt.AlignVCenter
+                        implicitWidth: Kirigami.Units.gridUnit * 3
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 3
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+                        checked: zynthian.zynthiloops.recordSolo
+                        onToggled: {
+                            zynthian.zynthiloops.recordSolo = checked
+                        }
+                    }
                 }
 
                 RowLayout {
@@ -346,22 +362,6 @@ QQC2.Popup {
                         checked: zynthian.zynthiloops.recordMasterOutput
                         onToggled: {
                             zynthian.zynthiloops.recordMasterOutput = checked
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: false
-                    QQC2.Label {
-                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Record Solo")
-                    }
-
-                    QQC2.CheckBox {
-                        checked: zynthian.zynthiloops.recordSolo
-                        onToggled: {
-                            zynthian.zynthiloops.recordSolo = checked
                         }
                     }
                 }

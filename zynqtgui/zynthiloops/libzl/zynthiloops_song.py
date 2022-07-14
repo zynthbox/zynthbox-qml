@@ -608,6 +608,13 @@ class zynthiloops_song(QObject):
 
         self.__metronome_manager__.loadSketchVersion(self.__initial_name__)
 
+    ### Property metronomeManager
+    def get_metronomeManager(self):
+        return self.__metronome_manager__
+
+    metronomeManager = Property(QObject, get_metronomeManager, constant=True)
+    ### END Property metronomeManager
+
     ### Property scaleModel
     def get_scale_model(self):
         return self.__scale_model__

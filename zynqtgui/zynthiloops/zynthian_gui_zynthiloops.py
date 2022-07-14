@@ -125,6 +125,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__big_knob_mode__ = ""
         self.__long_operation__ = False
         self.__record_master_output__ = False
+        self.__record_solo = False
         self.__count_in_bars__ = 0
         self.__global_fx_knob_value__ = 50
         self.clips_to_record = []
@@ -739,7 +740,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     countInBarsChanged = Signal()
 
-    countInBars = Property(float, get_countInBars, set_countInBars, notify=countInBarsChanged)
+    countInBars = Property(int, get_countInBars, set_countInBars, notify=countInBarsChanged)
     ### END Property countInBars
 
     ### Property recordMasterOutput
@@ -752,8 +753,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     recordMasterOutputChanged = Signal()
 
-    recordMasterOutput = Property(float, get_recordMasterOutput, set_recordMasterOutput, notify=recordMasterOutputChanged)
+    recordMasterOutput = Property(bool, get_recordMasterOutput, set_recordMasterOutput, notify=recordMasterOutputChanged)
     ### END Property recordMasterOutput
+
+    ### Property recordSolo
+    def get_recordSolo(self):
+        return self.__record_solo
+
+    def set_recordSolo(self, value):
+        self.__record_solo = value
+        self.recordSoloChanged.emit()
+
+    recordSoloChanged = Signal()
+
+    recordSolo = Property(bool, get_recordSolo, set_recordSolo, notify=recordSoloChanged)
+    ### END Property recordSolo
 
     ### Property masterAudioLevel
     def get_master_audio_level(self):
@@ -1311,7 +1325,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def startPlayback(self):
-        self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex, self.__song__.scenesModel.selectedSketchIndex)
+        if not self.is_recording or \
+                (self.is_recording and not self.recordSolo):
+            self.__song__.scenesModel.playScene(self.__song__.scenesModel.selectedSceneIndex,
+                                                self.__song__.scenesModel.selectedSketchIndex)
+
         self.start_metronome_request()
 
     def start_metronome_request(self):

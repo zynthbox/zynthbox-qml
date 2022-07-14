@@ -965,7 +965,11 @@ Zynthian.ScreenPage {
                         opacity: root.songMode ? 1 : 0.3
 
                         onPressed: {
-                            zynthian.zynthiloops.song.mixesModel.songMode = !zynthian.zynthiloops.song.mixesModel.songMode
+                            if (zynthian.zynthiloops.isMetronomeRunning) {
+                                applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
+                            } else {
+                                zynthian.zynthiloops.song.mixesModel.songMode = !zynthian.zynthiloops.song.mixesModel.songMode
+                            }
                         }
                     }
 

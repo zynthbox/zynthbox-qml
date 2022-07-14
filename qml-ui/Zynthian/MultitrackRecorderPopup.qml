@@ -73,6 +73,7 @@ QQC2.Popup {
         }
         if (song.mixesModel.songMode) {
             // Song mode enabled, play the full song
+            songDurationSpin.value = ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration;
         } else {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
             var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedSketchName)

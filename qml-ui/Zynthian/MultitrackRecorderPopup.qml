@@ -71,10 +71,7 @@ QQC2.Popup {
             }
             ZL.AudioLevels.setTrackToRecord(trackIndex, shouldRecord);
         }
-        if (song.mixesModel.songMode) {
-            // Song mode enabled, play the full song
-            songDurationSpin.value = ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration;
-        } else {
+        if (!song.mixesModel.songMode) {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
             var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedSketchName)
             var longestPatternDuration = 0;
@@ -130,7 +127,9 @@ QQC2.Popup {
                 property double recordingProgress: -1
                 property QtObject song
 
-                property int songDurationInTicks: songDurationSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
+                property int songDurationInTicks: song && song.mixesModel.songMode
+                    ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * song.mixesModel.selectedMix.segmentsModel.totalBeatDuration
+                    : ZynQuick.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
                 property int leadinDurationInTicks: leadinSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
                 property int fadeoutDurationInTicks: fadeoutSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
 
@@ -333,7 +332,8 @@ QQC2.Popup {
             QQC2.SpinBox{
                 id: songDurationSpin
                 Layout.fillWidth: true
-                Kirigami.FormData.label: qsTr("Song length in beats (temporary measure, will be auto-determined later):")
+                visible: _private.song && !_private.song.mixesModel.songMode
+                Kirigami.FormData.label: qsTr("Recording duration in beats:")
                 enabled: !_private.isRecording
                 value: 32
                 from: 0
@@ -350,11 +350,70 @@ QQC2.Popup {
             }
         }
         QQC2.ProgressBar {
+            id: recordingProgressBar
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            visible: _private.song && !_private.song.mixesModel.songMode
             opacity: _private.recordingProgress > -1 ? 1 : 0.3
             value: _private.recordingProgress
+        }
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: Kirigami.Units.gridUnit
+            visible: _private.song && _private.song.mixesModel.songMode && segmentsRepeater.count > 0
+            Row {
+                id: songProgressRow
+                anchors.fill: parent
+                spacing: 0
+                Kirigami.Theme.inherit: false
+                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                Repeater {
+                    id: segmentsRepeater
+                    property double totalDuration: _private.song ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * _private.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration : 0
+                    model: component.visible && totalDuration > 0 ? _private.song.mixesModel.selectedMix.segmentsModel : 0
+                    delegate: Item {
+                        id: segmentDelegate
+                        property QtObject segment: model.segment
+                        property double duration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDelegate.segment.barLength * 4 + segmentDelegate.segment.beatLength)
+                        width: parent.width * (segmentDelegate.duration / segmentsRepeater.totalDuration)
+                        height: parent.height
+                        Rectangle {
+                            anchors {
+                                fill: parent;
+                                margins: 1
+                            }
+                            border {
+                                width: 1
+                                color: Kirigami.Theme.focusColor
+                            }
+                            color: Kirigami.Theme.backgroundColor
+                        }
+                    }
+                }
+            }
+            Item {
+                anchors {
+                    top: parent.top
+                    topMargin: -2
+                    bottom: parent.bottom
+                    bottomMargin: -2
+                    left: parent.left
+                    leftMargin: component.visible ? songProgressRow.width * (ZynQuick.SegmentHandler.playhead / segmentsRepeater.totalDuration) : 0
+                }
+                width: 1
+                Rectangle {
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    width: 3
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                    color: Kirigami.Theme.focusColor
+                }
+            }
         }
         RowLayout {
             Item {

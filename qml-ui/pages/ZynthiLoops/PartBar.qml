@@ -309,6 +309,17 @@ Rectangle {
                             QQC2.Button {
                                 text: qsTr("Play Segment")
                                 onClicked: {
+                                    console.log(
+                                        "Playing Segment",
+                                        segmentDetails.selectedSegment.segmentId,
+                                        " : Offset",
+                                        segmentDetails.selectedSegment.getOffsetInBeats(),
+                                        ", durationInBeats",
+                                        (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength),
+                                        ", durationInTicks",
+                                        ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)
+                                    )
+
                                     ZynQuick.SegmentHandler.startPlayback(
                                         ZynQuick.PlayGridManager.syncTimer.getMultiplier() * segmentDetails.selectedSegment.getOffsetInBeats(),
                                         ZynQuick.PlayGridManager.syncTimer.getMultiplier() * (segmentDetails.selectedSegment.barLength * 4 + segmentDetails.selectedSegment.beatLength)

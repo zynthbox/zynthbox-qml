@@ -77,8 +77,8 @@ Zynthian.ScreenPage {
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
             Repeater {
                 id: segmentsRepeater
-                model: component.visible ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel : 0
                 property int totalDuration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration
+                model: component.visible && totalDuration > 0 ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel : 0
                 delegate: Item {
                     id: segmentDelegate
                     property QtObject segment: model.segment
@@ -104,6 +104,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.minimumHeight: 1
             Layout.maximumHeight: 1
+            visible: segmentsRepeater.count > 0
             Item {
                 height: 1
                 width: 1

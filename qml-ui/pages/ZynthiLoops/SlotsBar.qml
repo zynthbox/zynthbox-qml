@@ -46,6 +46,7 @@ Rectangle {
     property alias fxButton: fxButton
     property alias soundCombinatorButton: soundCombinatorButton
     property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
+    property bool displaySceneButtons: zynthian.zynthiloops.displaySceneButtons
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
@@ -53,6 +54,13 @@ Rectangle {
 
     onSongModeChanged: {
         if (root.songMode) {
+            partButton.checked = true
+        } else {
+            trackButton.checked = true
+        }
+    }
+    onDisplaySceneButtonsChanged: {
+        if (root.displaySceneButtons) {
             partButton.checked = true
         } else {
             trackButton.checked = true
@@ -264,7 +272,7 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             checked: bottomStack.currentIndex === 0
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("BottomBar")
                             visible: false
                             onCheckedChanged: {
@@ -280,7 +288,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             visible: false
                             text: qsTr("Mixer")
                             onCheckedChanged: {
@@ -296,7 +304,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             visible: false
                             text: qsTr("Sound Combinator")
                             onCheckedChanged: {
@@ -315,7 +323,7 @@ Rectangle {
                             Layout.fillHeight: true
                             checkable: true
                             checked: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("Track")
                             onCheckedChanged: {
                                 if (checked) {
@@ -330,7 +338,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("Parts")
                             onCheckedChanged: {
                                 if (checked) {
@@ -345,7 +353,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("Synths")
                             onCheckedChanged: {
                                 if (checked) {
@@ -360,7 +368,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("Samples")
                             onCheckedChanged: {
                                 if (checked) {
@@ -375,7 +383,7 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
-                            enabled: !root.songMode
+                            enabled: !root.songMode && !root.displaySceneButtons
                             text: qsTr("FX")
                             onCheckedChanged: {
                                 if (checked) {

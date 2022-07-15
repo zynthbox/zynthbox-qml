@@ -1011,6 +1011,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
                 self.newSketchLoaded.emit()
 
+            # Init GlobalFX
+            self.zyngui.init_global_fx()
+
             # Set ALSA Mixer volume to 100% when creating new sketch
             self.zyngui.screens["master_alsa_mixer"].volume = 100
 
@@ -1158,6 +1161,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                         self.zyngui.screens["layer"].load_snapshot(
                             f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
 
+                        # Init GlobalFX
+                        self.zyngui.init_global_fx()
+
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
@@ -1172,6 +1178,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     # Load snapshot
                     logging.info(f"Loading snapshot : {snapshot_path}")
                     self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+
+                    # Init GlobalFX
+                    self.zyngui.init_global_fx()
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()

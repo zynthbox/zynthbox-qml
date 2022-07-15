@@ -41,7 +41,7 @@ Zynthian.ScreenPage {
     property alias bottomStack: bottomStack
     readonly property QtObject song: zynthian.zynthiloops.song
     property QtObject selectedTrack: applicationWindow().selectedTrack
-    property bool displaySceneButtons: false
+    property bool displaySceneButtons: zynthian.zynthiloops.displaySceneButtons
     property bool displaySketchButtons: false
     property bool songMode: zynthian.zynthiloops.song.mixesModel.songMode
 
@@ -1166,7 +1166,7 @@ Zynthian.ScreenPage {
 
                             onPressed: {
                                 if (!root.songMode) {
-                                    root.displaySceneButtons = !root.displaySceneButtons
+                                    zynthian.zynthiloops.displaySceneButtons = !zynthian.zynthiloops.displaySceneButtons
                                 }
                             }
                         }

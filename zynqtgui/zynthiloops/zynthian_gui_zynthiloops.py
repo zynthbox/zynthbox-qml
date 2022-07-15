@@ -129,6 +129,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__count_in_bars__ = 0
         self.__global_fx_knob_value__ = 50
         self.clips_to_record = []
+        self.__display_scene_buttons = False
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -852,6 +853,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     longOperation = Property(bool, get_longOperation, notify=longOperationChanged)
     ### END Property longOperation
+
+    ### Property displaySceneButtons
+    def get_displaySceneButtons(self):
+        return self.__display_scene_buttons
+
+    def set_displaySceneButtons(self, value):
+        if self.__display_scene_buttons != value:
+            self.__display_scene_buttons = value
+            self.displaySceneButtonsChanged.emit()
+
+    displaySceneButtonsChanged = Signal()
+
+    displaySceneButtons = Property(bool, get_displaySceneButtons, set_displaySceneButtons, notify=displaySceneButtonsChanged)
+    ### END Property displaySceneButtons
 
     @Signal
     def master_volume_changed(self):

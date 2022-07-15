@@ -279,9 +279,9 @@ MouseArea {
             font.pointSize: 9
         }
         QQC2.Label {
-            visible: ZynQuick.PlayGridManager.activeNotes.length > 0
+            visible: ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length > 0
             text: visible
-                ? ZynQuick.PlayGridManager.activeNotes[0] + (ZynQuick.PlayGridManager.activeNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.activeNotes.length - 1) : "")
+                ? ZynQuick.PlayGridManager.internalPassthroughActiveNotes[0] + (ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length > 1 ? "+" + (ZynQuick.PlayGridManager.internalPassthroughActiveNotes.length - 1) : "")
                 : ""
             font.pointSize: 9
         }

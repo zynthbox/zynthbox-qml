@@ -365,17 +365,21 @@ class zynthiloops_track(QObject):
                 if channel >= 0 and track.checkIfLayerExists(channel):
                     layer = zyngui.screens['layer'].layer_midi_map[channel]
 
+                    # Iterate over all connected layers (including fx layer) on midi channel `channel`
                     for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
                         try:
                             jack_basenames.append(fxlayer.jackname.split(":")[0])
-                            trackHasEffects = True
+
+                            # fxlayer can be a Midi synth, or an effect. Check if it is an effect
+                            if fxlayer.engine.type == "Audio Effect":
+                                trackHasEffects = True
                         except Exception as e:
                             logging.error(f"### update_jack_port Error : {str(e)}")
 
             try:
                 for port in zip([f"SamplerSynth:track_{self.id + 1}_left", f"SamplerSynth:track_{self.id + 1}_right"], [f"zynthiloops_audio_levels_client:T{self.id + 1}A", f"zynthiloops_audio_levels_client:T{self.id + 1}B"]):
                     try:
-                        if (trackHasEffects):
+                        if trackHasEffects:
                             p = Popen(("jack_disconnect", port[1], port[0]))
                             p.wait()
                         else:

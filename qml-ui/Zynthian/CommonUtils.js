@@ -2,7 +2,9 @@
 
 function startMetronomeAndPlayback() {
     if (zynthian.zynthiloops.song.mixesModel.songMode) {
-        ZynQuick.SegmentHandler.startPlayback(0, 0);
+        if (zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0) {
+            ZynQuick.SegmentHandler.startPlayback(0, 0);
+        }
     } else {
         console.log("Starting Metronome and Playback");
         for (var i = 0; i < 10; ++i) {

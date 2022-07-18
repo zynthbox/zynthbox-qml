@@ -493,12 +493,17 @@ def audio_autoconnect(force=False):
 					engineInPorts[1] = engineInPorts[0];
 				for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), engineInPorts):
 					try:
-					    jclient.connect(port[0], port[1])
-					    hasGlobalEffects = True
+						jclient.connect(port[0], port[1])
+						hasGlobalEffects = True
 					except: pass
 			except Exception as e:
 				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
 				QTimer.singleShot(1000, force_audio_autoconnect)
+
+				# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+				# Logic below the return statement will be eventually evaluated when called again after the timeout
+				release_lock()
+				return
 	if hasGlobalEffects:
 		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
 		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
@@ -524,6 +529,11 @@ def audio_autoconnect(force=False):
 			except Exception as e:
 				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
 				QTimer.singleShot(1000, force_audio_autoconnect)
+
+				# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+				# Logic below the return statement will be eventually evaluated when called again after the timeout
+				release_lock()
+				return
 	except: pass
 
 	# Connect each track's ports to either that track's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the track
@@ -559,6 +569,11 @@ def audio_autoconnect(force=False):
 										except Exception as e:
 											logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
 											QTimer.singleShot(1000, force_audio_autoconnect)
+
+											# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+											# Logic below the return statement will be eventually evaluated when called again after the timeout
+											release_lock()
+											return
 								pass
 				# If track wants to route through global FX, connect its outputs to the global effects if there are any
 				hasGlobalEffects = False
@@ -577,6 +592,11 @@ def audio_autoconnect(force=False):
 						except Exception as e:
 							logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
 							QTimer.singleShot(1000, force_audio_autoconnect)
+
+							# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+							# Logic below the return statement will be eventually evaluated when called again after the timeout
+							release_lock()
+							return
 				# If there are still no effects attached to this track after taking global into account, connect its outputs to system playback
 				if trackHasEffects or hasGlobalEffects:
 					for port in zip(trackPorts, playback_ports):
@@ -714,6 +734,11 @@ def audio_autoconnect(force=False):
 							break
 	except:
 		QTimer.singleShot(1000, force_audio_autoconnect)
+
+		# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+		# Logic below the return statement will be eventually evaluated when called again after the timeout
+		release_lock()
+		return
 	### END Connect synth engines to global effects
 
 	headphones_out = jclient.get_ports("Headphones", is_input=True, is_audio=True)

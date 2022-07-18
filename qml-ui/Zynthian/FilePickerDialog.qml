@@ -47,6 +47,9 @@ QQC2.Dialog {
     property var currentFileInfo: null
     property string autoExtension: "" // Set this to suggest what the file extension will be on a saved file (so the overwrite checking logic can be retained)
 
+    property alias listCurrentIndex: filesListView.currentIndex
+    property alias listCount: filesListView.count
+
     modal: true
     closePolicy: QQC2.Popup.CloseOnPressOutside
 
@@ -60,6 +63,14 @@ QQC2.Dialog {
     onAccepted: filesListView.selectedModelData = null
     onRejected: filesListView.selectedModelData = null
     onDiscarded: filesListView.selectedModelData = null
+
+    onOpenedChanged: {
+        if (opened) {
+            zynthian.openedDialog = root
+        } else {
+            zynthian.openedDialog = null
+        }
+    }
 
     header: ColumnLayout{
         spacing: 8

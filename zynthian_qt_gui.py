@@ -48,7 +48,7 @@ from PySide2.QtCore import (
     QProcess, Qt,
     QObject,
     QMetaObject,
-    Slot,
+    SIGNAL, Slot,
     Signal,
     Property,
     QTimer,
@@ -741,6 +741,18 @@ class zynthian_gui(QObject):
                     controller.set_value(knob_value, True)
                     self.set_selector()
 
+    @Slot(None)
+    def zyncoder_set_current_index(self):
+        """
+        Set current index when there is an open file dialog
+        """
+
+        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
+            if self.openedDialog.property("listCurrentIndex") != self.__zselector[0].value:
+                self.openedDialog.setProperty("listCurrentIndex", self.__zselector[0].value)
+                logging.debug(f"Setting listCurrentIndex of openedDialog({self.openedDialog}) to {self.__zselector[0].value}")
+                self.set_selector()
+
     def configure_big_knob(self):
         # Configure Big Knob to set BPM
         try:
@@ -753,26 +765,47 @@ class zynthian_gui(QObject):
             min_value = 0
             max_value = 0
 
-            song = self.zynthiloops.song
-            if song is not None:
-                value = song.bpm
-                min_value = 50
-                max_value = 200 + 1
+            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK
+            if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None and self.openedDialog.property("listCount") is not None:
+                value = self.openedDialog.property("listCurrentIndex")
+                min_value = 0
+                max_value = self.openedDialog.property("listCount")
 
-            if self.__zselector[0] is None:
-                self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
-                                                               {'midi_cc': 0, 'value': value,
-                                                                'step': 1})
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
+                                                                   {'midi_cc': 0, 'value': value,
+                                                                    'step': 1})
 
-                self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
-                self.__zselector[0].show()
+                    self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
+                    self.__zselector[0].show()
 
-            self.__zselector_ctrl[0].set_options(
-                {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
-                 'midi_cc': 0,
-                 'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
+                     'midi_cc': 0,
+                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
 
-            self.__zselector[0].config(self.__zselector_ctrl[0])
+                self.__zselector[0].config(self.__zselector_ctrl[0])
+            else:
+                song = self.zynthiloops.song
+                if song is not None:
+                    value = song.bpm
+                    min_value = 50
+                    max_value = 200 + 1
+
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'global_big_knob', 'global_big_knob',
+                                                                   {'midi_cc': 0, 'value': value,
+                                                                    'step': 1})
+
+                    self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
+                    self.__zselector[0].show()
+
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'global_big_knob', 'name': 'global_big_knob', 'short_name': 'global_big_knob',
+                     'midi_cc': 0,
+                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
+
+                self.__zselector[0].config(self.__zselector_ctrl[0])
         except:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
@@ -892,6 +925,17 @@ class zynthian_gui(QObject):
             self.configure_small_knob1()
             self.configure_small_knob2()
             self.configure_small_knob3()
+        elif self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
+            # If openedDialog has listCurrentIndex and listCount property controll currentIndex of that dialog with BK.
+            # Hence configure big knob
+            self.configure_big_knob()
+
+            if self.__zselector[1] is not None:
+                self.__zselector[1].hide()
+            if self.__zselector[2] is not None:
+                self.__zselector[2].hide()
+            if self.__zselector[3] is not None:
+                self.__zselector[3].hide()
         else:
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
@@ -2796,18 +2840,24 @@ class zynthian_gui(QObject):
                             self.__zselector[3].read_zyncoder()
                             QMetaObject.invokeMethod(self, "zyncoder_set_reverb", Qt.QueuedConnection)
                     else:
-                        # When global popop is not open, call zyncoder_read of active screen/modal
-                        if self.modal_screen:
-                            free_zyncoders = self.screens[
-                                self.modal_screen
-                            ].zyncoder_read()
+                        if self.openedDialog is not None and self.openedDialog.property("listCurrentIndex") is not None:
+                            # If openedDialog has listCurrentIndex and listCount property control currentIndex of that dialog with BK.
+                            if self.__zselector[0]:
+                                self.__zselector[0].read_zyncoder()
+                                QMetaObject.invokeMethod(self, "zyncoder_set_current_index", Qt.QueuedConnection)
                         else:
-                            free_zyncoders = self.screens[
-                                self.active_screen
-                            ].zyncoder_read()
+                            # When global popop is not open, call zyncoder_read of active screen/modal
+                            if self.modal_screen:
+                                free_zyncoders = self.screens[
+                                    self.modal_screen
+                                ].zyncoder_read()
+                            else:
+                                free_zyncoders = self.screens[
+                                    self.active_screen
+                                ].zyncoder_read()
 
-                        if free_zyncoders:
-                            self.screens["control"].zyncoder_read(free_zyncoders)
+                            if free_zyncoders:
+                                self.screens["control"].zyncoder_read(free_zyncoders)
 
                 self.lock.release()
 
@@ -3950,8 +4000,12 @@ class zynthian_gui(QObject):
 
     def set_openedDialog(self, dialog):
         if dialog != self.opened_dialog:
+            logging.debug(f"Setting opened dialog : {dialog}")
+            self.opened_dialog.disconnect(self)
             self.opened_dialog = dialog
             self.openedDialogChanged.emit()
+            dialog.connect(dialog, SIGNAL("listCountChanged()"), self.set_selector)
+            self.set_selector()
 
     openedDialogChanged = Signal()
 

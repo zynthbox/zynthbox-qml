@@ -35,8 +35,6 @@ from collections import OrderedDict
 from zyncoder import *
 from zynqtgui import zynthian_gui_config
 
-from PySide2.QtCore import QTimer
-
 #-------------------------------------------------------------------------------
 # Configure logging
 #-------------------------------------------------------------------------------
@@ -57,6 +55,7 @@ refresh_time = 2
 jclient: jack.Client = None
 thread = None
 exit_flag = False
+force_next_autoconnect = False
 
 last_hw_str = None
 
@@ -443,10 +442,6 @@ def midi_autoconnect(force=False):
 	#Release Mutex Lock
 	release_lock()
 
-# This seems a bit silly, but it's easier to do it like this so we can just pass this to any timers that want it
-def force_audio_autoconnect():
-	audio_autoconnect(True)
-
 def audio_autoconnect(force=False):
 
 	if not force or not zynthian_gui_config.zyngui.isBootingComplete:
@@ -497,11 +492,9 @@ def audio_autoconnect(force=False):
 						hasGlobalEffects = True
 					except: pass
 			except Exception as e:
-				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
-				QTimer.singleShot(1000, force_audio_autoconnect)
-
-				# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
+				logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 				# Logic below the return statement will be eventually evaluated when called again after the timeout
+				force_next_autoconnect = True;
 				release_lock()
 				return
 	if hasGlobalEffects:
@@ -527,11 +520,10 @@ def audio_autoconnect(force=False):
 						jclient.connect(port[0], port[1])
 					except: pass
 			except Exception as e:
-				logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
-				QTimer.singleShot(1000, force_audio_autoconnect)
-
+				logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 				# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 				# Logic below the return statement will be eventually evaluated when called again after the timeout
+				force_next_autoconnect = True;
 				release_lock()
 				return
 	except: pass
@@ -567,11 +559,10 @@ def audio_autoconnect(force=False):
 													jclient.connect(port[0], port[1])
 												except: pass
 										except Exception as e:
-											logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
-											QTimer.singleShot(1000, force_audio_autoconnect)
-
+											logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 											# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 											# Logic below the return statement will be eventually evaluated when called again after the timeout
+											force_next_autoconnect = True;
 											release_lock()
 											return
 								pass
@@ -590,11 +581,10 @@ def audio_autoconnect(force=False):
 									hasGlobalEffects = True
 								except: pass
 						except Exception as e:
-							logging.error(f"Failed to connect an engine up. Postponing the auto connection one second, at which point it should hopefully be fine. Reported error: {e}")
-							QTimer.singleShot(1000, force_audio_autoconnect)
-
+							logging.error(f"Failed to connect an engine up. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 							# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 							# Logic below the return statement will be eventually evaluated when called again after the timeout
+							force_next_autoconnect = True;
 							release_lock()
 							return
 				# If there are still no effects attached to this track after taking global into account, connect its outputs to system playback
@@ -732,11 +722,11 @@ def audio_autoconnect(force=False):
 						else:
 							# Track does not want to route through Global FX. Break out of loop carry on with next midi channel
 							break
-	except:
-		QTimer.singleShot(1000, force_audio_autoconnect)
-
+	except Exception as e:
+		logging.error(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")
 		# Unlock mutex and return early as autoconnect is being rescheduled to be called after 1000ms because of an exception
 		# Logic below the return statement will be eventually evaluated when called again after the timeout
+		force_next_autoconnect = True;
 		release_lock()
 		return
 	### END Connect synth engines to global effects
@@ -918,12 +908,13 @@ def get_audio_input_ports(exclude_system_playback=False):
 def autoconnect(force=False):
 	midi_autoconnect(force)
 	audio_autoconnect(force)
+	force_next_autoconnect = False;
 
 
 def autoconnect_thread():
 	while not exit_flag:
 		try:
-			autoconnect()
+			autoconnect(force_next_autoconnect)
 		except Exception as err:
 			logger.error("ZynAutoConnect ERROR: {}".format(err))
 		sleep(refresh_time)

@@ -1292,7 +1292,7 @@ Zynthian.BasePlayGrid {
                                                     icon.name: "player-volume"
                                                     onClicked: {
                                                         if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                            var associatedClip = _private.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
+                                                            var associatedClip = patternsMenuItem.associatedTrack.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
                                                             // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                             associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                         }

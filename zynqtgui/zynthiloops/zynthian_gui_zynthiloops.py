@@ -966,6 +966,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
+    def generate_unique_mysketch_name(self, name):
+        if not (self.__sketch_basepath__ / name).exists():
+            return name
+        else:
+            counter = 1
+
+            while (self.__sketch_basepath__ / f"{name}-{counter}").exists():
+                counter += 1
+
+            return f"{name}-{counter}"
+
     @Slot(None)
     def newSketch(self, base_sketch=None, cb=None):
         def task():
@@ -993,24 +1004,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if base_sketch is not None:
                 logging.info(f"Creating New Sketch from community sketch : {base_sketch}")
-                self.zyngui.currentTaskMessage = "Copying community sketch as temp sketch"
+                self.zyngui.currentTaskMessage = "Copying community sketch to my sketches"
 
                 base_sketch_path = Path(base_sketch)
 
-                # Copy community sketch as temp
-                shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / 'temp')
+                # Copy community sketch to my sketches
 
-                logging.info(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name)}")
+                new_sketch_name = self.generate_unique_mysketch_name(base_sketch_path.parent.name)
+                shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / new_sketch_name)
 
-                self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/",
+                logging.info(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / new_sketch_name / base_sketch_path.name)}")
+
+                self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / new_sketch_name) + "/",
                                                                   base_sketch_path.stem.replace(".sketch", ""), self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
-                    str(self.__sketch_basepath__ / 'temp' / base_sketch_path.name))
+                    str(self.__sketch_basepath__ / new_sketch_name / base_sketch_path.name))
 
-                if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
-                    logging.info(f"Loading default snapshot")
-                    self.zyngui.currentTaskMessage = "Loading snapshot"
-                    self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
+                # In case a base sketch is supplied, handle loading snapshot from the source
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
@@ -1028,14 +1038,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.currentTaskMessage = "Loading snapshot"
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
+                # Init GlobalFX
+                self.zyngui.currentTaskMessage = "Initializing global fx"
+                self.zyngui.init_global_fx()
+
+                # Connect all jack ports of respective track after jack client initialization is done.
+                for i in range(0, self.__song__.tracksModel.count):
+                    track = self.__song__.tracksModel.getTrack(i)
+                    self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
+                    track.update_jack_port()
+
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
                 self.newSketchLoaded.emit()
-
-            # Init GlobalFX
-            self.zyngui.currentTaskMessage = "Initializing global fx"
-            self.zyngui.init_global_fx()
 
             # Set ALSA Mixer volume to 100% when creating new sketch
             self.zyngui.screens["master_alsa_mixer"].volume = 100
@@ -1043,12 +1059,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # Update volume controls
             self.zyngui.fixed_layers.fill_list()
             self.set_selector()
-
-            # Connect all jack ports of respective track after jack client initialization is done.
-            for i in range(0, self.__song__.tracksModel.count):
-                track = self.__song__.tracksModel.getTrack(i)
-                self.zyngui.currentTaskMessage = f"Updating jack port for Track `{track.name}`"
-                track.update_jack_port()
 
             if cb is not None:
                 cb()
@@ -1067,6 +1077,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         def task():
             self.__song__.save(False)
             QTimer.singleShot(3000, self.zyngui.end_long_task)
+
+        self.zyngui.currentTaskMessage = "Saving sketch"
         self.zyngui.do_long_task(task)
 
     @Slot(str)
@@ -1097,13 +1109,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "w") as f:
                     obj["name"] = name
 
-                    # for i, track in enumerate(obj["tracks"]):
-                    #     for j, clip in enumerate(track["clips"]):
-                    #         if clip['path'] is not None:
-                    #             path = clip['path'].replace("/zynthian/zynthian-my-data/sketches/my-sketches/temp/", str(self.__sketch_basepath__ / name) + "/")
-                    #             logging.error(f"Clip Path : {clip['path']}")
-                    #             obj["tracks"][i]["clips"][j]["path"] = path
-
                     f.write(json.dumps(obj))
                     f.flush()
                     os.fsync(f.fileno())
@@ -1121,9 +1126,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-            # logging.error("### Saving sketch to session")
-            # self.zyngui.session_dashboard.set_sketch(self.__song__.sketch_folder)
-
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
@@ -1133,28 +1135,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             old_folder = self.__song__.sketch_folder
             shutil.copytree(old_folder, self.__sketch_basepath__ / name)
 
-            # for json_path in (self.__sketch_basepath__ / name).glob("**/*.sketch.json"):
-            #     try:
-            #         with open(json_path, "r+") as f:
-            #             obj = json.load(f)
-            #             f.seek(0)
-            #
-            #             for i, track in enumerate(obj["tracks"]):
-            #                 for j, clip in enumerate(track["clips"]):
-            #                     if clip['path'] is not None:
-            #                         path = clip['path'].replace(old_folder, str(self.__sketch_basepath__ / name) + "/")
-            #                         logging.error(f"Clip Path : {clip['path']}")
-            #                         obj["tracks"][i]["clips"][j]["path"] = path
-            #
-            #             json.dump(obj, f)
-            #             f.truncate()
-            #             f.flush()
-            #             os.fsync(f.fileno())
-            #     except Exception as e:
-            #         logging.error(e)
-
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
+        self.zyngui.currentTaskMessage = "Saving a copy of the sketch"
         self.zyngui.do_long_task(task)
 
     @Slot(str, bool)
@@ -1169,6 +1152,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             sketch_path = Path(sketch)
 
+            self.zyngui.currentTaskMessage = "Stopping playback"
             try:
                 self.stopAllPlayback()
                 self.zyngui.screens["playgrid"].stopMetronomeRequest()
@@ -1183,30 +1167,52 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                     if load_snapshot:
                         # Load snapshot
-                        logging.info(
-                            f"Loading snapshot : '{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss'")
-                        self.zyngui.screens["layer"].load_snapshot(
-                            f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss")
+                        snapshot_path = f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss"
+                        if Path(snapshot_path).exists():
+                            self.zyngui.currentTaskMessage = "Loading snapshot"
+                            logging.info(f"Loading snapshot : {snapshot_path}")
+                            self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                        elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                            logging.info(f"Loading default snapshot")
+                            self.zyngui.currentTaskMessage = "Loading snapshot"
+                            self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                         # Init GlobalFX
+                        self.zyngui.currentTaskMessage = "Initializing Global FX"
                         self.zyngui.init_global_fx()
 
+                    # Connect all jack ports of respective track after jack client initialization is done.
+                    for i in range(0, self.__song__.tracksModel.count):
+                        track = self.__song__.tracksModel.getTrack(i)
+                        self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
+                        track.update_jack_port()
+
+                    self.zyngui.currentTaskMessage = "Finalizing"
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
+                self.zyngui.currentTaskMessage = "Creating new sketch from community sketch"
                 self.newSketch(sketch, _cb)
             else:
                 logging.info(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
+                self.zyngui.currentTaskMessage = "Loading sketch"
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self, load_history)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
 
                 if load_snapshot:
                     snapshot_path = str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'
                     # Load snapshot
-                    logging.info(f"Loading snapshot : {snapshot_path}")
-                    self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                    if Path(snapshot_path).exists():
+                        logging.info(f"Loading snapshot : {snapshot_path}")
+                        self.zyngui.currentTaskMessage = "Loading snapshot"
+                        self.zyngui.screens["layer"].load_snapshot(snapshot_path)
+                    elif Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
+                        logging.info(f"Loading default snapshot")
+                        self.zyngui.currentTaskMessage = "Loading snapshot"
+                        self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                     # Init GlobalFX
+                    self.zyngui.currentTaskMessage = "Initializing Global FX"
                     self.zyngui.init_global_fx()
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -1215,14 +1221,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Connect all jack ports of respective track after jack client initialization is done.
                 for i in range(0, self.__song__.tracksModel.count):
                     track = self.__song__.tracksModel.getTrack(i)
+                    self.zyngui.currentTaskMessage = f"Updating jack port for Track `{track.name}`"
                     track.update_jack_port()
 
+                self.zyngui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)
 
             if cb is not None:
                 cb()
 
+        self.zyngui.currentTaskMessage = "Loading Sketch"
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 

@@ -32,7 +32,7 @@ from datetime import datetime
 from pathlib import Path
 from subprocess import check_output
 
-from PySide2.QtCore import Property, QObject, QTimer, Signal, Slot
+from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal, Slot
 import taglib
 import json
 
@@ -92,8 +92,8 @@ class zynthiloops_clip(QObject):
             bank_name = "sample-bank"
         self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
-        self.__song__.bpm_changed.connect(lambda: self.song_bpm_changed())
-        self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat)
+        self.__song__.bpm_changed.connect(self.song_bpm_changed, Qt.QueuedConnection)
+        self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
@@ -101,7 +101,7 @@ class zynthiloops_clip(QObject):
             pass
 
         if self.track is not None:
-            self.track.volume_changed.connect(lambda: self.track_volume_changed())
+            self.track.volume_changed.connect(self.track_volume_changed)
             self.track_volume_changed()
 
         self.__sync_in_current_scene_timer__ = QTimer()
@@ -294,7 +294,7 @@ class zynthiloops_clip(QObject):
 
         try:
             self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            self.track.volume_changed.connect(lambda: self.track_volume_changed())
+            self.track.volume_changed.connect(self.track_volume_changed, Qt.QueuedConnection)
             self.track_volume_changed()
         except:
             pass
@@ -670,8 +670,8 @@ class zynthiloops_clip(QObject):
         except Exception as e:
             logging.debug(f"Not connected : {str(e)}")
 
-        self.audioSource.audioLevelChanged.connect(lambda leveldB: self.audio_level_changed_cb(leveldB))
-        self.audioSource.progressChanged.connect(lambda progress: self.progress_changed_cb(progress))
+        self.audioSource.audioLevelChanged.connect(self.audio_level_changed_cb, Qt.QueuedConnection)
+        self.audioSource.progressChanged.connect(self.progress_changed_cb, Qt.QueuedConnection)
 
         try:
             logging.info(f"Setting bpm from metadata : {self.audio_metadata}")

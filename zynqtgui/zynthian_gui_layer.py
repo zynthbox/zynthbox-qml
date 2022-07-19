@@ -1474,19 +1474,24 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				i += 1
 
 			# Finally, stop all unused engines
+			self.zyngui.currentTaskMessage = "Stopping unused engines"
 			self.zyngui.screens['engine'].stop_unused_engines()
 
 			#Restore MIDI profile state
 			if 'midi_profile_state' in snapshot:
+				self.zyngui.currentTaskMessage = "Setting midi profile state"
 				self.set_midi_profile_state(snapshot['midi_profile_state'])
 
 			#Set MIDI Routing
 			if 'midi_routing' in snapshot:
+				self.zyngui.currentTaskMessage = "Setting midi routing"
 				self.set_midi_routing(snapshot['midi_routing'])
 			else:
+				self.zyngui.currentTaskMessage = "Resetting midi routing"
 				self.reset_midi_routing()
 
 			#Autoconnect MIDI
+			self.zyngui.currentTaskMessage = "Connect midi ports"
 			self.zyngui.zynautoconnect_midi(True)
 
 			#Set extended config
@@ -1496,32 +1501,40 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			# Restore layer state, step 1 => Restore Bank & Preset Status
 			i = 0
 			for lss in snapshot['layers']:
+				self.zyngui.currentTaskMessage = "Restoring bank and presets"
 				self.layers[i].restore_snapshot_1(lss)
 				i += 1
 
 			# Restore layer state, step 2 => Restore Controllers Status
 			i = 0
 			for lss in snapshot['layers']:
+				self.zyngui.currentTaskMessage = "Restoring controller status"
 				self.layers[i].restore_snapshot_2(lss)
 				i += 1
 
 			#Set Audio Routing
 			if 'audio_routing' in snapshot:
+				self.zyngui.currentTaskMessage = "Setting audio routing"
 				self.set_audio_routing(snapshot['audio_routing'])
 			else:
+				self.zyngui.currentTaskMessage = "Resetting audio routing"
 				self.reset_audio_routing()
 
 			#Set Audio Capture
 			if 'audio_capture' in snapshot:
+				self.zyngui.currentTaskMessage = "Setting audio capture"
 				self.set_audio_capture(snapshot['audio_capture'])
 			else:
+				self.zyngui.currentTaskMessage = "Resetting audio capture"
 				self.reset_audio_routing()
 
 			#Autoconnect Audio
+			self.zyngui.currentTaskMessage = "Connect synth/audio ports"
 			self.zyngui.zynautoconnect_audio()
 
 			# Restore ALSA Mixer settings
 			if self.amixer_layer and 'amixer_layer' in snapshot:
+				self.zyngui.currentTaskMessage = "Restore alsa mixer settings"
 				self.amixer_layer.restore_snapshot_1(snapshot['amixer_layer'])
 				self.amixer_layer.restore_snapshot_2(snapshot['amixer_layer'])
 

@@ -4013,7 +4013,8 @@ class zynthian_gui(QObject):
             self.openedDialogChanged.emit()
 
             try:
-                dialog.connect(dialog, SIGNAL("listCountChanged()"), self.set_selector)
+                dialog.connect(dialog, SIGNAL("listCountChanged()"), self.set_selector, Qt.DirectConnection)
+                dialog.connect(dialog, SIGNAL("listCurrentIndexChanged()"), self.set_selector, Qt.DirectConnection)
             except: pass
 
             self.set_selector()

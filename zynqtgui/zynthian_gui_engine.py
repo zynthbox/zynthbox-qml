@@ -273,6 +273,8 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 	def start_engine(self, eng):
 		if eng not in self.zyngines:
+			self.zyngui.currentTaskMessage = f"Starting engine {eng}"
+
 			info=self.engine_info[eng]
 			zynthian_engine_class=info[4]
 			if eng[0:3]=="JV/":
@@ -289,6 +291,7 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 	def stop_engine(self, eng, wait=0):
 		if eng in self.zyngines:
+			self.zyngui.currentTaskMessage = f"Stopping engine {eng}"
 			self.zyngines[eng].stop()
 			del self.zyngines[eng]
 			if wait>0:

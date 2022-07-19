@@ -570,6 +570,14 @@ Kirigami.AbstractApplicationWindow {
         anchors.fill: parent
         open: false
         z: 9999999
+
+        QQC2.Label {
+            width: parent.width * 0.4
+            text: zynthian.currentTaskMessage
+            horizontalAlignment: "AlignHCenter"
+            x: parent.width/2 - width/2
+            y: parent.height - height - Kirigami.Units.gridUnit * 4
+        }
     }
 
     Rectangle {

@@ -326,7 +326,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__knob_touch_update_in_progress__:
             return
         if self.is_set_selector_running:
-            logging.debug(f"Set selector in progress. Not setting value with encoder")
+            # Set selector in progress. Not setting value with encoder
             return
 
         if self.__zselector[0] and self.__song__:
@@ -974,6 +974,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             except Exception as e:
                 logging.error(f"Already disconnected : {str(e)}")
 
+            self.zyngui.currentTaskMessage = "Stopping playback"
+
             try:
                 self.stopAllPlayback()
                 self.zyngui.screens["playgrid"].stopMetronomeRequest()
@@ -986,10 +988,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__.to_be_deleted()
 
             if (self.__sketch_basepath__ / 'temp').exists():
+                self.zyngui.currentTaskMessage = "Removing existing temp sketch"
                 shutil.rmtree(self.__sketch_basepath__ / 'temp')
 
             if base_sketch is not None:
                 logging.info(f"Creating New Sketch from community sketch : {base_sketch}")
+                self.zyngui.currentTaskMessage = "Copying community sketch as temp sketch"
 
                 base_sketch_path = Path(base_sketch)
 
@@ -1005,6 +1009,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                     logging.info(f"Loading default snapshot")
+                    self.zyngui.currentTaskMessage = "Loading snapshot"
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
@@ -1012,6 +1017,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
             else:
                 logging.info(f"Creating New Sketch")
+                self.zyngui.currentTaskMessage = "Creating empty sketch as temp sketch"
 
                 self.__song__ = zynthiloops_song.zynthiloops_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
                 self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
@@ -1019,6 +1025,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                     logging.info(f"Loading default snapshot")
+                    self.zyngui.currentTaskMessage = "Loading snapshot"
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -1027,6 +1034,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.newSketchLoaded.emit()
 
             # Init GlobalFX
+            self.zyngui.currentTaskMessage = "Initializing global fx"
             self.zyngui.init_global_fx()
 
             # Set ALSA Mixer volume to 100% when creating new sketch
@@ -1039,14 +1047,18 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # Connect all jack ports of respective track after jack client initialization is done.
             for i in range(0, self.__song__.tracksModel.count):
                 track = self.__song__.tracksModel.getTrack(i)
+                self.zyngui.currentTaskMessage = f"Updating jack port for Track `{track.name}`"
                 track.update_jack_port()
 
             if cb is not None:
                 cb()
 
+            self.zyngui.currentTaskMessage = "Finalizing"
+
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
+        self.zyngui.currentTaskMessage = "Creating New Sketch"
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 

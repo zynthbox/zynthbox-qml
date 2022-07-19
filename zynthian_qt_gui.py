@@ -449,6 +449,7 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+        self.__current_task_message = ""
 
         # global_fx_engines is a list of a set of 2 elements.
         # 1st element of the set is the engine instance
@@ -3823,7 +3824,9 @@ class zynthian_gui(QObject):
 
         # Emit long task ended only if all task has ended
         if self.__long_task_count__ == 0:
+            self.currentTaskMessage = ""
             self.longTaskEnded.emit()
+            self.run_set_selectors()
 
     longTaskStarted = Signal()
     longTaskEnded = Signal()
@@ -4115,6 +4118,22 @@ class zynthian_gui(QObject):
 
     reverbKnobValue = Property(int, get_reverbKnobValue, set_reverbKnobValue, notify=reverbKnobValueChanged)
     ### END Property reverbKnobValue
+
+    ### Property currentTaskMessage
+    def get_currentTaskMessage(self):
+        return self.__current_task_message
+
+    def set_currentTaskMessage(self, value):
+        if value != self.__current_task_message:
+            self.__current_task_message = value
+            self.currentTaskMessageChanged.emit()
+            QGuiApplication.instance().processEvents()
+
+
+    currentTaskMessageChanged = Signal()
+
+    currentTaskMessage = Property(str, get_currentTaskMessage, set_currentTaskMessage, notify=currentTaskMessageChanged)
+    ### END Property currentTaskMessage
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

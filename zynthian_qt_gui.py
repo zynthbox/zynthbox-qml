@@ -4004,10 +4004,18 @@ class zynthian_gui(QObject):
     def set_openedDialog(self, dialog):
         if dialog != self.opened_dialog:
             logging.debug(f"Setting opened dialog : {dialog}")
-            self.opened_dialog.disconnect(self)
+
+            try:
+                self.opened_dialog.disconnect(self)
+            except: pass
+
             self.opened_dialog = dialog
             self.openedDialogChanged.emit()
-            dialog.connect(dialog, SIGNAL("listCountChanged()"), self.set_selector)
+
+            try:
+                dialog.connect(dialog, SIGNAL("listCountChanged()"), self.set_selector)
+            except: pass
+
             self.set_selector()
 
     openedDialogChanged = Signal()

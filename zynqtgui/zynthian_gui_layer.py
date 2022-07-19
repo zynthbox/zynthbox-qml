@@ -96,6 +96,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
+			self.zyngui.screens['snapshot'].save_last_state_snapshot()
 
 	@Slot(int)
 	def selectNextPreset(self, midi_chan):
@@ -105,6 +106,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			logging.debug(layer.preset_index)
 			self.zyngui.screens['control'].show()
 			self.fill_list()
+			self.zyngui.screens['snapshot'].save_last_state_snapshot()
 
 	@Slot(int, int)
 	def selectPreset(self, midi_chan, preset_index):
@@ -116,6 +118,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 				logging.debug(layer.preset_index)
 				self.zyngui.screens['control'].show()
 				self.fill_list()
+				self.zyngui.screens['snapshot'].save_last_state_snapshot()
 
 	def reset(self):
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel

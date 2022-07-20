@@ -204,6 +204,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__is_init_in_progress__ = False
             logging.info(f"Zynthiloops Initialization Complete")
 
+            self.zyngui.zynautoconnect(True)
+
+            for i in range(0, self.__song__.tracksModel.count):
+                track = self.__song__.tracksModel.getTrack(i)
+                self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
+                track.update_jack_port()
+
         self.master_audio_level_timer.start()
 
         if sketch is not None:
@@ -1187,6 +1194,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                         self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
                         track.update_jack_port()
 
+                    if cb is not None:
+                        cb()
+
                     self.zyngui.currentTaskMessage = "Finalizing"
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
@@ -1224,12 +1234,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.currentTaskMessage = f"Updating jack port for Track `{track.name}`"
                     track.update_jack_port()
 
+                if cb is not None:
+                    cb()
+
                 self.zyngui.currentTaskMessage = "Finalizing"
                 self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)
-
-            if cb is not None:
-                cb()
 
         self.zyngui.currentTaskMessage = "Loading Sketch"
         self.longOperationIncrement()

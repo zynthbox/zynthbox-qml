@@ -2,8 +2,8 @@ import logging
 import os
 import sys
 from pathlib import Path
-from PySide2.QtCore import Property, QObject, QTimer, Signal
-from PySide2.QtGui import QGuiApplication
+from PySide2.QtCore import Property, QObject, QTimer, Qt, Signal
+from PySide2.QtGui import QCursor, QGuiApplication, QPixmap
 from PySide2.QtQml import QQmlApplicationEngine
 
 
@@ -60,6 +60,10 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     bootLogInterface = BootLogInterface(app)
+
+    nullCursor = QPixmap(16, 16)
+    nullCursor.fill(Qt.transparent)
+    app.setOverrideCursor(QCursor(nullCursor))
 
     engine.rootContext().setContextProperty("bootLogInterface", bootLogInterface)
     engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/BootLogWindow.qml"))

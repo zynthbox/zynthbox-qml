@@ -4074,14 +4074,15 @@ class zynthian_gui(QObject):
         Run set_selector for all pages when global popop opens/closes
         """
 
-        self.set_selector()
+        if self.isBootingComplete:
+            self.set_selector()
 
-        # Since set_selector of a page is called when show() method is called so run set selector of current page
-        # along with global set_selector to update knob settings as it is already being shown
-        if hasattr(self.get_current_screen(), "set_selector"):
-            self.get_current_screen().set_selector()
+            # Since set_selector of a page is called when show() method is called so run set selector of current page
+            # along with global set_selector to update knob settings as it is already being shown
+            if hasattr(self.get_current_screen(), "set_selector"):
+                self.get_current_screen().set_selector()
 
-        self.is_global_set_selector_running = False
+            self.is_global_set_selector_running = False
 
     globalPopupOpenedChanged = Signal()
 

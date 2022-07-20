@@ -802,6 +802,38 @@ def audio_autoconnect(force=False):
 				except:
 					pass
 
+		# Connect to AudioLevels client
+		audiolevels_out = jclient.get_ports("zynthiloops_audio_levels_client:playback_port_", is_input=True, is_audio=True)
+		audiolevels_connected_ports_1 = jclient.get_all_connections("zynthiloops_audio_levels_client:playback_port_a")
+		audiolevels_connected_ports_2 = jclient.get_all_connections("zynthiloops_audio_levels_client:playback_port_a")
+		# Disconnect ports (that is, any that aren't connected to the system playback ports)
+		for connected_port in audiolevels_connected_ports_1:
+			if connected_port in sysout_conports_1:
+				try:
+					jclient.disconnect(connected_port, audiolevels_out[0])
+				except:
+					pass
+		for connected_port in audiolevels_connected_ports_2:
+			if connected_port in sysout_conports_2:
+				try:
+					jclient.disconnect(connected_port, audiolevels_out[1])
+				except:
+					pass
+		# Connect anything that is connected to the system playback ports to the audiolevels client, except for the global uneffected
+		# SamplerSynth port (which is used for system sound type stuff that shouldn't go in recordings and the like)
+		for port_to_connect in sysout_conports_1:
+			if not port_to_connect.name.startswith("SamplerSynth:global-uneffected"):
+				try:
+					jclient.connect(port_to_connect, audiolevels_out[0])
+				except:
+					pass
+		for port_to_connect in sysout_conports_2:
+			if not port_to_connect.name.startswith("SamplerSynth:global-uneffected"):
+				try:
+					jclient.connect(port_to_connect, audiolevels_out[1])
+				except:
+				    pass
+
 	#Get System Capture ports => jack output ports!!
 	capture_ports = get_audio_capture_ports()
 	if len(capture_ports)>0:

@@ -1260,6 +1260,8 @@ class zynthian_gui(QObject):
     Zynautoconnect will use this list of engines and connect samplersynth to these engines
     """
     def init_global_fx(self):
+        logging.debug(f"Initializing global FX engines")
+
         delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
         reverb_engine = self.engine.start_engine("JV/Roomy")
 
@@ -1282,7 +1284,13 @@ class zynthian_gui(QObject):
         self.delayKnobValueChanged.emit()
         self.reverbKnobValueChanged.emit()
 
-        self.zynautoconnect()
+        self.zynautoconnect(True)
+
+        if self.zynthiloops.song is not None:
+            for i in range(0, self.zynthiloops.song.tracksModel.count):
+                track = self.zynthiloops.song.tracksModel.getTrack(i)
+                self.currentTaskMessage = f"Connecting Track `{track.name}` ports"
+                track.update_jack_port()
 
     # ---------------------------------------------------------------------------
     # OSC Management

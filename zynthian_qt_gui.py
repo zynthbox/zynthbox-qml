@@ -3590,9 +3590,8 @@ class zynthian_gui(QObject):
 
             logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
-            self.__booting_complete__ = True
+            self.isBootingComplete = True
             self.zynautoconnect()
-            self.isBootingCompleteChanged.emit()
 
         worker_thread = threading.Thread(target=task, args=(self,))
         worker_thread.start()
@@ -4052,9 +4051,20 @@ class zynthian_gui(QObject):
     def get_isBootingComplete(self):
         return self.__booting_complete__
 
+    def set_isBootingComplete(self, value):
+        if self.__booting_complete__ != value:
+            self.__booting_complete__ = value
+            self.isBootingCompleteChanged.emit()
+
+            if self.__booting_complete__:
+                if bootlog_fifo is not None:
+                    os.write(bootlog_fifo, f"exit\n".encode())
+                    os.close(bootlog_fifo)
+                    Path("/tmp/bootlog.fifo").unlink()
+
     isBootingCompleteChanged = Signal()
 
-    isBootingComplete = Property(bool, get_isBootingComplete, notify=isBootingCompleteChanged)
+    isBootingComplete = Property(bool, get_isBootingComplete, set_isBootingComplete, notify=isBootingCompleteChanged)
     ### END Property isBootingComplete
 
     ### Property globalPopupOpened
@@ -4147,6 +4157,8 @@ class zynthian_gui(QObject):
             self.currentTaskMessageChanged.emit()
             QGuiApplication.instance().processEvents()
 
+            if bootlog_fifo is not None and len(value) > 0:
+                os.write(bootlog_fifo, f"{value}\n".encode())
 
     currentTaskMessageChanged = Signal()
 
@@ -4365,8 +4377,19 @@ def delete_window():
 # GUI & Synth Engine initialization
 # ------------------------------------------------------------------------------
 
+def open_bootlog_fifo():
+    global bootlog_fifo
+
+    bootlog_fifo = os.open("/tmp/bootlog.fifo", os.O_WRONLY)
+
 if __name__ == "__main__":
     boot_start = timer()
+    bootlog_fifo = None
+
+    if not Path("/tmp/bootlog.fifo").exists():
+        os.mkfifo("/tmp/bootlog.fifo")
+
+    threading.Thread(target=open_bootlog_fifo).start()
 
     # Enable qml debugger if ZYNTHBOX_DEBUG env variable is set
     if os.environ.get("ZYNTHBOX_DEBUG"):

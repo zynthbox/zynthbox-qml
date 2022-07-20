@@ -116,8 +116,8 @@ QQC2.Popup {
     x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
     closePolicy: _private.recordingProgress === -1 ? (QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside) : QQC2.Popup.NoAutoClose
     ColumnLayout {
-        implicitHeight: Kirigami.Units.gridUnit * 40
-        implicitWidth: Kirigami.Units.gridUnit * 60
+        implicitHeight: Kirigami.Units.gridUnit * 48
+        implicitWidth: Kirigami.Units.gridUnit * 64
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -139,7 +139,9 @@ QQC2.Popup {
                     _private.recordingProgress = 0;
                     // Set the filenames for each track (never mind whether they're being recorded or not, it doesn't hurt)
                     var date = new Date();
-                    var baseRecordingLocation = _private.song.sketchFolder + "exports/exported-" + date.getFullYear() + date.getMonth() + date.getDate() + "-" + date.getHours() + date.getMinutes() + "/track-";
+                    var baseRecordingLocation = _private.song.sketchFolder + "exports/exported-" + date.getFullYear() + date.getMonth() + date.getDate() + "-" + date.getHours() + date.getMinutes();
+                    ZL.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
+                    baseRecordingLocation = baseRecordingLocation + "/track-";
                     for (var trackIndex = 0; trackIndex < 10; ++trackIndex) {
                         var track = _private.song.tracksModel.getTrack(trackIndex);
                         var soundIndication = "(unknown)";
@@ -282,6 +284,7 @@ QQC2.Popup {
                     text: qsTr("Track:")
                 }
                 QQC2.Label {
+                    Layout.fillHeight: true
                     Layout.fillWidth: true
                     text: qsTr("Record:")
                 }
@@ -291,6 +294,22 @@ QQC2.Popup {
                 Layout.maximumWidth: 1
                 color: Kirigami.Theme.textColor
                 opacity: 0.3
+            }
+            ColumnLayout {
+                id: trackDelegate
+                Layout.fillWidth: true
+                property int trackIndex: model.index
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    text: "Song"
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                QQC2.CheckBox {
+                    Layout.fillWidth: true
+                    enabled: !_private.isRecording
+                    checked: ZL.AudioLevels.recordGlobalPlayback
+                    onClicked: ZL.AudioLevels.recordGlobalPlayback = !ZL.AudioLevels.recordGlobalPlayback
+                }
             }
             Repeater {
                 model: _private.song ? 10 : 0

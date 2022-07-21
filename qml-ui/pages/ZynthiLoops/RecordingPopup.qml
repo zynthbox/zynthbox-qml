@@ -286,35 +286,28 @@ QQC2.Popup {
 
                                         Repeater {
                                             id: targetTracksSlotsRepeater
-                                            model: ["sample-trig", "sample-slice"].indexOf(targetTracksDelegate.track.trackAudioType) >= 0
-                                                    ? 5
-                                                    : 1
+                                            model: 5
                                             delegate: QQC2.Button {
                                                 property QtObject clip: targetTracksDelegate.track
                                                                             ? ["sample-trig", "sample-slice"].indexOf(targetTracksDelegate.track.trackAudioType) >= 0
                                                                                 ? targetTracksDelegate.track.samples[index]
-                                                                                : targetTracksDelegate.track.sceneClip
+                                                                                : index === 0
+                                                                                  ? targetTracksDelegate.track.sceneClip
+                                                                                  : null
                                                                             : null
 
+                                                opacity: clip != null
+                                                          ? checked
+                                                             ? 1
+                                                             : 0.5
+                                                          : 0
                                                 Layout.fillWidth: true
                                                 Layout.fillHeight: true
                                                 checked: clip && zynthian.zynthiloops.clipsToRecord.indexOf(clip) >= 0
-                                                opacity: checked ? 1 : 0.5
                                                 text: qsTr("Slot %1").arg(index+1)
                                                 onClicked: {
                                                     zynthian.zynthiloops.toggleFromClipsToRecord(clip)
                                                 }
-                                            }
-                                        }
-
-                                        // Filler to always have the button take 1/5th of remaining space instead of filling entire width
-                                        Repeater {
-                                            model: 5 - targetTracksSlotsRepeater.model
-                                            delegate: QQC2.Button {
-                                                Layout.fillWidth: true
-                                                Layout.fillHeight: true
-                                                text: "Slot 0" // Same text as the actual buttons to have same width
-                                                opacity: 0
                                             }
                                         }
                                     }

@@ -666,6 +666,10 @@ Zynthian.BasePlayGrid {
                             noteLengthVisualiser.noteDuration = noteDuration;
                             noteLengthVisualiser.noteOffset = noteOffset;
                             noteLengthVisualiser.noteDelay = noteDelay;
+                            if (noteDelay !== 0 && noteDuration === 0) {
+                                // So we also visualise default-duration notes which have been moved around
+                                noteLengthVisualiser.noteDuration = noteLengthVisualiser.singleStepLength;
+                            }
                             noteLengthVisualiser.note = note;
                         }
                         property var noteLengths: {
@@ -709,7 +713,7 @@ Zynthian.BasePlayGrid {
                                 Rectangle {
                                     anchors {
                                         left: parent.left
-                                        leftMargin: loopDelegate.loopIndex === 0 ? noteLengthVisualiser.noteOffset * noteLengthVisualiser.dividedWidth : 0
+                                        leftMargin: loopDelegate.loopIndex === 0 ? noteLengthVisualiser.noteOffset * noteLengthVisualiser.dividedWidth + (noteLengthVisualiser.noteDelay / noteLengthVisualiser.singleStepLength * noteLengthVisualiser.dividedWidth) : 0
                                         verticalCenter: parent.verticalCenter
                                     }
                                     height: 2
@@ -718,10 +722,10 @@ Zynthian.BasePlayGrid {
                                         var thisDuration = 0;
                                         if (loopDelegate.loopIndex === 0) {
                                             // The first loop
-                                            thisDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength), noteLengthVisualiser.noteDuration);
+                                            thisDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength + noteLengthVisualiser.noteDelay), noteLengthVisualiser.noteDuration);
                                         } else if (loopDelegate.loopIndex === noteLengthVisualiser.lastLoopIndex) {
                                             // The last loop
-                                            var firstLoopDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength), noteLengthVisualiser.noteDuration);
+                                            var firstLoopDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength + noteLengthVisualiser.noteDelay), noteLengthVisualiser.noteDuration);
                                             thisDuration = (noteLengthVisualiser.noteDuration - firstLoopDuration) % (16 * noteLengthVisualiser.singleStepLength);
                                         } else if (loopDelegate.loopIndex < noteLengthVisualiser.lastLoopIndex) {
                                             // All the loops between the first and last (they're just full width)
@@ -731,6 +735,26 @@ Zynthian.BasePlayGrid {
                                     }
                                     width: thisLoopDuration * noteLengthVisualiser.dividedWidth / noteLengthVisualiser.singleStepLength;
                                     color: noteLengthVisualiser.focusColor
+                                    Rectangle {
+                                        anchors {
+                                            top: parent.bottom
+                                            left: parent.left
+                                        }
+                                        width: 2
+                                        height: 4
+                                        color: parent.color
+                                        visible: parent.width > 0 && loopDelegate.loopIndex === 0
+                                    }
+                                    Rectangle {
+                                        anchors {
+                                            verticalCenter: parent.verticalCenter
+                                            right: parent.right
+                                        }
+                                        width: 2
+                                        height: 4
+                                        color: parent.color
+                                        visible: parent.width > 0 && loopDelegate.loopIndex === noteLengthVisualiser.lastLoopIndex
+                                    }
                                 }
                             }
                         }
@@ -959,7 +983,13 @@ Zynthian.BasePlayGrid {
                                 if (stepSettings.visible) {
                                     changeValue("delay", 1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
                                 } else if (noteSettings.visible) {
-                                    changeValue("delay", 1, 0, -noteSettings.stepDuration + 1, 0);
+                                    changeValue("delay", 1, -noteSettings.stepDuration + 1, -noteSettings.stepDuration - 1, 0);
+                                } else {
+                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        changeValue("delay", 1, -stepDuration + 1, stepDuration - 1, 0);
+                                    }
                                 }
                             }
                             function delayDown() {
@@ -967,6 +997,12 @@ Zynthian.BasePlayGrid {
                                     changeValue("delay", -1, -stepSettings.stepDuration + 1, stepSettings.stepDuration - 1, 0);
                                 } else if (noteSettings.visible) {
                                     changeValue("delay", -1, -noteSettings.stepDuration + 1, noteSettings.stepDuration - 1, 0);
+                                } else {
+                                    var seqPad = drumPadRepeater.itemAt(drumPadRepeater.selectedIndex);
+                                    if (seqPad && seqPad.note && seqPad.currentSubNote > -1) {
+                                        var stepDuration = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                                        changeValue("delay", -1, -stepDuration + 1, stepDuration - 1, 0);
+                                    }
                                 }
                             }
                             PadNoteButton {

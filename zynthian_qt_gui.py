@@ -4052,6 +4052,8 @@ class zynthian_gui(QObject):
         return self.__booting_complete__
 
     def set_isBootingComplete(self, value):
+        global bootlog_fifo
+
         if self.__booting_complete__ != value:
             self.__booting_complete__ = value
             self.isBootingCompleteChanged.emit()
@@ -4060,6 +4062,8 @@ class zynthian_gui(QObject):
                 if bootlog_fifo is not None:
                     os.write(bootlog_fifo, f"exit\n".encode())
                     os.close(bootlog_fifo)
+                    bootlog_fifo = None
+
                     Path("/tmp/bootlog.fifo").unlink()
 
     isBootingCompleteChanged = Signal()

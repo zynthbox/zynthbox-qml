@@ -299,16 +299,20 @@ class zynthian_gui_engine(zynthian_gui_selector):
 
 
 	def stop_unused_engines(self):
+		global_fx_engines = [fx_engine for fx_engine, _ in self.zyngui.global_fx_engines]
+
 		for eng in list(self.zyngines.keys()):
-			if len(self.zyngines[eng].layers)==0:
+			if len(self.zyngines[eng].layers) == 0 and self.zyngines[eng] not in global_fx_engines:
 				logging.debug("Stopping Unused Engine '{}' ...".format(eng))
 				self.zyngines[eng].stop()
 				del self.zyngines[eng]
 
 
 	def stop_unused_jalv_engines(self):
+		global_fx_engines = [fx_engine for fx_engine, _ in self.zyngui.global_fx_engines]
+
 		for eng in list(self.zyngines.keys()):
-			if len(self.zyngines[eng].layers)==0 and eng[0:3]=="JV/":
+			if len(self.zyngines[eng].layers) == 0 and self.zyngines[eng] not in global_fx_engines and eng[0:3] == "JV/":
 				self.zyngines[eng].stop()
 				del self.zyngines[eng]
 

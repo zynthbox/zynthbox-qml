@@ -277,3 +277,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
     def get_knob3Value(self):
         return self.__knob3_value__ - 50
     knob3Value = Property(int, get_knob3Value, notify=knob3ValueChanged)
+
+    @Slot(str)
+    def setCurrentTaskMessage(self, msg):
+        self.zyngui.currentTaskMessage = msg

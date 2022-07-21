@@ -673,7 +673,7 @@ class zynthiloops_song(QObject):
 
             for track_index in range(self.tracksModel.count):
                 track = self.tracksModel.getTrack(track_index)
-                if value == -1 or track.id == value:
+                if (value == -1 or track.id == value) and not track.muted:
                     track.unmute_all_clips_in_track()
                 else:
                     track.mute_all_clips_in_track()

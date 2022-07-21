@@ -637,6 +637,10 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    Connections {
+        target: ZynQuick.PlayGridManager
+        onTaskMessage: zynthian.playgrid.setCurrentTaskMessage(message);
+    }
     Repeater {
         id: playGridsRepeater
         model: ZynQuick.PlayGridManager.playgrids

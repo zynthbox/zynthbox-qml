@@ -1045,10 +1045,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.currentTaskMessage = "Loading snapshot"
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                # Init GlobalFX
-                self.zyngui.currentTaskMessage = "Initializing global fx"
-                self.zyngui.init_global_fx()
-
                 # Connect all jack ports of respective track after jack client initialization is done.
                 for i in range(0, self.__song__.tracksModel.count):
                     track = self.__song__.tracksModel.getTrack(i)
@@ -1184,10 +1180,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                             self.zyngui.currentTaskMessage = "Loading snapshot"
                             self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                        # Init GlobalFX
-                        self.zyngui.currentTaskMessage = "Initializing Global FX"
-                        self.zyngui.init_global_fx()
-
                     # Connect all jack ports of respective track after jack client initialization is done.
                     for i in range(0, self.__song__.tracksModel.count):
                         track = self.__song__.tracksModel.getTrack(i)
@@ -1220,10 +1212,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                         logging.info(f"Loading default snapshot")
                         self.zyngui.currentTaskMessage = "Loading snapshot"
                         self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
-
-                    # Init GlobalFX
-                    self.zyngui.currentTaskMessage = "Initializing Global FX"
-                    self.zyngui.init_global_fx()
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()

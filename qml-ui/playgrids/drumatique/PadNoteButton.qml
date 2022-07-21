@@ -174,7 +174,6 @@ QQC2.Button {
                     id:padSubNoteRect
                     property var subNote: modelData
                     property var subNoteVelocity: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "velocity");
-                    property var subNoteDuration: component.patternModel.subnoteMetadata(component.padNoteRow, component.padNoteIndex, index, "duration");
 
                     Layout.fillWidth: true
                     Layout.minimumHeight: subnoteLayout.maxHalfSubnoteHeight * 2
@@ -232,47 +231,6 @@ QQC2.Button {
                         }
                         height: subnoteLayout.maxHalfSubnoteHeight + (subnoteLayout.dividedSubNoteHeight * (subNoteVelocity / 127) * 100)
                         color: zynthian.theme_chooser.noteColors[subNote.midiNote]
-                    }
-                    Item {
-                        anchors {
-                            bottom: parent.bottom
-                            left: parent.left
-                        }
-                        height: 4
-                        width: 2
-                        visible: padSubNoteRect.subNoteDuration > 0
-                        Item {
-                            anchors {
-                                top: parent.top
-                                left: parent.right
-                            }
-                            transformOrigin: Item.TopLeft
-                            rotation: -90
-                            height: subnoteText.height
-                            width: subnoteText.width
-                            Rectangle {
-                                anchors {
-                                    fill: parent
-                                    margins: -1
-                                }
-                                color: component.backgroundColor
-                                opacity: 0.3
-                                radius: height / 2
-                            }
-                            Text {
-                                id: subnoteText
-                                anchors {
-                                    top: parent.top
-                                    left: parent.left
-                                }
-                                height: paintedHeight
-                                width: paintedWidth
-                                text: padSubNoteRect.subNoteDuration + "/32 qn"
-                                font.pixelSize: 8
-                                verticalAlignment: Text.AlignTop
-                                horizontalAlignment: Text.AlignLeft
-                            }
-                        }
                     }
                     Rectangle {
                         anchors.fill: parent;

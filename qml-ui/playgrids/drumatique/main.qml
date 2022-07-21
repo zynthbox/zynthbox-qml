@@ -653,6 +653,88 @@ Zynthian.BasePlayGrid {
                         }
                     }
 
+                    ColumnLayout {
+                        id: noteLengthVisualiser
+                        function clearVisualisation() {
+                            noteLengthVisualiser.note = null;
+                            noteLengthVisualiser.lastLoopIndex = -1;
+                        }
+                        function visualiseNote(note, noteDuration, noteDelay, noteOffset) {
+                            noteLengthVisualiser.singleStepLength = noteLengthVisualiser.noteLengths[_private.activePatternModel.noteLength]
+                            noteLengthVisualiser.totalStepLength = noteDuration / noteLengthVisualiser.singleStepLength;
+                            noteLengthVisualiser.lastLoopIndex = (noteLengthVisualiser.totalStepLength + noteOffset) / 16;
+                            noteLengthVisualiser.noteDuration = noteDuration;
+                            noteLengthVisualiser.noteOffset = noteOffset;
+                            noteLengthVisualiser.noteDelay = noteDelay;
+                            noteLengthVisualiser.note = note;
+                        }
+                        property var noteLengths: {
+                            1: 32,
+                            2: 16,
+                            3: 8,
+                            4: 4,
+                            5: 2,
+                            6: 1
+                        }
+                        property QtObject note: null
+                        property int noteOffset: 0
+                        property int noteDelay: 0
+                        property int noteDuration: 0
+                        property int lastLoopIndex: -1
+                        property double totalStepLength: 0
+                        property int singleStepLength: 0
+                        property int dividedWidth: width / 16
+                        anchors {
+                            left: parent.left
+                            leftMargin: 5
+                            right: parent.right
+                            rightMargin: 5
+                            bottom: parent.top
+                            bottomMargin: 1
+                        }
+                        height: drumsGridContainer.height
+                        visible: note !== null
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        readonly property color focusColor: Kirigami.Theme.focusColor
+                        spacing: 0
+                        Item { Layout.fillHeight: true; Layout.fillWidth: true; }
+                        Repeater {
+                            model: 30
+                            delegate: Item {
+                                id: loopDelegate
+                                Layout.fillWidth: true
+                                Layout.minimumHeight: 3
+                                property int loopIndex: 29 - model.index
+                                Rectangle {
+                                    anchors {
+                                        left: parent.left
+                                        leftMargin: loopDelegate.loopIndex === 0 ? noteLengthVisualiser.noteOffset * noteLengthVisualiser.dividedWidth : 0
+                                        verticalCenter: parent.verticalCenter
+                                    }
+                                    height: 2
+                                    property int thisLoopOffset: loopDelegate.loopIndex === 0 ? noteLengthVisualiser.noteOffset : 0
+                                    property double thisLoopDuration: {
+                                        var thisDuration = 0;
+                                        if (loopDelegate.loopIndex === 0) {
+                                            // The first loop
+                                            thisDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength), noteLengthVisualiser.noteDuration);
+                                        } else if (loopDelegate.loopIndex === noteLengthVisualiser.lastLoopIndex) {
+                                            // The last loop
+                                            var firstLoopDuration = Math.min((noteLengthVisualiser.singleStepLength * 16) - (noteLengthVisualiser.noteOffset * noteLengthVisualiser.singleStepLength), noteLengthVisualiser.noteDuration);
+                                            thisDuration = (noteLengthVisualiser.noteDuration - firstLoopDuration) % (16 * noteLengthVisualiser.singleStepLength);
+                                        } else if (loopDelegate.loopIndex < noteLengthVisualiser.lastLoopIndex) {
+                                            // All the loops between the first and last (they're just full width)
+                                            thisDuration = noteLengthVisualiser.singleStepLength * 16
+                                        }
+                                        return thisDuration;
+                                    }
+                                    width: thisLoopDuration * noteLengthVisualiser.dividedWidth / noteLengthVisualiser.singleStepLength;
+                                    color: noteLengthVisualiser.focusColor
+                                }
+                            }
+                        }
+                    }
                     RowLayout {
                         anchors.fill:parent
                         anchors.margins: 5
@@ -692,6 +774,19 @@ Zynthian.BasePlayGrid {
                                 stepSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
                                 if (noteSettings.visible) {
                                     noteSettings.currentSubNote = seqPad ? seqPad.currentSubNote : -1;
+                                }
+                                if (seqPad && seqPad.currentSubNote > -1) {
+                                    var noteLength = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "duration");
+                                    if (!noteLength) {
+                                        noteLength = 0;
+                                    }
+                                    var noteDelay = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, selectedIndex, seqPad.currentSubNote, "delay");
+                                    if (!noteDelay) {
+                                        noteDelay = 0;
+                                    }
+                                    noteLengthVisualiser.visualiseNote(note.subnotes[seqPad.currentSubNote], noteLength, noteDelay, selectedIndex % 16);
+                                } else {
+                                    noteLengthVisualiser.clearVisualisation();
                                 }
                             }
                             function goNext() {
@@ -822,6 +917,17 @@ Zynthian.BasePlayGrid {
                                         indicesToChange.push(seqPad.currentSubNote);
                                     }
                                     changeStepValue(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, indicesToChange, valueName, howMuch, minValue, maxValue, defaultValue);
+                                    if (seqPad.note && seqPad.currentSubNote > -1) {
+                                        var noteLength = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "duration");
+                                        if (!noteLength) {
+                                            noteLength = 0;
+                                        }
+                                        var noteDelay = _private.activePatternModel.subnoteMetadata(_private.activeBar + _private.bankOffset, drumPadRepeater.selectedIndex, seqPad.currentSubNote, "delay");
+                                        if (!noteDelay) {
+                                            noteDelay = 0;
+                                        }
+                                        noteLengthVisualiser.visualiseNote(seqPad.note.subnotes[seqPad.currentSubNote], noteLength, noteDelay, drumPadRepeater.selectedIndex % 16);
+                                    }
                                 } else if (noteSettings.visible) {
                                     // Only do the "change all the things" if note settings is visible... could otherwise, but confusion...
                                     var visibleStepIndices = noteSettings.visibleStepIndices();

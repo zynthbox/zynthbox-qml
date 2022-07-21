@@ -347,6 +347,7 @@ Rectangle {
                                             radius: 2
                                             font.pointSize: 8
                                             checkable: true
+                                            checked: root.song.playTrackSolo === model.track.id
                                             text: qsTr("S")
                                             background: Rectangle {
                                                 radius: parent.radius
@@ -354,7 +355,12 @@ Rectangle {
                                                 border.color: Qt.rgba(50, 50, 50, 0.1)
                                                 color: parent.down || parent.checked ? "#4caf50" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                             }
-                                            onCheckedChanged: {
+                                            onToggled: {
+                                                if (checked) {
+                                                    root.song.playTrackSolo = model.track.id
+                                                } else {
+                                                    root.song.playTrackSolo = -1
+                                                }
                                             }
                                         }
                                         QQC2.RoundButton {

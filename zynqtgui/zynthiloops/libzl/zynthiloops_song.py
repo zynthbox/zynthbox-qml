@@ -79,6 +79,7 @@ class zynthiloops_song(QObject):
         self.__selected_scale_index__ = 0
         # The octave is -1 indexed, as we operate with C4 == midi note 60, so this makes our default a key of C2
         self.__octave__ = 2
+        self.__play_track_solo = -1
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -660,6 +661,29 @@ class zynthiloops_song(QObject):
         return self.sketch_folder
     sketchFolder = Property(str, get_sketch_folder, constant=True)
     ### END Property sketchFolder
+
+    ### Property playTrackSolo
+    def get_playTrackSolo(self):
+        return self.__play_track_solo
+
+    def set_playTrackSolo(self, value):
+        if self.__play_track_solo != value:
+            logging.debug(f"set_playTrackSolo: {value}")
+            self.__play_track_solo = value
+
+            for track_index in range(self.tracksModel.count):
+                track = self.tracksModel.getTrack(track_index)
+                if value == -1 or track.id == value:
+                    track.unmute_all_clips_in_track()
+                else:
+                    track.mute_all_clips_in_track()
+
+            self.playTrackSoloChanged.emit()
+
+    playTrackSoloChanged = Signal()
+
+    playTrackSolo = Property(int, get_playTrackSolo, set_playTrackSolo, notify=playTrackSoloChanged)
+    ### END Property playTrackSolo
 
     def stop(self):
         for i in range(0, self.__parts_model__.count):

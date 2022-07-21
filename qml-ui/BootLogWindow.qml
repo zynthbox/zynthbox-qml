@@ -10,37 +10,21 @@ QQC2.ApplicationWindow {
      color: "#000000"
 
     width: Screen.width
-    height: 100
+    height: Screen.height
     maximumWidth: width
     maximumHeight: height
 
+    // Start window on bottom so that logo appears on top of this window.
     flags: Qt.WindowDoesNotAcceptFocus | Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint
 
+    // Display log on bottom as the window is fullscreen
     QQC2.Label {
         width: parent.width
-        anchors.centerIn: parent
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 50
         horizontalAlignment: Qt.AlignHCenter
         font.pointSize: 12
         color: "white"
         text: bootLogInterface.bootLog
-    }
-
-    Connections {
-        target: root
-        onScreenChanged: updatePosition()
-        onXChanged: updatePosition()
-        onYChanged: updatePosition()
-    }
-
-    function updatePosition() {
-        var xpos = Screen.width / 2 - root.width / 2;
-        var ypos = Screen.height - root.height
-
-        if (root.x != xpos) {
-            root.x = xpos
-        }
-        if (root.y != ypos) {
-            root.y = ypos
-        }
     }
 }

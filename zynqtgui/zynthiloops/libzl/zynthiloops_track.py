@@ -827,7 +827,7 @@ class zynthiloops_track(QObject):
         self.__muted__ = muted
         if muted:
             self.mute_all_clips_in_track()
-        else:
+        elif self.__song__.playTrackSolo == -1 or (self.__song__.playTrackSolo == self.id):
             self.unmute_all_clips_in_track()
         self.isMutedChanged.emit()
     isMutedChanged = Signal()

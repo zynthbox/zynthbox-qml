@@ -296,9 +296,7 @@ QQC2.Popup {
                 opacity: 0.3
             }
             ColumnLayout {
-                id: trackDelegate
                 Layout.fillWidth: true
-                property int trackIndex: model.index
                 QQC2.Label {
                     Layout.fillWidth: true
                     text: "Song"

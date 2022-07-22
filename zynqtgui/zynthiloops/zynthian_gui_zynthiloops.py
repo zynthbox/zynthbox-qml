@@ -208,7 +208,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             for i in range(0, self.__song__.tracksModel.count):
                 track = self.__song__.tracksModel.getTrack(i)
-                self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
                 track.update_jack_port()
 
         self.master_audio_level_timer.start()
@@ -1048,7 +1047,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Connect all jack ports of respective track after jack client initialization is done.
                 for i in range(0, self.__song__.tracksModel.count):
                     track = self.__song__.tracksModel.getTrack(i)
-                    self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
                     track.update_jack_port()
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -1183,7 +1181,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     # Connect all jack ports of respective track after jack client initialization is done.
                     for i in range(0, self.__song__.tracksModel.count):
                         track = self.__song__.tracksModel.getTrack(i)
-                        self.zyngui.currentTaskMessage = f"Connecting Track `{track.name}` ports"
                         track.update_jack_port()
 
                     if cb is not None:
@@ -1219,7 +1216,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Connect all jack ports of respective track after jack client initialization is done.
                 for i in range(0, self.__song__.tracksModel.count):
                     track = self.__song__.tracksModel.getTrack(i)
-                    self.zyngui.currentTaskMessage = f"Updating jack port for Track `{track.name}`"
                     track.update_jack_port()
 
                 if cb is not None:

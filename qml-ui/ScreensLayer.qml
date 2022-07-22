@@ -59,7 +59,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching control")
-                zynthian.currentTaskMessage = "Caching control page"
+                zynthian.currentTaskMessage = "Loading control page"
                 if (!root.pageCache["control"]) {
                     file = applicationWindow().pageScreenMapping.pageForScreen("control");
                     var component = Qt.createComponent(file);
@@ -68,7 +68,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching layers_for_track")
-                zynthian.currentTaskMessage = "Caching library page"
+                zynthian.currentTaskMessage = "Loading library page"
                 if (!root.pageCache["layers_for_track"]) {
                     file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_track");
                     var component = Qt.createComponent(file);

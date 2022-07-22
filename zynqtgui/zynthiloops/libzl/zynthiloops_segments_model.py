@@ -52,6 +52,7 @@ class zynthiloops_segments_model(QAbstractListModel):
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Segments Model")
+        self.zyngui.currentTaskMessage = f"Deserializing segments"
 
         self.beginResetModel()
         self.__segments.clear()

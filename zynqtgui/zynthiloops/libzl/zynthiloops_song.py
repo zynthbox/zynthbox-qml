@@ -279,6 +279,8 @@ class zynthiloops_song(QObject):
         self.__is_loading__ = True
         filename = self.__name__ + ".sketch.json"
 
+        self.zyngui.currentTaskMessage = f"Restoring sketch"
+
         try:
             logging.info(f"Restoring {self.sketch_folder + filename}, loadHistory({load_history})")
             with open(self.sketch_folder + filename, "r") as f:

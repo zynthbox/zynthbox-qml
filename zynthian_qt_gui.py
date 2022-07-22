@@ -441,6 +441,10 @@ class zynthian_gui(QObject):
 
     def __init__(self, parent=None):
         super(zynthian_gui, self).__init__(parent)
+
+        self.__current_task_message = ""
+        self.currentTaskMessage = f"Starting Zynthbox QML"
+
         self.zynmidi = None
         self.screens = {}
         self.__home_screen = "zynthiloops" #TODO: make this configurable, put same in static screens_sequence
@@ -449,7 +453,6 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
-        self.__current_task_message = ""
 
         # global_fx_engines is a list of a set of 2 elements.
         # 1st element of the set is the engine instance
@@ -1261,6 +1264,7 @@ class zynthian_gui(QObject):
     """
     def init_global_fx(self):
         logging.debug(f"Initializing global FX engines")
+        self.currentTaskMessage = "Initializing Global FX Engines"
 
         delay_engine = self.engine.start_engine("JV/Gxdigital_delay_st")
         reverb_engine = self.engine.start_engine("JV/Roomy")
@@ -1289,7 +1293,6 @@ class zynthian_gui(QObject):
         if self.zynthiloops.song is not None:
             for i in range(0, self.zynthiloops.song.tracksModel.count):
                 track = self.zynthiloops.song.tracksModel.getTrack(i)
-                self.currentTaskMessage = f"Connecting Track `{track.name}` ports"
                 track.update_jack_port()
 
     # ---------------------------------------------------------------------------
@@ -1356,6 +1359,8 @@ class zynthian_gui(QObject):
         # self.zyntransport = zynthian_engine_transport()
 
         # Create Core UI Screens
+        self.currentTaskMessage = "Creating screen objects"
+
         self.screens["info"] = zynthian_gui_info(self)
         self.screens["about"] = zynthian_gui_about(self)
         self.screens["confirm"] = zynthian_gui_confirm(self)
@@ -4482,6 +4487,7 @@ if __name__ == "__main__":
     engine.rootContext().setContextProperty("zynthian", zyngui)
 
     def load_qml():
+        zyngui.currentTaskMessage = f"Loading main page"
         engine.load(os.fspath(Path(__file__).resolve().parent / "qml-ui/main.qml"))
 
         if not engine.rootObjects() or not app.topLevelWindows():

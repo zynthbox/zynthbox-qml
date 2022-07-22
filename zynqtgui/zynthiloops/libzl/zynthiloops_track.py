@@ -357,6 +357,7 @@ class zynthiloops_track(QObject):
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
     def update_jack_port(self):
+        self.zyngui.currentTaskMessage = f"Updating jack ports for track `{self.name}`"
         self.update_jack_port_timer.start()
 
     def do_update_jack_port(self):

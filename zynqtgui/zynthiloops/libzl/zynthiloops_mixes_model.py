@@ -51,6 +51,7 @@ class zynthiloops_mixes_model(QAbstractListModel):
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Mixes Model")
+        self.zyngui.currentTaskMessage = f"Deserializing mixes"
 
         if "selectedMixIndex" in obj:
             self.set_selectedMixIndex(obj["selectedMixIndex"], True)

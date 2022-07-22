@@ -25,6 +25,7 @@
 import json
 import logging
 import os
+import tempfile
 import traceback
 from pathlib import Path
 
@@ -273,12 +274,31 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     def loadSound(self, sound):
         self.loadSoundFromFile(sound.path)
 
+    @Slot(int, str)
+    def loadTrackSoundFromJson(self, trackIndex, soundJson):
+        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".T{trackIndex+1}.sound", delete=False)
+        sound_path = tempSoundJson.name
+
+        try:
+            tempSoundJson.write(bytes(soundJson, encoding='utf8'))
+            tempSoundJson.flush()
+            os.fsync(tempSoundJson.fileno())
+        except: pass
+        finally:
+            tempSoundJson.close()
+
+        self.loadSoundFromFile(sound_path, trackIndex)
+
     @Slot(str)
-    def loadSoundFromFile(self, filepath):
+    def loadSoundFromFile(self, filepath, trackIndex=-1):
         def task():
             logging.debug(f"### Loading sound : {filepath}")
 
-            track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            if trackIndex == -1:
+                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            else:
+                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(trackIndex)
+
             source_channels = self.zyngui.layer.load_layer_channels_from_file(filepath)
             free_layers = track.getFreeLayers()
             used_layers = []
@@ -356,10 +376,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         logging.debug(f"# New Chained Sounds     : {new_chained_sounds}")
                         logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
 
-                # Remove all current sounds from track
-                for i in used_layers:
-                    cb_counter += 1
-                    track.remove_and_unchain_sound(i, post_removal_task)
+                if len(used_layers) > 0:
+                    # Remove all current sounds from track
+                    for i in used_layers:
+                        cb_counter += 1
+                        track.remove_and_unchain_sound(i, post_removal_task)
+                else:
+                    # If there are no sounds in curent track, immediately do post removal task
+                    post_removal_task()
 
             self.zyngui.end_long_task()
 

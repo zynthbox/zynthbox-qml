@@ -377,24 +377,12 @@ Item {
                     var trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
                     trackToAssociate.connectedPattern = theItem.importIndex;
                     console.log("Newly associated track is", trackToAssociate);
-                }
 
-
-                // Finally, actually import the sound if requested
-                var jsonToLoad = theItem.patternObject.layerData;
-                if (jsonToLoad != "") {
-                    var sourceChannels = zynthian.layer.load_layer_channels_from_json(jsonToLoad);
-                    var destinationChannels = theItem.destinationChannels;
-                    if (sourceChannels.length === destinationChannels.length) {
-                        let map = {};
-                        var i = 0;
-                        for (i in sourceChannels) {
-                            map[sourceChannels[i]] = destinationChannels[i];
-                        }
-                        for (i in map) {
-                            console.log("Mapping midi channel " + i + " to " + map[i]);
-                        }
-                        zynthian.layer.load_layer_from_json(jsonToLoad, map);
+                    // Finally, actually import the sound if requested
+                    var jsonToLoad = theItem.patternObject.layerData;
+                    if (jsonToLoad.length > 0 && theItem.importSound) {
+                        trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
+                        trackToAssociate.setTrackSoundFromSnapshotJson(jsonToLoad)
                     }
                 }
             }
@@ -409,6 +397,7 @@ Item {
             property QtObject patternObject: model.pattern === undefined ? modelData : model.pattern
             property var destinationChannels: []
             property bool importPattern: patternObject.enabled
+            property bool importSound: false
             property int associatedTrackIndex: 6 + model.index
             property int importIndex: model.index
             property var soundInfo: patternObject.layerData.length > 0 ? zynthian.layer.sound_metadata_from_json(patternObject.layerData) : [];
@@ -472,50 +461,15 @@ Item {
                     text: qsTr("Import Sound")
                     enabled: patternOptionsRoot.importPattern && patternOptionsRoot.soundInfo.length > 0
                     opacity: enabled ? 1 : 0.5
-                }
-                QQC2.Button {
-                    id: pickSoundDestination
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                    text: patternOptionsRoot.soundInfo.length === 0
-                        ? qsTr("No Embedded Sound")
-                        : qsTr("Pick Sound Destination")
-                    enabled: patternOptionsRoot.importPattern && patternOptionsRoot.soundInfo.length > 0
-                    property bool pickingLayer: false
-                    onClicked: {
-                        pickingLayer = true;
-                        layerReplacer.sourceChannels = zynthian.layer.load_layer_channels_from_json(patternOptionsRoot.patternObject.layerData);
-                        layerReplacer.jsonToLoad = patternOptionsRoot.patternObject.layerData;
-                        layerReplacer.open();
-                    }
-                    Connections {
-                        target: layerReplacer
-                        onAccepted: {
-                            if (pickSoundDestination.pickingLayer) {
-                                patternOptionsRoot.destinationChannels = layerReplacer.destinationChannels;
-                                layerReplacer.clear();
-                                pickSoundDestination.pickingLayer = false;
-                            }
-                        }
+                    checked: patternOptionsRoot.importSound
+                    onToggled: {
+                        patternOptionsRoot.importSound = checked
                     }
                 }
             }
         }
     }
 
-    Zynthian.LayerReplaceDialog {
-        id: layerReplacer
-        parent: component.parent
-        modal: true
-        actuallyReplace: false
-        y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
-        x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
-        height: contentItem.implicitHeight + header.implicitHeight + footer.implicitHeight + topMargin + bottomMargin + Kirigami.Units.smallSpacing
-        z: 1999999999
-        footerLeftPadding: component.leftPadding
-        footerRightPadding: component.rightPadding
-        footerBottomPadding: component.bottomPadding
-    }
     QQC2.Popup {
         id: trackPicker
         modal: true

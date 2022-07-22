@@ -120,6 +120,9 @@ class zynthiloops_track(QObject):
         ### Proxy recordingPopupActive from zynthian_qt_gui
         self.zyngui.recordingPopupActiveChanged.connect(self.recordingPopupActiveChanged.emit)
 
+        # Re-read sound snapshot json when a new snapshot is loaded
+        self.zyngui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
+
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, sceneIndex, partNum):
         clip = self.__song__.getClipByPart(self.__id__, sceneIndex, partNum)
@@ -777,10 +780,7 @@ class zynthiloops_track(QObject):
         except:
             pass
 
-        if self.connectedSound == -1:
-            self.__sound_json_snapshot__ = ""
-        else:
-            self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+        self.update_sound_snapshot_json()
 
         self.chained_sounds_changed.emit()
 
@@ -1192,3 +1192,11 @@ class zynthiloops_track(QObject):
                 clip = clips_model.getClip(clip_index)
                 if clip is not None:
                     clip.setVolume(self.volume)
+
+    def update_sound_snapshot_json(self):
+        if self.connectedSound == -1:
+            self.__sound_json_snapshot__ = ""
+        else:
+            self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
+
+        logging.debug(f"### sound snapshot json for track {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")

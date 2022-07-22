@@ -1627,6 +1627,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			return False
 
 		self.last_snapshot_fpath = fpath
+		self.snapshotLoaded.emit()
+
 		return True
 
 	# snapshot is an array of objects with snapshots of few selected layers, replaces them if existing
@@ -2200,6 +2202,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 	# Both parameters are midi channels
 	layer_created = Signal(int)
 	layer_deleted = Signal(int)
+	snapshotLoaded = Signal()
 
 
 #------------------------------------------------------------------------------

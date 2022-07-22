@@ -132,5 +132,9 @@ Zynthian.Stack {
                //easing.type: Easing.InOutCubic
             //}
         //}
+
+        Component.onCompleted: {
+            zynthian.currentTaskMessage = "Loading looper page"
+        }
     }
 }

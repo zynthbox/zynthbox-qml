@@ -60,7 +60,7 @@ Zynthian.Stack {
                     root.pageCache = {};
                 }
                 console.log("Caching song_arranger")
-                zynthian.currentTaskMessage = "Caching song arranger page"
+                zynthian.currentTaskMessage = "Loading song arranger page"
                 if (!root.pageCache["song_arranger"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("song_arranger");
                     var component = Qt.createComponent(file);
@@ -69,7 +69,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching song_player")
-                zynthian.currentTaskMessage = "Caching song player page"
+                zynthian.currentTaskMessage = "Loading song player page"
                 if (!root.pageCache["song_player"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("song_player");
                     var component = Qt.createComponent(file);
@@ -78,7 +78,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching playgrid")
-                zynthian.currentTaskMessage = "Caching playgrid page"
+                zynthian.currentTaskMessage = "Loading playgrid page"
                 if (!root.pageCache["playgrid"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("playgrid");
                     var component = Qt.createComponent(file);
@@ -87,7 +87,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching sketch_copier")
-                zynthian.currentTaskMessage = "Caching sketch copier page"
+                zynthian.currentTaskMessage = "Loading sketch copier page"
                 if (!root.pageCache["sketch_copier"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
                     var component = Qt.createComponent(file);
@@ -96,7 +96,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching midi_key_range")
-                zynthian.currentTaskMessage = "Caching midi key range page"
+                zynthian.currentTaskMessage = "Loading midi key range page"
                 if (!root.pageCache["midi_key_range"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("midi_key_range");
                     var component = Qt.createComponent(file);
@@ -105,7 +105,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching sound_categories")
-                zynthian.currentTaskMessage = "Caching sound categories page"
+                zynthian.currentTaskMessage = "Loading sound categories page"
                 if (!root.pageCache["sound_categories"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("sound_categories");
                     var component = Qt.createComponent(file);
@@ -114,7 +114,7 @@ Zynthian.Stack {
                 }
 
                 console.log("Caching engine")
-                zynthian.currentTaskMessage = "Caching engine page"
+                zynthian.currentTaskMessage = "Loading engine page"
                 if (!root.pageCache["engine"]) {
                     file = applicationWindow().pageScreenMapping.pageForModalScreen("engine");
                     var component = Qt.createComponent(file);

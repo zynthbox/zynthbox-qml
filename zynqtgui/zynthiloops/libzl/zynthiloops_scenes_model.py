@@ -86,6 +86,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Scenes")
+        self.zyngui.currentTaskMessage = f"Deserializing Scenes"
         if "scenesData" in obj:
             self.beginResetModel()
             for key, val in obj["scenesData"].items():

@@ -1154,28 +1154,7 @@ class zynthiloops_track(QObject):
 
     @Slot(str, result=None)
     def setTrackSoundFromSnapshotJson(self, snapshot):
-        logging.error(f"setTrackSoundSnapshotJson : T({self.__id__ + 1})")
-
-        self.zyngui.session_dashboard.selectedTrack = self.__id__
-
-        f = tempfile.NamedTemporaryFile(prefix="zynthbox_t1_", suffix=".sound", delete=False)
-        sound_path = f.name
-
-        logging.error(f"setTrackSoundSnapshotJson : teemp sound file({sound_path})")
-
-        try:
-            f.write(bytes(snapshot, encoding='utf8'))
-            f.flush()
-            os.fsync(f.fileno())
-        finally:
-            f.close()
-
-        QMetaObject.invokeMethod(self, "do_invoke_loadSoundFromFile", Qt.QueuedConnection, QGenericArgument("str", bytes(sound_path, encoding="utf8")))
-
-    @Slot(str)
-    def do_invoke_loadSoundFromFile(self, path):
-        logging.error(f"do_invoke_loadSoundFromFile: {path}")
-        self.zyngui.sound_categories.loadSoundFromFile(path)
+        self.zyngui.sound_categories.loadTrackSoundFromJson(self.id, snapshot)
 
     def mute_all_clips_in_track(self):
         for clip_model_index in range(5):

@@ -687,7 +687,7 @@ Zynthian.BasePlayGrid {
                         property int lastLoopIndex: -1
                         property double totalStepLength: 0
                         property int singleStepLength: 0
-                        property int dividedWidth: width / 16
+                        property double dividedWidth: width / 16
                         anchors {
                             left: parent.left
                             leftMargin: 5
@@ -713,7 +713,7 @@ Zynthian.BasePlayGrid {
                                 Rectangle {
                                     anchors {
                                         left: parent.left
-                                        leftMargin: loopDelegate.loopIndex === 0 ? noteLengthVisualiser.noteOffset * noteLengthVisualiser.dividedWidth + (noteLengthVisualiser.noteDelay / noteLengthVisualiser.singleStepLength * noteLengthVisualiser.dividedWidth) : 0
+                                        leftMargin: loopDelegate.loopIndex === 0 ? 1 + noteLengthVisualiser.noteOffset * noteLengthVisualiser.dividedWidth + (noteLengthVisualiser.noteDelay / noteLengthVisualiser.singleStepLength * noteLengthVisualiser.dividedWidth) : 0
                                         verticalCenter: parent.verticalCenter
                                     }
                                     height: 2
@@ -762,6 +762,7 @@ Zynthian.BasePlayGrid {
                     RowLayout {
                         anchors.fill:parent
                         anchors.margins: 5
+                        spacing: 0
                         Repeater {
                             id:drumPadRepeater
                             model: _private.activeBarModelWidth
@@ -1009,6 +1010,7 @@ Zynthian.BasePlayGrid {
                                 id: sequencerPad
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
+                                Layout.rightMargin: 5
                                 // The indicator rect is 9 px tall, spaced by 1px, and we've got 5px margin, and so
                                 // if we want 11px space between the bottom of this and the settings, 6px it is (which
                                 // there's no reason to do arithmetics for, it's a fixed value anyway, but that's where

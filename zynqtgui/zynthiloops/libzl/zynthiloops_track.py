@@ -756,6 +756,7 @@ class zynthiloops_track(QObject):
 
             zyngui.end_long_task()
 
+        self.zyngui.currentTaskMessage = f"Removing chained sound at channel `{chan}` from track `{self.name}`"
         zyngui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):

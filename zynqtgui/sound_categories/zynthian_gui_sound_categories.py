@@ -364,6 +364,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                             for i in range(5 - len(new_chained_sounds)):
                                 new_chained_sounds.append(-1)
 
+                        self.zyngui.currentTaskMessage = f"Loading selected sounds in track `{track.name}`"
                         self.zyngui.layer.load_layer_from_file(filepath, new_channels_map)
 
                         track.chainedSounds = new_chained_sounds
@@ -387,6 +388,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
             self.zyngui.end_long_task()
 
+        self.zyngui.currentTaskMessage = "Loading sound"
         self.zyngui.do_long_task(task)
 
     @Slot(None, result=str)

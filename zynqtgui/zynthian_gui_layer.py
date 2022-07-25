@@ -1991,9 +1991,9 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 
 	@Slot(str, result=str)
-	def save_curlayer_to_file(self, file_name):
+	def save_curlayer_to_file(self, file_name, category="0"):
 		try:
-			if self.zyngui.curlayer == None:
+			if self.zyngui.curlayer is None:
 				return
 			n_layers = 1
 			for i in range(16):
@@ -2007,8 +2007,13 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				saveToPath = Path(self.__sounds_basepath__ + final_name)
 			saveToPath.mkdir(parents=True, exist_ok=True)
+
+			sound_json = self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
+			if category not in ["0", "*"]:
+				sound_json["category"] = category
+
 			f = open(saveToPath / final_name, "w")
-			f.write(JSONEncoder().encode(self.export_multichannel_snapshot(self.zyngui.curlayer.midi_chan))) #TODO: get cloned midi channels
+			f.write(JSONEncoder().encode(sound_json)) #TODO: get cloned midi channels
 			f.flush()
 			os.fsync(f.fileno())
 			f.close()

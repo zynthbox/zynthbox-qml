@@ -54,7 +54,6 @@ class zynthiloops_clips_model(QAbstractListModel):
         return data
 
     def deserialize(self, arr, part_index):
-        self.zyngui.currentTaskMessage = f"Deserializing clips"
         if not isinstance(arr, list):
             for i in range(2):
                 clip = zynthiloops_clip(self.__track__.id, i, part_index, self.__song__, self)

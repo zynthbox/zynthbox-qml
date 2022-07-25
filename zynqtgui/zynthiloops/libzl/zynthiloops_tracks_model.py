@@ -45,7 +45,6 @@ class zynthiloops_tracks_model(QAbstractListModel):
         return data
 
     def deserialize(self, arr):
-        self.zyngui.currentTaskMessage = f"Deserializing tracks"
         if not isinstance(arr, list):
             raise Exception("Invalid json format for tracks")
         self.beginResetModel()

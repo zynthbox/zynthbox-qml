@@ -693,12 +693,15 @@ class zynthian_gui(QObject):
         Set song bpm when global popup is active
         """
 
+        # FIXME : Sometimes when this method is called, the value of zselector is 0
+        #         which is causing division by zero error.
+
         if self.globalPopupOpened:
             song = self.zynthiloops.song
 
             if song is not None and \
                     song.bpm != self.__zselector[0].value:
-                song.bpm = self.__zselector[0].value
+                song.bpm = np.clip(self.__zselector[0].value, 50, 200)
                 self.set_selector()
 
     @Slot(None)

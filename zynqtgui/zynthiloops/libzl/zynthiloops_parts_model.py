@@ -45,7 +45,6 @@ class zynthiloops_parts_model(QAbstractListModel):
         return data
 
     def deserialize(self, arr):
-        self.zyngui.currentTaskMessage = f"Deserializing parts"
         if not isinstance(arr, list):
             raise Exception("Invalid json format for parts")
         for i, p in enumerate(arr):

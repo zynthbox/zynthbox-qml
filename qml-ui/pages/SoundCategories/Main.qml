@@ -122,6 +122,10 @@ Zynthian.ScreenPage {
                 soundTypeComboBox.currentIndex = 0
                 zynthian.sound_categories.setSoundTypeFilter(soundTypeComboBox.model[soundTypeComboBox.currentIndex])
                 zynthian.sound_categories.load_sounds_model()
+
+                if (soundButtonGroup.checkedButton && soundButtonGroup.checkedButton.checked) {
+                    soundButtonGroup.checkedButton.checked = false
+                }
             }
         }
     }

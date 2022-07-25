@@ -895,7 +895,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.click_track_clack.stopOnChannel(-2)
         self.click_track_click.set_length(4, self.__song__.bpm)
         self.click_track_clack.set_length(1, self.__song__.bpm)
-        if enabled:
+        # If the metronome is running, queue the click tracks up to start (otherwise don't - for now at least)
+        if enabled and self.metronome_running_refcount > 0:
             self.click_track_click.queueClipToStartOnChannel(-2)
             self.click_track_clack.queueClipToStartOnChannel(-2)
 

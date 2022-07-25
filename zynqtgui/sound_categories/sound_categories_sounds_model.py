@@ -95,3 +95,7 @@ class sound_categories_sounds_model(QAbstractListModel):
         self.beginResetModel()
         self.sounds = []
         self.endResetModel()
+
+    def emit_category_updated(self, sound):
+        sound_index = self.sounds.index(sound)
+        self.dataChanged.emit(self.index(sound_index, 0), self.index(sound_index, 0), [self.Roles.CategoryRole])

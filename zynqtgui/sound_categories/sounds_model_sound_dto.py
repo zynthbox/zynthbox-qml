@@ -22,6 +22,9 @@
 # For a full copy of the GNU General Public License see the LICENSE.txt file.
 #
 # ******************************************************************************
+import json
+import os
+from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, Signal
 
@@ -29,6 +32,9 @@ from PySide2.QtCore import Property, QObject, Signal
 class sounds_model_sound_dto(QObject):
     def __init__(self, parent, zyngui, name, type, category="0"):
         super().__init__(parent)
+        self.__sounds_base_path__ = Path('/zynthian/zynthian-my-data/sounds')
+        self.__community_sounds_path__ = self.__sounds_base_path__ / 'community-sounds'
+        self.__my_sounds_path__ = self.__sounds_base_path__ / 'my-sounds'
 
         self.zyngui = zyngui
         self.__name__ = name
@@ -63,8 +69,31 @@ class sounds_model_sound_dto(QObject):
 
     def set_category(self, category):
         if self.__category__ != category:
-            self.zyngui.sound_categories.move_sound_category(self, category)
             self.__category__ = category
+
+            # Update category in sound file
+            if self.type == "my-sounds":
+                sound_file = self.__my_sounds_path__ / self.name
+            elif self.type == "community-sounds":
+                sound_file = self.__community_sounds_path__ / self.name
+
+            if sound_file is not None:
+                with open(sound_file, "r+") as file:
+                    sound_json = json.load(file)
+                    file.seek(0)
+
+                    if category in ["0", "*"]:
+                        del sound_json["category"]
+                    else:
+                        sound_json["category"] = category
+
+                    json.dump(sound_json, file)
+                    file.truncate()
+                    file.flush()
+                    os.fsync(file.fileno())
+
+            # Notify model about updated item
+            self.zyngui.sound_categories.__sounds_model__.emit_category_updated(self)
             self.category_changed.emit()
 
     category_changed = Signal()

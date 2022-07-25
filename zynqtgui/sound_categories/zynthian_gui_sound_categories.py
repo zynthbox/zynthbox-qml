@@ -55,30 +55,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         self.__sound_category_filter_proxy_model__.setFilterRole(sound_categories_sounds_model.Roles.CategoryRole)
         self.__sound_category_filter_proxy_model__.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
-        # Valid Sound category IDs
-        # 1: Drums
-        # 2: Bass
-        # 3: Leads
-        # 4: Synth/Keys
-        # 5: Strings/Pads
-        # 99: FX/Other
-        self.__my_sounds__ = {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": [],
-            "99": [],
-        }
-        self.__community_sounds__ = {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": [],
-            "99": [],
-        }
-
         self.__sound_category_name_mapping__ = {
             "*": "All",
             "0": "Uncategorized",
@@ -101,42 +77,24 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     def refresh_loading(self):
         pass
 
-    def move_sound_category(self, sound, toCategory):
-        if sound.type == "community-sounds":
-            try:
-                self.__community_sounds__[sound.category].remove(sound.name)
-            except: pass
-
-            try:
-                self.__community_sounds__[toCategory].append(sound.name)
-            except: pass
-
-        elif sound.type == "my-sounds":
-            try:
-                self.__my_sounds__[sound.category].remove(sound.name)
-            except: pass
-
-            try:
-                self.__my_sounds__[toCategory].append(sound.name)
-            except: pass
-
-        self.save_categories()
-        self.load_sounds_model()
+    # def move_sound_category(self, sound, toCategory):
+    #     if sound.type == "community-sounds":
+    #         self.save_category(self.__community_sounds_path__ / sound.name, toCategory)
+    #     elif sound.type == "my-sounds":
+    #         self.save_category(self.__my_sounds_path__ / sound.name, toCategory)
 
     # Returns the category index if found otherwise returns 0 for uncategorized entries
-    def get_category_for_sound(self, _sound, _type):
-        if _type == "community-sounds":
-            source_categories = self.__community_sounds__
-        elif _type == "my-sounds":
-            source_categories = self.__my_sounds__
-        else:
-            source_categories = {}
+    @staticmethod
+    def get_category_for_sound(sound_file):
+        category = "0"
 
-        for category, sounds in source_categories.items():
-            if _sound in sounds:
-                return category
+        with open(sound_file, "r") as file:
+            sound_json = json.load(file)
+            try:
+                category = sound_json["category"]
+            except: pass
 
-        return 0
+        return category
 
     @Slot(str, result=str)
     def getCategoryNameFromKey(self, key):
@@ -149,36 +107,6 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
     @Slot()
     def load_sounds_model(self):
         def task():
-            # Create community-sounds categories.json if not exists
-            if not (self.__community_sounds_path__ / 'categories.json').exists():
-                with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:
-                    json.dump(self.__community_sounds__, f)
-                    f.flush()
-                    os.fsync(f.fileno())
-
-            # Create my-sounds categories.json if not exists
-            if not (self.__my_sounds_path__ / 'categories.json').exists():
-                with open(self.__my_sounds_path__ / 'categories.json', 'w') as f:
-                    json.dump(self.__my_sounds__, f)
-                    f.flush()
-                    os.fsync(f.fileno())
-
-            # Read community-sounds categories
-            try:
-                with open(self.__community_sounds_path__ / "categories.json", "r+") as f:
-                    self.__community_sounds__ = json.load(f)
-            except Exception as e:
-                logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
-                traceback.print_stack()
-
-            # Read my-sounds categories
-            try:
-                with open(self.__my_sounds_path__ / "categories.json", "r+") as f:
-                    self.__my_sounds__ = json.load(f)
-            except Exception as e:
-                logging.error(f"Error while trying to read community sounds metadata : {str(e)}")
-                traceback.print_stack()
-
             # Fill community-sounds list
             for file in self.__community_sounds_path__.glob("**/*.sound"):
                 self.__sounds_model__.add_sound(
@@ -187,7 +115,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         self.zyngui,
                         file.name,
                         "community-sounds",
-                        self.get_category_for_sound(file.name, "community-sounds")
+                        self.get_category_for_sound(file)
                     )
                 )
 
@@ -199,25 +127,15 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         self.zyngui,
                         file.name,
                         "my-sounds",
-                        self.get_category_for_sound(file.name, "my-sounds")
+                        self.get_category_for_sound(file)
                     )
                 )
 
             self.zyngui.end_long_task()
 
+        self.zyngui.currentTaskMessage = "Reading and sorting sounds into categories"
         self.__sounds_model__.clear()
         self.zyngui.do_long_task(task)
-
-    def save_categories(self):
-        with open(self.__community_sounds_path__ / 'categories.json', 'w') as f:
-            json.dump(self.__community_sounds__, f)
-            f.flush()
-            os.fsync(f.fileno())
-
-        with open(self.__my_sounds_path__ / 'categories.json', 'w') as f:
-            json.dump(self.__my_sounds__, f)
-            f.flush()
-            os.fsync(f.fileno())
 
     @Slot(str)
     def setSoundTypeFilter(self, _filter):
@@ -259,16 +177,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(str, str)
     def saveSound(self, filename, category):
-        final_name = self.zyngui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename))
+        final_name = self.zyngui.layer.save_curlayer_to_file(str(self.__my_sounds_path__ / filename), category)
 
         if final_name is not None:
-            if category != "*" and category != "0":
-                self.__my_sounds__[category].append(final_name)
-                self.save_categories()
-
-            self.load_sounds_model()
+            logging.info(f"Saved sound file to {str(self.__my_sounds_path__ / filename)}")
         else:
             logging.error("Error saving sound file")
+
+        self.load_sounds_model()
 
     @Slot(QObject)
     def loadSound(self, sound):

@@ -983,17 +983,18 @@ Zynthian.ScreenPage {
                         delegate: TrackHeader2 {
                             id: trackHeaderDelegate
 
-                            property QtObject previousSegment: index > 0 ? root.song.mixesModel.selectedMix.getSegment(index - 1) : null
-                            property QtObject segment: root.song.mixesModel.selectedMix.getSegment(index)
+                            // Logic here is, the 5th position is always the current segment, so rapid-ish navigation can be done by tapping the left and rightmost segments
+                            property int thisSegmentIndex: root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex + (index - 4)
+                            // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
+                            property QtObject segment: root.song.mixesModel.selectedMix.segmentsModel.count > 0 ? root.song.mixesModel.selectedMix.segmentsModel.get_segment(thisSegmentIndex) : null
 
                             track: root.song.tracksModel.getTrack(index)
                             text: root.songMode
-                                    ? trackHeaderDelegate.segment.name
+                                    ? trackHeaderDelegate.segment ? trackHeaderDelegate.segment.name : ""
                                     : trackHeaderDelegate.track.name
-                            active: root.songMode &&
-                                    trackHeaderDelegate.segment.isEmpty
-                                        ? false
-                                        : true
+                            active: root.songMode && !trackHeaderDelegate.segment
+                                    ? false
+                                    : true
                             synthDetailsVisible: !root.songMode
 
                             Connections {
@@ -1046,7 +1047,7 @@ Zynthian.ScreenPage {
                             }
                             subText: {
                                 if (root.songMode) {
-                                    if (trackHeaderDelegate.segment.barLength === 0 && trackHeaderDelegate.segment.beatLength === 0) {
+                                    if (!trackHeaderDelegate.segment || (trackHeaderDelegate.segment.barLength === 0 && trackHeaderDelegate.segment.beatLength === 0)) {
                                         return ""
                                     } else {
                                         return trackHeaderDelegate.segment.barLength + "." + trackHeaderDelegate.segment.beatLength
@@ -1100,15 +1101,13 @@ Zynthian.ScreenPage {
 
                             highlightOnFocus: false
                             highlighted: root.songMode
-                                            ? index === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                            ? trackHeaderDelegate.thisSegmentIndex === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
                                             : index === zynthian.session_dashboard.selectedTrack
 
                             onPressed: {
                                 if (root.songMode) {
-                                    if (trackHeaderDelegate.segment.segmentId === 0 ||
-                                        !trackHeaderDelegate.segment.isEmpty ||
-                                        (trackHeaderDelegate.previousSegment && trackHeaderDelegate.segment.isEmpty && !trackHeaderDelegate.previousSegment.isEmpty)) {
-                                        root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = index
+                                    if (trackHeaderDelegate.segment) {
+                                        root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = trackHeaderDelegate.thisSegmentIndex
                                         root.lastSelectedObj = trackHeaderDelegate.segment
                                     }
                                 } else {

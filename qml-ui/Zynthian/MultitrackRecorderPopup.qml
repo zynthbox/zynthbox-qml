@@ -71,7 +71,10 @@ QQC2.Popup {
             }
             ZL.AudioLevels.setTrackToRecord(trackIndex, shouldRecord);
         }
-        if (!song.mixesModel.songMode) {
+        if (song.mixesModel.songMode) {
+            leadinSpin.value = 0;
+            fadeoutSpin.value = 8;
+        } else {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
             var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedSketchName)
             var longestPatternDuration = 0;
@@ -86,7 +89,9 @@ QQC2.Popup {
                     }
                 }
             }
+            leadinSpin.value = 4;
             songDurationSpin.value = longestPatternDuration;
+            fadeoutSpin.value = 4;
         }
         _private.song = song;
         open();
@@ -345,6 +350,17 @@ QQC2.Popup {
                 value: 4
                 from: 0
                 to: 128
+                QQC2.BusyIndicator {
+                    anchors {
+                        left: parent.right
+                        leftMargin: Kirigami.Units.smallSpacing
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: height
+                    visible: running
+                    running: recordingPlaybackStarter.running
+                }
             }
             QQC2.SpinBox{
                 id: songDurationSpin
@@ -364,6 +380,17 @@ QQC2.Popup {
                 value: 4
                 from: 0
                 to: 128
+                QQC2.BusyIndicator {
+                    anchors {
+                        left: parent.right
+                        leftMargin: Kirigami.Units.smallSpacing
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: height
+                    visible: running
+                    running: recordingStopper.running
+                }
             }
         }
         QQC2.ProgressBar {

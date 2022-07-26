@@ -133,7 +133,7 @@ Zynthian.ScreenPage {
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
             Repeater {
                 id: segmentsRepeater
-                property int totalDuration: ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration
+                property int totalDuration: zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration : 0
                 model: component.visible && totalDuration > 0 ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel : 0
                 delegate: Item {
                     id: segmentDelegate

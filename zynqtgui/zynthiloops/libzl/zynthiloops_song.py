@@ -62,6 +62,7 @@ class zynthiloops_song(QObject):
         self.sketch_folder = sketch_folder
 
         self.__is_loading__ = True
+        self.isLoadingChanged.emit()
         self.__tracks_model__ = zynthiloops_tracks_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__scenes_model__ = zynthiloops_scenes_model(self)
@@ -94,6 +95,7 @@ class zynthiloops_song(QObject):
 
         if not self.restore(load_history):
             self.__is_loading__ = True
+            self.isLoadingChanged.emit()
             # First, clear out any cruft that might have occurred during a failed load attempt
             self.__parts_model__ = zynthiloops_parts_model(self)
             self.__tracks_model__ = zynthiloops_tracks_model(self)
@@ -118,10 +120,8 @@ class zynthiloops_song(QObject):
             # Add default Mixes and Segments
             for mix_index in range(10):
                 mix = zynthiloops_mix(mix_index, self)
-
-                for segment_index in range(10):
-                    segment = zynthiloops_segment(mix, segment_index, self)
-                    mix.segmentsModel.add_segment(segment_index, segment)
+                segment = zynthiloops_segment(mix, mix.segmentsModel, self)
+                mix.segmentsModel.add_segment(0, segment)
 
                 self.__mixes_model__.add_mix(mix_index, mix)
 
@@ -135,6 +135,7 @@ class zynthiloops_song(QObject):
         (Path(self.sketch_folder) / 'wav' / 'sampleset').mkdir(parents=True, exist_ok=True)
         # Finally, just in case something happened, make sure we're not loading any longer
         self.__is_loading__ = False
+        self.isLoadingChanged.emit()
 
         # Schedule a save after a sketch loads/restores to ensure sketch file is available after creating a new sketch
         self.schedule_save()
@@ -277,6 +278,7 @@ class zynthiloops_song(QObject):
 
     def restore(self, load_history):
         self.__is_loading__ = True
+        self.isLoadingChanged.emit()
         filename = self.__name__ + ".sketch.json"
 
         self.zyngui.currentTaskMessage = f"Restoring sketch"
@@ -346,12 +348,14 @@ class zynthiloops_song(QObject):
                     self.set_bpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex], True)
 
                 self.__is_loading__ = False
+                self.isLoadingChanged.emit()
                 return True
         except Exception as e:
             logging.error(f"Error during sketch restoration: {e}")
             traceback.print_exception(None, e, e.__traceback__)
 
             self.__is_loading__ = False
+            self.isLoadingChanged.emit()
             return False
 
     @Slot(int, int, result=QObject)
@@ -685,6 +689,15 @@ class zynthiloops_song(QObject):
 
     playTrackSolo = Property(int, get_playTrackSolo, set_playTrackSolo, notify=playTrackSoloChanged)
     ### END Property playTrackSolo
+
+    ### Property isLoading
+    def get_isLoading(self):
+        return self.__is_loading__
+
+    isLoadingChanged = Signal()
+
+    isLoading = Property(bool, get_isLoading, notify=isLoadingChanged)
+    ### END Property isLoading
 
     def stop(self):
         for i in range(0, self.__parts_model__.count):

@@ -39,16 +39,20 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.__song = song
         self.__mix = mix
         self.__selected_segment_index = 0
-        self.__segments: dict[int, zynthiloops_segment] = {}
+        self.__segments = []
         self.totalBeatDurationThrottle = QTimer()
         self.totalBeatDurationThrottle.setInterval(1)
         self.totalBeatDurationThrottle.setSingleShot(True)
         self.totalBeatDurationThrottle.timeout.connect(self.totalBeatDurationChanged.emit)
+        self.countChangedThrottle = QTimer()
+        self.countChangedThrottle.setInterval(1)
+        self.countChangedThrottle.setSingleShot(True)
+        self.countChangedThrottle.timeout.connect(self.countChanged.emit)
 
     def serialize(self):
         logging.debug("### Serializing Segments Model")
 
-        return [self.__segments[segment_index].serialize() for segment_index in self.__segments]
+        return [segment.serialize() for segment in self.__segments]
 
     def deserialize(self, obj):
         logging.debug("### Deserializing Segments Model")
@@ -57,10 +61,13 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.__segments.clear()
 
         for index, segment_obj in enumerate(obj):
-            segment = zynthiloops_segment(self.__mix, -1, self.__song)
+            segment = zynthiloops_segment(self.__mix, self, self.__song)
             segment.deserialize(segment_obj)
+            self.add_segment(index, segment)
 
-            self.add_segment(segment.segmentId, segment)
+        # We must always have at least one segment
+        if len(self.__segments) == 0:
+            self.new_segment()
 
         self.endResetModel()
 
@@ -87,11 +94,46 @@ class zynthiloops_segments_model(QAbstractListModel):
     def rowCount(self, index):
         return self.get_count()
 
+    # Inserts the given segment at the given location
+    @Slot(int, QObject)
     def add_segment(self, segment_index, segment: zynthiloops_segment):
-        self.__segments[segment_index] = segment
+        self.__segments.insert(segment_index, segment)
         segment.barLengthChanged.connect(self.totalBeatDurationThrottle.start)
         segment.beatLengthChanged.connect(self.totalBeatDurationThrottle.start)
+        self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()
+        if not self.__song.isLoading:
+            self.__song.schedule_save()
+
+    # Creates a new segment at the given location
+    # Returns the newly created segment
+    @Slot(int, result=QObject)
+    def new_segment(self, segment_index = -1):
+        if segment_index == -1:
+            segment_index = self.__segments.count()
+        newSegment = zynthiloops_segment(self.__mix, self, self.__song)
+        self.__segments.insert(segment_index, newSegment)
+        self.countChangedThrottle.start()
+        self.totalBeatDurationThrottle.start()
+        if not self.__song.isLoading:
+            self.__song.schedule_save()
+        return newSegment
+
+    # Removes the given segment from the list of segments
+    # Returns the segment which was removed from the list
+    @Slot(int, result=QObject)
+    def remove_segment(self, segment_index):
+        segment = self.__segments[segment_index]
+        self.__segments.pop(segment_index)
+        self.countChangedThrottle.start()
+        self.totalBeatDurationThrottle.start()
+        if not self.__song.isLoading:
+            self.__song.schedule_save()
+        return segment
+
+    @Slot(QObject, result=int)
+    def segment_index(self, segment: zynthiloops_segment):
+        return self.__segments.index(segment)
 
     ### Property count
     def get_count(self):
@@ -105,8 +147,7 @@ class zynthiloops_segments_model(QAbstractListModel):
     ### Property totalBeatDuration
     def get_totalBeatDuration(self):
         totalDuration = 0
-        for segmentIndex in self.__segments:
-            segment = self.__segments[segmentIndex]
+        for segment in self.__segments:
             totalDuration += segment.barLength * 4 + segment.beatLength
         return totalDuration
 
@@ -137,11 +178,11 @@ class zynthiloops_segments_model(QAbstractListModel):
     selectedSegment = Property(QObject, get_selectedSegment, notify=selectedSegmentIndexChanged)
     ### END Property selectedSegment
 
-    @Slot(int, result=QObject)
+    @Slot(int,result=QObject)
     def get_segment(self, segment_index):
-        try:
+        if segment_index > -1 and segment_index < len(self.__segments):
             return self.__segments[segment_index]
-        except:
+        else:
             return None
 
     @Slot(QObject)
@@ -151,5 +192,7 @@ class zynthiloops_segments_model(QAbstractListModel):
 
     @Slot()
     def clear(self):
+        self.beginResetModel()
         for segment_index in range(self.count):
             self.get_segment(segment_index).clear()
+        self.endResetModel()

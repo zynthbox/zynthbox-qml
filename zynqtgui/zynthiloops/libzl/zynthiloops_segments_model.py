@@ -43,11 +43,17 @@ class zynthiloops_segments_model(QAbstractListModel):
         self.totalBeatDurationThrottle = QTimer()
         self.totalBeatDurationThrottle.setInterval(1)
         self.totalBeatDurationThrottle.setSingleShot(True)
-        self.totalBeatDurationThrottle.timeout.connect(self.totalBeatDurationChanged.emit)
+        self.totalBeatDurationThrottle.timeout.connect(self.totalReset)
         self.countChangedThrottle = QTimer()
         self.countChangedThrottle.setInterval(1)
         self.countChangedThrottle.setSingleShot(True)
         self.countChangedThrottle.timeout.connect(self.countChanged.emit)
+
+    @Slot(None)
+    def totalReset(self):
+        self.beginResetModel()
+        self.endResetModel()
+        self.totalBeatDurationChanged.emit()
 
     def serialize(self):
         logging.debug("### Serializing Segments Model")

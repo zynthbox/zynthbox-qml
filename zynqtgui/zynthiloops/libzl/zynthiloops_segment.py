@@ -29,16 +29,18 @@ from ... import zynthian_gui_config
 
 
 class zynthiloops_segment(QObject):
-    def __init__(self, mix, segment_id, song):
+    def __init__(self, mix, segment_model, song):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
-        self.__segment_id = segment_id
         self.__mix = mix
         self.__bar_length = 0
         self.__beat_length = 0
         self.__clips = []
+
+        self.__segment_model = segment_model
+        self.__segment_model.countChanged.connect(self.segmentIdChanged.emit)
 
         # Update isEmpty when bar/beat length changes
         self.barLengthChanged.connect(self.isEmptyChanged.emit)
@@ -57,7 +59,6 @@ class zynthiloops_segment(QObject):
         logging.debug("### Serializing Segment")
 
         return {
-            "segmentId": self.__segment_id,
             "barLength": self.__bar_length,
             "beatLength": self.__beat_length,
             "clips": [
@@ -72,8 +73,6 @@ class zynthiloops_segment(QObject):
     def deserialize(self, obj):
         logging.debug("### Deserializing Segment")
 
-        if "segmentId" in obj:
-            self.set_segmentId(obj["segmentId"], True)
         if "barLength" in obj:
             self.set_barLength(obj["barLength"], True)
         if "beatLength" in obj:
@@ -104,7 +103,7 @@ class zynthiloops_segment(QObject):
 
     ### Property name
     def get_name(self):
-        return f"Segment {self.__segment_id + 1}"
+        return f"Segment {self.get_segmentId() + 1}"
 
     name = Property(str, get_name, constant=True)
     ### END Property name
@@ -120,24 +119,12 @@ class zynthiloops_segment(QObject):
 
     ### Property segmentId
     def get_segmentId(self):
-        return self.__segment_id
-
-    def set_segmentId(self, segment_id, force_set=False):
-        if self.__segment_id != segment_id or force_set:
-            self.__segment_id = segment_id
-            self.segmentIdChanged.emit()
+        return self.__segment_model.segment_index(self)
 
     segmentIdChanged = Signal()
 
     segmentId = Property(int, get_segmentId, notify=segmentIdChanged)
     ### END Property segmentId
-
-    ### Property name
-    def get_name(self):
-        return f"Segment {self.__segment_id + 1}"
-
-    name = Property(str, get_name, constant=True)
-    ### END Property name
 
     ### Property isEmpty
     def get_isEmpty(self):

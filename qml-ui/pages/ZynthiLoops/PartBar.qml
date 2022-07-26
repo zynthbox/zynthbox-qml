@@ -331,6 +331,54 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
+
+                            QQC2.Button {
+                                text: qsTr("Add Before")
+                                onClicked: {
+                                    zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId);
+                                }
+                            }
+                            QQC2.Button {
+                                text: confirmRemoval.visible ? qsTr("Don't Remove") : qsTr("Remove...")
+                                onClicked: {
+                                    confirmRemoval.visible = !confirmRemoval.visible;
+                                }
+                                QQC2.Button {
+                                    id: confirmRemoval
+                                    anchors {
+                                        top: parent.top
+                                        right: parent.left
+                                        rightMargin: Kirigami.Units.smallSpacing
+                                        bottom: parent.bottom
+                                    }
+                                    visible: false
+                                    width: parent.width
+                                    text: qsTr("Remove")
+                                    onClicked: {
+                                        confirmRemoval.visible = false;
+                                        if (zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.count === 1) {
+                                            // If there's only this single segment, don't actually delete it, just clear it
+                                            zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegment.clear();
+                                        } else {
+                                            // If there's more than one, we can remove the one we've got selected
+                                            if (zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex === zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.count - 1) {
+                                                // If we've got the last segment selected, and we're deleting that, we need to go back a step to avoid ouchies
+                                                zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 1;
+                                                zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.remove_segment(zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex + 1);
+                                            } else {
+                                                zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.remove_segment(zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            QQC2.Button {
+                                text: qsTr("Add After")
+                                onClicked: {
+                                    zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
+                                    zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
+                                }
+                            }
                         }
                     }
                 }

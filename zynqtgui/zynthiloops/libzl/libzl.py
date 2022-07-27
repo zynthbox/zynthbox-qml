@@ -121,6 +121,10 @@ def init():
             libzl.ClipAudioSource_setRootNote.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
             libzl.ClipAudioSource_destroy.argtypes = [ctypes.c_void_p]
+
+            libzl.AudioLevels_setRecordGlobalPlayback.argtypes = [ctypes.c_bool]
+            libzl.AudioLevels_setGlobalPlaybackFilenamePrefix.argtypes = [ctypes.c_char_p]
+            libzl.AudioLevels_isRecording.restypes = ctypes.c_bool
             ### END Type Definition
 
             # Start juce event loop
@@ -179,6 +183,31 @@ def dbFromVolume(vol: float):
 def setRecordingAudioLevelCallback(cb):
     if libzl:
         libzl.setRecordingAudioLevelCallback(cb)
+
+
+def AudioLevels_setRecordGlobalPlayback(shouldRecord=True):
+    if libzl:
+        libzl.AudioLevels_setRecordGlobalPlayback(shouldRecord)
+
+
+def AudioLevels_setGlobalPlaybackFilenamePrefix(fileNamePrefix: str):
+    if libzl:
+        libzl.AudioLevels_setGlobalPlaybackFilenamePrefix(fileNamePrefix.encode())
+
+
+def AudioLevels_startRecording():
+    if libzl:
+        libzl.AudioLevels_startRecording()
+
+
+def AudioLevels_stopRecording():
+    if libzl:
+        libzl.AudioLevels_stopRecording()
+
+
+def AudioLevels_isRecording() -> bool:
+    if libzl:
+        return libzl.AudioLevels_isRecording()
 
 
 class ClipAudioSource(QObject):

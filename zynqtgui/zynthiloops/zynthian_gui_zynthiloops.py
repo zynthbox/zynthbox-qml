@@ -1330,11 +1330,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture",
-                                               *self.recorder_process_internal_arguments,
-                                               *base_ports,
-                                               self.clip_to_record_path), stdout=PIPE, stderr=PIPE)
+                libzl.AudioLevels_setRecordGlobalPlayback()
+                libzl.AudioLevels_setGlobalPlaybackFilenamePrefix(self.clip_to_record_path)
+                libzl.AudioLevels_startRecording()
             else:
+                # TODO : Port external recording to AudioLevels recorder
+
                 if channel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"
                 elif channel == "2":
@@ -1343,10 +1344,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.__last_recording_type__ = "External (Stereo)"
                 self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--disable-console", "--no-stdin", "--port", f"system:capture_{channel}", self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
 
-            logging.info("Process opened, let's wait for output...")
-            # Let's make sure that we have at least a bit of output before continuing (so we know the process has actually started)
-            self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
-            logging.info("Output get! Continue.")
+                logging.info("Process opened, let's wait for output...")
+                # Let's make sure that we have at least a bit of output before continuing (so we know the process has actually started)
+                self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
+                logging.info("Output get! Continue.")
 
             self.isRecording = True
         else:
@@ -1358,9 +1359,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.clip_to_record is not None and self.isRecording:
             self.isRecording = False
 
-        if self.recorder_process is not None:
+        # As per the current implementation, either AudioLevels recorder will be running or
+        # jack_capture will be running at any point of time. Both cannot be running together
+        if libzl.AudioLevels_isRecording():
+            libzl.AudioLevels_stopRecording()
+            self.recording_complete.emit()
+        elif self.recorder_process is not None:
             self.recorder_process.terminate()
-            logging.info("Asked recorder to stop doing the thing");
+            logging.info("Asked recorder to stop doing the thing")
             self.recording_complete.emit()
 
     @Slot(None)
@@ -1441,8 +1447,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def load_recorded_file_to_clip(self):
         logging.info("Loading recorded clip - but first, wait for the recorder to exit")
-        self.recorder_process.wait()
+
+        if self.recorder_process is not None:
+            self.recorder_process.wait()
+
         logging.info("Recorder exited, now we should have a file")
+
         if not Path(self.clip_to_record_path).exists():
             logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 

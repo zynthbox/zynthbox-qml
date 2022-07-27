@@ -1316,10 +1316,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
             if self.recordMasterOutput:
-                base_ports = ["--port", "system:playback_1", "--port", "system:playback_2"]
+                base_ports = [("system:playback_1", "system:playback_2")]
             else:
-                base_ports = ["--port", f"zynthiloops_audio_levels_client:T{track.id + 1}A",
-                              "--port", f"zynthiloops_audio_levels_client:T{track.id + 1}B"]
+                base_ports = track.trackSynthPorts
 
             self.ongoingCountIn = self.countInBars + 1
 
@@ -1330,8 +1329,15 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if source == 'internal':
                 self.__last_recording_type__ = "Internal"
-                libzl.AudioLevels_setRecordGlobalPlayback()
-                libzl.AudioLevels_setGlobalPlaybackFilenamePrefix(self.clip_to_record_path)
+                libzl.AudioLevels_setShouldRecordPorts(True)
+                libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
+                libzl.AudioLevels_clearRecordPorts()
+
+                for ports in base_ports:
+                    for port in zip(ports, (0, 1)):
+                        logging.debug(f"Adding record port : {port}")
+                        libzl.AudioLevels_addRecordPort(port[0], port[1])
+
                 libzl.AudioLevels_startRecording()
             else:
                 # TODO : Port external recording to AudioLevels recorder
@@ -1363,6 +1369,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         # jack_capture will be running at any point of time. Both cannot be running together
         if libzl.AudioLevels_isRecording():
             libzl.AudioLevels_stopRecording()
+            libzl.AudioLevels_clearRecordPorts()
             self.recording_complete.emit()
         elif self.recorder_process is not None:
             self.recorder_process.terminate()

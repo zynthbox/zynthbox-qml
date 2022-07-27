@@ -73,6 +73,7 @@ class zynthiloops_track(QObject):
         self.__externalMidiChannel__ = -1
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
+        self.__track_synth_ports = []
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -394,17 +395,25 @@ class zynthiloops_track(QObject):
             except Exception as e:
                 logging.error(f"Error processing SamplerSynth jack ports for T{self.id + 1}: {str(e)}")
 
+            synth_ports = []
+
             for port_name in jack_basenames:
+                port_names = []
                 try:
                     ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
 
                     # Map first port from jack.Client.get_ports to track A and second port to track B
                     for port in zip(ports, [f"T{self.id + 1}A", f"T{self.id + 1}B"]):
                         logging.error(f"Connecting port zynthiloops_audio_levels_client:{port[1]} -> {port[0]}")
+                        port_names.append(port[0])
                         p = Popen(("jack_connect", f"zynthiloops_audio_levels_client:{port[1]}", port[0]))
                         p.wait()
                 except Exception as e:
                     logging.error(f"Error processing jack port for T{self.id + 1} : {port}({str(e)})")
+
+                synth_ports.append(port_names)
+
+            self.set_trackSynthPorts(synth_ports)
 
         worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
         worker_thread.start()
@@ -1141,6 +1150,20 @@ class zynthiloops_track(QObject):
 
     routeThroughGlobalFX = Property(bool, get_routeThroughGlobalFX, set_routeThroughGlobalFX, notify=routeThroughGlobalFXChanged)
     ### END Property routeThroughGlobalFX
+
+    ### Property trackSynthPorts
+    def get_trackSynthPorts(self):
+        return self.__track_synth_ports
+
+    def set_trackSynthPorts(self, ports):
+        if self.__track_synth_ports != ports:
+            self.__track_synth_ports = ports
+            self.trackSynthPortsChanged.emit()
+
+    trackSynthPortsChanged = Signal()
+
+    trackSynthPorts = Property('QVariantList', get_trackSynthPorts, notify=trackSynthPortsChanged)
+    ### END Property trackSynthPorts
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):

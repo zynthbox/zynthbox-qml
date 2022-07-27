@@ -663,6 +663,7 @@ Kirigami.AbstractApplicationWindow {
         height: root.height * 0.66
         edge: Qt.BottomEdge
         modal: false
+        interactive: !opened
 
         contentItem: MiniPlayGrid {}
     }

@@ -124,6 +124,12 @@ def init():
 
             libzl.AudioLevels_setRecordGlobalPlayback.argtypes = [ctypes.c_bool]
             libzl.AudioLevels_setGlobalPlaybackFilenamePrefix.argtypes = [ctypes.c_char_p]
+
+            libzl.AudioLevels_setRecordPortsFilenamePrefix.argtypes = [ctypes.c_char_p]
+            libzl.AudioLevels_addRecordPort.argtypes = [ctypes.c_char_p, ctypes.c_int]
+            libzl.AudioLevels_removeRecordPort.argtypes = [ctypes.c_char_p, ctypes.c_int]
+            libzl.AudioLevels_setShouldRecordPorts.argtypes = [ctypes.c_bool]
+
             libzl.AudioLevels_isRecording.restypes = ctypes.c_bool
             ### END Type Definition
 
@@ -185,7 +191,7 @@ def setRecordingAudioLevelCallback(cb):
         libzl.setRecordingAudioLevelCallback(cb)
 
 
-def AudioLevels_setRecordGlobalPlayback(shouldRecord=True):
+def AudioLevels_setRecordGlobalPlayback(shouldRecord):
     if libzl:
         libzl.AudioLevels_setRecordGlobalPlayback(shouldRecord)
 
@@ -208,6 +214,31 @@ def AudioLevels_stopRecording():
 def AudioLevels_isRecording() -> bool:
     if libzl:
         return libzl.AudioLevels_isRecording()
+
+
+def AudioLevels_setRecordPortsFilenamePrefix(fileNamePrefix: str):
+    if libzl:
+        libzl.AudioLevels_setRecordPortsFilenamePrefix(fileNamePrefix.encode())
+
+
+def AudioLevels_addRecordPort(portName: str, channel: int):
+    if libzl:
+        libzl.AudioLevels_addRecordPort(portName.encode(), channel)
+
+
+def AudioLevels_removeRecordPort(portName: str, channel: int):
+    if libzl:
+        libzl.AudioLevels_removeRecordPort(portName.encode(), channel)
+
+
+def AudioLevels_setShouldRecordPorts(shouldRecord):
+    if libzl:
+        libzl.AudioLevels_setShouldRecordPorts(shouldRecord)
+
+
+def AudioLevels_clearRecordPorts():
+    if libzl:
+        libzl.AudioLevels_clearRecordPorts()
 
 
 class ClipAudioSource(QObject):

@@ -533,7 +533,9 @@ ColumnLayout {
                                             zynthian.session_dashboard.selectedTrack = index;
                                         } else {
                                             if (!zynthian.zynthiloops.isRecording) {
-                                                trackDelegate.selectedClip.queueRecording("internal", "");
+                                                zynthian.zynthiloops.recordingSource = "internal"
+                                                zynthian.zynthiloops.recordingChannel = ""
+                                                trackDelegate.selectedClip.queueRecording();
                                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
                                             } else {
                                                 trackDelegate.selectedClip.stopRecording();

@@ -328,10 +328,7 @@ Zynthian.ScreenPage {
                         onClicked: {
                             if (!zynthian.zynthiloops.isRecording) {
                                 root.clip.clear();
-                                root.clip.queueRecording(
-                                    sourceComboModel.get(sourceCombo.currentIndex).value,
-                                    channelComboModel.get(channelCombo.currentIndex).value
-                                );
+                                root.clip.queueRecording();
                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
                             } else {
                                 root.clip.stopRecording();
@@ -350,6 +347,9 @@ Zynthian.ScreenPage {
                             ListElement { text: "External (Audio In)"; value: "external" }
                         }
                         textRole: "text"
+                        onActivated: {
+                            zynthian.zynthiloops.recordingSource = sourceComboModel.get(index).value
+                        }
                     }
                     QQC2.ComboBox {
                         id: channelCombo
@@ -364,6 +364,9 @@ Zynthian.ScreenPage {
                             ListElement { text: "Right Channel"; value: "2" }
                         }
                         textRole: "text"
+                        onActivated: {
+                            zynthian.zynthiloops.recordingChannel = channelComboModel.get(index).value
+                        }
                     }
                 }
             }

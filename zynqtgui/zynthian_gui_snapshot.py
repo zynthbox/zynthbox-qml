@@ -268,11 +268,11 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 	def schedule_save_last_state_snapshot(self):
 		# HACK to use a timer from another thread
-		if self.isLoading == 0 and self.zyngui.screend['zynthiloops'].song.isLoading == False:
+		if self.isLoading == 0 and self.zyngui.zynthiloops.song.isLoading == False:
 			self.save_last_state_timer_requested.emit()
 
 	def save_last_state_snapshot(self):
-		if self.isLoading == 0 and self.zyngui.screend['zynthiloops'].song.isLoading == False:
+		if self.isLoading == 0 and self.zyngui.zynthiloops.song.isLoading == False:
 			self.zyngui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
 
 

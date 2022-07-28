@@ -55,6 +55,22 @@ QQC2.Popup {
             zynthian.openedDialog = root
             // Assign clip to record on open so that correct clip is fetched
             zynthian.zynthiloops.clipsToRecord = [root.selectedTrack.getClipToRecord()]
+
+            // Reset source combo model to selected value when dialog opens
+            for (var i=0; i<sourceComboModel.count; i++) {
+                if (sourceComboModel.get(i).value === zynthian.zynthiloops.recordingSource) {
+                    sourceCombo.currentIndex = i
+                    break
+                }
+            }
+
+            // Reset channel combo model to selected value when dialog opens
+            for (var i=0; i<channelComboModel.count; i++) {
+                if (channelComboModel.get(i).value === zynthian.zynthiloops.recordingChannel) {
+                    channelCombo.currentIndex = i
+                    break
+                }
+            }
         } else {
             // Report dialog close to zynthian to stop receiving cuia events
             if (zynthian.openedDialog === root) {
@@ -127,6 +143,9 @@ QQC2.Popup {
                             ListElement { text: "External (Audio In)"; value: "external" }
                         }
                         textRole: "text"
+                        onActivated: {
+                            zynthian.zynthiloops.recordingSource = sourceComboModel.get(index).value
+                        }
                     }
 
                     QQC2.Label {
@@ -207,6 +226,9 @@ QQC2.Popup {
                             ListElement { text: "Stereo"; value: "*" }
                         }
                         textRole: "text"
+                        onActivated: {
+                            zynthian.zynthiloops.recordingChannel = channelComboModel.get(index).value
+                        }
                     }
                 }
 
@@ -473,14 +495,11 @@ QQC2.Popup {
                         if (zynthian.zynthiloops.clipsToRecord[0]) {
                             if (!zynthian.zynthiloops.isRecording) {
                                 // Start recording with first clip in clipsToRecord
-                                zynthian.zynthiloops.clipsToRecord[0].queueRecording(
-                                    sourceComboModel.get(sourceCombo.currentIndex).value,
-                                    channelComboModel.get(channelCombo.currentIndex).value
-                                );
+                                zynthian.zynthiloops.clipsToRecord[0].queueRecording();
                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
                             } else {
                                 Zynthian.CommonUtils.stopMetronomeAndPlayback();
-                                bottomBar.tabbedView.initialAction.trigger()
+                                // bottomBar.tabbedView.initialAction.trigger()
                             }
                         }
                     }

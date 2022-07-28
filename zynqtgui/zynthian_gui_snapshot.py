@@ -259,8 +259,9 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 	def load_default_snapshot(self, quiet=False):
 		if isfile(self.default_snapshot_fpath):
 			self.isLoading += 1
-			return self.zyngui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
+			result = self.zyngui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
 			self.isLoading -= 1
+			return result
 
 	@Signal
 	def save_last_state_timer_requested(self):
@@ -279,8 +280,9 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 	def load_last_state_snapshot(self, quiet=False):
 		if isfile(self.last_state_snapshot_fpath):
 			self.isLoading += 1
-			return self.zyngui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
+			result = self.zyngui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
 			self.isLoading -= 1
+			return result
 
 
 	def delete_last_state_snapshot(self):

@@ -2195,7 +2195,7 @@ class zynthian_gui(QObject):
                     track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
                     clip = track.getClipToRecord()
                     logging.info(f"Recording Clip : {clip}")
-                    clip.queueRecording("internal", "*")
+                    clip.queueRecording()
                     self.run_start_metronome_and_playback.emit()
                 else:
                     # Some Clip is currently being recorded

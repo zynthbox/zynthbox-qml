@@ -242,10 +242,7 @@ GridLayout {
                 applicationWindow().openRecordingPopup()
 //                if (!zynthian.zynthiloops.isRecording) {
 //                    // console.log("Count In", countInComboModel.get(countInCombo.currentIndex).value)
-//                    controlObj.queueRecording(
-//                        sourceComboModel.get(sourceCombo.currentIndex).value,
-//                        channelComboModel.get(channelCombo.currentIndex).value
-//                    );
+//                    controlObj.queueRecording();
 //                    Zynthian.CommonUtils.startMetronomeAndPlayback();
 //                } else {
 //                    Zynthian.CommonUtils.stopMetronomeAndPlayback();

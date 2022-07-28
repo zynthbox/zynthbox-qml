@@ -88,7 +88,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.isZ2V3 = os.environ.get("ZYNTHIAN_WIRING_LAYOUT") == "Z2_V3"
         self.is_set_selector_running = False
-        self.recorder_process = None
         self.clip_to_record = None
         self.clip_to_record_path = None
         self.clip_to_record_path = None
@@ -100,7 +99,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording = False
         self.recording_count_in_value = 0
-        self.recording_complete.connect(lambda: self.load_recorded_file_to_clip())
+        self.recording_complete.connect(self.load_recorded_file_to_clip)
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
@@ -109,8 +108,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__jack_client_init_timer__.setInterval(1000)
         self.__jack_client_init_timer__.setSingleShot(True)
         self.__jack_client_init_timer__.timeout.connect(self.init_jack_client)
-        self.recorder_process = None
-        self.recorder_process_internal_arguments = ["--disable-console", "--no-stdin"]
         self.__last_recording_type__ = ""
         self.__capture_audio_level_left__ = -400
         self.__capture_audio_level_right__ = -400
@@ -130,6 +127,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__global_fx_knob_value__ = 50
         self.clips_to_record = []
         self.__display_scene_buttons = False
+        self.__recording_source = "internal"
+        self.__recording_channel = "1"
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -874,6 +873,34 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     displaySceneButtons = Property(bool, get_displaySceneButtons, set_displaySceneButtons, notify=displaySceneButtonsChanged)
     ### END Property displaySceneButtons
 
+    ### Property recordingSource
+    def get_recordingSource(self):
+        return self.__recording_source
+
+    def set_recordingSource(self, source):
+        if source != self.__recording_source:
+            self.__recording_source = source
+            self.recordingSourceChanged.emit()
+
+    recordingSourceChanged = Signal()
+
+    recordingSource = Property(str, get_recordingSource, set_recordingSource, notify=recordingSourceChanged)
+    ### END Property recordingSource
+
+    ### Property recordingChannel
+    def get_recordingChannel(self):
+        return self.__recording_channel
+
+    def set_recordingChannel(self, channel):
+        if channel != self.__recording_channel:
+            self.__recording_channel = channel
+            self.recordingChannelChanged.emit()
+
+    recordingChannelChanged = Signal()
+
+    recordingChannel = Property(str, get_recordingChannel, set_recordingChannel, notify=recordingChannelChanged)
+    ### END Property recordingChannel
+
     @Signal
     def master_volume_changed(self):
         pass
@@ -942,9 +969,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.ongoingCountInChanged.emit()
 
     ongoingCountIn = Property(int, get_ongoingCountIn, set_ongoingCountIn, notify=ongoingCountInChanged)
-
-    def recording_process_stopped(self, exitCode, exitStatus):
-        logging.info(f"Stopped recording {self} : Code({exitCode}), Status({exitStatus})")
 
     def show(self):
         self.set_selector()
@@ -1279,8 +1303,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.metronome_running_refcount > 0:
             self.set_clickTrackEnabled(self.click_track_enabled)
 
-
-    def queue_clip_record(self, clip, source, channel):
+    def queue_clip_record(self, clip):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
             track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
@@ -1291,7 +1314,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             else:
                 (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
-            if source == 'internal':
+            if self.recordingSource == 'internal':
                 try:
                     preset_name = layers_snapshot['layers'][0]['preset_name'].replace(' ', '-').replace('/', '-')
                 except:
@@ -1315,45 +1338,40 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.clip_to_record_path = f"{base_recording_dir}/{base_filename}{'-'+str(count) if count > 0 else ''}.clip.wav"
 
-            if self.recordMasterOutput:
-                base_ports = [("system:playback_1", "system:playback_2")]
-            else:
-                base_ports = track.trackSynthPorts
-
             self.ongoingCountIn = self.countInBars + 1
 
-            logging.debug(
-                f"Command jack_capture : /usr/local/bin/jack_capture {self.recorder_process_internal_arguments} \
-                {base_ports} \
-                {self.clip_to_record_path}")
-
-            if source == 'internal':
+            if self.recordingSource == 'internal':
                 self.__last_recording_type__ = "Internal"
-                libzl.AudioLevels_setShouldRecordPorts(True)
-                libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
-                libzl.AudioLevels_clearRecordPorts()
 
-                for ports in base_ports:
-                    for port in zip(ports, (0, 1)):
-                        logging.debug(f"Adding record port : {port}")
-                        libzl.AudioLevels_addRecordPort(port[0], port[1])
-
-                libzl.AudioLevels_startRecording()
+                if self.recordMasterOutput:
+                    recording_ports = [("system:playback_1", "system:playback_2")]
+                else:
+                    recording_ports = track.trackSynthPorts
             else:
                 # TODO : Port external recording to AudioLevels recorder
 
-                if channel == "1":
+                if self.recordingChannel == "1":
                     self.__last_recording_type__ = "External (Mono Left)"
-                elif channel == "2":
+                    recording_ports = [("system:capture_1", "system:capture_1")]
+                elif self.recordingChannel == "2":
                     self.__last_recording_type__ = "External (Mono Right)"
+                    recording_ports = [("system:capture_2", "system:capture_2")]
                 else:
                     self.__last_recording_type__ = "External (Stereo)"
-                self.recorder_process = Popen(("/usr/local/bin/jack_capture", "--disable-console", "--no-stdin", "--port", f"system:capture_{channel}", self.clip_to_record_path),stdout=PIPE,stderr=PIPE)
+                    recording_ports = [("system:capture_1", "system:capture_2")]
 
-                logging.info("Process opened, let's wait for output...")
-                # Let's make sure that we have at least a bit of output before continuing (so we know the process has actually started)
-                self.recorder_process.stderr.read(13) # This should be the string ">>> Recording", but also anything will do really
-                logging.info("Output get! Continue.")
+            logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
+
+            libzl.AudioLevels_setShouldRecordPorts(True)
+            libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
+            libzl.AudioLevels_clearRecordPorts()
+
+            for ports in recording_ports:
+                for port in zip(ports, (0, 1)):
+                    logging.debug(f"Adding record port : {port}")
+                    libzl.AudioLevels_addRecordPort(port[0], port[1])
+
+            libzl.AudioLevels_startRecording()
 
             self.isRecording = True
         else:
@@ -1365,15 +1383,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.clip_to_record is not None and self.isRecording:
             self.isRecording = False
 
-        # As per the current implementation, either AudioLevels recorder will be running or
-        # jack_capture will be running at any point of time. Both cannot be running together
         if libzl.AudioLevels_isRecording():
             libzl.AudioLevels_stopRecording()
             libzl.AudioLevels_clearRecordPorts()
-            self.recording_complete.emit()
-        elif self.recorder_process is not None:
-            self.recorder_process.terminate()
-            logging.info("Asked recorder to stop doing the thing")
             self.recording_complete.emit()
 
     @Slot(None)
@@ -1453,12 +1465,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.current_beat_changed.emit()
 
     def load_recorded_file_to_clip(self):
-        logging.info("Loading recorded clip - but first, wait for the recorder to exit")
-
-        if self.recorder_process is not None:
-            self.recorder_process.wait()
-
-        logging.info("Recorder exited, now we should have a file")
+        logging.info(f"Loading recorded wav to clip({self.clip_to_record})")
 
         if not Path(self.clip_to_record_path).exists():
             logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
@@ -1488,7 +1495,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         self.set_clip_to_record(None)
         self.clip_to_record_path = None
-        self.recorder_process = None
         self.__last_recording_type__ = ""
 
         self.clips_to_record.clear()

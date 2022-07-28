@@ -51,6 +51,7 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 		self.index_offset = 0
 		self.midi_banks = {}
 		self.midi_programs = {}
+		self.isLoading = 0
 
 		self.save_last_state_timer = QTimer(self)
 		self.save_last_state_timer.setInterval(1000)
@@ -257,7 +258,9 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 	def load_default_snapshot(self, quiet=False):
 		if isfile(self.default_snapshot_fpath):
+			self.isLoading += 1
 			return self.zyngui.screens['layer'].load_snapshot(self.default_snapshot_fpath, quiet)
+			self.isLoading -= 1
 
 	@Signal
 	def save_last_state_timer_requested(self):
@@ -265,15 +268,19 @@ class zynthian_gui_snapshot(zynthian_gui_selector):
 
 	def schedule_save_last_state_snapshot(self):
 		# HACK to use a timer from another thread
-		self.save_last_state_timer_requested.emit()
+		if self.isLoading == 0 and self.zyngui.screend['zynthiloops'].song.isLoading == False:
+			self.save_last_state_timer_requested.emit()
 
 	def save_last_state_snapshot(self):
-		self.zyngui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
+		if self.isLoading == 0 and self.zyngui.screend['zynthiloops'].song.isLoading == False:
+			self.zyngui.screens['layer'].save_snapshot(self.last_state_snapshot_fpath)
 
 
 	def load_last_state_snapshot(self, quiet=False):
 		if isfile(self.last_state_snapshot_fpath):
+			self.isLoading += 1
 			return self.zyngui.screens['layer'].load_snapshot(self.last_state_snapshot_fpath, quiet)
+			self.isLoading -= 1
 
 
 	def delete_last_state_snapshot(self):

@@ -281,6 +281,7 @@ Rectangle {
                                     horizontalAlignment: "AlignHCenter"
                                     verticalAlignment: "AlignVCenter"
                                     inputMethodHints: Qt.ImhDigitsOnly
+                                    activeFocusOnTab: false
                                     text: segmentDetails.selectedSegment.barLength
                                     onAccepted: {
                                         segmentDetails.selectedSegment.barLength = parseInt(text)
@@ -299,6 +300,7 @@ Rectangle {
                                     horizontalAlignment: "AlignHCenter"
                                     verticalAlignment: "AlignVCenter"
                                     inputMethodHints: Qt.ImhDigitsOnly
+                                    activeFocusOnTab: false
                                     text: segmentDetails.selectedSegment.beatLength
                                     onAccepted: {
                                         segmentDetails.selectedSegment.beatLength = parseInt(text)

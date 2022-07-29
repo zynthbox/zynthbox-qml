@@ -24,9 +24,8 @@ class BootLogInterface(QObject):
         self.check_boot_log_timer.start()
 
     def check_boot_log_timer_timeout(self):
-        if not Path("/tmp/bootlog.fifo").exists():
-            logging.debug("bootlog.fifo not found. Waiting")
-        else:
+        # Skip reading until bootlog.fifo file is found
+        if Path("/tmp/bootlog.fifo").exists():
             if self.__boot_log_file is None:
                 self.__boot_log_file = open("/tmp/bootlog.fifo", "r")
 

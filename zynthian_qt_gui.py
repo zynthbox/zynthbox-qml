@@ -471,6 +471,8 @@ class zynthian_gui(QObject):
         self.__down_button_pressed__ = False
         self.__right_button_pressed__ = False
         self.__global_popup_opened__ = False
+        self.__is__modal__screens__caching__complete__ = False
+        self.__is__screens__caching__complete__ = False
 
         # When true, 1-5 buttons selects track 6-10
         self.tracks_mod_active = False
@@ -3578,30 +3580,39 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def stop_splash(self):
-        def task(self):
-            extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
+        def task():
+            if self.isModalScreensCachingComplete and self.isScreensCachingComplete:
+                logging.debug("QML Caching complete. Calling stop_splash")
+                stop_splash_timer.stop()
 
-            process = None
-            if extro_path.exists():
-                process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
+                extro_path = Path('/usr/share/zynthbox-bootsplash/zynthbox-bootsplash-extro.mp4')
 
-            with open("/tmp/mplayer-splash-control", "w") as f:
-                f.write("quit\n")
-                f.close()
+                process = None
+                if extro_path.exists():
+                    process = Popen(("mplayer", '-noborder', '-ontop', '-geometry', '50%:50%', str(extro_path)))
 
-            if process is not None:
-                process.wait()
+                with open("/tmp/mplayer-splash-control", "w") as f:
+                    f.write("quit\n")
+                    f.close()
 
-            self.isBootingComplete = True
-            self.displayMainWindow.emit()
-            boot_end = timer()
+                if process is not None:
+                    process.wait()
 
-            logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
+                self.isBootingComplete = True
+                self.displayMainWindow.emit()
+                boot_end = timer()
 
-            self.zynautoconnect()
+                logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
-        worker_thread = threading.Thread(target=task, args=(self,))
-        worker_thread.start()
+                self.zynautoconnect()
+            else:
+                logging.debug("QML Caching not yet complete. Rescheduling stop_splash call")
+
+        stop_splash_timer = QTimer()
+        stop_splash_timer.setInterval(500)
+        stop_splash_timer.setSingleShot(False)
+        stop_splash_timer.timeout.connect(task)
+        stop_splash_timer.start()
 
     def get_encoder_list_speed_multiplier(self):
         return self.__encoder_list_speed_multiplier
@@ -4175,6 +4186,35 @@ class zynthian_gui(QObject):
 
     currentTaskMessage = Property(str, get_currentTaskMessage, set_currentTaskMessage, notify=currentTaskMessageChanged)
     ### END Property currentTaskMessage
+
+    ### Property isModalScreensCachingComplete
+    def get_isModalScreensCachingComplete(self):
+        return self.__is__modal__screens__caching__complete__
+
+    def set_isModalScreensCachingComplete(self, value):
+        if value != self.__is__modal__screens__caching__complete__:
+            self.__is__modal__screens__caching__complete__ = value
+            self.isModalScreensCachingCompleteChanged.emit()
+
+    isModalScreensCachingCompleteChanged = Signal()
+
+    isModalScreensCachingComplete = Property(bool, get_isModalScreensCachingComplete, set_isModalScreensCachingComplete, notify=isModalScreensCachingCompleteChanged)
+    ### END Property isModalScreensCachingComplete
+
+    ### Property isScreensCachingComplete
+    def get_isScreensCachingComplete(self):
+        return self.__is__screens__caching__complete__
+
+    def set_isScreensCachingComplete(self, value):
+        if value != self.__is__screens__caching__complete__:
+            self.__is__screens__caching__complete__ = value
+            self.isScreensCachingCompleteChanged.emit()
+            self.isScreensCachingCompleteChanged.emit()
+
+    isScreensCachingCompleteChanged = Signal()
+
+    isScreensCachingComplete = Property(bool, get_isScreensCachingComplete, set_isScreensCachingComplete, notify=isScreensCachingCompleteChanged)
+    ### END Property isScreensCachingComplete
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

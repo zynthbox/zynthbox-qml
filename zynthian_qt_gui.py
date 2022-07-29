@@ -614,7 +614,7 @@ class zynthian_gui(QObject):
         '''
         self.show_screens_queue_timer = QTimer()
         self.show_screens_queue_timer.setSingleShot(True)
-        self.show_screens_queue_timer.setInterval(500)
+        self.show_screens_queue_timer.setInterval(10)
         self.show_screens_queue_timer.timeout.connect(self.show_screens_queue_timer_timeout, Qt.QueuedConnection)
         ### END SCREEN SHOW QUEUE
 
@@ -667,23 +667,22 @@ class zynthian_gui(QObject):
         self.show_screens_queue_timer.start()
 
     '''
-    Show screen queue timer timeout when invoked will process 1 screen from the queue.
-    If there are more screens left to be processed, the timer will restart itself otherwise timer will stop      
+    Show screen queue timer timeout when invoked will process the screens from the queue and will call processEvents
+    after showing every screen to process any queued qt events. This will cause the UI to keep updating and not cause
+     any visible stutter in UI.      
     '''
     def show_screens_queue_timer_timeout(self):
         # Try calling show method of the screen and select first action if told to do so
         try:
-            screen, select_first_action = self.show_screens_queue.pop()
-            logging.debug(f"Showing screen : {screen}")
-            screen.show()
-            if select_first_action:
-                logging.debug(f"Selection first action for screen : {screen}")
-                screen.select_action(0)
-        except: pass
+            for screen, select_first_action in self.show_screens_queue:
+                logging.debug(f"Showing screen : {screen}")
+                screen.show()
+                if select_first_action:
+                    logging.debug(f"Selection first action for screen : {screen}")
+                    screen.select_action(0)
 
-        # If self.show_screens_queue has some screens left to be processed, restart timer
-        if len(self.show_screens_queue) > 0:
-            self.show_screens_queue_timer.start()
+                QGuiApplication.instance().processEvents()
+        except: pass
     ### END SHOW SCREEN QUEUE
 
     ### Global controller and selector

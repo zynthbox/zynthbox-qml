@@ -3593,12 +3593,12 @@ class zynthian_gui(QObject):
             if process is not None:
                 process.wait()
 
+            self.isBootingComplete = True
             self.displayMainWindow.emit()
             boot_end = timer()
 
             logging.info(f"### BOOTUP TIME : {timedelta(seconds=boot_end - boot_start)}")
 
-            self.isBootingComplete = True
             self.zynautoconnect()
 
         worker_thread = threading.Thread(target=task, args=(self,))
@@ -4169,7 +4169,7 @@ class zynthian_gui(QObject):
             self.currentTaskMessageChanged.emit()
             QGuiApplication.instance().processEvents()
 
-            if bootlog_fifo is not None and len(value) > 0:
+            if ((hasattr(self, "__booting_complete__") and not self.__booting_complete__) or not hasattr(self, "__booting_complete__")) and bootlog_fifo is not None and len(value) > 0:
                 os.write(bootlog_fifo, f"{value}\n".encode())
 
     currentTaskMessageChanged = Signal()

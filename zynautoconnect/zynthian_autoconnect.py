@@ -32,6 +32,8 @@ from threading  import Thread, Lock
 from collections import OrderedDict
 
 # Zynthian specific modules
+from PySide2.QtCore import QTimer
+
 from zyncoder import *
 from zynqtgui import zynthian_gui_config
 
@@ -56,8 +58,23 @@ jclient: jack.Client = None
 thread = None
 exit_flag = False
 force_next_autoconnect = False
+xrun_count = 0
 
 last_hw_str = None
+
+
+def xrun_counter_timer_timeout():
+	global xrun_count
+
+	if xrun_count > 0:
+		logging.warning(f"Got {xrun_count} XRUNS in last 10 seconds")
+		xrun_count = 0
+
+
+xrun_counter_timer = QTimer()
+xrun_counter_timer.setInterval(10000)
+xrun_counter_timer.setSingleShot(False)
+xrun_counter_timer.timeout.connect(xrun_counter_timer_timeout)
 
 #------------------------------------------------------------------------------
 
@@ -980,6 +997,8 @@ def start(rt=2):
 	except Exception as e:
 		logger.error("ZynAutoConnect ERROR: Can't connect with Jack Audio Server ({})".format(e))
 
+	xrun_counter_timer.start()
+
 	# Create Lock object (Mutex) to avoid concurrence problems
 	lock=Lock()
 
@@ -1003,7 +1022,9 @@ def is_running():
 
 
 def cb_jack_xrun(delayed_usecs: float):
-	logger.warning("Jack Audio XRUN!")
+	global xrun_count
+
+	xrun_count += 1
 	zynthian_gui_config.zyngui.status_info['xrun'] = True
 
 
@@ -1017,9 +1038,6 @@ def get_jackd_samplerate():
 
 def get_jackd_blocksize():
 	return jclient.blocksize
-
-
-
 
 
 #------------------------------------------------------------------------------

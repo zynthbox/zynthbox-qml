@@ -75,6 +75,8 @@ Zynthian.Stack {
                     root.pageCache["layers_for_track"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
                     root.pageCache["layers_for_track"].visible = false;
                 }
+
+                zynthian.isScreensCachingComplete = true
             }
         },
         Connections {

@@ -121,6 +121,8 @@ Zynthian.Stack {
                     root.pageCache["engine"] = component.createObject(root, {"width": root.width, "height": root.height});
                     root.pageCache["engine"].visible = false;
                 }
+
+                zynthian.isModalScreensCachingComplete = true
             }
         },
         Connections {

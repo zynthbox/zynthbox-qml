@@ -54,6 +54,9 @@ ColumnLayout {
     spacing: Kirigami.Units.largeSpacing
 
     function cuiaCallback(cuia) {
+        if (clipFilePickerDialog.opened) {
+            return clipFilePickerDialog.cuiaCallback(cuia);
+        }
         if (bottomDrawer.opened &&
             bottomStack.children[bottomStack.currentIndex].cuiaCallback != null) {
             return bottomStack.children[bottomStack.currentIndex].cuiaCallback(cuia);

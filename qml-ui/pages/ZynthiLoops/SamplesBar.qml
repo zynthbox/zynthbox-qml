@@ -14,6 +14,10 @@ Zynthian.Card {
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
+        if (samplePickerDialog.opened) {
+            return samplePickerDialog.cuiaCallback(cuia);
+        }
+
         switch (cuia) {
             case "SELECT_UP":
                 if (controlObj.selectedSlotRow > 0) {

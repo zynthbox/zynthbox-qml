@@ -47,6 +47,7 @@ Zynthian.BasePlayGrid {
     defaults: {
         "positionalVelocity": true
     }
+    property bool isVisible: ["playgrid"].indexOf(zynthian.current_screen_id) >= 0
     persist: ["positionalVelocity"]
     additionalActions: [
         Kirigami.Action {
@@ -91,94 +92,101 @@ Zynthian.BasePlayGrid {
             return true;
         }
         var returnValue = false;
-        switch (cuia) {
-            case "SWITCH_BACK_SHORT":
-            case "SWITCH_BACK_BOLD":
-            case "SWITCH_BACK_LONG":
-                if (ignoreNextBack) {
-                    // When back button's been used for interaction elsewhere, ignore it here...
-                    // Remember to set this, or things will look a bit weird
-                    ignoreNextBack = false;
-                } else {
-                    if (component.patternsMenuVisible) {
-                        component.hidePatternsMenu();
-                    } else if (_private.hasSelection) {
-                        _private.deselectSelectedItem();
-                    } else if (component.mostRecentlyPlayedNote) {
-                        component.mostRecentlyPlayedNote = undefined;
-                    } else if (component.heardNotes.length > 0) {
-                        component.heardNotes = [];
-                        component.heardVelocities = [];
+
+        if (sequenceLoader.opened) {
+            returnValue = sequenceLoader.cuiaCallback(cuia);
+        }
+
+        if (returnValue === false) {
+            switch (cuia) {
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                case "SWITCH_BACK_LONG":
+                    if (ignoreNextBack) {
+                        // When back button's been used for interaction elsewhere, ignore it here...
+                        // Remember to set this, or things will look a bit weird
+                        ignoreNextBack = false;
+                    } else {
+                        if (component.patternsMenuVisible) {
+                            component.hidePatternsMenu();
+                        } else if (_private.hasSelection) {
+                            _private.deselectSelectedItem();
+                        } else if (component.mostRecentlyPlayedNote) {
+                            component.mostRecentlyPlayedNote = undefined;
+                        } else if (component.heardNotes.length > 0) {
+                            component.heardNotes = [];
+                            component.heardVelocities = [];
+                        }
                     }
-                }
-                returnValue = true;
-                break;
-            case "SELECT_UP":
-                _private.nextBar();
-                break;
-            case "SELECT_DOWN":
-                _private.previousBar();
-                break;
-            //case "SELECT_LEFT":
-                //returnValue = true;
-                //break;
-            //case "SELECT_RIGHT":
-                //returnValue = true;
-                //break;
-            case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex - 1;
-                }
-                returnValue = true;
-                break;
-            case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < _private.trackCount) {
-                    zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex + 1;
-                }
-                returnValue = true;
-                break;
-            case "SWITCH_SELECT_SHORT":
-                _private.activateSelectedItem();
-                returnValue = true;
-                break;
-            case "TRACK_1":
-                returnValue = backButtonClearPatternHelper(0);
-                break;
-            case "TRACK_2":
-                returnValue = backButtonClearPatternHelper(1);
-                break;
-            case "TRACK_3":
-                returnValue = backButtonClearPatternHelper(2);
-                break;
-            case "TRACK_4":
-                returnValue = backButtonClearPatternHelper(3);
-                break;
-            case "TRACK_5":
-                returnValue = backButtonClearPatternHelper(4);
-                break;
-            case "TRACK_6":
-                returnValue = backButtonClearPatternHelper(5);
-                break;
-            case "TRACK_7":
-                returnValue = backButtonClearPatternHelper(6);
-                break;
-            case "TRACK_8":
-                returnValue = backButtonClearPatternHelper(7);
-                break;
-            case "TRACK_9":
-                returnValue = backButtonClearPatternHelper(8);
-                break;
-            case "TRACK_10":
-                returnValue = backButtonClearPatternHelper(9);
-                break;
-            case "TRACK_11":
-                returnValue = backButtonClearPatternHelper(10);
-                break;
-            case "TRACK_12":
-                returnValue = backButtonClearPatternHelper(11);
-                break;
-            default:
-                break;
+                    returnValue = true;
+                    break;
+                case "SELECT_UP":
+                    _private.nextBar();
+                    break;
+                case "SELECT_DOWN":
+                    _private.previousBar();
+                    break;
+                //case "SELECT_LEFT":
+                    //returnValue = true;
+                    //break;
+                //case "SELECT_RIGHT":
+                    //returnValue = true;
+                    //break;
+                case "NAVIGATE_LEFT":
+                    if (zynthian.session_dashboard.selectedTrack > 0) {
+                        zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex - 1;
+                    }
+                    returnValue = true;
+                    break;
+                case "NAVIGATE_RIGHT":
+                    if (zynthian.session_dashboard.selectedTrack < _private.trackCount) {
+                        zynthian.session_dashboard.selectedTrack = _private.activePatternModel.trackIndex + 1;
+                    }
+                    returnValue = true;
+                    break;
+                case "SWITCH_SELECT_SHORT":
+                    _private.activateSelectedItem();
+                    returnValue = true;
+                    break;
+                case "TRACK_1":
+                    returnValue = backButtonClearPatternHelper(0);
+                    break;
+                case "TRACK_2":
+                    returnValue = backButtonClearPatternHelper(1);
+                    break;
+                case "TRACK_3":
+                    returnValue = backButtonClearPatternHelper(2);
+                    break;
+                case "TRACK_4":
+                    returnValue = backButtonClearPatternHelper(3);
+                    break;
+                case "TRACK_5":
+                    returnValue = backButtonClearPatternHelper(4);
+                    break;
+                case "TRACK_6":
+                    returnValue = backButtonClearPatternHelper(5);
+                    break;
+                case "TRACK_7":
+                    returnValue = backButtonClearPatternHelper(6);
+                    break;
+                case "TRACK_8":
+                    returnValue = backButtonClearPatternHelper(7);
+                    break;
+                case "TRACK_9":
+                    returnValue = backButtonClearPatternHelper(8);
+                    break;
+                case "TRACK_10":
+                    returnValue = backButtonClearPatternHelper(9);
+                    break;
+                case "TRACK_11":
+                    returnValue = backButtonClearPatternHelper(10);
+                    break;
+                case "TRACK_12":
+                    returnValue = backButtonClearPatternHelper(11);
+                    break;
+                default:
+                    break;
+            }
         }
         return returnValue;
     }
@@ -1329,6 +1337,11 @@ Zynthian.BasePlayGrid {
                     onHidePatternsMenu: {
                         patternMenuPopup.close();
                     }
+                    onIsVisibleChanged: {
+                        if (patternMenuPopup.opened && component.isVisible === false) {
+                            patternMenuPopup.close();
+                        }
+                    }
                 }
                 Binding {
                     target: component
@@ -1722,6 +1735,14 @@ Zynthian.BasePlayGrid {
                     stepSettings.column = column;
                     stepSettingsPopup.open();
                 }
+                Connections {
+                    target: component
+                    onIsVisibleChanged: {
+                        if (stepSettingsPopup.opened && component.isVisible === false) {
+                            stepSettingsPopup.close();
+                        }
+                    }
+                }
                 onClosed: {
                     stepSettings.row = -1;
                     stepSettings.column = -1;
@@ -1747,6 +1768,14 @@ Zynthian.BasePlayGrid {
                     noteSettings.patternModel = patternModel;
                     noteSettingsPopup.open();
                 }
+                Connections {
+                    target: component
+                    onIsVisibleChanged: {
+                        if (noteSettingsPopup.opened && component.isVisible === false) {
+                            noteSettingsPopup.close();
+                        }
+                    }
+                }
                 onClosed: {
                     noteSettings.patternModel = null;
                     noteSettings.firstBar = -1;
@@ -1768,6 +1797,14 @@ Zynthian.BasePlayGrid {
                 width: parent.width
                 height: Kirigami.Units.gridUnit * 15
 
+                Connections {
+                    target: component
+                    onIsVisibleChanged: {
+                        if (tracksViewDrawer.opened && component.isVisible === false) {
+                            tracksViewDrawer.close();
+                        }
+                    }
+                }
                 SessionDashboard.TracksViewSoundsBar {
                     anchors.fill: parent
                     property QtObject bottomDrawer: tracksViewDrawer
@@ -1779,6 +1816,14 @@ Zynthian.BasePlayGrid {
                 function pickPart(associatedTrackIndex) {
                     partPicker.associatedTrackIndex = associatedTrackIndex;
                     open();
+                }
+                Connections {
+                    target: component
+                    onIsVisibleChanged: {
+                        if (partPicker.opened && component.isVisible === false) {
+                            partPicker.close();
+                        }
+                    }
                 }
                 onClosed: {
                     partPicker.associatedTrackIndex = -1;

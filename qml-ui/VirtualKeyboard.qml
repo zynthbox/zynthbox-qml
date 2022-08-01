@@ -43,6 +43,24 @@ Item {
         }
     }
 
+    property var cuiaCallback: function(cuia) {
+        var result = false;
+
+        switch (cuia) {
+            case "SWITCH_BACK_SHORT":
+            case "SWITCH_BACK_BOLD":
+            case "SWITCH_BACK_LONG":
+                Qt.inputMethod.hide();
+                result = true;
+                break;
+            default:
+                // Just do nothing
+                break;
+        }
+
+        return result;
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "#cc222222"

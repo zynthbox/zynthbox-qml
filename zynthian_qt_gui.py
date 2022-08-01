@@ -1865,6 +1865,17 @@ class zynthian_gui(QObject):
     def callable_ui_action(self, cuia, params=None):
         logging.debug("CUIA '{}' => {}".format(cuia, params))
 
+        # Before anything else, try and ask the main window whether there's anything to be done
+        try:
+            cuia_callback = zynthian_gui_config.top.property("cuiaCallback")
+            if cuia_callback is not None and cuia_callback.isCallable():
+                _result = cuia_callback.call([cuia])
+                if _result is not None and _result.toBool():
+                        return
+        except Exception as e:
+            logging.error("Attempted to run callbacks on the main window, which apparently failed badly, with the error: {}".format(e))
+            pass
+
         # Check if there are any open dialogs. Forward cuia events to cuiaCallback of opened dialog
         if self.opened_dialog is not None:
             try:

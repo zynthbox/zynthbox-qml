@@ -145,6 +145,10 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         console.log("ZL Cuia Handler :", cuia)
 
+        if (sketchPickerDialog.opened) {
+            return sketchPickerDialog.cuiaCallback(cuia);
+        }
+
         // Forward CUIA actions to bottomBar only when bottomBar is open
         if (bottomStack.currentIndex === 0) {
             if (bottomBar.tabbedView.activeItem.cuiaCallback != null) {

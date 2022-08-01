@@ -113,7 +113,14 @@ Zynthian.ScreenPage {
     screenId: "session_dashboard"
 
     cuiaCallback: function(cuia) {
-        return tabbedView.cuiaCallback(cuia);
+        var result = false;
+        if (sketchPickerDialog.opened) {
+            result = sketchPickerDialog.cuiaCallback(cuia);
+        }
+        if (!result) {
+            result = tabbedView.cuiaCallback(cuia);
+        }
+        return result;
     }
 
     Zynthian.SaveFileDialog {

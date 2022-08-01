@@ -45,6 +45,9 @@ GridLayout {
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
+        if (bottomBar.filePickerDialog.opened) {
+            return bottomBar.filePickerDialog.cuiaCallback(cuia);
+        }
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
                 bottomBar.filePickerDialog.folderModel.folder = bottomBar.controlObj.recordingDir;
@@ -55,7 +58,7 @@ GridLayout {
                 bottomStack.slotsBar.trackButton.checked = true
                 return true;
         }
-        
+
         return false;
     }
 

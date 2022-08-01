@@ -35,6 +35,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 Item {
     id: component
+    property bool opened: sequenceFilePicker.opened || loadedSequenceOptionsPicker.opened || loadedPatternOptionsPicker.opened || trackPicker.opened
     property int topPadding: Kirigami.Units.largeSpacing
     property int leftPadding: Kirigami.Units.largeSpacing
     property int rightPadding: Kirigami.Units.largeSpacing
@@ -86,6 +87,51 @@ Item {
         sequenceFilePicker.sequenceName = "";
         sequenceFilePicker.saveMode = true;
         sequenceFilePicker.open();
+    }
+
+    property var cuiaCallback: function(cuia) {
+        var result = false;
+
+        if (sequenceFilePicker.opened) {
+            result = sequenceFilePicker.cuiaCallback(cuia);
+        }
+
+        if (!result) {
+            switch(cuia) {
+                case "SWITCH_SELECT_SHORT":
+                case "SWITCH_SELECT_BOLD":
+                case "SWITCH_SELECT_LONG":
+                    if (loadedSequenceOptionsPicker.opened) {
+                        loadedSequenceOptionsPicker.accept();
+                        result = true;
+                    } else if (loadedPatternOptionsRepeater.opened) {
+                        loadedPatternOptionsRepeater.accept();
+                        result = true;
+                    } else if (trackPicker.opened) {
+                        trackPicker.close();
+                        result = true;
+                    }
+                    break;
+                case "SWITCH_BACK_SHORT":
+                case "SWITCH_BACK_BOLD":
+                case "SWITCH_BACK_LONG":
+                    if (loadedSequenceOptionsPicker.opened) {
+                        loadedSequenceOptionsPicker.reject();
+                        result = true;
+                    } else if (loadedPatternOptionsRepeater.opened) {
+                        loadedPatternOptionsRepeater.reject();
+                        result = true;
+                    } else if (trackPicker.opened) {
+                        trackPicker.close();
+                        result = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return result;
     }
 
     Zynthian.FilePickerDialog {

@@ -36,6 +36,12 @@ class ZynGui(QObject):
         self.select_path = ""
         self.shown = True
 
+    '''
+    Checks if current screen should handle the knob value changes  
+    '''
+    def is_current_screen_knobs_active(self):
+        return self == self.zyngui.get_current_screen() and not self.zyngui.globalPopupOpened
+
     def show(self):
         pass
 

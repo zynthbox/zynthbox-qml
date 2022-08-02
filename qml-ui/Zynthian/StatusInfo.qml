@@ -349,6 +349,32 @@ MouseArea {
                         from: 50
                         to: 200
                     }
+
+                    onPressed: registerTap();
+                    property int bpm: 0
+                    property var timestamps: []
+                    function registerTap() {
+                        var newStamp = Date.now();
+                        if (bpmDial.timestamps.length > 0 && newStamp - bpmDial.timestamps[timestamps.length - 1] > 2000) {
+                            // If the most recent tap was more than two seconds ago, clear the list and start a new estimation
+                            bpmDial.timestamps = [];
+                            bpm = 0;
+                        }
+                        bpmDial.timestamps.push(newStamp);
+                        if (bpmDial.timestamps.length > 1) {
+                            var differences = [];
+                            for (var i = 0; i < bpmDial.timestamps.length - 1; ++i) {
+                                differences.push(bpmDial.timestamps[i + 1] - bpmDial.timestamps[i]);
+                            }
+                            var sum = 0;
+                            for (var i = 0; i < differences.length; ++i) {
+                                sum += differences[i];
+                            }
+                            var average = sum / differences.length;
+                            bpmDial.bpm = 60000 / average;
+                            zynthian.zynthiloops.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
+                        }
+                    }
                 }
             }
             Card {

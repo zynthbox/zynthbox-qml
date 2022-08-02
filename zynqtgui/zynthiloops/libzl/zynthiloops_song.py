@@ -550,7 +550,7 @@ class zynthiloops_song(QObject):
             libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex])
             # Call zyngui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
-            self.zyngui.set_selector()
+            # self.zyngui.set_selector()
 
             self.bpm_changed.emit()
             self.schedule_save()

@@ -338,31 +338,31 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[0].read_zyncoder()
 
             if self.__big_knob_mode__ == "preset":
-                QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.DirectConnection)
             elif self.__big_knob_mode__ == "track":
-                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.DirectConnection)
 
         # Update clip startposition/layer volume when required with small knob 1
         if self.__zselector[1] and self.__song__:
             self.__zselector[1].read_zyncoder()
             if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive or self.zyngui.slotsBarSynthsActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.DirectConnection)
             elif self.zyngui.slotsBarMixerActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_track_volume", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_track_volume", Qt.DirectConnection)
             else:
-                QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.DirectConnection)
 
         # Update clip length when required with small knob 2
         if self.__zselector[2] and self.__song__:
             self.__zselector[2].read_zyncoder()
-            QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
+            QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.DirectConnection)
 
         # Update clip length when required with small knob 3
         if self.__zselector[3] and self.__song__:
             self.__zselector[3].read_zyncoder()
 
             if self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.DirectConnection)
 
         return [0, 1, 2, 3]
 
@@ -667,49 +667,51 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        # Hide selectors and return if dependent variables is None or a long operation is in progress
-        if self.__song__ is None or \
-                self.zyngui.globalPopupOpened or \
-                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
-                self.longOperation:
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
+        # # Hide selectors and return if dependent variables is None or a long operation is in progress
+        # if self.__song__ is None or \
+        #         self.zyngui.globalPopupOpened or \
+        #         (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
+        #         self.longOperation:
+        #     if self.__zselector[0] is not None:
+        #         self.__zselector[0].hide()
+        #     if self.__zselector[1] is not None:
+        #         self.__zselector[1].hide()
+        #     if self.__zselector[2] is not None:
+        #         self.__zselector[2].hide()
+        #     if self.__zselector[3] is not None:
+        #         self.__zselector[3].hide()
+        #
+        #     return
+        #
+        # self.is_set_selector_running = True
+        #
+        # ### Common vars for small knobs
+        # selected_clip = None
+        # selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        #
+        # if self.zyngui.trackWaveEditorBarActive:
+        #     logging.debug(f"### set_selector : trackWaveEditorBarActive is active.")
+        #     selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
+        # elif self.zyngui.clipWaveEditorBarActive:
+        #     logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
+        #     selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
+        # ###
+        #
+        # # Configure Big Knob
+        # self.configure_big_knob()
+        #
+        # # Configure small knob 1
+        # self.configure_small_knob_1(selected_track_obj, selected_clip)
+        #
+        # # Configure small knob 2
+        # self.configure_small_knob_2(selected_track_obj, selected_clip)
+        #
+        # # Configure small knob 3
+        # self.configure_small_knob_3(selected_track_obj, selected_clip)
+        #
+        # self.is_set_selector_running = False
 
-            return
-
-        self.is_set_selector_running = True
-
-        ### Common vars for small knobs
-        selected_clip = None
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
-
-        if self.zyngui.trackWaveEditorBarActive:
-            logging.debug(f"### set_selector : trackWaveEditorBarActive is active.")
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
-        elif self.zyngui.clipWaveEditorBarActive:
-            logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
-        ###
-
-        # Configure Big Knob
-        self.configure_big_knob()
-
-        # Configure small knob 1
-        self.configure_small_knob_1(selected_track_obj, selected_clip)
-
-        # Configure small knob 2
-        self.configure_small_knob_2(selected_track_obj, selected_clip)
-
-        # Configure small knob 3
-        self.configure_small_knob_3(selected_track_obj, selected_clip)
-
-        self.is_set_selector_running = False
+        pass
 
     def switch_select(self, t):
         pass

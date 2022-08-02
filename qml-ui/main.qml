@@ -71,6 +71,8 @@ Kirigami.AbstractApplicationWindow {
         // If the virtual keyboard is open, pass thins directly to that
         if (virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
             result = virtualKeyboardLoader.item.cuiaCallback(cuia);
+        } else if (slotSelectionDrawer.opened) {
+            result = slotSelectionDrawer.cuiaCallback(cuia);
         } else if (cuia.startsWith("SWITCH_BACK")) {
             if (tracksMenu.visible) {
                 tracksMenu.visible = false;

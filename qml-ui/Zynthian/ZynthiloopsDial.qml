@@ -13,6 +13,7 @@ ColumnLayout {
     property QtObject controlObj
     property string controlProperty
     property real buttonStepSize
+    signal pressed(var mouse)
     signal doubleClicked()
     onControlObjChanged: {
         if (controlObj && controlObj[controlProperty]) {
@@ -73,6 +74,7 @@ ColumnLayout {
             property real startValue
             property real startDiff
             onPressed: {
+                root.pressed(mouse);
                 startY = mouse.y;
                 startValue = dial.value
                 // Calculate difference from floored value to apply when writing final value

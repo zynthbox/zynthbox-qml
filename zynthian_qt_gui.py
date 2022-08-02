@@ -771,7 +771,9 @@ class zynthian_gui(QObject):
 
             self.__zselector[0] = zynthian_gui_controller(3, self.__zselector_ctrl[0], self)
             self.__zselector[0].show()
-        elif self.knob0_delta != 0:
+            self.__zselector[0].read_zyncoder()
+
+        if self.__zselector[0].value != 50:
             self.__zselector_ctrl[0].set_options({'value': 50})
 
             self.__zselector[0].config(self.__zselector_ctrl[0])
@@ -785,7 +787,9 @@ class zynthian_gui(QObject):
 
             self.__zselector[1] = zynthian_gui_controller(0, self.__zselector_ctrl[1], self)
             self.__zselector[1].show()
-        elif self.knob1_delta != 0:
+            self.__zselector[1].read_zyncoder()
+
+        if self.__zselector[1].value != 50:
             self.__zselector_ctrl[1].set_options({'value': 50})
 
             self.__zselector[1].config(self.__zselector_ctrl[1])
@@ -799,7 +803,9 @@ class zynthian_gui(QObject):
 
             self.__zselector[2] = zynthian_gui_controller(1, self.__zselector_ctrl[2], self)
             self.__zselector[2].show()
-        elif self.knob2_delta != 0:
+            self.__zselector[2].read_zyncoder()
+
+        if self.__zselector[2].value != 50:
             self.__zselector_ctrl[2].set_options({'value': 50})
 
             self.__zselector[2].config(self.__zselector_ctrl[2])
@@ -813,7 +819,9 @@ class zynthian_gui(QObject):
 
             self.__zselector[3] = zynthian_gui_controller(2, self.__zselector_ctrl[3], self)
             self.__zselector[3].show()
-        elif self.knob3_delta != 0:
+            self.__zselector[3].read_zyncoder()
+
+        if self.__zselector[3].value != 50:
             self.__zselector_ctrl[3].set_options({'value': 50})
 
             self.__zselector[3].config(self.__zselector_ctrl[3])
@@ -2727,6 +2735,11 @@ class zynthian_gui(QObject):
                     self.__zselector[1].read_zyncoder()
                     self.__zselector[2].read_zyncoder()
                     self.__zselector[3].read_zyncoder()
+
+                    # logging.debug(f"selector 0 value : {self.__zselector[0].value}")
+                    # logging.debug(f"selector 1 value : {self.__zselector[1].value}")
+                    # logging.debug(f"selector 2 value : {self.__zselector[2].value}")
+                    # logging.debug(f"selector 3 value : {self.__zselector[3].value}")
 
                     self.knob0_delta = self.__zselector[0].value - 50
                     self.knob1_delta = self.__zselector[1].value - 50

@@ -71,18 +71,20 @@ Kirigami.AbstractApplicationWindow {
         // If the virtual keyboard is open, pass thins directly to that
         if (virtualKeyboardLoader.item && virtualKeyboardLoader.item.visible) {
             result = virtualKeyboardLoader.item.cuiaCallback(cuia);
-        //} else if (tracksMenu.visible) {
-            //tracksMenu.visible = false;
-            //result = true;
-        //} else if (scenesMenu.visible) {
-            //scenesMenu.visible = false;
-            //result = true;
-        //} else if (samplesMenu.visible) {
-            //samplesMenu.visible = false;
-            //result = true;
-        //} else if (zynthian.globalPopupOpened) {
-            //zynthian.globalPopupOpened = false;
-            //result = true;
+        } else if (cuia.startsWith("SWITCH_BACK")) {
+            if (tracksMenu.visible) {
+                tracksMenu.visible = false;
+                result = true;
+            } else if (scenesMenu.visible) {
+                scenesMenu.visible = false;
+                result = true;
+            } else if (samplesMenu.visible) {
+                samplesMenu.visible = false;
+                result = true;
+            } else if (zynthian.globalPopupOpened) {
+                zynthian.globalPopupOpened = false;
+                result = true;
+            }
         }
 
         return result;

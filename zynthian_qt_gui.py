@@ -1891,20 +1891,6 @@ class zynthian_gui(QObject):
                 logging.error("Attempted to use cuiaCallback on openeedDialog, got error: {}".format(e))
                 pass
 
-        if self.left_sidebar is not None:
-            try:
-                cuia_callback = self.left_sidebar.property("cuiaCallback")
-                visible = self.left_sidebar.property("opened")
-
-                if cuia_callback is not None and cuia_callback.isCallable() and visible:
-                    _result = cuia_callback.call([cuia])
-
-                    if _result is not None and _result.toBool():
-                        return
-            except Exception as e:
-                logging.error("Attempted to use cuiaCallback on leftSidebar, got error: {}".format(e))
-                pass
-
         if cuia != "SCREEN_MAIN" and self.current_qml_page != None:
             try:
                 js_value = self.current_qml_page_prop.property("cuiaCallback")

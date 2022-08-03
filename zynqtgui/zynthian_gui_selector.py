@@ -312,7 +312,12 @@ class zynthian_gui_selector(zynthian_qt_gui_base.ZynGui):
 			if self.index!=self.zselector.value:
 				self.select(self.zselector.value)
 				self.screen_at_timer_start = self.zyngui.get_current_screen_id()
-				self.auto_activation_timer_requested.emit(500)
+
+				if self.zyngui.get_current_screen_id() == "preset":
+					self.auto_activation_timeout()
+				else:
+					self.auto_activation_timer_requested.emit(500)
+
 		return [0,1,2]
 
 	@Slot('int')

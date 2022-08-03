@@ -50,6 +50,9 @@ Rectangle {
 
     readonly property QtObject song: zynthian.zynthiloops.song
     readonly property QtObject selectedTrack: applicationWindow().selectedTrack
+
+    // FIXME : Sample picker dialog was having issues when selecting sample for track T6-T10
+    //         Find a proper solution and see if selectedTrack can be used for all cases instead of this
     property QtObject selectedSlotRowItem
 
     onSongModeChanged: {

@@ -722,14 +722,14 @@ Rectangle {
         y: parent.y
 
         headerText: qsTr("%1-S%2 : Pick a sample")
-                        .arg(root.selectedSlotRowItem.track.name)
-                        .arg(root.selectedSlotRowItem.track.selectedSlotRow + 1)
+                        .arg(root.selectedTrack.name)
+                        .arg(root.selectedTrack.selectedSlotRow + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedSlotRowItem.track.set_sample(file.filePath, root.selectedSlotRowItem.track.selectedSlotRow)
+            root.selectedTrack.set_sample(file.filePath, root.selectedTrack.selectedSlotRow)
         }
     }
 

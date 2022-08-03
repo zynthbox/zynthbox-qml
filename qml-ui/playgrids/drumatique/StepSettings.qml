@@ -148,6 +148,39 @@ ColumnLayout {
                     }
                 ]
             }
+            Zynthian.PlayGridButton {
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    bottom: parent.bottom
+                }
+                width: height
+                icon.name: "media-playback-start-symbolic"
+                onClicked: {
+                    var startNote = 0;
+                    var endNote = component.note.subnotes.length;
+                    if (component.currentSubNote > -1) {
+                        startNote = endNote = component.currentSubNote;
+                        ++endNote;
+                    }
+                    for (var i = startNote; i < endNote; ++i) {
+                        var note = component.note.subnotes[i];
+                        var velocity = component.model.subnoteMetadata(component.row, component.column, i, "velocity");
+                        if (typeof(velocity) === "undefined") {
+                            velocity = 64;
+                        }
+                        var duration = component.model.subnoteMetadata(component.row, component.column, i, "duration");
+                        if (typeof(duration) === "undefined") {
+                            duration = component.stepDuration;
+                        }
+                        var delay = component.model.subnoteMetadata(component.row, component.column, i, "delay");
+                        if (typeof(delay) === "undefined") {
+                            delay = 0;
+                        }
+                        ZynQuick.PlayGridManager.scheduleNote(note.midiNote, note.midiChannel, true, velocity, duration, delay);
+                    }
+                }
+            }
         }
         QQC2.Label {
             Layout.fillWidth: true

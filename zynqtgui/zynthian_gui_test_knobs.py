@@ -49,29 +49,31 @@ class zynthian_gui_test_knobs(zynthian_qt_gui_base.ZynGui):
         pass
 
     def set_selector(self, zs_hiden=True):
-        for i in range(4):
-            if self.__zselector[i] is not None:
-                if not self.zyngui.globalPopupOpened and \
-                        self.zyngui.get_current_screen_id() is not None and \
-                        self.zyngui.get_current_screen() == self:
-                    self.__zselector[i].show()
-                else:
-                    self.__zselector[i].hide()
+        # for i in range(4):
+        #     if self.__zselector[i] is not None:
+        #         if not self.zyngui.globalPopupOpened and \
+        #                 self.zyngui.get_current_screen_id() is not None and \
+        #                 self.zyngui.get_current_screen() == self:
+        #             self.__zselector[i].show()
+        #         else:
+        #             self.__zselector[i].hide()
+        #
+        #     if self.__zselector[i]:
+        #         self.__zselector_ctrl[i].set_options(
+        #             {'symbol': 'test knob {}'.format(i), 'name': 'Test Knob {}'.format(i),
+        #              'short_name': 'Knob{}'.format(i), 'midi_cc': 0,
+        #              'value_max': 100,
+        #              'value': 0})
+        #         self.__zselector[i].config(self.__zselector_ctrl[i])
+        #     elif not self.zyngui.globalPopupOpened and \
+        #             self.zyngui.get_current_screen_id() is not None and \
+        #             self.zyngui.get_current_screen() == self:
+        #         self.__zselector_ctrl[i] = zynthian_controller(None, 'test knob {}'.format(i), 'test knob {}'.format(i),
+        #                                                        {'midi_cc': 0, 'value': 0, 'value_max': 100})
+        #         self.__zselector[i] = zynthian_gui_controller(i, self.__zselector_ctrl[i], self)
+        #         self.__zselector[i].show()
 
-            if self.__zselector[i]:
-                self.__zselector_ctrl[i].set_options(
-                    {'symbol': 'test knob {}'.format(i), 'name': 'Test Knob {}'.format(i),
-                     'short_name': 'Knob{}'.format(i), 'midi_cc': 0,
-                     'value_max': 100,
-                     'value': 0})
-                self.__zselector[i].config(self.__zselector_ctrl[i])
-            elif not self.zyngui.globalPopupOpened and \
-                    self.zyngui.get_current_screen_id() is not None and \
-                    self.zyngui.get_current_screen() == self:
-                self.__zselector_ctrl[i] = zynthian_controller(None, 'test knob {}'.format(i), 'test knob {}'.format(i),
-                                                               {'midi_cc': 0, 'value': 0, 'value_max': 100})
-                self.__zselector[i] = zynthian_gui_controller(i, self.__zselector_ctrl[i], self)
-                self.__zselector[i].show()
+        pass
 
     def zyncoder_read(self):
         for i in range(4):

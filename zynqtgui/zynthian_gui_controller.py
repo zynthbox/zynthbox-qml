@@ -276,7 +276,8 @@ class zynthian_gui_controller(QObject):
 		except:
 			pass
 
-		logging.debug("ZCTRL '%s': %s (%s -> %s), %s, %s" % (zctrl.short_name,zctrl.value,zctrl.value_min,zctrl.value_max,zctrl.labels,zctrl.ticks))
+		if self.zyngui.isBootingComplete:
+			logging.debug("ZCTRL '%s': %s (%s -> %s), %s, %s" % (zctrl.short_name,zctrl.value,zctrl.value_min,zctrl.value_max,zctrl.labels,zctrl.ticks))
 
 		#List of values (value selector)
 		if isinstance(zctrl.labels,list):

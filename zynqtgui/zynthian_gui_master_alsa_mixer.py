@@ -93,10 +93,6 @@ class zynthian_gui_master_alsa_mixer(QObject):
             return
         self.__mixer.setvolume(max(0, min(100, vol)))
 
-        # Call zyngui global set_selector when volume changes as
-        # volume is controlled by Small Knob 1 when global popup is opened
-        self.zyngui.set_selector()
-
         self.volume_changed.emit()
 
     volume = Property(int, get_volume, set_volume, notify = volume_changed)

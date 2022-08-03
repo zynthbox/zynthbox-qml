@@ -79,13 +79,15 @@ class zynthian_gui_zs3_learn(zynthian_gui_selector):
 
 
 	def set_selector(self):
-		if self.zselector:
-			self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':self.num_programs, 'value':self.index })
-			self.zselector.config(self.zselector_ctrl)
-			self.zselector.show()
-		else:
-			self.zselector_ctrl=zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':self.num_programs, 'value':self.index })
-			self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.main_frame,self.zselector_ctrl)
+		# if self.zselector:
+		# 	self.zselector_ctrl.set_options({ 'symbol':self.selector_caption, 'name':self.selector_caption, 'short_name':self.selector_caption, 'midi_cc':0, 'value_max':self.num_programs, 'value':self.index })
+		# 	self.zselector.config(self.zselector_ctrl)
+		# 	self.zselector.show()
+		# else:
+		# 	self.zselector_ctrl=zynthian_controller(None,self.selector_caption,self.selector_caption,{ 'midi_cc':0, 'value_max':self.num_programs, 'value':self.index })
+		# 	self.zselector=zynthian_gui_controller(zynthian_gui_config.select_ctrl,self.main_frame,self.zselector_ctrl)
+
+		pass
 
 
 	def select_action(self, i, t='S'):

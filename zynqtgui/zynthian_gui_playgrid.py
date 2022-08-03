@@ -190,34 +190,36 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def set_selector(self, zs_hiden=False):
-        if self.zyngui.globalPopupOpened or \
-                (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self):
-            if self.__zselector[0] is not None:
-                self.__zselector[0].hide()
-            if self.__zselector[1] is not None:
-                self.__zselector[1].hide()
-            if self.__zselector[2] is not None:
-                self.__zselector[2].hide()
-            if self.__zselector[3] is not None:
-                self.__zselector[3].hide()
+        # if self.zyngui.globalPopupOpened or \
+        #         (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self):
+        #     if self.__zselector[0] is not None:
+        #         self.__zselector[0].hide()
+        #     if self.__zselector[1] is not None:
+        #         self.__zselector[1].hide()
+        #     if self.__zselector[2] is not None:
+        #         self.__zselector[2].hide()
+        #     if self.__zselector[3] is not None:
+        #         self.__zselector[3].hide()
+        #
+        #     return
+        #
+        # self.is_set_selector_running = True
+        #
+        # # Configure Big Knob
+        # self.configure_big_knob()
+        #
+        # # Configure small knob 1
+        # self.configure_small_knob_1()
+        #
+        # # Configure small knob 2
+        # self.configure_small_knob_2()
+        #
+        # # Configure small knob 3
+        # self.configure_small_knob_3()
 
-            return
+        # self.is_set_selector_running = False
 
-        self.is_set_selector_running = True
-
-        # Configure Big Knob
-        self.configure_big_knob()
-
-        # Configure small knob 1
-        self.configure_small_knob_1()
-
-        # Configure small knob 2
-        self.configure_small_knob_2()
-
-        # Configure small knob 3
-        self.configure_small_knob_3()
-
-        self.is_set_selector_running = False
+        pass
 
     def refresh_loading(self):
         pass

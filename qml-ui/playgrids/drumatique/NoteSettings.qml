@@ -296,6 +296,32 @@ ColumnLayout {
                             color: Kirigami.Theme.highlightColor
                             visible: component.currentStep === (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex && (component.currentSubNote === -1 || subnoteDelegate.subnoteIndex === component.currentSubNote)
                         }
+                        Zynthian.PlayGridButton {
+                            anchors {
+                                top: parent.top
+                                right: parent.left
+                                bottom: parent.bottom
+                                rightMargin: Kirigami.Units.smallSpacing
+                            }
+                            width: height
+                            icon.name: "media-playback-start-symbolic"
+                            visible: component.currentStep === (barDelegate.barIndex * component.patternModel.width) + stepDelegate.stepIndex && (component.currentSubNote === -1 || subnoteDelegate.subnoteIndex === component.currentSubNote)
+                            onClicked: {
+                                var velocity = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "velocity");
+                                if (typeof(velocity) === "undefined") {
+                                    velocity = 64;
+                                }
+                                var duration = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "duration");
+                                if (typeof(duration) === "undefined") {
+                                    duration = component.stepDuration;
+                                }
+                                var delay = component.patternModel.subnoteMetadata(barDelegate.barIndex, stepDelegate.stepIndex, subnoteDelegate.subnoteIndex, "delay");
+                                if (typeof(delay) === "undefined") {
+                                    delay = 0;
+                                }
+                                ZynQuick.PlayGridManager.scheduleNote(subnoteDelegate.subnote.midiNote, subnoteDelegate.subnote.midiChannel, true, velocity, duration, delay);
+                            }
+                        }
                         Rectangle {
                             anchors {
                                 top: parent.top

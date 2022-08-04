@@ -171,7 +171,7 @@ Rectangle {
                                     Item {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        Layout.bottomMargin: Kirigami.Units.gridUnit * 0.5
+
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -328,6 +328,7 @@ Rectangle {
                                     QQC2.Slider {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
+                                        Layout.preferredHeight: Kirigami.Units.gridUnit
                                         orientation: Qt.Horizontal
                                         from: 1.0
                                         to: -1.0
@@ -342,7 +343,6 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         Layout.margins: 4
-                                        Layout.topMargin: Kirigami.Units.gridUnit * 0.5
                                         horizontalAlignment: "AlignHCenter"
                                         elide: "ElideRight"
                                         text: model.track.name

@@ -55,6 +55,7 @@ class zynthiloops_clip(QObject):
         self.__is_playing__ = False
         self.__initial_length__ = 4
         self.__length__ = self.__initial_length__
+        self.__pan__ = 0.0
         self.__initial_start_position__ = 0.0
         self.__start_position__ = self.__initial_start_position__
         self.__loop_delta__ = 0.0
@@ -103,6 +104,9 @@ class zynthiloops_clip(QObject):
         if self.track is not None:
             self.track.volume_changed.connect(self.track_volume_changed)
             self.track_volume_changed()
+
+            self.track.panChanged.connect(self.track_pan_changed)
+            self.track_pan_changed()
 
         self.__sync_in_current_scene_timer__ = QTimer()
         self.__sync_in_current_scene_timer__.setSingleShot(True)
@@ -200,6 +204,10 @@ class zynthiloops_clip(QObject):
 
             if self.audioSource is not None:
                 self.audioSource.set_volume(self.track.volume)
+
+    def track_pan_changed(self):
+        if self.track is not None and self.audioSource is not None:
+            self.set_pan(self.track.pan, True)
 
     @Slot(int)
     def setVolume(self, vol):
@@ -301,6 +309,10 @@ class zynthiloops_clip(QObject):
 
     @Signal
     def length_changed(self):
+        pass
+
+    @Signal
+    def pan_changed(self):
         pass
 
     @Signal
@@ -442,6 +454,20 @@ class zynthiloops_clip(QObject):
                 self.audioSource.set_length(self.__length__, self.__song__.bpm)
             self.reset_beat_count()
     length = Property(float, length, set_length, notify=length_changed)
+
+    def pan(self):
+        return self.__pan__
+
+    def set_pan(self, pan: float, force_set=False):
+        if self.__pan__ != pan or force_set is True:
+            self.__pan__ = pan
+
+            self.pan_changed.emit()
+
+            if self.audioSource is not None:
+                self.audioSource.set_pan(self.__pan__)
+
+    pan = Property(float, pan, set_pan, notify=pan_changed)
 
 
     def row(self):
@@ -697,6 +723,7 @@ class zynthiloops_clip(QObject):
         self.duration_changed.emit()
         if self.is_track_sample:
             self.__song__.tracksModel.getTrack(self.row).samples_changed.emit()
+        self.track_pan_changed()
 
         self.__song__.schedule_save()
 

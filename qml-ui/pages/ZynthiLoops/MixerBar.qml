@@ -158,13 +158,6 @@ Rectangle {
                             border.width: 1
                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    tracksVolumeRow.handleClick(track);
-                                }
-                            }
-
                             RowLayout {
                                 anchors.fill: parent
                                 anchors.topMargin: 4
@@ -178,6 +171,13 @@ Rectangle {
                                     Item {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
+                                        Layout.bottomMargin: Kirigami.Units.gridUnit * 0.5
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                tracksVolumeRow.handleClick(track);
+                                            }
+                                        }
 
                                         VolumeControl {
                                             id: volumeControl
@@ -325,12 +325,34 @@ Rectangle {
                                         }
                                     }
 
+                                    QQC2.Slider {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        orientation: Qt.Horizontal
+                                        from: 1.0
+                                        to: -1.0
+                                        value: model.track.pan
+                                        onMoved: {
+                                            model.track.pan = value
+                                        }
+                                    }
+
                                     QQC2.Label {
                                         Layout.alignment: Qt.AlignCenter
                                         Layout.fillWidth: true
+                                        Layout.fillHeight: false
+                                        Layout.margins: 4
+                                        Layout.topMargin: Kirigami.Units.gridUnit * 0.5
                                         horizontalAlignment: "AlignHCenter"
                                         elide: "ElideRight"
                                         text: model.track.name
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                tracksVolumeRow.handleClick(track);
+                                            }
+                                        }
                                     }
 
                                     RowLayout {

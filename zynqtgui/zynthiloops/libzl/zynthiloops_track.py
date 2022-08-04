@@ -54,6 +54,8 @@ class zynthiloops_track(QObject):
         self.__song__ = song
         self.__initial_volume__ = 0
         self.__volume__ = self.__initial_volume__
+        self.__initial_pan__ = 0
+        self.__pan__ = self.__initial_pan__
         self.__audio_level__ = -200
         self.__clips_model__ = [zynthiloops_clips_model(song, self, 0), zynthiloops_clips_model(song, self, 1), zynthiloops_clips_model(song, self, 2), zynthiloops_clips_model(song, self, 3), zynthiloops_clips_model(song, self, 4)]
         self.__layers_snapshot = []
@@ -262,6 +264,7 @@ class zynthiloops_track(QObject):
         return {"name": self.__name__,
                 "color": self.__color__,
                 "volume": self.__volume__,
+                "pan": self.__pan__,
                 "connectedPattern": self.__connected_pattern__,
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
@@ -282,6 +285,9 @@ class zynthiloops_track(QObject):
             if "volume" in obj:
                 self.__volume__ = obj["volume"]
                 self.set_volume(self.__volume__, True)
+            if "pan" in obj:
+                self.__pan__ = obj["pan"]
+                self.set_pan(self.__pan__, True)
             if "connectedPattern" in obj:
                 self.__connected_pattern__ = obj["connectedPattern"]
                 self.set_connected_pattern(self.__connected_pattern__)
@@ -478,6 +484,29 @@ class zynthiloops_track(QObject):
             self.zyngui.zynthiloops.set_selector()
 
     volume = Property(int, get_volume, set_volume, notify=volume_changed)
+
+    ### Property initialPan
+    def get_initial_pan(self):
+        return self.__initial_pan__
+    initialPan = Property(float, get_initial_pan, constant=True)
+    ### END Property initialPan
+
+    ### Property pan
+    def get_pan(self):
+        return self.__pan__
+
+    def set_pan(self, pan: float, force_set=False):
+        if self.__pan__ != pan or force_set is True:
+            self.__pan__ = pan
+
+            self.panChanged.emit()
+            if force_set is False:
+                self.__song__.schedule_save()
+
+    panChanged = Signal()
+
+    pan = Property(float, get_pan, set_pan, notify=panChanged)
+    ### END Property pan
 
     ### Property initialVolume
     def get_initial_volume(self):

@@ -99,7 +99,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording = False
         self.recording_count_in_value = 0
-        self.recording_complete.connect(self.load_recorded_file_to_clip)
+        self.recording_complete.connect(self.load_recorded_file_to_clip, Qt.DirectConnection)
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
@@ -129,6 +129,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__display_scene_buttons = False
         self.__recording_source = "internal"
         self.__recording_channel = "1"
+        self.__last_recording_midi__ = ""
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
 
@@ -934,6 +935,20 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     recordingChannel = Property(str, get_recordingChannel, set_recordingChannel, notify=recordingChannelChanged)
     ### END Property recordingChannel
 
+    ### Property lastRecordingMidi
+    def get_lastRecordingMidi(self):
+        return self.__last_recording_midi__
+
+    def set_lastRecordingMidi(self, data):
+        if data != self.__last_recording_midi__:
+            self.__last_recording_midi__ = data
+            self.lastRecordingMidiChanged.emit()
+
+    lastRecordingMidiChanged = Signal()
+
+    lastRecordingMidi = Property(str, get_lastRecordingMidi, set_lastRecordingMidi, notify=lastRecordingMidiChanged)
+    ### END Property lastRecordingMidi
+
     @Signal
     def master_volume_changed(self):
         pass
@@ -1510,6 +1525,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
         self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
         self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+        self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+
 
         # Set same recorded clip to other additional clips
         for clip in self.clips_to_record:
@@ -1520,6 +1537,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
                 clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
                 clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+                clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 
         if self.clip_to_record.isTrackSample:
             logging.info(f"Recorded clip is a sample")

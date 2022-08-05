@@ -41,10 +41,9 @@ function stopMetronomeAndPlayback() {
 
         if (zynthian.zynthiloops.clipToRecord) {
             ZynQuick.MidiRecorder.stopRecording()
-            var clip = zynthian.zynthiloops.clipToRecord
-            clip.stopRecording()
-            clip.metadataMidiRecording = ZynQuick.MidiRecorder.base64Midi()
-            ZynQuick.MidiRecorder.loadFromBase64Midi(clip.metadataMidiRecording)
+            zynthian.zynthiloops.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
+            zynthian.zynthiloops.clipToRecord.stopRecording()
+            ZynQuick.MidiRecorder.loadFromBase64Midi(zynthian.zynthiloops.lastRecordingMidi)
         }
 
         zynthian.zynthiloops.stopAllPlayback();

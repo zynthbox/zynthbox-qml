@@ -71,6 +71,14 @@ QQC2.Popup {
                     break
                 }
             }
+
+            // Reset recordingType combo model to selected value when dialog opens
+            for (var i=0; i<recordingTypeComboModel.count; i++) {
+                if (recordingTypeComboModel.get(i).value === zynthian.zynthiloops.recordingType) {
+                    recordingTypeCombo.currentIndex = i
+                    break
+                }
+            }
         } else {
             // Report dialog close to zynthian to stop receiving cuia events
             if (zynthian.openedDialog === root) {
@@ -121,10 +129,40 @@ QQC2.Popup {
             ColumnLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: false
+                Layout.minimumWidth: Kirigami.Units.gridUnit * 25
                 enabled: !zynthian.zynthiloops.isRecording
 
                 RowLayout {
                     Layout.fillWidth: false
+
+                    QQC2.Label {
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("Recording Type")
+                    }
+
+                    QQC2.ComboBox {
+                        id: recordingTypeCombo
+
+                        Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                        Layout.alignment: Qt.AlignCenter
+                        model: ListModel {
+                            id: recordingTypeComboModel
+
+                            ListElement { text: "Audio"; value: "audio" }
+                            ListElement { text: "Midi"; value: "midi" }
+                        }
+                        textRole: "text"
+                        onActivated: {
+                            zynthian.zynthiloops.recordingType = recordingTypeComboModel.get(index).value
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: false
+                    visible: recordingTypeCombo.currentIndex == 0
+
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         Layout.alignment: Qt.AlignCenter
@@ -167,7 +205,8 @@ QQC2.Popup {
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: sourceCombo.currentIndex === 0 // Visible when source is internal
+                    visible: recordingTypeCombo.currentIndex == 0 && // Visible when recordingType is audio
+                             sourceCombo.currentIndex === 0 // and when source is internal
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
@@ -205,7 +244,8 @@ QQC2.Popup {
 
                 RowLayout {
                     Layout.fillWidth: false
-                    visible: sourceCombo.currentIndex === 1 // Visible when source is external
+                    visible: recordingTypeCombo.currentIndex == 0 && // Visible when recordingType is audio
+                             sourceCombo.currentIndex === 1 // and when source is external
 
                     QQC2.Label {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10

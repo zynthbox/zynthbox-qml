@@ -129,6 +129,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__display_scene_buttons = False
         self.__recording_source = "internal"
         self.__recording_channel = "1"
+        self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
 
         self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
@@ -935,6 +936,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     recordingChannel = Property(str, get_recordingChannel, set_recordingChannel, notify=recordingChannelChanged)
     ### END Property recordingChannel
 
+    ### Property recordingType
+    # Recording type can be : "audio" or "midi"
+    # "audio" will record both wav and midi (saved as metadata in wav file)
+    # "midi" will record only midi and apply it to pattern
+    def get_recordingType(self):
+        return self.__recording_type
+
+    def set_recordingType(self, type):
+        if type != self.__recording_type:
+            self.__recording_type = type
+            self.recordingTypeChanged.emit()
+
+    recordingTypeChanged = Signal()
+
+    recordingType = Property(str, get_recordingType, set_recordingType, notify=recordingTypeChanged)
+    ### END Property recordingType
+
     ### Property lastRecordingMidi
     def get_lastRecordingMidi(self):
         return self.__last_recording_midi__
@@ -1388,38 +1406,39 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             self.ongoingCountIn = self.countInBars + 1
 
-            if self.recordingSource == 'internal':
-                self.__last_recording_type__ = "Internal"
+            if self.recordingType == "audio":
+                if self.recordingSource == 'internal':
+                    self.__last_recording_type__ = "Internal"
 
-                if self.recordMasterOutput:
-                    recording_ports = [("system:playback_1", "system:playback_2")]
+                    if self.recordMasterOutput:
+                        recording_ports = [("system:playback_1", "system:playback_2")]
+                    else:
+                        recording_ports = track.trackSynthPorts
                 else:
-                    recording_ports = track.trackSynthPorts
-            else:
-                # TODO : Port external recording to AudioLevels recorder
+                    # TODO : Port external recording to AudioLevels recorder
 
-                if self.recordingChannel == "1":
-                    self.__last_recording_type__ = "External (Mono Left)"
-                    recording_ports = [("system:capture_1", "system:capture_1")]
-                elif self.recordingChannel == "2":
-                    self.__last_recording_type__ = "External (Mono Right)"
-                    recording_ports = [("system:capture_2", "system:capture_2")]
-                else:
-                    self.__last_recording_type__ = "External (Stereo)"
-                    recording_ports = [("system:capture_1", "system:capture_2")]
+                    if self.recordingChannel == "1":
+                        self.__last_recording_type__ = "External (Mono Left)"
+                        recording_ports = [("system:capture_1", "system:capture_1")]
+                    elif self.recordingChannel == "2":
+                        self.__last_recording_type__ = "External (Mono Right)"
+                        recording_ports = [("system:capture_2", "system:capture_2")]
+                    else:
+                        self.__last_recording_type__ = "External (Stereo)"
+                        recording_ports = [("system:capture_1", "system:capture_2")]
 
-            logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
+                logging.debug(f"Queueing clip({self.clip_to_record}) to record with source({self.recordingSource}), ports({recording_ports}), recordingType({self.__last_recording_type__})")
 
-            libzl.AudioLevels_setShouldRecordPorts(True)
-            libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
-            libzl.AudioLevels_clearRecordPorts()
+                libzl.AudioLevels_setShouldRecordPorts(True)
+                libzl.AudioLevels_setRecordPortsFilenamePrefix(self.clip_to_record_path)
+                libzl.AudioLevels_clearRecordPorts()
 
-            for ports in recording_ports:
-                for port in zip(ports, (0, 1)):
-                    logging.debug(f"Adding record port : {port}")
-                    libzl.AudioLevels_addRecordPort(port[0], port[1])
+                for ports in recording_ports:
+                    for port in zip(ports, (0, 1)):
+                        logging.debug(f"Adding record port : {port}")
+                        libzl.AudioLevels_addRecordPort(port[0], port[1])
 
-            libzl.AudioLevels_startRecording()
+                libzl.AudioLevels_startRecording()
 
             self.isRecording = True
         else:
@@ -1513,43 +1532,44 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.current_beat_changed.emit()
 
     def load_recorded_file_to_clip(self):
-        logging.info(f"Loading recorded wav to clip({self.clip_to_record})")
+        if self.recordingType == "audio":
+            logging.info(f"Loading recorded wav to clip({self.clip_to_record})")
 
-        if not Path(self.clip_to_record_path).exists():
-            logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
+            if not Path(self.clip_to_record_path).exists():
+                logging.error("### The recording does not exist! This is a big problem and we will have to deal with that.")
 
-        layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-        logging.debug(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
+            layer = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
+            logging.debug(f"### Channel({self.zyngui.curlayer.midi_chan}), Layer({json.dumps(layer)})")
 
-        self.clip_to_record.set_path(self.clip_to_record_path, False)
-        self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-        self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
-        self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
-        self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+            self.clip_to_record.set_path(self.clip_to_record_path, False)
+            self.clip_to_record.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
+            self.clip_to_record.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+            self.clip_to_record.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+            self.clip_to_record.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 
 
-        # Set same recorded clip to other additional clips
-        for clip in self.clips_to_record:
-            # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
-            # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
-            if clip != self.clip_to_record:
-                clip.set_path(self.clip_to_record_path, True)
-                clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
-                clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
-                clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
-                clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
+            # Set same recorded clip to other additional clips
+            for clip in self.clips_to_record:
+                # When recording popup starts recording, it queues recording with one of the clip in clipsToRecord
+                # This check avoids setting clip twice and hence doesn't let a crash happen when path is set twice
+                if clip != self.clip_to_record:
+                    clip.set_path(self.clip_to_record_path, True)
+                    clip.write_metadata("ZYNTHBOX_ACTIVELAYER", [json.dumps(layer)])
+                    clip.write_metadata("ZYNTHBOX_BPM", [str(self.__song__.bpm)])
+                    clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
+                    clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 
-        if self.clip_to_record.isTrackSample:
-            logging.info(f"Recorded clip is a sample")
-            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-            track.samples_changed.emit()
+            if self.clip_to_record.isTrackSample:
+                logging.info(f"Recorded clip is a sample")
+                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                track.samples_changed.emit()
 
-        self.set_clip_to_record(None)
-        self.clip_to_record_path = None
-        self.__last_recording_type__ = ""
+            self.set_clip_to_record(None)
+            self.clip_to_record_path = None
+            self.__last_recording_type__ = ""
 
-        self.clips_to_record.clear()
-        self.clipsToRecordChanged.emit()
+            self.clips_to_record.clear()
+            self.clipsToRecordChanged.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):

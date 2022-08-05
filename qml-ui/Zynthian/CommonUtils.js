@@ -42,8 +42,30 @@ function stopMetronomeAndPlayback() {
         if (zynthian.zynthiloops.clipToRecord) {
             ZynQuick.MidiRecorder.stopRecording()
             zynthian.zynthiloops.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
-            zynthian.zynthiloops.clipToRecord.stopRecording()
-            ZynQuick.MidiRecorder.loadFromBase64Midi(zynthian.zynthiloops.lastRecordingMidi)
+
+            if (zynthian.zynthiloops.recordingType === "audio") {
+                zynthian.zynthiloops.clipToRecord.stopRecording()
+                ZynQuick.MidiRecorder.loadFromBase64Midi(zynthian.zynthiloops.lastRecordingMidi)
+            } else {
+                // FIXME : This needs be done in zynthian_gui_zynthiloops and not here
+                zynthian.zynthiloops.isRecording = false
+
+                for (var clipIndex in zynthian.zynthiloops.clipsToRecord) {
+                    var clip = zynthian.zynthiloops.clipsToRecord[clipIndex]
+
+                    if (!clip.isTrackSample) {
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
+                        var pattern = sequence.getByPart(clip.row, clip.part)
+
+                        console.log("Applying pattern to", pattern, " for ", clip, clip.row, clip.col, clip.part)
+                        ZynQuick.MidiRecorder.applyToPattern(pattern)
+                    }
+                }
+
+                // FIXME : This needs be done in zynthian_gui_zynthiloops and not here
+                zynthian.zynthiloops.clipToRecord = null
+                zynthian.zynthiloops.clipsToRecord = []
+            }
         }
 
         zynthian.zynthiloops.stopAllPlayback();

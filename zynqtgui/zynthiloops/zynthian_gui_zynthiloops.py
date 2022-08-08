@@ -99,7 +99,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording = False
         self.recording_count_in_value = 0
-        self.recording_complete.connect(self.load_recorded_file_to_clip, Qt.DirectConnection)
         self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
         self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
         self.click_track_enabled = False
@@ -1055,10 +1054,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def song_changed(self):
         pass
 
-    @Signal
-    def recording_complete(self):
-        pass
-
     @Property(QObject, notify=song_changed)
     def song(self):
         return self.__song__
@@ -1449,11 +1444,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def stopRecording(self):
         if self.clip_to_record is not None and self.isRecording:
             self.isRecording = False
+            self.stopAudioRecording()
+            self.load_recorded_file_to_clip()
 
+            self.set_clip_to_record(None)
+            self.clip_to_record_path = None
+            self.__last_recording_type__ = ""
+
+            self.clips_to_record.clear()
+            self.clipsToRecordChanged.emit()
+
+    @Slot()
+    def stopAudioRecording(self):
         if libzl.AudioLevels_isRecording():
             libzl.AudioLevels_stopRecording()
             libzl.AudioLevels_clearRecordPorts()
-            self.recording_complete.emit()
 
     @Slot(None)
     def startPlayback(self):
@@ -1563,13 +1568,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 logging.info(f"Recorded clip is a sample")
                 track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
                 track.samples_changed.emit()
-
-            self.set_clip_to_record(None)
-            self.clip_to_record_path = None
-            self.__last_recording_type__ = ""
-
-            self.clips_to_record.clear()
-            self.clipsToRecordChanged.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):

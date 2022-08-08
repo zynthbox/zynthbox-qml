@@ -2003,24 +2003,42 @@ Zynthian.BasePlayGrid {
 
                 Zynthian.PlayGridButton {
                     id:playPauseBtn
-                    property var timeOnPressed
-                    text: _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
-                    onPressed: {
-                        playPauseBtn.timeOnPressed = new Date();
-                    }
-                    onReleased: {
-                        // pause
-                        if (_private.sequence.isPlaying) {
-                            _private.sequence.stopSequencePlayback();
-                        }
-                        // play
-                        else {
-                            var timeOnRelease = new Date();
-                            if (timeOnRelease - playPauseBtn.timeOnPressed > 1500){
-                                _private.sequence.resetSequence();
+                    text: _private.activePatternModel.recordLive
+                        ? "Stop"
+                        : _private.sequence && _private.sequence.isPlaying ? "Pause" : "Play"
+                    visualPressAndHold: true
+                    onClicked: {
+                        if (_private.activePatternModel.recordLive) {
+                            // Otherwise we'll just turn it right back off again
+                            if (!pressingAndHolding) {
+                                _private.activePatternModel.recordLive = false;
                             }
-                            _private.sequence.startSequencePlayback();
                         }
+                        else {
+                            if (_private.sequence.isPlaying) {
+                                _private.sequence.stopSequencePlayback();
+                            }
+                            // play
+                            else {
+                                _private.sequence.startSequencePlayback();
+                            }
+                        }
+                    }
+                    onPressAndHold: {
+                        _private.activePatternModel.recordLive = true;
+                        if (!ZynQuick.PlayGridManager.metronomeActive) {
+                            Zynthian.CommonUtils.startMetronomeAndPlayback();
+                        }
+                    }
+                    Kirigami.Icon {
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                        }
+                        width: parent.width * .3
+                        height: width
+                        source: "media-record-symbolic"
+                        opacity: _private.activePatternModel.recordLive ? 1 : 0.2
                     }
                 }
 

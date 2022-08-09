@@ -500,6 +500,7 @@ class zynthiloops_track(QObject):
             self.__pan__ = pan
 
             self.panChanged.emit()
+            self.zyngui.zynthiloops.set_selector()
             if force_set is False:
                 self.__song__.schedule_save()
 

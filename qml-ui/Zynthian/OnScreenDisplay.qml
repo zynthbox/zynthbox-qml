@@ -60,6 +60,11 @@ QQC2.Popup {
         implicitHeight: Kirigami.Units.gridUnit * 5
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.View
+        MouseArea {
+            anchors.fill: parent
+            onPressed: hideTimer.stop();
+            onReleased: hideTimer.start();
+        }
         ColumnLayout {
             anchors.fill: parent
             QQC2.Label {

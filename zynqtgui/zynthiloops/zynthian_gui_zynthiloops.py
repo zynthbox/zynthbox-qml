@@ -307,15 +307,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
             self.set_selector()
 
-    @Slot(None)
-    def zyncoder_update_track_pan(self):
+    def update_track_pan_actual(self, pan):
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
-        pan = np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0))
-
         if selected_track_obj is not None and selected_track_obj.pan != (-1 * pan):
             selected_track_obj.pan = -1 * pan
             logging.debug(f"### zyncoder_update_track_pan {pan}")
             self.set_selector()
+            self.zyngui.osd.updateOsd("track_pan", f"Track T{selected_track_obj.id + 1}: Pan", -1, 1, 0.1, 0, selected_track_obj.pan, self.set_selected_track_pan)
+
+    def set_selected_track_pan(self, pan):
+        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        logging.error(f"Setting pan for the current track from {selected_track_obj.pan} to {min(max(-1, -1 * pan), 1)}")
+        self.update_track_pan_actual(min(max(-1, -1 * pan), 1))
+
+    @Slot(None)
+    def zyncoder_update_track_pan(self):
+        pan = np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0))
+        self.update_track_pan_actual(pan)
 
     @Slot(None)
     def zyncoder_update_clip_length(self):

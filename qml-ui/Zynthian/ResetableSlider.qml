@@ -11,22 +11,22 @@ QQC2.Slider {
     value: controlObj[controlProp]
 
     MouseArea {
-        property real valPerPixel: Math.abs(root.to - root.from) / root.width
+        property real xValPerPixel: Math.abs(root.to - root.from) / root.width
 
         anchors.fill: root
         onPositionChanged: {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
 
             if (root.orientation == Qt.Horizontal) {
-                controlObj[controlProp] = root.from - positionX * valPerPixel
-            } else if (parent.orientation == Qt.Vertical) {
+                root.controlObj[root.controlProp] = root.from - positionX * xValPerPixel
+            } else if (root.orientation == Qt.Vertical) {
                 // TODO : Implement vertical slider drag
             }
         }
 
         onDoubleClicked: {
-            if (initialValue) {
-                controlObj[controlProp] = initialValue
+            if (root.initialValue != null) {
+                root.controlObj[root.controlProp] = root.initialValue
             }
         }
     }

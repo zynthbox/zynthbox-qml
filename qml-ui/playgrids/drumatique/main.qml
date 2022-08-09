@@ -2016,11 +2016,11 @@ Zynthian.BasePlayGrid {
                         }
                         else {
                             if (_private.sequence.isPlaying) {
-                                _private.sequence.stopSequencePlayback();
+                                Zynthian.CommonUtils.stopMetronomeAndPlayback();
                             }
                             // play
                             else {
-                                _private.sequence.startSequencePlayback();
+                                Zynthian.CommonUtils.startMetronomeAndPlayback();
                             }
                         }
                     }

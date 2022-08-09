@@ -160,6 +160,8 @@ from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 from zynqtgui.zynthian_gui_master_alsa_mixer import zynthian_gui_master_alsa_mixer
 
+from zynqtgui.zynthian_osd import zynthian_osd
+
 from pathlib import Path
 
 import faulthandler
@@ -1467,6 +1469,9 @@ class zynthian_gui(QObject):
         self.screens["sketch_copier"] = zynthian_gui_sketch_copier(self)
 
         self.screens["led_config"] = zynthian_gui_led_config(self)
+
+        # Add the OSD handler
+        self.__osd = zynthian_osd(self)
 
         # Init Auto-connector
         zynautoconnect.start()
@@ -4212,6 +4217,12 @@ class zynthian_gui(QObject):
 
     isScreensCachingComplete = Property(bool, get_isScreensCachingComplete, set_isScreensCachingComplete, notify=isScreensCachingCompleteChanged)
     ### END Property isScreensCachingComplete
+
+    ### Property osd
+    @Property(QObject, constant=True)
+    def osd(self):
+        return self.__osd
+    ### END Property osd
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

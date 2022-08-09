@@ -40,3 +40,4 @@ LayerSetupDialog 1.0 LayerSetupDialog.qml
 KnobIndicator 1.0 KnobIndicator.qml
 MultitrackRecorderPopup 1.0 MultitrackRecorderPopup.qml
 ResetableSlider 1.0 ResetableSlider.qml
+OnScreenDisplay 1.0 OnScreenDisplay.qml

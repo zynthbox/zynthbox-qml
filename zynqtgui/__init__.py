@@ -29,8 +29,9 @@ __all__ = [
 	"zynthian_gui_autoeq",
 	"zynthian_gui_session_dashboard",
 	"zynthian_gui_guioptions",
-	"zynthian_gui_test_knobs"
+	"zynthian_gui_test_knobs",
 #	"zynthian_gui_osc_browser"
+	"zynthian_osd"
 ]
 
 import zynqtgui.zynthian_gui_config as zynthian_gui_config
@@ -65,3 +66,4 @@ from zynqtgui.zynthian_gui_guioptions import zynthian_gui_guioptions
 from zynqtgui.zynthian_gui_test_knobs import zynthian_gui_test_knobs
 from zynqtgui.session_dashboard.zynthian_gui_session_dashboard import zynthian_gui_session_dashboard
 #from zynqtgui.zynthian_gui_osc_browser import zynthian_gui_osc_browser
+from zynqtgui.zynthian_osd import zynthian_osd

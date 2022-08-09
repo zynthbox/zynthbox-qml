@@ -1024,6 +1024,8 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
+    Zynthian.OnScreenDisplay { }
+
     Window {
         id: clipPickerMenu
         visible: false;

@@ -325,17 +325,16 @@ Rectangle {
                                         }
                                     }
 
-                                    QQC2.Slider {
+                                    Zynthian.ResetableSlider {
                                         Layout.fillWidth: true
                                         Layout.fillHeight: false
                                         Layout.preferredHeight: Kirigami.Units.gridUnit
                                         orientation: Qt.Horizontal
                                         from: 1.0
                                         to: -1.0
-                                        value: model.track.pan
-                                        onMoved: {
-                                            model.track.pan = value
-                                        }
+                                        controlObj: model.track
+                                        controlProp: "pan"
+                                        initialValue: model.track.initialPan
                                     }
 
                                     QQC2.Label {

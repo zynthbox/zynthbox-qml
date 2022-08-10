@@ -313,7 +313,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             selected_track_obj.pan = -1 * pan
             logging.debug(f"### zyncoder_update_track_pan {pan}")
             self.set_selector()
-            self.zyngui.osd.updateOsd("track_pan", f"Track T{selected_track_obj.id + 1}: Pan", -1, 1, 0.1, 0, selected_track_obj.pan, self.set_selected_track_pan)
+            self.zyngui.osd.updateOsd("track_pan", f"Track T{selected_track_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_track_obj.pan, self.set_selected_track_pan)
 
     def set_selected_track_pan(self, pan):
         self.update_track_pan_actual(min(max(-1, -1 * pan), 1))

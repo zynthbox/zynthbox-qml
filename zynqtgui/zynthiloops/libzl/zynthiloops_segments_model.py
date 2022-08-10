@@ -170,6 +170,7 @@ class zynthiloops_segments_model(QAbstractListModel):
         if self.__selected_segment_index != index:
             self.__selected_segment_index = index
             self.selectedSegmentIndexChanged.emit()
+            self.zyngui.zynthiloops.set_selector()
 
     selectedSegmentIndexChanged = Signal()
 

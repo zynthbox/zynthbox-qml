@@ -33,18 +33,18 @@ class zynthian_osd(QObject):
         self.zyngui = zynthian_gui_config.zyngui
         self.__parameterName = ""
         self.__description = ""
-        self.__minimum = 0
-        self.__maximum = 0
+        self.__start = 0
+        self.__stop = 0
         self.__step = 0
         self.__defaultValue = 0
         self.__value = 0
         self.__setValueFunction = None
 
-    def updateOsd(self, parameterName, description, minimum, maximum, step, defaultValue, currentValue, setValueFunction):
+    def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction):
         self.__parameterName = parameterName
         self.__description = description
-        self.__minimum = minimum
-        self.__maximum = maximum
+        self.__start = start
+        self.__stop = stop
         self.__step = step
         self.__value = currentValue
         self.__setValueFunction = setValueFunction
@@ -63,12 +63,12 @@ class zynthian_osd(QObject):
         return self.__description;
 
     @Property(float, notify=update)
-    def minimum(self):
-        return self.__minimum
+    def start(self):
+        return self.__start
 
     @Property(float, notify=update)
-    def maximum(self):
-        return self.__maximum
+    def stop(self):
+        return self.__stop
 
     @Property(float, notify=update)
     def step(self):

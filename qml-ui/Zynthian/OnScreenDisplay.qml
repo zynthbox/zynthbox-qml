@@ -55,6 +55,7 @@ QQC2.Popup {
         }
     }
 
+    readonly property bool invertedScale: zynthian.osd.start > zynthian.osd.stop
     Item {
         implicitWidth: Kirigami.Units.gridUnit * 10
         implicitHeight: Kirigami.Units.gridUnit * 5
@@ -78,9 +79,11 @@ QQC2.Popup {
                 Layout.fillWidth: true
                 QQC2.Button {
                     icon.name: "arrow-left"
-                    enabled: zynthian.osd.value > zynthian.osd.minimum
+                    onPressed: hideTimer.stop();
+                    onReleased: hideTimer.start();
+                    enabled: component.invertedScale ? zynthian.osd.value < zynthian.osd.start : zynthian.osd.value > zynthian.osd.start
                     onClicked: {
-                        zynthian.osd.setValue(zynthian.osd.name,  zynthian.osd.value - zynthian.osd.step);
+                        zynthian.osd.setValue(zynthian.osd.name,  component.invertedScale ? zynthian.osd.value + zynthian.osd.step : zynthian.osd.value - zynthian.osd.step);
                     }
                 }
                 ColumnLayout {
@@ -88,7 +91,7 @@ QQC2.Popup {
                     RowLayout {
                         Layout.fillWidth: true
                         QQC2.Label {
-                            text: zynthian.osd.minimum
+                            text: zynthian.osd.start
                         }
                         Item {
                             Layout.fillWidth: true
@@ -100,21 +103,23 @@ QQC2.Popup {
                             Layout.fillWidth: true
                         }
                         QQC2.Label {
-                            text: zynthian.osd.maximum
+                            text: zynthian.osd.stop
                         }
                     }
                     QQC2.ProgressBar {
                         Layout.fillWidth: true
-                        from: zynthian.osd.minimum
-                        to: zynthian.osd.maximum
+                        from: zynthian.osd.start
+                        to: zynthian.osd.stop
                         value: zynthian.osd.value
                     }
                 }
                 QQC2.Button {
                     icon.name: "arrow-right"
-                    enabled: zynthian.osd.value < zynthian.osd.maximum
+                    onPressed: hideTimer.stop();
+                    onReleased: hideTimer.start();
+                    enabled: component.invertedScale ? zynthian.osd.value > zynthian.osd.stop : zynthian.osd.value < zynthian.osd.stop
                     onClicked: {
-                        zynthian.osd.setValue(zynthian.osd.name, zynthian.osd.value + zynthian.osd.step);
+                        zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value - zynthian.osd.step : zynthian.osd.value + zynthian.osd.step);
                     }
                 }
             }
@@ -125,6 +130,9 @@ QQC2.Popup {
                 }
                 QQC2.Button {
                     text: qsTr("Reset to default")
+                    onPressed: hideTimer.stop();
+                    onReleased: hideTimer.start();
+                    enabled: zynthian.osd.value !== zynthian.osd.defaultValue
                     onClicked: {
                         zynthian.osd.setValue(zynthian.osd.name, zynthian.osd.defaultValue);
                     }

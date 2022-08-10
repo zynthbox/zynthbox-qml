@@ -130,6 +130,7 @@ class zynthiloops_mixes_model(QAbstractListModel):
         if value != self.__song_mode:
             self.__song_mode = value
             self.songModeChanged.emit()
+            self.zyngui.zynthiloops.set_selector()
 
     songModeChanged = Signal()
 

@@ -223,6 +223,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.newSketch(None, _cb)
 
     @Slot(None)
+    def zyncoder_set_selected_segment(self):
+        if self.__big_knob_mode__ == "segment" and self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_track_multiplier):
+            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
+            self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_track_multiplier)
+            self.set_selector()
+
+    @Slot(None)
     def zyncoder_set_selected_track(self):
         if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/self.big_knob_track_multiplier):
             logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
@@ -358,6 +365,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             if self.__big_knob_mode__ == "preset":
                 QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
+            elif self.__big_knob_mode__ == "segment":
+                QMetaObject.invokeMethod(self, "zyncoder_set_selected_segment", Qt.QueuedConnection)
             elif self.__big_knob_mode__ == "track":
                 QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
 
@@ -426,8 +435,40 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
                 self.__zselector[0].custom_encoder_speed = 0
+            elif self.song.mixesModel.songMode:
+                # If sound combinator is not active and in song mode, Use Big knob to control selected segment
+
+                self.__big_knob_mode__ = "segment"
+
+                try:
+                    selected_segment = self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex * self.big_knob_track_multiplier
+                except:
+                    selected_segment = 0
+
+                logging.debug(
+                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment // self.big_knob_track_multiplier})")
+
+                if self.__zselector[0] is None:
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_segment', 'zynthiloops_segment',
+                                                                   {'midi_cc': 0, 'value': selected_segment,
+                                                                    'step': 1})
+
+                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl,
+                                                                  self.__zselector_ctrl[0],
+                                                                  self)
+                    self.__zselector[0].show()
+
+                self.__zselector_ctrl[0].set_options(
+                    {'symbol': 'zynthiloops_segment', 'name': 'zynthiloops_segment', 'short_name': 'zynthiloops_segment',
+                     'midi_cc': 0,
+                     'value_max': self.song.mixesModel.selectedMix.segmentsModel.count * self.big_knob_track_multiplier, 'value': selected_segment, 'step': 1})
+
+                self.__zselector[0].config(self.__zselector_ctrl[0])
+
+                if not self.isZ2V3:
+                    self.__zselector[0].custom_encoder_speed = 0
             else:
-                # If sound combinator is not active, Use Big knob to control selected track
+                # If sound combinator is not active and not song mode, Use Big knob to control selected track
 
                 self.__big_knob_mode__ = "track"
 
@@ -436,7 +477,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 except:
                     selected_track = 0
 
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active. selected_track({selected_track // self.big_knob_track_multiplier})")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_track({selected_track // self.big_knob_track_multiplier})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',

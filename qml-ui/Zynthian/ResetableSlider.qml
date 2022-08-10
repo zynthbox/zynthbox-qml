@@ -8,12 +8,20 @@ QQC2.Slider {
     property var controlProp
     property var initialValue
 
+    signal pressed(var mouse)
+    signal released(var mouse)
+
     value: controlObj[controlProp]
 
     MouseArea {
+        id: mouseArea
         property real xValPerPixel: Math.abs(root.to - root.from) / root.width
 
         anchors.fill: root
+
+        onPressed: root.pressed(mouse)
+        onReleased: root.released(mouse)
+
         onPositionChanged: {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
 

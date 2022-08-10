@@ -309,11 +309,13 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def update_track_pan_actual(self, pan):
         selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
-        if selected_track_obj is not None and selected_track_obj.pan != (-1 * pan):
+
+        # Do not set pan value if change is less than step size of 0.1
+        if selected_track_obj is not None and selected_track_obj.pan != (-1 * pan) and abs(selected_track_obj.pan + pan) > 0.01:
+            logging.debug(f"### zyncoder_update_track_pan from {selected_track_obj.pan} to {-1 * pan}")
             selected_track_obj.pan = -1 * pan
-            logging.debug(f"### zyncoder_update_track_pan {pan}")
             self.set_selector()
-            self.zyngui.osd.updateOsd("track_pan", f"Track T{selected_track_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_track_obj.pan, self.set_selected_track_pan)
+            self.zyngui.osd.updateOsd("track_pan", f"Track T{selected_track_obj.id + 1}: Pan", 1, -1, 0.01, 0, selected_track_obj.pan, self.set_selected_track_pan)
 
     def set_selected_track_pan(self, pan):
         self.update_track_pan_actual(min(max(-1, -1 * pan), 1))
@@ -874,6 +876,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     def set_knob_touch_update_in_progress(self, value):
         if self.__knob_touch_update_in_progress__ != value:
+            self.set_selector()
             self.__knob_touch_update_in_progress__ = value
             self.knob_touch_update_in_progress_changed.emit()
 

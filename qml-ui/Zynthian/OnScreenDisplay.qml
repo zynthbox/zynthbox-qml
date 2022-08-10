@@ -91,19 +91,20 @@ QQC2.Popup {
                     RowLayout {
                         Layout.fillWidth: true
                         QQC2.Label {
-                            text: zynthian.osd.start
+                            text: zynthian.osd.startLabel === "" ? zynthian.osd.start : zynthian.osd.startLabel
                         }
                         Item {
                             Layout.fillWidth: true
                         }
                         QQC2.Label {
+                            visible: zynthian.osd.showValueLabel
                             text: (zynthian.osd.value + "").substring(0, (zynthian.osd.value < 0 ? 5 : 4))
                         }
                         Item {
                             Layout.fillWidth: true
                         }
                         QQC2.Label {
-                            text: zynthian.osd.stop
+                            text: zynthian.osd.stopLabel === "" ? zynthian.osd.stop : zynthian.osd.stopLabel
                         }
                     }
                     QQC2.ProgressBar {

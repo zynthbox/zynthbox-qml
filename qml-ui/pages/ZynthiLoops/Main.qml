@@ -977,6 +977,22 @@ Zynthian.ScreenPage {
                         }
                     }
 
+                    Connections {
+                        target: root.song.mixesModel.selectedMix.segmentsModel
+                        onSelectedSegmentIndexChanged: {
+                            // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
+                            if (root.songMode) {
+                                if (root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex > (tracksHeaderRepeater.segmentOffset+7)) {
+                                    console.log("selected segment is outside visible segments on the right :", root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex, tracksHeaderRepeater.segmentOffset, Math.min(tracksHeaderRepeater.maximumSegmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 7))
+                                    tracksHeaderRepeater.segmentOffset = Math.min(tracksHeaderRepeater.maximumSegmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 7)
+                                } else if (root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex < tracksHeaderRepeater.segmentOffset) {
+                                    console.log("selected segment is outside visible segments on the left :", root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex, tracksHeaderRepeater.segmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex)
+                                    tracksHeaderRepeater.segmentOffset = root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                }
+                            }
+                        }
+                    }
+
                     // Display 10 header buttons which will show track header buttons when song mode is not active and segment buttons when song mode is active
                     Repeater {
                         id: tracksHeaderRepeater

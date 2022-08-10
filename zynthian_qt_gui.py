@@ -699,13 +699,20 @@ class zynthian_gui(QObject):
         # FIXME : Sometimes when this method is called, the value of zselector is 0
         #         which is causing division by zero error.
 
-        if self.globalPopupOpened:
-            song = self.zynthiloops.song
+        if self.globalPopupOpened and self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200), self.altButtonPressed):
+            self.set_selector()
 
-            if song is not None and \
-                    song.bpm != self.__zselector[0].value:
-                song.bpm = np.clip(self.__zselector[0].value, 50, 200)
-                self.set_selector()
+    def osd_set_bpm(self, bpm):
+        self.set_bpm_actual(bpm, True)
+
+    def set_bpm_actual(self, bpm, showOsd = False):
+        song = self.zynthiloops.song
+        if song is not None and song.bpm != bpm:
+            song.bpm = bpm
+            if showOsd is True:
+                self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
+            return True
+        return False
 
     @Slot(None)
     def zyncoder_set_volume(self):

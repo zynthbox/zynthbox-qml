@@ -225,7 +225,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     @Slot(None)
     def zyncoder_set_selected_segment(self):
         if self.__big_knob_mode__ == "segment" and self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_track_multiplier):
-            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
+            logging.debug(f"Setting segment from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
             self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_track_multiplier)
             self.set_selector()
 
@@ -461,7 +461,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_segment', 'name': 'zynthiloops_segment', 'short_name': 'zynthiloops_segment',
                      'midi_cc': 0,
-                     'value_max': self.song.mixesModel.selectedMix.segmentsModel.count * self.big_knob_track_multiplier, 'value': selected_segment, 'step': 1})
+                     'value_max': (self.song.mixesModel.selectedMix.segmentsModel.count - 1) * self.big_knob_track_multiplier, 'value': selected_segment, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 

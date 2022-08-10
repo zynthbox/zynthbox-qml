@@ -112,6 +112,27 @@ QQC2.Popup {
                         from: zynthian.osd.start
                         to: zynthian.osd.stop
                         value: zynthian.osd.value
+                        Item {
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                bottomMargin: -5
+                                left: parent.left
+                                leftMargin: (parent.width * ((zynthian.osd.defaultValue - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start))) - 3
+                            }
+                            width: 5
+                            clip: true
+                            Rectangle {
+                                anchors {
+                                    verticalCenter: parent.bottom
+                                    horizontalCenter: parent.horizontalCenter
+                                }
+                                height: 3
+                                width: 3
+                                rotation: 45
+                                color: Kirigami.Theme.textColor
+                            }
+                        }
                     }
                 }
                 QQC2.Button {

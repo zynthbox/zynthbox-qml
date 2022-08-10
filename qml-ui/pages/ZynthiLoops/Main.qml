@@ -977,8 +977,18 @@ Zynthian.ScreenPage {
                         }
                     }
 
+                    // Display 10 header buttons which will show track header buttons when song mode is not active and segment buttons when song mode is active
                     Repeater {
                         id: tracksHeaderRepeater
+
+                        // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
+                        property bool shouldShowArrows: root.song.mixesModel.selectedMix.segmentsModel.count > 10
+                        // Segment offset will determine what is the first segment to display when arrow keys are displayed
+                        property int segmentOffset: 0
+                        // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
+                        property int maximumSegmentOffset: root.song.mixesModel.selectedMix.segmentsModel.count - 10 + 2
+
+
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                         model: zynthian.isBootingComplete
                                 ? 10
@@ -987,18 +997,50 @@ Zynthian.ScreenPage {
                         delegate: TrackHeader2 {
                             id: trackHeaderDelegate
 
-                            // Logic here is, the 5th position is always the current segment, so rapid-ish navigation can be done by tapping the left and rightmost segments
-                            property int thisSegmentIndex: root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex + (index - 4)
+                            // Calculate current cell's segment index
+                            // If arrow keys are visible, take into account that arrow keys will be visible no cells 0 and 9 respectively
+                            property int thisSegmentIndex: index +
+                                                           (tracksHeaderRepeater.shouldShowArrows ? tracksHeaderRepeater.segmentOffset : 0) + // Offset index if arrows are visible else 0
+                                                           (tracksHeaderRepeater.shouldShowArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
                             // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
-                            property QtObject segment: root.song.mixesModel.selectedMix.segmentsModel.count > 0 ? root.song.mixesModel.selectedMix.segmentsModel.get_segment(thisSegmentIndex) : null
+                            property QtObject segment: root.song.mixesModel.selectedMix.segmentsModel.count > 0
+                                                        ? root.song.mixesModel.selectedMix.segmentsModel.get_segment(trackHeaderDelegate.thisSegmentIndex)
+                                                        : null
 
                             track: root.song.tracksModel.getTrack(index)
                             text: root.songMode
-                                    ? trackHeaderDelegate.segment ? trackHeaderDelegate.segment.name : ""
+                                    ? root.song.mixesModel.selectedMix.segmentsModel.count > 10
+                                        ? index === 0
+                                            ? "<"
+                                            : index === 9
+                                                ? ">"
+                                                : trackHeaderDelegate.segment
+                                                    ? trackHeaderDelegate.segment.name
+                                                    : ""
+                                        : trackHeaderDelegate.segment
+                                            ? trackHeaderDelegate.segment.name
+                                            : ""
                                     : trackHeaderDelegate.track.name
-                            active: root.songMode && !trackHeaderDelegate.segment
-                                    ? false
-                                    : true
+                            active: {
+                                if (root.songMode) {
+                                    // If song mode is active, mark respective arrow key cell as active if there are segments outside view
+                                    if (tracksHeaderRepeater.shouldShowArrows && index === 0 && tracksHeaderRepeater.segmentOffset > 0) {
+                                        return true
+                                    } else if (tracksHeaderRepeater.shouldShowArrows && index === 9 && tracksHeaderRepeater.segmentOffset < tracksHeaderRepeater.maximumSegmentOffset) {
+                                        return true
+                                    }
+
+                                    // If song mode is active, mark segment cell as active if it has a segment
+                                    if (trackHeaderDelegate.segment != null) {
+                                        return true
+                                    } else {
+                                        return false
+                                    }
+                                } else {
+                                    // If song mode is not active, mark all cell as active
+                                    return true
+                                }
+                            }
                             synthDetailsVisible: !root.songMode
 
                             Connections {
@@ -1104,17 +1146,40 @@ Zynthian.ScreenPage {
                             }
 
                             highlightOnFocus: false
-                            highlighted: root.songMode
-                                            ? trackHeaderDelegate.thisSegmentIndex === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
-                                            : index === zynthian.session_dashboard.selectedTrack
+                            highlighted: {
+                                if (root.songMode) {
+                                    // If song mode is active and arrow keys are visible, do not highlight arrow key cells
+                                    if (tracksHeaderRepeater.shouldShowArrows && index === 0) {
+                                        return false
+                                    } else if (tracksHeaderRepeater.shouldShowArrows && index === 9) {
+                                        return false
+                                    }
+
+                                    // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
+                                    return trackHeaderDelegate.thisSegmentIndex === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                } else {
+                                    // If song mode is not active, highlight if current cell is selected track
+                                    return index === zynthian.session_dashboard.selectedTrack
+                                }
+                            }
 
                             onPressed: {
-                                if (root.songMode) {
-                                    if (trackHeaderDelegate.segment) {
-                                        root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = trackHeaderDelegate.thisSegmentIndex
-                                        root.lastSelectedObj = trackHeaderDelegate.segment
+                                if (root.songMode) {                                    
+                                    if (tracksHeaderRepeater.shouldShowArrows && index === 0) {
+                                        // If song mode is active, clicking left arrow key cells should decrement segment offset to display out of view segments
+                                        tracksHeaderRepeater.segmentOffset = Math.max(0, tracksHeaderRepeater.segmentOffset - 1)
+                                    } else if (tracksHeaderRepeater.shouldShowArrows && index === 9) {
+                                        // If song mode is active, clicking right arrow key cells should increment segment offset to display out of view segments
+                                        tracksHeaderRepeater.segmentOffset = Math.min(tracksHeaderRepeater.maximumSegmentOffset, tracksHeaderRepeater.segmentOffset + 1)
+                                    } else {
+                                        // If song mode is active, clicking segment cells should activate that segment
+                                        if (trackHeaderDelegate.segment) {
+                                            root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = trackHeaderDelegate.thisSegmentIndex
+                                            root.lastSelectedObj = trackHeaderDelegate.segment
+                                        }
                                     }
                                 } else {
+                                    // If song mode is not active, clicking on cells should activate that track
                                     root.lastSelectedObj = trackHeaderDelegate.track
 
                                     // Open MixedTracksViewBar and switch to track

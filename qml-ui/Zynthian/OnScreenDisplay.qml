@@ -50,15 +50,19 @@ QQC2.Popup {
     Connections {
         target: zynthian.osd
         onUpdate: {
-            hideTimer.restart();
+            // Logic here being, if it's open and not running, it means we explicitly asked it to
+            // stop somewhere (essentially, by pressing something on the osd)
+            if (component.opened && hideTimer.running) {
+                hideTimer.restart();
+            }
             component.open();
         }
     }
 
     readonly property bool invertedScale: zynthian.osd.start > zynthian.osd.stop
     Item {
-        implicitWidth: Kirigami.Units.gridUnit * 10
-        implicitHeight: Kirigami.Units.gridUnit * 5
+        implicitWidth: Kirigami.Units.gridUnit * 15
+        implicitHeight: Kirigami.Units.gridUnit * 6
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         MouseArea {
@@ -69,6 +73,7 @@ QQC2.Popup {
         ColumnLayout {
             anchors.fill: parent
             QQC2.Label {
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 horizontalAlignment: Text.AlignHCenter
@@ -77,19 +82,21 @@ QQC2.Popup {
             }
             RowLayout {
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 QQC2.Button {
                     icon.name: "arrow-left"
                     onPressed: hideTimer.stop();
                     onReleased: hideTimer.start();
                     enabled: component.invertedScale ? zynthian.osd.value < zynthian.osd.start : zynthian.osd.value > zynthian.osd.start
                     onClicked: {
-                        zynthian.osd.setValue(zynthian.osd.name,  component.invertedScale ? zynthian.osd.value + zynthian.osd.step : zynthian.osd.value - zynthian.osd.step);
+                        zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value + zynthian.osd.step : zynthian.osd.value - zynthian.osd.step);
                     }
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
                     RowLayout {
                         Layout.fillWidth: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit
                         QQC2.Label {
                             text: zynthian.osd.startLabel === "" ? zynthian.osd.start : zynthian.osd.startLabel
                         }
@@ -107,11 +114,60 @@ QQC2.Popup {
                             text: zynthian.osd.stopLabel === "" ? zynthian.osd.stop : zynthian.osd.stopLabel
                         }
                     }
-                    QQC2.ProgressBar {
+                    Item {
+                        id: sliderItem
                         Layout.fillWidth: true
-                        from: zynthian.osd.start
-                        to: zynthian.osd.stop
-                        value: zynthian.osd.value
+                        Layout.fillHeight: true
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+                        MultiPointTouchArea {
+                            anchors {
+                                fill: parent
+                                topMargin: -sliderItem.height // Let's allow for some sloppy interaction here, why not
+                            }
+                            touchPoints: [
+                                TouchPoint {
+                                    id: slidePoint;
+                                    property var currentValue: undefined
+                                    onPressedChanged: {
+                                        if (pressed) {
+                                            currentValue = zynthian.osd.value;
+                                            hideTimer.stop();
+                                        } else {
+                                            currentValue = undefined;
+                                            hideTimer.start();
+                                        }
+                                    }
+                                    onXChanged: {
+                                        if (pressed && currentValue !== undefined) {
+                                            var delta = (zynthian.osd.stop - zynthian.osd.start) * ((slidePoint.x - slidePoint.startX) / sliderItem.width);
+                                            if (component.invertedScale) {
+                                                zynthian.osd.setValue(zynthian.osd.name, Math.min(Math.max(currentValue + delta, zynthian.osd.stop), zynthian.osd.start));
+                                            } else {
+                                                zynthian.osd.setValue(zynthian.osd.name, Math.min(Math.max(currentValue + delta, zynthian.osd.start), zynthian.osd.stop));
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                        Rectangle {
+                            anchors.fill: parent
+                            color: Kirigami.Theme.backgroundColor
+                            border {
+                                width: 1
+                                color: Kirigami.Theme.textColor
+                            }
+                        }
+                        Rectangle {
+                            anchors {
+                                left: parent.left
+                                top: parent.top
+                                bottom: parent.bottom
+                                margins: 1
+                            }
+                            color: Kirigami.Theme.textColor
+                            width: (parent.width - 2) * ((zynthian.osd.value - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start))
+                        }
                         Item {
                             anchors {
                                 top: parent.top
@@ -134,6 +190,11 @@ QQC2.Popup {
                             }
                         }
                     }
+                    //QQC2.ProgressBar {
+                        //from: zynthian.osd.start
+                        //to: zynthian.osd.stop
+                        //value: zynthian.osd.value
+                    //}
                 }
                 QQC2.Button {
                     icon.name: "arrow-right"
@@ -147,6 +208,7 @@ QQC2.Popup {
             }
             RowLayout {
                 Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 Item {
                     Layout.fillWidth: true
                 }

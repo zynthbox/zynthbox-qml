@@ -455,6 +455,7 @@ class zynthian_gui(QObject):
         self.modal_screen_back = None
         self.screen_back = None
         self.__forced_screen_back = None
+        self.__knob_touch_update_in_progress__ = False
 
         # global_fx_engines is a list of a set of 2 elements.
         # 1st element of the set is the engine instance
@@ -699,18 +700,18 @@ class zynthian_gui(QObject):
         # FIXME : Sometimes when this method is called, the value of zselector is 0
         #         which is causing division by zero error.
 
-        if self.globalPopupOpened and self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200), self.altButtonPressed):
-            self.set_selector()
+        logging.debug(f"global set bpm : {self.__zselector[0].value}")
 
-    def osd_set_bpm(self, bpm):
-        self.set_bpm_actual(bpm, True)
+        if (self.globalPopupOpened or self.altButtonPressed) and self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200)):
+            # self.set_selector()
+            pass
 
-    def set_bpm_actual(self, bpm, showOsd = False):
+    def set_bpm_actual(self, bpm):
         song = self.zynthiloops.song
         if song is not None and song.bpm != bpm:
             song.bpm = bpm
-            if showOsd is True:
-                self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
+            self.set_selector()
+            self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
             return True
         return False
 
@@ -937,7 +938,7 @@ class zynthian_gui(QObject):
                 self.__zselector[3].hide()
 
     def set_selector(self):
-        if self.globalPopupOpened:
+        if self.globalPopupOpened or self.altButtonPressed:
             self.configure_big_knob()
             self.configure_small_knob1()
             self.configure_small_knob2()
@@ -2834,6 +2835,9 @@ class zynthian_gui(QObject):
             # self.zynread_wait_flag=False
 
     def zyncoder_read(self):
+        if self.knobTouchUpdateInProgress:
+            return
+
         if not self.loading:  # TODO Es necesario???
             try:
                 # TODO: figure out the multithreading error
@@ -2846,7 +2850,7 @@ class zynthian_gui(QObject):
                     # This will make sure none of the gui updates while set_selector is in progress
                     logging.debug(f"Set selector in progress. Not setting value with encoder")
                 else:
-                    if self.globalPopupOpened:
+                    if self.globalPopupOpened or self.altButtonPressed:
                         # When global popup is open, set song bpm with big knob
                         if self.__zselector[0] and self.zynthiloops.song is not None:
                             self.__zselector[0].read_zyncoder()
@@ -3875,6 +3879,7 @@ class zynthian_gui(QObject):
             logging.debug(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
             self.alt_button_pressed_changed.emit()
+            self.run_set_selectors()
 
     alt_button_pressed_changed = Signal()
 
@@ -4230,6 +4235,22 @@ class zynthian_gui(QObject):
     def osd(self):
         return self.__osd
     ### END Property osd
+
+    ### Property knobTouchUpdateInProgress
+    def get_knob_touch_update_in_progress(self):
+        return self.__knob_touch_update_in_progress__
+
+    def set_knob_touch_update_in_progress(self, value):
+        if self.__knob_touch_update_in_progress__ != value:
+            self.set_selector()
+            self.__knob_touch_update_in_progress__ = value
+            self.knob_touch_update_in_progress_changed.emit()
+
+    knob_touch_update_in_progress_changed = Signal()
+
+    knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
+                                         notify=knob_touch_update_in_progress_changed)
+    ### END Property knobTouchUpdateInProgress
 
     current_screen_id_changed = Signal()
     current_modal_screen_id_changed = Signal()

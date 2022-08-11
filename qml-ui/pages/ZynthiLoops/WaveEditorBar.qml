@@ -139,7 +139,7 @@ GridLayout {
                         waveBar.controlObj.startPosition += delta
                     }
                     onPressedChanged: {
-                        zynthian.zynthiloops.knobTouchUpdateInProgress = pressed
+                        zynthian.knobTouchUpdateInProgress = pressed
                     }
                 }
             }
@@ -185,7 +185,7 @@ GridLayout {
 
                     yAxis.enabled: false
                     onGrabChanged: {
-                        zynthian.zynthiloops.knobTouchUpdateInProgress = startHandleDragHandler.active
+                        zynthian.knobTouchUpdateInProgress = startHandleDragHandler.active
                     }
                 }
             }
@@ -228,7 +228,7 @@ GridLayout {
 
                     yAxis.enabled: false
                     onGrabChanged: {
-                        zynthian.zynthiloops.knobTouchUpdateInProgress = loopHandleDragHandler.active
+                        zynthian.knobTouchUpdateInProgress = loopHandleDragHandler.active
                     }
                 }
             }
@@ -289,7 +289,7 @@ GridLayout {
                             endHandle.x = endLoopLine.x - endHandle.width
                         }
 
-                        zynthian.zynthiloops.knobTouchUpdateInProgress = endHandleDragHandler.active
+                        zynthian.knobTouchUpdateInProgress = endHandleDragHandler.active
                     }
                 }
             }

@@ -114,7 +114,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
         self.__zselector_track = -1
-        self.__knob_touch_update_in_progress__ = False
         self.__selected_clip_col__ = 0
         self.__is_init_in_progress__ = True
         self.__long_task_count__ = 0
@@ -150,8 +149,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.update_timer_bpm_timer.timeout.connect(self.update_timer_bpm)
 
         self.__volume_control_obj = None
-
-        self.zyngui.alt_button_pressed_changed.connect(self.configure_big_knob)
 
         Path('/zynthian/zynthian-my-data/samples').mkdir(exist_ok=True, parents=True)
         Path('/zynthian/zynthian-my-data/sample-banks/my-samplebanks').mkdir(exist_ok=True, parents=True)
@@ -355,12 +352,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 logging.debug(f"### zyncoder_update_clip_length {selected_clip.length}")
                 self.set_selector()
 
-    @Slot(None)
-    def zyncoder_set_bpm(self):
-        self.zyngui.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200), True);
+    # @Slot(None)
+    # def zyncoder_set_bpm(self):
+    #     self.zyngui.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200), True);
 
     def zyncoder_read(self):
-        if self.__knob_touch_update_in_progress__:
+        if self.zyngui.knobTouchUpdateInProgress:
             return
         if self.is_set_selector_running:
             # Set selector in progress. Not setting value with encoder
@@ -369,9 +366,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[0] and self.__song__:
             self.__zselector[0].read_zyncoder()
 
-            if self.__big_knob_mode__ == "bpm":
-                QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
-            elif self.__big_knob_mode__ == "preset":
+            # if self.__big_knob_mode__ == "bpm":
+            #     QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
+            # el
+            if self.__big_knob_mode__ == "preset":
                 QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
             elif self.__big_knob_mode__ == "segment":
                 QMetaObject.invokeMethod(self, "zyncoder_set_selected_segment", Qt.QueuedConnection)
@@ -411,30 +409,31 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[0] is not None:
                 self.__zselector[0].show()
 
-            if self.zyngui.altButtonPressed:
-                # If the alt button is pressed, use big knob to set bpm
-                self.__big_knob_mode__ = "bpm"
-                min_value = 50
-                max_value = 200 + 1
-                value = 120
-                if self.song is not None:
-                    value = self.song.bpm
-
-                if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_bpm', 'zynthiloops_bpm',
-                                                                   {'midi_cc': 0, 'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                    self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0], self)
-                    self.__zselector[0].show()
-
-                self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'zynthiloops_bpm', 'name': 'zynthiloops_bpm', 'short_name': 'zynthiloops_bpm',
-                     'midi_cc': 0,
-                     'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
-
-                self.__zselector[0].config(self.__zselector_ctrl[0])
-                self.__zselector[0].custom_encoder_speed = 0
-            elif self.zyngui.sound_combinator_active:
+            # if self.zyngui.altButtonPressed:
+            #     # If the alt button is pressed, use big knob to set bpm
+            #     self.__big_knob_mode__ = "bpm"
+            #     min_value = 50
+            #     max_value = 200 + 1
+            #     value = 120
+            #     if self.song is not None:
+            #         value = self.song.bpm
+            #
+            #     if self.__zselector[0] is None:
+            #         self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_bpm', 'zynthiloops_bpm',
+            #                                                        {'midi_cc': 0, 'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
+            #
+            #         self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0], self)
+            #         self.__zselector[0].show()
+            #
+            #     self.__zselector_ctrl[0].set_options(
+            #         {'symbol': 'zynthiloops_bpm', 'name': 'zynthiloops_bpm', 'short_name': 'zynthiloops_bpm',
+            #          'midi_cc': 0,
+            #          'value_max': max_value, 'value': value, 'value_min': min_value, 'step': 1})
+            #
+            #     self.__zselector[0].config(self.__zselector_ctrl[0])
+            #     self.__zselector[0].custom_encoder_speed = 0
+            # el
+            if self.zyngui.sound_combinator_active:
                 # If sound combinator is active, Use Big knob to control preset
 
                 self.__big_knob_mode__ = "preset"
@@ -782,7 +781,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def set_selector(self, zs_hiden=False):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
         if self.__song__ is None or \
-                self.zyngui.globalPopupOpened or \
+                (self.zyngui.globalPopupOpened or self.zyngui.altButtonPressed) or \
                 (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
                 self.longOperation:
             if self.__zselector[0] is not None:
@@ -940,22 +939,6 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     isRecording = Property(bool, get_isRecording, set_isRecording, notify=isRecordingChanged)
     ### END Property isRecording
-
-    ### Property knobTouchUpdateInProgress
-    def get_knob_touch_update_in_progress(self):
-        return self.__knob_touch_update_in_progress__
-
-    def set_knob_touch_update_in_progress(self, value):
-        if self.__knob_touch_update_in_progress__ != value:
-            self.set_selector()
-            self.__knob_touch_update_in_progress__ = value
-            self.knob_touch_update_in_progress_changed.emit()
-
-    knob_touch_update_in_progress_changed = Signal()
-
-    knobTouchUpdateInProgress = Property(bool, get_knob_touch_update_in_progress, set_knob_touch_update_in_progress,
-                                         notify=knob_touch_update_in_progress_changed)
-    ### END Property knobTouchUpdateInProgress
 
     ### Property longOperation
     def longOperationIncrement(self):

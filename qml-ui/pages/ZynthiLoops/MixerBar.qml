@@ -336,10 +336,10 @@ Rectangle {
                                         controlProp: "pan"
                                         initialValue: model.track.initialPan
                                         onPressed: {
-                                            zynthian.zynthiloops.knobTouchUpdateInProgress = true
+                                            zynthian.knobTouchUpdateInProgress = true
                                         }
                                         onReleased: {
-                                            zynthian.zynthiloops.knobTouchUpdateInProgress = false
+                                            zynthian.knobTouchUpdateInProgress = false
                                         }
                                     }
 

@@ -46,13 +46,20 @@ QQC2.Popup {
                 component.close();
             }
         }
+        property bool isHeld: false;
+        function pressed() {
+            isHeld = true;
+            stop();
+        }
+        function released() {
+            restart();
+            isHeld = false;
+        }
     }
     Connections {
         target: zynthian.osd
         onUpdate: {
-            // Logic here being, if it's open and not running, it means we explicitly asked it to
-            // stop somewhere (essentially, by pressing something on the osd)
-            if (component.opened && hideTimer.running) {
+            if (!hideTimer.isHeld) {
                 hideTimer.restart();
             }
             component.open();
@@ -67,8 +74,8 @@ QQC2.Popup {
         Kirigami.Theme.colorSet: Kirigami.Theme.View
         MouseArea {
             anchors.fill: parent
-            onPressed: hideTimer.stop();
-            onReleased: hideTimer.start();
+            onPressed: hideTimer.pressed();
+            onReleased: hideTimer.released();
         }
         ColumnLayout {
             anchors.fill: parent
@@ -85,8 +92,8 @@ QQC2.Popup {
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                 QQC2.Button {
                     icon.name: "arrow-left"
-                    onPressed: hideTimer.stop();
-                    onReleased: hideTimer.start();
+                    onPressed: hideTimer.pressed();
+                    onReleased: hideTimer.released();
                     enabled: component.invertedScale ? zynthian.osd.value < zynthian.osd.start : zynthian.osd.value > zynthian.osd.start
                     onClicked: {
                         zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value + zynthian.osd.step : zynthian.osd.value - zynthian.osd.step);
@@ -131,10 +138,10 @@ QQC2.Popup {
                                     onPressedChanged: {
                                         if (pressed) {
                                             currentValue = zynthian.osd.value;
-                                            hideTimer.stop();
+                                            hideTimer.pressed();
                                         } else {
                                             currentValue = undefined;
-                                            hideTimer.start();
+                                            hideTimer.released();
                                         }
                                     }
                                     onXChanged: {
@@ -158,15 +165,44 @@ QQC2.Popup {
                                 color: Kirigami.Theme.textColor
                             }
                         }
-                        Rectangle {
+                        Item {
+                            id: barContainer
                             anchors {
-                                left: parent.left
-                                top: parent.top
-                                bottom: parent.bottom
+                                fill: parent
                                 margins: 1
                             }
-                            color: Kirigami.Theme.textColor
-                            width: (parent.width - 2) * ((zynthian.osd.value - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start))
+                            property double zeroOffset: (zynthian.osd.visualZero - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start)
+                            Rectangle {
+                                anchors {
+                                    left: parent.left
+                                    leftMargin: parent.width * barContainer.zeroOffset
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+                                color: Kirigami.Theme.textColor
+                                width: (component.invertedScale ? zynthian.osd.value < zynthian.osd.visualZero : zynthian.osd.value > zynthian.osd.visualZero) ? parent.width * ((zynthian.osd.value - zynthian.osd.visualZero) / (zynthian.osd.stop - zynthian.osd.start)) : 0
+                            }
+                            Rectangle {
+                                anchors {
+                                    left: parent.left
+                                    leftMargin: parent.width * barContainer.zeroOffset
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                }
+                                width: 1
+                                color: Kirigami.Theme.textColor
+                            }
+                            Rectangle {
+                                anchors {
+                                    right: parent.left
+                                    rightMargin: -parent.width * barContainer.zeroOffset
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                    margins: 1
+                                }
+                                color: Kirigami.Theme.textColor
+                                width: (component.invertedScale ? zynthian.osd.value > zynthian.osd.visualZero : zynthian.osd.value < zynthian.osd.visualZero) ? (parent.width * barContainer.zeroOffset) - parent.width * ((zynthian.osd.value - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start)) : 0
+                            }
                         }
                         Item {
                             anchors {
@@ -198,8 +234,8 @@ QQC2.Popup {
                 }
                 QQC2.Button {
                     icon.name: "arrow-right"
-                    onPressed: hideTimer.stop();
-                    onReleased: hideTimer.start();
+                    onPressed: hideTimer.pressed();
+                    onReleased: hideTimer.released();
                     enabled: component.invertedScale ? zynthian.osd.value > zynthian.osd.stop : zynthian.osd.value < zynthian.osd.stop
                     onClicked: {
                         zynthian.osd.setValue(zynthian.osd.name, component.invertedScale ? zynthian.osd.value - zynthian.osd.step : zynthian.osd.value + zynthian.osd.step);
@@ -214,8 +250,8 @@ QQC2.Popup {
                 }
                 QQC2.Button {
                     text: qsTr("Reset to default")
-                    onPressed: hideTimer.stop();
-                    onReleased: hideTimer.start();
+                    onPressed: hideTimer.pressed();
+                    onReleased: hideTimer.released();
                     enabled: zynthian.osd.value !== zynthian.osd.defaultValue
                     onClicked: {
                         zynthian.osd.setValue(zynthian.osd.name, zynthian.osd.defaultValue);

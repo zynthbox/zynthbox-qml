@@ -1013,6 +1013,10 @@ Zynthian.ScreenPage {
                         delegate: TrackHeader2 {
                             id: trackHeaderDelegate
 
+                            property bool startDrag: false
+                            property point dragStartPosition
+                            property int segmentOffsetAtDragStart
+
                             // Calculate current cell's segment index
                             // If arrow keys are visible, take into account that arrow keys will be visible no cells 0 and 9 respectively
                             property int thisSegmentIndex: index +
@@ -1180,7 +1184,7 @@ Zynthian.ScreenPage {
                             }
 
                             onPressed: {
-                                if (root.songMode) {                                    
+                                if (root.songMode) {
                                     if (tracksHeaderRepeater.shouldShowArrows && index === 0) {
                                         // If song mode is active, clicking left arrow key cells should decrement segment offset to display out of view segments
                                         tracksHeaderRepeater.segmentOffset = Math.max(0, tracksHeaderRepeater.segmentOffset - 1)
@@ -1211,8 +1215,30 @@ Zynthian.ScreenPage {
                             }
 
                             onPressAndHold: {
-                                zynthian.track.trackId = trackHeaderDelegate.track.id
+                                //zynthian.track.trackId = trackHeaderDelegate.track.id
                                 //zynthian.current_modal_screen_id = "track"
+                                if (root.songMode) {
+                                    startDrag = true
+                                    dragStartPosition = Qt.point(pressX, pressY)
+                                    segmentOffsetAtDragStart = tracksHeaderRepeater.segmentOffset
+                                }
+                            }
+                            onReleased: {
+                                if (root.songMode) {
+                                    startDrag = false
+                                }
+                            }
+
+                            onPressXChanged: {
+                                if (startDrag) {
+                                    var offset = Math.round((pressX-dragStartPosition.x)/trackHeaderDelegate.width)
+
+                                    if (offset < 0) {
+                                        tracksHeaderRepeater.segmentOffset = Math.min(tracksHeaderRepeater.maximumSegmentOffset, segmentOffsetAtDragStart + Math.abs(offset))
+                                    } else {
+                                        tracksHeaderRepeater.segmentOffset = Math.max(0, segmentOffsetAtDragStart - Math.abs(offset))
+                                    }
+                                }
                             }
                         }
                     }

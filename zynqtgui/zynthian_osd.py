@@ -41,9 +41,10 @@ class zynthian_osd(QObject):
         self.__setValueFunction = None
         self.__startLabel = ""
         self.__stopLabel = ""
+        self.__visualZero = 0
         self.__showValueLabel = True
 
-    def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", showValueLabel = True):
+    def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", showValueLabel = True, visualZero = None):
         self.__parameterName = parameterName
         self.__description = description
         self.__start = start
@@ -55,6 +56,10 @@ class zynthian_osd(QObject):
         self.__startLabel = startLabel
         self.__stopLabel = stopLabel
         self.__showValueLabel = showValueLabel
+        if visualZero is None:
+            self.__visualZero = start
+        else:
+            self.__visualZero = visualZero
         self.update.emit(parameterName)
 
     # Signal to cause the OSD to show up and do things. The string passed to it is the name of the parameter being changed
@@ -99,6 +104,10 @@ class zynthian_osd(QObject):
     @Property(bool, notify=update)
     def showValueLabel(self):
         return self.__showValueLabel
+
+    @Property(float, notify=update)
+    def visualZero(self):
+        return self.__visualZero
 
     @Slot(str, float)
     def setValue(self, parameterName, newValue):

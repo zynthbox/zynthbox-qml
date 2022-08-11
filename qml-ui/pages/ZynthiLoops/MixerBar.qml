@@ -335,12 +335,6 @@ Rectangle {
                                         controlObj: model.track
                                         controlProp: "pan"
                                         initialValue: model.track.initialPan
-                                        onPressed: {
-                                            zynthian.knobTouchUpdateInProgress = true
-                                        }
-                                        onReleased: {
-                                            zynthian.knobTouchUpdateInProgress = false
-                                        }
                                     }
 
                                     QQC2.Label {

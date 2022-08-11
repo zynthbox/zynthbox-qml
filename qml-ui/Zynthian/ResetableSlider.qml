@@ -26,7 +26,7 @@ QQC2.Slider {
             var positionX = Math.max(0, Math.min(mapToItem(root, mouse.x, mouse.y).x, root.x + root.width))
 
             if (root.orientation == Qt.Horizontal) {
-                root.controlObj[root.controlProp] = root.from - positionX * xValPerPixel
+                root.controlObj[root.controlProp] = parseFloat((root.from - positionX * xValPerPixel).toFixed(2))
             } else if (root.orientation == Qt.Vertical) {
                 // TODO : Implement vertical slider drag
             }

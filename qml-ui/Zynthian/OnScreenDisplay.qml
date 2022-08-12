@@ -112,7 +112,7 @@ QQC2.Popup {
                         }
                         QQC2.Label {
                             visible: zynthian.osd.showValueLabel
-                            text: (zynthian.osd.value + "").substring(0, (zynthian.osd.value < 0 ? 5 : 4))
+                            text: zynthian.osd.valueLabel
                         }
                         Item {
                             Layout.fillWidth: true

@@ -326,14 +326,28 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_track_volume(self):
-        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
         volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
+        self.set_track_volume_actual(volume)
+
+    def set_track_volume_actual(self, volume):
+        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
 
         if selected_track.volume != volume:
             # zselector doesnt support negetive mimimum value. Need to interoporale zyncoder value from range(0 to 60) to actual range(-40 to 20)
             selected_track.volume = volume
             logging.debug(f"### zyncoder_update_track_volume {selected_track.volume}")
             self.set_selector()
+            self.zyngui.osd.updateOsd(
+                parameterName="track_volume",
+                description=f"{selected_track.name} Volume",
+                start=-40,
+                stop=20,
+                step=1,
+                defaultValue=0,
+                currentValue=selected_track.volume,
+                setValueFunction=self.set_track_volume_actual,
+                showValueLabel=True
+            )
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):

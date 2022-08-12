@@ -283,7 +283,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):
+        self.set_layer_volume_actual(self.__zselector[1].value / 1000)
+
+    def set_layer_volume_actual(self, volume):
         selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        try:
+            synth_name = selected_track.getLayerNameByMidiChannel(selected_track.selectedSlotRow).split('>')[0]
+        except:
+            synth_name = ""
 
         try:
             if ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
@@ -298,10 +305,24 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             volume_control_obj = None
 
         if volume_control_obj is not None and \
-           volume_control_obj.value != self.__zselector[1].value / 1000:
-            volume_control_obj.value = self.__zselector[1].value / 1000
+           volume_control_obj.value != volume:
+            volume_control_obj.value = volume
             logging.debug(f"### zyncoder_update_layer_volume {volume_control_obj.value}")
             self.set_selector()
+
+            self.zyngui.osd.updateOsd(
+                parameterName="layer_volume",
+                description=f"{synth_name} Volume",
+                start=volume_control_obj.value_min,
+                stop=volume_control_obj.value_max,
+                step=volume_control_obj.step_size,
+                defaultValue=None,
+                currentValue=volume_control_obj.value,
+                setValueFunction=self.set_layer_volume_actual,
+                showValueLabel=True,
+                showResetToDefault=False,
+                showVisualZero=False
+            )
 
     @Slot(None)
     def zyncoder_update_track_volume(self):

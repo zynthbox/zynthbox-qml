@@ -112,7 +112,7 @@ class zynthian_osd(QObject):
         if self.__valueLabel is not None and len(self.__valueLabel) > 0:
             return self.__valueLabel
         else:
-            return round(self.__value, 3)
+            return str(round(self.__value, 3))
 
     @Property(bool, notify=update)
     def showValueLabel(self):

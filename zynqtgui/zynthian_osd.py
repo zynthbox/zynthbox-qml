@@ -43,8 +43,10 @@ class zynthian_osd(QObject):
         self.__stopLabel = ""
         self.__visualZero = 0
         self.__showValueLabel = True
+        self.__showResetToDefault = True
+        self.__showVisualZero = True
 
-    def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", showValueLabel = True, visualZero = None):
+    def updateOsd(self, parameterName, description, start, stop, step, defaultValue, currentValue, setValueFunction, startLabel = "", stopLabel = "", showValueLabel = True, visualZero = None, showResetToDefault = True, showVisualZero = True):
         self.__parameterName = parameterName
         self.__description = description
         self.__start = start
@@ -56,6 +58,8 @@ class zynthian_osd(QObject):
         self.__startLabel = startLabel
         self.__stopLabel = stopLabel
         self.__showValueLabel = showValueLabel
+        self.__showResetToDefault = showResetToDefault
+        self.__showVisualZero = showVisualZero
         if visualZero is None:
             self.__visualZero = start
         else:
@@ -104,6 +108,14 @@ class zynthian_osd(QObject):
     @Property(bool, notify=update)
     def showValueLabel(self):
         return self.__showValueLabel
+
+    @Property(bool, notify=update)
+    def showResetToDefault(self):
+        return self.__showResetToDefault
+
+    @Property(bool, notify=update)
+    def showVisualZero(self):
+        return self.__showVisualZero
 
     @Property(float, notify=update)
     def visualZero(self):

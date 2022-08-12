@@ -212,6 +212,7 @@ QQC2.Popup {
                                 left: parent.left
                                 leftMargin: (parent.width * ((zynthian.osd.defaultValue - zynthian.osd.start) / (zynthian.osd.stop - zynthian.osd.start))) - 3
                             }
+                            visible: zynthian.osd.showVisualZero
                             width: 5
                             clip: true
                             Rectangle {
@@ -249,6 +250,7 @@ QQC2.Popup {
                     Layout.fillWidth: true
                 }
                 QQC2.Button {
+                    visible: zynthian.osd.showResetToDefault
                     text: qsTr("Reset to default")
                     onPressed: hideTimer.pressed();
                     onReleased: hideTimer.released();

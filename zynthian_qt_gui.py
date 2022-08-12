@@ -707,7 +707,10 @@ class zynthian_gui(QObject):
         song = self.zynthiloops.song
         if song is not None and song.bpm != bpm:
             song.bpm = bpm
-            self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
+            # Show bpm osd when global popup is not open
+            # Since when global popup is open, bpm change can be visualized with dial value change
+            if not self.globalPopupOpened:
+                self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
             return True
         return False
 

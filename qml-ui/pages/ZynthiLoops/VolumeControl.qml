@@ -164,7 +164,7 @@ Rectangle {
                                         case 0:
                                             return "0"
                                         case 20:
-                                            return "+6"
+                                            return "+20"
                                         default:
                                             return ""
                                     }

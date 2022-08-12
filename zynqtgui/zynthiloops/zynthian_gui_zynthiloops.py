@@ -242,13 +242,44 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
-            preset_index = min(round(self.__zselector[0].value/1000), len(layer.preset_list) - 1)
+        preset_index = min(round(self.__zselector[0].value / 1000), len(layer.preset_list) - 1)
+        self.set_preset_actual(preset_index)
+
+    def set_preset_actual(self, preset_index):
+        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+        selected_channel = track.get_chained_sounds()[track.selectedSlotRow]
+        preset_index = int(preset_index)
+        try:
+            preset_name = track.getLayerNameByMidiChannel(selected_channel).split('>')[1]
+        except:
+            preset_name = ""
+
+        if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
+            layer = self.zyngui.layer.layer_midi_map[selected_channel]
 
             if track.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
                 logging.debug(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
                 track.chainedSoundsInfoChanged.emit()
+                self.set_selector()
                 self.zyngui.fixed_layers.fill_list()
+                self.zyngui.osd.updateOsd(
+                    parameterName="selected_preset",
+                    description=f"Preset({preset_index+1}/{len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list)})",
+                    start=0,
+                    stop=len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list) - 1,
+                    step=1,
+                    defaultValue=None,
+                    currentValue=preset_index,
+                    setValueFunction=self.set_preset_actual,
+                    startLabel="1",
+                    stopLabel=f"{len(self.zyngui.layer.layer_midi_map[selected_channel].preset_list)}",
+                    valueLabel=preset_name,
+                    showValueLabel=True,
+                    visualZero=None,
+                    showResetToDefault=False,
+                    showVisualZero=False
+                )
 
     @Slot(None)
     def zyncoder_update_layer_volume(self):

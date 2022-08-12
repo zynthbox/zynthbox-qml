@@ -827,6 +827,17 @@ Rectangle {
                     samplePickerPopup.close()
                 }
             }
+
+            QQC2.Button {
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                Layout.alignment: Qt.AlignCenter
+                text: qsTr("Download Samples")
+                onClicked: {
+                    zynthian.current_modal_screen_id = "sample_downloader"
+                    samplePickerPopup.close()
+                }
+            }
         }
     }
 

@@ -695,6 +695,7 @@ don't want to have to dig too far...
                     }
                     onPatternChanged: {
                         if (trackPartSceneDelegate.pattern) {
+                            trackPartSceneDelegate.pattern.zlDashboard = zynthian.session_dashboard;
                             trackPartSceneDelegate.pattern.zlTrack = baseTrackDelegate.theTrack;
                             trackPartSceneDelegate.pattern.zlPart = trackPartDelegate.part;
                             trackPartSceneDelegate.pattern.zlScene = trackPartSceneDelegate.sceneClip;

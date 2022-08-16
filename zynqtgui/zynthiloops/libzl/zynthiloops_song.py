@@ -323,7 +323,7 @@ class zynthiloops_song(QObject):
                     self.set_volume(self.__volume__, True)
 
                     # Restore ALSA Mixer volume from sketch
-                    self.__metronome_manager__.zyngui.screens["master_alsa_mixer"].volume = self.__volume__
+                    # self.__metronome_manager__.zyngui.screens["master_alsa_mixer"].volume = self.__volume__
                 if "selectedScaleIndex" in sketch:
                     self.set_selected_scale_index(sketch["selectedScaleIndex"], True)
                 if "octave" in sketch:

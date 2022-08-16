@@ -448,7 +448,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             }
 
             # Master Button
-            if self.zyngui.modal_screen == "audio_settings":
+            if self.zyngui.globalPopupOpened:
                 self.button_color_map[24] = {
                     'color': self.led_color_active,
                     'blink': False

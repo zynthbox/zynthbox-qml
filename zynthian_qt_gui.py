@@ -747,13 +747,12 @@ class zynthian_gui(QObject):
                     start=0,
                     stop=100,
                     step=1,
-                    defaultValue=None,
-                    currentValue=self.master_alsa_mixer.volume,
+                    defaultValue=self.master_alsa_mixer.initialVolume,
+                    currentValue=volume,
                     setValueFunction=self.set_volume_actual,
                     showValueLabel=True,
-                    visualZero=None,
-                    showResetToDefault=False,
-                    showVisualZero=False
+                    showResetToDefault=True,
+                    showVisualZero=True
                 )
 
             self.set_selector()

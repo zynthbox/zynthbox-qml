@@ -773,8 +773,6 @@ class zynthian_gui(QObject):
             delay_percent = int(delay_percent)
             delay = np.interp(delay_percent, [0, 100], [controller.value_min, controller.value_max])
 
-            logging.debug(f"### Trying to set global delay : delay_percent({delay_percent}), delay({delay}), controller_value({controller.value})")
-
             if controller is not None and \
                     controller.value != delay:
                 controller.set_value(delay, True)

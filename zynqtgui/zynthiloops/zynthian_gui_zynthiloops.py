@@ -243,8 +243,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
-        preset_index = min(round(self.__zselector[0].value / 1000), len(layer.preset_list) - 1)
-        self.set_preset_actual(preset_index)
+            preset_index = min(round(self.__zselector[0].value / 1000), len(layer.preset_list) - 1)
+            self.set_preset_actual(preset_index)
 
     def set_preset_actual(self, preset_index):
         track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)

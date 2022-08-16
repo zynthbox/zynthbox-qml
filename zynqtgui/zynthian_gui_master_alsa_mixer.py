@@ -70,6 +70,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
             for mixer_name in alsaaudio.mixers(card):
                 if mixer_name in accepted_mixer_names:
                     self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
+                    self.set_volume(65)
                     break
             logging.debug(f"Using the mixer named {self.__mixer.mixer()}")
         except Exception as e:

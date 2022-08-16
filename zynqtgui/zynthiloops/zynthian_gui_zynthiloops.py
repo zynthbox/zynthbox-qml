@@ -497,7 +497,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_preset', 'name': 'Zynthiloops Preset', 'short_name': 'Preset', 'midi_cc': 0,
-                     'value_max': max_value, 'value_min': 0, 'value': preset_index, 'step': 1})
+                     'value_max': max_value, 'value_min': 0, 'value': preset_index})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
                 self.__zselector[0].custom_encoder_speed = 0

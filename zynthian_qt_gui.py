@@ -693,70 +693,144 @@ class zynthian_gui(QObject):
     ### Global controller and selector
     @Slot(None)
     def zyncoder_set_bpm(self):
+        if self.globalPopupOpened or self.altButtonPressed:
+            self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
+
+    def set_bpm_actual(self, bpm):
         """
-        Set song bpm when global popup is active
+            Set song bpm when global popup is active
         """
 
         # FIXME : Sometimes when this method is called, the value of zselector is 0
         #         which is causing division by zero error.
 
-        if (self.globalPopupOpened or self.altButtonPressed) and self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200)):
-            self.set_selector()
-
-    def set_bpm_actual(self, bpm):
         song = self.zynthiloops.song
+        bpm = int(bpm)
         if song is not None and song.bpm != bpm:
             song.bpm = bpm
             # Show bpm osd when global popup is not open
             # Since when global popup is open, bpm change can be visualized with dial value change
             if not self.globalPopupOpened:
-                self.osd.updateOsd("song_bpm", "Song BPM", 50, 200, 120, 1, song.bpm, self.set_bpm_actual)
-            return True
-        return False
+                self.osd.updateOsd(
+                    parameterName="song_bpm",
+                    description=f"Song BPM",
+                    start=50,
+                    stop=200,
+                    step=1,
+                    defaultValue=120,
+                    currentValue=song.bpm,
+                    setValueFunction=self.set_bpm_actual,
+                    showValueLabel=True,
+                )
+
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_set_volume(self):
+        if self.globalPopupOpened or self.altButtonPressed:
+            self.set_volume_actual(self.__zselector[1].value)
+
+    def set_volume_actual(self, volume):
         """
         Set volume when global popup is active
         """
 
-        if self.globalPopupOpened:
-            if self.master_alsa_mixer is not None and \
-                    self.master_alsa_mixer.volume != self.__zselector[1].value:
-                self.master_alsa_mixer.volume = self.__zselector[1].value
-                self.set_selector()
+        volume = int(volume)
+        if self.master_alsa_mixer is not None and \
+                self.master_alsa_mixer.volume != volume:
+            self.master_alsa_mixer.volume = volume
+
+            if not self.globalPopupOpened:
+                self.osd.updateOsd(
+                    parameterName="master_volume",
+                    description=f"Master Volume",
+                    start=0,
+                    stop=100,
+                    step=1,
+                    defaultValue=None,
+                    currentValue=self.master_alsa_mixer.volume,
+                    setValueFunction=self.set_volume_actual,
+                    showValueLabel=True,
+                    visualZero=None,
+                    showResetToDefault=False,
+                    showVisualZero=False
+                )
+
+            self.set_selector()
 
     @Slot(None)
     def zyncoder_set_delay(self):
+        if self.globalPopupOpened or self.altButtonPressed:
+            self.set_delay_actual(self.__zselector[2].value)
+
+    def set_delay_actual(self, delay_percent):
         """
         Set global fx delay when global popup is active
         """
 
-        if self.globalPopupOpened:
-            if self.global_fx_engines[0] is not None:
-                controller = self.global_fx_engines[0][1]
-                knob_value = np.interp(self.__zselector[2].value, [0, 100], [controller.value_min, controller.value_max])
+        if self.global_fx_engines[0] is not None:
+            controller = self.global_fx_engines[0][1]
+            delay_percent = int(delay_percent)
+            delay = np.interp(delay_percent, [0, 100], [controller.value_min, controller.value_max])
 
-                if controller is not None and \
-                        controller.value != knob_value:
-                    controller.set_value(knob_value, True)
-                    self.set_selector()
+            logging.debug(f"### Trying to set global delay : delay_percent({delay_percent}), delay({delay}), controller_value({controller.value})")
+
+            if controller is not None and \
+                    controller.value != delay:
+                controller.set_value(delay, True)
+
+                if not self.globalPopupOpened:
+                    self.osd.updateOsd(
+                        parameterName="global_delay",
+                        description=f"Global Delay FX",
+                        start=0,
+                        stop=100,
+                        step=1,
+                        defaultValue=10,
+                        currentValue=delay_percent,
+                        setValueFunction=self.set_delay_actual,
+                        showValueLabel=True,
+                        showResetToDefault=True,
+                        showVisualZero=True
+                    )
+
+                self.set_selector()
 
     @Slot(None)
     def zyncoder_set_reverb(self):
+        if self.globalPopupOpened or self.altButtonPressed:
+            self.set_reverb_actual(self.__zselector[3].value)
+
+    def set_reverb_actual(self, reverb_percent):
         """
         Set global fx reverb when global popup is active
         """
 
-        if self.globalPopupOpened:
-            if self.global_fx_engines[1] is not None:
-                controller = self.global_fx_engines[1][1]
-                knob_value = np.interp(self.__zselector[3].value, [0, 100], [controller.value_min, controller.value_max])
+        if self.global_fx_engines[1] is not None:
+            controller = self.global_fx_engines[1][1]
+            reverb_percent = int(reverb_percent)
+            reverb = np.interp(reverb_percent, [0, 100], [controller.value_min, controller.value_max])
 
-                if controller is not None and \
-                        controller.value != knob_value:
-                    controller.set_value(knob_value, True)
-                    self.set_selector()
+            if controller is not None and \
+                    controller.value != reverb:
+                controller.set_value(reverb, True)
+
+                if not self.globalPopupOpened:
+                    self.osd.updateOsd(
+                        parameterName="global_reverb",
+                        description=f"Global Reverb FX",
+                        start=0,
+                        stop=100,
+                        step=1,
+                        defaultValue=10,
+                        currentValue=reverb_percent,
+                        setValueFunction=self.set_reverb_actual,
+                        showValueLabel=True,
+                        showResetToDefault=True,
+                        showVisualZero=True
+                    )
+
+                self.set_selector()
 
     @Slot(None)
     def zyncoder_set_current_index(self):

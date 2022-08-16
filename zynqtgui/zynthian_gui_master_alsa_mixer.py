@@ -70,7 +70,7 @@ class zynthian_gui_master_alsa_mixer(QObject):
             for mixer_name in alsaaudio.mixers(card):
                 if mixer_name in accepted_mixer_names:
                     self.__mixer = alsaaudio.Mixer(mixer_name, 0, card)
-                    self.set_volume(65)
+                    self.set_volume(self.get_initialVolume())
                     break
             logging.debug(f"Using the mixer named {self.__mixer.mixer()}")
         except Exception as e:
@@ -114,5 +114,12 @@ class zynthian_gui_master_alsa_mixer(QObject):
         self.volume_changed.emit()
 
     volume = Property(int, get_volume, set_volume, notify = volume_changed)
+
+    ### Property initialVolume
+    def get_initialVolume(self):
+        return 65
+
+    initialVolume = Property(int, get_initialVolume, constant=True)
+    ### END Property initialVolume
 
 #-------------------------------------------------------------------------------

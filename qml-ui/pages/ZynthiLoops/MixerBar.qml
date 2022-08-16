@@ -453,6 +453,9 @@ Rectangle {
                                 zynthian.master_alsa_mixer.volume = masterVolume.slider.value;
                                 zynthian.zynthiloops.song.volume = masterVolume.slider.value;
                             }
+                            onDoubleClicked: {
+                                zynthian.master_alsa_mixer.volume = zynthian.master_alsa_mixer.initialVolume
+                            }
                         }
                     }
 

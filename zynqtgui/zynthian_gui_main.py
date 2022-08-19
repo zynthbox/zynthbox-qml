@@ -91,7 +91,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
             self.list_data.append((self.song_player, 0, "Song Player"))
             #self.list_metadata.append({"icon":"../../img/song_player.svg"})
-            self.list_metadata.append({"icon":"../../img/rec-audio.svg"})
+            self.list_metadata.append({"icon":"../../img/song-player.svg"})
 
             self.list_data.append((self.admin, 0, "Settings"))
             self.list_metadata.append({"icon":"../../img/settings.svg"})

@@ -557,7 +557,7 @@ Zynthian.ScreenPage {
         Rectangle {
             id: selectedTrackOutline
             width: privateProps.headerWidth
-            visible: !root.songMode
+            visible: false //!root.songMode
 
             // If scene selection buttons are visible, do not show outline over scene buttons
             height: (privateProps.headerHeight + loopGrid.columnSpacing) * (root.displaySceneButtons ? 1 : 2)
@@ -785,171 +785,171 @@ Zynthian.ScreenPage {
                 spacing: 1
 
                 // HEADER ROW
-                RowLayout {
-                    id: variationsHeaderRow
+                // RowLayout {
+                    // id: variationsHeaderRow
 
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: privateProps.headerHeight
-                    Layout.maximumHeight: privateProps.headerHeight
-                    spacing: 1
+                    // Layout.fillWidth: true
+                    // Layout.preferredHeight: privateProps.headerHeight
+                    // Layout.maximumHeight: privateProps.headerHeight
+                    // spacing: 1
 
-                    TableHeader {
-                        id: songCell
-                        Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
-                        Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
-                        Layout.fillHeight: true
+                    // TableHeader {
+                        // id: songCell
+                        // Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
+                        // Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
+                        // Layout.fillHeight: true
 
-                        highlightOnFocus: false
-                        highlighted: !root.songMode && root.displaySketchButtons
-                        text: root.song.name
-                        subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
+                        // highlightOnFocus: false
+                        // highlighted: !root.songMode && root.displaySketchButtons
+                        // text: root.song.name
+                        // subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
 
-                        textSize: 10
-                        subTextSize: 8
+                        // textSize: 10
+                        // subTextSize: 8
 
-                        onPressed: {
-                            if (!root.songMode) {
-                                root.displaySketchButtons = !root.displaySketchButtons
-                            }
-                        }
-                    }
+                        // onPressed: {
+                            // if (!root.songMode) {
+                                // root.displaySketchButtons = !root.displaySketchButtons
+                            // }
+                        // }
+                    // }
 
-                    Repeater {
-                        // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                        model: zynthian.isBootingComplete
-                                ? 10
-                                : 0
-                        delegate: TableHeader {
-                            id: sceneHeaderDelegate
+                    // Repeater {
+                        // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                        // model: zynthian.isBootingComplete
+                                // ? 10
+                                // : 0
+                        // delegate: TableHeader {
+                            // id: sceneHeaderDelegate
 
-                            property QtObject track: root.song.tracksModel.getTrack(index)
-                            property QtObject mix: root.song.mixesModel.getMix(index)
+                            // property QtObject track: root.song.tracksModel.getTrack(index)
+                            // property QtObject mix: root.song.mixesModel.getMix(index)
 
-                            color: Kirigami.Theme.backgroundColor
-                            active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
+                            // color: Kirigami.Theme.backgroundColor
+                            // active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
 
-                            Layout.fillWidth: false
-                            Layout.fillHeight: true
-                            Layout.preferredWidth: privateProps.headerWidth
+                            // Layout.fillWidth: false
+                            // Layout.fillHeight: true
+                            // Layout.preferredWidth: privateProps.headerWidth
 
-                            highlightOnFocus: false
-                            highlighted: root.songMode
-                                            ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
-                                            : root.displaySketchButtons
-                                                ? root.song.scenesModel.selectedSketchIndex === index
-                                                : zynthian.session_dashboard.selectedTrack === index
+                            // highlightOnFocus: false
+                            // highlighted: root.songMode
+                                            // ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
+                                            // : root.displaySketchButtons
+                                                // ? root.song.scenesModel.selectedSketchIndex === index
+                                                // : zynthian.session_dashboard.selectedTrack === index
 
-                            text: root.songMode
-                                    ? sceneHeaderDelegate.mix.name
-                                    : root.displaySketchButtons
-                                        ? qsTr("S%1").arg(index+1)
-                                        : ""
-                            textSize: 10
+                            // text: root.songMode
+                                    // ? sceneHeaderDelegate.mix.name
+                                    // : root.displaySketchButtons
+                                        // ? qsTr("S%1").arg(index+1)
+                                        // : ""
+                            // textSize: 10
 
-                            onPressed: {
-                                if (root.songMode) {
-                                    root.song.mixesModel.selectedMixIndex = index
-                                    root.lastSelectedObj = sceneHeaderDelegate.mix
-                                } else if (root.displaySketchButtons) {
-                                    root.lastSelectedObj = {
-                                        className: "zynthiloops_sketch",
-                                        sketchIndex: index
-                                    }
-                                    root.song.scenesModel.selectedSketchIndex = index
-                                } else {
-                                    // Always open Sound combinator when clicking any indicator cell
-                                    zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
-                                    Qt.callLater(function() {
-                                        bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
-                                        bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
+                            // onPressed: {
+                                // if (root.songMode) {
+                                    // root.song.mixesModel.selectedMixIndex = index
+                                    // root.lastSelectedObj = sceneHeaderDelegate.mix
+                                // } else if (root.displaySketchButtons) {
+                                    // root.lastSelectedObj = {
+                                        // className: "zynthiloops_sketch",
+                                        // sketchIndex: index
+                                    // }
+                                    // root.song.scenesModel.selectedSketchIndex = index
+                                // } else {
+                                    // // Always open Sound combinator when clicking any indicator cell
+                                    // zynthian.session_dashboard.selectedTrack = sceneHeaderDelegate.track.id
+                                    // Qt.callLater(function() {
+                                        // bottomStack.bottomBar.controlType = BottomBar.ControlType.Track
+                                        // bottomStack.bottomBar.controlObj = sceneHeaderDelegate.track
 
-                                        bottomStack.slotsBar.bottomBarButton.checked = true
-                                        // bottomStack.slotsBar.soundCombinatorButton.checked = true
-                                    })
-                                }
-                            }
+                                        // bottomStack.slotsBar.bottomBarButton.checked = true
+                                        // // bottomStack.slotsBar.soundCombinatorButton.checked = true
+                                    // })
+                                // }
+                            // }
 
-                            ColumnLayout {
-                                anchors {
-                                    centerIn: parent
-                                    margins: Kirigami.Units.gridUnit
-                                }
-                                visible: !root.songMode &&
-                                         !root.displaySketchButtons &&
-                                         sceneHeaderDelegate.track.trackAudioType === "synth"
+                            // ColumnLayout {
+                                // anchors {
+                                    // centerIn: parent
+                                    // margins: Kirigami.Units.gridUnit
+                                // }
+                                // visible: !root.songMode &&
+                                         // !root.displaySketchButtons &&
+                                         // sceneHeaderDelegate.track.trackAudioType === "synth"
 
-                                Repeater {
-                                    id: synthsOccupiedIndicatorRepeater
-                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
+                                // Repeater {
+                                    // id: synthsOccupiedIndicatorRepeater
+                                    // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                    // model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
-                                    delegate: Rectangle {
-                                        width: 50
-                                        height: 3
-                                        radius: 100
-                                        color: synthsOccupiedIndicatorRepeater.model[index] == null
-                                                ? "transparent"
-                                                : synthsOccupiedIndicatorRepeater.model[index]
-                                                    ? "#ccbbbbbb"
-                                                    : "#11ffffff"
-                                    }
-                                }
-                            }
+                                    // delegate: Rectangle {
+                                        // width: 50
+                                        // height: 3
+                                        // radius: 100
+                                        // color: synthsOccupiedIndicatorRepeater.model[index] == null
+                                                // ? "transparent"
+                                                // : synthsOccupiedIndicatorRepeater.model[index]
+                                                    // ? "#ccbbbbbb"
+                                                    // : "#11ffffff"
+                                    // }
+                                // }
+                            // }
 
-                            RowLayout {
-                                anchors {
-                                    centerIn: parent
-                                    margins: Kirigami.Units.gridUnit
-                                }
-                                visible: !root.songMode &&
-                                         !root.displaySketchButtons &&
-                                         ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
+                            // RowLayout {
+                                // anchors {
+                                    // centerIn: parent
+                                    // margins: Kirigami.Units.gridUnit
+                                // }
+                                // visible: !root.songMode &&
+                                         // !root.displaySketchButtons &&
+                                         // ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.track.trackAudioType) >= 0
 
-                                Repeater {
-                                    id: samplesOccupiedIndicatorRepeater
-                                    // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
+                                // Repeater {
+                                    // id: samplesOccupiedIndicatorRepeater
+                                    // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                    // model: zynthian.isBootingComplete ? sceneHeaderDelegate.track.occupiedSlots : 0
 
-                                    delegate: Rectangle {
-                                        width: 3
-                                        height: 40
-                                        Layout.alignment: Qt.AlignVCenter
-                                        radius: 100
-                                        color: samplesOccupiedIndicatorRepeater.model[index] == null
-                                                ? "transparent"
-                                                : samplesOccupiedIndicatorRepeater.model[index]
-                                                    ? "#ccbbbbbb"
-                                                    : "#11ffffff"
-                                    }
-                                }
-                            }
+                                    // delegate: Rectangle {
+                                        // width: 3
+                                        // height: 40
+                                        // Layout.alignment: Qt.AlignVCenter
+                                        // radius: 100
+                                        // color: samplesOccupiedIndicatorRepeater.model[index] == null
+                                                // ? "transparent"
+                                                // : samplesOccupiedIndicatorRepeater.model[index]
+                                                    // ? "#ccbbbbbb"
+                                                    // : "#11ffffff"
+                                    // }
+                                // }
+                            // }
 
-                            QQC2.Label {
-                                anchors.centerIn: parent
-                                visible: !root.songMode &&
-                                         !root.displaySketchButtons &&
-                                         sceneHeaderDelegate.track.trackAudioType === "external"
-                                text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
-                            }
+                            // QQC2.Label {
+                                // anchors.centerIn: parent
+                                // visible: !root.songMode &&
+                                         // !root.displaySketchButtons &&
+                                         // sceneHeaderDelegate.track.trackAudioType === "external"
+                                // text: qsTr("Midi %1").arg(sceneHeaderDelegate.track.externalMidiChannel > -1 ? sceneHeaderDelegate.track.externalMidiChannel + 1 : sceneHeaderDelegate.track.id + 1)
+                            // }
 
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "#2affffff"
-                                visible: !root.songMode &&
-                                         !root.displaySketchButtons &&
-                                         zynthian.session_dashboard.selectedTrack === index
-                            }
+                            // Rectangle {
+                                // anchors.fill: parent
+                                // color: "#2affffff"
+                                // visible: !root.songMode &&
+                                         // !root.displaySketchButtons &&
+                                         // zynthian.session_dashboard.selectedTrack === index
+                            // }
 
-                        }
-                    }
-                }
+                        // }
+                    // }
+                // }
 
                 RowLayout {
                     id: tracksHeaderRow
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: privateProps.headerHeight
-                    Layout.maximumHeight: privateProps.headerHeight
+                    Layout.preferredHeight: privateProps.headerHeight*1.5
+                    Layout.maximumHeight: privateProps.headerHeight*1.5
 
                     spacing: 1
 
@@ -1254,7 +1254,9 @@ Zynthian.ScreenPage {
                     ListView {
                         Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
                         Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
-                        Layout.fillHeight: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: privateProps.headerHeight*1.5
+                        Layout.maximumHeight: privateProps.headerHeight*1.5
 
                         clip: true
                         spacing: 1
@@ -1268,7 +1270,7 @@ Zynthian.ScreenPage {
                             subText: root.song.scenesModel.selectedSceneName
 
                             width: ListView.view.width
-                            height: privateProps.headerHeight
+                            height: ListView.view.height
 
                             highlightOnFocus: false
                             highlighted: !root.songMode &&
@@ -1311,8 +1313,8 @@ Zynthian.ScreenPage {
                                 delegate: Item {
                                     Layout.preferredWidth: privateProps.cellWidth
                                     Layout.maximumWidth: privateProps.cellWidth
-                                    Layout.preferredHeight: privateProps.cellHeight
-                                    Layout.maximumHeight: privateProps.cellHeight
+                                    Layout.preferredHeight: privateProps.headerHeight*1.5
+                                    Layout.maximumHeight: privateProps.headerHeight*1.5
 
                                     TableHeader {
                                         anchors.fill: parent

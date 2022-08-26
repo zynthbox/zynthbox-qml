@@ -63,6 +63,16 @@ QQC2.AbstractButton {
             anchors.margins: 2
             spacing: 2
 
+            QQC2.Label {
+                id: contents
+                Layout.fillWidth: true
+                Layout.fillHeight: false
+                horizontalAlignment: "AlignHCenter"
+                elide: "ElideRight"
+                text: root.text
+                font.pointSize: 8
+            }
+
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
@@ -76,7 +86,7 @@ QQC2.AbstractButton {
                     anchors.centerIn: parent
                     horizontalAlignment: "AlignHCenter"
                     elide: "ElideRight"
-                    font.pointSize: 6
+                    font.pointSize: 8
                     text: subSubText
                 }
             }
@@ -86,36 +96,22 @@ QQC2.AbstractButton {
                 Layout.fillHeight: true
 
                 QQC2.Label {
-                    id: contents
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: root.synthDetailsVisible
-                            ? parent.width * 0.4
-                            : parent.width
-                    horizontalAlignment: "AlignHCenter"
-                    elide: "ElideRight"
-                    text: root.text
-                    font.pointSize: 8
-                }
-
-                QQC2.Label {
                     id: subContents
                     anchors.top: contents.bottom
-                    width: root.synthDetailsVisible
-                            ? parent.width * 0.4
-                            : parent.width
+                    width: parent.width
                     visible: root.subText != null
                     horizontalAlignment: "AlignHCenter"
                     verticalAlignment: "AlignVCenter"
                     elide: "ElideRight"
                     text: root.subText ? root.subText : ""
-                    font.pointSize: 7
+                    font.pointSize: 8
                 }
 
                 Item {
                     anchors {
                         left: contents.right
                     }
-                    width: parent.width * 0.6
+                    width: parent.width
                     height: parent.height
                     visible: root.synthDetailsVisible
 
@@ -161,7 +157,7 @@ QQC2.AbstractButton {
                         elide: "ElideRight"
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
-                        font.pointSize: 7
+                        font.pointSize: 8
                         // text: track.connectedSoundName.split(" > ")[0]
                         text: root.track.trackAudioType === "synth"
                                   ? root.track.connectedSoundName.split(" > ")[0]

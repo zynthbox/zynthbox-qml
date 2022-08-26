@@ -1147,12 +1147,14 @@ class zynthiloops_track(QObject):
 
             if clip.enabled:
                 partNames.append(chr(i+65).lower())
+            else:
+                partNames.append("")
 
-        return "/".join(partNames)
+        return partNames
 
     selectedPartNamesChanged = Signal()
 
-    selectedPartNames = Property(str, get_selectedPartNames, notify=selectedPartNamesChanged)
+    selectedPartNames = Property('QVariantList', get_selectedPartNames, notify=selectedPartNamesChanged)
     ### Property selectedPartNames
 
     ### Property recordingPopupActive

@@ -64,10 +64,10 @@ QQC2.AbstractButton {
             anchors.margins: 2
             smooth: false
 
-            visible: root.isInScene &&
+            visible: false /*root.isInScene &&
                      track.trackAudioType !== "sample-loop" &&
                      root.pattern &&
-                     root.pattern.hasNotes
+                     root.pattern.hasNotes*/
             source: root.pattern ? root.pattern.thumbnailUrl : ""
             cache: false
         }
@@ -77,10 +77,10 @@ QQC2.AbstractButton {
                 right: parent.right
                 bottom: parent.bottom
             }
-            visible: root.isInScene &&
+            visible: false /*root.isInScene &&
                      track.trackAudioType === "sample-loop" &&
                      track.sceneClip.path &&
-                     track.sceneClip.path.length > 0
+                     track.sceneClip.path.length > 0*/
             text: visible
                 ? qsTr("%1%2")
                     .arg(track.sceneClip.isPlaying &&
@@ -99,10 +99,10 @@ QQC2.AbstractButton {
                 right: parent.right
                 bottom: parent.bottom
             }
-            visible: root.isInScene &&
+            visible: false /*root.isInScene &&
                      track.trackAudioType !== "sample-loop" &&
                      root.pattern &&
-                     root.pattern.hasNotes
+                     root.pattern.hasNotes*/
             text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
             property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynthian.zynthiloops.isMetronomeRunning
                     ? patternPlaybackLabel.playbackPosition + "/"
@@ -127,23 +127,51 @@ QQC2.AbstractButton {
             visible: !root.isInScene
         }
 
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.topMargin: spacing
+            anchors.bottomMargin: spacing
+
+            Repeater {
+                model: track.selectedPartNames
+                delegate: RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        color: modelData.length > 0 ? "#99888888" : "transparent"
+                    }
+
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.minimumWidth: 12
+                        Layout.fillHeight: true
+                        text: modelData
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                    }
+                }
+            }
+        }
+
         QQC2.Label {
             width: parent.width - 8
             anchors.centerIn: parent
             horizontalAlignment: "AlignHCenter"
             elide: "ElideRight"
             color: "#ffffff"
-            text: qsTr("%1 %2")
+            text: qsTr("%1")
                     .arg(track.id+1)
-                    .arg(track.selectedPartNames)
-            font.pointSize: 7
+            font.pointSize: 8
             visible: root.isInScene
         }
 
         Rectangle {
             height: Kirigami.Units.gridUnit * 0.7
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.right: parent.right - 10
             anchors.top: parent.top
             color: "#99888888"
             visible: presetName.text &&
@@ -157,7 +185,7 @@ QQC2.AbstractButton {
                 elide: "ElideRight"
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
-                font.pointSize: 7
+                font.pointSize: 8
                 text: model.track.trackAudioType === "synth"
                       ? presetText
                           ? presetText

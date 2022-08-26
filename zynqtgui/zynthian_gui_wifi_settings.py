@@ -260,8 +260,12 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
                 self.startWifi()
             elif mode == "hotspot":
                 self.startHotspot()
-            else:
+            elif mode == "off":
                 self.stopWifi()
+            else:
+                # Do nothing if wifi mode is none of the above handled ones
+                pass
+
             self.wifiModeChanged.emit()
             self.zyngui.end_long_task()
 

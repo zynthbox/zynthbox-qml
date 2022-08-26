@@ -33,7 +33,15 @@ import "ZynthiLoops" as ZynthiLoops
 Zynthian.ScreenPage {
     id: root
     title: qsTr("Wifi Settings")
-    screenId: "wifi_settings"
+    screenId: "wifi_settings"    
+    contextualActions: [
+        Kirigami.Action {
+            text: qsTr("Refresh")
+            onTriggered: {
+                zynthian.wifi_settings.reloadLists()
+            }
+        }
+    ]
     
     Connections {
         target: zynthian
@@ -138,20 +146,18 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
                     Layout.leftMargin: Kirigami.Units.gridUnit
                     horizontalAlignment: TextInput.AlignLeft
-                    text: qsTr("Wifi Hotspot")
+                    text: qsTr("Wifi")
                 }
 
-                QQC2.Switch {
+                QQC2.ComboBox {
+                    id: wifiModeDropdown
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: Kirigami.Units.gridUnit*4
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*12
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
-                    checked: zynthian.wifi_settings.wifiMode === "hotspot"
-                    onToggled: {
-                        if (checked) {
-                            zynthian.wifi_settings.wifiMode = "hotspot"
-                        } else {
-                            zynthian.wifi_settings.wifiMode = "off"
-                        }
+                    model: ["off", /*"hotspot",*/ "on"]
+                    currentIndex: find(zynthian.wifi_settings.wifiMode)
+                    onActivated: {
+                        zynthian.wifi_settings.wifiMode = wifiModeDropdown.model[wifiModeDropdown.currentIndex]
                     }
                 }
             }

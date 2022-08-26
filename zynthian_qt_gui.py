@@ -4172,6 +4172,8 @@ class zynthian_gui(QObject):
 
                     Path("/tmp/bootlog.fifo").unlink()
 
+                self.currentTaskMessage = ""
+
     isBootingCompleteChanged = Signal()
 
     isBootingComplete = Property(bool, get_isBootingComplete, set_isBootingComplete, notify=isBootingCompleteChanged)

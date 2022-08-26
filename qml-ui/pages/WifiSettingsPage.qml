@@ -32,6 +32,9 @@ import "ZynthiLoops" as ZynthiLoops
 
 Zynthian.ScreenPage {
     id: root
+
+    signal openCaptivePortal(string url)
+
     title: qsTr("Wifi Settings")
     screenId: "wifi_settings"    
     contextualActions: [
@@ -42,7 +45,14 @@ Zynthian.ScreenPage {
             }
         }
     ]
-    
+    Component.onCompleted: {
+        zynthian.wifi_settings.openCaptivePortal.connect(root.openCaptivePortal)
+    }
+    onOpenCaptivePortal: {
+	console.log("### WifiCheck : opening captive portal")
+        applicationWindow().showPassiveNotification("Opening Captive Portal")
+    }
+
     Connections {
         target: zynthian
         onCurrent_screen_idChanged: {
@@ -90,6 +100,7 @@ Zynthian.ScreenPage {
                     text: qsTr("Connect")
                     Layout.alignment: Qt.AlignRight
                     onClicked: {
+                        connectDialog.close()
                         zynthian.wifi_settings.connect(connectDialog.ssid, passwordField.text)
                     }
                 }
@@ -215,6 +226,17 @@ Zynthian.ScreenPage {
                     Layout.preferredHeight: Kirigami.Units.gridUnit*2
                     model: zynthian.wifi_settings.savedWifiNetworks
                     textRole: "ssid"
+                }
+
+                QQC2.Button {
+                    Layout.preferredWidth: Kirigami.Units.gridUnit*6
+                    Layout.preferredHeight: Kirigami.Units.gridUnit*2
+                    text: qsTr("Remove")
+                    visible: zynthian.wifi_settings.savedWifiNetworks.length > 0
+                    onClicked: {
+                        zynthian.wifi_settings.remove_network(savedNetworksDropdown.model[savedNetworksDropdown.currentIndex].ssid)
+                        zynthian.wifi_settings.reloadLists()
+                    }
                 }
             }
         }

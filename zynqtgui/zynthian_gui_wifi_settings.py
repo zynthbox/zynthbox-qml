@@ -28,6 +28,7 @@ import re
 from collections import OrderedDict
 from subprocess import check_output
 
+import requests
 from PySide2.QtCore import Property, QTimer, Signal, Slot
 
 import logging
@@ -184,6 +185,7 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
         wpa_supplicant_data += '}\n'
         self.save_wpa_supplicant_config(wpa_supplicant_data)
 
+    @Slot(str)
     def remove_network(self, delSSID):
         logging.info("Remove Network: {}".format(delSSID))
 
@@ -230,6 +232,21 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
             logging.error("Can't start WIFI network!")
             return False
         else:
+            try:
+                logging.debug(f"## WifiCheck : Making a request to networkcheck.kde.org to determine if wifi has a captive network")
+                reply = requests.head("http://networkcheck.kde.org")
+                logging.debug(f"## WifiCheck : Reply headers : {reply.headers}")
+
+                # Check if server redirects to some other page when trying to get network check.
+                # If there was a redirect, it probably means there is a captive portal. Open the url in a browser
+                if "location" in reply.headers and \
+                        reply.headers["location"] is not None and \
+                        len(reply.headers["location"]) > 0:
+                    logging.debug(f"### WifiCheck : There was a redirect when trying to get http://networkcheck.kde.org. There might be a captive portal. Open browser with the url {reply.headers['location']}")
+                    self.openCaptivePortal.emit(reply.headers["location"])
+            except Exception as e:
+                logging.error(f"### WifiCheck : Error trying to determine if wifi network has a captive portal : {str(e)}")
+
             return True
 
     def stopWifi(self):
@@ -249,6 +266,8 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
     @Slot(str, str)
     def connect(self, ssid, password):
         logging.error(f"Connect to wifi : {ssid}, {password}")
+        self.add_new_network(ssid, password)
+        self.set_wifiMode("on")
 
     ### Property wifiMode
     def get_wifiMode(self):
@@ -256,15 +275,18 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
 
     def set_wifiMode(self, mode):
         def task():
-            if mode == "on":
-                self.startWifi()
-            elif mode == "hotspot":
-                self.startHotspot()
-            elif mode == "off":
-                self.stopWifi()
-            else:
-                # Do nothing if wifi mode is none of the above handled ones
-                pass
+            try:
+                if mode == "on":
+                    self.startWifi()
+                elif mode == "hotspot":
+                    self.startHotspot()
+                elif mode == "off":
+                    self.stopWifi()
+                else:
+                    # Do nothing if wifi mode is none of the above handled ones
+                    pass
+            except Exception as e:
+                logging.error(f"Error setting wifi mode : {str(e)}")
 
             self.wifiModeChanged.emit()
             self.zyngui.end_long_task()
@@ -293,3 +315,5 @@ class zynthian_gui_wifi_settings(zynthian_qt_gui_base.ZynGui):
 
     savedWifiNetworks = Property('QVariantList', get_savedWifiNetworks, notify=savedWifiNetworksChanged)
     ### END Property savedWifiNetworks
+
+    openCaptivePortal = Signal(str)

@@ -152,8 +152,6 @@ QQC2.AbstractButton {
                         Layout.fillWidth: false
                         Layout.minimumWidth: 12
                         Layout.fillHeight: true
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
                         font.pointSize: 9
                         text: modelData
                     }
@@ -181,35 +179,35 @@ QQC2.AbstractButton {
             }
         }
 
-        Rectangle {
-            height: Kirigami.Units.gridUnit * 0.7
-            anchors.left: parent.left
-            anchors.right: parent.right - 10
-            anchors.top: parent.top
-            color: "#99888888"
-            visible: presetName.text &&
-                     presetName.text.length > 0
+//        Rectangle {
+//            height: Kirigami.Units.gridUnit * 0.7
+//            anchors.left: parent.left
+//            anchors.right: parent.right
+//            anchors.top: parent.top
+//            color: "#99888888"
+//            visible: presetName.text &&
+//                     presetName.text.length > 0
 
-            QQC2.Label {
-                id: presetName
-                property string presetText: channel.connectedSoundName.split(" > ")[1]
+//            QQC2.Label {
+//                id: presetName
+//                property string presetText: channel.connectedSoundName.split(" > ")[1]
 
-                anchors.fill: parent
-                elide: "ElideRight"
-                horizontalAlignment: "AlignHCenter"
-                verticalAlignment: "AlignVCenter"
-                font.pointSize: 8
-                text: model.channel.channelAudioType === "synth"
-                      ? presetText
-                          ? presetText
-                          : ""
-                      : ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0
-                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
-                          : model.channel.channelAudioType === "sample-loop"
-                              ? model.channel.sceneClip.path.split("/").pop()
-                              : qsTr("Midi %1").arg(model.channel.externalMidiChannel > -1 ? model.channel.externalMidiChannel + 1 : model.channel.id + 1)
-            }
-        }
+//                anchors.fill: parent
+//                elide: "ElideRight"
+//                horizontalAlignment: "AlignHCenter"
+//                verticalAlignment: "AlignVCenter"
+//                font.pointSize: 8
+//                text: model.channel.channelAudioType === "synth"
+//                      ? presetText
+//                          ? presetText
+//                          : ""
+//                      : ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0
+//                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+//                          : model.channel.channelAudioType === "sample-loop"
+//                              ? model.channel.sceneClip.path.split("/").pop()
+//                              : qsTr("Midi %1").arg(model.channel.externalMidiChannel > -1 ? model.channel.externalMidiChannel + 1 : model.channel.id + 1)
+//            }
+//        }
     }
 
     background: Rectangle {

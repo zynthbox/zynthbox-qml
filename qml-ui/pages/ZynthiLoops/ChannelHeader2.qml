@@ -97,7 +97,7 @@ QQC2.AbstractButton {
 
                 QQC2.Label {
                     id: subContents
-                    anchors.top: contents.bottom
+//                    anchors.top: contents.bottom
                     width: parent.width
                     visible: root.subText != null
                     horizontalAlignment: "AlignHCenter"
@@ -108,9 +108,9 @@ QQC2.AbstractButton {
                 }
 
                 Item {
-                    anchors {
-                        left: contents.right
-                    }
+//                    anchors {
+//                        left: contents.right
+//                    }
                     width: parent.width
                     height: parent.height
                     visible: root.synthDetailsVisible

@@ -1150,13 +1150,13 @@ Zynthian.ScreenPage {
                                 value: {
                                     if (root.copySourceObj === model.channel)
                                         return "#ff2196f3"
-                                    else if (channelHeaderDelegate.channel.channelAudioType === "synth" && channelHeaderDelegate.channel.occupiedSlotsCount > 0)
+                                    else if (channelHeaderDelegate.channel.channelAudioType === "synth")
                                         return "#66ff0000"
-                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop" && channelHeaderDelegate.channel.sceneClip.path && channelHeaderDelegate.channel.sceneClip.path.length > 0)
+                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-loop")
                                         return "#6600ff00"
-                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig" && channelHeaderDelegate.channel.occupiedSlotsCount > 0)
+                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-trig")
                                         return "#66ffff00"
-                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice" && channelHeaderDelegate.channel.occupiedSlotsCount > 0)
+                                    else if (channelHeaderDelegate.channel.channelAudioType === "sample-slice")
                                         return "#66ffff00"
                                     else if (channelHeaderDelegate.channel.channelAudioType === "external")
                                         return "#998e24aa"

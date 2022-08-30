@@ -286,7 +286,7 @@ QQC2.Popup {
             ColumnLayout {
                 QQC2.Label {
                     Layout.fillWidth: true
-                    text: qsTr("Track:")
+                    text: qsTr("Channel:")
                 }
                 QQC2.Label {
                     Layout.fillHeight: true
@@ -322,7 +322,7 @@ QQC2.Popup {
                     property int trackIndex: model.index
                     QQC2.Label {
                         Layout.fillWidth: true
-                        text: "T" + (trackDelegate.trackIndex + 1)
+                        text: "Ch" + (trackDelegate.trackIndex + 1)
                         horizontalAlignment: Text.AlignHCenter
                     }
                     QQC2.CheckBox {

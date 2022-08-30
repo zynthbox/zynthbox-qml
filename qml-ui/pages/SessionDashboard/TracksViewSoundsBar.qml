@@ -118,7 +118,7 @@ Zynthian.Card {
         anchors.margins: Kirigami.Units.gridUnit
 
 //        Kirigami.Heading {
-//            text: qsTr("Track : %1").arg(root.selectedTrack.name)
+//            text: qsTr("Channel : %1").arg(root.selectedTrack.name)
 //        }
 
         Repeater {

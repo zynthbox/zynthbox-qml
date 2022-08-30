@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Track %1 Sounds").arg(zynthian.session_dashboard.selectedTrack+1)
+                    text: qsTr("Channel %1 Sounds").arg(zynthian.session_dashboard.selectedTrack+1)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                     Layout.preferredHeight: favModeButton.height

@@ -335,7 +335,7 @@ Rectangle {
                             checkable: true
                             checked: true
                             enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("Track")
+                            text: qsTr("Channel")
                             onCheckedChanged: {
                                 if (checked) {
                                     bottomStack.currentIndex = 3
@@ -546,7 +546,7 @@ Rectangle {
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignHCenter
                             font.pointSize: 14
-                            text: qsTr("T%1-Slot%2")
+                            text: qsTr("Ch%1-Slot%2")
                                     .arg(zynthian.session_dashboard.selectedTrack + 1)
                                     .arg(root.selectedSlotRowItem.track.selectedSlotRow + 1)
                         }
@@ -819,7 +819,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignCenter
-                text: qsTr("Pick sample-bank for track")
+                text: qsTr("Pick sample-bank for channel")
 
                 onClicked: {
                     bankPickerDialog.folderModel.folder = '/zynthian/zynthian-my-data/sample-banks'

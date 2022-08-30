@@ -660,7 +660,7 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignVCenter
-                        text: qsTr("T%1").arg(zynthian.session_dashboard.selectedTrack+1)
+                        text: qsTr("%1").arg(root.selectedTrack.name)
 
                         MouseArea {
                             anchors.fill: parent
@@ -1506,7 +1506,7 @@ Zynthian.ScreenPage {
                                                               ? root.lastSelectedObj.className === "zynthiloops_clip"
                                                                 ? qsTr("Clip")
                                                                 : root.lastSelectedObj.className === "zynthiloops_track"
-                                                                    ? qsTr("Track")
+                                                                    ? qsTr("Channel")
                                                                     : root.lastSelectedObj.className === "zynthiloops_sketch"
                                                                         ? qsTr("Sketch")
                                                                         : root.lastSelectedObj.className === "zynthiloops_part"
@@ -1583,7 +1583,7 @@ Zynthian.ScreenPage {
                                                                    ? root.copySourceObj.className === "zynthiloops_clip"
                                                                        ? qsTr("Clip")
                                                                        : root.copySourceObj.className === "zynthiloops_track"
-                                                                           ? qsTr("Track")
+                                                                           ? qsTr("Channel")
                                                                            : root.copySourceObj.className === "zynthiloops_sketch"
                                                                                ? qsTr("Sketch")
                                                                                : root.lastSelectedObj.className === "zynthiloops_part"

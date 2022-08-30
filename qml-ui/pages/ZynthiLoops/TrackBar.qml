@@ -97,7 +97,7 @@ GridLayout {
             // As per #299 disable this button
             visible: false
             Layout.alignment: Qt.AlignCenter
-            text: "Track Editor..."
+            text: "Channel Editor"
             onClicked: {
                 zynthian.current_modal_screen_id = "track"
             }
@@ -112,7 +112,7 @@ GridLayout {
         QQC2.Button {
             Layout.alignment: Qt.AlignCenter
 
-            text: qsTr("Copy Track")
+            text: qsTr("Copy Channel")
             visible: bottomBar.trackCopySource == null
             onClicked: {
                 bottomBar.trackCopySource = bottomBar.controlObj;
@@ -122,7 +122,7 @@ GridLayout {
         QQC2.Button {
             Layout.alignment: Qt.AlignCenter
 
-            text: qsTr("Paste Track")
+            text: qsTr("Paste Channel")
             visible: bottomBar.trackCopySource != null
             enabled: bottomBar.trackCopySource != bottomBar.controlObj
             onClicked: {

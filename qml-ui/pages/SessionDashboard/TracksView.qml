@@ -668,7 +668,7 @@ ColumnLayout {
                 Layout.alignment: Qt.AlignVCenter
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
-                text: qsTr("All patterns are already assigned to tracks")
+                text: qsTr("All patterns are already assigned to channels")
                 wrapMode: "WordWrap"
                 font.italic: true
                 font.pointSize: 11

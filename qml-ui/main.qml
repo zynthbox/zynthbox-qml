@@ -228,7 +228,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: trackButton
             icon.color: customTheme.Kirigami.Theme.textColor
-            text: qsTr("Track %1 ˬ")
+            text: qsTr("Channel %1 ˬ")
                     .arg(zynthian.session_dashboard.selectedTrack+1)
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
@@ -242,7 +242,7 @@ Kirigami.AbstractApplicationWindow {
                 Repeater {
                     model: zynthian.zynthiloops.song.tracksModel
                     delegate: QQC2.MenuItem {
-                        text: qsTr("Track %1").arg(index + 1)
+                        text: qsTr("Channel %1").arg(index + 1)
                         width: parent.width
                         //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
                         //height: visible ? implicitHeight : 0

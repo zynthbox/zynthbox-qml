@@ -445,6 +445,7 @@ Item {
             property bool importPattern: patternObject.enabled
             property bool importSound: false
             property int associatedTrackIndex: 6 + model.index
+            property QtObject associatedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(patternOptionsRoot.associatedTrackIndex)
             property int importIndex: model.index
             property var soundInfo: patternObject.layerData.length > 0 ? zynthian.layer.sound_metadata_from_json(patternObject.layerData) : [];
             RowLayout {
@@ -480,8 +481,8 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
                     text: patternOptionsRoot.associatedTrackIndex > -1 && patternOptionsRoot.associatedTrackIndex < 12
-                        ? qsTr("Import to Track %1").arg(patternOptionsRoot.associatedTrackIndex + 1)
-                        : qsTr("Pick Track Association")
+                        ? qsTr("Import to Channel %1").arg(patternOptionsRoot.associatedTrack.name)
+                        : qsTr("Pick Channel Association")
                     enabled: patternOptionsRoot.importPattern
                     property bool pickingTrack: false
                     onClicked: {
@@ -529,7 +530,7 @@ Item {
             anchors.fill: parent
             Kirigami.Heading {
                 Layout.fillWidth: true
-                text: qsTr("Pick Track To Import Pattern Into")
+                text: qsTr("Pick Channel To Import Pattern Into")
             }
             GridLayout {
                 Layout.fillHeight: true
@@ -543,8 +544,8 @@ Item {
                         Layout.fillHeight: true
                         text: (trackPicker.associatedTrackIndex === model.id ? qsTr("Current") : "") + "\n\n" +
                             (model.track.connectedPattern > -1
-                                ? qsTr("Replace pattern on:\nTrack %1").arg(model.id + 1)
-                                : qsTr("Import to:\nTrack %1").arg(model.id + 1))
+                                ? qsTr("Replace pattern on:\nChannel %1").arg(model.name)
+                                : qsTr("Import to:\nChannel %1").arg(model.name))
                         onClicked: {
                             trackPicker.associatedTrackIndex = model.id
                             trackPicker.close();

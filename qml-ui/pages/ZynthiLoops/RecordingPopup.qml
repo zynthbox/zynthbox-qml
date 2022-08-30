@@ -114,7 +114,7 @@ QQC2.Popup {
 
         Kirigami.Heading {
             Layout.fillWidth: true
-            text: qsTr("Record clip for Track %1").arg(selectedTrack.id+1)
+            text: qsTr("Record clip for Channel %1").arg(selectedTrack.name)
         }
         Rectangle {
             Layout.fillWidth: true
@@ -212,7 +212,7 @@ QQC2.Popup {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
-                        text: qsTr("Source Track")
+                        text: qsTr("Source Channel")
                     }
 
                     QQC2.ComboBox {
@@ -223,16 +223,16 @@ QQC2.Popup {
                         model: ListModel {
                             id: trackComboModel
 
-                            ListElement { text: "Track 1"; value: 0 }
-                            ListElement { text: "Track 2"; value: 1 }
-                            ListElement { text: "Track 3"; value: 2 }
-                            ListElement { text: "Track 4"; value: 3 }
-                            ListElement { text: "Track 5"; value: 4 }
-                            ListElement { text: "Track 6"; value: 5 }
-                            ListElement { text: "Track 7"; value: 6 }
-                            ListElement { text: "Track 8"; value: 7 }
-                            ListElement { text: "Track 9"; value: 8 }
-                            ListElement { text: "Track 10"; value: 9 }
+                            ListElement { text: "Channel 1"; value: 0 }
+                            ListElement { text: "Channel 2"; value: 1 }
+                            ListElement { text: "Channel 3"; value: 2 }
+                            ListElement { text: "Channel 4"; value: 3 }
+                            ListElement { text: "Channel 5"; value: 4 }
+                            ListElement { text: "Channel 6"; value: 5 }
+                            ListElement { text: "Channel 7"; value: 6 }
+                            ListElement { text: "Channel 8"; value: 7 }
+                            ListElement { text: "Channel 9"; value: 8 }
+                            ListElement { text: "Channel 10"; value: 9 }
                         }
                         textRole: "text"
                         currentIndex: visible ? zynthian.session_dashboard.selectedTrack : -1
@@ -279,13 +279,13 @@ QQC2.Popup {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                         Layout.alignment: Qt.AlignCenter
                         enabled: parent.enabled
-                        text: qsTr("Target Tracks")
+                        text: qsTr("Target Channels")
                     }
 
                     QQC2.Button {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                         Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Select target tracks")
+                        text: qsTr("Select target channels")
                         onClicked: {
                             targetTracksPopup.open()
                         }
@@ -331,7 +331,7 @@ QQC2.Popup {
                                             Layout.minimumWidth: Kirigami.Units.gridUnit * 8
                                             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                                             elide: "ElideRight"
-                                            text: qsTr("Track %1 (%2)")
+                                            text: qsTr("Channel %1 (%2)")
                                                     .arg(targetTracksDelegate.track.name)
                                                     .arg(targetTracksDelegate.track.trackAudioType === "sample-loop"
                                                             ? "Loop"

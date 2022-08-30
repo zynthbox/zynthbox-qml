@@ -38,7 +38,7 @@ ColumnLayout {
         checkable: true
         checked: bottomStack.slotsBar ? bottomStack.slotsBar.trackButton.checked : false
         enabled: !root.songMode && !root.displaySceneButtons
-        text: qsTr("Track")
+        text: qsTr("Channel")
         onClicked: {
             bottomStack.slotsBar.trackButton.checked = true
         }

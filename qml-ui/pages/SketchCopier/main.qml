@@ -71,10 +71,10 @@ Zynthian.ScreenPage {
             }
         },
         Kirigami.Action {
-            text: "Track"
+            text: "Channel"
 
             Kirigami.Action {
-                text: "Copy Track"
+                text: "Copy Channel"
                 iconName: "edit-copy-symbolic"
                 enabled: !copier.isCopyInProgress
                 visible: !copier.isCopyInProgress
@@ -83,7 +83,7 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
-                text: "Cancel Track Copy"
+                text: "Cancel Channel Copy"
                 iconName: "dialog-cancel"
                 enabled: copier.isCopyInProgress
                 visible: copier.isCopyInProgress
@@ -92,7 +92,7 @@ Zynthian.ScreenPage {
                 }
             }
             Kirigami.Action {
-                text: "Paste Track"
+                text: "Paste Channel"
                 iconName: "edit-paste-symbolic"
                 enabled: copier.isCopyInProgress
                 visible: copier.isCopyInProgress
@@ -319,7 +319,7 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
                     QQC2.Label {
-                        text: qsTr("%1 Tracks").arg(sketchesData.selectedSketch.tracksModel.count)
+                        text: qsTr("%1 Channels").arg(sketchesData.selectedSketch.tracksModel.count)
                     }
                 }
             }
@@ -338,7 +338,7 @@ Zynthian.ScreenPage {
             Layout.preferredHeight: 1
 
             QQC2.Label {
-                text: qsTr("Track %1: %2")
+                text: qsTr("Channel %1: %2")
                         .arg(tracksData.selectedTrack ? (tracksData.selectedTrack.id+1) : "")
                         .arg(tracksData.selectedTrack ? tracksData.selectedTrack.name : "")
                 opacity: 0.7

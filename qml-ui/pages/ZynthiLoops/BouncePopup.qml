@@ -235,7 +235,7 @@ QQC2.Popup {
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             wrapMode: Text.Wrap
-            text: "Bounce the audio from the pattern in " + (_private.selectedTrack ? _private.selectedTrack.name : "") + " to a wave file, assign that recording as the track's loop sample, and set the track to loop mode.";
+            text: "Bounce the audio from the pattern in " + (_private.selectedTrack ? _private.selectedTrack.name : "") + " to a wave file, assign that recording as the channel's loop sample, and set the channel to loop mode.";
         }
         QQC2.CheckBox {
             Layout.fillWidth: true

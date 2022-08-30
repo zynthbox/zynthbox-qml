@@ -71,7 +71,7 @@ QQC2.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: qsTr("Pick External Midi Channel For Track T%1").arg(_private.selectedTrack ? _private.selectedTrack.id + 1 : "")
+            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
  
             QtObject {
                 id: _private

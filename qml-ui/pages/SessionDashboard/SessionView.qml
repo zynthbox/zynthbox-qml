@@ -87,7 +87,7 @@ ColumnLayout {
             spacing: 0
             Kirigami.Heading {
                 level: 2
-                text: qsTr("Tracks")
+                text: qsTr("Channels")
                 MouseArea {
                     anchors.fill: parent
                     onClicked: zynthian.current_modal_screen_id = "zynthiloops"

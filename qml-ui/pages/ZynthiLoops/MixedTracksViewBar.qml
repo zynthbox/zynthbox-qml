@@ -179,7 +179,7 @@ Rectangle {
                                 property QtObject controlObj: root.selectedTrack
                                 property int controlType: BottomBar.ControlType.Track
 
-                                text: qsTr("TRACK: %1").arg(controlObj ? controlObj.name : "")
+                                text: qsTr("Channel: %1").arg(controlObj ? controlObj.name : "")
                             }
 
                             QQC2.Button {

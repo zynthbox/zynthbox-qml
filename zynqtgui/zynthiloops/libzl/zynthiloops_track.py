@@ -444,12 +444,12 @@ class zynthiloops_track(QObject):
 
     def name(self):
         if self.__name__ is None:
-            return f"T{self.__id__ + 1}"
+            return f"Ch{self.__id__ + 1}"
         else:
             return self.__name__
 
     def set_name(self, name):
-        if name != f"T{self.__id__ + 1}":
+        if name != f"Ch{self.__id__ + 1}":
             self.__name__ = name
             self.__name_changed__.emit()
             self.__song__.schedule_save()

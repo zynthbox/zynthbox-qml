@@ -131,7 +131,7 @@ Rectangle {
                         case BottomBar.ControlType.Pattern:
                             return qsTr("CLIP: %1").arg(text);
                         case BottomBar.ControlType.Track:
-                            return qsTr("TRACK: %1").arg(text);
+                            return qsTr("CHANNEL: %1").arg(text);
                         case BottomBar.ControlType.Part:
                             return qsTr("PART: %1").arg(text);
     //                    case BottomBar.ControlType.Pattern:
@@ -297,7 +297,7 @@ Rectangle {
                                 case BottomBar.ControlType.Pattern:
                                     return qsTr("CLIP: %1").arg(text);
                                 case BottomBar.ControlType.Track:
-                                    return qsTr("TRACK: %1").arg(text);
+                                    return qsTr("CHANNEL: %1").arg(text);
                                 case BottomBar.ControlType.Part:
                                     return qsTr("PART: %1").arg(text);
         //                        case BottomBar.ControlType.Pattern:
@@ -469,7 +469,7 @@ Rectangle {
                     },
                     Zynthian.TabbedControlViewAction {
                         id: trackAction
-                        text: qsTr("Track")
+                        text: qsTr("Channel")
                         page: Qt.resolvedUrl("TrackBar.qml")
                         preload: true
                         visible: root.controlType === BottomBar.ControlType.Track

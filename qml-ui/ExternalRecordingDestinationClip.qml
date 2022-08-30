@@ -61,7 +61,7 @@ ColumnLayout {
                 QQC2.Label {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Track " + (index+1)
+                    text: "Channel " + (index+1)
                 }
                 Repeater {
                     model: 10

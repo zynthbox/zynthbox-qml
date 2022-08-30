@@ -192,7 +192,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(int, str)
     def loadTrackSoundFromJson(self, trackIndex, soundJson):
-        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".T{trackIndex+1}.sound", delete=False)
+        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".Ch{trackIndex+1}.sound", delete=False)
         sound_path = tempSoundJson.name
 
         try:

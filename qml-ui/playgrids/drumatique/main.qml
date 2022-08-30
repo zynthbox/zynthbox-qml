@@ -1473,7 +1473,7 @@ Zynthian.BasePlayGrid {
                                                 Layout.fillHeight: true
                                                 Layout.preferredHeight: patternsMenuItem.height / 2
                                                 Layout.fillWidth: true
-                                                text: patternsMenuItem.associatedTrack ? "Track " + patternsMenuItem.associatedTrack.name : "(no track)"
+                                                text: patternsMenuItem.associatedTrack ? "Channel " + patternsMenuItem.associatedTrack.name : "(no channel)"
                                                 font.pixelSize: 15
                                                 Kirigami.Theme.inherit: false
                                                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
@@ -1840,7 +1840,7 @@ Zynthian.BasePlayGrid {
                     implicitHeight: Kirigami.Units.gridUnit * 40
                     Kirigami.Heading {
                         Layout.fillWidth: true
-                        text: qsTr("Select Active Parts For Track %1").arg(partPicker.associatedTrackIndex + 1)
+                        text: qsTr("Select Active Parts For Channel %1").arg(partPicker.associatedTrack.name)
                     }
                     ColumnLayout {
                         Layout.fillHeight: true

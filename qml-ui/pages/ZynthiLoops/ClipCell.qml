@@ -27,6 +27,8 @@ import QtQuick 2.10
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as QQC2
 import QtQml.Models 2.10
+import QtGraphicalEffects 1.0
+
 import org.kde.kirigami 2.4 as Kirigami
 import org.zynthian.quick 1.0 as ZynQuick
 import Zynthian 1.0 as Zynthian
@@ -141,16 +143,19 @@ QQC2.AbstractButton {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        color: modelData.length > 0 ? "#99888888" : "transparent"
+                        color: modelData.length > 0
+                                ? Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.2)
+                                : "transparent"
                     }
 
                     QQC2.Label {
                         Layout.fillWidth: false
                         Layout.minimumWidth: 12
                         Layout.fillHeight: true
-                        text: modelData
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
+                        font.pointSize: 9
+                        text: modelData
                     }
                 }
             }
@@ -164,8 +169,16 @@ QQC2.AbstractButton {
             color: "#ffffff"
             text: qsTr("%1")
                     .arg(track.id+1)
-            font.pointSize: 8
+            font.pointSize: 12
             visible: root.isInScene
+
+            layer.enabled: true
+            layer.effect: DropShadow {
+                verticalOffset: 0
+                color: "#80000000"
+                radius: 5
+                samples: 11
+            }
         }
 
         Rectangle {

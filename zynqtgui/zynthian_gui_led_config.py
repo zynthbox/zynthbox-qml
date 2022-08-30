@@ -96,9 +96,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
     def update_button_colors(self):
         try:
-            track = None
+            channel = None
             if self.zyngui.zynthiloops.song is not None:
-                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
 
             # Menu
             if self.zyngui.modal_screen is None and self.zyngui.active_screen == "main":
@@ -117,25 +117,25 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
                 if self.zyngui.leftSidebarActive:
-                    partClip = self.zyngui.zynthiloops.song.getClipByPart(track.id, self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex, i-1)
+                    partClip = self.zyngui.zynthiloops.song.getClipByPart(channel.id, self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex, i-1)
 
-                    if track is not None and partClip.enabled:
-                        if track.trackAudioType == "synth":
+                    if channel is not None and partClip.enabled:
+                        if channel.channelAudioType == "synth":
                             self.button_color_map[i] = {
                                 'color': self.led_color_red,
                                 'blink': True
                             }
-                        elif track.trackAudioType in ["sample-trig", "sample-slice"]:
+                        elif channel.channelAudioType in ["sample-trig", "sample-slice"]:
                             self.button_color_map[i] = {
                                 'color': self.led_color_yellow,
                                 'blink': True
                             }
-                        elif track.trackAudioType == "sample-loop":
+                        elif channel.channelAudioType == "sample-loop":
                             self.button_color_map[i] = {
                                 'color': self.led_color_green,
                                 'blink': True
                             }
-                        elif track.trackAudioType == "external":
+                        elif channel.channelAudioType == "external":
                             self.button_color_map[i] = {
                                 'color': self.led_color_purple,
                                 'blink': True
@@ -165,9 +165,9 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     continue
 
                 # If slots synths bar is active, light up filled cells otherwise turn off led
-                if track is not None and track.trackAudioType == "synth":
-                    if track.chainedSounds[i-1] > -1 and \
-                            track.checkIfLayerExists(track.chainedSounds[i-1]):
+                if channel is not None and channel.channelAudioType == "synth":
+                    if channel.chainedSounds[i-1] > -1 and \
+                            channel.checkIfLayerExists(channel.chainedSounds[i-1]):
                         self.button_color_map[i] = {
                             'color': self.led_color_red,
                             'blink': False
@@ -181,8 +181,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     continue
 
                 # If slots samples bar is active, light up filled cells otherwise turn off led
-                if track is not None and track.trackAudioType in ["sample-trig", "sample-slice"]:
-                    if track.samples[i-1].path is not None:
+                if channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
+                    if channel.samples[i-1].path is not None:
                         self.button_color_map[i] = {
                             'color': self.led_color_yellow,
                             'blink': False
@@ -196,8 +196,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     continue
 
                 # light up "1" Button green if clip has a wav otherwise turn off led
-                if track is not None and track.trackAudioType == "sample-loop":
-                    clip = track.clipsModel.getClip(0)
+                if channel is not None and channel.channelAudioType == "sample-loop":
+                    clip = channel.clipsModel.getClip(0)
 
                     if i-1 == 0 and clip.path is not None and len(clip.path) > 0:
                         self.button_color_map[i] = {
@@ -214,8 +214,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
 
                 # If sound combinator is active, light up filled cells with green color otherwise display blue color
                 if self.zyngui.soundCombinatorActive:
-                    if track is not None and \
-                            (i-1) == track.selectedSlotRow:
+                    if channel is not None and \
+                            (i-1) == channel.selectedSlotRow:
                         # Set active color to selected sound row when combinator is open
                         self.button_color_map[i] = {
                             'color': self.led_color_active,
@@ -236,7 +236,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # 7 : FX Button
-            if track is not None and track.trackAudioType == "synth":
+            if channel is not None and channel.channelAudioType == "synth":
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_red,
@@ -247,7 +247,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                         'color': self.led_color_red,
                         'blink': False
                     }
-            elif track is not None and track.trackAudioType in ["sample-trig", "sample-slice"]:
+            elif channel is not None and channel.channelAudioType in ["sample-trig", "sample-slice"]:
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_yellow,
@@ -269,7 +269,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                         'color': self.led_color_blue,
                         'blink': False
                     }
-            elif track is not None and track.trackAudioType == "sample-loop":
+            elif channel is not None and channel.channelAudioType == "sample-loop":
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_green,
@@ -280,7 +280,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                         'color': self.led_color_green,
                         'blink': False
                     }
-            elif track is not None and track.trackAudioType == "external":
+            elif channel is not None and channel.channelAudioType == "external":
                 if self.zyngui.leftSidebarActive:
                     self.button_color_map[7] = {
                         'color': self.led_color_purple,
@@ -328,7 +328,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Under screen button 3
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen in ["layers_for_track", "bank", "preset"]:
+            if self.zyngui.modal_screen is None and self.zyngui.active_screen in ["layers_for_channel", "bank", "preset"]:
                 self.button_color_map[10] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -394,7 +394,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Save button
-            if self.zyngui.zynthiloops.clickTrackEnabled:
+            if self.zyngui.zynthiloops.clickChannelEnabled:
                 self.button_color_map[16] = {
                     'color': self.led_color_blue,
                     'blink': True

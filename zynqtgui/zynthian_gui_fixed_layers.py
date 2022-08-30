@@ -217,7 +217,7 @@ class zynthian_gui_fixed_layers(zynthian_gui_selector):
 
         self.special_layer_name_changed.emit()
         self.current_index_valid_changed.emit()
-        self.zyngui.screens['layers_for_track'].fill_list()
+        self.zyngui.screens['layers_for_channel'].fill_list()
         self.__mixer_timer.start()
         super().fill_list()
 

@@ -490,8 +490,8 @@ def audio_autoconnect(force=False):
 	#   always be connected to system playback, which SamplerSynth does by default)
 	# - If the global effects stack is empty, connect the global effected port to
 	#   system playback, otherwise connect to the effects
-	# - For each track, check whether the effects stack is empty. It it is, connect
-	#   the SamplerSynth output for that track to system playback, otherwise connect
+	# - For each channel, check whether the effects stack is empty. It it is, connect
+	#   the SamplerSynth output for that channel to system playback, otherwise connect
 	#   to the effects
 
 	# Connect SamplerSynth's global efected to either the global effects, or to system out, depending on whether or not there are any global effects
@@ -545,33 +545,33 @@ def audio_autoconnect(force=False):
 				return
 	except: pass
 
-	# Connect each track's ports to either that track's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the track
+	# Connect each channel's ports to either that channel's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the channel
 	# If there's no song yet, we can't do a lot...
 	song = zynthian_gui_config.zyngui.screens["zynthiloops"].song
 	if not song:
 		pass
 	else:
-		for trackId in range(0, 10):
-			track = song.tracksModel.getTrack(trackId)
-			if track is not None:
-				trackPorts = jclient.get_ports(f"SamplerSynth:track_{trackId + 1}_", is_audio=True, is_output=True)
-				# Firstly, attempt to connect the track to any effects attached to the track
-				trackHasEffects = False
-				if len(track.chainedSounds) > 0:
-					for chainedSound in track.chainedSounds:
-						if chainedSound > -1 and track.checkIfLayerExists(chainedSound):
+		for channelId in range(0, 10):
+			channel = song.channelsModel.getChannel(channelId)
+			if channel is not None:
+				channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}_", is_audio=True, is_output=True)
+				# Firstly, attempt to connect the channel to any effects attached to the channel
+				channelHasEffects = False
+				if len(channel.chainedSounds) > 0:
+					for chainedSound in channel.chainedSounds:
+						if chainedSound > -1 and channel.checkIfLayerExists(chainedSound):
 							layer = zynthian_gui_config.zyngui.screens['layer'].layer_midi_map[chainedSound]
 							effectsLayers = zynthian_gui_config.zyngui.screens['layer'].get_fxchain_layers(layer)
 							if effectsLayers != None and len(effectsLayers) > 0:
-								# As there are effects, connect the track's outputs to their inputs
+								# As there are effects, connect the channel's outputs to their inputs
 								for sl in effectsLayers:
 									if sl.engine.type == "Audio Effect":
 										try:
 											engineInPorts = jclient.get_ports(sl.engine.jackname, is_audio=True, is_input=True);
 											if len(engineInPorts) == 1:
 												engineInPorts.append(engineInPorts[0]);
-											for port in zip(trackPorts, engineInPorts):
-												trackHasEffects = True
+											for port in zip(channelPorts, engineInPorts):
+												channelHasEffects = True
 												try:
 													jclient.connect(port[0], port[1])
 												except: pass
@@ -583,16 +583,16 @@ def audio_autoconnect(force=False):
 											release_lock()
 											return
 								pass
-				# If track wants to route through global FX, connect its outputs to the global effects if there are any
+				# If channel wants to route through global FX, connect its outputs to the global effects if there are any
 				hasGlobalEffects = False
-				if track.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
+				if channel.routeThroughGlobalFX and len(zynthian_gui_config.zyngui.global_fx_engines) > 0:
 					for engine, _ in zynthian_gui_config.zyngui.global_fx_engines:
 						try:
 							engineInPorts = jclient.get_ports(engine.jackname, is_audio=True, is_input=True);
 							# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
 							if len(engineInPorts) == 1:
 								engineInPorts[1] = engineInPorts[0];
-							for port in zip(trackPorts, engineInPorts):
+							for port in zip(channelPorts, engineInPorts):
 								try:
 									jclient.connect(port[0], port[1])
 									hasGlobalEffects = True
@@ -604,15 +604,15 @@ def audio_autoconnect(force=False):
 							force_next_autoconnect = True;
 							release_lock()
 							return
-				# If there are still no effects attached to this track after taking global into account, connect its outputs to system playback
-				if trackHasEffects or hasGlobalEffects:
-					for port in zip(trackPorts, playback_ports):
+				# If there are still no effects attached to this channel after taking global into account, connect its outputs to system playback
+				if channelHasEffects or hasGlobalEffects:
+					for port in zip(channelPorts, playback_ports):
 						try:
 							jclient.disconnect(port[0], port[1])
 						except: pass
-				# If there were no global effects or track effects, make sure that the track is connected to system playback
+				# If there were no global effects or channel effects, make sure that the channel is connected to system playback
 				else:
-					for port in zip(trackPorts, playback_ports):
+					for port in zip(channelPorts, playback_ports):
 						try:
 							jclient.connect(port[0], port[1])
 						except: pass
@@ -694,13 +694,13 @@ def audio_autoconnect(force=False):
 		if zynthian_gui_config.zyngui.zynthiloops.song:
 			for midi_channel in zynthian_gui_config.zyngui.layer.layer_midi_map:
 				synth_engine = zynthian_gui_config.zyngui.layer.layer_midi_map[midi_channel]
-				for track_index in range(0, 10):
-					track = zynthian_gui_config.zyngui.zynthiloops.song.tracksModel.getTrack(track_index)
+				for channel_index in range(0, 10):
+					channel = zynthian_gui_config.zyngui.zynthiloops.song.channelsModel.getChannel(channel_index)
 
-					# Find which track midichannel belongs to
-					if track is not None and midi_channel in track.chainedSounds:
-						# Check if track wants to route through global FX
-						if track.routeThroughGlobalFX:
+					# Find which channel midichannel belongs to
+					if channel is not None and midi_channel in channel.chainedSounds:
+						# Check if channel wants to route through global FX
+						if channel.routeThroughGlobalFX:
 							is_synth_engine_connected_to_system = False
 							synth_engine_output_ports = jclient.get_ports(synth_engine.jackname, is_output=True, is_audio=True)
 
@@ -737,7 +737,7 @@ def audio_autoconnect(force=False):
 									except:
 										pass
 						else:
-							# Track does not want to route through Global FX. Break out of loop carry on with next midi channel
+							# Channel does not want to route through Global FX. Break out of loop carry on with next midi channel
 							break
 	except Exception as e:
 		logging.error(f"Failed to autoconnect fully. Postponing the auto connection until the next autoconnect run, at which point it should hopefully be fine. Reported error: {e}")

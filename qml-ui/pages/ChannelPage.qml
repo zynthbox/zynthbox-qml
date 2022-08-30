@@ -35,12 +35,12 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject track: zynthian.track.track
-    readonly property QtObject part: zynthian.track.part
-    readonly property QtObject clip: track.clipsModel.getClip(zynthian.track.partId);
+    readonly property QtObject channel: zynthian.channel.channel
+    readonly property QtObject part: zynthian.channel.part
+    readonly property QtObject clip: channel.clipsModel.getClip(zynthian.channel.partId);
 
-    screenId: "track"
-    title: qsTr("%1 Details").arg(root.track.name)//zynthian.track.selector_path_element
+    screenId: "channel"
+    title: qsTr("%1 Details").arg(root.channel.name)//zynthian.channel.selector_path_element
 
     //Component.onCompleted: zynthian.fixed_layers.activate_index(6)
 
@@ -68,8 +68,8 @@ Zynthian.ScreenPage {
                 font: topSoundHeading.font
                 from: 0
                 to: root.song.partsModel.count - 1
-                value: root.track.partId
-                onValueModified: zynthian.track.partId = value
+                value: root.channel.partId
+                onValueModified: zynthian.channel.partId = value
                 textFromValue: function(value) {
                     return root.part.name
                 }
@@ -93,7 +93,7 @@ Zynthian.ScreenPage {
             spacing: Kirigami.Units.largeSpacing
             Layout.fillWidth: true
             Zynthian.Card {
-                id: trackCard
+                id: channelCard
                 Layout.fillWidth: true
 
                 contentItem: ColumnLayout {
@@ -105,33 +105,33 @@ Zynthian.ScreenPage {
                             RowLayout {
                                 QQC2.SpinBox {
                                     from: 0
-                                    implicitWidth: trackTitle.implicitWidth + Kirigami.Units.gridUnit * 7
-                                    implicitHeight: trackTitle.implicitHeight + topPadding + bottomPadding
-                                    to: root.song.tracksModel.count - 1
-                                    value: root.track.trackId
-                                    onValueModified: zynthian.track.trackId = value
+                                    implicitWidth: channelTitle.implicitWidth + Kirigami.Units.gridUnit * 7
+                                    implicitHeight: channelTitle.implicitHeight + topPadding + bottomPadding
+                                    to: root.song.channelsModel.count - 1
+                                    value: root.channel.channelId
+                                    onValueModified: zynthian.channel.channelId = value
                                     contentItem: Kirigami.Heading {
-                                        id: trackTitle
+                                        id: channelTitle
                                         //Layout.fillWidth: true
                                         wrapMode: Text.NoWrap
-                                        text: root.track.name
+                                        text: root.channel.name
                                     }
                                 }
                                 QQC2.Button {
                                     icon.name: "document-edit"
                                     onClicked: {
                                         titleStack.currentIndex = 1;
-                                        trackNameEdit.text = root.track.name;
-                                        trackNameEdit.forceActiveFocus();
+                                        channelNameEdit.text = root.channel.name;
+                                        channelNameEdit.forceActiveFocus();
                                     }
                                     Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.medium*1.3)
                                     Layout.preferredHeight: Layout.preferredWidth
                                 }
                             }
                             QQC2.TextField {
-                                id: trackNameEdit
+                                id: channelNameEdit
                                 onAccepted: {
-                                    root.track.name = text
+                                    root.channel.name = text
                                     titleStack.currentIndex = 0;
                                 }
                             }
@@ -141,7 +141,7 @@ Zynthian.ScreenPage {
                             id: midiButton
                             text: qsTr("Load Voices")
                             onClicked: {
-                                zynthian.zynthiloops.restoreLayersFromTrack(zynthian.track.trackId)
+                                zynthian.zynthiloops.restoreLayersFromChannel(zynthian.channel.channelId)
                                 //zynthian.fixed_layers.activate_index(6)
                             }
                         }
@@ -201,8 +201,8 @@ Zynthian.ScreenPage {
                                     }
                                     function updateText() {
 
-                                        for (var i in root.track.soundData) {
-                                            let data = root.track.soundData[i];
+                                        for (var i in root.channel.soundData) {
+                                            let data = root.channel.soundData[i];
                                             if (data.midi_chan === channelDelegate.targetMidiChan) {
                                                 currentSoundName.text = data.preset_name;
                                                 return;
@@ -216,7 +216,7 @@ Zynthian.ScreenPage {
                                     }
                                     Connections {
                                         target: root
-                                        onTrackChanged: voiceCombo.updateText();
+                                        onChannelChanged: voiceCombo.updateText();
                                     }
 
                                     displayText: ""
@@ -234,7 +234,7 @@ Zynthian.ScreenPage {
                                             voiceCombo.updateText()
                                         }
                                         //zynthian.fixed_layers.activate_index(6)
-                                        zynthian.zynthiloops.saveLayersToTrack(zynthian.track.trackId)
+                                        zynthian.zynthiloops.saveLayersToChannel(zynthian.channel.channelId)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
@@ -318,7 +318,7 @@ Zynthian.ScreenPage {
 
             Zynthian.Card {
                 //Layout.fillHeight: true
-                Layout.preferredHeight: trackCard.height
+                Layout.preferredHeight: channelCard.height
                 contentItem: ColumnLayout {
                     QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter

@@ -186,9 +186,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     def syncClipsEnabledFromCurrentScene(self):
         # Sync enabled attribute for clips in scene
-        for track in range(10):
+        for channel in range(10):
             for part in range(5):
-                clip = self.__song__.getClipByPart(track, self.selectedSketchIndex, part)
+                clip = self.__song__.getClipByPart(channel, self.selectedSketchIndex, part)
 
                 if clip is not None and self.isClipInCurrentScene(clip):
                     clip.enabled = True
@@ -204,7 +204,7 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
             # Start all clips except clip to be recorded
             if clip != self.zyngui.zynthiloops.clipToRecord and \
-                    clip.part == clip.clipTrack.selectedPart and \
+                    clip.part == clip.clipChannel.selectedPart and \
                     (sketchIndex < 0 or (0 <= sketchIndex == clip.col)):
                 clip.play()
 
@@ -275,9 +275,9 @@ class zynthiloops_scenes_model(QAbstractListModel):
 
     @Slot(int, int, result=None)
     def copySketch(self, from_sketch, to_sketch):
-        for i in range(0, self.__song__.tracksModel.count):
-            track = self.__song__.tracksModel.getTrack(i)
+        for i in range(0, self.__song__.channelsModel.count):
+            channel = self.__song__.channelsModel.getChannel(i)
             for part in range(5):
-                track.parts[part].getClip(to_sketch).copyFrom(track.parts[part].getClip(from_sketch))
+                channel.parts[part].getClip(to_sketch).copyFrom(channel.parts[part].getClip(from_sketch))
 
     clipCountChanged = Signal()

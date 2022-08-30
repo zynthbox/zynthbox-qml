@@ -39,7 +39,7 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject selectedTrack: song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    readonly property QtObject selectedChannel: song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -47,23 +47,23 @@ Rectangle {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_SELECT_SHORT":
-                bottomBar.controlType = BottomBar.ControlType.Track;
-                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                bottomBar.controlType = BottomBar.ControlType.Channel;
+                bottomBar.controlObj = zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
 
                 bottomStack.slotsBar.bottomBarButton.checked = true
 
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack -= 1;
+                if (zynthian.session_dashboard.selectedChannel > 0) {
+                    zynthian.session_dashboard.selectedChannel -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < 9) {
-                    zynthian.session_dashboard.selectedTrack += 1;
+                if (zynthian.session_dashboard.selectedChannel < 9) {
+                    zynthian.session_dashboard.selectedChannel += 1;
                 }
 
                 return true;
@@ -123,7 +123,7 @@ Rectangle {
                     }
 
                     ListView {
-                        id: tracksVolumeRow
+                        id: channelsVolumeRow
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -133,24 +133,24 @@ Rectangle {
                         orientation: Qt.Horizontal
                         boundsBehavior: Flickable.StopAtBounds
 
-                        model: root.song.tracksModel
+                        model: root.song.channelsModel
 
-                        function handleClick(track) {
-                            if (zynthian.session_dashboard.selectedTrack !== track.id) {
+                        function handleClick(channel) {
+                            if (zynthian.session_dashboard.selectedChannel !== channel.id) {
                                 zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                zynthian.session_dashboard.selectedTrack = track.id;
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                                zynthian.session_dashboard.selectedChannel = channel.id;
+                                bottomBar.controlType = BottomBar.ControlType.Channel;
+                                bottomBar.controlObj = zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
                             } else {
-                                bottomBar.controlType = BottomBar.ControlType.Track;
-                                bottomBar.controlObj = zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack);
+                                bottomBar.controlType = BottomBar.ControlType.Channel;
+                                bottomBar.controlObj = zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel);
 
                                 bottomStack.currentIndex = 0
                             }
                         }
 
                         delegate: Rectangle {
-                            property bool highlighted: index === zynthian.session_dashboard.selectedTrack
+                            property bool highlighted: index === zynthian.session_dashboard.selectedChannel
                             width: privateProps.cellWidth
                             height: ListView.view.height
                             color: highlighted ? "#22ffffff" : "transparent"
@@ -175,30 +175,30 @@ Rectangle {
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
-                                                tracksVolumeRow.handleClick(track);
+                                                channelsVolumeRow.handleClick(channel);
                                             }
                                         }
 
                                         VolumeControl {
                                             id: volumeControl
 
-                                            property var audioLevelText: model.track.audioLevel.toFixed(2)
-                                            property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.track.samples[model.track.selectedSlotRow].cppObjId);
+                                            property var audioLevelText: model.channel.audioLevel.toFixed(2)
+                                            property QtObject sampleClipObject: ZynQuick.PlayGridManager.getClipById(model.channel.samples[model.channel.selectedSlotRow].cppObjId);
                                             property real synthAudioLevel
 
                                             anchors.fill: parent
 
-                                            enabled: !model.track.muted
-                                            headerText: model.track.muted || model.track.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
-        //                                    footerText: model.track.name
+                                            enabled: !model.channel.muted
+                                            headerText: model.channel.muted || model.channel.audioLevel <= -40 ? "" : (audioLevelText + " (dB)")
+        //                                    footerText: model.channel.name
                                             audioLeveldB: visible
-                                                            ? !model.track.muted
-                                                                ? model.track.trackAudioType === "sample-loop"
-                                                                    ? ZL.AudioLevels.add(model.track.audioLevel, synthAudioLevel)
-                                                                    : model.track.trackAudioType === "synth"
+                                                            ? !model.channel.muted
+                                                                ? model.channel.channelAudioType === "sample-loop"
+                                                                    ? ZL.AudioLevels.add(model.channel.audioLevel, synthAudioLevel)
+                                                                    : model.channel.channelAudioType === "synth"
                                                                         ? synthAudioLevel
-                                                                        : model.track.trackAudioType === "sample-trig" ||
-                                                                            model.track.trackAudioType === "sample-slice"
+                                                                        : model.channel.channelAudioType === "sample-trig" ||
+                                                                            model.channel.channelAudioType === "sample-slice"
                                                                             ? sampleClipObject
                                                                                 ? sampleClipObject.audioLevel
                                                                                 : -400
@@ -208,25 +208,25 @@ Rectangle {
                                             inputAudioLevelVisible: false
 
                                             onValueChanged: {
-                                                 model.track.volume = slider.value
+                                                 model.channel.volume = slider.value
                                             }
 
                                             onClicked: {
-                                                tracksVolumeRow.handleClick(track);
+                                                channelsVolumeRow.handleClick(channel);
                                             }
                                             onDoubleClicked: {
-                                                model.track.volume = model.track.initialVolume;
+                                                model.channel.volume = model.channel.initialVolume;
                                             }
 
                                             Binding {
                                                 target: volumeControl.slider
                                                 property: "value"
-                                                value: model.track.volume
+                                                value: model.channel.volume
                                             }
                                             Binding {
                                                 target: volumeControl
                                                 property: "synthAudioLevel"
-                                                value: root.visible ? ZL.AudioLevels.tracks[model.track.id] : -400
+                                                value: root.visible ? ZL.AudioLevels.channels[model.channel.id] : -400
                                             }
                                         }
 
@@ -277,17 +277,17 @@ Rectangle {
                                                 }
 
                                                 Connections {
-                                                    target: model.track
-                                                    onChainedSoundsChanged: model.track.trackAudioType === "synth" ? soundnameUpdater.restart() : false
-                                                    onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
-                                                    onTrackAudioTypeChanged: soundnameUpdater.restart()
-                                                    onSceneClipChanged: model.track.trackAudioType === "sample-loop" ? soundnameUpdater.restart() : false
-                                                    onSelectedSlotRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.track.trackAudioType) >= 0 ? soundnameUpdater.restart() : false
+                                                    target: model.channel
+                                                    onChainedSoundsChanged: model.channel.channelAudioType === "synth" ? soundnameUpdater.restart() : false
+                                                    onSamplesChanged: ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0 ? soundnameUpdater.restart() : false
+                                                    onChannelAudioTypeChanged: soundnameUpdater.restart()
+                                                    onSceneClipChanged: model.channel.channelAudioType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                    onSelectedSlotRowChanged: ["sample-trig", "sample-slice", "external"].indexOf(model.channel.channelAudioType) >= 0 ? soundnameUpdater.restart() : false
                                                 }
 
                                                 Connections {
-                                                    target: model.track.sceneClip
-                                                    onPathChanged: model.track.trackAudioType === "sample-loop" ? soundnameUpdater.restart() : false
+                                                    target: model.channel.sceneClip
+                                                    onPathChanged: model.channel.channelAudioType === "sample-loop" ? soundnameUpdater.restart() : false
                                                 }
                                                 Connections {
                                                     target: root
@@ -298,23 +298,23 @@ Rectangle {
                                                     if (root.visible) {
                                                         var text = "";
 
-                                                        if (model.track.trackAudioType === "synth") {
-                                                            for (var id in model.track.chainedSounds) {
-                                                                if (model.track.chainedSounds[id] >= 0 &&
-                                                                    model.track.checkIfLayerExists(model.track.chainedSounds[id])) {
-                                                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.track.chainedSounds[id]).split(">");
+                                                        if (model.channel.channelAudioType === "synth") {
+                                                            for (var id in model.channel.chainedSounds) {
+                                                                if (model.channel.chainedSounds[id] >= 0 &&
+                                                                    model.channel.checkIfLayerExists(model.channel.chainedSounds[id])) {
+                                                                    var soundName = zynthian.fixed_layers.selector_list.getDisplayValue(model.channel.chainedSounds[id]).split(">");
                                                                     text = qsTr("%1").arg(soundName[1] ? soundName[1].trim() : "")
                                                                     break;
                                                                 }
                                                             }
-                                                        } else if (model.track.trackAudioType === "sample-trig" ||
-                                                                model.track.trackAudioType === "sample-slice") {
+                                                        } else if (model.channel.channelAudioType === "sample-trig" ||
+                                                                model.channel.channelAudioType === "sample-slice") {
                                                             try {
-                                                                text = model.track.samples[model.track.selectedSlotRow].path.split("/").pop()
+                                                                text = model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
                                                             } catch (e) {}
-                                                        } else if (model.track.trackAudioType === "sample-loop") {
+                                                        } else if (model.channel.channelAudioType === "sample-loop") {
                                                             try {
-                                                                text = model.track.sceneClip.path.split("/").pop()
+                                                                text = model.channel.sceneClip.path.split("/").pop()
                                                             } catch (e) {}
                                                         }
 
@@ -332,9 +332,9 @@ Rectangle {
                                         orientation: Qt.Horizontal
                                         from: 1.0
                                         to: -1.0
-                                        controlObj: model.track
+                                        controlObj: model.channel
                                         controlProp: "pan"
-                                        initialValue: model.track.initialPan
+                                        initialValue: model.channel.initialPan
                                     }
 
                                     QQC2.Label {
@@ -344,12 +344,12 @@ Rectangle {
                                         Layout.margins: 4
                                         horizontalAlignment: "AlignHCenter"
                                         elide: "ElideRight"
-                                        text: model.track.name
+                                        text: model.channel.name
 
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
-                                                tracksVolumeRow.handleClick(track);
+                                                channelsVolumeRow.handleClick(channel);
                                             }
                                         }
                                     }
@@ -368,7 +368,7 @@ Rectangle {
                                             radius: 2
                                             font.pointSize: 8
                                             checkable: true
-                                            checked: root.song.playTrackSolo === model.track.id
+                                            checked: root.song.playChannelSolo === model.channel.id
                                             text: qsTr("S")
                                             background: Rectangle {
                                                 radius: parent.radius
@@ -378,9 +378,9 @@ Rectangle {
                                             }
                                             onToggled: {
                                                 if (checked) {
-                                                    root.song.playTrackSolo = model.track.id
+                                                    root.song.playChannelSolo = model.channel.id
                                                 } else {
-                                                    root.song.playTrackSolo = -1
+                                                    root.song.playChannelSolo = -1
                                                 }
                                             }
                                         }
@@ -399,7 +399,7 @@ Rectangle {
                                                 color: parent.down || parent.checked ? "#f44336" : Qt.lighter(Kirigami.Theme.backgroundColor, 1.3)
                                             }
                                             onCheckedChanged: {
-                                                model.track.muted = checked;
+                                                model.channel.muted = checked;
                                             }
                                         }
                                     }
@@ -409,7 +409,7 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: 1
                                     color: "#ff31363b"
-                                    visible: index != root.song.tracksModel.count-1 && !highlighted
+                                    visible: index != root.song.channelsModel.count-1 && !highlighted
                                 }
                             }
                         }

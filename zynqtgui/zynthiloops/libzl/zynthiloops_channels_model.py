@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# A model to for storing channels in ZynthiLoops page
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -26,50 +26,50 @@ import logging
 
 import numpy as np
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
-from .zynthiloops_track import zynthiloops_track
+from .zynthiloops_channel import zynthiloops_channel
 
-class zynthiloops_tracks_model(QAbstractListModel):
+class zynthiloops_channels_model(QAbstractListModel):
     IdRole = Qt.UserRole + 1
     NameRole = Qt.UserRole + 2
-    TrackRole = Qt.UserRole + 3
+    ChannelRole = Qt.UserRole + 3
 
     def __init__(self, parent: QObject):
-        super(zynthiloops_tracks_model, self).__init__(parent)
+        super(zynthiloops_channels_model, self).__init__(parent)
         self.__song__ = parent
-        self.__tracks__: [zynthiloops_track] = []
+        self.__channels__: [zynthiloops_channel] = []
 
     def serialize(self):
         data = []
-        for t in self.__tracks__:
+        for t in self.__channels__:
             data.append(t.serialize())
         return data
 
     def deserialize(self, arr):
         if not isinstance(arr, list):
-            raise Exception("Invalid json format for tracks")
+            raise Exception("Invalid json format for channels")
         self.beginResetModel()
-        self.__tracks__.clear()
+        self.__channels__.clear()
         for i, t in enumerate(arr):
-            track = zynthiloops_track(i, self.__song__, self)
-            self.add_track(track)
-            track.deserialize(t)
+            channel = zynthiloops_channel(i, self.__song__, self)
+            self.add_channel(channel)
+            channel.deserialize(t)
         self.endResetModel()
 
     def data(self, index, role=None):
-        # logging.info(index.row(), self.__tracks__[index.row()])
+        # logging.info(index.row(), self.__channels__[index.row()])
 
         if not index.isValid():
             return None
 
-        if index.row() >= len(self.__tracks__):
+        if index.row() >= len(self.__channels__):
             return None
 
         if role == self.IdRole:
-            return self.__tracks__[index.row()].id
+            return self.__channels__[index.row()].id
         elif role == self.NameRole or role == Qt.DisplayRole:
-            return self.__tracks__[index.row()].name
-        elif role == self.TrackRole:
-            return self.__tracks__[index.row()]
+            return self.__channels__[index.row()].name
+        elif role == self.ChannelRole:
+            return self.__channels__[index.row()]
         else:
             return None
 
@@ -78,27 +78,27 @@ class zynthiloops_tracks_model(QAbstractListModel):
             Qt.DisplayRole: b'display',
             self.IdRole: b"id",
             self.NameRole: b"name",
-            self.TrackRole: b"track"
+            self.ChannelRole: b"channel"
         }
 
         return role_names
 
     def rowCount(self, index):
-        return len(self.__tracks__)
+        return len(self.__channels__)
 
-    def add_track(self, track: zynthiloops_track):
-        length = len(self.__tracks__)
+    def add_channel(self, channel: zynthiloops_channel):
+        length = len(self.__channels__)
 
         self.beginInsertRows(QModelIndex(), length, length)
-        self.__tracks__.append(track)
+        self.__channels__.append(channel)
         self.endInsertRows()
         self.countChanged.emit()
 
     @Slot(int, result=QObject)
-    def getTrack(self, row : int):
-        if row < 0 or row >= len(self.__tracks__):
+    def getChannel(self, row : int):
+        if row < 0 or row >= len(self.__channels__):
             return None
-        return self.__tracks__[row]
+        return self.__channels__[row]
 
 
     @Signal
@@ -107,22 +107,22 @@ class zynthiloops_tracks_model(QAbstractListModel):
 
 
     def count(self):
-        return len(self.__tracks__)
+        return len(self.__channels__)
     count = Property(int, count, notify=countChanged)
 
-    def delete_track(self, track):
-        for index, r_track in enumerate(self.__tracks__):
-            if r_track is track:
+    def delete_channel(self, channel):
+        for index, r_channel in enumerate(self.__channels__):
+            if r_channel is channel:
                 self.beginRemoveRows(QModelIndex(), index, index)
-                del self.__tracks__[index]
+                del self.__channels__[index]
                 self.endRemoveRows()
                 self.countChanged.emit()
 
                 break
 
-        for index, r_track in enumerate(self.__tracks__):
-            r_track.set_id(index)
-            clipsModel = r_track.clipsModel
+        for index, r_channel in enumerate(self.__channels__):
+            r_channel.set_id(index)
+            clipsModel = r_channel.clipsModel
 
             for clip_index in range(0, clipsModel.count):
                 clip = clipsModel.getClip(clip_index)
@@ -135,9 +135,9 @@ class zynthiloops_tracks_model(QAbstractListModel):
         already_connected = False
 
         for i in range(0, self.count):
-            track = self.getTrack(i)
+            channel = self.getChannel(i)
 
-            if track.connectedPattern == patternIndex:
+            if channel.connectedPattern == patternIndex:
                 already_connected = True
                 break
 
@@ -150,11 +150,11 @@ class zynthiloops_tracks_model(QAbstractListModel):
         zyngui = self.__song__.get_metronome_manager().zyngui
         assigned_layers = []
 
-        tracks_model = zyngui.screens["zynthiloops"].song.tracksModel
+        channels_model = zyngui.screens["zynthiloops"].song.channelsModel
 
-        for i in range(0, tracks_model.count):
-            track = tracks_model.getTrack(i)
-            assigned_layers.extend([x for x in track.chainedSounds if x >= 0 and track.checkIfLayerExists(x)])
+        for i in range(0, channels_model.count):
+            channel = channels_model.getChannel(i)
+            assigned_layers.extend([x for x in channel.chainedSounds if x >= 0 and channel.checkIfLayerExists(x)])
 
         values = np.unique(assigned_layers)
 
@@ -168,9 +168,9 @@ class zynthiloops_tracks_model(QAbstractListModel):
     ### Property connectedPatternsCount
     def get_connected_patterns_count(self):
         connected_patterns = []
-        for index, track in enumerate(self.__tracks__):
-            if track.connectedPattern >= 0:
-                connected_patterns.append(track.connectedPattern)
+        for index, channel in enumerate(self.__channels__):
+            if channel.connectedPattern >= 0:
+                connected_patterns.append(channel.connectedPattern)
         values = np.unique(connected_patterns)
         return len(values)
     connected_patterns_count_changed = Signal()

@@ -62,7 +62,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		self.last_snapshot_fpath = None
 		self.auto_next_screen = False
 		self.layer_index_replace_engine = None
-		self.__page_after_layer_creation = "layers_for_track"
+		self.__page_after_layer_creation = "layers_for_channel"
 		self.last_zs3_index = [0] * 16; # Last selected ZS3 snapshot, per MIDI channel
 		self.create_amixer_layer()
 		self.__soundsets_basepath__ = "/zynthian/zynthian-my-data/soundsets/" #TODO: all in fixed layers
@@ -484,30 +484,30 @@ class zynthian_gui_layer(zynthian_gui_selector):
 		else:
 			self.add_layer_midich(midi_chan, select)
 
-	def add_midichannel_to_track(self, midich, position_in_track = -1):
+	def add_midichannel_to_channel(self, midich, position_in_channel = -1):
 		try:
-			selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
-			chain = selected_track.get_chained_sounds()
+			selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
+			chain = selected_channel.get_chained_sounds()
 			if midich not in chain:
-				if position_in_track >= 0:
-					chain[position_in_track] = midich
+				if position_in_channel >= 0:
+					chain[position_in_channel] = midich
 				else:
 					for i, el in enumerate(chain):
 						if el == -1:
 							chain[i] = midich
 							break
-			selected_track.set_chained_sounds(chain)
+			selected_channel.set_chained_sounds(chain)
 		except:
 			pass
 
-	def remove_midichannel_from_track(self, midich):
+	def remove_midichannel_from_channel(self, midich):
 		try:
-			selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
-			chain = selected_track.get_chained_sounds()
+			selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
+			chain = selected_channel.get_chained_sounds()
 			for i, el in enumerate(chain):
 				if el == midich:
 					chain[i] = -1
-			selected_track.set_chained_sounds(chain)
+			selected_channel.set_chained_sounds(chain)
 		except:
 			pass
 
@@ -516,10 +516,10 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			zyngine = self.zyngui.screens['engine'].start_engine(self.add_layer_eng)
 			self.add_layer_eng = None
 
-			position_in_track = -1
-			for i, element in enumerate(self.zyngui.screens['layers_for_track'].list_data):
+			position_in_channel = -1
+			for i, element in enumerate(self.zyngui.screens['layers_for_channel'].list_data):
 				if midich == element[1]:
-					position_in_track = i
+					position_in_channel = i
 					break
 
 			if self.layer_index_replace_engine != None and len(self.layers) > self.index:
@@ -538,7 +538,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			else:
 				layer = zynthian_layer(zyngine, midich, self.zyngui)
 
-			self.add_midichannel_to_track(midich, position_in_track)
+			self.add_midichannel_to_channel(midich, position_in_channel)
 
 			# Try to connect Audio Effects ...
 			if len(self.layers)>0 and layer.engine.type=="Audio Effect":
@@ -638,7 +638,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			layers_to_delete = []
 			midi_chans_to_delete = []
 			for root_layer in root_layers_to_delete:
-				self.remove_midichannel_from_track(root_layer.midi_chan)
+				self.remove_midichannel_from_channel(root_layer.midi_chan)
 				# Midichain layers
 				midichain_layers = self.get_midichain_layers(root_layer)
 				if len(midichain_layers)>0:
@@ -1762,7 +1762,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 		#TODO: always clone?
 		for i in restored_channels:
-			self.add_midichannel_to_track(i)
+			self.add_midichannel_to_channel(i)
 			for j in restored_channels:
 				if not zyncoder.lib_zyncoder.get_midi_filter_clone(i, j):
 					zyncoder.lib_zyncoder.set_midi_filter_clone(i, j, True)
@@ -2138,7 +2138,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.zynautoconnect_midi()
 			new_layer.reset_audio_out()
 			self.layers.append(new_layer)
-			self.add_midichannel_to_track(to_midichan)
+			self.add_midichannel_to_channel(to_midichan)
 			self.layer_created.emit(to_midichan)
 
 			self.fill_list()

@@ -103,8 +103,8 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
             self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
 
-            #self.list_data.append((self.session_dashboard, 0, "Tracks"))
-            #self.list_metadata.append({"icon":"../../img/tracks.svg"})
+            #self.list_data.append((self.session_dashboard, 0, "Channels"))
+            #self.list_metadata.append({"icon":"../../img/channels.svg"})
 
             #if "zynseq" in zynthian_gui_config.experimental_features:
                 # self.list_data.append((self.step_sequencer, 0, "Sequencer"))
@@ -337,9 +337,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("Play Grid")
         self.zyngui.show_modal("playgrid")
 
-    def track(self):
-        logging.info("Track")
-        self.zyngui.show_modal("track")
+    def channel(self):
+        logging.info("Channel")
+        self.zyngui.show_modal("channel")
 
     def session_dashboard(self):
         logging.info("Session")

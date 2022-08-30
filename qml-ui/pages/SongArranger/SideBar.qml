@@ -37,7 +37,7 @@ Zynthian.Card {
     id: root
 
     enum ControlType {
-        Track,
+        Channel,
         None
     }
 
@@ -69,8 +69,8 @@ Zynthian.Card {
 
             initialAction: {
                 switch (root.controlType) {
-                    case SideBar.ControlType.Track:
-                        return trackAction;
+                    case SideBar.ControlType.Channel:
+                        return channelAction;
                     default:
                         return emptyAction;
                 }
@@ -80,10 +80,10 @@ Zynthian.Card {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    id: trackAction
+                    id: channelAction
                     text: qsTr("Channel")
-                    page: Qt.resolvedUrl("TrackBar.qml")
-                    visible: root.controlType === SideBar.ControlType.Track
+                    page: Qt.resolvedUrl("ChannelBar.qml")
+                    visible: root.controlType === SideBar.ControlType.Channel
                     initialProperties: {"sideBar": root}
                 },
                 Zynthian.TabbedControlViewAction {

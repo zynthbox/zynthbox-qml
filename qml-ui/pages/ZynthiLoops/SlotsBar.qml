@@ -38,7 +38,7 @@ Rectangle {
     id: root
 
     property alias bottomBarButton: bottomBarButton
-    property alias trackButton: trackButton
+    property alias channelButton: channelButton
     property alias mixerButton: mixerButton
     property alias partButton: partButton
     property alias synthsButton: synthsButton
@@ -49,24 +49,24 @@ Rectangle {
     property bool displaySceneButtons: zynthian.zynthiloops.displaySceneButtons
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject selectedTrack: applicationWindow().selectedTrack
+    readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
-    // FIXME : Sample picker dialog was having issues when selecting sample for track T6-T10
-    //         Find a proper solution and see if selectedTrack can be used for all cases instead of this
+    // FIXME : Sample picker dialog was having issues when selecting sample for channel T6-T10
+    //         Find a proper solution and see if selectedChannel can be used for all cases instead of this
     property QtObject selectedSlotRowItem
 
     onSongModeChanged: {
         if (root.songMode) {
             partButton.checked = true
         } else {
-            trackButton.checked = true
+            channelButton.checked = true
         }
     }
     onDisplaySceneButtonsChanged: {
         if (root.displaySceneButtons) {
             partButton.checked = true
         } else {
-            trackButton.checked = true
+            channelButton.checked = true
         }
     }
 
@@ -83,7 +83,7 @@ Rectangle {
         }
 
         switch (cuia) {
-            case "SWITCH_TRACKS_MOD_SHORT":
+            case "SWITCH_CHANNELS_MOD_SHORT":
                 return true
 
             case "SWITCH_SELECT_SHORT":
@@ -92,61 +92,61 @@ Rectangle {
                 return true;
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack -= 1;
+                if (zynthian.session_dashboard.selectedChannel > 0) {
+                    zynthian.session_dashboard.selectedChannel -= 1;
                 }
 
                 return true;
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < 9) {
-                    zynthian.session_dashboard.selectedTrack += 1;
+                if (zynthian.session_dashboard.selectedChannel < 9) {
+                    zynthian.session_dashboard.selectedChannel += 1;
                 }
 
                 return true;
 
             case "SELECT_UP":
-                if (root.selectedSlotRowItem.track.selectedSlotRow > 0) {
-                    root.selectedSlotRowItem.track.selectedSlotRow -= 1
+                if (root.selectedSlotRowItem.channel.selectedSlotRow > 0) {
+                    root.selectedSlotRowItem.channel.selectedSlotRow -= 1
                 }
 
                 return true;
 
             case "SELECT_DOWN":
-                if (root.selectedSlotRowItem.track.selectedSlotRow < 4) {
-                    root.selectedSlotRowItem.track.selectedSlotRow += 1
+                if (root.selectedSlotRowItem.channel.selectedSlotRow < 4) {
+                    root.selectedSlotRowItem.channel.selectedSlotRow += 1
                 }
 
                 return true;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-            case "TRACK_1":
-            case "TRACK_6":
-                root.selectedSlotRowItem.track.selectedSlotRow = 0
+            case "CHANNEL_1":
+            case "CHANNEL_6":
+                root.selectedSlotRowItem.channel.selectedSlotRow = 0
                 handleItemClick()
                 return true
 
-            case "TRACK_2":
-            case "TRACK_7":
-                root.selectedSlotRowItem.track.selectedSlotRow = 1
+            case "CHANNEL_2":
+            case "CHANNEL_7":
+                root.selectedSlotRowItem.channel.selectedSlotRow = 1
                 handleItemClick()
                 return true
 
-            case "TRACK_3":
-            case "TRACK_8":
-                root.selectedSlotRowItem.track.selectedSlotRow = 2
+            case "CHANNEL_3":
+            case "CHANNEL_8":
+                root.selectedSlotRowItem.channel.selectedSlotRow = 2
                 handleItemClick()
                 return true
 
-            case "TRACK_4":
-            case "TRACK_9":
-                root.selectedSlotRowItem.track.selectedSlotRow = 3
+            case "CHANNEL_4":
+            case "CHANNEL_9":
+                root.selectedSlotRowItem.channel.selectedSlotRow = 3
                 handleItemClick()
                 return true
 
-            case "TRACK_5":
-            case "TRACK_10":
-                root.selectedSlotRowItem.track.selectedSlotRow = 4
+            case "CHANNEL_5":
+            case "CHANNEL_10":
+                root.selectedSlotRowItem.channel.selectedSlotRow = 4
                 handleItemClick()
                 return true
         }
@@ -155,19 +155,19 @@ Rectangle {
     }
 
     function selectConnectedSound() {
-        if (root.selectedSlotRowItem.track.connectedSound >= 0) {
-            zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.track.connectedSound);
+        if (root.selectedSlotRowItem.channel.connectedSound >= 0) {
+            zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
 
-            if (root.selectedSlotRowItem.track.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(root.selectedSlotRowItem.track.id, root.selectedSlotRowItem.track.selectedPart);
-                pattern.midiChannel = root.selectedSlotRowItem.track.connectedSound;
+            if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
+                pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
             }
         }
     }
 
     function handleItemClick(type) {
         // Type will be used to invoke the respective handler when
-        // required from MixedTracksViewBar or something else in future
+        // required from MixedChannelsViewBar or something else in future
         // This allows us to invoke specific handler frmo other page
         // when when the buttons are not checked
         if (!type) {
@@ -178,12 +178,12 @@ Rectangle {
             // Clicked entry is synth
             console.log("handleItemClick : Synth")
 
-            var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
+            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
 
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
-                if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
-                    root.selectedSlotRowItem.track.remove_and_unchain_sound(chainedSound)
+                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
+                    root.selectedSlotRowItem.channel.remove_and_unchain_sound(chainedSound)
                 }
             } else {
                 layerSetupDialog.open()
@@ -192,11 +192,11 @@ Rectangle {
             // Clicked entry is fx
             console.log("handleItemClick : FX")
 
-            var chainedSound = root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
+            var chainedSound = root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
 
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
-                if (root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound)) {
+                if (root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound)) {
                     zynthian.start_loading()
                     zynthian.fixed_layers.activate_index(chainedSound)
                     zynthian.layer_effects.fx_reset_confirmed()
@@ -216,13 +216,13 @@ Rectangle {
 
             if (zynthian.backButtonPressed) {
                 // Back is pressed. Clear Slot
-                root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.track.selectedSlotRow].clear()
+                root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].clear()
             } else {
                 samplePickerPopup.open()
             }
         } else if (type === "sample-loop") {
-            if (root.selectedTrack.selectedSlotRow === 0) {
-                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            if (root.selectedChannel.selectedSlotRow === 0) {
+                var clip = root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                 if (zynthian.backButtonPressed) {
                     clip.clear()
@@ -329,7 +329,7 @@ Rectangle {
                         //// INVISIBLE BUTTONS
 
                         QQC2.Button {
-                            id: trackButton
+                            id: channelButton
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             checkable: true
@@ -412,7 +412,7 @@ Rectangle {
                     }
 
                     ListView {
-                        id: tracksSlotsRow
+                        id: channelsSlotsRow
 
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -422,15 +422,15 @@ Rectangle {
                         orientation: Qt.Horizontal
                         boundsBehavior: Flickable.StopAtBounds
 
-                        model: root.song.tracksModel
+                        model: root.song.channelsModel
 
                         delegate: Rectangle {
-                            id: trackDelegate
+                            id: channelDelegate
 
-                            property bool highlighted: index === zynthian.session_dashboard.selectedTrack
+                            property bool highlighted: index === zynthian.session_dashboard.selectedChannel
 //                            property int selectedRow: 0
-                            property int trackIndex: index
-                            property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
+                            property int channelIndex: index
+                            property QtObject channel: zynthian.zynthiloops.song.channelsModel.getChannel(index)
 
                             width: privateProps.cellWidth
                             height: ListView.view.height
@@ -441,7 +441,7 @@ Rectangle {
 
                             onHighlightedChanged: {
                                 if (highlighted) {
-                                    root.selectedSlotRowItem = trackDelegate
+                                    root.selectedSlotRowItem = channelDelegate
                                 }
                             }
 
@@ -467,16 +467,16 @@ Rectangle {
                                             Layout.rightMargin: 4
                                             color: "transparent"
                                             border.width: 2
-                                            border.color: trackDelegate.highlighted && trackDelegate.track.selectedSlotRow === index ? Kirigami.Theme.highlightColor : "transparent"
+                                            border.color: channelDelegate.highlighted && channelDelegate.channel.selectedSlotRow === index ? Kirigami.Theme.highlightColor : "transparent"
 
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (zynthian.session_dashboard.selectedTrack !== trackDelegate.trackIndex ||
-                                                        trackDelegate.track.selectedSlotRow !== index) {
-                                                        tracksSlotsRow.currentIndex = index
-                                                        trackDelegate.track.selectedSlotRow = index
-                                                        zynthian.session_dashboard.selectedTrack = trackDelegate.trackIndex;
+                                                    if (zynthian.session_dashboard.selectedChannel !== channelDelegate.channelIndex ||
+                                                        channelDelegate.channel.selectedSlotRow !== index) {
+                                                        channelsSlotsRow.currentIndex = index
+                                                        channelDelegate.channel.selectedSlotRow = index
+                                                        zynthian.session_dashboard.selectedChannel = channelDelegate.channelIndex;
                                                     } else {
                                                         handleItemClick()
                                                     }
@@ -485,12 +485,12 @@ Rectangle {
                                             }
 
                                             Rectangle {
-                                                property string text: synthsButton.checked && trackDelegate.track.chainedSounds[index] > -1 && trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[index])
-                                                                        ? trackDelegate.track.getLayerNameByMidiChannel(trackDelegate.track.chainedSounds[index]).split(">")[0]
-                                                                        : fxButton.checked && trackDelegate.track.chainedSounds[index] > -1 && trackDelegate.track.checkIfLayerExists(trackDelegate.track.chainedSounds[index])
-                                                                            ? trackDelegate.track.getEffectsNameByMidiChannel(trackDelegate.track.chainedSounds[index])
-                                                                            : samplesButton.checked && trackDelegate.track.samples[index].path
-                                                                                ? trackDelegate.track.samples[index].path.split("/").pop()
+                                                property string text: synthsButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
+                                                                        ? channelDelegate.channel.getLayerNameByMidiChannel(channelDelegate.channel.chainedSounds[index]).split(">")[0]
+                                                                        : fxButton.checked && channelDelegate.channel.chainedSounds[index] > -1 && channelDelegate.channel.checkIfLayerExists(channelDelegate.channel.chainedSounds[index])
+                                                                            ? channelDelegate.channel.getEffectsNameByMidiChannel(channelDelegate.channel.chainedSounds[index])
+                                                                            : samplesButton.checked && channelDelegate.channel.samples[index].path
+                                                                                ? channelDelegate.channel.samples[index].path.split("/").pop()
                                                                                 : ""
 
                                                 clip: true
@@ -527,7 +527,7 @@ Rectangle {
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: 1
                                     color: "#ff31363b"
-                                    visible: index !== root.song.tracksModel.count-1 && !highlighted
+                                    visible: index !== root.song.channelsModel.count-1 && !highlighted
                                 }
                             }
                         }
@@ -547,8 +547,8 @@ Rectangle {
                             Layout.alignment: Qt.AlignHCenter
                             font.pointSize: 14
                             text: qsTr("Ch%1-Slot%2")
-                                    .arg(zynthian.session_dashboard.selectedTrack + 1)
-                                    .arg(root.selectedSlotRowItem.track.selectedSlotRow + 1)
+                                    .arg(zynthian.session_dashboard.selectedChannel + 1)
+                                    .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
                         }
                         QQC2.Label {
                             Layout.fillWidth: false
@@ -621,7 +621,7 @@ Rectangle {
                             id: volumeSlider
 
                             property QtObject volumeControlObject: null
-                            property int chainedSound: root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]
+                            property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
 
                             orientation: Qt.Horizontal
 
@@ -631,7 +631,7 @@ Rectangle {
 
                             visible: synthsButton.checked
                             enabled: chainedSound >= 0 &&
-                                     root.selectedSlotRowItem.track.checkIfLayerExists(chainedSound) &&
+                                     root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) &&
                                      volumeControlObject &&
                                      volumeControlObject.controllable
                             value: volumeControlObject ? volumeControlObject.value : 0
@@ -650,7 +650,7 @@ Rectangle {
                         Connections {
                             enabled: bottomStack.currentIndex === 2
                             target: zynthian.session_dashboard
-                            onSelectedTrackChanged: sidebarUpdateTimer.restart()
+                            onSelectedChannelChanged: sidebarUpdateTimer.restart()
                         }
                         // This depends on an explicitly commented-out property, so let's probably comment this out as well
                         //Connections {
@@ -660,9 +660,9 @@ Rectangle {
                         //}
                         Connections {
                             enabled: root.selectedSlotRowItem != null &&
-                                     root.selectedSlotRowItem.track != null &&
+                                     root.selectedSlotRowItem.channel != null &&
                                      bottomStack.currentIndex === 2
-                            target: enabled ? root.selectedSlotRowItem.track : null
+                            target: enabled ? root.selectedSlotRowItem.channel : null
                             onChainedSoundsChanged: sidebarUpdateTimer.restart()
                             onSamplesChanged: sidebarUpdateTimer.restart()
                         }
@@ -689,17 +689,17 @@ Rectangle {
                             onTriggered: {
                                 console.log("### Updating sidebar")
                                 detailsText.text = root.selectedSlotRowItem
-                                                    ? synthsButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow])
-                                                        ? root.selectedSlotRowItem.track.getLayerNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow]).split(">")[0]
-                                                        : fxButton.checked && root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow] > -1 && root.selectedSlotRowItem.track.checkIfLayerExists(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow])
-                                                            ? root.selectedSlotRowItem.track.getEffectsNameByMidiChannel(root.selectedSlotRowItem.track.chainedSounds[root.selectedSlotRowItem.track.selectedSlotRow])
-                                                            : samplesButton.checked && root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.track.selectedSlotRow].path
-                                                                ? root.selectedSlotRowItem.track.samples[root.selectedSlotRowItem.track.selectedSlotRow].path.split("/").pop()
+                                                    ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                        ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
+                                                        : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                            ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                            : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
+                                                                ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
                                                                 : ""
                                                     : ""
 
-                                volumeSlider.volumeControlObject = zynthian.layers_for_track.volume_controls[root.selectedSlotRowItem.track.selectedSlotRow]
-                                                                    ? zynthian.layers_for_track.volume_controls[root.selectedSlotRowItem.track.selectedSlotRow]
+                                volumeSlider.volumeControlObject = zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
+                                                                    ? zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
                                                                     : null
                             }
                         }
@@ -725,14 +725,14 @@ Rectangle {
         y: parent.y
 
         headerText: qsTr("%1-S%2 : Pick a sample")
-                        .arg(root.selectedTrack.name)
-                        .arg(root.selectedTrack.selectedSlotRow + 1)
+                        .arg(root.selectedChannel.name)
+                        .arg(root.selectedChannel.selectedSlotRow + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedTrack.set_sample(file.filePath, root.selectedTrack.selectedSlotRow)
+            root.selectedChannel.set_sample(file.filePath, root.selectedChannel.selectedSlotRow)
         }
     }
 
@@ -746,14 +746,14 @@ Rectangle {
         y: parent.y
 
         headerText: qsTr("%1-S%2 : Pick a bank")
-                        .arg(root.selectedSlotRowItem.track.name)
-                        .arg(root.selectedSlotRowItem.track.selectedSlotRow + 1)
+                        .arg(root.selectedSlotRowItem.channel.name)
+                        .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["sample-bank.json"]
         }
         onFileSelected: {
-            root.selectedSlotRowItem.track.setBank(file.filePath)
+            root.selectedSlotRowItem.channel.setBank(file.filePath)
         }
     }
 
@@ -767,13 +767,13 @@ Rectangle {
         y: parent.y
 
         headerText: qsTr("%1 : Pick an audio file")
-                        .arg(root.selectedTrack.name)
+                        .arg(root.selectedChannel.name)
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex).path = file.filePath
+            root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex).path = file.filePath
         }
     }
 
@@ -796,7 +796,7 @@ Rectangle {
                 text: qsTr("Pick recording for slot")
 
                 onClicked: {
-                    samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.track.recordingDir
+                    samplePickerDialog.folderModel.folder = root.selectedSlotRowItem.channel.recordingDir
                     samplePickerDialog.open()
                     samplePickerPopup.close()
                 }

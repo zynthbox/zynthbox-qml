@@ -40,8 +40,8 @@ Zynthian.ScreenPage {
 
     function cuiaCallback(cuia) {
         var returnValue = false;
-        if (multitrackRecorderPopup.opened) {
-            returnValue = multitrackRecorderPopup.cuiaCallback(cuia);
+        if (multichannelRecorderPopup.opened) {
+            returnValue = multichannelRecorderPopup.cuiaCallback(cuia);
         }
         return returnValue;
     }
@@ -59,12 +59,12 @@ Zynthian.ScreenPage {
                 ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0
                 : true
             onTriggered: {
-                multitrackRecorderPopup.recordSong(zynthian.zynthiloops.song)
+                multichannelRecorderPopup.recordSong(zynthian.zynthiloops.song)
             }
         }
     ]
-    Zynthian.MultitrackRecorderPopup {
-        id: multitrackRecorderPopup
+    Zynthian.MultichannelRecorderPopup {
+        id: multichannelRecorderPopup
     }
     ColumnLayout {
         anchors.fill: parent;

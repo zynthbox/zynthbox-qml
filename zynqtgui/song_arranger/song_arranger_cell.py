@@ -7,14 +7,14 @@ from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
 
 
 class song_arranger_cell(QObject):
-    def __init__(self, bar, metronome_manager, track, arranger):
-        super(song_arranger_cell, self).__init__(track)
+    def __init__(self, bar, metronome_manager, channel, arranger):
+        super(song_arranger_cell, self).__init__(channel)
 
         self.__bar__ = bar
         self.__zl_clip__: zynthiloops_clip = None
         self.__metronome_manager__: zynthian_gui_zynthiloops = metronome_manager
         self.__is_playing__ = False
-        self.__track__ = track
+        self.__channel__ = channel
         self.__arranger__ = arranger
 
         self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)

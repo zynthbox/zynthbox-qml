@@ -44,7 +44,7 @@ GridLayout {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }
         
@@ -69,14 +69,14 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: Kirigami.Units.gridUnit*2
 
-            headerText: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ||
+            headerText: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_channel" ||
                         bottomBar.controlObj.audioLevel <= -40
                             ? ""
                             : (bottomBar.controlObj.audioLevel.toFixed(2) + " (dB)")
             footerText: bottomBar.controlObj.name
-            audioLeveldB: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ? bottomBar.controlObj.audioLevel : -400
+            audioLeveldB: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_channel" ? bottomBar.controlObj.audioLevel : -400
 
-            slider.value: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" ? bottomBar.controlObj.volume : 0
+            slider.value: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_channel" ? bottomBar.controlObj.volume : 0
             onValueChanged: {
                 bottomBar.controlObj.volume = slider.value
             }
@@ -91,7 +91,7 @@ GridLayout {
         Layout.fillHeight: true
         Layout.fillWidth: false
         Layout.preferredWidth: Kirigami.Units.gridUnit * 6
-        visible: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_track" && !bottomBar.controlObj.isEmpty()
+        visible: bottomBar.controlObj.className && bottomBar.controlObj.className === "zynthiloops_channel" && !bottomBar.controlObj.isEmpty()
 
         QQC2.Button {
             // As per #299 disable this button
@@ -99,7 +99,7 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
             text: "Channel Editor"
             onClicked: {
-                zynthian.current_modal_screen_id = "track"
+                zynthian.current_modal_screen_id = "channel"
             }
         }
     }
@@ -113,9 +113,9 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
 
             text: qsTr("Copy Channel")
-            visible: bottomBar.trackCopySource == null
+            visible: bottomBar.channelCopySource == null
             onClicked: {
-                bottomBar.trackCopySource = bottomBar.controlObj;
+                bottomBar.channelCopySource = bottomBar.controlObj;
             }
         }
 
@@ -123,11 +123,11 @@ GridLayout {
             Layout.alignment: Qt.AlignCenter
 
             text: qsTr("Paste Channel")
-            visible: bottomBar.trackCopySource != null
-            enabled: bottomBar.trackCopySource != bottomBar.controlObj
+            visible: bottomBar.channelCopySource != null
+            enabled: bottomBar.channelCopySource != bottomBar.controlObj
             onClicked: {
-                bottomBar.controlObj.copyFrom(bottomBar.trackCopySource);
-                bottomBar.trackCopySource = null;
+                bottomBar.controlObj.copyFrom(bottomBar.channelCopySource);
+                bottomBar.channelCopySource = null;
             }
         }
     }

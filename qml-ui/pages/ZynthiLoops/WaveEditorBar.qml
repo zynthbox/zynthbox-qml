@@ -45,14 +45,14 @@ GridLayout {
     property QtObject controlObj: (bottomBar.controlType === BottomBar.ControlType.Clip || bottomBar.controlType === BottomBar.ControlType.Pattern)
                                     ? bottomBar.controlObj // selected bottomBar object is clip/pattern
                                     : bottomBar.controlObj != null && bottomBar.controlObj.samples != null
-                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a track
+                                        ? bottomBar.controlObj.samples[bottomBar.controlObj.selectedSlotRow] // selected bottomBar object is not clip/pattern and hence it is a channel
                                         : null
-    property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject channel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }
         
@@ -194,7 +194,7 @@ GridLayout {
             QQC2.Button {
                 id: loopHandle
 
-                visible: waveBar.track.trackAudioType !== "sample-slice"
+                visible: waveBar.channel.channelAudioType !== "sample-slice"
                 anchors.verticalCenter: startLoopLine.verticalCenter
                 padding: Kirigami.Units.largeSpacing * 1.5
                 background: Item {
@@ -312,7 +312,7 @@ GridLayout {
             // Loop line
             Rectangle {
                 id: loopLine
-                visible: waveBar.track.trackAudioType !== "sample-slice"
+                visible: waveBar.channel.channelAudioType !== "sample-slice"
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
@@ -367,7 +367,7 @@ GridLayout {
                 property QtObject cppClipObject: waveBar.controlObj
                                                     ? ZynQuick.PlayGridManager.getClipById(waveBar.controlObj.cppObjId)
                                                     : null
-                model: (waveBar.visible && waveBar.track.trackAudioType === "sample-slice" || waveBar.track.trackAudioType === "sample-trig") && cppClipObject
+                model: (waveBar.visible && waveBar.channel.channelAudioType === "sample-slice" || waveBar.channel.channelAudioType === "sample-trig") && cppClipObject
                         ? cppClipObject.playbackPositions
                         : 0
                 delegate: Item {
@@ -384,10 +384,10 @@ GridLayout {
                 }
             }
 
-            // Create and place beat lines when trackAudioType !== "sample-slice"
+            // Create and place beat lines when channelAudioType !== "sample-slice"
             Repeater {
                 // Count number of beat lines to be shown as per beat and visible width
-                model: waveBar.track.trackAudioType !== "sample-slice"
+                model: waveBar.channel.channelAudioType !== "sample-slice"
                         ? Math.ceil(wav.width / wav.pixelsPerBeat)
                         : 0
                 delegate: Rectangle {
@@ -403,10 +403,10 @@ GridLayout {
                 }
             }
 
-            // Create and place slice lines when trackAudioType === "sample-slice"
+            // Create and place slice lines when channelAudioType === "sample-slice"
             Repeater {
                 // Count number of slice lines to be shown
-                model: waveBar.track.trackAudioType === "sample-slice"
+                model: waveBar.channel.channelAudioType === "sample-slice"
                        ? waveBar.controlObj.slices
                        : 0
                 delegate: Rectangle {

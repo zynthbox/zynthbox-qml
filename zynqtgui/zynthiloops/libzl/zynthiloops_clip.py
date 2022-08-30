@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthiloops Clip: An object to store clip information for a track
+# Zynthiloops Clip: An object to store clip information for a channel
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -44,11 +44,11 @@ from ... import zynthian_gui_config
 
 
 class zynthiloops_clip(QObject):
-    def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_track_sample=False):
+    def __init__(self, row_index: int, col_index: int, part_index: int, song: QObject, parent=None, is_channel_sample=False):
         super(zynthiloops_clip, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
 
-        self.is_track_sample = is_track_sample
+        self.is_channel_sample = is_channel_sample
         self.__row_index__ = row_index
         self.__col_index__ = col_index
         self.__part_index__ = part_index
@@ -83,10 +83,10 @@ class zynthiloops_clip(QObject):
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.__enabled__ = False
-        self.track = None
+        self.channel = None
 
         try:
-            # Check if a dir named <somerandomname>.<track_id> exists.
+            # Check if a dir named <somerandomname>.<channel_id> exists.
             # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
             bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
         except:
@@ -97,16 +97,16 @@ class zynthiloops_clip(QObject):
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
 
         try:
-            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+            self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)
         except:
             pass
 
-        if self.track is not None:
-            self.track.volume_changed.connect(self.track_volume_changed)
-            self.track_volume_changed()
+        if self.channel is not None:
+            self.channel.volume_changed.connect(self.channel_volume_changed)
+            self.channel_volume_changed()
 
-            self.track.panChanged.connect(self.track_pan_changed)
-            self.track_pan_changed()
+            self.channel.panChanged.connect(self.channel_pan_changed)
+            self.channel_pan_changed()
 
         self.__sync_in_current_scene_timer__ = QTimer()
         self.__sync_in_current_scene_timer__.setSingleShot(True)
@@ -157,11 +157,11 @@ class zynthiloops_clip(QObject):
     initialStartPosition = Property(float, get_initial_start_position, constant=True)
     ### END Property initialStartPosition
 
-    ### Property clipTrack
-    def get_track(self):
-        return self.track
-    clipTrack = Property(QObject, get_track, constant=True)
-    ### END Property clipTrack
+    ### Property clipChannel
+    def get_channel(self):
+        return self.channel
+    clipChannel = Property(QObject, get_channel, constant=True)
+    ### END Property clipChannel
 
     ### Property initialLength
     def get_initial_length(self):
@@ -197,17 +197,17 @@ class zynthiloops_clip(QObject):
                 self.__current_beat__ = (self.__current_beat__ + 1) % self.__length__
             self.current_beat_changed.emit()
 
-    def track_volume_changed(self):
-        if self.track is not None and not self.zyngui.zynthiloops.longOperation:
-            self.track.volume = self.__song__.tracksModel.getTrack(self.__row_index__).volume
-            logging.info(f"Track volume changed : {self.track.volume}")
+    def channel_volume_changed(self):
+        if self.channel is not None and not self.zyngui.zynthiloops.longOperation:
+            self.channel.volume = self.__song__.channelsModel.getChannel(self.__row_index__).volume
+            logging.info(f"Channel volume changed : {self.channel.volume}")
 
             if self.audioSource is not None:
-                self.audioSource.set_volume(self.track.volume)
+                self.audioSource.set_volume(self.channel.volume)
 
-    def track_pan_changed(self):
-        if self.track is not None and self.audioSource is not None:
-            self.set_pan(self.track.pan, True)
+    def channel_pan_changed(self):
+        if self.channel is not None and self.audioSource is not None:
+            self.set_pan(self.channel.pan, True)
 
     @Slot(int)
     def setVolume(self, vol):
@@ -259,7 +259,7 @@ class zynthiloops_clip(QObject):
                 if obj["path"] is None:
                     self.__path__ = None
                 else:
-                    if self.is_track_sample:
+                    if self.is_channel_sample:
                         self.set_path(str(self.bank_path / obj["path"]), False)
                     else:
                         self.set_path(str(self.wav_path / obj["path"]), False)
@@ -301,9 +301,9 @@ class zynthiloops_clip(QObject):
             traceback.print_exception(None, e, e.__traceback__)
 
         try:
-            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
-            self.track.volume_changed.connect(self.track_volume_changed, Qt.QueuedConnection)
-            self.track_volume_changed()
+            self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)
+            self.channel.volume_changed.connect(self.channel_volume_changed, Qt.QueuedConnection)
+            self.channel_volume_changed()
         except:
             pass
 
@@ -477,7 +477,7 @@ class zynthiloops_clip(QObject):
         self.__row_index__ = new_index
 
         try:
-            self.track = self.__song__.tracksModel.getTrack(self.__row_index__)
+            self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)
             self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'sample-bank.{new_index + 1}'
         except:
             pass
@@ -503,7 +503,7 @@ class zynthiloops_clip(QObject):
 
 
     def name(self):
-        return f"{self.get_track_name()}-{self.get_part_name()}"
+        return f"{self.get_channel_name()}-{self.get_part_name()}"
     name = Property(str, name, constant=True)
 
 
@@ -632,7 +632,7 @@ class zynthiloops_clip(QObject):
         if self.__path__ is None:
             return None
         else:
-            if self.is_track_sample:
+            if self.is_channel_sample:
                 return str(self.bank_path / self.__path__)
             else:
                 return str(self.wav_path / self.__path__)
@@ -646,7 +646,7 @@ class zynthiloops_clip(QObject):
         selected_path = Path(path)
         new_filename = ""
 
-        if self.is_track_sample:
+        if self.is_channel_sample:
             if should_copy:
                 new_filename = self.generate_unique_filename(selected_path, self.bank_path)
                 logging.info(f"Copying sample({path}) into bank folder ({self.bank_path / new_filename})")
@@ -668,8 +668,8 @@ class zynthiloops_clip(QObject):
             self.audioSource.destroy()
 
         self.audioSource = ClipAudioSource(self, path.encode('utf-8'))
-        if self.clipTrack is not None:
-            self.clipTrack.trackAudioType = "sample-loop"
+        if self.clipChannel is not None:
+            self.clipChannel.channelAudioType = "sample-loop"
         self.cpp_obj_changed.emit()
         print(path)
 
@@ -688,7 +688,7 @@ class zynthiloops_clip(QObject):
         self.__snap_length_to_beat__ = (self.__get_metadata_prop__("ZYNTHBOX_SNAP_LENGTH_TO_BEAT", 'True').lower() == "true")
 
         self.reset_beat_count()
-        self.track_volume_changed()
+        self.channel_volume_changed()
 
         try:
             self.audioSource.audioLevelChanged.disconnect()
@@ -721,9 +721,9 @@ class zynthiloops_clip(QObject):
         self.path_changed.emit()
         self.sound_data_changed.emit()
         self.duration_changed.emit()
-        if self.is_track_sample:
-            self.__song__.tracksModel.getTrack(self.row).samples_changed.emit()
-        self.track_pan_changed()
+        if self.is_channel_sample:
+            self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
+        self.channel_pan_changed()
 
         self.__song__.schedule_save()
 
@@ -732,8 +732,8 @@ class zynthiloops_clip(QObject):
     def audio_level_changed_cb(self, leveldB):
         self.__audio_level__ = leveldB
         self.audioLevelChanged.emit()
-        if self.track is not None:
-            self.track.audioLevel = leveldB
+        if self.channel is not None:
+            self.channel.audioLevel = leveldB
 
     def progress_changed_cb(self, progress):
         self.__progress__ = progress
@@ -762,20 +762,20 @@ class zynthiloops_clip(QObject):
 
         self.__path__ = None
         self.path_changed.emit()
-        if self.is_track_sample:
-            self.__song__.tracksModel.getTrack(self.row).samples_changed.emit()
+        if self.is_channel_sample:
+            self.__song__.channelsModel.getChannel(self.row).samples_changed.emit()
 
         self.__song__.schedule_save()
 
     @Slot(None)
     def play(self):
         if not self.__is_playing__:
-            if self.track is not None:
-                clipsModel = self.track.clipsModel
+            if self.channel is not None:
+                clipsModel = self.channel.clipsModel
 
                 for clip_index in range(0, clipsModel.count):
                     clip: zynthiloops_clip = clipsModel.getClip(clip_index)
-                    logging.debug(f"Track({self.track}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+                    logging.debug(f"Channel({self.channel}), Clip({clip}: isPlaying({clip.__is_playing__}))")
 
                     if clip.__is_playing__:
                         clip.stop()
@@ -786,9 +786,9 @@ class zynthiloops_clip(QObject):
             self.__is_playing__ = True
             self.__is_playing_changed__.emit()
 
-            if self.clipTrack is not None and self.clipTrack.trackAudioType == "sample-loop":
+            if self.clipChannel is not None and self.clipChannel.channelAudioType == "sample-loop":
                 logging.info(f"Playing Clip {self}")
-                self.audioSource.queueClipToStartOnChannel(self.track.id)
+                self.audioSource.queueClipToStartOnChannel(self.channel.id)
 
     @Slot(None)
     def stop(self):
@@ -807,7 +807,7 @@ class zynthiloops_clip(QObject):
 
             # self.audioSource.stop()
             logging.info(f"Stopping Clip {self}")
-            self.audioSource.queueClipToStopOnChannel(self.track.id)
+            self.audioSource.queueClipToStopOnChannel(self.channel.id)
 
             self.__song__.partsModel.getPart(self.__col_index__).isPlaying = False
 
@@ -1010,12 +1010,12 @@ class zynthiloops_clip(QObject):
     metadataAudioType = Property(str, get_metadata_audio_type, notify=metadata_audio_type_changed)
     ### END Property metadataAudioType
 
-    ### Property trackName
-    def get_track_name(self):
-        track = self.__song__.tracksModel.getTrack(self.__row_index__)
-        return track.name
-    trackName = Property(str, get_track_name, constant=True)
-    ### END Property trackName
+    ### Property channelName
+    def get_channel_name(self):
+        channel = self.__song__.channelsModel.getChannel(self.__row_index__)
+        return channel.name
+    channelName = Property(str, get_channel_name, constant=True)
+    ### END Property channelName
 
     ### Property inCurrentScene
     def get_in_current_scene(self):
@@ -1101,12 +1101,12 @@ class zynthiloops_clip(QObject):
     slices = Property(int, get_slices, set_slices, notify=slices_changed)
     ### END Property slices
 
-    ### Property isTrackSample
-    def get_is_track_sample(self):
-        return self.is_track_sample
+    ### Property isChannelSample
+    def get_is_channel_sample(self):
+        return self.is_channel_sample
 
-    isTrackSample = Property(bool, get_is_track_sample, constant=True)
-    ### END Property isTrackSample
+    isChannelSample = Property(bool, get_is_channel_sample, constant=True)
+    ### END Property isChannelSample
 
     ### BEGIN Property enabled
     def get_enabled(self):

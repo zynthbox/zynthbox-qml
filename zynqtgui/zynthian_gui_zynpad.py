@@ -202,7 +202,7 @@ class zynthian_gui_zynpad():
 	#	returns: MIDI channel (1..16)
 	def get_pad_channel(self):
 		return libseq.getChannel(self.parent.bank, self.selected_pad, 0) + 1
-		#TODO: A pad may drive a complex sequence with multiple tracks hence multiple channels - need to go back to using Group
+		#TODO: A pad may drive a complex sequence with multiple channels hence multiple channels - need to go back to using Group
 
 
 	# Function to get the MIDI trigger note
@@ -220,7 +220,7 @@ class zynthian_gui_zynpad():
 		self.parent.refreshParamEditor()
 
 
-	# Function to get group of selected track
+	# Function to get group of selected channel
 	def get_group(self):
 		return libseq.getGroup(self.parent.bank, self.selected_pad)
 
@@ -431,10 +431,10 @@ class zynthian_gui_zynpad():
 
 	# Function to show the editor (pattern or arranger based on sequence content)
 	def show_editor(self):
-		tracks_in_sequence = libseq.getTracksInSequence(self.parent.bank, self.selected_pad)
-		patterns_in_track = libseq.getPatternsInTrack(self.parent.bank, self.selected_pad, 0)
+		channels_in_sequence = libseq.getTracksInSequence(self.parent.bank, self.selected_pad)
+		patterns_in_channel = libseq.getPatternsInTrack(self.parent.bank, self.selected_pad, 0)
 		pattern = libseq.getPattern(self.parent.bank, self.selected_pad, 0, 0)
-		if tracks_in_sequence != 1 or patterns_in_track !=1 or pattern == -1:
+		if channels_in_sequence != 1 or patterns_in_channel !=1 or pattern == -1:
 			self.parent.show_child(self.parent.arranger)
 			return
 		channel = libseq.getChannel(self.parent.bank, self.selected_pad, 0)

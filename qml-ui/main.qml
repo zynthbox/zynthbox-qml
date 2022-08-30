@@ -50,20 +50,20 @@ Kirigami.AbstractApplicationWindow {
     }
     readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
-    property var tracks: [
-        zynthian.zynthiloops.song.tracksModel.getTrack(0),
-        zynthian.zynthiloops.song.tracksModel.getTrack(1),
-        zynthian.zynthiloops.song.tracksModel.getTrack(2),
-        zynthian.zynthiloops.song.tracksModel.getTrack(3),
-        zynthian.zynthiloops.song.tracksModel.getTrack(4),
-        zynthian.zynthiloops.song.tracksModel.getTrack(5),
-        zynthian.zynthiloops.song.tracksModel.getTrack(6),
-        zynthian.zynthiloops.song.tracksModel.getTrack(7),
-        zynthian.zynthiloops.song.tracksModel.getTrack(8),
-        zynthian.zynthiloops.song.tracksModel.getTrack(9),
+    property var channels: [
+        zynthian.zynthiloops.song.channelsModel.getChannel(0),
+        zynthian.zynthiloops.song.channelsModel.getChannel(1),
+        zynthian.zynthiloops.song.channelsModel.getChannel(2),
+        zynthian.zynthiloops.song.channelsModel.getChannel(3),
+        zynthian.zynthiloops.song.channelsModel.getChannel(4),
+        zynthian.zynthiloops.song.channelsModel.getChannel(5),
+        zynthian.zynthiloops.song.channelsModel.getChannel(6),
+        zynthian.zynthiloops.song.channelsModel.getChannel(7),
+        zynthian.zynthiloops.song.channelsModel.getChannel(8),
+        zynthian.zynthiloops.song.channelsModel.getChannel(9),
     ]
-    property QtObject selectedTrack: {
-        return root.tracks[0]
+    property QtObject selectedChannel: {
+        return root.channels[0]
     }
     property var cuiaCallback: function(cuia) {
         var result = false;
@@ -74,8 +74,8 @@ Kirigami.AbstractApplicationWindow {
         } else if (slotSelectionDrawer.opened) {
             result = slotSelectionDrawer.cuiaCallback(cuia);
         } else if (cuia.startsWith("SWITCH_BACK")) {
-            if (tracksMenu.visible) {
-                tracksMenu.visible = false;
+            if (channelsMenu.visible) {
+                channelsMenu.visible = false;
                 result = true;
             } else if (scenesMenu.visible) {
                 scenesMenu.visible = false;
@@ -169,8 +169,8 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             onClicked: {
                 zynthian.current_screen_id = 'session_dashboard';
-                zynthian.session_dashboard.visibleTracksStart = 0;
-                zynthian.session_dashboard.visibleTracksEnd = 5;
+                zynthian.session_dashboard.visibleChannelsStart = 0;
+                zynthian.session_dashboard.visibleChannelsEnd = 5;
             }
         }
         Zynthian.BreadcrumbButton {
@@ -180,8 +180,8 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*2
             onClicked: {
                 zynthian.current_screen_id = 'session_dashboard';
-                zynthian.session_dashboard.visibleTracksStart = 6;
-                zynthian.session_dashboard.visibleTracksEnd = 11;
+                zynthian.session_dashboard.visibleChannelsStart = 6;
+                zynthian.session_dashboard.visibleChannelsEnd = 11;
             }
         }*/
         Zynthian.BreadcrumbButton {
@@ -226,30 +226,30 @@ Kirigami.AbstractApplicationWindow {
             }
         }
         Zynthian.BreadcrumbButton {
-            id: trackButton
+            id: channelButton
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Channel %1 ˬ")
-                    .arg(zynthian.session_dashboard.selectedTrack+1)
+                    .arg(zynthian.session_dashboard.selectedChannel+1)
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
-            onClicked: tracksMenu.visible = true
+            onClicked: channelsMenu.visible = true
             QQC2.Menu {
-                id: tracksMenu
+                id: channelsMenu
                 y: parent.height
                 modal: true
                 dim: false
                 Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
                 Repeater {
-                    model: zynthian.zynthiloops.song.tracksModel
+                    model: zynthian.zynthiloops.song.channelsModel
                     delegate: QQC2.MenuItem {
                         text: qsTr("Channel %1").arg(index + 1)
                         width: parent.width
-                        //visible: index >= zynthian.session_dashboard.visibleTracksStart && index <= zynthian.session_dashboard.visibleTracksEnd
+                        //visible: index >= zynthian.session_dashboard.visibleChannelsStart && index <= zynthian.session_dashboard.visibleChannelsEnd
                         //height: visible ? implicitHeight : 0
                         onClicked: {
-                            zynthian.session_dashboard.selectedTrack = index;
+                            zynthian.session_dashboard.selectedChannel = index;
                         }
-                        highlighted: zynthian.session_dashboard.selectedTrack === index
+                        highlighted: zynthian.session_dashboard.selectedChannel === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                     }
                 }
@@ -258,16 +258,16 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: samplesButton
 
-            property QtObject selectedSample: root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+            property QtObject selectedSample: root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Sample %1 ˬ %2")
-                    .arg(root.selectedTrack.selectedSlotRow + 1)
+                    .arg(root.selectedChannel.selectedSlotRow + 1)
                     .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 11
             rightPadding: Kirigami.Units.largeSpacing*2
             onClicked: samplesMenu.visible = true
-            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+            visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
 
             QQC2.Menu {
                 id: samplesMenu
@@ -280,9 +280,9 @@ Kirigami.AbstractApplicationWindow {
                         text: qsTr("Sample %1").arg(index + 1)
                         width: parent.width
                         onClicked: {
-                            root.selectedTrack.selectedSlotRow = index
+                            root.selectedChannel.selectedSlotRow = index
                         }
-                        highlighted: root.selectedTrack.selectedSlotRow === index
+                        highlighted: root.selectedChannel.selectedSlotRow === index
                     }
                 }
             }
@@ -290,13 +290,13 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sampleLoopButton
 
-            property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedTrack, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
-            visible: root.selectedTrack.trackAudioType === "sample-loop" &&
+            visible: root.selectedChannel.channelAudioType === "sample-loop" &&
                      clip && clip.path && clip.path.length >= 0
         }
         Zynthian.BreadcrumbButton {
@@ -304,7 +304,7 @@ Kirigami.AbstractApplicationWindow {
             icon.color: customTheme.Kirigami.Theme.textColor
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
-            visible: root.selectedTrack.trackAudioType === "synth"
+            visible: root.selectedChannel.channelAudioType === "synth"
 
             // Open preset screen on clicking this synth button
             onClicked: zynthian.current_screen_id = "preset"
@@ -323,11 +323,11 @@ Kirigami.AbstractApplicationWindow {
             function updateSoundName() {
                 var text = "";
 
-                if (root.selectedTrack) {
-                    for (var id in root.selectedTrack.chainedSounds) {
-                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
+                if (root.selectedChannel) {
+                    for (var id in root.selectedChannel.chainedSounds) {
+                        if (root.selectedChannel.chainedSounds[id] >= 0 &&
+                            root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]).split(">")[0]// + "ˬ"; TODO re-enable when this will open the popup again
                             break;
                         }
                     }
@@ -354,15 +354,15 @@ Kirigami.AbstractApplicationWindow {
 
             // Open synth edit page whjen preset button is clicked
             onClicked: {
-                if (root.selectedTrack) {
-                    zynthian.fixed_layers.activate_index(root.selectedTrack.connectedSound)
+                if (root.selectedChannel) {
+                    zynthian.fixed_layers.activate_index(root.selectedChannel.connectedSound)
                     zynthian.control.single_effect_engine = null;
                     zynthian.current_screen_id = "control";
                     zynthian.forced_screen_back = "zynthiloops"
                 }
             }
 
-            visible: root.selectedTrack.trackAudioType === "synth"
+            visible: root.selectedChannel.channelAudioType === "synth"
 
             text: {
                 presetButton.updateSoundName();
@@ -378,11 +378,11 @@ Kirigami.AbstractApplicationWindow {
             function updateSoundName() {
                 var text = "";
 
-                if (root.selectedTrack) {
-                    for (var id in root.selectedTrack.chainedSounds) {
-                        if (root.selectedTrack.chainedSounds[id] >= 0 &&
-                            root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[id])) {
-                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedTrack.chainedSounds[id]);
+                if (root.selectedChannel) {
+                    for (var id in root.selectedChannel.chainedSounds) {
+                        if (root.selectedChannel.chainedSounds[id] >= 0 &&
+                            root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[id])) {
+                            text = zynthian.fixed_layers.selector_list.getDisplayValue(root.selectedChannel.chainedSounds[id]);
                             text = text.split(">")[1] ? text.split(">")[1] : i18n("Presets")
                             break;
                         }
@@ -506,10 +506,10 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    // Listen to selected_track_changed signal to
+    // Listen to selected_channel_changed signal to
     Connections {
         target: zynthian.session_dashboard
-        onSelected_track_changed: root.selectedTrack = root.tracks[zynthian.session_dashboard.selectedTrack]
+        onSelected_channel_changed: root.selectedChannel = root.channels[zynthian.session_dashboard.selectedChannel]
     }
 
     ScreensLayer {
@@ -708,41 +708,41 @@ Kirigami.AbstractApplicationWindow {
             var returnVal = false
 
             switch (cuia) {
-                case "TRACK_1":
-                case "TRACK_6":
-                    clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                case "CHANNEL_1":
+                case "CHANNEL_6":
+                    clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
                     break
 
-                case "TRACK_2":
-                case "TRACK_7":
-                    clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                case "CHANNEL_2":
+                case "CHANNEL_7":
+                    clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
                     break
 
-                case "TRACK_3":
-                case "TRACK_8":
-                    clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                case "CHANNEL_3":
+                case "CHANNEL_8":
+                    clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
                     break
 
-                case "TRACK_4":
-                case "TRACK_9":
-                    clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                case "CHANNEL_4":
+                case "CHANNEL_9":
+                    clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
                     break
 
-                case "TRACK_5":
-                case "TRACK_10":
-                    clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                case "CHANNEL_5":
+                case "CHANNEL_10":
+                    clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -795,7 +795,7 @@ Kirigami.AbstractApplicationWindow {
 
                     ColumnLayout {
                         id: slotsColumn
-                        property bool slotsColumnVisible: slotSelectionDrawer.visible && ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+                        property bool slotsColumnVisible: slotSelectionDrawer.visible && ["synth", "sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
 
                         anchors.fill: parent
                         anchors.margins: slotSelectionDelegate.margin
@@ -804,9 +804,9 @@ Kirigami.AbstractApplicationWindow {
                         QQC2.Label {
                             Layout.alignment: Qt.AlignCenter
                             visible: slotsColumn.slotsColumnVisible
-                            text: root.selectedTrack.trackAudioType === "synth"
+                            text: root.selectedChannel.channelAudioType === "synth"
                                     ? qsTr("Synth Slots")
-                                    : ["sample-trig", "sample-slice"].indexOf(root.selectedTrack.trackAudioType) >= 0
+                                    : ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
                                         ? qsTr("Sample Slots")
                                         : ""
                         }
@@ -821,15 +821,15 @@ Kirigami.AbstractApplicationWindow {
 
                                 QQC2.Button {
                                     id: slotsColumnDelegate
-                                    property string soundName: root.selectedTrack.chainedSoundsNames[index]
+                                    property string soundName: root.selectedChannel.chainedSoundsNames[index]
 
                                     width: parent.width
                                     height: Kirigami.Units.gridUnit * 3
                                     anchors.centerIn: parent
                                     text: index + 1
                                     onClicked: {
-                                        root.selectedTrack.selectedSlotRow = index
-                                        dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                                        root.selectedChannel.selectedSlotRow = index
+                                        dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                     }
 
                                     Rectangle {
@@ -838,7 +838,7 @@ Kirigami.AbstractApplicationWindow {
                                         anchors.right: parent.right
                                         anchors.top: parent.top
                                         color: "#99888888"
-                                        visible: root.selectedTrack.trackAudioType === "synth" &&
+                                        visible: root.selectedChannel.channelAudioType === "synth" &&
                                                  synthName.text &&
                                                  synthName.text.length > 0
 
@@ -861,7 +861,7 @@ Kirigami.AbstractApplicationWindow {
                                         anchors.right: parent.right
                                         anchors.bottom: parent.bottom
                                         color: "#99888888"
-                                        visible: root.selectedTrack.trackAudioType === "synth" &&
+                                        visible: root.selectedChannel.channelAudioType === "synth" &&
                                                  presetName.text &&
                                                  presetName.text.length > 0
 
@@ -909,7 +909,7 @@ Kirigami.AbstractApplicationWindow {
                         Zynthiloops.PartBarDelegate {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            track: slotSelectionDelegate.visible ? root.selectedTrack : null
+                            channel: slotSelectionDelegate.visible ? root.selectedChannel : null
                         }
                     }
                 }

@@ -99,9 +99,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__clips_queue__: list[zynthiloops_clip] = []
         self.is_recording = False
         self.recording_count_in_value = 0
-        self.click_track_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_click.wav").encode('utf-8'))
-        self.click_track_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_track_clack.wav").encode('utf-8'))
-        self.click_track_enabled = False
+        self.click_channel_click = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_channel_click.wav").encode('utf-8'))
+        self.click_channel_clack = ClipAudioSource(None, (dirname(realpath(__file__)) + "/assets/click_channel_clack.wav").encode('utf-8'))
+        self.click_channel_enabled = False
         self.jack_client = None
         self.__jack_client_init_timer__ = QTimer()
         self.__jack_client_init_timer__.setInterval(1000)
@@ -113,7 +113,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__song__ = None
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
-        self.__zselector_track = -1
+        self.__zselector_channel = -1
         self.__selected_clip_col__ = 0
         self.__is_init_in_progress__ = True
         self.__long_task_count__ = 0
@@ -130,7 +130,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.__recording_type = "audio"
         self.__last_recording_midi__ = ""
 
-        self.big_knob_track_multiplier = 1 if self.isZ2V3 else 10
+        self.big_knob_channel_multiplier = 1 if self.isZ2V3 else 10
 
         self.__master_audio_level__ = -200
         self.master_audio_level_timer = QTimer()
@@ -161,23 +161,23 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.jack_client = jack.Client('zynthiloops_audio_levels_client')
             logging.info(f"*** zynthiloops_audio_levels_client Jack client found. Continuing")
 
-            # Connect all jack ports of respective track after jack client initialization is done.
-            for i in range(0, self.__song__.tracksModel.count):
-                track = self.__song__.tracksModel.getTrack(i)
-                track.update_jack_port()
+            # Connect all jack ports of respective channel after jack client initialization is done.
+            for i in range(0, self.__song__.channelsModel.count):
+                channel = self.__song__.channelsModel.getChannel(i)
+                channel.update_jack_port()
         except:
             logging.info(f"*** zynthiloops_audio_levels_client Jack client not found. Checking again in 1000ms")
             self.__jack_client_init_timer__.start()
 
     def connect_control_objects(self):
-        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
 
-        if self.__volume_control_obj == self.zyngui.layers_for_track.get_volume_controls()[selected_track.selectedSlotRow]:
+        if self.__volume_control_obj == self.zyngui.layers_for_channel.get_volume_controls()[selected_channel.selectedSlotRow]:
             return
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.disconnect(self.set_selector)
 
-        self.__volume_control_obj = self.zyngui.layers_for_track.get_volume_controls()[selected_track.selectedSlotRow]
+        self.__volume_control_obj = self.zyngui.layers_for_channel.get_volume_controls()[selected_channel.selectedSlotRow]
 
         if self.__volume_control_obj:
             self.__volume_control_obj.value_changed.connect(self.set_selector)
@@ -198,17 +198,17 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if cb is not None:
                 cb()
 
-            self.zyngui.layers_for_track.fill_list()
+            self.zyngui.layers_for_channel.fill_list()
             self.zyngui.zynthiloops.set_selector()
-            self.zyngui.session_dashboard.set_selected_track(0, True)
+            self.zyngui.session_dashboard.set_selected_channel(0, True)
             self.__is_init_in_progress__ = False
             logging.info(f"Zynthiloops Initialization Complete")
 
             self.zyngui.zynautoconnect(True)
 
-            for i in range(0, self.__song__.tracksModel.count):
-                track = self.__song__.tracksModel.getTrack(i)
-                track.update_jack_port()
+            for i in range(0, self.__song__.channelsModel.count):
+                channel = self.__song__.channelsModel.getChannel(i)
+                channel.update_jack_port()
 
         self.master_audio_level_timer.start()
 
@@ -224,22 +224,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
-        if self.__big_knob_mode__ == "segment" and self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_track_multiplier):
-            logging.debug(f"Setting segment from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
-            self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_track_multiplier)
+        if self.__big_knob_mode__ == "segment" and self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
+            logging.debug(f"Setting segment from zyncoder {round(self.__zselector[0].value/self.big_knob_channel_multiplier)}")
+            self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_channel_multiplier)
             self.set_selector()
 
     @Slot(None)
-    def zyncoder_set_selected_track(self):
-        if self.__big_knob_mode__ == "track" and self.zyngui.session_dashboard.get_selected_track() != round(self.__zselector[0].value/self.big_knob_track_multiplier):
-            logging.debug(f"Setting track from zyncoder {round(self.__zselector[0].value/self.big_knob_track_multiplier)}")
-            self.zyngui.session_dashboard.set_selected_track(round(self.__zselector[0].value/self.big_knob_track_multiplier))
+    def zyncoder_set_selected_channel(self):
+        if self.__big_knob_mode__ == "channel" and self.zyngui.session_dashboard.get_selected_channel() != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
+            logging.debug(f"Setting channel from zyncoder {round(self.__zselector[0].value/self.big_knob_channel_multiplier)}")
+            self.zyngui.session_dashboard.set_selected_channel(round(self.__zselector[0].value/self.big_knob_channel_multiplier))
             self.set_selector()
 
     @Slot(None)
     def zyncoder_set_preset(self):
-        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-        selected_channel = track.get_chained_sounds()[track.selectedSlotRow]
+        channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
 
         if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
@@ -247,21 +247,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.set_preset_actual(preset_index)
 
     def set_preset_actual(self, preset_index):
-        track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-        selected_channel = track.get_chained_sounds()[track.selectedSlotRow]
+        channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
         preset_index = int(preset_index)
         try:
-            preset_name = track.getLayerNameByMidiChannel(selected_channel).split('>')[1]
+            preset_name = channel.getLayerNameByMidiChannel(selected_channel).split('>')[1]
         except:
             preset_name = ""
 
         if self.__big_knob_mode__ == "preset" and selected_channel in self.zyngui.layer.layer_midi_map:
             layer = self.zyngui.layer.layer_midi_map[selected_channel]
 
-            if track.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
+            if channel.checkIfLayerExists(selected_channel) and layer.preset_index != preset_index:
                 logging.debug(f"Selecting preset : {preset_index}")
                 layer.set_preset(preset_index, True)
-                track.chainedSoundsInfoChanged.emit()
+                channel.chainedSoundsInfoChanged.emit()
                 self.set_selector()
                 self.zyngui.fixed_layers.fill_list()
                 self.zyngui.osd.updateOsd(
@@ -287,19 +287,19 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         self.set_layer_volume_actual(self.__zselector[1].value / 1000)
 
     def set_layer_volume_actual(self, volume):
-        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
         try:
-            synth_name = selected_track.getLayerNameByMidiChannel(selected_track.selectedSlotRow).split('>')[0]
+            synth_name = selected_channel.getLayerNameByMidiChannel(selected_channel.selectedSlotRow).split('>')[0]
         except:
             synth_name = ""
 
         try:
-            if ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
-                        selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]):
-                volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
+            if ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
+                        selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+                volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
             elif self.zyngui.sound_combinator_active and \
-                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]):
-                volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
+                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+                volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
             else:
                 volume_control_obj = None
         except:
@@ -326,39 +326,39 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             )
 
     @Slot(None)
-    def zyncoder_update_track_volume(self):
+    def zyncoder_update_channel_volume(self):
         volume = np.interp(self.__zselector[1].value, (0, 60), (-40, 20))
-        self.set_track_volume_actual(volume)
+        self.set_channel_volume_actual(volume)
 
-    def set_track_volume_actual(self, volume):
-        selected_track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+    def set_channel_volume_actual(self, volume):
+        selected_channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
 
-        if selected_track.volume != volume:
+        if selected_channel.volume != volume:
             # zselector doesnt support negetive mimimum value. Need to interoporale zyncoder value from range(0 to 60) to actual range(-40 to 20)
-            selected_track.volume = volume
-            logging.debug(f"### zyncoder_update_track_volume {selected_track.volume}")
+            selected_channel.volume = volume
+            logging.debug(f"### zyncoder_update_channel_volume {selected_channel.volume}")
             self.set_selector()
             self.zyngui.osd.updateOsd(
-                parameterName="track_volume",
-                description=f"{selected_track.name} Volume",
+                parameterName="channel_volume",
+                description=f"{selected_channel.name} Volume",
                 start=-40,
                 stop=20,
                 step=1,
                 defaultValue=0,
-                currentValue=selected_track.volume,
-                setValueFunction=self.set_track_volume_actual,
+                currentValue=selected_channel.volume,
+                setValueFunction=self.set_channel_volume_actual,
                 showValueLabel=True
             )
 
     @Slot(None)
     def zyncoder_update_clip_start_position(self):
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
+        if self.zyngui.channelWaveEditorBarActive:
+            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
+            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.startPosition != (self.__zselector[1].value / 1000):
             selected_clip.startPosition = self.__zselector[1].value / 1000
@@ -367,46 +367,46 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_update_clip_loop(self):
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
+        if self.zyngui.channelWaveEditorBarActive:
+            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
+            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.loopDelta != self.__zselector[2].value/1000:
             selected_clip.loopDelta = self.__zselector[2].value/1000
             logging.debug(f"### zyncoder_update_clip_loop {selected_clip.loopDelta}")
             self.set_selector()
 
-    def update_track_pan_actual(self, pan):
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+    def update_channel_pan_actual(self, pan):
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
 
         # Do not set pan value if change is less than step size of 0.1
-        if selected_track_obj is not None and selected_track_obj.pan != pan:
-            logging.debug(f"### zyncoder_update_track_pan from {selected_track_obj.pan} to {pan}")
-            selected_track_obj.pan = pan
+        if selected_channel_obj is not None and selected_channel_obj.pan != pan:
+            logging.debug(f"### zyncoder_update_channel_pan from {selected_channel_obj.pan} to {pan}")
+            selected_channel_obj.pan = pan
             self.set_selector()
-            self.zyngui.osd.updateOsd("track_pan", f"Channel {selected_track_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_track_obj.pan, self.set_selected_track_pan, startLabel="L", stopLabel="R", showValueLabel=False, visualZero=0)
+            self.zyngui.osd.updateOsd("channel_pan", f"Channel {selected_channel_obj.id + 1}: Pan", 1, -1, 0.1, 0, selected_channel_obj.pan, self.set_selected_channel_pan, startLabel="L", stopLabel="R", showValueLabel=False, visualZero=0)
 
-    def set_selected_track_pan(self, pan):
-        self.update_track_pan_actual(min(max(-1, round(pan, 2)), 1))
+    def set_selected_channel_pan(self, pan):
+        self.update_channel_pan_actual(min(max(-1, round(pan, 2)), 1))
 
     @Slot(None)
-    def zyncoder_update_track_pan(self):
+    def zyncoder_update_channel_pan(self):
         pan = round(np.interp(self.__zselector[2].value, (0, 1000), (-1.0, 1.0)), 2)
-        self.update_track_pan_actual(-1 * pan)
+        self.update_channel_pan_actual(-1 * pan)
 
     @Slot(None)
     def zyncoder_update_clip_length(self):
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
         selected_clip = None
 
-        if self.zyngui.trackWaveEditorBarActive:
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
+        if self.zyngui.channelWaveEditorBarActive:
+            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
+            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedSketchIndex)
 
         if selected_clip is not None and selected_clip.snapLengthToBeat:
             if selected_clip.length != self.__zselector[3].value//100:
@@ -433,16 +433,16 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 QMetaObject.invokeMethod(self, "zyncoder_set_preset", Qt.QueuedConnection)
             elif self.__big_knob_mode__ == "segment":
                 QMetaObject.invokeMethod(self, "zyncoder_set_selected_segment", Qt.QueuedConnection)
-            elif self.__big_knob_mode__ == "track":
-                QMetaObject.invokeMethod(self, "zyncoder_set_selected_track", Qt.QueuedConnection)
+            elif self.__big_knob_mode__ == "channel":
+                QMetaObject.invokeMethod(self, "zyncoder_set_selected_channel", Qt.QueuedConnection)
 
         # Update clip startposition/layer volume when required with small knob 1
         if self.__zselector[1] and self.__song__:
             self.__zselector[1].read_zyncoder()
-            if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive or self.zyngui.slotsBarSynthsActive:
+            if self.zyngui.sound_combinator_active or self.zyngui.slotsBarChannelActive or self.zyngui.slotsBarSynthsActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_layer_volume", Qt.QueuedConnection)
             elif self.zyngui.slotsBarMixerActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_track_volume", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_channel_volume", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_start_position", Qt.QueuedConnection)
 
@@ -450,7 +450,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[2] and self.__song__:
             self.__zselector[2].read_zyncoder()
             if self.zyngui.slotsBarMixerActive:
-                QMetaObject.invokeMethod(self, "zyncoder_update_track_pan", Qt.QueuedConnection)
+                QMetaObject.invokeMethod(self, "zyncoder_update_channel_pan", Qt.QueuedConnection)
             else:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_loop", Qt.QueuedConnection)
 
@@ -458,7 +458,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.__zselector[3] and self.__song__:
             self.__zselector[3].read_zyncoder()
 
-            if self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive:
+            if self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive:
                 QMetaObject.invokeMethod(self, "zyncoder_update_clip_length", Qt.QueuedConnection)
 
         return [0, 1, 2, 3]
@@ -475,9 +475,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "preset"
 
                 logging.debug(f"### set_selector : Configuring big knob, sound combinator is active.")
-                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                selected_channel = track.get_chained_sounds()[track.selectedSlotRow]
-                logging.debug(f"### selectedTrack : track{self.zyngui.session_dashboard.selectedTrack}({track}), slot({track.selectedSlotRow}), channel({selected_channel})")
+                channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                selected_channel = channel.get_chained_sounds()[channel.selectedSlotRow]
+                logging.debug(f"### selectedChannel : channel{self.zyngui.session_dashboard.selectedChannel}({channel}), slot({channel.selectedSlotRow}), channel({selected_channel})")
                 preset_index = 0
                 max_value = 0
 
@@ -507,12 +507,12 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__big_knob_mode__ = "segment"
 
                 try:
-                    selected_segment = self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex * self.big_knob_track_multiplier
+                    selected_segment = self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex * self.big_knob_channel_multiplier
                 except:
                     selected_segment = 0
 
                 logging.debug(
-                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment // self.big_knob_track_multiplier})")
+                    f"### set_selector : Configuring big knob, sound combinator is not active and song mode is active. selected_segment({selected_segment // self.big_knob_channel_multiplier})")
 
                 if self.__zselector[0] is None:
                     self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_segment', 'zynthiloops_segment',
@@ -526,35 +526,35 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'zynthiloops_segment', 'name': 'zynthiloops_segment', 'short_name': 'zynthiloops_segment', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': (self.song.mixesModel.selectedMix.segmentsModel.count - 1) * self.big_knob_track_multiplier, 'value': selected_segment, 'step': 1})
+                     'value_min': 0, 'value_max': (self.song.mixesModel.selectedMix.segmentsModel.count - 1) * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 
                 if not self.isZ2V3:
                     self.__zselector[0].custom_encoder_speed = 0
             else:
-                # If sound combinator is not active and not song mode, Use Big knob to control selected track
+                # If sound combinator is not active and not song mode, Use Big knob to control selected channel
 
-                self.__big_knob_mode__ = "track"
+                self.__big_knob_mode__ = "channel"
 
                 try:
-                    selected_track = self.zyngui.session_dashboard.get_selected_track() * self.big_knob_track_multiplier
+                    selected_channel = self.zyngui.session_dashboard.get_selected_channel() * self.big_knob_channel_multiplier
                 except:
-                    selected_track = 0
+                    selected_channel = 0
 
-                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_track({selected_track // self.big_knob_track_multiplier})")
+                logging.debug(f"### set_selector : Configuring big knob, sound combinator is not active and song mode is not active. selected_channel({selected_channel // self.big_knob_channel_multiplier})")
 
                 if self.__zselector[0] is None:
-                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_track', 'zynthiloops_track',
-                                                                {'midi_cc': 0, 'value': selected_track, 'step': 1})
+                    self.__zselector_ctrl[0] = zynthian_controller(None, 'zynthiloops_channel', 'zynthiloops_channel',
+                                                                {'midi_cc': 0, 'value': selected_channel, 'step': 1})
 
                     self.__zselector[0] = zynthian_gui_controller(zynthian_gui_config.select_ctrl, self.__zselector_ctrl[0],
                                                                   self)
                     self.__zselector[0].show()
 
                 self.__zselector_ctrl[0].set_options(
-                    {'symbol': 'zynthiloops_track', 'name': 'zynthiloops_track', 'short_name': 'zynthiloops_track', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': 9*self.big_knob_track_multiplier, 'value': selected_track, 'step': 1})
+                    {'symbol': 'zynthiloops_channel', 'name': 'zynthiloops_channel', 'short_name': 'zynthiloops_channel', 'midi_cc': 0,
+                     'value_min': 0, 'value_max': 9*self.big_knob_channel_multiplier, 'value': selected_channel, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 
@@ -564,7 +564,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[0] is not None:
                 self.__zselector[0].hide()
 
-    def configure_small_knob_1(self, selected_track, selected_clip):
+    def configure_small_knob_1(self, selected_channel, selected_clip):
         if self.__zselector[1] is None:
             self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
                                                             'zynthiloops_knob1',
@@ -576,21 +576,21 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
                 (
-                    (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
+                    (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and
                     selected_clip is not None and
                     selected_clip.path is not None and
                     len(selected_clip.path) > 0
                 ) or (
                     self.zyngui.sound_combinator_active and
-                    selected_track is not None and
-                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])
+                    selected_channel is not None and
+                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
                 ) or (
-                    ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and
-                    selected_track is not None and
-                    selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])
+                    ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and
+                    selected_channel is not None and
+                    selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])
                 ) or (
                     self.zyngui.slotsBarMixerActive and
-                    selected_track is not None
+                    selected_channel is not None
                 ):
             logging.debug(
                 f"### set_selector : Configuring small knob 1, showing")
@@ -603,24 +603,24 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             if self.__zselector[1]:
                 self.__zselector[1].hide()
 
-        if self.zyngui.sound_combinator_active or self.zyngui.slotsBarTrackActive or self.zyngui.slotsBarSynthsActive:
+        if self.zyngui.sound_combinator_active or self.zyngui.slotsBarChannelActive or self.zyngui.slotsBarSynthsActive:
             volume = 0
             min_value = 0
             max_value = 0
 
             try:
-                # logging.error(f"layer({selected_track.chainedSounds[selected_track.selectedSlotRow]}), layerExists({selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow])})")
+                # logging.error(f"layer({selected_channel.chainedSounds[selected_channel.selectedSlotRow]}), layerExists({selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow])})")
 
                 if self.zyngui.sound_combinator_active and \
-                        selected_track.checkIfLayerExists(
-                            selected_track.chainedSounds[selected_track.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
+                        selected_channel.checkIfLayerExists(
+                            selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+                    volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
                     volume = volume_control_obj.value * 1000
                     min_value = volume_control_obj.value_min * 1000
                     max_value = volume_control_obj.value_max * 1000
-                elif ((self.zyngui.slotsBarTrackActive and selected_track.trackAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
-                        selected_track.checkIfLayerExists(selected_track.chainedSounds[selected_track.selectedSlotRow]):
-                    volume_control_obj = self.zyngui.layers_for_track.volume_controls[selected_track.selectedSlotRow]
+                elif ((self.zyngui.slotsBarChannelActive and selected_channel.channelAudioType == "synth") or self.zyngui.slotsBarSynthsActive) and \
+                        selected_channel.checkIfLayerExists(selected_channel.chainedSounds[selected_channel.selectedSlotRow]):
+                    volume_control_obj = self.zyngui.layers_for_channel.volume_controls[selected_channel.selectedSlotRow]
                     volume = volume_control_obj.value * 1000
                     min_value = volume_control_obj.value_min * 1000
                     max_value = volume_control_obj.value_max * 1000
@@ -639,7 +639,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[1].custom_encoder_speed = 0
         elif self.zyngui.slotsBarMixerActive:
             # zselector doesnt negetive minimum value. need to interpolate actual range (-40 to 20) to range (0 to 60)
-            volume = np.interp(selected_track.volume, (-40, 20), (0, 60))
+            volume = np.interp(selected_channel.volume, (-40, 20), (0, 60))
 
             if self.__zselector[1] is None:
                 self.__zselector_ctrl[1] = zynthian_controller(None, 'zynthiloops_knob1',
@@ -689,7 +689,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[1].custom_encoder_speed = 0
 
 
-    def configure_small_knob_2(self, selected_track, selected_clip):
+    def configure_small_knob_2(self, selected_channel, selected_clip):
         if self.__zselector[2] is None:
             self.__zselector_ctrl[2] = zynthian_controller(None, 'zynthiloops_knob2',
                                                            'zynthiloops_knob2',
@@ -700,11 +700,11 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if (self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
-                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+                (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0) or (
-            selected_track is not None and \
+            selected_channel is not None and \
                 self.zyngui.slotsBarMixerActive
         ):
             logging.debug(
@@ -720,8 +720,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             pan_interped = 0
 
             try:
-                if selected_track is not None:
-                    pan_interped = np.interp(-1 * selected_track.pan, (-1.0, 1.0), (0, 1000))
+                if selected_channel is not None:
+                    pan_interped = np.interp(-1 * selected_channel.pan, (-1.0, 1.0), (0, 1000))
             except Exception as e:
                 logging.error(f"Error configuring knob 2 : {str(e)}")
 
@@ -756,7 +756,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             self.__zselector[2].custom_encoder_speed = 0
 
 
-    def configure_small_knob_3(self, selected_track, selected_clip):
+    def configure_small_knob_3(self, selected_channel, selected_clip):
         value = 0
         min_value = 0
         max_value = 0
@@ -764,7 +764,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         try:
             if self.zyngui.get_current_screen_id() is not None and \
                     self.zyngui.get_current_screen() == self and \
-                    (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+                    (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
                     selected_clip is not None and \
                     selected_clip.path is not None and \
                     len(selected_clip.path) > 0:
@@ -785,7 +785,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         if self.zyngui.get_current_screen_id() is not None and \
                 self.zyngui.get_current_screen() == self and \
-                (self.zyngui.trackWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
+                (self.zyngui.channelWaveEditorBarActive or self.zyngui.clipWaveEditorBarActive) and \
                 selected_clip is not None and \
                 selected_clip.path is not None and \
                 len(selected_clip.path) > 0:
@@ -835,27 +835,27 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
         ### Common vars for small knobs
         selected_clip = None
-        selected_track_obj = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.get_selected_track())
+        selected_channel_obj = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.get_selected_channel())
 
-        if self.zyngui.trackWaveEditorBarActive:
-            logging.debug(f"### set_selector : trackWaveEditorBarActive is active.")
-            selected_clip = selected_track_obj.samples[selected_track_obj.selectedSlotRow]
+        if self.zyngui.channelWaveEditorBarActive:
+            logging.debug(f"### set_selector : channelWaveEditorBarActive is active.")
+            selected_clip = selected_channel_obj.samples[selected_channel_obj.selectedSlotRow]
         elif self.zyngui.clipWaveEditorBarActive:
             logging.debug(f"### set_selector : clipWaveEditorBarActive is active.")
-            selected_clip = self.__song__.getClip(selected_track_obj.id, self.song.scenesModel.selectedSketchIndex)
+            selected_clip = self.__song__.getClip(selected_channel_obj.id, self.song.scenesModel.selectedSketchIndex)
         ###
 
         # Configure Big Knob
         self.configure_big_knob()
 
         # Configure small knob 1
-        self.configure_small_knob_1(selected_track_obj, selected_clip)
+        self.configure_small_knob_1(selected_channel_obj, selected_clip)
 
         # Configure small knob 2
-        self.configure_small_knob_2(selected_track_obj, selected_clip)
+        self.configure_small_knob_2(selected_channel_obj, selected_clip)
 
         # Configure small knob 3
-        self.configure_small_knob_3(selected_track_obj, selected_clip)
+        self.configure_small_knob_3(selected_channel_obj, selected_clip)
 
         self.is_set_selector_running = False
 
@@ -876,9 +876,9 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
     def master_volume_level_timer_timeout(self):
         try:
             added_db = 0
-            for i in range(0, self.__song__.tracksModel.count):
-                track = self.__song__.tracksModel.getTrack(i)
-                added_db += pow(10, track.get_audioLevel()/10)
+            for i in range(0, self.__song__.channelsModel.count):
+                channel = self.__song__.channelsModel.getChannel(i)
+                added_db += pow(10, channel.get_audioLevel()/10)
 
             self.set_master_audio_level(10*math.log10(added_db))
         except:
@@ -1073,29 +1073,29 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return self.zyngui.master_alsa_mixer.volume
 
     @Signal
-    def click_track_enabled_changed(self):
+    def click_channel_enabled_changed(self):
         pass
 
-    def get_clickTrackEnabled(self):
-        return self.click_track_enabled
+    def get_clickChannelEnabled(self):
+        return self.click_channel_enabled
 
-    def set_clickTrackEnabled(self, enabled: bool):
-        self.click_track_enabled = enabled
+    def set_clickChannelEnabled(self, enabled: bool):
+        self.click_channel_enabled = enabled
 
-        self.click_track_click.stopOnChannel(-2)
-        self.click_track_clack.stopOnChannel(-2)
-        self.click_track_click.set_length(4, self.__song__.bpm)
-        self.click_track_clack.set_length(1, self.__song__.bpm)
-        # If the metronome is running, queue the click tracks up to start (otherwise don't - for now at least)
+        self.click_channel_click.stopOnChannel(-2)
+        self.click_channel_clack.stopOnChannel(-2)
+        self.click_channel_click.set_length(4, self.__song__.bpm)
+        self.click_channel_clack.set_length(1, self.__song__.bpm)
+        # If the metronome is running, queue the click channels up to start (otherwise don't - for now at least)
         if enabled and self.metronome_running_refcount > 0:
-            self.click_track_click.queueClipToStartOnChannel(-2)
-            self.click_track_clack.queueClipToStartOnChannel(-2)
+            self.click_channel_click.queueClipToStartOnChannel(-2)
+            self.click_channel_clack.queueClipToStartOnChannel(-2)
 
-        self.click_track_enabled_changed.emit()
+        self.click_channel_enabled_changed.emit()
 
-    clickTrackEnabled = Property(bool, get_clickTrackEnabled, set_clickTrackEnabled, notify=click_track_enabled_changed)
+    clickChannelEnabled = Property(bool, get_clickChannelEnabled, set_clickChannelEnabled, notify=click_channel_enabled_changed)
 
-    def track_layers_snapshot(self):
+    def channel_layers_snapshot(self):
         snapshot = []
         for i in range(5, 10):
             if i in self.zyngui.screens['layer'].layer_midi_map:
@@ -1104,22 +1104,22 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
         return snapshot
 
     @Slot(int)
-    def saveLayersToTrack(self, tid):
-        if tid < 0 or tid >= self.__song__.tracksModel.count:
+    def saveLayersToChannel(self, tid):
+        if tid < 0 or tid >= self.__song__.channelsModel.count:
             return
-        track_layers_snapshot = self.track_layers_snapshot()
-        logging.debug(track_layers_snapshot)
-        self.__song__.tracksModel.getTrack(tid).set_layers_snapshot(track_layers_snapshot)
+        channel_layers_snapshot = self.channel_layers_snapshot()
+        logging.debug(channel_layers_snapshot)
+        self.__song__.channelsModel.getChannel(tid).set_layers_snapshot(channel_layers_snapshot)
         self.__song__.schedule_save()
 
     @Slot(int)
-    def restoreLayersFromTrack(self, tid):
-        if tid < 0 or tid >= self.__song__.tracksModel.count:
+    def restoreLayersFromChannel(self, tid):
+        if tid < 0 or tid >= self.__song__.channelsModel.count:
             return
         for i in range(5, 10):
             if i in self.zyngui.screens['layer'].layer_midi_map:
                 self.zyngui.screens['layer'].remove_root_layer(self.zyngui.screens['layer'].root_layers.index(self.zyngui.screens['layer'].layer_midi_map[i]), True)
-        self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.tracksModel.getTrack(tid).get_layers_snapshot(), 5, 9)
+        self.zyngui.screens['layer'].load_channels_snapshot(self.__song__.channelsModel.getChannel(tid).get_layers_snapshot(), 5, 9)
 
     @Signal
     def ongoingCountInChanged(self):
@@ -1215,7 +1215,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
-                self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+                self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
             else:
                 logging.info(f"Creating New Sketch")
                 self.zyngui.currentTaskMessage = "Creating empty sketch as temp sketch"
@@ -1229,14 +1229,14 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     self.zyngui.currentTaskMessage = "Loading snapshot"
                     self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                # Connect all jack ports of respective track after jack client initialization is done.
-                for i in range(0, self.__song__.tracksModel.count):
-                    track = self.__song__.tracksModel.getTrack(i)
-                    track.update_jack_port()
+                # Connect all jack ports of respective channel after jack client initialization is done.
+                for i in range(0, self.__song__.channelsModel.count):
+                    channel = self.__song__.channelsModel.getChannel(i)
+                    channel.update_jack_port()
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
-                self.zyngui.screens["session_dashboard"].set_selected_track(0, True)
+                self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
                 self.newSketchLoaded.emit()
 
             # Set ALSA Mixer volume to 100% when creating new sketch
@@ -1363,10 +1363,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                             self.zyngui.currentTaskMessage = "Loading snapshot"
                             self.zyngui.screens["layer"].load_snapshot("/zynthian/zynthian-my-data/snapshots/default.zss")
 
-                    # Connect all jack ports of respective track after jack client initialization is done.
-                    for i in range(0, self.__song__.tracksModel.count):
-                        track = self.__song__.tracksModel.getTrack(i)
-                        track.update_jack_port()
+                    # Connect all jack ports of respective channel after jack client initialization is done.
+                    for i in range(0, self.__song__.channelsModel.count):
+                        channel = self.__song__.channelsModel.getChannel(i)
+                        channel.update_jack_port()
 
                     if cb is not None:
                         cb()
@@ -1398,10 +1398,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
 
-                # Connect all jack ports of respective track after jack client initialization is done.
-                for i in range(0, self.__song__.tracksModel.count):
-                    track = self.__song__.tracksModel.getTrack(i)
-                    track.update_jack_port()
+                # Connect all jack ports of respective channel after jack client initialization is done.
+                for i in range(0, self.__song__.channelsModel.count):
+                    channel = self.__song__.channelsModel.getChannel(i)
+                    channel.update_jack_port()
 
                 if cb is not None:
                     cb()
@@ -1448,29 +1448,29 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def stopAllPlayback(self):
-        # The click track wants to not have any effects added at all, so use the magic channel -2, which is our uneffected global channel
-        self.click_track_click.stopOnChannel(-2)
-        self.click_track_clack.stopOnChannel(-2)
+        # The click channel wants to not have any effects added at all, so use the magic channel -2, which is our uneffected global channel
+        self.click_channel_click.stopOnChannel(-2)
+        self.click_channel_clack.stopOnChannel(-2)
 
-        for track_index in range(self.__song__.tracksModel.count):
-            self.__song__.tracksModel.getTrack(track_index).stopAllClips()
+        for channel_index in range(self.__song__.channelsModel.count):
+            self.__song__.channelsModel.getChannel(channel_index).stopAllClips()
 
     def update_timer_bpm(self):
-        self.click_track_click.set_length(4, self.__song__.bpm)
-        self.click_track_clack.set_length(1, self.__song__.bpm)
+        self.click_channel_click.set_length(4, self.__song__.bpm)
+        self.click_channel_clack.set_length(1, self.__song__.bpm)
 
         libzl.setBpm(self.__song__.bpm)
         if self.metronome_running_refcount > 0:
-            self.set_clickTrackEnabled(self.click_track_enabled)
+            self.set_clickChannelEnabled(self.click_channel_enabled)
 
     def queue_clip_record(self, clip):
         if self.zyngui.curlayer is not None:
             layers_snapshot = self.zyngui.screens["layer"].export_multichannel_snapshot(self.zyngui.curlayer.midi_chan)
-            track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
             self.set_clip_to_record(clip)
 
-            if clip.isTrackSample:
-                Path(track.bankDir).mkdir(parents=True, exist_ok=True)
+            if clip.isChannelSample:
+                Path(channel.bankDir).mkdir(parents=True, exist_ok=True)
             else:
                 (Path(clip.recording_basepath) / 'wav').mkdir(parents=True, exist_ok=True)
 
@@ -1484,8 +1484,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
 
             count = 0
 
-            if clip.isTrackSample:
-                base_recording_dir = track.bankDir
+            if clip.isChannelSample:
+                base_recording_dir = channel.bankDir
             else:
                 base_recording_dir = f"{clip.recording_basepath}/wav"
 
@@ -1507,7 +1507,7 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     if self.recordMasterOutput:
                         recording_ports = [("system:playback_1", "system:playback_2")]
                     else:
-                        recording_ports = track.trackSynthPorts
+                        recording_ports = channel.channelSynthPorts
                 else:
                     # TODO : Port external recording to AudioLevels recorder
 
@@ -1579,10 +1579,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                 # Do not start timer again and remove stop schedule
                 self.metronome_schedule_stop = False
             else:
-                if self.click_track_enabled:
-                    # The click track wants to not have any effects added at all, so play it on the magic channel -2, which is our uneffected global channel
-                    self.click_track_click.queueClipToStartOnChannel(-2)
-                    self.click_track_clack.queueClipToStartOnChannel(-2)
+                if self.click_channel_enabled:
+                    # The click channel wants to not have any effects added at all, so play it on the magic channel -2, which is our uneffected global channel
+                    self.click_channel_click.queueClipToStartOnChannel(-2)
+                    self.click_channel_clack.queueClipToStartOnChannel(-2)
 
                 libzl.startTimer(self.__song__.bpm)
 
@@ -1618,8 +1618,8 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
             # Start blink timer when metronome stops to keep blinking in sync with bpm
             self.zyngui.wsleds_blink_timer.start()
 
-            self.click_track_click.stopOnChannel(-2)
-            self.click_track_clack.stopOnChannel(-2)
+            self.click_channel_click.stopOnChannel(-2)
+            self.click_channel_clack.stopOnChannel(-2)
             self.__current_beat__ = -1
             self.__current_bar__ = -1
             self.current_beat_changed.emit()
@@ -1663,10 +1663,10 @@ class zynthian_gui_zynthiloops(zynthian_qt_gui_base.ZynGui):
                     clip.write_metadata("ZYNTHBOX_AUDIO_TYPE", [self.__last_recording_type__])
                     clip.write_metadata("ZYNTHBOX_MIDI_RECORDING", [self.lastRecordingMidi])
 
-            if self.clip_to_record.isTrackSample:
+            if self.clip_to_record.isChannelSample:
                 logging.info(f"Recorded clip is a sample")
-                track = self.__song__.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
-                track.samples_changed.emit()
+                channel = self.__song__.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                channel.samples_changed.emit()
         # self.__song__.save()
 
     def get_next_free_layer(self):

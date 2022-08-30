@@ -35,7 +35,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 Item {
     id: component
-    property bool opened: sequenceFilePicker.opened || loadedSequenceOptionsPicker.opened || loadedPatternOptionsPicker.opened || trackPicker.opened
+    property bool opened: sequenceFilePicker.opened || loadedSequenceOptionsPicker.opened || loadedPatternOptionsPicker.opened || channelPicker.opened
     property int topPadding: Kirigami.Units.largeSpacing
     property int leftPadding: Kirigami.Units.largeSpacing
     property int rightPadding: Kirigami.Units.largeSpacing
@@ -107,8 +107,8 @@ Item {
                     } else if (loadedPatternOptionsRepeater.opened) {
                         loadedPatternOptionsRepeater.accept();
                         result = true;
-                    } else if (trackPicker.opened) {
-                        trackPicker.close();
+                    } else if (channelPicker.opened) {
+                        channelPicker.close();
                         result = true;
                     }
                     break;
@@ -121,8 +121,8 @@ Item {
                     } else if (loadedPatternOptionsRepeater.opened) {
                         loadedPatternOptionsRepeater.reject();
                         result = true;
-                    } else if (trackPicker.opened) {
-                        trackPicker.close();
+                    } else if (channelPicker.opened) {
+                        channelPicker.close();
                         result = true;
                     }
                     break;
@@ -399,36 +399,36 @@ Item {
                 // As we're importing to the global sequence, operate on the pattern in the appropriate position
                 var globalPattern = globalSequence.get(theItem.importIndex);
 
-                // First, remove this pattern from whatever track it was associated with, if any
-                var foundTrack = null;
+                // First, remove this pattern from whatever channel it was associated with, if any
+                var foundChannel = null;
                 var foundIndex = -1;
-                for(var i = 0; i < zynthian.zynthiloops.song.tracksModel.count; ++i) {
-                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
-                    if (track && track.connectedPattern === theItem.importIndex) {
-                        foundTrack = track;
+                for(var i = 0; i < zynthian.zynthiloops.song.channelsModel.count; ++i) {
+                    var channel = zynthian.zynthiloops.song.channelsModel.getChannel(i);
+                    if (channel && channel.connectedPattern === theItem.importIndex) {
+                        foundChannel = channel;
                         foundIndex = i;
                         break;
                     }
                 }
                 if (foundIndex > -1) {
-                    foundTrack.connectedPattern = -1;
+                    foundChannel.connectedPattern = -1;
                 }
-                console.log("Importing", theItem.patternObject, "into", globalPattern, "originally on track", foundTrack);
+                console.log("Importing", theItem.patternObject, "into", globalPattern, "originally on channel", foundChannel);
 
                 // Now apply our loaded pattern onto the global one
                 globalPattern.cloneOther(theItem.patternObject);
 
-                // Then associate this pattern with the track we requested, if requested
-                if (theItem.associatedTrackIndex > -1) {
-                    var trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
-                    trackToAssociate.connectedPattern = theItem.importIndex;
-                    console.log("Newly associated track is", trackToAssociate);
+                // Then associate this pattern with the channel we requested, if requested
+                if (theItem.associatedChannelIndex > -1) {
+                    var channelToAssociate = zynthian.zynthiloops.song.channelsModel.getChannel(theItem.associatedChannelIndex);
+                    channelToAssociate.connectedPattern = theItem.importIndex;
+                    console.log("Newly associated channel is", channelToAssociate);
 
                     // Finally, actually import the sound if requested
                     var jsonToLoad = theItem.patternObject.layerData;
                     if (jsonToLoad.length > 0 && theItem.importSound) {
-                        trackToAssociate = zynthian.zynthiloops.song.tracksModel.getTrack(theItem.associatedTrackIndex);
-                        trackToAssociate.setTrackSoundFromSnapshotJson(jsonToLoad)
+                        channelToAssociate = zynthian.zynthiloops.song.channelsModel.getChannel(theItem.associatedChannelIndex);
+                        channelToAssociate.setChannelSoundFromSnapshotJson(jsonToLoad)
                     }
                 }
             }
@@ -444,8 +444,8 @@ Item {
             property var destinationChannels: []
             property bool importPattern: patternObject.enabled
             property bool importSound: false
-            property int associatedTrackIndex: 6 + model.index
-            property QtObject associatedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(patternOptionsRoot.associatedTrackIndex)
+            property int associatedChannelIndex: 6 + model.index
+            property QtObject associatedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(patternOptionsRoot.associatedChannelIndex)
             property int importIndex: model.index
             property var soundInfo: patternObject.layerData.length > 0 ? zynthian.layer.sound_metadata_from_json(patternObject.layerData) : [];
             RowLayout {
@@ -477,26 +477,26 @@ Item {
                     popup.z: 1999999999
                 }
                 QQC2.Button {
-                    id: importToTrack
+                    id: importToChannel
                     Layout.fillWidth: true
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                    text: patternOptionsRoot.associatedTrackIndex > -1 && patternOptionsRoot.associatedTrackIndex < 12
-                        ? qsTr("Import to Channel %1").arg(patternOptionsRoot.associatedTrack.name)
+                    text: patternOptionsRoot.associatedChannelIndex > -1 && patternOptionsRoot.associatedChannelIndex < 12
+                        ? qsTr("Import to Channel %1").arg(patternOptionsRoot.associatedChannel.name)
                         : qsTr("Pick Channel Association")
                     enabled: patternOptionsRoot.importPattern
-                    property bool pickingTrack: false
+                    property bool pickingChannel: false
                     onClicked: {
-                        pickingTrack = true;
-                        trackPicker.associatedTrackIndex = patternOptionsRoot.associatedTrackIndex;
-                        trackPicker.open()
+                        pickingChannel = true;
+                        channelPicker.associatedChannelIndex = patternOptionsRoot.associatedChannelIndex;
+                        channelPicker.open()
                     }
                     Connections {
-                        target: trackPicker;
+                        target: channelPicker;
                         onVisibleChanged: {
-                            if (importToTrack.pickingTrack === true && trackPicker.visible === false && patternOptionsRoot.associatedTrackIndex !== trackPicker.associatedTrackIndex) {
-                                patternOptionsRoot.associatedTrackIndex = trackPicker.associatedTrackIndex;
-                                importToTrack.pickingTrack = false;
-                                // TODO Should we maybe set the sound destination to whereever the track is pointed if that's a thing already, or...?
+                            if (importToChannel.pickingChannel === true && channelPicker.visible === false && patternOptionsRoot.associatedChannelIndex !== channelPicker.associatedChannelIndex) {
+                                patternOptionsRoot.associatedChannelIndex = channelPicker.associatedChannelIndex;
+                                importToChannel.pickingChannel = false;
+                                // TODO Should we maybe set the sound destination to whereever the channel is pointed if that's a thing already, or...?
                             }
                         }
                     }
@@ -518,14 +518,14 @@ Item {
     }
 
     QQC2.Popup {
-        id: trackPicker
+        id: channelPicker
         modal: true
         y: component.mapFromGlobal(0, Math.round(component.Window.height/2 - height/2)).y
         x: component.mapFromGlobal(Math.round(component.Window.width/2 - width/2), 0).x
         width: component.Window.width
         height: Math.round(component.Window.height * 0.8)
         z: 1999999999
-        property int associatedTrackIndex: -1
+        property int associatedChannelIndex: -1
         ColumnLayout {
             anchors.fill: parent
             Kirigami.Heading {
@@ -537,18 +537,18 @@ Item {
                 Layout.fillWidth: true
                 columns: 4
                 Repeater {
-                    model: zynthian.zynthiloops.song.tracksModel
+                    model: zynthian.zynthiloops.song.channelsModel
                     delegate: Zynthian.PlayGridButton {
                         Layout.fillWidth: true
-                        Layout.preferredWidth: trackPicker.width / 4
+                        Layout.preferredWidth: channelPicker.width / 4
                         Layout.fillHeight: true
-                        text: (trackPicker.associatedTrackIndex === model.id ? qsTr("Current") : "") + "\n\n" +
-                            (model.track.connectedPattern > -1
+                        text: (channelPicker.associatedChannelIndex === model.id ? qsTr("Current") : "") + "\n\n" +
+                            (model.channel.connectedPattern > -1
                                 ? qsTr("Replace pattern on:\nChannel %1").arg(model.name)
                                 : qsTr("Import to:\nChannel %1").arg(model.name))
                         onClicked: {
-                            trackPicker.associatedTrackIndex = model.id
-                            trackPicker.close();
+                            channelPicker.associatedChannelIndex = model.id
+                            channelPicker.close();
                         }
                     }
                 }
@@ -559,7 +559,7 @@ Item {
                     property QtObject backAction: Kirigami.Action {
                         text: "Back"
                         onTriggered: {
-                            trackPicker.close();
+                            channelPicker.close();
                         }
                     }
                     property list<QtObject> contextualActions: [
@@ -568,8 +568,8 @@ Item {
                         Kirigami.Action {
                             text: qsTr("Unassign")
                             onTriggered: {
-                                trackPicker.associatedTrackIndex = -1
-                                trackPicker.close();
+                                channelPicker.associatedChannelIndex = -1
+                                channelPicker.close();
                             }
                         }
                     ]

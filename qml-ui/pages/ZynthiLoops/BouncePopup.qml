@@ -34,9 +34,9 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 QQC2.Popup {
     id: root
-    function bounce(sketchName, track) {
+    function bounce(sketchName, channel) {
         _private.sketchName = sketchName;
-        _private.selectedTrack = track;
+        _private.selectedChannel = channel;
         open();
     }
 
@@ -76,7 +76,7 @@ QQC2.Popup {
             QtObject {
                 id: _private
                 property string sketchName
-                property QtObject selectedTrack
+                property QtObject selectedChannel
                 property double bounceProgress: -1
 
                 property QtObject sequence: null
@@ -95,12 +95,12 @@ QQC2.Popup {
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
                     _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.sketchName);
                     if (_private.sequence) {
-                        _private.pattern = sequence.getByPart(_private.selectedTrack.connectedPattern, _private.selectedTrack.selectedPart);
+                        _private.pattern = sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
                         if (_private.pattern) {
                             // If there's currently a pattern set to be solo, let's remember that
                             _private.previousSolo = _private.sequence.soloPattern;
                             // Now, set the pattern we're wanting to record as solo
-                            _private.sequence.soloPattern = _private.selectedTrack.connectedPattern;
+                            _private.sequence.soloPattern = _private.selectedChannel.connectedPattern;
                             // Assemble the duration of time we want to be recording for
                             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
                             _private.patternDurationInBeats = _private.pattern.width * _private.pattern.availableBars * noteLengths[_private.pattern.noteLength];
@@ -113,7 +113,7 @@ QQC2.Popup {
                                 _private.recordingDurationInMS = _private.recordingDurationInMS + patternDurationInMS;
                                 _private.recordingDurationInBeats = _private.recordingDurationInBeats + _private.patternDurationInBeats;
                             }
-                            if (_private.selectedTrack.trackAudioType === "synth") {
+                            if (_private.selectedChannel.channelAudioType === "synth") {
                                 _private.playbackStopDurationInBeats = _private.recordingDurationInBeats - ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount;
                                 //_private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, ZynQuick.PlayGridManager.syncTimer.scheduleAheadAmount) * 1000);
                                 _private.playbackStopDurationInMS = _private.recordingDurationInMS - (ZynQuick.PlayGridManager.syncTimer.subbeatCountToSeconds(beatsPerMinute, 6) * 1000);
@@ -129,7 +129,7 @@ QQC2.Popup {
                             _private.cumulativeBeats = 0;
                             _private.isRecording = true;
                             var sceneIndices = { "S1": 0, "S2": 1, "S3": 2, "S4": 3, "S5": 4, "S6": 5, "S7": 6, "S8": 7, "S9": 8, "S10": 9};
-                            var clip = _private.selectedTrack.clipsModel.getClip(sceneIndices[_private.sketchName]);
+                            var clip = _private.selectedChannel.clipsModel.getClip(sceneIndices[_private.sketchName]);
                             zynthian.zynthiloops.recordingSource = "internal"
                             zynthian.zynthiloops.recordingChannel = ""
                             clip.queueRecording();
@@ -203,8 +203,8 @@ QQC2.Popup {
                         // Set the new sample's start and end points
                         clip.startPosition = (startTime / 1000) + Math.max(0, clip.duration - (_private.recordingDurationInMS / 1000));
                         clip.length = loopLength / ZynQuick.PlayGridManager.syncTimer.getMultiplier();
-                        // Set track mode to loop
-                        _private.selectedTrack.trackAudioType = "sample-loop";
+                        // Set channel mode to loop
+                        _private.selectedChannel.channelAudioType = "sample-loop";
                         // Close out and we're done
                         root.close();
                         _private.bounceProgress = -1;
@@ -235,7 +235,7 @@ QQC2.Popup {
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
             wrapMode: Text.Wrap
-            text: "Bounce the audio from the pattern in " + (_private.selectedTrack ? _private.selectedTrack.name : "") + " to a wave file, assign that recording as the channel's loop sample, and set the channel to loop mode.";
+            text: "Bounce the audio from the pattern in " + (_private.selectedChannel ? _private.selectedChannel.name : "") + " to a wave file, assign that recording as the channel's loop sample, and set the channel to loop mode.";
         }
         QQC2.CheckBox {
             Layout.fillWidth: true

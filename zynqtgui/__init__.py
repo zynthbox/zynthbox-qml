@@ -7,7 +7,7 @@ __all__ = [
 	"zynthian_gui_admin",
 	"zynthian_gui_snapshot",
 	"zynthian_gui_layer",
-	"zynthian_gui_layers_for_track",
+	"zynthian_gui_layers_for_channel",
 	"zynthian_gui_layer_options",
 	"zynthian_gui_engine",
 	"zynthian_gui_midi_chan",
@@ -42,7 +42,7 @@ from zynqtgui.zynthian_gui_option import zynthian_gui_option
 from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
-from zynqtgui.zynthian_gui_layers_for_track import zynthian_gui_layers_for_track
+from zynqtgui.zynthian_gui_layers_for_channel import zynthian_gui_layers_for_channel
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_engine import zynthian_gui_engine
 from zynqtgui.zynthian_gui_midi_chan import zynthian_gui_midi_chan

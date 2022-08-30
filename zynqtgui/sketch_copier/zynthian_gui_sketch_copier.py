@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian Arranger: A page to copy tracks between sketches in a session
+# Zynthian Arranger: A page to copy channels between sketches in a session
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -29,19 +29,19 @@ from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from .. import zynthian_qt_gui_base
 from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
-from ..zynthiloops.libzl.zynthiloops_track import zynthiloops_track
+from ..zynthiloops.libzl.zynthiloops_channel import zynthiloops_channel
 
 
 class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
         super(zynthian_gui_sketch_copier, self).__init__(parent)
-        self.__track_copy_cache__ = None
-        self.__track_copy_source__ = None
+        self.__channel_copy_cache__ = None
+        self.__channel_copy_source__ = None
         self.__add_sketch_path__ = ""
 
     ### Property isCopyInProgress
     def get_is_copy_in_progress(self):
-        return self.__track_copy_cache__ is not None
+        return self.__channel_copy_cache__ is not None
     is_copy_in_progress_changed = Signal()
     isCopyInProgress = Property(bool, get_is_copy_in_progress, notify=is_copy_in_progress_changed)
     ### END Property isCopyInProgress
@@ -56,42 +56,42 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     addSketchPath = Property(str, get_add_sketch_path, set_add_sketch_path, notify=add_sketch_path_changed)
     ### END Property addSketchPath
 
-    ### Property trackCopySource
-    def get_track_copy_source(self):
-        return self.__track_copy_source__
-    track_copy_source_changed = Signal()
-    trackCopySource = Property(QObject, get_track_copy_source, notify=track_copy_source_changed)
-    ### END Property trackCopySource
+    ### Property channelCopySource
+    def get_channel_copy_source(self):
+        return self.__channel_copy_source__
+    channel_copy_source_changed = Signal()
+    channelCopySource = Property(QObject, get_channel_copy_source, notify=channel_copy_source_changed)
+    ### END Property channelCopySource
 
     @Slot(QObject)
-    def copyTrack(self, track):
-        self.__track_copy_cache__ = track.serialize()
-        self.__track_copy_source__ = track
+    def copyChannel(self, channel):
+        self.__channel_copy_cache__ = channel.serialize()
+        self.__channel_copy_source__ = channel
         self.is_copy_in_progress_changed.emit()
-        self.track_copy_source_changed.emit()
+        self.channel_copy_source_changed.emit()
 
-        logging.info(f"Copied track : {self.__track_copy_cache__}")
+        logging.info(f"Copied channel : {self.__channel_copy_cache__}")
 
     @Slot(None)
-    def cancelCopyTrack(self):
-        self.__track_copy_cache__ = None
-        self.__track_copy_source__ = None
+    def cancelCopyChannel(self):
+        self.__channel_copy_cache__ = None
+        self.__channel_copy_source__ = None
         self.is_copy_in_progress_changed.emit()
-        self.track_copy_source_changed.emit()
+        self.channel_copy_source_changed.emit()
 
-        logging.info(f"Track Copy Cancelled")
+        logging.info(f"Channel Copy Cancelled")
 
     @Slot(QObject)
-    def pasteTrack(self, sketch):
-        logging.info(f"Pasting track to sketch : {sketch.name}")
+    def pasteChannel(self, sketch):
+        logging.info(f"Pasting channel to sketch : {sketch.name}")
 
-        pasted_track = zynthiloops_track(sketch.tracksModel.count, sketch, self)
-        sketch.tracksModel.add_track(pasted_track)
-        pasted_track.deserialize(self.__track_copy_cache__)
-        self.__track_copy_cache__ = None
-        self.__track_copy_source__ = None
+        pasted_channel = zynthiloops_channel(sketch.channelsModel.count, sketch, self)
+        sketch.channelsModel.add_channel(pasted_channel)
+        pasted_channel.deserialize(self.__channel_copy_cache__)
+        self.__channel_copy_cache__ = None
+        self.__channel_copy_source__ = None
         self.is_copy_in_progress_changed.emit()
-        self.track_copy_source_changed.emit()
+        self.channel_copy_source_changed.emit()
 
     @Slot(int)
     def setSketchSlot(self, slot):

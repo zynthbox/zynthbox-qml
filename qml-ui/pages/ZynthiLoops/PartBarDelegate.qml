@@ -11,7 +11,7 @@ import JuceGraphics 1.0
 
 ColumnLayout {
     id: root
-    property QtObject track
+    property QtObject channel
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
     property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
     property QtObject selectedPartClip
@@ -23,12 +23,12 @@ ColumnLayout {
     spacing: 1
 
     Repeater {
-        model: root.track && root.sequence ? 5 : 0
+        model: root.channel && root.sequence ? 5 : 0
         delegate: Rectangle {
             id: partDelegate
             property int partIndex: index
-            property QtObject pattern: root.sequence.getByPart(root.track.id, model.index)
-            property QtObject clip: root.track.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
+            property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 
             Layout.fillWidth: true
@@ -49,14 +49,14 @@ ColumnLayout {
                 color: Kirigami.Theme.textColor
                 source: partDelegate.clip ? partDelegate.clip.path : ""
 
-                visible: root.visible && root.track.trackAudioType === "sample-loop" &&
+                visible: root.visible && root.channel.channelAudioType === "sample-loop" &&
                          partDelegate.clipHasWav
             }
             Image {
                 anchors.fill: parent
                 anchors.margins: 2
                 smooth: false
-                visible: root.visible && root.track.trackAudioType !== "sample-loop" &&
+                visible: root.visible && root.channel.channelAudioType !== "sample-loop" &&
                          partDelegate.pattern &&
                          partDelegate.pattern.hasNotes
                 source: partDelegate.pattern ? partDelegate.pattern.thumbnailUrl : ""
@@ -76,9 +76,9 @@ ColumnLayout {
             QQC2.Label {
                 anchors.centerIn: parent
                 font.pointSize: 8
-                visible: ["sample-trig", "sample-slice", "synth", "external"].indexOf(root.track.trackAudioType) >= 0
+                visible: ["sample-trig", "sample-slice", "synth", "external"].indexOf(root.channel.channelAudioType) >= 0
                 text: qsTr("%1%2")
-                        .arg(root.track.id + 1)
+                        .arg(root.channel.id + 1)
                         .arg(String.fromCharCode(partDelegate.partIndex+65).toLowerCase())
             }
             Rectangle {
@@ -89,7 +89,7 @@ ColumnLayout {
                     right: parent.right
                 }
                 color: "#99888888"
-                visible: root.track.trackAudioType === "sample-loop" &&
+                visible: root.channel.channelAudioType === "sample-loop" &&
                          detailsLabel.text && detailsLabel.text.trim().length > 0
 
                 QQC2.Label {
@@ -110,7 +110,7 @@ ColumnLayout {
                         zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
                     } else {
                         partDelegate.clip.enabled = !partDelegate.clip.enabled;
-                        root.track.selectedPart = index;
+                        root.channel.selectedPart = index;
 
                         root.selectedPartClip = partDelegate.clip
                         root.selectedPartPattern = partDelegate.pattern
@@ -120,13 +120,13 @@ ColumnLayout {
                 }
                 onPressAndHold: {
                     partDelegate.clip.enabled = true;
-                    root.track.selectedPart = index;
+                    root.channel.selectedPart = index;
 
                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                    bottomStack.bottomBar.controlObj = root.track.sceneClip;
+                    bottomStack.bottomBar.controlObj = root.channel.sceneClip;
                     bottomStack.slotsBar.bottomBarButton.checked = true;
 
-                    if (root.track.trackAudioType === "sample-loop") {
+                    if (root.channel.channelAudioType === "sample-loop") {
                         if (partDelegate.clipHasWav) {
                             bottomStack.bottomBar.waveEditorAction.trigger();
                         } else {

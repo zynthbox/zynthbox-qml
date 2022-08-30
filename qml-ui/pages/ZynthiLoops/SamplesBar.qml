@@ -10,7 +10,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 Zynthian.Card {
     id: root
 
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
@@ -32,7 +32,7 @@ Zynthian.Card {
                 return true;
 
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 return true;
 
             case "SWITCH_SELECT_SHORT":

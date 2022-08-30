@@ -33,7 +33,7 @@ class song_arranger_cells_model(QAbstractListModel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.__track__ = parent
+        self.__channel__ = parent
         self.__cells__ = []
 
     ### Property count

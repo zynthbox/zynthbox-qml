@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-KeyZone setup component for ZynthiLoops Tracks
+KeyZone setup component for ZynthiLoops Channels
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
@@ -33,7 +33,7 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 Item {
     id: component
-    property QtObject selectedTrack: null
+    property QtObject selectedChannel: null
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -45,7 +45,7 @@ Item {
             QQC2.Label {
                 text: "Manual"
                 Rectangle {
-                    visible: component.selectedTrack && component.selectedTrack.keyZoneMode == "manual";
+                    visible: component.selectedChannel && component.selectedChannel.keyZoneMode == "manual";
                     anchors {
                         left: parent.left
                         right: parent.right
@@ -58,16 +58,16 @@ Item {
             Repeater {
                 model: 5
                 QQC2.Button {
-                    property var trackSample: visible ? component.selectedTrack && component.selectedTrack.samples && component.selectedTrack.samples[index] : undefined
-                    property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
+                    property var channelSample: visible ? component.selectedChannel && component.selectedChannel.samples && component.selectedChannel.samples[index] : undefined
+                    property QtObject clipObj: channelSample ? ZynQuick.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     enabled: clipObj !== null
                     text: (index === 0 ? "Assign full width to sample " : "") + (index + 1)
                     onClicked: {
                         // Reset all keyzones to 0-127
-                        component.selectedTrack.keyZoneMode = "manual";
-                        if (component.selectedTrack) {
-                            for (var i = 0; i < component.selectedTrack.samples.length; ++i) {
-                                var sample = component.selectedTrack.samples[i];
+                        component.selectedChannel.keyZoneMode = "manual";
+                        if (component.selectedChannel) {
+                            for (var i = 0; i < component.selectedChannel.samples.length; ++i) {
+                                var sample = component.selectedChannel.samples[i];
                                 if (sample) {
                                     var clip = ZynQuick.PlayGridManager.getClipById(sample.cppObjId);
                                     if (clip) {
@@ -83,7 +83,7 @@ Item {
                         clipObj.keyZoneStart = 0;
                         clipObj.keyZoneEnd = 127;
                         clipObj.rootNote = 60;
-                        component.selectedTrack.selectedSlotRow = index;
+                        component.selectedChannel.selectedSlotRow = index;
                     }
                 }
             }
@@ -98,28 +98,28 @@ Item {
             }
             QQC2.Button {
                 text: "All Full"
-                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "all-full";
+                checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "all-full";
                 onClicked: {
-                    if (component.selectedTrack) {
-                        component.selectedTrack.keyZoneMode = "all-full";
+                    if (component.selectedChannel) {
+                        component.selectedChannel.keyZoneMode = "all-full";
                     }
                 }
             }
             QQC2.Button {
                 text: "Split Full"
-                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "split-full";
+                checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-full";
                 onClicked: {
-                    if (component.selectedTrack) {
-                        component.selectedTrack.keyZoneMode = "split-full";
+                    if (component.selectedChannel) {
+                        component.selectedChannel.keyZoneMode = "split-full";
                     }
                 }
             }
             QQC2.Button {
                 text: "Split Narrow"
-                checked: component.selectedTrack && component.selectedTrack.keyZoneMode == "split-narrow";
+                checked: component.selectedChannel && component.selectedChannel.keyZoneMode == "split-narrow";
                 onClicked: {
-                    if (component.selectedTrack) {
-                        component.selectedTrack.keyZoneMode = "split-narrow";
+                    if (component.selectedChannel) {
+                        component.selectedChannel.keyZoneMode = "split-narrow";
                     }
                 }
             }
@@ -134,8 +134,8 @@ Item {
                 model: 5
                 delegate: Item {
                     id: sampleKeyzoneDelegate
-                    property var trackSample: component.selectedTrack.samples && component.selectedTrack.samples[index]
-                    property QtObject clipObj: trackSample ? ZynQuick.PlayGridManager.getClipById(trackSample.cppObjId) : null;
+                    property var channelSample: component.selectedChannel.samples && component.selectedChannel.samples[index]
+                    property QtObject clipObj: channelSample ? ZynQuick.PlayGridManager.getClipById(channelSample.cppObjId) : null;
                     Connections {
                         target: clipObj
                         onKeyZoneStartChanged: zynthian.zynthiloops.song.schedule_save()
@@ -144,7 +144,7 @@ Item {
                     }
                     height: parent.height;
                     width: 1
-                    property bool isCurrent: component.selectedTrack.selectedSlotRow === index
+                    property bool isCurrent: component.selectedChannel.selectedSlotRow === index
                     z: isCurrent ? 99 : 0
                     property color lineColor: isCurrent ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
                     property Item pianoKeyItem: clipObj ? pianoKeysRepeater.itemAt(clipObj.keyZoneStart) : null

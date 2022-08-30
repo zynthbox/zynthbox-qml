@@ -41,35 +41,35 @@ QQC2.Popup {
      * @param song The zl.song object for the dialog to operate on
      */
     function recordSong(song) {
-        for (var trackIndex = 0; trackIndex < 10; ++trackIndex) {
-            // Work out which tracks we want to default-enable (that is, all tracks which have things that are likely to be making a noise)
+        for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
+            // Work out which channels we want to default-enable (that is, all channels which have things that are likely to be making a noise)
             var shouldRecord = false;
-            var track = song.tracksModel.getTrack(trackIndex);
-            if (track.trackAudioType === "synth") {
+            var channel = song.channelsModel.getChannel(channelIndex);
+            if (channel.channelAudioType === "synth") {
                 for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
-                    if (track.chainedSounds[soundIndex] > -1) {
+                    if (channel.chainedSounds[soundIndex] > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
-            } else if (track.trackAudioType === "sample-loop") {
+            } else if (channel.channelAudioType === "sample-loop") {
                 for (var loopIndex = 0; loopIndex < 10; ++loopIndex) {
-                    if (track.clipsModel.getClip(loopIndex).cppObjId > -1) {
+                    if (channel.clipsModel.getClip(loopIndex).cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
-            } else if (track.trackAudioType === "sample-trig" || track.trackAudioType === "sample-slice") {
+            } else if (channel.channelAudioType === "sample-trig" || channel.channelAudioType === "sample-slice") {
                 for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                    if (track.samples[sampleIndex].cppObjId > -1) {
+                    if (channel.samples[sampleIndex].cppObjId > -1) {
                         shouldRecord = true;
                         break;
                     }
                 }
             } else {
-                // Assume external tracks shouldn't be recorded, as they are not going to make internal noises
+                // Assume external channels shouldn't be recorded, as they are not going to make internal noises
             }
-            ZL.AudioLevels.setTrackToRecord(trackIndex, shouldRecord);
+            ZL.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
         }
         if (song.mixesModel.songMode) {
             leadinSpin.value = 0;
@@ -80,9 +80,9 @@ QQC2.Popup {
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }
-            for (var trackIndex = 0; trackIndex < 10; ++trackIndex) {
+            for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
                 for (var partIndex = 0; partIndex < 5; ++partIndex) {
-                    var pattern = sequence.getByPart(trackIndex, partIndex);
+                    var pattern = sequence.getByPart(channelIndex, partIndex);
                     var patternDuration = pattern.width * pattern.availableBars * noteLengths[pattern.noteLength];
                     if (patternDuration > longestPatternDuration) {
                         longestPatternDuration = patternDuration;
@@ -142,24 +142,24 @@ QQC2.Popup {
                 property int cumulativeBeats
                 function startRecording() {
                     _private.recordingProgress = 0;
-                    // Set the filenames for each track (never mind whether they're being recorded or not, it doesn't hurt)
+                    // Set the filenames for each channel (never mind whether they're being recorded or not, it doesn't hurt)
                     var date = new Date();
                     var baseRecordingLocation = _private.song.sketchFolder + "exports/exported-" + date.getFullYear() + date.getMonth() + date.getDate() + "-" + date.getHours() + date.getMinutes();
                     ZL.AudioLevels.setGlobalPlaybackFilenamePrefix(baseRecordingLocation + "/song-");
-                    baseRecordingLocation = baseRecordingLocation + "/track-";
-                    for (var trackIndex = 0; trackIndex < 10; ++trackIndex) {
-                        var track = _private.song.tracksModel.getTrack(trackIndex);
+                    baseRecordingLocation = baseRecordingLocation + "/channel-";
+                    for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
+                        var channel = _private.song.channelsModel.getChannel(channelIndex);
                         var soundIndication = "(unknown)";
-                        if (track.trackAudioType === "synth") {
+                        if (channel.channelAudioType === "synth") {
                             for (var soundIndex = 0; soundIndex < 5; ++soundIndex) {
-                                if (track.chainedSounds[soundIndex] > -1) {
-                                    soundIndication = track.connectedSoundName.replace(/([^a-z0-9]+)/gi, '-');
+                                if (channel.chainedSounds[soundIndex] > -1) {
+                                    soundIndication = channel.connectedSoundName.replace(/([^a-z0-9]+)/gi, '-');
                                     break;
                                 }
                             }
-                        } else if (track.trackAudioType === "sample-loop") {
+                        } else if (channel.channelAudioType === "sample-loop") {
                             for (var loopIndex = 0; loopIndex < 10; ++loopIndex) {
-                                var clip = track.clipsModel.getClip(loopIndex);
+                                var clip = channel.clipsModel.getClip(loopIndex);
                                 if (clip.cppObjId > -1) {
                                     // We pick the name of whatever the first loop is here, just so we've got one
                                     soundIndication = clip.path.split("/").pop();
@@ -170,9 +170,9 @@ QQC2.Popup {
                                     break;
                                 }
                             }
-                        } else if (track.trackAudioType === "sample-trig" || track.trackAudioType === "sample-slice") {
+                        } else if (channel.channelAudioType === "sample-trig" || channel.channelAudioType === "sample-slice") {
                             for (var sampleIndex = 0; sampleIndex < 5; ++sampleIndex) {
-                                var clip = track.samples[sampleIndex];
+                                var clip = channel.samples[sampleIndex];
                                 if (clip.cppObjId > -1) {
                                     // We pick the name of whatever the first sample is here, just so we've got one
                                     soundIndication = clip.path.split("/").pop();
@@ -186,8 +186,8 @@ QQC2.Popup {
                         } else {
                             soundIndication = "external";
                         }
-                        console.log("Setting track", trackIndex, "filename prefix to", baseRecordingLocation + (trackIndex + 1) + "-" + soundIndication);
-                        ZL.AudioLevels.setTrackFilenamePrefix(trackIndex, baseRecordingLocation + (trackIndex + 1) + "-" + soundIndication);
+                        console.log("Setting channel", channelIndex, "filename prefix to", baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
+                        ZL.AudioLevels.setChannelFilenamePrefix(channelIndex, baseRecordingLocation + (channelIndex + 1) + "-" + soundIndication);
                     }
                     // Start the recording
                     ZL.AudioLevels.startRecording();
@@ -273,9 +273,9 @@ QQC2.Popup {
                 onOpenedChanged: {
                     if (!component.opened) {
                         _private.song = null;
-                        for (var trackIndex = 0; trackIndex < 10; ++trackIndex) {
-                            // Disable recording for all tracks, otherwise we'll just end up recording things when we don't want to
-                            ZL.AudioLevels.setTrackToRecord(trackIndex, false);
+                        for (var channelIndex = 0; channelIndex < 10; ++channelIndex) {
+                            // Disable recording for all channels, otherwise we'll just end up recording things when we don't want to
+                            ZL.AudioLevels.setChannelToRecord(channelIndex, false);
                         }
                     }
                 }
@@ -317,19 +317,19 @@ QQC2.Popup {
             Repeater {
                 model: _private.song ? 10 : 0
                 ColumnLayout {
-                    id: trackDelegate
+                    id: channelDelegate
                     Layout.fillWidth: true
-                    property int trackIndex: model.index
+                    property int channelIndex: model.index
                     QQC2.Label {
                         Layout.fillWidth: true
-                        text: "Ch" + (trackDelegate.trackIndex + 1)
+                        text: "Ch" + (channelDelegate.channelIndex + 1)
                         horizontalAlignment: Text.AlignHCenter
                     }
                     QQC2.CheckBox {
                         Layout.fillWidth: true
                         enabled: !_private.isRecording
-                        checked: ZL.AudioLevels.tracksToRecord[trackDelegate.trackIndex]
-                        onClicked: ZL.AudioLevels.setTrackToRecord(trackDelegate.trackIndex, !ZL.AudioLevels.tracksToRecord[trackDelegate.trackIndex])
+                        checked: ZL.AudioLevels.channelsToRecord[channelDelegate.channelIndex]
+                        onClicked: ZL.AudioLevels.setChannelToRecord(channelDelegate.channelIndex, !ZL.AudioLevels.channelsToRecord[channelDelegate.channelIndex])
                     }
                 }
             }

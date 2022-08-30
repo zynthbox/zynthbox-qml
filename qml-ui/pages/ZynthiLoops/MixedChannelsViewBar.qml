@@ -40,10 +40,10 @@ Rectangle {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    readonly property QtObject selectedTrack: applicationWindow().selectedTrack
+    readonly property QtObject selectedChannel: applicationWindow().selectedChannel
 
-    property QtObject sequence: root.selectedTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
-    property QtObject pattern: root.sequence && root.selectedTrack ? root.sequence.getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart) : null
+    property QtObject sequence: root.selectedChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
+    property QtObject pattern: root.sequence && root.selectedChannel ? root.sequence.getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart) : null
 
 
     Layout.fillWidth: true
@@ -57,37 +57,37 @@ Rectangle {
             returnValue = externalMidiChannelPicker.cuiaCallback(cuia);
         } else {
             switch (cuia) {
-                case "SWITCH_TRACKS_MOD_SHORT":
+                case "SWITCH_CHANNELS_MOD_SHORT":
                     returnValue = true;
                     break;
 
                 case "NAVIGATE_LEFT":
-                    if (zynthian.session_dashboard.selectedTrack > 0) {
-                        zynthian.session_dashboard.selectedTrack -= 1;
+                    if (zynthian.session_dashboard.selectedChannel > 0) {
+                        zynthian.session_dashboard.selectedChannel -= 1;
                     }
                     returnValue = true;
                     break;
 
                 case "NAVIGATE_RIGHT":
-                    if (zynthian.session_dashboard.selectedTrack < 9) {
-                        zynthian.session_dashboard.selectedTrack += 1;
+                    if (zynthian.session_dashboard.selectedChannel < 9) {
+                        zynthian.session_dashboard.selectedChannel += 1;
                     }
                     returnValue = true;
                     break;
 
                 case "SELECT_UP":
-                    if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        if (root.selectedTrack.selectedSlotRow > 0) {
-                            root.selectedTrack.selectedSlotRow -= 1;
+                    if (root.selectedChannel.channelAudioType === "sample-trig") {
+                        if (root.selectedChannel.selectedSlotRow > 0) {
+                            root.selectedChannel.selectedSlotRow -= 1;
                         }
                         returnValue = true;
                     }
                     break;
 
                 case "SELECT_DOWN":
-                    if (root.selectedTrack.trackAudioType === "sample-trig") {
-                        if (root.selectedTrack.selectedSlotRow < 4) {
-                            root.selectedTrack.selectedSlotRow += 1;
+                    if (root.selectedChannel.channelAudioType === "sample-trig") {
+                        if (root.selectedChannel.selectedSlotRow < 4) {
+                            root.selectedChannel.selectedSlotRow += 1;
                         }
                         returnValue = true;
                     }
@@ -105,19 +105,19 @@ Rectangle {
     }
 
     QQC2.Popup {
-        id: trackKeyZoneSetup
+        id: channelKeyZoneSetup
         parent: QQC2.Overlay.overlay
         y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
         x: parent.mapFromGlobal(Math.round(parent.width/2 - width/2), 0).x
         exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
         modal: true
         focus: true
-        TrackKeyZoneSetup {
+        ChannelKeyZoneSetup {
             anchors.fill: parent
             implicitWidth: root.width
             implicitHeight: root.height
             readonly property QtObject song: zynthian.zynthiloops.song
-            selectedTrack: song ? song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack) : null
+            selectedChannel: song ? song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel) : null
         }
     }
 
@@ -176,8 +176,8 @@ Rectangle {
                             EditableHeader {
                                 Layout.minimumWidth: parent.width / 4
                                 Layout.maximumWidth: parent.width / 4
-                                property QtObject controlObj: root.selectedTrack
-                                property int controlType: BottomBar.ControlType.Track
+                                property QtObject controlObj: root.selectedChannel
+                                property int controlType: BottomBar.ControlType.Channel
 
                                 text: qsTr("Channel: %1").arg(controlObj ? controlObj.name : "")
                             }
@@ -187,37 +187,37 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "synth"
+                                checked: root.selectedChannel.channelAudioType === "synth"
                                 text: qsTr("Synth")
-                                onClicked: root.selectedTrack.trackAudioType = "synth"
+                                onClicked: root.selectedChannel.channelAudioType = "synth"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-trig" ||
-                                         root.selectedTrack.trackAudioType === "sample-slice"
+                                checked: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                         root.selectedChannel.channelAudioType === "sample-slice"
                                 text: qsTr("Samples")
-                                onClicked: root.selectedTrack.trackAudioType = "sample-trig"
+                                onClicked: root.selectedChannel.channelAudioType = "sample-trig"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "sample-loop"
+                                checked: root.selectedChannel.channelAudioType === "sample-loop"
                                 text: qsTr("Loop")
-                                onClicked: root.selectedTrack.trackAudioType = "sample-loop"
+                                onClicked: root.selectedChannel.channelAudioType = "sample-loop"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedTrack.trackAudioType === "external"
+                                checked: root.selectedChannel.channelAudioType === "external"
                                 text: qsTr("External")
-                                onClicked: root.selectedTrack.trackAudioType = "external"
+                                onClicked: root.selectedChannel.channelAudioType = "external"
                             }
                         }
 
@@ -235,25 +235,25 @@ Rectangle {
                                     anchors.fill: parent
 
                                     RowLayout {
-                                        visible: root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                 root.selectedTrack.trackAudioType === "sample-slice"
+                                        visible: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                 root.selectedChannel.channelAudioType === "sample-slice"
                                         Layout.fillHeight: true
                                         spacing: 0
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
                                             text: "Trig"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-trig"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-trig"
                                             onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-trig"
+                                                root.selectedChannel.channelAudioType = "sample-trig"
                                             }
                                         }
                                         QQC2.Button {
                                             Layout.fillHeight: true
                                             text: "Slice"
-                                            checked: root.selectedTrack && root.selectedTrack.trackAudioType === "sample-slice"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-slice"
                                             onClicked: {
-                                                root.selectedTrack.trackAudioType = "sample-slice"
+                                                root.selectedChannel.channelAudioType = "sample-slice"
                                             }
                                         }
                                     }
@@ -264,13 +264,13 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: root.selectedTrack.trackAudioType === "external"
+                                        visible: root.selectedChannel.channelAudioType === "external"
 
                                         QQC2.Button {
                                             Layout.fillHeight: true
-                                            text: qsTr("External Midi Channel: %1").arg(root.selectedTrack ? (root.selectedTrack.externalMidiChannel > -1 ? root.selectedTrack.externalMidiChannel + 1 : root.selectedTrack.id + 1) : "")
+                                            text: qsTr("External Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : "")
                                             onClicked: {
-                                                externalMidiChannelPicker.pickChannel(root.selectedTrack);
+                                                externalMidiChannelPicker.pickChannel(root.selectedChannel);
                                             }
                                         }
                                         Item {
@@ -282,7 +282,7 @@ Rectangle {
 
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: root.selectedTrack.trackAudioType === "sample-trig"
+                                        visible: root.selectedChannel.channelAudioType === "sample-trig"
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
@@ -294,25 +294,25 @@ Rectangle {
                                             QQC2.Button {
                                                 Layout.fillHeight: true
                                                 text: "Off"
-                                                checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "all-full"
+                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "all-full"
                                                 onClicked: {
-                                                    root.selectedTrack.keyZoneMode = "all-full";
+                                                    root.selectedChannel.keyZoneMode = "all-full";
                                                 }
                                             }
                                             QQC2.Button {
                                                 Layout.fillHeight: true
                                                 text: "Auto"
-                                                checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-full"
+                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-full"
                                                 onClicked: {
-                                                    root.selectedTrack.keyZoneMode = "split-full";
+                                                    root.selectedChannel.keyZoneMode = "split-full";
                                                 }
                                             }
                                             QQC2.Button {
                                                 Layout.fillHeight: true
                                                 text: "Narrow"
-                                                checked: root.selectedTrack && root.selectedTrack.keyZoneMode === "split-narrow"
+                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-narrow"
                                                 onClicked: {
-                                                    root.selectedTrack.keyZoneMode = "split-narrow";
+                                                    root.selectedChannel.keyZoneMode = "split-narrow";
                                                 }
                                             }
                                         }
@@ -320,7 +320,7 @@ Rectangle {
                                             Layout.fillHeight: true
                                             icon.name: "timeline-use-zone-on"
                                             onClicked: {
-                                                trackKeyZoneSetup.open();
+                                                channelKeyZoneSetup.open();
                                             }
                                         }
                                         Item {
@@ -331,14 +331,14 @@ Rectangle {
                                     }
                                     RowLayout {
                                         Layout.fillHeight: true
-                                        visible: root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                 root.selectedTrack.trackAudioType === "sample-slice" ||
-                                                 root.selectedTrack.trackAudioType === "synth"
+                                        visible: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                 root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                 root.selectedChannel.channelAudioType === "synth"
                                         QQC2.Button {
                                             Layout.fillHeight: true
                                             text: "Bounce To Loop"
                                             onClicked: {
-                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedSketchName, root.selectedTrack);
+                                                bouncePopup.bounce(zynthian.zynthiloops.song.scenesModel.selectedSketchName, root.selectedChannel);
                                             }
                                         }
                                         Item {
@@ -359,13 +359,13 @@ Rectangle {
                                     target: synthRepeater
                                     property: "model"
                                     delayed: true
-                                    value: root.selectedTrack.trackAudioType === "synth"
-                                                ? root.selectedTrack.chainedSoundsNames
-                                                : root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                root.selectedTrack.trackAudioType === "sample-slice"
-                                                    ? root.selectedTrack.samples
-                                                    : root.selectedTrack.trackAudioType === "sample-loop"
-                                                        ? [root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex), null, null, null, null]
+                                    value: root.selectedChannel.channelAudioType === "synth"
+                                                ? root.selectedChannel.chainedSoundsNames
+                                                : root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                root.selectedChannel.channelAudioType === "sample-slice"
+                                                    ? root.selectedChannel.samples
+                                                    : root.selectedChannel.channelAudioType === "sample-loop"
+                                                        ? [root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex), null, null, null, null]
                                                         : []
 
                                 }
@@ -374,9 +374,9 @@ Rectangle {
                                     id: synthRepeater
 
                                     delegate: Rectangle {
-                                        property bool highlighted: root.selectedTrack.trackAudioType === "sample-loop"
+                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop"
                                                                     ? index === 0
-                                                                    : root.selectedTrack.selectedSlotRow === index
+                                                                    : root.selectedChannel.selectedSlotRow === index
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -389,7 +389,7 @@ Rectangle {
                                         Rectangle {
                                             id: delegate
 
-                                            property QtObject volumeControlObj: zynthian.layers_for_track.volume_controls[index]
+                                            property QtObject volumeControlObj: zynthian.layers_for_channel.volume_controls[index]
                                             property real volumePercent: volumeControlObj
                                                                             ? (volumeControlObj.value - volumeControlObj.value_min)/(volumeControlObj.value_max - volumeControlObj.value_min)
                                                                             : 0
@@ -407,8 +407,8 @@ Rectangle {
 
                                             // For loop and slice modes only first slot is visible.
                                             // For other modes all slots are visible
-                                            enabled: root.selectedTrack.trackAudioType === "sample-loop" ||
-                                                     root.selectedTrack.trackAudioType === "sample-slice"
+                                            enabled: root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                     root.selectedChannel.channelAudioType === "sample-slice"
                                                         ? index === 0
                                                         : true
                                             opacity: enabled ? 1 : 0
@@ -420,7 +420,7 @@ Rectangle {
                                                     top: parent.top
                                                     bottom: parent.bottom
                                                 }
-                                                visible: root.selectedTrack.trackAudioType === "synth" &&
+                                                visible: root.selectedChannel.channelAudioType === "synth" &&
                                                          synthNameLabel.text.trim().length > 0
 
                                                 color: Kirigami.Theme.highlightColor
@@ -436,11 +436,11 @@ Rectangle {
                                                     rightMargin: Kirigami.Units.gridUnit*0.5
                                                 }
                                                 horizontalAlignment: Text.AlignLeft
-                                                text: root.selectedTrack.trackAudioType === "synth" && modelData && modelData.className == null // Check if modelData is not a track/clip object by checking if it has the className property
+                                                text: root.selectedChannel.channelAudioType === "synth" && modelData && modelData.className == null // Check if modelData is not a channel/clip object by checking if it has the className property
                                                         ? modelData
-                                                        : (root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                          root.selectedTrack.trackAudioType === "sample-slice" ||
-                                                          root.selectedTrack.trackAudioType === "sample-loop") &&
+                                                        : (root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                          root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                          root.selectedChannel.channelAudioType === "sample-loop") &&
                                                           modelData
                                                             ? modelData.path
                                                               ? modelData.path.split("/").pop()
@@ -453,10 +453,10 @@ Rectangle {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
-                                                    if (index !== root.selectedTrack.selectedSlotRow) {
-                                                        root.selectedTrack.selectedSlotRow = index
+                                                    if (index !== root.selectedChannel.selectedSlotRow) {
+                                                        root.selectedChannel.selectedSlotRow = index
                                                     } else {
-                                                        bottomStack.slotsBar.handleItemClick(root.selectedTrack.trackAudioType)
+                                                        bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                                     }
                                                 }
                                             }
@@ -481,17 +481,17 @@ Rectangle {
                                     radius: 4
 
                                     WaveFormItem {
-                                        property QtObject clip: root.selectedTrack.trackAudioType === "sample-loop"
-                                                                    ? root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
-                                                                    : root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+                                        property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
+                                                                    ? root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                                                                    : root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                                         anchors.fill: parent
                                         color: Kirigami.Theme.textColor
                                         source: clip ? clip.path : ""
 
-                                        visible: (root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                  root.selectedTrack.trackAudioType === "sample-slice" ||
-                                                  root.selectedTrack.trackAudioType === "sample-loop") &&
+                                        visible: (root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                  root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                  root.selectedChannel.channelAudioType === "sample-loop") &&
                                                  clip && clip.path && clip.path.length > 0
 
                                         // Mask for wave part before start
@@ -557,7 +557,7 @@ Rectangle {
                                         // SamplerSynth progress dots
                                         Repeater {
                                             property QtObject cppClipObject: parent.visible ? ZynQuick.PlayGridManager.getClipById(parent.clip.cppObjId) : null;
-                                            model: (root.visible && root.selectedTrack.trackAudioType === "sample-slice" || root.selectedTrack.trackAudioType === "sample-trig") && cppClipObject
+                                            model: (root.visible && root.selectedChannel.channelAudioType === "sample-slice" || root.selectedChannel.channelAudioType === "sample-trig") && cppClipObject
                                                 ? cppClipObject.playbackPositions
                                                 : 0
                                             delegate: Item {
@@ -578,23 +578,23 @@ Rectangle {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            if (root.selectedTrack.trackAudioType === "sample-loop") {
-                                                var clip = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                                            if (root.selectedChannel.channelAudioType === "sample-loop") {
+                                                var clip = root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
 
                                                 if (clip && clip.path && clip.path.length > 0) {
                                                     bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomStack.bottomBar.controlObj = root.selectedTrack.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
+                                                    bottomStack.bottomBar.controlObj = root.selectedChannel.clipsModel.getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
                                                     bottomStack.slotsBar.bottomBarButton.checked = true;
                                                     bottomStack.bottomBar.waveEditorAction.trigger();
                                                 }
                                             } else {
-                                                var clip = root.selectedTrack.samples[root.selectedTrack.selectedSlotRow]
+                                                var clip = root.selectedChannel.samples[root.selectedChannel.selectedSlotRow]
 
                                                 if (clip && clip.path && clip.path.length > 0) {
-                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Track;
-                                                    bottomStack.bottomBar.controlObj = root.selectedTrack;
+                                                    bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel;
+                                                    bottomStack.bottomBar.controlObj = root.selectedChannel;
                                                     bottomStack.slotsBar.bottomBarButton.checked = true;
-                                                    bottomStack.bottomBar.trackWaveEditorAction.trigger();
+                                                    bottomStack.bottomBar.channelWaveEditorAction.trigger();
                                                 }
                                             }
                                         }
@@ -616,12 +616,12 @@ Rectangle {
                                     Image {
                                         id: patternVisualiser
 
-                                        visible: root.selectedTrack &&
-                                                 root.selectedTrack.connectedPattern >= 0 &&
-                                                 (root.selectedTrack.trackAudioType === "synth" ||
-                                                  root.selectedTrack.trackAudioType === "external" ||
-                                                  root.selectedTrack.trackAudioType === "sample-trig" ||
-                                                  root.selectedTrack.trackAudioType === "sample-slice")
+                                        visible: root.selectedChannel &&
+                                                 root.selectedChannel.connectedPattern >= 0 &&
+                                                 (root.selectedChannel.channelAudioType === "synth" ||
+                                                  root.selectedChannel.channelAudioType === "external" ||
+                                                  root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                  root.selectedChannel.channelAudioType === "sample-slice")
 
                                         anchors {
                                             fill: parent
@@ -656,7 +656,7 @@ Rectangle {
                                                 zynthian.forced_screen_back = "zynthiloops";
                                                 ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                                                 var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
-                                                sequence.setActiveTrack(root.selectedTrack.id, root.selectedTrack.selectedPart);
+                                                sequence.setActiveChannel(root.selectedChannel.id, root.selectedChannel.selectedPart);
                                             }
                                         }
                                     }

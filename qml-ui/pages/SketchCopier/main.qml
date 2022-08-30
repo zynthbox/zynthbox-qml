@@ -79,7 +79,7 @@ Zynthian.ScreenPage {
                 enabled: !copier.isCopyInProgress
                 visible: !copier.isCopyInProgress
                 onTriggered: {
-                    copier.copyTrack(tracksData.selectedTrack);
+                    copier.copyChannel(channelsData.selectedChannel);
                 }
             }
             Kirigami.Action {
@@ -88,7 +88,7 @@ Zynthian.ScreenPage {
                 enabled: copier.isCopyInProgress
                 visible: copier.isCopyInProgress
                 onTriggered: {
-                    copier.cancelCopyTrack();
+                    copier.cancelCopyChannel();
                 }
             }
             Kirigami.Action {
@@ -97,7 +97,7 @@ Zynthian.ScreenPage {
                 enabled: copier.isCopyInProgress
                 visible: copier.isCopyInProgress
                 onTriggered: {
-                    copier.pasteTrack(sketchesData.selectedSketch);
+                    copier.pasteChannel(sketchesData.selectedSketch);
                 }
             }
         },
@@ -134,7 +134,7 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        // 12 buttons for both sketches and tracks
+        // 12 buttons for both sketches and channels
         property real buttonWidth: contentColumn.width/12 - contentColumn.spacing*2 - 10
         property real buttonHeight: Kirigami.Units.gridUnit*6
     }
@@ -319,7 +319,7 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
                     QQC2.Label {
-                        text: qsTr("%1 Channels").arg(sketchesData.selectedSketch.tracksModel.count)
+                        text: qsTr("%1 Channels").arg(sketchesData.selectedSketch.channelsModel.count)
                     }
                 }
             }
@@ -329,41 +329,41 @@ Zynthian.ScreenPage {
             Layout.preferredHeight: 1
         }
         ColumnLayout {
-            property var selectedTrack
-            property int selectedTrackIndex
+            property var selectedChannel
+            property int selectedChannelIndex
 
-            id: tracksData
+            id: channelsData
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredHeight: 1
 
             QQC2.Label {
                 text: qsTr("Channel %1: %2")
-                        .arg(tracksData.selectedTrack ? (tracksData.selectedTrack.id+1) : "")
-                        .arg(tracksData.selectedTrack ? tracksData.selectedTrack.name : "")
+                        .arg(channelsData.selectedChannel ? (channelsData.selectedChannel.id+1) : "")
+                        .arg(channelsData.selectedChannel ? channelsData.selectedChannel.name : "")
                 opacity: 0.7
             }
 
             RowLayout {
                 Repeater {
-                    model: sketchesData.selectedSketch.tracksModel
+                    model: sketchesData.selectedSketch.channelsModel
                     delegate: CopierButton {
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
 
                         enabled: !copier.isCopyInProgress
-                        highlighted: tracksData.selectedTrack === track
-                        isCopySource: copier.trackCopySource === track
+                        highlighted: channelsData.selectedChannel === channel
+                        isCopySource: copier.channelCopySource === channel
                         text: (index+1)
                         onClicked: {
-                            tracksData.selectedTrack = track;
+                            channelsData.selectedChannel = channel;
                         }
                     }
                 }
 
                 Repeater {
-                    model: 12 - (sketchesData.selectedSketch.tracksModel.count
-                                   ? sketchesData.selectedSketch.tracksModel.count
+                    model: 12 - (sketchesData.selectedSketch.channelsModel.count
+                                   ? sketchesData.selectedSketch.channelsModel.count
                                    : 0)
                     delegate: CopierButton {
                         Layout.preferredWidth: privateProps.buttonWidth
@@ -376,7 +376,7 @@ Zynthian.ScreenPage {
                 }
 
                 ColumnLayout {
-                    id: tracksInfoBar
+                    id: channelsInfoBar
                     Layout.fillHeight: true
                     Layout.alignment: Qt.AlignTop
                     Layout.leftMargin: Kirigami.Units.gridUnit*2

@@ -34,29 +34,29 @@ from PySide2.QtCore import Qt, QObject, Signal, Slot, Property
 # Zynthian Option Selection GUI Class
 #------------------------------------------------------------------------------
 
-class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_channel(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
-        super(zynthian_gui_track, self).__init__(parent)
-        self.title = "Tracks"
-        self.__track_id__ = 0
+        super(zynthian_gui_channel, self).__init__(parent)
+        self.title = "Channels"
+        self.__channel_id__ = 0
         self.__part_id__ = 0
 
     def show(self):
         pass
 
     @Signal
-    def __track_id_changed__(self):
+    def __channel_id_changed__(self):
         pass
 
-    @Property(int, notify=__track_id_changed__)
-    def trackId(self):
-        return self.__track_id__
+    @Property(int, notify=__channel_id_changed__)
+    def channelId(self):
+        return self.__channel_id__
 
-    @trackId.setter
-    def setTrackId(self, tId):
-        self.__track_id__ = tId
-        self.__track_id_changed__.emit()
-        self.__track_changed__.emit()
+    @channelId.setter
+    def setChannelId(self, tId):
+        self.__channel_id__ = tId
+        self.__channel_id_changed__.emit()
+        self.__channel_changed__.emit()
 
     @Signal
     def __part_id_changed__(self):
@@ -73,12 +73,12 @@ class zynthian_gui_track(zynthian_qt_gui_base.ZynGui):
         self.__part_changed__.emit()
 
     @Signal
-    def __track_changed__(self):
+    def __channel_changed__(self):
         pass
 
-    @Property(QObject, notify=__track_changed__)
-    def track(self):
-        return self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.__track_id__)
+    @Property(QObject, notify=__channel_changed__)
+    def channel(self):
+        return self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.__channel_id__)
 
 
     @Signal

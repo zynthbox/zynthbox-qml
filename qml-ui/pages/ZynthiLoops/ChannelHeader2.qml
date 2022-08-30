@@ -41,7 +41,7 @@ QQC2.AbstractButton {
 
     property var subText
     property var subSubText
-    property QtObject track
+    property QtObject channel
 
     property alias textSize: contents.font.pointSize
     property var subTextSize
@@ -117,20 +117,20 @@ QQC2.AbstractButton {
 
                     Image {
                         id: synthImage
-                        visible: root.track.trackAudioType === "synth" &&
-                                 root.track.occupiedSlotsCount > 0  &&
+                        visible: root.channel.channelAudioType === "synth" &&
+                                 root.channel.occupiedSlotsCount > 0  &&
                                  synthImage.status !== Image.Error
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         clip: true
                         opacity: 0.7
-                        property string imageName: String(root.track.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")
+                        property string imageName: String(root.channel.connectedSoundName.split(" > ")[0]).toLowerCase().replace(/ /g, "-")
                         source: imageName !== "" ? Qt.resolvedUrl("../../../img/synths/" + imageName  + ".png") : ""
                     }
 
                     Image {
-                        visible: (root.track.trackAudioType === "synth" && synthImage.status === Image.Error && root.track.occupiedSlotsCount > 0) ||
-                                 ["sample-loop", "sample-trig", "sample-slice"].indexOf(root.track.trackAudioType) >= 0
+                        visible: (root.channel.channelAudioType === "synth" && synthImage.status === Image.Error && root.channel.occupiedSlotsCount > 0) ||
+                                 ["sample-loop", "sample-trig", "sample-slice"].indexOf(root.channel.channelAudioType) >= 0
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectCrop
                         horizontalAlignment: Image.AlignHCenter
@@ -158,9 +158,9 @@ QQC2.AbstractButton {
                         horizontalAlignment: "AlignHCenter"
                         verticalAlignment: "AlignVCenter"
                         font.pointSize: 8
-                        // text: track.connectedSoundName.split(" > ")[0]
-                        text: root.track.trackAudioType === "synth"
-                                  ? root.track.connectedSoundName.split(" > ")[0]
+                        // text: channel.connectedSoundName.split(" > ")[0]
+                        text: root.channel.channelAudioType === "synth"
+                                  ? root.channel.connectedSoundName.split(" > ")[0]
                                   : ""
                     }
                 }

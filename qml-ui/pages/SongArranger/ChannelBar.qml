@@ -52,7 +52,7 @@ GridLayout {
 
         ListView {
             id: clipsList
-            model: root.sideBar.controlObj.zlTrack.clipsModel
+            model: root.sideBar.controlObj.zlChannel.clipsModel
             Layout.fillWidth: true
             Layout.fillHeight: true
             interactive: true

@@ -33,7 +33,7 @@ import '../../Zynthian' 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    property QtObject track: applicationWindow().selectedTrack
+    property QtObject channel: applicationWindow().selectedChannel
     property QtObject soundCopySource
 
     title: qsTr("Sound Categories")
@@ -453,7 +453,7 @@ Zynthian.ScreenPage {
                             ? soundButtonGroup.checkedButton != null &&
                               soundButtonGroup.checkedButton.checked
                                 ? zynthian.sound_categories.getSoundNamesFromSoundFile(soundButtonGroup.checkedButton.soundObj.path)
-                                : root.track.chainedSoundsNames
+                                : root.channel.chainedSoundsNames
                             : null
 
                     delegate: Item {

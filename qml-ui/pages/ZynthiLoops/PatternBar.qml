@@ -40,14 +40,14 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject sequence: controlObj.clipTrack ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
-    property QtObject pattern: root.sequence && controlObj.clipTrack ? root.sequence.getByPart(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart) : null
+    property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName) : null
+    property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart) : null
     property QtObject bottomBar: null
 
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }
         
@@ -93,8 +93,8 @@ GridLayout {
             Layout.fillHeight: true
             smooth: false
 
-            visible: controlObj != null && controlObj.clipTrack != null && controlObj.clipTrack.connectedPattern >= 0
-            source: root.pattern && controlObj.clipTrack ? root.pattern.thumbnailUrl : ""
+            visible: controlObj != null && controlObj.clipChannel != null && controlObj.clipChannel.connectedPattern >= 0
+            source: root.pattern && controlObj.clipChannel ? root.pattern.thumbnailUrl : ""
             Rectangle { // Progress
                 anchors {
                     top: parent.top
@@ -118,7 +118,7 @@ GridLayout {
                     zynthian.forced_screen_back = "zynthiloops";
                     ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
                     var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
-                    sequence.setActiveTrack(controlObj.clipTrack.id, controlObj.clipTrack.selectedPart);
+                    sequence.setActiveChannel(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart);
                 }
             }
         }

@@ -37,15 +37,15 @@ import org.zynthian.quick 1.0 as ZynQuick
 Rectangle {
     id: root
     property alias filePickerDialog: pickerDialog
-    property var trackCopySource: null
+    property var channelCopySource: null
     property var clipCopySource: null
     property alias tabbedView: tabbedView
 
     property alias patternAction: patternAction
     property alias recordingAction: recordingAction
     property alias waveEditorAction: waveEditorAction
-    property alias trackWaveEditorAction: trackWaveEditorAction
-    property alias tracksViewSoundsBarAction: trackSoundsAction
+    property alias channelWaveEditorAction: channelWaveEditorAction
+    property alias channelsViewSoundsBarAction: channelSoundsAction
 
     Layout.fillWidth: true
     color: Kirigami.Theme.backgroundColor
@@ -53,7 +53,7 @@ Rectangle {
     enum ControlType {
         Song,
         Clip,
-        Track,
+        Channel,
         Part,
         Pattern,
         None
@@ -67,8 +67,8 @@ Rectangle {
             root.controlType = BottomBar.ControlType.Song
         } else if (type === "clip") {
             root.controlType = BottomBar.ControlType.Clip
-        } else if (type === "track") {
-            root.controlType = BottomBar.ControlType.Track
+        } else if (type === "channel") {
+            root.controlType = BottomBar.ControlType.Channel
         } else if (type === "part") {
             root.controlType = BottomBar.ControlType.Part
         } else if (type === "pattern") {
@@ -119,7 +119,7 @@ Rectangle {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.maximumHeight: Kirigami.Units.gridUnit * 2
-                visible: root.controlType !== BottomBar.ControlType.Track
+                visible: root.controlType !== BottomBar.ControlType.Channel
 
                 EditableHeader {
                     text: {
@@ -130,13 +130,13 @@ Rectangle {
                         case BottomBar.ControlType.Clip:
                         case BottomBar.ControlType.Pattern:
                             return qsTr("CLIP: %1").arg(text);
-                        case BottomBar.ControlType.Track:
+                        case BottomBar.ControlType.Channel:
                             return qsTr("CHANNEL: %1").arg(text);
                         case BottomBar.ControlType.Part:
                             return qsTr("PART: %1").arg(text);
     //                    case BottomBar.ControlType.Pattern:
     //                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
-    //                        var pattern = sequence.getByPart(root.controlObj.clipTrack.connectedPattern, 0)
+    //                        var pattern = sequence.getByPart(root.controlObj.clipChannel.connectedPattern, 0)
     //                        return qsTr("PATTERN: %1").arg(pattern.objectName)
                         default:
                             return text;
@@ -152,13 +152,13 @@ Rectangle {
                 // Selecting custom slices not required. Keeping the dropdown commented if later required for something else
     //            QQC2.Label {
     //                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-    //                         controlObj.clipTrack.trackAudioType === "sample-slice"
+    //                         controlObj.clipChannel.channelAudioType === "sample-slice"
     //                text: qsTr("Slices")
     //            }
 
     //            QQC2.ComboBox {
     //                visible: (root.controlType === BottomBar.ControlType.Clip || root.controlType === BottomBar.ControlType.Pattern) &&
-    //                         controlObj.clipTrack.trackAudioType === "sample-slice"
+    //                         controlObj.clipChannel.channelAudioType === "sample-slice"
     //                model: [4, 8, 12, 16]
     //                currentIndex: find(controlObj.slices)
     //                onActivated: controlObj.slices = model[index]
@@ -281,7 +281,7 @@ Rectangle {
                 visibleFocusRects: false
 
                 initialHeaderItem: RowLayout {
-                    visible: root.controlType === BottomBar.ControlType.Track
+                    visible: root.controlType === BottomBar.ControlType.Channel
                     EditableHeader {
                         id: tabbedViewHeader
                         Binding {
@@ -296,7 +296,7 @@ Rectangle {
                                 case BottomBar.ControlType.Clip:
                                 case BottomBar.ControlType.Pattern:
                                     return qsTr("CLIP: %1").arg(text);
-                                case BottomBar.ControlType.Track:
+                                case BottomBar.ControlType.Channel:
                                     return qsTr("CHANNEL: %1").arg(text);
                                 case BottomBar.ControlType.Part:
                                     return qsTr("PART: %1").arg(text);
@@ -313,7 +313,7 @@ Rectangle {
                     }
                 }
                 finalHeaderItem: RowLayout {
-                    visible: root.controlType === BottomBar.ControlType.Track
+                    visible: root.controlType === BottomBar.ControlType.Channel
                     Item {
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                     }
@@ -328,7 +328,7 @@ Rectangle {
                         Layout.fillHeight: true
 
                         text: qsTr("Midi")
-                        //enabled: !trackDelegate.hasWavLoaded && !trackDelegate.trackHasConnectedPattern
+                        //enabled: !channelDelegate.hasWavLoaded && !channelDelegate.channelHasConnectedPattern
 
                         onClicked: {
                             zynthian.session_dashboard.midiSelectionRequested();
@@ -349,17 +349,17 @@ Rectangle {
     //                }
 
                     Binding {
-                        target: trackAudioTypeDropdown
+                        target: channelAudioTypeDropdown
                         property: "currentIndex"
                         delayed: true
                         value: controlObj &&
-                               controlObj.trackAudioType
-                                 ? trackAudioTypeDropdown.findCurrentIndex(controlObj.trackAudioType)
+                               controlObj.channelAudioType
+                                 ? channelAudioTypeDropdown.findCurrentIndex(controlObj.channelAudioType)
                                  : -1
                     }
 
                     QQC2.ComboBox {
-                        id: trackAudioTypeDropdown
+                        id: channelAudioTypeDropdown
 
                         function findCurrentIndex(val) {
                             for (var i = 0; i < model.count; i++) {
@@ -371,7 +371,7 @@ Rectangle {
                             return -1
                         }
 
-                        // For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth"
+                        // For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth"
                         model: ListModel {
                             ListElement { text: "Synth"; value: "synth" }
                             ListElement { text: "Loop"; value: "sample-loop" }
@@ -382,7 +382,7 @@ Rectangle {
                         textRole: "text"
                         currentIndex:  -1
                         onActivated: {
-                            controlObj.trackAudioType = trackAudioTypeDropdown.model.get(index).value;
+                            controlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
                         }
                     }
                 }
@@ -393,9 +393,9 @@ Rectangle {
                         return songAction;
                     case BottomBar.ControlType.Clip:
                         return controlObj.hasOwnProperty("path") && controlObj.path.length > 0 ? clipSettingsAction : recordingAction;
-                    case BottomBar.ControlType.Track:
-                        if (controlObj.trackAudioType === "synth")
-                            return trackSoundsAction;
+                    case BottomBar.ControlType.Channel:
+                        if (controlObj.channelAudioType === "synth")
+                            return channelSoundsAction;
                         else {
                             return sampleSoundsAction;
                         }
@@ -468,19 +468,19 @@ Rectangle {
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
-                        id: trackAction
+                        id: channelAction
                         text: qsTr("Channel")
-                        page: Qt.resolvedUrl("TrackBar.qml")
+                        page: Qt.resolvedUrl("ChannelBar.qml")
                         preload: true
-                        visible: root.controlType === BottomBar.ControlType.Track
+                        visible: root.controlType === BottomBar.ControlType.Channel
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
-                        id: trackSoundsAction
+                        id: channelSoundsAction
                         text: qsTr("Sounds")
-                        page: Qt.resolvedUrl("../SessionDashboard/TracksViewSoundsBar.qml")
+                        page: Qt.resolvedUrl("../SessionDashboard/ChannelsViewSoundsBar.qml")
                         preload: true
-                        visible: root.controlType === BottomBar.ControlType.Track
+                        visible: root.controlType === BottomBar.ControlType.Channel
                         initialProperties: {"bottomBar": root}
                     },
                     Zynthian.TabbedControlViewAction {
@@ -488,37 +488,37 @@ Rectangle {
                         text: qsTr("Samples")
                         page: Qt.resolvedUrl("SamplesBar.qml")
                         preload: true
-                        visible: root.controlType === BottomBar.ControlType.Track
+                        visible: root.controlType === BottomBar.ControlType.Channel
                         initialProperties: {"bottomBar": root}
                     },
-                    // Duplicate tab instance but for different placement and controlObj for track
+                    // Duplicate tab instance but for different placement and controlObj for channel
                     Zynthian.TabbedControlViewAction {
-                        id: trackclipSettingsAction
+                        id: channelclipSettingsAction
 
                         property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSlotRow] : null
 
                         text: qsTr("Smp. Settings")
                         page: Qt.resolvedUrl("ClipSettingsBar.qml")
-                        visible: root.controlType === BottomBar.ControlType.Track &&
+                        visible: root.controlType === BottomBar.ControlType.Channel &&
                                  clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
                     },
-                    // Duplicate tab instance but for different placement and controlObj for track
+                    // Duplicate tab instance but for different placement and controlObj for channel
                     Zynthian.TabbedControlViewAction {
-                        id: trackWaveEditorAction
+                        id: channelWaveEditorAction
 
                         property QtObject clip: root.controlObj && root.controlObj.samples ? root.controlObj.samples[root.controlObj.selectedSlotRow] : null
 
                         text: qsTr("Wave Editor")
                         page: Qt.resolvedUrl("WaveEditorBar.qml")
-                        visible: root.controlType === BottomBar.ControlType.Track &&
+                        visible: root.controlType === BottomBar.ControlType.Channel &&
                                  clip && clip.path && clip.path.length > 0
                         initialProperties: {"bottomBar": root}
                     }
                    /* Zynthian.TabbedControlViewAction {
                         text: qsTr("FX")
                         page: Qt.resolvedUrl("FXBar.qml")
-                        visible: root.controlType === BottomBar.ControlType.Track
+                        visible: root.controlType === BottomBar.ControlType.Channel
                         initialProperties: {"bottomBar": root}
                     },*/
                 ]
@@ -535,7 +535,7 @@ Rectangle {
         x: parent.x
         y: parent.y
 
-        headerText: qsTr("%1 : Pick an audio file").arg(root.controlObj ? root.controlObj.trackName : "")
+        headerText: qsTr("%1 : Pick an audio file").arg(root.controlObj ? root.controlObj.channelName : "")
         rootFolder: "/zynthian/zynthian-my-data"
         folderModel {
             nameFilters: ["*.wav"]

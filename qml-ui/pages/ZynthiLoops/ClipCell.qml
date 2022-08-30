@@ -41,18 +41,18 @@ QQC2.AbstractButton {
     property bool isPlaying
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
-    property bool highlighted: track.sceneClip.row === zynthian.session_dashboard.selectedTrack &&
-                               track.sceneClip.col === zynthian.zynthiloops.song.scenesModel.selectedSketchIndex // bottomBar.controlObj === track.sceneClip
+    property bool highlighted: channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
+                               channel.sceneClip.col === zynthian.zynthiloops.song.scenesModel.selectedSketchIndex // bottomBar.controlObj === channel.sceneClip
     property color highlightColor: !highlighted &&
                                    root.isInScene &&
-                                   ((track.trackAudioType === "sample-loop" && track.sceneClip.path && track.sceneClip.path.length > 0) || pattern.hasNotes)
+                                   ((channel.channelAudioType === "sample-loop" && channel.sceneClip.path && channel.sceneClip.path.length > 0) || pattern.hasNotes)
                                        ? Qt.rgba(255,255,255,0.6)
                                        : highlighted
                                            ? root.isInScene
                                                ? Kirigami.Theme.highlightColor
                                                : "#aaf44336"
                                            : "transparent"
-    property bool isInScene: track.selectedPartNames.length > 0
+    property bool isInScene: channel.selectedPartNames.length > 0
 
     property QtObject sequence
     property QtObject pattern
@@ -67,7 +67,7 @@ QQC2.AbstractButton {
             smooth: false
 
             visible: false /*root.isInScene &&
-                     track.trackAudioType !== "sample-loop" &&
+                     channel.channelAudioType !== "sample-loop" &&
                      root.pattern &&
                      root.pattern.hasNotes*/
             source: root.pattern ? root.pattern.thumbnailUrl : ""
@@ -80,18 +80,18 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: false /*root.isInScene &&
-                     track.trackAudioType === "sample-loop" &&
-                     track.sceneClip.path &&
-                     track.sceneClip.path.length > 0*/
+                     channel.channelAudioType === "sample-loop" &&
+                     channel.sceneClip.path &&
+                     channel.sceneClip.path.length > 0*/
             text: visible
                 ? qsTr("%1%2")
-                    .arg(track.sceneClip.isPlaying &&
-                         track.sceneClip.currentBeat >= 0
-                            ? (track.sceneClip.currentBeat+1) + "/"
+                    .arg(channel.sceneClip.isPlaying &&
+                         channel.sceneClip.currentBeat >= 0
+                            ? (channel.sceneClip.currentBeat+1) + "/"
                             : "")
-                    .arg(track.sceneClip.snapLengthToBeat
-                            ? track.sceneClip.length.toFixed(0)
-                            : track.sceneClip.length.toFixed(2))
+                    .arg(channel.sceneClip.snapLengthToBeat
+                            ? channel.sceneClip.length.toFixed(0)
+                            : channel.sceneClip.length.toFixed(2))
                 : ""
         }
 
@@ -102,7 +102,7 @@ QQC2.AbstractButton {
                 bottom: parent.bottom
             }
             visible: false /*root.isInScene &&
-                     track.trackAudioType !== "sample-loop" &&
+                     channel.channelAudioType !== "sample-loop" &&
                      root.pattern &&
                      root.pattern.hasNotes*/
             text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
@@ -135,7 +135,7 @@ QQC2.AbstractButton {
             anchors.bottomMargin: spacing
 
             Repeater {
-                model: track.selectedPartNames
+                model: channel.selectedPartNames
                 delegate: RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -168,7 +168,7 @@ QQC2.AbstractButton {
             elide: "ElideRight"
             color: "#ffffff"
             text: qsTr("%1")
-                    .arg(track.id+1)
+                    .arg(channel.id+1)
             font.pointSize: 12
             visible: root.isInScene
 
@@ -192,28 +192,28 @@ QQC2.AbstractButton {
 
             QQC2.Label {
                 id: presetName
-                property string presetText: track.connectedSoundName.split(" > ")[1]
+                property string presetText: channel.connectedSoundName.split(" > ")[1]
 
                 anchors.fill: parent
                 elide: "ElideRight"
                 horizontalAlignment: "AlignHCenter"
                 verticalAlignment: "AlignVCenter"
                 font.pointSize: 8
-                text: model.track.trackAudioType === "synth"
+                text: model.channel.channelAudioType === "synth"
                       ? presetText
                           ? presetText
                           : ""
-                      : ["sample-trig", "sample-slice"].indexOf(model.track.trackAudioType) >= 0
-                          ? model.track.samples[model.track.selectedSlotRow].path.split("/").pop()
-                          : model.track.trackAudioType === "sample-loop"
-                              ? model.track.sceneClip.path.split("/").pop()
-                              : qsTr("Midi %1").arg(model.track.externalMidiChannel > -1 ? model.track.externalMidiChannel + 1 : model.track.id + 1)
+                      : ["sample-trig", "sample-slice"].indexOf(model.channel.channelAudioType) >= 0
+                          ? model.channel.samples[model.channel.selectedSlotRow].path.split("/").pop()
+                          : model.channel.channelAudioType === "sample-loop"
+                              ? model.channel.sceneClip.path.split("/").pop()
+                              : qsTr("Midi %1").arg(model.channel.externalMidiChannel > -1 ? model.channel.externalMidiChannel + 1 : model.channel.id + 1)
             }
         }
     }
 
     background: Rectangle {
-        color: copySourceObj === track.sceneClip ? "#2196f3" : root.backgroundColor
+        color: copySourceObj === channel.sceneClip ? "#2196f3" : root.backgroundColor
 
         border.width: 1
         border.color: root.highlightColor
@@ -226,23 +226,23 @@ QQC2.AbstractButton {
             id: progressRect
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     track.sceneClip.isPlaying &&
-                     track.trackAudioType === "sample-loop" &&
-                     track.sceneClip.path &&
-                     track.sceneClip.path.length > 0
+                     channel.sceneClip.isPlaying &&
+                     channel.channelAudioType === "sample-loop" &&
+                     channel.sceneClip.path &&
+                     channel.sceneClip.path.length > 0
 
             color: Kirigami.Theme.textColor
             height: Kirigami.Units.smallSpacing
-            width: visible ? (track.sceneClip.progress - track.sceneClip.startPosition)/adjustment : 0
-            property double adjustment: visible ? (((60/zynthian.zynthiloops.song.bpm) * track.sceneClip.length) / parent.width) : 1
+            width: visible ? (channel.sceneClip.progress - channel.sceneClip.startPosition)/adjustment : 0
+            property double adjustment: visible ? (((60/zynthian.zynthiloops.song.bpm) * channel.sceneClip.length) / parent.width) : 1
         }
         Rectangle {
             id: patternProgressRect
 
             anchors.bottom: parent.bottom
             visible: root.isInScene &&
-                     track.trackAudioType !== "sample-loop" &&
-                     track.connectedPattern >= 0 &&
+                     channel.channelAudioType !== "sample-loop" &&
+                     channel.connectedPattern >= 0 &&
                      sequence.isPlaying &&
                      root.pattern.hasNotes
             color: Kirigami.Theme.textColor

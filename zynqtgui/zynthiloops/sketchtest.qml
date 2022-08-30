@@ -17,9 +17,9 @@ Controls.ApplicationWindow {
                 text: songManager.song.name
             }
             Repeater {
-                model: songManager.song.tracksModel
+                model: songManager.song.channelsModel
                 delegate: Controls.Label {
-                    text: track.name
+                    text: channel.name
                 }
             }
         }
@@ -44,9 +44,9 @@ Controls.ApplicationWindow {
                 rows: songManager.song.partsModel.count
                 flow: GridLayout.TopToBottom
                 Repeater {
-                    model: songManager.song.tracksModel
+                    model: songManager.song.channelsModel
                     delegate: Repeater {
-                        model: track.clipsModel
+                        model: channel.clipsModel
                         delegate: Controls.Button {
                             id: clipButton
                             text: model.clip.name
@@ -75,8 +75,8 @@ Controls.ApplicationWindow {
             }
         }
         Controls.Button {
-            text: "Add Track"
-            onClicked: songManager.song.addTrack()
+            text: "Add Channel"
+            onClicked: songManager.song.addChannel()
         }
         Controls.Button {
             text: "Reset Song"

@@ -126,23 +126,23 @@ class zynthian_gui_keybinding(QObject):
 			"NAVIGATE_LEFT": { "modifier": 0, "keysym": "Left" },
 			"NAVIGATE_RIGHT": { "modifier": 0, "keysym": "Right" },
 
-			"TRACK_1": { "modifier": 0, "keysym": "1" },
-			"TRACK_2": { "modifier": 0, "keysym": "2" },
-			"TRACK_3": { "modifier": 0, "keysym": "3" },
-			"TRACK_4": { "modifier": 0, "keysym": "4" },
-			"TRACK_5": { "modifier": 0, "keysym": "5" },
+			"CHANNEL_1": { "modifier": 0, "keysym": "1" },
+			"CHANNEL_2": { "modifier": 0, "keysym": "2" },
+			"CHANNEL_3": { "modifier": 0, "keysym": "3" },
+			"CHANNEL_4": { "modifier": 0, "keysym": "4" },
+			"CHANNEL_5": { "modifier": 0, "keysym": "5" },
 
-			"TRACK_6": { "modifier": 4, "keysym": "1" },
-			"TRACK_7": { "modifier": 4, "keysym": "2" },
-			"TRACK_8": { "modifier": 4, "keysym": "3" },
-			"TRACK_9": { "modifier": 4, "keysym": "4" },
-			"TRACK_10": { "modifier": 4, "keysym": "5" },
+			"CHANNEL_6": { "modifier": 4, "keysym": "1" },
+			"CHANNEL_7": { "modifier": 4, "keysym": "2" },
+			"CHANNEL_8": { "modifier": 4, "keysym": "3" },
+			"CHANNEL_9": { "modifier": 4, "keysym": "4" },
+			"CHANNEL_10": { "modifier": 4, "keysym": "5" },
 
-			# "TRACK_11": { "modifier": 4, "keysym": "5" }, # Disable track 11 and 12
-			# "TRACK_12": { "modifier": 4, "keysym": "6" }, # Disable track 11 and 12
+			# "CHANNEL_11": { "modifier": 4, "keysym": "5" }, # Disable channel 11 and 12
+			# "CHANNEL_12": { "modifier": 4, "keysym": "6" }, # Disable channel 11 and 12
 
-			"TRACK_PREVIOUS": {"modifier": 4, "keysym": "Left"},
-			"TRACK_NEXT": { "modifier": 4, "keysym": "Right" },
+			"CHANNEL_PREVIOUS": {"modifier": 4, "keysym": "Left"},
+			"CHANNEL_NEXT": { "modifier": 4, "keysym": "Right" },
 
 			"INCREASE" : { "modifier": 0, "keysym": "+" },
 			"DECREASE" : { "modifier": 0, "keysym": "-" },

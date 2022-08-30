@@ -81,7 +81,7 @@ ColumnLayout {
         }
 
         ColumnLayout {
-            id: tracksLayout
+            id: channelsLayout
             Layout.fillWidth: true
             Layout.preferredWidth: 1
             spacing: 0
@@ -95,22 +95,22 @@ ColumnLayout {
             }
 
             Repeater {
-                model: zynthian.zynthiloops.song.tracksModel
+                model: zynthian.zynthiloops.song.channelsModel
                 delegate: DashboardListItem {
                     width: parent.width
-                    patternConnections: index < 6 ? trackSoundConnections : trackPatternConnections
+                    patternConnections: index < 6 ? channelSoundConnections : channelPatternConnections
                     secondColumn: index < 6 ? layersLayout : patternsLayout
                     Layout.preferredHeight: root.itemHeight
                     //dragManager.targetMinY: -550
                     dragManager.targetMaxY: index < 6 ? patternsLayout.y - soundsHeading.height  : layersLayout.height + soundsHeading.height //FIXME: random magic numbers
                     contentItem: RowLayout {
                         id: delegate
-                        property QtObject track: model.track
+                        property QtObject channel: model.channel
                         QQC2.Label {
                             text: (index+1) + "." + (visibleChildren.length > 1 ? model.display : "")
                         }
                         Repeater { //HACK
-                            model: delegate.track.clipsModel
+                            model: delegate.channel.clipsModel
                             QQC2.Label {
                                 text: model.display
                                 visible: model.clip.path.length > 0
@@ -130,38 +130,38 @@ ColumnLayout {
                         for (var i in model) {
                             print(i+ " _ " + model[i])
                         }
-                        for (var i in model.track) {
-                            print(i+ " => " + model.track[i])
+                        for (var i in model.channel) {
+                            print(i+ " => " + model.channel[i])
                         }
-                        if (index < 6 && model.track.connectedSound >= 0) {
-                            trackSoundConnections.addConnection(index, model.track.connectedSound);
+                        if (index < 6 && model.channel.connectedSound >= 0) {
+                            channelSoundConnections.addConnection(index, model.channel.connectedSound);
                         }
-                        if (index >= 6 && model.track.connectedPattern >= 0) {
-                            trackPatternConnections.addConnection(index, model.track.connectedPattern);
+                        if (index >= 6 && model.channel.connectedPattern >= 0) {
+                            channelPatternConnections.addConnection(index, model.channel.connectedPattern);
                         }
                     }
                     onRequestConnect: {
                         if (index < 6) {
                             if (child) {
-                                model.track.connectedSound = child.row;
+                                model.channel.connectedSound = child.row;
                             } else {
-                                model.track.connectedSound = -1;
+                                model.channel.connectedSound = -1;
                             }
                         } else {
                             if (child) {
-                                model.track.connectedPattern = child.row;
+                                model.channel.connectedPattern = child.row;
                             } else {
-                                model.track.connectedPattern = -1;
+                                model.channel.connectedPattern = -1;
                             }
                         }
                     }
                     data: [Connections {
-                        target: model.track
+                        target: model.channel
                         onConnectedSoundChanged: {
-                            if (model.track.connectedSound >= 0) {
-                                trackSoundConnections.addConnection(index, model.track.connectedSound);
+                            if (model.channel.connectedSound >= 0) {
+                                channelSoundConnections.addConnection(index, model.channel.connectedSound);
                             } else {
-                                trackSoundConnections.removeConnection(index)
+                                channelSoundConnections.removeConnection(index)
                             }
                         }
                     }]
@@ -177,7 +177,7 @@ ColumnLayout {
             Layout.preferredWidth: 1
             Layout.fillHeight: true
             PatternConnections {
-                id: trackPatternConnections
+                id: channelPatternConnections
                 anchors {
                     fill: parent
                     //topMargin: soundsHeading.height
@@ -221,7 +221,7 @@ ColumnLayout {
                 spacing: 0
                 onHeightChanged: {
                     patternSoundsConnections.requestPaint();
-                    trackPatternConnections.requestPaint();
+                    channelPatternConnections.requestPaint();
                 }
                 Repeater {
                     id: patternsViewMainRepeater
@@ -323,7 +323,7 @@ ColumnLayout {
             Layout.fillHeight: true
 
             PatternConnections {
-                id: trackSoundConnections
+                id: channelSoundConnections
                 anchors {
                     fill: parent
                     //topMargin: soundsHeading.height

@@ -36,11 +36,11 @@ from .zynthiloops_mix import zynthiloops_mix
 from .zynthiloops_mixes_model import zynthiloops_mixes_model
 from .zynthiloops_scenes_model import zynthiloops_scenes_model
 from .zynthiloops_segment import zynthiloops_segment
-from .zynthiloops_track import zynthiloops_track
+from .zynthiloops_channel import zynthiloops_channel
 from .zynthiloops_part import zynthiloops_part
 from .zynthiloops_clip import zynthiloops_clip
 from .zynthiloops_parts_model import zynthiloops_parts_model
-from .zynthiloops_tracks_model import zynthiloops_tracks_model
+from .zynthiloops_channels_model import zynthiloops_channels_model
 
 import logging
 import json
@@ -63,7 +63,7 @@ class zynthiloops_song(QObject):
 
         self.__is_loading__ = True
         self.isLoadingChanged.emit()
-        self.__tracks_model__ = zynthiloops_tracks_model(self)
+        self.__channels_model__ = zynthiloops_channels_model(self)
         self.__parts_model__ = zynthiloops_parts_model(self)
         self.__scenes_model__ = zynthiloops_scenes_model(self)
         self.__mixes_model__ = zynthiloops_mixes_model(self)
@@ -80,7 +80,7 @@ class zynthiloops_song(QObject):
         self.__selected_scale_index__ = 0
         # The octave is -1 indexed, as we operate with C4 == midi note 60, so this makes our default a key of C2
         self.__octave__ = 2
-        self.__play_track_solo = -1
+        self.__play_channel_solo = -1
 
         self.__current_bar__ = 0
         self.__current_part__ = self.__parts_model__.getPart(0)
@@ -98,7 +98,7 @@ class zynthiloops_song(QObject):
             self.isLoadingChanged.emit()
             # First, clear out any cruft that might have occurred during a failed load attempt
             self.__parts_model__ = zynthiloops_parts_model(self)
-            self.__tracks_model__ = zynthiloops_tracks_model(self)
+            self.__channels_model__ = zynthiloops_channels_model(self)
             self.__scenes_model__ = zynthiloops_scenes_model(self)
             self.__mixes_model__ = zynthiloops_mixes_model(self)
 
@@ -107,14 +107,14 @@ class zynthiloops_song(QObject):
                 self.__parts_model__.add_part(zynthiloops_part(i, self))
 
             for _ in range(0, 10):
-                track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
-                self.__tracks_model__.add_track(track)
+                channel = zynthiloops_channel(self.__channels_model__.count, self, self.__channels_model__)
+                self.__channels_model__.add_channel(channel)
 
-                # Create 5 parts per track
+                # Create 5 parts per channel
                 for i in range(0, 5):
-                    clipsModel = track.getClipsModelByPart(i)
+                    clipsModel = channel.getClipsModelByPart(i)
                     for j in range(0, 10):
-                        clip = zynthiloops_clip(track.id, j, i, self, clipsModel)
+                        clip = zynthiloops_clip(channel.id, j, i, self, clipsModel)
                         clipsModel.add_clip(clip)
 
             # Add default Mixes and Segments
@@ -160,7 +160,7 @@ class zynthiloops_song(QObject):
             "volume": self.__volume__,
             "selectedScaleIndex": self.__selected_scale_index__,
             "octave": self.__octave__,
-            "tracks": self.__tracks_model__.serialize(),
+            "channels": self.__channels_model__.serialize(),
             "parts": self.__parts_model__.serialize(),
             "scenes": self.__scenes_model__.serialize(),
             "mixes": self.__mixes_model__.serialize()
@@ -330,8 +330,8 @@ class zynthiloops_song(QObject):
                     self.set_octave(sketch["octave"], True)
                 if "parts" in sketch:
                     self.__parts_model__.deserialize(sketch["parts"])
-                if "tracks" in sketch:
-                    self.__tracks_model__.deserialize(sketch["tracks"])
+                if "channels" in sketch:
+                    self.__channels_model__.deserialize(sketch["channels"])
                 if "scenes" in sketch:
                     self.__scenes_model__.deserialize(sketch["scenes"])
                 if "mixes" in sketch:
@@ -359,34 +359,34 @@ class zynthiloops_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, track: int, sketch: int):
-        # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
-        if track >= self.__tracks_model__.count:
+    def getClip(self, channel: int, sketch: int):
+        # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
+        if channel >= self.__channels_model__.count:
             return None
 
-        track = self.__tracks_model__.getTrack(track)
-        # logging.error(track.clipsModel.count)
+        channel = self.__channels_model__.getChannel(channel)
+        # logging.error(channel.clipsModel.count)
 
-        if sketch >= track.clipsModel.count:
+        if sketch >= channel.clipsModel.count:
             return None
 
-        clip = track.clipsModel.getClip(sketch)
+        clip = channel.clipsModel.getClip(sketch)
         # logging.error(clip)
         return clip
 
     @Slot(int, int, result=QObject)
-    def getClipByPart(self, track: int, sketch: int, part: int):
-        # logging.error("GETCLIP {} {} count {}".format(track, part, self.__tracks_model__.count))
-        if track >= self.__tracks_model__.count:
+    def getClipByPart(self, channel: int, sketch: int, part: int):
+        # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
+        if channel >= self.__channels_model__.count:
             return None
 
-        track = self.__tracks_model__.getTrack(track)
-        # logging.error(track.clipsModel.count)
+        channel = self.__channels_model__.getChannel(channel)
+        # logging.error(channel.clipsModel.count)
 
-        if sketch >= track.getClipsModelByPart(part).count:
+        if sketch >= channel.getClipsModelByPart(part).count:
             return None
 
-        clip = track.getClipsModelByPart(part).getClip(sketch)
+        clip = channel.getClipsModelByPart(part).getClip(sketch)
         # logging.error(clip)
         return clip
 
@@ -485,7 +485,7 @@ class zynthiloops_song(QObject):
         pass
 
     @Signal
-    def tracks_model_changed(self):
+    def channels_model_changed(self):
         pass
 
     @Signal
@@ -496,9 +496,9 @@ class zynthiloops_song(QObject):
     def __scenes_model_changed__(self):
         pass
 
-    def tracksModel(self):
-        return self.__tracks_model__
-    tracksModel = Property(QObject, tracksModel, notify=tracks_model_changed)
+    def channelsModel(self):
+        return self.__channels_model__
+    channelsModel = Property(QObject, channelsModel, notify=channels_model_changed)
 
     def partsModel(self):
         return self.__parts_model__
@@ -522,12 +522,12 @@ class zynthiloops_song(QObject):
     isPlaying = Property(bool, notify=__is_playing_changed__)
 
     # @Slot(None)
-    # def addTrack(self):
-    #     track = zynthiloops_track(self.__tracks_model__.count, self, self.__tracks_model__)
-    #     self.__tracks_model__.add_track(track)
+    # def addChannel(self):
+    #     channel = zynthiloops_channel(self.__channels_model__.count, self, self.__channels_model__)
+    #     self.__channels_model__.add_channel(channel)
     #     for i in range(0, 2): #TODO: keep numer of parts consistent
-    #         clip = zynthiloops_clip(track.id, i, self, track.clipsModel)
-    #         track.clipsModel.add_clip(clip)
+    #         clip = zynthiloops_clip(channel.id, i, self, channel.clipsModel)
+    #         channel.clipsModel.add_clip(clip)
     #         #self.add_clip_to_part(clip, i)
     #     self.schedule_save()
 
@@ -667,28 +667,28 @@ class zynthiloops_song(QObject):
     sketchFolder = Property(str, get_sketch_folder, constant=True)
     ### END Property sketchFolder
 
-    ### Property playTrackSolo
-    def get_playTrackSolo(self):
-        return self.__play_track_solo
+    ### Property playChannelSolo
+    def get_playChannelSolo(self):
+        return self.__play_channel_solo
 
-    def set_playTrackSolo(self, value):
-        if self.__play_track_solo != value:
-            logging.debug(f"set_playTrackSolo: {value}")
-            self.__play_track_solo = value
+    def set_playChannelSolo(self, value):
+        if self.__play_channel_solo != value:
+            logging.debug(f"set_playChannelSolo: {value}")
+            self.__play_channel_solo = value
 
-            for track_index in range(self.tracksModel.count):
-                track = self.tracksModel.getTrack(track_index)
-                if (value == -1 or track.id == value) and not track.muted:
-                    track.unmute_all_clips_in_track()
+            for channel_index in range(self.channelsModel.count):
+                channel = self.channelsModel.getChannel(channel_index)
+                if (value == -1 or channel.id == value) and not channel.muted:
+                    channel.unmute_all_clips_in_channel()
                 else:
-                    track.mute_all_clips_in_track()
+                    channel.mute_all_clips_in_channel()
 
-            self.playTrackSoloChanged.emit()
+            self.playChannelSoloChanged.emit()
 
-    playTrackSoloChanged = Signal()
+    playChannelSoloChanged = Signal()
 
-    playTrackSolo = Property(int, get_playTrackSolo, set_playTrackSolo, notify=playTrackSoloChanged)
-    ### END Property playTrackSolo
+    playChannelSolo = Property(int, get_playChannelSolo, set_playChannelSolo, notify=playChannelSoloChanged)
+    ### END Property playChannelSolo
 
     ### Property isLoading
     def get_isLoading(self):

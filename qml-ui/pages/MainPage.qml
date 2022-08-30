@@ -67,28 +67,28 @@ Zynthian.ScreenPage {
                 mainviewGridId.moveCurrentIndexRight();
                 return true;
 
-            case "TRACK_1":
-            case "TRACK_6":
+            case "CHANNEL_1":
+            case "CHANNEL_6":
                 zynthian.main.visibleCategory = "modules"
                 return true
 
-            case "TRACK_2":
-            case "TRACK_7":
+            case "CHANNEL_2":
+            case "CHANNEL_7":
                 zynthian.main.visibleCategory = "appimages"
                 return true
 
-            case "TRACK_3":
-            case "TRACK_8":
+            case "CHANNEL_3":
+            case "CHANNEL_8":
                 zynthian.main.visibleCategory = "sessions"
                 return true
 
-            case "TRACK_4":
-            case "TRACK_9":
+            case "CHANNEL_4":
+            case "CHANNEL_9":
                 zynthian.main.visibleCategory = "templates"
                 return true
 
-            case "TRACK_5":
-            case "TRACK_10":
+            case "CHANNEL_5":
+            case "CHANNEL_10":
                 zynthian.main.visibleCategory = "discover"
                 return true
 

@@ -36,7 +36,7 @@ Zynthian.ScreenPage {
     id: root
 
     readonly property QtObject song: zynthian.zynthiloops.song
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     backAction: null
     contextualActions: [
@@ -229,11 +229,11 @@ Zynthian.ScreenPage {
     Connections {
         target: zynthian
         onCurrent_screen_idChanged: {
-            // Select connected sound of selected track if not already selected
+            // Select connected sound of selected channel if not already selected
             if (zynthian.current_screen_id === "session_dashboard" &&
-                !selectedTrack.checkIfLayerExists(zynthian.active_midi_channel) &&
-                zynthian.active_midi_channel !== selectedTrack.connectedSound) {
-                zynthian.fixed_layers.activate_index(selectedTrack.connectedSound);
+                !selectedChannel.checkIfLayerExists(zynthian.active_midi_channel) &&
+                zynthian.active_midi_channel !== selectedChannel.connectedSound) {
+                zynthian.fixed_layers.activate_index(selectedChannel.connectedSound);
             }
         }
     }
@@ -270,19 +270,19 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         text: "1-6"
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        checked: zynthian.session_dashboard.visibleTracksStart == 0
+                        checked: zynthian.session_dashboard.visibleChannelsStart == 0
                         onClicked: {
-                            zynthian.session_dashboard.visibleTracksStart = 0;
-                            zynthian.session_dashboard.visibleTracksEnd = 5;
+                            zynthian.session_dashboard.visibleChannelsStart = 0;
+                            zynthian.session_dashboard.visibleChannelsEnd = 5;
                         }
                     }
                     QQC2.Button {
                         text: "7-12"
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                        checked: zynthian.session_dashboard.visibleTracksStart == 6
+                        checked: zynthian.session_dashboard.visibleChannelsStart == 6
                         onClicked: {
-                            zynthian.session_dashboard.visibleTracksStart = 6;
-                            zynthian.session_dashboard.visibleTracksEnd = 11;
+                            zynthian.session_dashboard.visibleChannelsStart = 6;
+                            zynthian.session_dashboard.visibleChannelsEnd = 11;
                         }
                     }
                 }
@@ -301,9 +301,9 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignCenter
                         checkable: true
-                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        checked: zynthian.zynthiloops.clickChannelEnabled
                         onToggled: {
-                            zynthian.zynthiloops.clickTrackEnabled = checked
+                            zynthian.zynthiloops.clickChannelEnabled = checked
                         }
                         
                         Kirigami.Icon {
@@ -319,8 +319,8 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignCenter
                         font.pointSize: 12
                         text: qsTr("%1 x Sounds | %2 x Midi")
-                        .arg(15 - zynthian.zynthiloops.song.tracksModel.connectedSoundsCount)
-                        .arg(5 - zynthian.zynthiloops.song.tracksModel.connectedPatternsCount)
+                        .arg(15 - zynthian.zynthiloops.song.channelsModel.connectedSoundsCount)
+                        .arg(5 - zynthian.zynthiloops.song.channelsModel.connectedPatternsCount)
                     }
 
                     Kirigami.Heading {
@@ -342,9 +342,9 @@ Zynthian.ScreenPage {
 
             tabActions: [
                 Zynthian.TabbedControlViewAction {
-                    id: tracksViewTab
+                    id: channelsViewTab
                     text: qsTr("Channels")
-                    page: Qt.resolvedUrl("TracksView.qml")
+                    page: Qt.resolvedUrl("ChannelsView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     // Sketches tab renamed to sessions

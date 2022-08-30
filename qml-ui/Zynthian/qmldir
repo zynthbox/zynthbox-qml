@@ -38,6 +38,6 @@ LayerReplaceDialog 1.0 LayerReplaceDialog.qml
 SequenceLoader 1.0 SequenceLoader.qml
 LayerSetupDialog 1.0 LayerSetupDialog.qml
 KnobIndicator 1.0 KnobIndicator.qml
-MultitrackRecorderPopup 1.0 MultitrackRecorderPopup.qml
+MultichannelRecorderPopup 1.0 MultichannelRecorderPopup.qml
 ResetableSlider 1.0 ResetableSlider.qml
 OnScreenDisplay 1.0 OnScreenDisplay.qml

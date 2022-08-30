@@ -55,7 +55,7 @@ GridLayout {
                 return true;
 
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 return true;
         }
 
@@ -180,7 +180,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                            ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                              ? ZL.AudioLevels.tracks[bottomBar.controlObj.clipTrack.id]
+                              ? ZL.AudioLevels.channels[bottomBar.controlObj.clipChannel.id]
                               : ZL.AudioLevels.captureA
                            : -100
 
@@ -204,7 +204,7 @@ GridLayout {
                     maximumValue: 20
                     value: visible
                             ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                               ? ZL.AudioLevels.tracks[bottomBar.controlObj.clipTrack.id]
+                               ? ZL.AudioLevels.channels[bottomBar.controlObj.clipChannel.id]
                                : ZL.AudioLevels.captureB
                             : -100
 

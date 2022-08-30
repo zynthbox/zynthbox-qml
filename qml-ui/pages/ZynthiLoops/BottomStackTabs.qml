@@ -36,11 +36,11 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         checkable: true
-        checked: bottomStack.slotsBar ? bottomStack.slotsBar.trackButton.checked : false
+        checked: bottomStack.slotsBar ? bottomStack.slotsBar.channelButton.checked : false
         enabled: !root.songMode && !root.displaySceneButtons
         text: qsTr("Channel")
         onClicked: {
-            bottomStack.slotsBar.trackButton.checked = true
+            bottomStack.slotsBar.channelButton.checked = true
         }
     }
 

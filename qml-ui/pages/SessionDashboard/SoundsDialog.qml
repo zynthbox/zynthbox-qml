@@ -42,8 +42,8 @@ QQC2.Dialog {
 
     /* Disable Sounds Dialog as it is not used anymore
 
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property var chainedSoundsArr: selectedTrack ? selectedTrack.chainedSounds.slice() : []
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property var chainedSoundsArr: selectedChannel ? selectedChannel.chainedSounds.slice() : []
 //     property var chainColors: ({
 //         t1: "#e6194B",
 //         t2: "#3cb44b",
@@ -100,7 +100,7 @@ QQC2.Dialog {
     height: Screen.height - Kirigami.Units.gridUnit*2
 
     header: Kirigami.Heading {
-        text: qsTr("Pick a sound for %1").arg(soundsDialog.selectedTrack ? soundsDialog.selectedTrack.name : "(no selected track)")
+        text: qsTr("Pick a sound for %1").arg(soundsDialog.selectedChannel ? soundsDialog.selectedChannel.name : "(no selected channel)")
         font.pointSize: 16
         padding: Kirigami.Units.gridUnit
     }
@@ -122,12 +122,12 @@ QQC2.Dialog {
             Layout.preferredWidth: 1
             text: qsTr("Un-select all slots")
             onClicked: {
-              //  soundsDialog.selectedTrack.connectedSound = -1;
-//                soundsDialog.selectedTrack.chainedSounds = [-1,-1,-1,-1, -1]
-                soundsDialog.selectedTrack.clearChainedSoundsWithoutCloning();
-//                if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
-//                    seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
+              //  soundsDialog.selectedChannel.connectedSound = -1;
+//                soundsDialog.selectedChannel.chainedSounds = [-1,-1,-1,-1, -1]
+                soundsDialog.selectedChannel.clearChainedSoundsWithoutCloning();
+//                if (soundsDialog.selectedChannel.connectedPattern >= 0) {
+//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+//                    seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
 //                }
                 soundsDialog.accept();
             }
@@ -159,9 +159,9 @@ QQC2.Dialog {
                     id: soundBtnDelegate
 
                     property int layerIndex: index
-                    property bool hasConnectedTracks: false
+                    property bool hasConnectedChannels: false
                     property bool isChained: false
-                    property bool hasTrack: false
+                    property bool hasChannel: false
                     property color borderColor: Qt.rgba(
                                                     Kirigami.Theme.textColor.r,
                                                     Kirigami.Theme.textColor.g,
@@ -174,23 +174,23 @@ QQC2.Dialog {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing*(parent.columns-1))/parent.columns
                     Layout.preferredHeight: (parent.height-parent.rowSpacing*(parent.rows-1))/parent.rows
                     radius: 4
-                    highlighted: soundsDialog.selectedTrack &&
-                                 soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
-                                 soundsDialog.selectedTrack.checkIfLayerExists(index)
+                    highlighted: soundsDialog.selectedChannel &&
+                                 soundsDialog.selectedChannel.chainedSounds.indexOf(index) >= 0 &&
+                                 soundsDialog.selectedChannel.checkIfLayerExists(index)
 
-                    enabled: (!highlighted && !isChained) || !hasTrack
+                    enabled: (!highlighted && !isChained) || !hasChannel
 
                     background: Rectangle { // Derived from znthian qtquick-controls-style
                         Kirigami.Theme.highlightColor: {
-                            if (soundsDialog.selectedTrack && zynthian.active_midi_channel === index) {
+                            if (soundsDialog.selectedChannel && zynthian.active_midi_channel === index) {
                                 return Qt.rgba(
                                     soundBtnDelegate.borderColor.r,
                                     soundBtnDelegate.borderColor.g,
                                     soundBtnDelegate.borderColor.b,
                                     enabled ? 1 : 0.5
                                 )
-                            } else if (soundsDialog.selectedTrack && soundsDialog.selectedTrack.chainedSounds.indexOf(index) >= 0 &&
-                                       soundsDialog.selectedTrack.checkIfLayerExists(index)) {
+                            } else if (soundsDialog.selectedChannel && soundsDialog.selectedChannel.chainedSounds.indexOf(index) >= 0 &&
+                                       soundsDialog.selectedChannel.checkIfLayerExists(index)) {
                                 return Qt.rgba(
                                     soundBtnDelegate.borderColor.r,
                                     soundBtnDelegate.borderColor.g,
@@ -211,11 +211,11 @@ QQC2.Dialog {
                         Kirigami.Theme.colorSet: Kirigami.Theme.Button
                         color: soundBtnDelegate.highlighted
                                 ? Kirigami.Theme.highlightColor
-                                : soundBtnDelegate.hasTrack
+                                : soundBtnDelegate.hasChannel
                                   ? Kirigami.Theme.backgroundColor
                                   : "#000000"
                         border.width: 2
-                        border.color: soundBtnDelegate.hasTrack
+                        border.color: soundBtnDelegate.hasChannel
                                           ? Qt.rgba(
                                               soundBtnDelegate.borderColor.r,
                                               soundBtnDelegate.borderColor.g,
@@ -242,7 +242,7 @@ QQC2.Dialog {
                                         0.1
                                     );
                                     soundBtnDelegate.isChained = false;
-                                    soundBtnDelegate.hasTrack = false;
+                                    soundBtnDelegate.hasChannel = false;
                                 } else {
                                     borderColorTimer.restart();
                                 }
@@ -255,45 +255,45 @@ QQC2.Dialog {
                             interval: 50
                             running: true
                             onTriggered: {
-//                                for (var j in selectedTrack.chainedSounds) {
-//                                    if (soundBtnDelegate.layerIndex === selectedTrack.chainedSounds[j] &&
-//                                        soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
+//                                for (var j in selectedChannel.chainedSounds) {
+//                                    if (soundBtnDelegate.layerIndex === selectedChannel.chainedSounds[j] &&
+//                                        soundsDialog.selectedChannel.checkIfLayerExists(soundBtnDelegate.layerIndex)) {
 //                                        soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
 //                                        soundBtnDelegate.isChained = true;
-//                                        console.log((index+1)+" chained to Selected Track T"+(selectedTrack.id+1), soundBtnDelegate.borderColor)
+//                                        console.log((index+1)+" chained to Selected Channel T"+(selectedChannel.id+1), soundBtnDelegate.borderColor)
 
-//                                        // Return if sound is found in selected track
+//                                        // Return if sound is found in selected channel
 //                                        return;
 //                                    }
 //                                }
 
-                                for (var i=0; i<zynthian.zynthiloops.song.tracksModel.count; i++) {
+                                for (var i=0; i<zynthian.zynthiloops.song.channelsModel.count; i++) {
                                     var found = false;
-                                    var track = zynthian.zynthiloops.song.tracksModel.getTrack(i);
+                                    var channel = zynthian.zynthiloops.song.channelsModel.getChannel(i);
                                     var chains = zynthian.layer.chainForLayer(i);
 
-                                    // console.log("Track T"+(parseInt(k)+1))
+                                    // console.log("Channel T"+(parseInt(k)+1))
 
-                                    for (var k in track.chainedSounds) {
-                                        // console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", track.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
+                                    for (var k in channel.chainedSounds) {
+                                        // console.log("Comparing layer and chained sounds ---- layerIndex:", soundBtnDelegate.layerIndex, ", Chained Sounds :", channel.chainedSounds[parseInt(k)], ", printableChain :", chains, " chains index :", chains.indexOf(soundBtnDelegate.layerIndex));
 
-                                        if (soundsDialog.selectedTrack && soundsDialog.selectedTrack.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === track.chainedSounds[k]) {
+                                        if (soundsDialog.selectedChannel && soundsDialog.selectedChannel.checkIfLayerExists(soundBtnDelegate.layerIndex) && soundBtnDelegate.layerIndex === channel.chainedSounds[k]) {
                                             found = true
                                             console.log((index+1)+" chained to T"+(i+1))
 //                                            console.log("  > Setting color : "+chainColors["t"+(i+1)]);
                                             soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                             soundBtnDelegate.isChained = true;
-                                            soundBtnDelegate.hasTrack = true;
+                                            soundBtnDelegate.hasChannel = true;
                                         }
                                     }
 
-                                    // Break out of loop when first connected track is found
+                                    // Break out of loop when first connected channel is found
                                     if (found) {
                                         break;
                                     } else if ((chains.length > 1 && chains.indexOf(soundBtnDelegate.layerIndex) >= 0)) {
                                         soundBtnDelegate.borderColor = soundsDialog.chainColors[zynthian.layer.printableChainForLayer(i)]
                                         soundBtnDelegate.isChained = true;
-                                        soundBtnDelegate.hasTrack = false;
+                                        soundBtnDelegate.hasChannel = false;
                                     }
                                 }
                             }
@@ -311,26 +311,26 @@ QQC2.Dialog {
                     onClicked: {
                         soundsDialog.accept();
 
-                        soundsDialog.selectedTrack.selectSound(index);
+                        soundsDialog.selectedChannel.selectSound(index);
 
-                        if (soundsDialog.selectedTrack.connectedPattern >= 0) {
-                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedTrack.id, soundsDialog.selectedTrack.selectedPart);
-                            seq.midiChannel = soundsDialog.selectedTrack.connectedSound;
+                        if (soundsDialog.selectedChannel.connectedPattern >= 0) {
+                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+                            seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
                         }
 
                         zynthian.fixed_layers.activate_index(index);
 
-                        if (!soundsDialog.selectedTrack.checkIfLayerExists(index)) {
+                        if (!soundsDialog.selectedChannel.checkIfLayerExists(index)) {
                             applicationWindow().requestOpenLayerSetupDialog();
                         }
                     }
 
-                    // Reset hasConnectedTracks on dialog close
+                    // Reset hasConnectedChannels on dialog close
                     Connections {
                         target: soundsDialog
                         onVisibleChanged: {
                             if (!visible) {
-                                soundBtnDelegate.hasConnectedTracks = false;
+                                soundBtnDelegate.hasConnectedChannels = false;
                             }
                         }
                     }
@@ -366,14 +366,14 @@ QQC2.Dialog {
                         anchors.margins: Kirigami.Units.gridUnit*0.5
 
                         Repeater {
-                            model: zynthian.zynthiloops.song.tracksModel
+                            model: zynthian.zynthiloops.song.channelsModel
                             delegate: QQC2.Label {
                                 font.pointSize: 10
-                                text: model.track.name
-                                visible: model.track.connectedSound === layerIndex
+                                text: model.channel.name
+                                visible: model.channel.connectedSound === layerIndex
                                 onVisibleChanged: {
                                     if (visible) {
-                                        soundBtnDelegate.hasConnectedTracks = true;
+                                        soundBtnDelegate.hasConnectedChannels = true;
                                     }
                                 }
                             }

@@ -37,7 +37,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 QQC2.Dialog {
     id: root
 
-    property QtObject selectedTrack: applicationWindow().selectedTrack
+    property QtObject selectedChannel: applicationWindow().selectedChannel
 
     parent: QQC2.Overlay.overlay
     y: parent.mapFromGlobal(0, Math.round(parent.height/2 - height/2)).y
@@ -62,21 +62,21 @@ QQC2.Dialog {
                 text: qsTr("Pick a Synth")
                 onPressed: {
                     Qt.callLater(function() {
-                        if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
+                        if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
                             zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
                             root.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
                             newSynthWorkaroundTimer.restart()
-                            zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
-                        } else if (!root.selectedTrack.createChainedSoundInNextFreeLayer(root.selectedTrack.selectedSlotRow)) {
+                            zynthian.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
+                        } else if (!root.selectedChannel.createChainedSoundInNextFreeLayer(root.selectedChannel.selectedSlotRow)) {
                             root.reject();
                             noFreeSlotsPopup.open();
                         } else {
                             zynthian.layer.page_after_layer_creation = zynthian.current_screen_id
                             root.accept()
-                            zynthian.fixed_layers.activate_index(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow]);
+                            zynthian.fixed_layers.activate_index(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow]);
                             newSynthWorkaroundTimer.restart()
-                            zynthian.layer.select_engine(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                            zynthian.layer.select_engine(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                         }
                     })
                 }
@@ -84,7 +84,7 @@ QQC2.Dialog {
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
-                visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                 text: qsTr("Change preset")
                 onClicked: {
                     zynthian.current_screen_id = "preset"
@@ -104,17 +104,17 @@ QQC2.Dialog {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
             }
             QQC2.Button {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
-                visible: root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                visible: root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                 text: qsTr("Remove Synth")
                 onClicked: {
                     root.accept();
-                    if (root.selectedTrack.checkIfLayerExists(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])) {
-                        root.selectedTrack.remove_and_unchain_sound(root.selectedTrack.chainedSounds[root.selectedTrack.selectedSlotRow])
+                    if (root.selectedChannel.checkIfLayerExists(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])) {
+                        root.selectedChannel.remove_and_unchain_sound(root.selectedChannel.chainedSounds[root.selectedChannel.selectedSlotRow])
                     }
                 }
             }
@@ -122,9 +122,9 @@ QQC2.Dialog {
                 id: newSynthWorkaroundTimer
                 interval: 200
                 onTriggered: {
-                    if (root.selectedTrack.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(root.selectedTrack.id, root.selectedTrack.selectedPart);
-                        pattern.midiChannel = root.selectedTrack.connectedSound;
+                    if (root.selectedChannel.connectedPattern >= 0) {
+                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                        pattern.midiChannel = root.selectedChannel.connectedSound;
                     }
                 }
             }

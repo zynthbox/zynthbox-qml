@@ -67,13 +67,13 @@ Zynthian.Stack {
                     root.pageCache["control"].visible = false;
                 }
 
-                console.log("Caching layers_for_track")
+                console.log("Caching layers_for_channel")
                 zynthian.currentTaskMessage = "Loading library page"
-                if (!root.pageCache["layers_for_track"]) {
-                    file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_track");
+                if (!root.pageCache["layers_for_channel"]) {
+                    file = applicationWindow().pageScreenMapping.pageForScreen("layers_for_channel");
                     var component = Qt.createComponent(file);
-                    root.pageCache["layers_for_track"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
-                    root.pageCache["layers_for_track"].visible = false;
+                    root.pageCache["layers_for_channel"] = component.createObject(root, {"width": root.width, "height": root.height, "visible": false});
+                    root.pageCache["layers_for_channel"].visible = false;
                 }
 
                 zynthian.isScreensCachingComplete = true

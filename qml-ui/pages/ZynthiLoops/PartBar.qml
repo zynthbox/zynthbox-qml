@@ -43,8 +43,8 @@ Rectangle {
     color: Kirigami.Theme.backgroundColor
 
     property QtObject bottomBar: null
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
-    property QtObject selectedPartTrack
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedPartChannel
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 
@@ -59,62 +59,62 @@ Rectangle {
         var returnVal = false
 
         switch (cuia) {
-            case "TRACK_1":
-            case "TRACK_6":
-                clip = root.selectedTrack.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            case "CHANNEL_1":
+            case "CHANNEL_6":
+                clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
-            case "TRACK_2":
-            case "TRACK_7":
-                clip = root.selectedTrack.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            case "CHANNEL_2":
+            case "CHANNEL_7":
+                clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
-            case "TRACK_3":
-            case "TRACK_8":
-                clip = root.selectedTrack.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            case "CHANNEL_3":
+            case "CHANNEL_8":
+                clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
-            case "TRACK_4":
-            case "TRACK_9":
-                clip = root.selectedTrack.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            case "CHANNEL_4":
+            case "CHANNEL_9":
+                clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
-            case "TRACK_5":
-            case "TRACK_10":
-                clip = root.selectedTrack.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            case "CHANNEL_5":
+            case "CHANNEL_10":
+                clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
                 clip.enabled = !clip.enabled
                 returnVal = true
                 break
 
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
                 returnVal = true
                 break
 
             case "NAVIGATE_LEFT":
-                if (zynthian.session_dashboard.selectedTrack > 0) {
-                    zynthian.session_dashboard.selectedTrack -= 1;
+                if (zynthian.session_dashboard.selectedChannel > 0) {
+                    zynthian.session_dashboard.selectedChannel -= 1;
                 }
                 returnVal = true
                 break
 
             case "NAVIGATE_RIGHT":
-                if (zynthian.session_dashboard.selectedTrack < 9) {
-                    zynthian.session_dashboard.selectedTrack += 1;
+                if (zynthian.session_dashboard.selectedChannel < 9) {
+                    zynthian.session_dashboard.selectedChannel += 1;
                 }
                 returnVal = true
                 break
         }
 
-        console.log("### Part Bar CUIA Callback :", selectedTrack.id, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex, cuia, clip)
+        console.log("### Part Bar CUIA Callback :", selectedChannel.id, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex, cuia, clip)
 
         return returnVal;
     }
@@ -169,10 +169,10 @@ Rectangle {
                             Layout.fillWidth: false
                             Layout.fillHeight: true
                             Layout.preferredWidth: privateProps.cellWidth
-                            track: zynthian.zynthiloops.song.tracksModel.getTrack(model.index)
+                            channel: zynthian.zynthiloops.song.channelsModel.getChannel(model.index)
                             onClicked: {
                                 if (!root.songMode) {
-                                    root.selectedPartTrack = partBarDelegate.track
+                                    root.selectedPartChannel = partBarDelegate.channel
                                     root.selectedPartClip = partBarDelegate.selectedPartClip
                                     root.selectedPartPattern = partBarDelegate.selectedPartPattern
                                     root.clicked()
@@ -195,7 +195,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                                visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType === "sample-loop"
+                                visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType === "sample-loop"
                                 text: root.selectedPartClip ? root.selectedPartClip.path.split("/").pop() : ""
                             }
 
@@ -203,7 +203,7 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: false
                                 wrapMode: "WrapAtWordBoundaryOrAnywhere"
-                                visible: root.selectedPartTrack && root.selectedPartTrack.trackAudioType !== "sample-loop"
+                                visible: root.selectedPartChannel && root.selectedPartChannel.channelAudioType !== "sample-loop"
                                 text: root.selectedPartPattern ? root.selectedPartPattern.objectName : ""
                             }
 

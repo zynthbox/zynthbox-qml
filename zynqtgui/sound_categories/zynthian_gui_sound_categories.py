@@ -191,8 +191,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         self.loadSoundFromFile(sound.path)
 
     @Slot(int, str)
-    def loadTrackSoundFromJson(self, trackIndex, soundJson):
-        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".Ch{trackIndex+1}.sound", delete=False)
+    def loadChannelSoundFromJson(self, channelIndex, soundJson):
+        tempSoundJson = tempfile.NamedTemporaryFile(suffix=f".Ch{channelIndex+1}.sound", delete=False)
         sound_path = tempSoundJson.name
 
         try:
@@ -203,43 +203,43 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
         finally:
             tempSoundJson.close()
 
-        self.loadSoundFromFile(sound_path, trackIndex)
+        self.loadSoundFromFile(sound_path, channelIndex)
 
     @Slot(str)
-    def loadSoundFromFile(self, filepath, trackIndex=-1):
+    def loadSoundFromFile(self, filepath, channelIndex=-1):
         def task():
             logging.debug(f"### Loading sound : {filepath}")
 
-            if trackIndex == -1:
-                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+            if channelIndex == -1:
+                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
             else:
-                track = self.zyngui.zynthiloops.song.tracksModel.getTrack(trackIndex)
+                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(channelIndex)
 
             source_channels = self.zyngui.layer.load_layer_channels_from_file(filepath)
-            free_layers = track.getFreeLayers()
+            free_layers = channel.getFreeLayers()
             used_layers = []
 
-            for i in track.chainedSounds:
-                if i >= 0 and track.checkIfLayerExists(i):
+            for i in channel.chainedSounds:
+                if i >= 0 and channel.checkIfLayerExists(i):
                     used_layers.append(i)
 
             logging.debug(f"### Before Removing")
-            logging.debug(f"# Selected Track         : {self.zyngui.session_dashboard.selectedTrack}")
+            logging.debug(f"# Selected Channel         : {self.zyngui.session_dashboard.selectedChannel}")
             logging.debug(f"# Source Channels        : {source_channels}")
             logging.debug(f"# Free Layers            : {free_layers}")
             logging.debug(f"# Used Layers            : {used_layers}")
-            logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
+            logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
             logging.debug(f"# Source Channels Count  : {len(source_channels)}")
             logging.debug(f"# Available Layers Count : {len(free_layers) + len(used_layers)}")
 
             # Check if count of channels required to load sound is available or not
-            # Available count of channels : used layers by current track (will get replaced) + free layers
+            # Available count of channels : used layers by current channel (will get replaced) + free layers
             if (len(free_layers) + len(used_layers)) < len(source_channels):
-                logging.debug(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from tracks to continue.")
+                logging.debug(f"{len(source_channels) - len(free_layers) - len(used_layers)} more free channels are required to load sound. Please remove some sound from channels to continue.")
             else:
                 # Required free channel count condition satisfied. Continue loading.
 
-                # A counter to keep track of numner of callbacks called
+                # A counter to keep channel of numner of callbacks called
                 # so that post_removal_task can be executed after all callbacks are called
                 cb_counter = 0
 
@@ -253,8 +253,8 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                     if cb_counter > 0:
                         return
                     else:
-                        # Repopulate after removing current track layers
-                        free_layers = track.getFreeLayers()
+                        # Repopulate after removing current channel layers
+                        free_layers = channel.getFreeLayers()
 
                         # New channels map's both key and value should be string
                         # That is how load_layer_from_file method expects the values
@@ -263,14 +263,14 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                         logging.debug(f"### After Removing")
                         logging.debug(f"# Source Channels        : {source_channels}")
                         logging.debug(f"# Free Layers            : {free_layers}")
-                        logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
+                        logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
 
                         for index, channel in enumerate(source_channels):
                             new_channels_map[f"{channel}"] = f"{free_layers[index]}"
 
                         logging.debug(f"# Channel map for loading sound : {new_channels_map}")
 
-                        # Populate new chained sounds and update track
+                        # Populate new chained sounds and update channel
                         new_chained_sounds = []
 
                         for key, val in new_channels_map.items():
@@ -280,26 +280,26 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
                             for i in range(5 - len(new_chained_sounds)):
                                 new_chained_sounds.append(-1)
 
-                        self.zyngui.currentTaskMessage = f"Loading selected sounds in track `{track.name}`"
+                        self.zyngui.currentTaskMessage = f"Loading selected sounds in channel `{channel.name}`"
                         self.zyngui.layer.load_layer_from_file(filepath, new_channels_map)
 
-                        track.chainedSounds = new_chained_sounds
+                        channel.chainedSounds = new_chained_sounds
 
                         # Repopulate after loading sound
-                        free_layers = track.getFreeLayers()
+                        free_layers = channel.getFreeLayers()
 
                         logging.debug(f"### After Loading")
                         logging.debug(f"# Free Layers            : {free_layers}")
                         logging.debug(f"# New Chained Sounds     : {new_chained_sounds}")
-                        logging.debug(f"# Chained Sounds         : {track.chainedSounds}")
+                        logging.debug(f"# Chained Sounds         : {channel.chainedSounds}")
 
                 if len(used_layers) > 0:
-                    # Remove all current sounds from track
+                    # Remove all current sounds from channel
                     for i in used_layers:
                         cb_counter += 1
-                        track.remove_and_unchain_sound(i, post_removal_task)
+                        channel.remove_and_unchain_sound(i, post_removal_task)
                 else:
-                    # If there are no sounds in curent track, immediately do post removal task
+                    # If there are no sounds in curent channel, immediately do post removal task
                     post_removal_task()
 
             self.zyngui.end_long_task()
@@ -309,11 +309,11 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
-        track = self.zyngui.zynthiloops.song.tracksModel.getTrack(self.zyngui.session_dashboard.selectedTrack)
+        channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
         suggested = ""
         try:
             # Get preset name of connectedSound
-            layer_name = str(track.getLayerNameByMidiChannel(track.connectedSound).split(" > ")[1])
+            layer_name = str(channel.getLayerNameByMidiChannel(channel.connectedSound).split(" > ")[1])
 
             # All heuristics related to suggested sound file name goes below
 

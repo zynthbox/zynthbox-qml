@@ -55,22 +55,22 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__save_timer__ = QTimer(self)
         self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
         self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
-        self.__visible_tracks_start__ = 0
-        self.__visible_tracks_end__ = 5
+        self.__visible_channels_start__ = 0
+        self.__visible_channels_end__ = 5
         self.__last_selected_sketch__ = None
-        self.__change_track_sound_timer__ = QTimer()
-        self.__change_track_sound_timer__.setInterval(1000)
-        self.__change_track_sound_timer__.setSingleShot(True)
-        self.__change_track_sound_timer__.timeout.connect(self.change_to_track_sound, Qt.QueuedConnection)
-        self.__selected_track__ = 0
+        self.__change_channel_sound_timer__ = QTimer()
+        self.__change_channel_sound_timer__.setInterval(1000)
+        self.__change_channel_sound_timer__.setSingleShot(True)
+        self.__change_channel_sound_timer__.timeout.connect(self.change_to_channel_sound, Qt.QueuedConnection)
+        self.__selected_channel__ = 0
 
         if not self.restore():
             def cb():
                 logging.info("Session dashboard Init Sketch CB (No restore)")
-                self.set_selected_track(self.__selected_track__, True)
+                self.set_selected_channel(self.__selected_channel__, True)
 
-                selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-                selected_track.set_chained_sounds(selected_track.get_chained_sounds())
+                selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.selectedChannel)
+                selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
 
             self.__name__ = None
             self.__id__ = 0
@@ -102,17 +102,17 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def emit_chained_sounds_changed(self):
-        selected_track = self.zyngui.screens['zynthiloops'].song.tracksModel.getTrack(self.selectedTrack)
-        if selected_track is not None:
-            selected_track.set_chained_sounds(selected_track.get_chained_sounds())
-        self.zyngui.screens['zynthiloops'].song.tracksModel.connected_sounds_count_changed.emit()
-        # self.set_selected_track(self.selectedTrack, True)
+        selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.selectedChannel)
+        if selected_channel is not None:
+            selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
+        self.zyngui.screens['zynthiloops'].song.channelsModel.connected_sounds_count_changed.emit()
+        # self.set_selected_channel(self.selectedChannel, True)
 
     @Slot(None)
-    def set_selected_track_complete(self):
+    def set_selected_channel_complete(self):
         self.zyngui.fixed_layers.fill_list()
-        self.selected_track_changed.emit()
-        self.__change_track_sound_timer__.start()
+        self.selected_channel_changed.emit()
+        self.__change_channel_sound_timer__.start()
 
     ### Property name
     def get_name(self):
@@ -142,70 +142,70 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     sessionSketchesModel = Property(QObject, get_session_sketches_model, notify=session_sketches_model_changed)
     ### END Property sessionSketchesModel
 
-    ### Property selectedTrack
-    def change_to_track_sound(self):
-        self.zyngui.screens["layers_for_track"].update_track_sounds()
+    ### Property selectedChannel
+    def change_to_channel_sound(self):
+        self.zyngui.screens["layers_for_channel"].update_channel_sounds()
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
-        self.__change_track_sound_timer__.setInterval(1000)
+        self.__change_channel_sound_timer__.setInterval(1000)
         self.zyngui.zynthiloops.set_selector()
 
         self.schedule_save()
-    def get_selected_track(self):
-        return self.__selected_track__
-    def set_selected_track(self, track, force_set=False):
-        if self.__selected_track__ != track or force_set is True:
-            logging.debug(f"### Setting selected track : track({track})")
-            self.__selected_track__ = track
+    def get_selected_channel(self):
+        return self.__selected_channel__
+    def set_selected_channel(self, channel, force_set=False):
+        if self.__selected_channel__ != channel or force_set is True:
+            logging.debug(f"### Setting selected channel : channel({channel})")
+            self.__selected_channel__ = channel
 
             # Set is_set_selector_running way before set_selector is called so that
-            # knob values are discarded. set_selector will be called by change_to_track_sound
+            # knob values are discarded. set_selector will be called by change_to_channel_sound
             # after 1000ms when active midi channel is switched
             self.zyngui.zynthiloops.set_set_selector_active()
 
-            # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when track changes
-            # fill_list and emitting selected_track_changed event is a bit on the heavier side and hence should go
-            # in the set_selected_track_complete slot
-            QMetaObject.invokeMethod(self, "set_selected_track_complete", Qt.QueuedConnection)
-    selected_track_changed = Signal()
-    selectedTrack = Property(int, get_selected_track, set_selected_track, notify=selected_track_changed)
-    ### END Property selectedTrack
+            # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes
+            # fill_list and emitting selected_channel_changed event is a bit on the heavier side and hence should go
+            # in the set_selected_channel_complete slot
+            QMetaObject.invokeMethod(self, "set_selected_channel_complete", Qt.QueuedConnection)
+    selected_channel_changed = Signal()
+    selectedChannel = Property(int, get_selected_channel, set_selected_channel, notify=selected_channel_changed)
+    ### END Property selectedChannel
 
-    ### Property visibleTracksStart
-    def get_visible_tracks_start(self):
-        return self.__visible_tracks_start__
-    def set_visible_tracks_start(self, index):
-        self.__visible_tracks_start__ = index
-        self.visible_tracks_changed.emit()
-    visible_tracks_changed = Signal()
-    visibleTracksStart = Property(int, get_visible_tracks_start, set_visible_tracks_start, notify=visible_tracks_changed)
-    ### END Property visibleTracksStart
+    ### Property visibleChannelsStart
+    def get_visible_channels_start(self):
+        return self.__visible_channels_start__
+    def set_visible_channels_start(self, index):
+        self.__visible_channels_start__ = index
+        self.visible_channels_changed.emit()
+    visible_channels_changed = Signal()
+    visibleChannelsStart = Property(int, get_visible_channels_start, set_visible_channels_start, notify=visible_channels_changed)
+    ### END Property visibleChannelsStart
 
-    ### Property visibleTracksEnd
-    def get_visible_tracks_end(self):
-        return self.__visible_tracks_end__
-    def set_visible_tracks_end(self, index):
-        self.__visible_tracks_end__ = index
-        self.visible_tracks_changed.emit()
-    visibleTracksEnd = Property(int, get_visible_tracks_end, set_visible_tracks_end, notify=visible_tracks_changed)
-    ### END Property visibleTracksEnd
+    ### Property visibleChannelsEnd
+    def get_visible_channels_end(self):
+        return self.__visible_channels_end__
+    def set_visible_channels_end(self, index):
+        self.__visible_channels_end__ = index
+        self.visible_channels_changed.emit()
+    visibleChannelsEnd = Property(int, get_visible_channels_end, set_visible_channels_end, notify=visible_channels_changed)
+    ### END Property visibleChannelsEnd
 
-    ### Property selectedTrackName
-    def get_selected_track_name(self):
-        track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(self.__selected_track__)
-        if track.connectedSound >= 0:
-            return self.zyngui.screens["fixed_layers"].selector_list.getDisplayValue(track.connectedSound)
+    ### Property selectedChannelName
+    def get_selected_channel_name(self):
+        channel = self.zyngui.screens["zynthiloops"].song.channelsModel.getChannel(self.__selected_channel__)
+        if channel.connectedSound >= 0:
+            return self.zyngui.screens["fixed_layers"].selector_list.getDisplayValue(channel.connectedSound)
         else:
             return ""
-    selected_track_name_changed = Signal()
-    selectedTrackName = Property(str, get_selected_track_name, notify=selected_track_name_changed)
-    ### END Property selectedTrackName
+    selected_channel_name_changed = Signal()
+    selectedChannelName = Property(str, get_selected_channel_name, notify=selected_channel_name_changed)
+    ### END Property selectedChannelName
 
     def serialize(self):
         return {
             "name": self.__name__,
             "id": self.__id__,
-            "selectedTrack": self.__selected_track__,
+            "selectedChannel": self.__selected_channel__,
             "sketches": self.__session_sketches_model__.serialize(),
             "lastSelectedSketch": self.__last_selected_sketch__
         }
@@ -251,7 +251,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     def restore(self, sketch=""):
         def sketch_loaded_cb():
-            self.selected_track_changed.emit()
+            self.selected_channel_changed.emit()
             QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
             logging.info(f"Session Dashboard Initialization Complete")
 
@@ -275,9 +275,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             if "id" in session:
                 self.__id__ = session["id"]
                 self.id_changed.emit()
-            # if "selectedTrack" in session:
-            #     self.__selected_track__ = session["selectedTrack"]
-            #     self.set_selected_track(session["selectedTrack"], True)
+            # if "selectedChannel" in session:
+            #     self.__selected_channel__ = session["selectedChannel"]
+            #     self.set_selected_channel(session["selectedChannel"], True)
             if "sketches" in session:
                 self.__session_sketches_model__.deserialize(session["sketches"])
                 self.session_sketches_model_changed.emit()
@@ -333,4 +333,4 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def disableNextSoundSwitchTimer(self):
-        self.__change_track_sound_timer__.setInterval(0)
+        self.__change_channel_sound_timer__.setInterval(0)

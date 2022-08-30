@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# A model to for storing channels in ZynthiLoops page
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -27,71 +27,71 @@ import logging
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 
 
-class song_arranger_tracks_model(QAbstractListModel):
-    TrackRole = Qt.UserRole + 1
-    ZLTrackRole = TrackRole + 1
+class song_arranger_channels_model(QAbstractListModel):
+    ChannelRole = Qt.UserRole + 1
+    ZLChannelRole = ChannelRole + 1
 
     def __init__(self, parent=None):
-        super(song_arranger_tracks_model, self).__init__(parent)
-        self.__tracks__ = []
+        super(song_arranger_channels_model, self).__init__(parent)
+        self.__channels__ = []
 
     ### Property count
     def count(self):
-        return len(self.__tracks__)
+        return len(self.__channels__)
 
     countChanged = Signal()
     count = Property(int, count, notify=countChanged)
     ### END Property count
 
     @Slot(int, result=QObject)
-    def getTrack(self, row: int):
-        if row < 0 or row >= len(self.__tracks__):
+    def getChannel(self, row: int):
+        if row < 0 or row >= len(self.__channels__):
             return None
-        return self.__tracks__[row]
+        return self.__channels__[row]
 
     def data(self, index, role=None):
-        # logging.info(index.row(), self.__tracks__[index.row()])
+        # logging.info(index.row(), self.__channels__[index.row()])
 
         if not index.isValid():
             return None
 
-        if index.row() >= len(self.__tracks__):
+        if index.row() >= len(self.__channels__):
             return None
 
-        if role == self.TrackRole:
-            return self.__tracks__[index.row()]
-        elif role == self.ZLTrackRole:
-            return self.__tracks__[index.row()].zlTrack
+        if role == self.ChannelRole:
+            return self.__channels__[index.row()]
+        elif role == self.ZLChannelRole:
+            return self.__channels__[index.row()].zlChannel
         else:
             return None
 
     def roleNames(self):
         role_names = {
-            self.TrackRole: b"track",
-            self.ZLTrackRole: b"zlTrack",
+            self.ChannelRole: b"channel",
+            self.ZLChannelRole: b"zlChannel",
         }
 
         return role_names
 
     def rowCount(self, index):
-        return len(self.__tracks__)
+        return len(self.__channels__)
 
-    def add_track(self, track):
-        length = len(self.__tracks__)
+    def add_channel(self, channel):
+        length = len(self.__channels__)
 
         self.beginInsertRows(QModelIndex(), length, length)
-        self.__tracks__.append(track)
+        self.__channels__.append(channel)
         self.endInsertRows()
         self.countChanged.emit()
 
     def clear(self):
-        if len(self.__tracks__) > 0:
-            self.beginRemoveRows(QModelIndex(), 0, len(self.__tracks__)-1)
+        if len(self.__channels__) > 0:
+            self.beginRemoveRows(QModelIndex(), 0, len(self.__channels__)-1)
 
-            for track in self.__tracks__:
-                for cell_index in range(0, track.cellsModel.count):
-                    cell = track.cellsModel.getCell(cell_index)
+            for channel in self.__channels__:
+                for cell_index in range(0, channel.cellsModel.count):
+                    cell = channel.cellsModel.getCell(cell_index)
                     cell.destroy()
 
-            self.__tracks__ = []
+            self.__channels__ = []
             self.endRemoveRows()

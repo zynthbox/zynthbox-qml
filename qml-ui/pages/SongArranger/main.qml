@@ -72,7 +72,7 @@ Zynthian.ScreenPage {
         id: privateProps
 
         property int headerWidth: 100
-        // Try to fix 12 tracks
+        // Try to fix 12 channels
         property int headerHeight: Math.round(tableLayout.height/14 - cellGrid.rowSpacing*2)
         property int cellWidth: 50
         property int cellHeight: headerHeight
@@ -194,7 +194,7 @@ Zynthian.ScreenPage {
                 spacing: 1
 
                 ListView {
-                    id: tracksHeaderColumns
+                    id: channelsHeaderColumns
 
                     Layout.preferredWidth: privateProps.headerWidth
                     Layout.maximumWidth: privateProps.headerWidth
@@ -205,17 +205,17 @@ Zynthian.ScreenPage {
                     contentY: cellGridFlickable.contentY
                     boundsBehavior: Flickable.StopAtBounds
 
-                    model: root.arranger.tracksModel
+                    model: root.arranger.channelsModel
 
                     delegate: Zynthian.TableHeader {
-                        text: track.zlTrack.name
+                        text: channel.zlChannel.name
 
                         width: ListView.view.width
                         height: privateProps.headerHeight
 
                         onPressed: {
-                            sideBar.controlType = SideBar.ControlType.Track;
-                            sideBar.controlObj = model.track;
+                            sideBar.controlType = SideBar.ControlType.Channel;
+                            sideBar.controlObj = model.channel;
                         }
                     }
                 }
@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
                     }
 
                     contentX: barsHeaderRow.contentX - barsHeaderRow.originX
-                    contentY: tracksHeaderColumns.contentY - tracksHeaderColumns.originY
+                    contentY: channelsHeaderColumns.contentY - channelsHeaderColumns.originY
 
                     Item {
                         Grid {
@@ -246,10 +246,10 @@ Zynthian.ScreenPage {
                             columnSpacing: 1
 
                             Repeater {
-                                model: root.arranger.tracksModel
+                                model: root.arranger.channelsModel
 
                                 delegate: Repeater {
-                                    model: track.cellsModel
+                                    model: channel.cellsModel
 
                                     delegate: Item {
                                         width: privateProps.cellWidth
@@ -268,9 +268,9 @@ Zynthian.ScreenPage {
                                                 if (cell.zlClip) {
                                                     // Clip already selected. Remove clip.
                                                     cell.zlClip = null;
-                                                } else if (track.selectedClip) {
+                                                } else if (channel.selectedClip) {
                                                     // No clips selected. Add clip
-                                                    cell.zlClip = track.selectedClip;
+                                                    cell.zlClip = channel.selectedClip;
                                                 }
                                             }
                                         }

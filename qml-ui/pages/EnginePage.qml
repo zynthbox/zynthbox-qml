@@ -42,12 +42,12 @@ Zynthian.ScreenPage {
             enabled: false
         },
         Kirigami.Action {
-            readonly property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+            readonly property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
             text: qsTr("Clear Slot")
-            enabled: selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+            enabled: selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)
             onTriggered: {
-                selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+                selectedChannel.remove_and_unchain_sound(zynthian.active_midi_channel)
                 zynthian.show_modal("zynthiloops")
             }
         }

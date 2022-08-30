@@ -35,8 +35,8 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_track", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
@@ -107,7 +107,7 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("Synths")
                 onTriggered: {
-                    zynthian.layer.page_after_layer_creation = "layers_for_track";
+                    zynthian.layer.page_after_layer_creation = "layers_for_channel";
                     zynthian.layer.select_engine(zynthian.fixed_layers.active_midi_channel)
                 }
             }
@@ -177,7 +177,7 @@ Zynthian.ScreenPage {
 
         switch (cuia) {
         case "SWITCH_SELECT_SHORT":
-            if (zynthian.current_screen_id == "layers_for_track" && !zynthian.fixed_layers.current_index_valid) {
+            if (zynthian.current_screen_id == "layers_for_channel" && !zynthian.fixed_layers.current_index_valid) {
                 layerSetupDialog.open();
                 return true
             } else if (zynthian.fixed_layers.current_index_valid) {
@@ -202,7 +202,7 @@ Zynthian.ScreenPage {
         case "SWITCH_BACK_SHORT":
         case "SWITCH_BACK_BOLD":
         case "SWITCH_BACK_LONG":
-            zynthian.current_screen_id = "layers_for_track";
+            zynthian.current_screen_id = "layers_for_channel";
             zynthian.go_back();
             return true;
         default:
@@ -211,7 +211,7 @@ Zynthian.ScreenPage {
     }
 
 
-    property var screenIds: ["layers_for_track", "bank", "preset"]
+    property var screenIds: ["layers_for_channel", "bank", "preset"]
     //property var screenTitles: [qsTr("Layers"), qsTr("Banks (%1)").arg(zynthian.bank.effective_count), qsTr("Presets (%1)").arg(zynthian.preset.effective_count)]
     previousScreen: "main"
     onCurrentScreenIdRequested: {
@@ -236,7 +236,7 @@ Zynthian.ScreenPage {
                 Kirigami.Heading {
                     Layout.fillWidth: true
                     level: 2
-                    text: qsTr("Channel %1 Sounds").arg(zynthian.session_dashboard.selectedTrack+1)
+                    text: qsTr("Channel %1 Sounds").arg(zynthian.session_dashboard.selectedChannel+1)
                     Kirigami.Theme.inherit: false
                     Kirigami.Theme.colorSet: Kirigami.Theme.View
                     Layout.preferredHeight: favModeButton.height
@@ -246,7 +246,7 @@ Zynthian.ScreenPage {
                 id: layersView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                screenId: "layers_for_track"
+                screenId: "layers_for_channel"
                 // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
                 active: zynthian.isBootingComplete
 
@@ -263,8 +263,8 @@ Zynthian.ScreenPage {
                     onItemActivated: layersView.itemActivated(screenId, index)
                     onItemActivatedSecondary: layersView.itemActivatedSecondary(screenId, index)
                     //visible: (model.display === "-" && y+layersView.view.originY < layersView.view.height) ||
-                     //   layersView.selectedTrack.chainedSounds.indexOf(index) !== -1
-                    /*layersView.selectedTrack.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedTrack.connectedSound) !== -1*/
+                     //   layersView.selectedChannel.chainedSounds.indexOf(index) !== -1
+                    /*layersView.selectedChannel.connectedSound == index || model.metadata.midi_cloned_to.indexOf(layersView.selectedChannel.connectedSound) !== -1*/
                     height: layersView.view.height/5
                     onClicked: {
                         if (!zynthian.fixed_layers.current_index_valid) {
@@ -478,7 +478,7 @@ Zynthian.ScreenPage {
                     contentItem: ColumnLayout {
                         spacing: 0
                         Repeater {
-                            model: zynthian.isBootingComplete && visible ? zynthian.layers_for_track.volume_controls : []
+                            model: zynthian.isBootingComplete && visible ? zynthian.layers_for_channel.volume_controls : []
                             delegate: ColumnLayout {
                                 Layout.preferredHeight: parent.height/5
                                 spacing: Kirigami.Units.largeSpacing
@@ -616,7 +616,7 @@ Zynthian.ScreenPage {
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        visible: root.selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)
                         text: qsTr("Change preset")
                         onClicked: {
                             zynthian.current_screen_id = "preset"
@@ -642,17 +642,17 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        visible: root.selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)
                     }
                     QQC2.Button {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
-                        visible: root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)
+                        visible: root.selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)
                         text: qsTr("Remove Synth")
                         onClicked: {
                             layerSetupDialog.accept();
-                            if (root.selectedTrack.checkIfLayerExists(zynthian.active_midi_channel)) {
-                                root.selectedTrack.remove_and_unchain_sound(zynthian.active_midi_channel)
+                            if (root.selectedChannel.checkIfLayerExists(zynthian.active_midi_channel)) {
+                                root.selectedChannel.remove_and_unchain_sound(zynthian.active_midi_channel)
                             }
                         }
                     }

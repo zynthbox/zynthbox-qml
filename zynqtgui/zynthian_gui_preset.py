@@ -131,7 +131,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.start_loading()
 				engine_created = True
 				engine = self.zyngui.screens['engine'].start_engine(sound['engine'])
-				midi_chan = self.zyngui.screens["layers_for_track"].list_data[self.zyngui.screens["layers_for_track"].index][1]
+				midi_chan = self.zyngui.screens["layers_for_channel"].list_data[self.zyngui.screens["layers_for_channel"].index][1]
 				layer = zynthian_layer(engine, midi_chan, self.zyngui)
 				self.zyngui.screens['layer'].layers.append(layer)
 				self.zyngui.screens['engine'].stop_unused_engines()
@@ -140,7 +140,7 @@ class zynthian_gui_preset(zynthian_gui_selector):
 				self.zyngui.zynautoconnect_midi(True)
 				self.zyngui.screens['layer'].reset_audio_routing()
 				self.zyngui.zynautoconnect_audio()
-				self.zyngui.screens['layer'].add_midichannel_to_track(midi_chan, self.zyngui.screens["layers_for_track"].index)
+				self.zyngui.screens['layer'].add_midichannel_to_channel(midi_chan, self.zyngui.screens["layers_for_channel"].index)
 			else:
 				if self.zyngui.curlayer.preset_name == sound["preset"] and self.zyngui.curlayer.bank_name == sound["bank"]:
 					self.__select_in_progess = False

@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing tracks in ZynthiLoops page
+# A model to for storing channels in ZynthiLoops page
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -42,12 +42,12 @@ from .zynthiloops_clips_model import zynthiloops_clips_model
 from .zynthiloops_clip import zynthiloops_clip
 from ... import zynthian_gui_config
 
-class zynthiloops_track(QObject):
+class zynthiloops_channel(QObject):
     # Possible Values : "audio", "video"
     __type__ = "audio"
 
     def __init__(self, id: int, song: QObject, parent: QObject = None):
-        super(zynthiloops_track, self).__init__(parent)
+        super(zynthiloops_channel, self).__init__(parent)
         self.zyngui = zynthian_gui_config.zyngui
         self.__id__ = id
         self.__name__ = None
@@ -75,7 +75,7 @@ class zynthiloops_track(QObject):
         self.__externalMidiChannel__ = -1
         self.__sound_json_snapshot__ = ""
         self.route_through_global_fx = True
-        self.__track_synth_ports = []
+        self.__channel_synth_ports = []
 
         self.update_jack_port_timer = QTimer()
         self.update_jack_port_timer.setInterval(100)
@@ -87,11 +87,11 @@ class zynthiloops_track(QObject):
         self.fixed_layers_list_updated_handler_throttle.setSingleShot(True)
         self.fixed_layers_list_updated_handler_throttle.timeout.connect(self.fixed_layers_list_updated_handler)
 
-        # Create 5 clip objects for 5 samples per track
+        # Create 5 clip objects for 5 samples per channel
         for i in range(0, 5):
             self.__samples__.append(zynthiloops_clip(self.id, -1, -1, self.__song__, self, True))
 
-        self.__track_audio_type__ = "synth"
+        self.__channel_audio_type__ = "synth"
 
         # self.chained_sounds_changed.connect(self.select_correct_layer)
 
@@ -113,7 +113,7 @@ class zynthiloops_track(QObject):
             self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndexChanged.connect(lambda: self.occupiedSlotsChanged.emit())
         except:
             pass
-        self.track_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
+        self.channel_audio_type_changed.connect(lambda: self.occupiedSlotsChanged.emit())
         self.samples_changed.connect(lambda: self.occupiedSlotsChanged.emit())
 
         self.selectedPartChanged.connect(lambda: self.clipsModelChanged.emit())
@@ -132,7 +132,7 @@ class zynthiloops_track(QObject):
         #logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
         if clip and clip.enabled == True:
             self.set_selected_part(partNum)
-            allowMultipart = self.trackAudioType == "sample-trig" and self.keyZoneMode == "all-full"
+            allowMultipart = self.channelAudioType == "sample-trig" and self.keyZoneMode == "all-full"
             #logging.error(f"Allowing multipart playback: {allowMultipart}")
             if not allowMultipart:
                 for part in range(0, 5):
@@ -164,7 +164,7 @@ class zynthiloops_track(QObject):
 
     @Property(str, constant=True)
     def className(self):
-        return "zynthiloops_track"
+        return "zynthiloops_channel"
 
     def layer_deleted(self, chan : int):
         self.set_chained_sounds([-1 if x==chan else x for x in self.__chained_sounds__])
@@ -173,13 +173,13 @@ class zynthiloops_track(QObject):
         zyngui = self.__song__.get_metronome_manager().zyngui
         if self.checkIfLayerExists(zyngui.active_midi_channel):
             logging.info("### select_correct_layer : Reselect any available sound since it is removing current selected channel")
-            # zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
+            # zyngui.screens['session_dashboard'].set_selected_channel(zyngui.screens['session_dashboard'].selectedChannel, True)
             try:
-                zyngui.screens["layers_for_track"].update_track_sounds()
+                zyngui.screens["layers_for_channel"].update_channel_sounds()
             except:
                 pass
         else:
-            logging.info("### select_correct_layer : Do not Reselect track sound since it is not removing current selected channel")
+            logging.info("### select_correct_layer : Do not Reselect channel sound since it is not removing current selected channel")
 
     def master_volume_changed(self):
         self.master_volume = libzl.dbFromVolume(self.__song__.get_metronome_manager().get_master_volume()/100)
@@ -207,7 +207,7 @@ class zynthiloops_track(QObject):
             else:
                 obj.append(None)
 
-        # Create bank dir and write bank json only if track has some samples loaded
+        # Create bank dir and write bank json only if channel has some samples loaded
         for c in obj:
             if c is not None:
                 bank_dir.mkdir(parents=True, exist_ok=True)
@@ -227,9 +227,9 @@ class zynthiloops_track(QObject):
         bank_dir = Path(self.bankDir)
 
         if not (bank_dir / 'sample-bank.json').exists():
-            logging.info(f"sample-bank.json does not exist for track {self.id + 1}. Skipping restoration")
+            logging.info(f"sample-bank.json does not exist for channel {self.id + 1}. Skipping restoration")
         else:
-            logging.info(f"Restoring sample-bank.json for track {self.id + 1}")
+            logging.info(f"Restoring sample-bank.json for channel {self.id + 1}")
 
             try:
                 with open(bank_dir / 'sample-bank.json', "r") as f:
@@ -268,7 +268,7 @@ class zynthiloops_track(QObject):
                 "connectedPattern": self.__connected_pattern__,
                 # "connectedSound": self.__connected_sound__,
                 "chainedSounds": self.__chained_sounds__,
-                "trackAudioType": self.__track_audio_type__,
+                "channelAudioType": self.__channel_audio_type__,
                 "selectedPart": self.__selected_part__,
                 "externalMidiChannel" : self.__externalMidiChannel__,
                 "clips": [self.__clips_model__[part].serialize() for part in range(0, 5)],
@@ -297,9 +297,9 @@ class zynthiloops_track(QObject):
             if "chainedSounds" in obj:
                 self.__chained_sounds__ = obj["chainedSounds"]
                 self.set_chained_sounds(self.__chained_sounds__)
-            if "trackAudioType" in obj:
-                self.__track_audio_type__ = obj["trackAudioType"]
-                self.set_track_audio_type(self.__track_audio_type__, True)
+            if "channelAudioType" in obj:
+                self.__channel_audio_type__ = obj["channelAudioType"]
+                self.set_channel_audio_type(self.__channel_audio_type__, True)
             if "externalMidiChannel" in obj:
                 self.set_externalMidiChannel(obj["externalMidiChannel"])
             if "clips" in obj:
@@ -318,10 +318,10 @@ class zynthiloops_track(QObject):
                 # Run autoconnect to update jack connections when routeThrouGlobalFX is set
                 self.zyngui.zynautoconnect()
         except Exception as e:
-            logging.error(f"Error during track deserialization: {e}")
+            logging.error(f"Error during channel deserialization: {e}")
             traceback.print_exception(None, e, e.__traceback__)
 
-        # Restore bank after restoring track
+        # Restore bank after restoring channel
         self.restore_bank()
 
     def set_layers_snapshot(self, snapshot):
@@ -364,17 +364,17 @@ class zynthiloops_track(QObject):
     soundData = Property('QVariantList', get_soundData, notify=sound_data_changed)
 
     def update_jack_port(self):
-        self.zyngui.currentTaskMessage = f"Updating jack ports for track `{self.name}`"
+        self.zyngui.currentTaskMessage = f"Updating jack ports for channel `{self.name}`"
         self.update_jack_port_timer.start()
 
     def do_update_jack_port(self):
-        def task(zyngui, track):
+        def task(zyngui, channel):
             jack_basenames = []
 
-            trackHasEffects = False
-            for channel in track.chainedSounds:
-                if channel >= 0 and track.checkIfLayerExists(channel):
-                    layer = zyngui.screens['layer'].layer_midi_map[channel]
+            channelHasEffects = False
+            for ch in channel.chainedSounds:
+                if ch >= 0 and channel.checkIfLayerExists(ch):
+                    layer = zyngui.screens['layer'].layer_midi_map[ch]
 
                     # Iterate over all connected layers (including fx layer) on midi channel `channel`
                     for fxlayer in zyngui.screens['layer'].get_fxchain_layers(layer):
@@ -383,23 +383,23 @@ class zynthiloops_track(QObject):
 
                             # fxlayer can be a Midi synth, or an effect. Check if it is an effect
                             if fxlayer.engine.type == "Audio Effect":
-                                trackHasEffects = True
+                                channelHasEffects = True
                         except Exception as e:
                             logging.error(f"### update_jack_port Error : {str(e)}")
 
             try:
-                for port in zip([f"SamplerSynth:track_{self.id + 1}_left", f"SamplerSynth:track_{self.id + 1}_right"], [f"zynthiloops_audio_levels_client:T{self.id + 1}A", f"zynthiloops_audio_levels_client:T{self.id + 1}B"]):
+                for port in zip([f"SamplerSynth:channel_{self.id + 1}_left", f"SamplerSynth:channel_{self.id + 1}_right"], [f"zynthiloops_audio_levels_client:Ch{self.id + 1}A", f"zynthiloops_audio_levels_client:Ch{self.id + 1}B"]):
                     try:
-                        if trackHasEffects:
+                        if channelHasEffects:
                             p = Popen(("jack_disconnect", port[1], port[0]))
                             p.wait()
                         else:
                             p = Popen(("jack_connect", port[1], port[0]))
                             p.wait()
                     except Exception as e:
-                        logging.error(f"Error processing SamplerSynth jack port for T{self.id + 1} : {port}({str(e)})")
+                        logging.error(f"Error processing SamplerSynth jack port for Ch{self.id + 1} : {port}({str(e)})")
             except Exception as e:
-                logging.error(f"Error processing SamplerSynth jack ports for T{self.id + 1}: {str(e)}")
+                logging.error(f"Error processing SamplerSynth jack ports for Ch{self.id + 1}: {str(e)}")
 
             synth_ports = []
 
@@ -408,31 +408,31 @@ class zynthiloops_track(QObject):
                 try:
                     ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
 
-                    # Map first port from jack.Client.get_ports to track A and second port to track B
-                    for port in zip(ports, [f"T{self.id + 1}A", f"T{self.id + 1}B"]):
+                    # Map first port from jack.Client.get_ports to channel A and second port to channel B
+                    for port in zip(ports, [f"Ch{self.id + 1}A", f"Ch{self.id + 1}B"]):
                         logging.error(f"Connecting port zynthiloops_audio_levels_client:{port[1]} -> {port[0]}")
                         port_names.append(port[0])
                         p = Popen(("jack_connect", f"zynthiloops_audio_levels_client:{port[1]}", port[0]))
                         p.wait()
                 except Exception as e:
-                    logging.error(f"Error processing jack port for T{self.id + 1} : {port}({str(e)})")
+                    logging.error(f"Error processing jack port for Ch{self.id + 1} : {port}({str(e)})")
 
                 synth_ports.append(port_names)
 
-            self.set_trackSynthPorts(synth_ports)
+            self.set_channelSynthPorts(synth_ports)
 
         worker_thread = threading.Thread(target=task, args=(self.zyngui, self))
         worker_thread.start()
 
     @Slot(None)
     def clear(self):
-        track = self.__song__.tracksModel.getTrack(self.__id__)
-        clipsModel = track.clipsModel
+        channel = self.__song__.channelsModel.getChannel(self.__id__)
+        clipsModel = channel.clipsModel
 
-        logging.debug(f"Track {track} ClipsModel {clipsModel}")
+        logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
 
         for clip_index in range(0, clipsModel.count):
-            logging.debug(f"Track {self.__id__} Clip {clip_index}")
+            logging.debug(f"Channel {self.__id__} Clip {clip_index}")
             clip: zynthiloops_clip = clipsModel.getClip(clip_index)
             logging.debug(
                 f"Clip : clip.row({clip.row}), clip.col({clip.col}), clip({clip})")
@@ -467,14 +467,14 @@ class zynthiloops_track(QObject):
     def set_volume(self, volume:int, force_set=False):
         if self.__volume__ != math.floor(volume) or force_set is True:
             self.__volume__ = math.floor(volume)
-            logging.debug(f"Track : Setting volume {self.__volume__}")
+            logging.debug(f"Channel : Setting volume {self.__volume__}")
 
-            # Update synth volume when track volume changes
+            # Update synth volume when channel volume changes
             for sound in self.chainedSounds:
                 if sound >= 0 and self.checkIfLayerExists(sound):
                     volume_control_obj = self.zyngui.fixed_layers.volume_controls[sound]
 
-                    # Interpolate track volume (-40 -> 20) to volume control object's range
+                    # Interpolate channel volume (-40 -> 20) to volume control object's range
                     if volume_control_obj is not None and \
                             volume_control_obj.value != np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max]):
                         volume_control_obj.value = np.interp(self.__volume__, [-40, 20], [volume_control_obj.value_min, volume_control_obj.value_max])
@@ -536,7 +536,7 @@ class zynthiloops_track(QObject):
 
     @Slot(None)
     def delete(self):
-        self.__song__.tracksModel.delete_track(self)
+        self.__song__.channelsModel.delete_channel(self)
 
     def set_id(self, new_id):
         self.__id__ = new_id
@@ -568,11 +568,11 @@ class zynthiloops_track(QObject):
 
         return is_empty
 
-    # source : Source zynthiloops_track object
+    # source : Source zynthiloops_channel object
     @Slot(QObject)
     def copyFrom(self, source):
         for part in range(5):
-            # Copy all clips from source track to self
+            # Copy all clips from source channel to self
             for clip_index in range(0, self.parts[part].count):
                 self.parts[part].getClip(clip_index).copyFrom(source.parts[part].getClip(clip_index))
 
@@ -581,7 +581,7 @@ class zynthiloops_track(QObject):
 
         dest_bank_dir.mkdir(parents=True, exist_ok=True)
 
-        # Copy all samples from source track
+        # Copy all samples from source channel
         for file in source_bank_dir.glob("*"):
             shutil.copy2(file, dest_bank_dir / file.name)
 
@@ -607,9 +607,9 @@ class zynthiloops_track(QObject):
             logging.debug(f"Next free layer : {next_free_layer}")
             zyngui.screens["fixed_layers"].activate_index(next_free_layer)
 
-            for track_id in range(self.__song__.tracksModel.count):
-                track = self.__song__.tracksModel.getTrack(track_id)
-                track.__chained_sounds__ = [-1 if x == next_free_layer else x for x in track.__chained_sounds__]
+            for channel_id in range(self.__song__.channelsModel.count):
+                channel = self.__song__.channelsModel.getChannel(channel_id)
+                channel.__chained_sounds__ = [-1 if x == next_free_layer else x for x in channel.__chained_sounds__]
 
             self.__chained_sounds__[index] = next_free_layer
             self.__song__.schedule_save()
@@ -708,9 +708,9 @@ class zynthiloops_track(QObject):
 
         try: #can be called before creation
             zyngui = self.__song__.get_metronome_manager().zyngui
-            zyngui.screens['fixed_layers'].fill_list() #This will update *also* layers for track
-            # zyngui.screens['session_dashboard'].set_selected_track(zyngui.screens['session_dashboard'].selectedTrack, True)
-            zyngui.screens['layers_for_track'].activate_index(0)
+            zyngui.screens['fixed_layers'].fill_list() #This will update *also* layers for channel
+            # zyngui.screens['session_dashboard'].set_selected_channel(zyngui.screens['session_dashboard'].selectedChannel, True)
+            zyngui.screens['layers_for_channel'].activate_index(0)
             zyngui.set_curlayer(None)
         except Exception as e:
             logging.error(f"Error filling list : {str(e)}")
@@ -769,7 +769,7 @@ class zynthiloops_track(QObject):
         self.__connected_pattern__ = pattern
         self.__song__.schedule_save()
         self.connected_pattern_changed.emit()
-        self.__song__.tracksModel.connected_patterns_count_changed.emit()
+        self.__song__.channelsModel.connected_patterns_count_changed.emit()
     connected_pattern_changed = Signal()
     connectedPattern = Property(int, get_connected_pattern, set_connected_pattern, notify=connected_pattern_changed)
     ### END Property connectedPattern
@@ -783,7 +783,7 @@ class zynthiloops_track(QObject):
         zyngui = self.__song__.get_metronome_manager().zyngui
 
         def task():
-            zyngui.screens['layers_for_track'].fill_list()
+            zyngui.screens['layers_for_channel'].fill_list()
 
             zyngui.layer.remove_root_layer(chan)
             self.select_correct_layer()
@@ -795,7 +795,7 @@ class zynthiloops_track(QObject):
 
             zyngui.end_long_task()
 
-        self.zyngui.currentTaskMessage = f"Removing chained sound at channel `{chan}` from track `{self.name}`"
+        self.zyngui.currentTaskMessage = f"Removing chained sound at channel `{chan}` from channel `{self.name}`"
         zyngui.do_long_task(task)
 
     def set_chained_sounds(self, sounds):
@@ -812,12 +812,12 @@ class zynthiloops_track(QObject):
         self.__song__.schedule_save()
 
         try: #can be called before creation
-            self.zyngui.screens['layers_for_track'].fill_list()
+            self.zyngui.screens['layers_for_channel'].fill_list()
             if self.connectedSound >= 0:
-                self.zyngui.screens['layers_for_track'].layer_selection_consistency_check()
+                self.zyngui.screens['layers_for_channel'].layer_selection_consistency_check()
             else:
-                self.zyngui.screens['layers_for_track'].select_action(
-                    self.zyngui.screens['layers_for_track'].current_index)
+                self.zyngui.screens['layers_for_channel'].select_action(
+                    self.zyngui.screens['layers_for_channel'].current_index)
         except:
             pass
 
@@ -867,38 +867,38 @@ class zynthiloops_track(QObject):
     def set_muted(self, muted):
         self.__muted__ = muted
         if muted:
-            self.mute_all_clips_in_track()
-        elif self.__song__.playTrackSolo == -1 or (self.__song__.playTrackSolo == self.id):
-            self.unmute_all_clips_in_track()
+            self.mute_all_clips_in_channel()
+        elif self.__song__.playChannelSolo == -1 or (self.__song__.playChannelSolo == self.id):
+            self.unmute_all_clips_in_channel()
         self.isMutedChanged.emit()
     isMutedChanged = Signal()
     muted = Property(bool, get_muted, set_muted, notify=isMutedChanged)
     ### End Property muted
 
-    ### Property trackAudioType
+    ### Property channelAudioType
     # Possible values : "synth", "sample-loop", "sample-trig", "sample-slice", "external"
-    # For simplicity, trackAudioType is string in the format "sample-xxxx" or "synth" or "external"
+    # For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth" or "external"
     # TODO : Later implement it properly with model and enums
-    def get_track_audio_type(self):
-        return self.__track_audio_type__
+    def get_channel_audio_type(self):
+        return self.__channel_audio_type__
 
-    def set_track_audio_type(self, type:str, force_set=False):
-        logging.debug(f"Setting Audio Type : {type}, {self.__track_audio_type__}")
+    def set_channel_audio_type(self, type:str, force_set=False):
+        logging.debug(f"Setting Audio Type : {type}, {self.__channel_audio_type__}")
 
-        if force_set or type != self.__track_audio_type__:
-            self.__track_audio_type__ = type
+        if force_set or type != self.__channel_audio_type__:
+            self.__channel_audio_type__ = type
             self.zyngui.zynthiloops.set_selector()
-            self.track_audio_type_changed.emit()
+            self.channel_audio_type_changed.emit()
             for scene in range(0, 10):
                 for part in range(0, 5):
                     self.onClipEnabledChanged(scene, part)
             if not force_set:
                 self.__song__.schedule_save()
 
-    track_audio_type_changed = Signal()
+    channel_audio_type_changed = Signal()
 
-    trackAudioType = Property(str, get_track_audio_type, set_track_audio_type, notify=track_audio_type_changed)
-    ### END Property trackAudioType
+    channelAudioType = Property(str, get_channel_audio_type, set_channel_audio_type, notify=channel_audio_type_changed)
+    ### END Property channelAudioType
 
     ### Property samples
     def get_samples(self):
@@ -953,14 +953,14 @@ class zynthiloops_track(QObject):
     ### Property bankDir
     def get_bank_dir(self):
         try:
-            # Check if a dir named <somerandomname>.<track_id> exists.
+            # Check if a dir named <somerandomname>.<channel_id> exists.
             # If exists, use that name as the bank dir name otherwise use default name `sample-bank`
             bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
         except:
             bank_name = "sample-bank"
         path = self.__base_samples_dir__ / f"{bank_name}.{self.id + 1}"
 
-        logging.debug(f"get_bank_dir track{self.id + 1} : bankDir({path})")
+        logging.debug(f"get_bank_dir channel{self.id + 1} : bankDir({path})")
 
         return str(path)
 
@@ -1043,7 +1043,7 @@ class zynthiloops_track(QObject):
     def get_occupiedSlots(self):
         occupied_slots = []
 
-        if self.__track_audio_type__ == "sample-trig":
+        if self.__channel_audio_type__ == "sample-trig":
             # logging.debug(f"### get_occupiedSlots : Sample trig")
             # If type is sample-trig check how many samples has wavs selected
             for sample in self.__samples__:
@@ -1053,7 +1053,7 @@ class zynthiloops_track(QObject):
                     occupied_slots.append(True)
                 else:
                     occupied_slots.append(False)
-        elif self.__track_audio_type__ == "synth":
+        elif self.__channel_audio_type__ == "synth":
             # logging.debug(f"### get_occupiedSlots : synth")
             # If type is synth check how many synth engines are selected and chained
             for sound in self.__chained_sounds__:
@@ -1061,7 +1061,7 @@ class zynthiloops_track(QObject):
                     occupied_slots.append(True)
                 else:
                     occupied_slots.append(False)
-        elif self.__track_audio_type__ == "sample-slice":
+        elif self.__channel_audio_type__ == "sample-slice":
             # logging.debug(f"### get_occupiedSlots : Sample slice")
 
             # If type is sample-slice check if samples[0] has wav selected
@@ -1183,37 +1183,37 @@ class zynthiloops_track(QObject):
     routeThroughGlobalFX = Property(bool, get_routeThroughGlobalFX, set_routeThroughGlobalFX, notify=routeThroughGlobalFXChanged)
     ### END Property routeThroughGlobalFX
 
-    ### Property trackSynthPorts
-    def get_trackSynthPorts(self):
-        return self.__track_synth_ports
+    ### Property channelSynthPorts
+    def get_channelSynthPorts(self):
+        return self.__channel_synth_ports
 
-    def set_trackSynthPorts(self, ports):
-        if self.__track_synth_ports != ports:
-            self.__track_synth_ports = ports
-            self.trackSynthPortsChanged.emit()
+    def set_channelSynthPorts(self, ports):
+        if self.__channel_synth_ports != ports:
+            self.__channel_synth_ports = ports
+            self.channelSynthPortsChanged.emit()
 
-    trackSynthPortsChanged = Signal()
+    channelSynthPortsChanged = Signal()
 
-    trackSynthPorts = Property('QVariantList', get_trackSynthPorts, notify=trackSynthPortsChanged)
-    ### END Property trackSynthPorts
+    channelSynthPorts = Property('QVariantList', get_channelSynthPorts, notify=channelSynthPortsChanged)
+    ### END Property channelSynthPorts
 
     @Slot(None, result=QObject)
     def getClipToRecord(self):
-        if self.trackAudioType in ["sample-trig", "sample-slice"]:
+        if self.channelAudioType in ["sample-trig", "sample-slice"]:
             return self.samples[self.selectedSlotRow]
         else:
             return self.sceneClip
 
     @Slot(None, result=str)
-    def getTrackSoundSnapshotJson(self):
-        #logging.error(f"getTrackSoundSnapshotJson : T({self.__id__ + 1})")
+    def getChannelSoundSnapshotJson(self):
+        #logging.error(f"getChannelSoundSnapshotJson : T({self.__id__ + 1})")
         return self.__sound_json_snapshot__
 
     @Slot(str, result=None)
-    def setTrackSoundFromSnapshotJson(self, snapshot):
-        self.zyngui.sound_categories.loadTrackSoundFromJson(self.id, snapshot)
+    def setChannelSoundFromSnapshotJson(self, snapshot):
+        self.zyngui.sound_categories.loadChannelSoundFromJson(self.id, snapshot)
 
-    def mute_all_clips_in_track(self):
+    def mute_all_clips_in_channel(self):
         for clip_model_index in range(5):
             clips_model = self.__clips_model__[clip_model_index]
             for clip_index in range(0, clips_model.count):
@@ -1221,7 +1221,7 @@ class zynthiloops_track(QObject):
                 if clip is not None:
                     clip.setVolume(-40)
 
-    def unmute_all_clips_in_track(self):
+    def unmute_all_clips_in_channel(self):
         for clip_model_index in range(5):
             clips_model = self.__clips_model__[clip_model_index]
             for clip_index in range(0, clips_model.count):
@@ -1235,4 +1235,4 @@ class zynthiloops_track(QObject):
         else:
             self.__sound_json_snapshot__ = json.dumps(self.zyngui.layer.export_multichannel_snapshot(self.connectedSound))
 
-        logging.debug(f"### sound snapshot json for track {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")
+        logging.debug(f"### sound snapshot json for channel {self.name} connectedSound {self.connectedSound} : {self.__sound_json_snapshot__}")

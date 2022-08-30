@@ -49,7 +49,7 @@ function stopMetronomeAndPlayback() {
                 for (var clipIndex in zynthian.zynthiloops.clipsToRecord) {
                     var clip = zynthian.zynthiloops.clipsToRecord[clipIndex]
 
-                    if (!clip.isTrackSample) {
+                    if (!clip.isChannelSample) {
                         var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
                         var pattern = sequence.getByPart(clip.row, clip.part)
 
@@ -86,19 +86,19 @@ function switchToScene(index) {
     zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index
 }
 
-function cuiaHandler(cuia, selectedTrack, bottomStack) {
+function cuiaHandler(cuia, selectedChannel, bottomStack) {
     switch (cuia) {
         // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-        // and invoke respective handler when trackAudioType is synth, trig or slice
-        // Otherwise, when in loop mode, do not handle button to allow falling back to track
+        // and invoke respective handler when channelAudioType is synth, trig or slice
+        // Otherwise, when in loop mode, do not handle button to allow falling back to channel
         // selection
-        case "TRACK_1":
-        case "TRACK_6":
-            if (selectedTrack.trackAudioType === "sample-loop") {
-                if (selectedTrack.connectedPattern >= 0) {
-                    bottomStack.bottomBar.setControlObjByType(selectedTrack.sceneClip, "pattern")
+        case "CHANNEL_1":
+        case "CHANNEL_6":
+            if (selectedChannel.channelAudioType === "sample-loop") {
+                if (selectedChannel.connectedPattern >= 0) {
+                    bottomStack.bottomBar.setControlObjByType(selectedChannel.sceneClip, "pattern")
                 } else {
-                    bottomStack.bottomBar.setControlObjByType(selectedTrack.sceneClip, "clip")
+                    bottomStack.bottomBar.setControlObjByType(selectedChannel.sceneClip, "clip")
                 }
 
                 bottomStack.bottomBar.filePickerDialog.folderModel.folder = bottomStack.bottomBar.controlObj.recordingDir;
@@ -106,67 +106,67 @@ function cuiaHandler(cuia, selectedTrack, bottomStack) {
                 bottomStack.bottomBar.filePickerDialog.open();
 
                 return true
-            } else if (selectedTrack.trackAudioType === "synth" ||
-                selectedTrack.trackAudioType === "sample-trig" ||
-                selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 0
-                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+            } else if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-trig" ||
+                selectedChannel.channelAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 0
+                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
 
             return false
 
-        case "TRACK_2":
-        case "TRACK_7":
-            if (selectedTrack.trackAudioType === "sample-loop") {
+        case "CHANNEL_2":
+        case "CHANNEL_7":
+            if (selectedChannel.channelAudioType === "sample-loop") {
                 return true
-            } else if (selectedTrack.trackAudioType === "synth" ||
-                selectedTrack.trackAudioType === "sample-trig" ||
-                selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 1
-                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
-                return true
-            }
-
-            return false
-
-        case "TRACK_3":
-        case "TRACK_8":
-            if (selectedTrack.trackAudioType === "sample-loop") {
-                return true
-            } else if (selectedTrack.trackAudioType === "synth" ||
-                selectedTrack.trackAudioType === "sample-trig" ||
-                selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 2
-                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+            } else if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-trig" ||
+                selectedChannel.channelAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 1
+                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
 
             return false
 
-        case "TRACK_4":
-        case "TRACK_9":
-            if (selectedTrack.trackAudioType === "sample-loop") {
+        case "CHANNEL_3":
+        case "CHANNEL_8":
+            if (selectedChannel.channelAudioType === "sample-loop") {
                 return true
-            } else if (selectedTrack.trackAudioType === "synth" ||
-                selectedTrack.trackAudioType === "sample-trig" ||
-                selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 3
-                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+            } else if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-trig" ||
+                selectedChannel.channelAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 2
+                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
 
             return false
 
-        case "TRACK_5":
-        case "TRACK_10":
-            if (selectedTrack.trackAudioType === "sample-loop") {
+        case "CHANNEL_4":
+        case "CHANNEL_9":
+            if (selectedChannel.channelAudioType === "sample-loop") {
                 return true
-            } else if (selectedTrack.trackAudioType === "synth" ||
-                selectedTrack.trackAudioType === "sample-trig" ||
-                selectedTrack.trackAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.track.selectedSlotRow = 4
-                bottomStack.slotsBar.handleItemClick(selectedTrack.trackAudioType)
+            } else if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-trig" ||
+                selectedChannel.channelAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 3
+                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
+                return true
+            }
+
+            return false
+
+        case "CHANNEL_5":
+        case "CHANNEL_10":
+            if (selectedChannel.channelAudioType === "sample-loop") {
+                return true
+            } else if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-trig" ||
+                selectedChannel.channelAudioType === "sample-slice") {
+                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 4
+                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
 

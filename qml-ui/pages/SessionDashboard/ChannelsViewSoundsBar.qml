@@ -10,18 +10,18 @@ import org.zynthian.quick 1.0 as ZynQuick
 Zynthian.Card {
     id: root
 
-    property QtObject selectedTrack
-    //: applicationWindow().selectedTrack
+    property QtObject selectedChannel
+    //: applicationWindow().selectedChannel
 
     Binding {
         target: root
-        property: "selectedTrack"
+        property: "selectedChannel"
         delayed: true
-        value: applicationWindow().selectedTrack
+        value: applicationWindow().selectedChannel
     }
 
-    property int selectedTrackIndex: zynthian.session_dashboard.selectedTrack;
-    property var chainedSounds: selectedTrack ? selectedTrack.chainedSounds : []
+    property int selectedChannelIndex: zynthian.session_dashboard.selectedChannel;
+    property var chainedSounds: selectedChannel ? selectedChannel.chainedSounds : []
     property bool openBottomDrawerOnLoad: false
 
     Connections {
@@ -48,35 +48,35 @@ Zynthian.Card {
     function cuiaCallback(cuia) {
         switch (cuia) {
             case "SELECT_UP":
-                if (root.selectedTrack.selectedSlotRow > 0) {
-                    root.selectedTrack.selectedSlotRow -= 1
+                if (root.selectedChannel.selectedSlotRow > 0) {
+                    root.selectedChannel.selectedSlotRow -= 1
                 }
                 return true;
 
             case "SELECT_DOWN":
-                if (root.selectedTrack.selectedSlotRow < 4) {
-                    root.selectedTrack.selectedSlotRow += 1
+                if (root.selectedChannel.selectedSlotRow < 4) {
+                    root.selectedChannel.selectedSlotRow += 1
                 }
                 return true;
 
 //            case "NAVIGATE_LEFT":
-//                var selectedMidiChannel = root.chainedSounds[root.selectedTrack.selectedSlotRow];
-//                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+//                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
+//                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
 //                    zynthian.layer.selectPrevPreset(selectedMidiChannel);
 //                    chainedSoundsRepeater.itemAt(selectedRowIndex).update();
 //                }
 //                return true;
 
 //            case "NAVIGATE_RIGHT":
-//                var selectedMidiChannel = root.chainedSounds[root.selectedTrack.selectedSlotRow];
-//                if (selectedTrack.checkIfLayerExists(selectedMidiChannel)) {
+//                var selectedMidiChannel = root.chainedSounds[root.selectedChannel.selectedSlotRow];
+//                if (selectedChannel.checkIfLayerExists(selectedMidiChannel)) {
 //                    zynthian.layer.selectNextPreset(selectedMidiChannel);
-//                    chainedSoundsRepeater.itemAt(root.selectedTrack.selectedSlotRow).update();
+//                    chainedSoundsRepeater.itemAt(root.selectedChannel.selectedSlotRow).update();
 //                }
 //                return true;
 
             case "SWITCH_BACK_SHORT":
-                bottomStack.slotsBar.trackButton.checked = true
+                bottomStack.slotsBar.channelButton.checked = true
 
                 return true;
 
@@ -87,25 +87,25 @@ Zynthian.Card {
                 return true;
 
             // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-            case "TRACK_1":
-            case "TRACK_6":
-                root.selectedTrack.selectedSlotRow = 0
+            case "CHANNEL_1":
+            case "CHANNEL_6":
+                root.selectedChannel.selectedSlotRow = 0
                 return true
-            case "TRACK_2":
-            case "TRACK_7":
-                root.selectedTrack.selectedSlotRow = 1
+            case "CHANNEL_2":
+            case "CHANNEL_7":
+                root.selectedChannel.selectedSlotRow = 1
                 return true
-            case "TRACK_3":
-            case "TRACK_8":
-                root.selectedTrack.selectedSlotRow = 2
+            case "CHANNEL_3":
+            case "CHANNEL_8":
+                root.selectedChannel.selectedSlotRow = 2
                 return true
-            case "TRACK_4":
-            case "TRACK_9":
-                root.selectedTrack.selectedSlotRow = 3
+            case "CHANNEL_4":
+            case "CHANNEL_9":
+                root.selectedChannel.selectedSlotRow = 3
                 return true
-            case "TRACK_5":
-            case "TRACK_10":
-                root.selectedTrack.selectedSlotRow = 4
+            case "CHANNEL_5":
+            case "CHANNEL_10":
+                root.selectedChannel.selectedSlotRow = 4
                 return true
 
             default:
@@ -118,7 +118,7 @@ Zynthian.Card {
         anchors.margins: Kirigami.Units.gridUnit
 
 //        Kirigami.Heading {
-//            text: qsTr("Channel : %1").arg(root.selectedTrack.name)
+//            text: qsTr("Channel : %1").arg(root.selectedChannel.name)
 //        }
 
         Repeater {
@@ -144,7 +144,7 @@ Zynthian.Card {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                border.width: root.selectedTrack.selectedSlotRow === index ? 1 : 0
+                border.width: root.selectedChannel.selectedSlotRow === index ? 1 : 0
                 border.color: Kirigami.Theme.highlightColor
                 color: "transparent"
                 radius: 4
@@ -159,12 +159,12 @@ Zynthian.Card {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        root.selectedTrack.selectedSlotRow = index;
+                        root.selectedChannel.selectedSlotRow = index;
                     }
                 }
 
                 RowLayout {
-                    opacity: root.selectedTrack.selectedSlotRow === index ? 1 : 0.5
+                    opacity: root.selectedChannel.selectedSlotRow === index ? 1 : 0.5
                     anchors.fill: parent
 
                     Rectangle {
@@ -197,7 +197,7 @@ Zynthian.Card {
                                 var str = "";
 
                                 if (chainedSound !== -1) {
-                                    var presetName = root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                                    var presetName = root.selectedChannel.getLayerNameByMidiChannel(chainedSound).split(">")[1]
                                     if (presetName != null) {
                                         str = presetName;
                                     }
@@ -212,7 +212,7 @@ Zynthian.Card {
                                 var str = "";
 
                                 if (chainedSound !== -1) {
-                                    var presetName = root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[1]
+                                    var presetName = root.selectedChannel.getLayerNameByMidiChannel(chainedSound).split(">")[1]
                                     if (presetName != null) {
                                         str = presetName;
                                     }
@@ -226,8 +226,8 @@ Zynthian.Card {
                             anchors.fill: parent
 
                             onClicked: {
-                                if (root.selectedTrack.selectedSlotRow !== index) {
-                                    root.selectedTrack.selectedSlotRow = index;
+                                if (root.selectedChannel.selectedSlotRow !== index) {
+                                    root.selectedChannel.selectedSlotRow = index;
                                 } else {
                                     layerSetupDialog.open()
                                 }
@@ -258,7 +258,7 @@ Zynthian.Card {
                                 top: parent.top
                                 bottom: parent.bottom
                             }
-                            visible: root.selectedTrack.trackAudioType === "synth" &&
+                            visible: root.selectedChannel.channelAudioType === "synth" &&
                                      soundLabelSynth.text.trim().length > 0
 
                             color: Kirigami.Theme.highlightColor
@@ -274,12 +274,12 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
+                            text: chainedSound > -1 && root.selectedChannel ? root.selectedChannel.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
 
                             elide: "ElideRight"
 
                             function updateName() {
-                                text = chainedSound > -1 && root.selectedTrack ? root.selectedTrack.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
+                                text = chainedSound > -1 && root.selectedChannel ? root.selectedChannel.getLayerNameByMidiChannel(chainedSound).split(">")[0] : ""
                             }
                         }
 
@@ -287,8 +287,8 @@ Zynthian.Card {
                             anchors.fill: parent
 
                             onClicked: {
-                                if (root.selectedTrack.selectedSlotRow !== index) {
-                                    root.selectedTrack.selectedSlotRow = index;
+                                if (root.selectedChannel.selectedSlotRow !== index) {
+                                    root.selectedChannel.selectedSlotRow = index;
                                 } else {
                                     layerSetupDialog.open()
                                 }
@@ -303,10 +303,10 @@ Zynthian.Card {
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
-                        enabled: root.selectedTrack.selectedSlotRow === index && soundDelegate.chainedSound !== -1
+                        enabled: root.selectedChannel.selectedSlotRow === index && soundDelegate.chainedSound !== -1
                         onClicked: {
-                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
-                                selectedTrack.remove_and_unchain_sound(soundDelegate.chainedSound);
+                            if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
+                                selectedChannel.remove_and_unchain_sound(soundDelegate.chainedSound);
                             }
                         }
 
@@ -326,9 +326,9 @@ Zynthian.Card {
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
-                        enabled: root.selectedTrack.selectedSlotRow === index && soundDelegate.chainedSound !== -1
+                        enabled: root.selectedChannel.selectedSlotRow === index && soundDelegate.chainedSound !== -1
                         onClicked: {
-                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                            if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 zynthian.start_loading()
 
                                 // Open library edit page
@@ -362,9 +362,9 @@ Zynthian.Card {
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
-                        enabled: root.selectedTrack.selectedSlotRow === index && soundDelegate.chainedSound !== -1
+                        enabled: root.selectedChannel.selectedSlotRow === index && soundDelegate.chainedSound !== -1
                         onClicked: {
-                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                            if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 zynthian.start_loading()
 
                                 // Open library edit page
@@ -418,9 +418,9 @@ Zynthian.Card {
                                 rightMargin: Kirigami.Units.gridUnit*0.5
                             }
                             horizontalAlignment: Text.AlignLeft
-                            text: root.selectedTrack ? root.selectedTrack.getEffectsNameByMidiChannel(chainedSound) : ""
+                            text: root.selectedChannel ? root.selectedChannel.getEffectsNameByMidiChannel(chainedSound) : ""
                             function updateName() {
-                                text = root.selectedTrack ? root.selectedTrack.getEffectsNameByMidiChannel(chainedSound) : ""
+                                text = root.selectedChannel ? root.selectedChannel.getEffectsNameByMidiChannel(chainedSound) : ""
                             }
 
                             elide: "ElideRight"
@@ -429,8 +429,8 @@ Zynthian.Card {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                if (soundDelegate.chainedSound === -1 || root.selectedTrack.selectedSlotRow !== index) {
-                                    root.selectedTrack.selectedSlotRow = index;
+                                if (soundDelegate.chainedSound === -1 || root.selectedChannel.selectedSlotRow !== index) {
+                                    root.selectedChannel.selectedSlotRow = index;
                                 } else {
                                     zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                     zynthian.layer_options.show();
@@ -452,9 +452,9 @@ Zynthian.Card {
                         Layout.preferredHeight: parent.height < Kirigami.Units.gridUnit*2 ? Kirigami.Units.gridUnit*1.3 : Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignVCenter
                         radius: 4
-                        enabled: root.selectedTrack.selectedSlotRow === index && fxLabel.text.length > 0
+                        enabled: root.selectedChannel.selectedSlotRow === index && fxLabel.text.length > 0
                         onClicked: {
-                            if (root.selectedTrack.checkIfLayerExists(soundDelegate.chainedSound)) {
+                            if (root.selectedChannel.checkIfLayerExists(soundDelegate.chainedSound)) {
                                 zynthian.fixed_layers.activate_index(soundDelegate.chainedSound)
                                 zynthian.layer_effects.fx_reset()
 

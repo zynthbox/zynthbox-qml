@@ -133,13 +133,13 @@ class zynthiloops_part(QObject):
 
     @Slot(None)
     def clear(self):
-        for i in range(0, self.__song__.tracksModel.count):
-            track = self.__song__.tracksModel.getTrack(i)
-            clipsModel = track.clipsModel
-            logging.debug(f"Track {track} ClipsModel {clipsModel}")
+        for i in range(0, self.__song__.channelsModel.count):
+            channel = self.__song__.channelsModel.getChannel(i)
+            clipsModel = channel.clipsModel
+            logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
 
             for clip_index in range(0, clipsModel.count):
-                logging.debug(f"Track {i} Clip {clip_index}")
+                logging.debug(f"Channel {i} Clip {clip_index}")
                 clip: zynthiloops_clip = clipsModel.getClip(clip_index)
 
                 if clip.col == self.partIndex:
@@ -155,13 +155,13 @@ class zynthiloops_part(QObject):
         #     part = self.__song__.partsModel.getPart(i)
         #     part.stop()
 
-        for i in range(0, self.__song__.tracksModel.count):
-            track = self.__song__.tracksModel.getTrack(i)
-            clipsModel = track.clipsModel
-            logging.debug(f"Track {track} ClipsModel {clipsModel}")
+        for i in range(0, self.__song__.channelsModel.count):
+            channel = self.__song__.channelsModel.getChannel(i)
+            clipsModel = channel.clipsModel
+            logging.debug(f"Channel {channel} ClipsModel {clipsModel}")
 
             for clip_index in range(0, clipsModel.count):
-                logging.debug(f"Track {i} Clip {clip_index}")
+                logging.debug(f"Channel {i} Clip {clip_index}")
                 clip: zynthiloops_clip = clipsModel.getClip(clip_index)
 
                 if clip.col == self.partIndex:
@@ -175,8 +175,8 @@ class zynthiloops_part(QObject):
     def stop(self):
         clips_to_stop = []
 
-        for i in range(0, self.__song__.tracksModel.count):
-            clipsModel = self.__song__.tracksModel.getTrack(i).clipsModel
+        for i in range(0, self.__song__.channelsModel.count):
+            clipsModel = self.__song__.channelsModel.getChannel(i).clipsModel
 
             for clip_index in range(0, clipsModel.count):
                 clip: zynthiloops_clip = clipsModel.getClip(clip_index)

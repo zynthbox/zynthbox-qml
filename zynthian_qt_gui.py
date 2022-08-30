@@ -98,7 +98,7 @@ from zynqtgui.zynthian_gui_admin import zynthian_gui_admin
 from zynqtgui.zynthian_gui_snapshot import zynthian_gui_snapshot
 from zynqtgui.zynthian_gui_layer import zynthian_gui_layer
 from zynqtgui.zynthian_gui_fixed_layers import zynthian_gui_fixed_layers
-from zynqtgui.zynthian_gui_layers_for_track import zynthian_gui_layers_for_track
+from zynqtgui.zynthian_gui_layers_for_channel import zynthian_gui_layers_for_channel
 from zynqtgui.zynthian_gui_layer_options import zynthian_gui_layer_options
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
 from zynqtgui.zynthian_gui_layer_effects import zynthian_gui_layer_effects
@@ -117,7 +117,7 @@ from zynqtgui.zynthian_gui_audio_in import zynthian_gui_audio_in
 from zynqtgui.zynthian_gui_bank import zynthian_gui_bank
 from zynqtgui.zynthian_gui_preset import zynthian_gui_preset
 from zynqtgui.zynthian_gui_control import zynthian_gui_control
-from zynqtgui.zynthian_gui_track import zynthian_gui_track
+from zynqtgui.zynthian_gui_channel import zynthian_gui_channel
 
 # from zynqtgui.zynthian_gui_control_xy import zynthian_gui_control_xy
 # from zynqtgui.zynthian_gui_midi_profile import zynthian_gui_midi_profile
@@ -349,7 +349,7 @@ class zynthian_gui(QObject):
     screens_sequence = (
         #"session_dashboard",  #FIXME or main? make this more configurable?
         "zynthiloops",
-        "layers_for_track",
+        "layers_for_channel",
         "bank",
         "preset",
         "control",
@@ -362,7 +362,7 @@ class zynthian_gui(QObject):
         "main",
         "layer",
         "fixed_layers",
-        "layers_for_track",
+        "layers_for_channel",
         "main_layers_view",
         "bank",
         "preset",
@@ -477,8 +477,8 @@ class zynthian_gui(QObject):
         self.__is__modal__screens__caching__complete__ = False
         self.__is__screens__caching__complete__ = False
 
-        # When true, 1-5 buttons selects track 6-10
-        self.tracks_mod_active = False
+        # When true, 1-5 buttons selects channel 6-10
+        self.channels_mod_active = False
 
         # Create variables for LED control
         self.wsleds_blink = False
@@ -499,10 +499,10 @@ class zynthian_gui(QObject):
         self.song_bar_active = False
         self.slots_bar_part_active = False
         self.sound_combinator_active = False
-        self.track_wave_editor_bar_active = False
-        self.track_samples_bar_active = False
+        self.channel_wave_editor_bar_active = False
+        self.channel_samples_bar_active = False
         self.clip_wave_editor_bar_active = False
-        self.slots_bar_track_active = False
+        self.slots_bar_channel_active = False
         self.slots_bar_mixer_active = False
         self.slots_bar_synths_active = False
         self.slots_bar_samples_active = False
@@ -1068,33 +1068,33 @@ class zynthian_gui(QObject):
     soundCombinatorActive = Property(bool, get_sound_combinator_active, set_sound_combinator_active,
                                      notify=soundCombinatorActiveChanged)
 
-    def get_track_wave_editor_bar_active(self):
-        return self.track_wave_editor_bar_active
+    def get_channel_wave_editor_bar_active(self):
+        return self.channel_wave_editor_bar_active
 
-    def set_track_wave_editor_bar_active(self, isActive):
-        if self.track_wave_editor_bar_active != isActive:
-            self.track_wave_editor_bar_active = isActive
+    def set_channel_wave_editor_bar_active(self, isActive):
+        if self.channel_wave_editor_bar_active != isActive:
+            self.channel_wave_editor_bar_active = isActive
             self.screens["zynthiloops"].set_selector()
-            self.trackWaveEditorBarActiveChanged.emit()
+            self.channelWaveEditorBarActiveChanged.emit()
 
-    trackWaveEditorBarActiveChanged = Signal()
+    channelWaveEditorBarActiveChanged = Signal()
 
-    trackWaveEditorBarActive = Property(bool, get_track_wave_editor_bar_active, set_track_wave_editor_bar_active,
-                                     notify=trackWaveEditorBarActiveChanged)
+    channelWaveEditorBarActive = Property(bool, get_channel_wave_editor_bar_active, set_channel_wave_editor_bar_active,
+                                     notify=channelWaveEditorBarActiveChanged)
 
-    def get_track_samples_bar_active(self):
-        return self.track_samples_bar_active
+    def get_channel_samples_bar_active(self):
+        return self.channel_samples_bar_active
 
-    def set_track_samples_bar_active(self, isActive):
-        if self.track_samples_bar_active != isActive:
-            self.track_samples_bar_active = isActive
+    def set_channel_samples_bar_active(self, isActive):
+        if self.channel_samples_bar_active != isActive:
+            self.channel_samples_bar_active = isActive
             self.screens["zynthiloops"].set_selector()
-            self.trackSamplesBarActiveChanged.emit()
+            self.channelSamplesBarActiveChanged.emit()
 
-    trackSamplesBarActiveChanged = Signal()
+    channelSamplesBarActiveChanged = Signal()
 
-    trackSamplesBarActive = Property(bool, get_track_samples_bar_active, set_track_samples_bar_active,
-                                     notify=trackSamplesBarActiveChanged)
+    channelSamplesBarActive = Property(bool, get_channel_samples_bar_active, set_channel_samples_bar_active,
+                                     notify=channelSamplesBarActiveChanged)
 
     def get_clip_wave_editor_bar_active(self):
         return self.clip_wave_editor_bar_active
@@ -1110,19 +1110,19 @@ class zynthian_gui(QObject):
     clipWaveEditorBarActive = Property(bool, get_clip_wave_editor_bar_active, set_clip_wave_editor_bar_active,
                                        notify=clipWaveEditorBarActiveChanged)
 
-    def get_slots_bar_track_active(self):
-        return self.slots_bar_track_active
+    def get_slots_bar_channel_active(self):
+        return self.slots_bar_channel_active
 
-    def set_slots_bar_track_active(self, isActive):
-        if self.slots_bar_track_active != isActive:
-            self.slots_bar_track_active = isActive
+    def set_slots_bar_channel_active(self, isActive):
+        if self.slots_bar_channel_active != isActive:
+            self.slots_bar_channel_active = isActive
             self.screens["zynthiloops"].set_selector()
-            self.slotsBarTrackActiveChanged.emit()
+            self.slotsBarChannelActiveChanged.emit()
 
-    slotsBarTrackActiveChanged = Signal()
+    slotsBarChannelActiveChanged = Signal()
 
-    slotsBarTrackActive = Property(bool, get_slots_bar_track_active, set_slots_bar_track_active,
-                                   notify=slotsBarTrackActiveChanged)
+    slotsBarChannelActive = Property(bool, get_slots_bar_channel_active, set_slots_bar_channel_active,
+                                   notify=slotsBarChannelActiveChanged)
 
     def get_slots_bar_mixer_active(self):
         return self.slots_bar_mixer_active
@@ -1375,9 +1375,9 @@ class zynthian_gui(QObject):
         self.zynautoconnect(True)
 
         if self.zynthiloops.song is not None:
-            for i in range(0, self.zynthiloops.song.tracksModel.count):
-                track = self.zynthiloops.song.tracksModel.getTrack(i)
-                track.update_jack_port()
+            for i in range(0, self.zynthiloops.song.channelsModel.count):
+                channel = self.zynthiloops.song.channelsModel.getChannel(i)
+                channel.update_jack_port()
 
     # ---------------------------------------------------------------------------
     # OSC Management
@@ -1474,7 +1474,7 @@ class zynthian_gui(QObject):
         self.screens["control"] = zynthian_gui_control(self)
         self.screens["control_downloader"] = zynthian_gui_newstuff(self)
         self.screens["fx_control_downloader"] = self.screens["control_downloader"]
-        self.screens["track"] = zynthian_gui_track(self)
+        self.screens["channel"] = zynthian_gui_channel(self)
         # self.screens['control_xy'] = zynthian_gui_control_xy(self)
         # self.screens['midi_profile'] = zynthian_gui_midi_profile(self)
         # self.screens['zs3_learn'] = zynthian_gui_zs3_learn(self)
@@ -1517,7 +1517,7 @@ class zynthian_gui(QObject):
         # Fixed layers depends on zynthiloops and session_dashboard screens and hence needs to be initialized
         # after those 2 pages
         ###
-        self.screens["layers_for_track"] = zynthian_gui_layers_for_track(self)
+        self.screens["layers_for_channel"] = zynthian_gui_layers_for_channel(self)
         self.screens["fixed_layers"] = zynthian_gui_fixed_layers(self)
         self.screens["main_layers_view"] = zynthian_gui_fixed_layers(self)
 
@@ -1615,14 +1615,14 @@ class zynthian_gui(QObject):
                 screen = self.active_screen
             else:
                 screen = self.__home_screen
-        elif screen is "layer" or screen is "main_layers_view" or screen is "fixed_layers":  #HACK replace completely layer with layers_for_track
-            screen = "layers_for_track"
+        elif screen is "layer" or screen is "main_layers_view" or screen is "fixed_layers":  #HACK replace completely layer with layers_for_channel
+            screen = "layers_for_channel"
 
         if (
             screen == "layer"
             or screen == "fixed_layers"
             or screen == "main_layers_view"
-            or screen ==  "layers_for_track"
+            or screen ==  "layers_for_channel"
             or screen == "bank"
             or screen == "preset"
             or screen == "control"
@@ -1874,7 +1874,7 @@ class zynthian_gui(QObject):
         else:
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
-        self.screens["layers_for_track"].sync_index_from_curlayer()
+        self.screens["layers_for_channel"].sync_index_from_curlayer()
         self.screens["bank"].fill_list()
         self.screens["bank"].show()
         self.screens["preset"].fill_list()
@@ -2169,7 +2169,7 @@ class zynthian_gui(QObject):
             pass
 
         elif cuia == "SCREEN_LAYER":
-            self.show_screen("layers_for_track")
+            self.show_screen("layers_for_channel")
 
         elif cuia == "SCREEN_LAYER_FX":
             self.show_screen("layer_effects")
@@ -2221,37 +2221,37 @@ class zynthian_gui(QObject):
         ):
             self.toggle_modal("stepseq")
 
-        elif cuia == "TRACK_1":
-            self.screens["session_dashboard"].selectedTrack = 0
-        elif cuia == "TRACK_2":
-            self.screens["session_dashboard"].selectedTrack = 1
-        elif cuia == "TRACK_3":
-            self.screens["session_dashboard"].selectedTrack = 2
-        elif cuia == "TRACK_4":
-            self.screens["session_dashboard"].selectedTrack = 3
-        elif cuia == "TRACK_5":
-            self.screens["session_dashboard"].selectedTrack = 4
-        elif cuia == "TRACK_6":
-            self.screens["session_dashboard"].selectedTrack = 5
-        elif cuia == "TRACK_7":
-            self.screens["session_dashboard"].selectedTrack = 6
-        elif cuia == "TRACK_8":
-            self.screens["session_dashboard"].selectedTrack = 7
-        elif cuia == "TRACK_9":
-            self.screens["session_dashboard"].selectedTrack = 8
-        elif cuia == "TRACK_10":
-            self.screens["session_dashboard"].selectedTrack = 9
-        elif cuia == "TRACK_11":
-            self.screens["session_dashboard"].selectedTrack = 10
-        elif cuia == "TRACK_12":
-            self.screens["session_dashboard"].selectedTrack = 11
+        elif cuia == "CHANNEL_1":
+            self.screens["session_dashboard"].selectedChannel = 0
+        elif cuia == "CHANNEL_2":
+            self.screens["session_dashboard"].selectedChannel = 1
+        elif cuia == "CHANNEL_3":
+            self.screens["session_dashboard"].selectedChannel = 2
+        elif cuia == "CHANNEL_4":
+            self.screens["session_dashboard"].selectedChannel = 3
+        elif cuia == "CHANNEL_5":
+            self.screens["session_dashboard"].selectedChannel = 4
+        elif cuia == "CHANNEL_6":
+            self.screens["session_dashboard"].selectedChannel = 5
+        elif cuia == "CHANNEL_7":
+            self.screens["session_dashboard"].selectedChannel = 6
+        elif cuia == "CHANNEL_8":
+            self.screens["session_dashboard"].selectedChannel = 7
+        elif cuia == "CHANNEL_9":
+            self.screens["session_dashboard"].selectedChannel = 8
+        elif cuia == "CHANNEL_10":
+            self.screens["session_dashboard"].selectedChannel = 9
+        elif cuia == "CHANNEL_11":
+            self.screens["session_dashboard"].selectedChannel = 10
+        elif cuia == "CHANNEL_12":
+            self.screens["session_dashboard"].selectedChannel = 11
 
-        elif cuia == "TRACK_PREVIOUS":
-            if self.screens["session_dashboard"].selectedTrack > 0:
-                self.screens["session_dashboard"].selectedTrack -= 1
-        elif cuia == "TRACK_NEXT":
-            if self.screens["session_dashboard"].selectedTrack < 11:
-                self.screens["session_dashboard"].selectedTrack += 1
+        elif cuia == "CHANNEL_PREVIOUS":
+            if self.screens["session_dashboard"].selectedChannel > 0:
+                self.screens["session_dashboard"].selectedChannel -= 1
+        elif cuia == "CHANNEL_NEXT":
+            if self.screens["session_dashboard"].selectedChannel < 11:
+                self.screens["session_dashboard"].selectedChannel += 1
 
         elif cuia == "KEYBOARD":
             logging.info("KEYBOARD")
@@ -2274,8 +2274,8 @@ class zynthian_gui(QObject):
                 if not zl.isRecording:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
-                    track = zl.song.tracksModel.getTrack(self.session_dashboard.selectedTrack)
-                    clip = track.getClipToRecord()
+                    channel = zl.song.channelsModel.getChannel(self.session_dashboard.selectedChannel)
+                    clip = channel.getClipToRecord()
                     logging.info(f"Recording Clip : {clip}")
                     clip.queueRecording()
                     self.run_start_metronome_and_playback.emit()
@@ -2295,12 +2295,12 @@ class zynthian_gui(QObject):
             else:
                 self.openLeftSidebar.emit()
 
-        elif cuia == "SWITCH_TRACKS_MOD_SHORT" or cuia == "SWITCH_TRACKS_MOD_BOLD" or cuia == "SWITCH_TRACKS_MOD_LONG":
-            self.tracks_mod_active = not self.tracks_mod_active
-            logging.debug(f'self.tracks_mod_active({self.tracks_mod_active})')
+        elif cuia == "SWITCH_CHANNELS_MOD_SHORT" or cuia == "SWITCH_CHANNELS_MOD_BOLD" or cuia == "SWITCH_CHANNELS_MOD_LONG":
+            self.channels_mod_active = not self.channels_mod_active
+            logging.debug(f'self.channels_mod_active({self.channels_mod_active})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
-            self.screens["zynthiloops"].clickTrackEnabled = not self.screens["zynthiloops"].clickTrackEnabled
+            self.screens["zynthiloops"].clickChannelEnabled = not self.screens["zynthiloops"].clickChannelEnabled
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2537,7 +2537,7 @@ class zynthian_gui(QObject):
             fake_key = Key.enter
         elif i == 22:
             fake_key = Key.esc
-        # Track buttons
+        # Channel buttons
         elif i == 5:
             fake_key = "1"
         elif i == 6:
@@ -2569,14 +2569,14 @@ class zynthian_gui(QObject):
 
         if press:
             if not fake_key in self.__fake_keys_pressed:
-                if self.tracks_mod_active:
+                if self.channels_mod_active:
                     self.fakeKeyboard.press(Key.ctrl)
 
                 self.__fake_keys_pressed.add(fake_key)
                 self.fakeKeyboard.press(fake_key)
         else:
             if fake_key in self.__fake_keys_pressed:
-                if self.tracks_mod_active:
+                if self.channels_mod_active:
                     self.fakeKeyboard.release(Key.ctrl)
 
                 self.__fake_keys_pressed.discard(fake_key)
@@ -3739,8 +3739,8 @@ class zynthian_gui(QObject):
     def get_fixed_layers(self):
         return self.screens["fixed_layers"]
 
-    def get_layers_for_track(self):
-        return self.screens["layers_for_track"]
+    def get_layers_for_channel(self):
+        return self.screens["layers_for_channel"]
 
     def get_main_layers_view(self):
         return self.screens["main_layers_view"]
@@ -3796,8 +3796,8 @@ class zynthian_gui(QObject):
     def get_control(self):
         return self.screens["control"]
 
-    def get_track(self):
-        return self.screens["track"]
+    def get_channel(self):
+        return self.screens["channel"]
 
     @Property(QObject, constant=True)
     def audio_out(self):
@@ -4404,7 +4404,7 @@ class zynthian_gui(QObject):
     engine = Property(QObject, get_engine, constant=True)
     layer = Property(QObject, get_layer, constant=True)
     fixed_layers = Property(QObject, get_fixed_layers, constant=True)
-    layers_for_track = Property(QObject, get_layers_for_track, constant=True)
+    layers_for_channel = Property(QObject, get_layers_for_channel, constant=True)
     main_layers_view = Property(QObject, get_main_layers_view, constant=True)
     layer_options = Property(QObject, get_layer_options, constant=True)
     layer_effects = Property(QObject, get_layer_effects, constant=True)
@@ -4427,7 +4427,7 @@ class zynthian_gui(QObject):
     bank = Property(QObject, get_bank, constant=True)
     preset = Property(QObject, get_preset, constant=True)
     control = Property(QObject, get_control, constant=True)
-    track = Property(QObject, get_track, constant=True)
+    channel = Property(QObject, get_channel, constant=True)
     audio_recorder = Property(QObject, get_audio_recorder, constant=True)
     midi_recorder = Property(QObject, get_midi_recorder, constant=True)
     playgrid_downloader = Property(QObject, get_playgrid_downloader, constant=True)

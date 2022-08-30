@@ -39,7 +39,7 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 QQC2.Popup {
     id: root
-    property QtObject selectedTrack: zynthian.zynthiloops.song.tracksModel.getTrack(zynthian.session_dashboard.selectedTrack)
+    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
     modal: true
@@ -54,7 +54,7 @@ QQC2.Popup {
             // Report dialog open to zynthian for passing cuia events to dialog
             zynthian.openedDialog = root
             // Assign clip to record on open so that correct clip is fetched
-            zynthian.zynthiloops.clipsToRecord = [root.selectedTrack.getClipToRecord()]
+            zynthian.zynthiloops.clipsToRecord = [root.selectedChannel.getClipToRecord()]
 
             // Reset source combo model to selected value when dialog opens
             for (var i=0; i<sourceComboModel.count; i++) {
@@ -65,9 +65,9 @@ QQC2.Popup {
             }
 
             // Reset channel combo model to selected value when dialog opens
-            for (var i=0; i<channelComboModel.count; i++) {
-                if (channelComboModel.get(i).value === zynthian.zynthiloops.recordingChannel) {
-                    channelCombo.currentIndex = i
+            for (var i=0; i<recordingChannelComboModel.count; i++) {
+                if (recordingChannelComboModel.get(i).value === zynthian.zynthiloops.recordingChannel) {
+                    recordingChannelCombo.currentIndex = i
                     break
                 }
             }
@@ -114,7 +114,7 @@ QQC2.Popup {
 
         Kirigami.Heading {
             Layout.fillWidth: true
-            text: qsTr("Record clip for Channel %1").arg(selectedTrack.name)
+            text: qsTr("Record clip for Channel %1").arg(selectedChannel.name)
         }
         Rectangle {
             Layout.fillWidth: true
@@ -216,12 +216,12 @@ QQC2.Popup {
                     }
 
                     QQC2.ComboBox {
-                        id: trackCombo
+                        id: channelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
-                            id: trackComboModel
+                            id: channelComboModel
 
                             ListElement { text: "Channel 1"; value: 0 }
                             ListElement { text: "Channel 2"; value: 1 }
@@ -235,9 +235,9 @@ QQC2.Popup {
                             ListElement { text: "Channel 10"; value: 9 }
                         }
                         textRole: "text"
-                        currentIndex: visible ? zynthian.session_dashboard.selectedTrack : -1
+                        currentIndex: visible ? zynthian.session_dashboard.selectedChannel : -1
                         onActivated: {
-                            zynthian.session_dashboard.selectedTrack = trackComboModel.get(index).value
+                            zynthian.session_dashboard.selectedChannel = channelComboModel.get(index).value
                         }
                     }
                 }
@@ -254,12 +254,12 @@ QQC2.Popup {
                     }
 
                     QQC2.ComboBox {
-                        id: channelCombo
+                        id: recordingChannelCombo
 
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 8
                         Layout.alignment: Qt.AlignCenter
                         model: ListModel {
-                            id: channelComboModel
+                            id: recordingChannelComboModel
 
                             ListElement { text: "Left Channel"; value: "1" }
                             ListElement { text: "Right Channel"; value: "2" }
@@ -267,7 +267,7 @@ QQC2.Popup {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.zynthiloops.recordingChannel = channelComboModel.get(index).value
+                            zynthian.zynthiloops.recordingChannel = recordingChannelComboModel.get(index).value
                         }
                     }
                 }
@@ -287,11 +287,11 @@ QQC2.Popup {
                         Layout.alignment: Qt.AlignCenter
                         text: qsTr("Select target channels")
                         onClicked: {
-                            targetTracksPopup.open()
+                            targetChannelsPopup.open()
                         }
 
                         QQC2.Popup {
-                            id: targetTracksPopup
+                            id: targetChannelsPopup
                             exit: null; enter: null; // Disable the enter and exit transition animations. TODO This really wants doing somewhere central...
                             modal: true
                             focus: true
@@ -319,8 +319,8 @@ QQC2.Popup {
                                 Repeater {
                                     model: 10
                                     delegate: RowLayout {
-                                        id: targetTracksDelegate
-                                        property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
+                                        id: targetChannelsDelegate
+                                        property QtObject channel: zynthian.zynthiloops.song.channelsModel.getChannel(index)
 
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
@@ -332,29 +332,29 @@ QQC2.Popup {
                                             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
                                             elide: "ElideRight"
                                             text: qsTr("Channel %1 (%2)")
-                                                    .arg(targetTracksDelegate.track.name)
-                                                    .arg(targetTracksDelegate.track.trackAudioType === "sample-loop"
+                                                    .arg(targetChannelsDelegate.channel.name)
+                                                    .arg(targetChannelsDelegate.channel.channelAudioType === "sample-loop"
                                                             ? "Loop"
-                                                            : targetTracksDelegate.track.trackAudioType === "sample-trig"
+                                                            : targetChannelsDelegate.channel.channelAudioType === "sample-trig"
                                                                 ? "Smp: Trig"
-                                                                : targetTracksDelegate.track.trackAudioType === "sample-slice"
+                                                                : targetChannelsDelegate.channel.channelAudioType === "sample-slice"
                                                                     ? "Smp: Slice"
-                                                                    : targetTracksDelegate.track.trackAudioType === "synth"
+                                                                    : targetChannelsDelegate.channel.channelAudioType === "synth"
                                                                       ? "Synth"
-                                                                      : targetTracksDelegate.track.trackAudioType === "external"
+                                                                      : targetChannelsDelegate.channel.channelAudioType === "external"
                                                                             ? "External"
                                                                             : "")
                                         }
 
                                         Repeater {
-                                            id: targetTracksSlotsRepeater
+                                            id: targetChannelsSlotsRepeater
                                             model: 5
                                             delegate: QQC2.Button {
-                                                property QtObject clip: targetTracksDelegate.track
-                                                                            ? ["sample-trig", "sample-slice"].indexOf(targetTracksDelegate.track.trackAudioType) >= 0
-                                                                                ? targetTracksDelegate.track.samples[index]
+                                                property QtObject clip: targetChannelsDelegate.channel
+                                                                            ? ["sample-trig", "sample-slice"].indexOf(targetChannelsDelegate.channel.channelAudioType) >= 0
+                                                                                ? targetChannelsDelegate.channel.samples[index]
                                                                                 : index === 0
-                                                                                  ? targetTracksDelegate.track.sceneClip
+                                                                                  ? targetChannelsDelegate.channel.sceneClip
                                                                                   : null
                                                                             : null
 
@@ -434,9 +434,9 @@ QQC2.Popup {
                         implicitWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        checked: zynthian.zynthiloops.clickChannelEnabled
                         onToggled: {
-                            zynthian.zynthiloops.clickTrackEnabled = checked
+                            zynthian.zynthiloops.clickChannelEnabled = checked
                         }
                     }
                 }
@@ -470,7 +470,7 @@ QQC2.Popup {
                             maximumValue: 20
                             value: visible
                                    ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                      ? ZL.AudioLevels.tracks[root.selectedTrack.id]
+                                      ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                       : ZL.AudioLevels.captureA
                                    : -100
 
@@ -494,7 +494,7 @@ QQC2.Popup {
                             maximumValue: 20
                             value: visible
                                     ? sourceComboModel.get(sourceCombo.currentIndex).value === "internal"
-                                       ? ZL.AudioLevels.tracks[root.selectedTrack.id]
+                                       ? ZL.AudioLevels.channels[root.selectedChannel.id]
                                        : ZL.AudioLevels.captureB
                                     : -100
 

@@ -34,18 +34,18 @@ class zynthiloops_clips_model(QAbstractListModel):
     ClipRole = ClipIndexRole + 2
     __clips__: [zynthiloops_clip] = []
 
-    def __init__(self, song, parentTrack=None, partIndex=-1):
-        super().__init__(parentTrack)
-        self.__track__ = parentTrack
+    def __init__(self, song, parentChannel=None, partIndex=-1):
+        super().__init__(parentChannel)
+        self.__channel__ = parentChannel
         self.__song__ = song
         self.__clips__ = []
         self.__samples__ = []
         self.__partIndex__ = partIndex
         partNames = ['a', 'b', 'c', 'd', 'e']
         self.__partName__ = "(?)" if (partIndex == -1) else partNames[partIndex]
-        if self.__track__ is not None:
-            self.__track__.keyZoneModeChanged.connect(self.updateSamplesFromTrack)
-            self.__track__.track_audio_type_changed.connect(self.updateSamplesFromTrack)
+        if self.__channel__ is not None:
+            self.__channel__.keyZoneModeChanged.connect(self.updateSamplesFromChannel)
+            self.__channel__.channel_audio_type_changed.connect(self.updateSamplesFromChannel)
 
     def serialize(self):
         data = []
@@ -56,17 +56,17 @@ class zynthiloops_clips_model(QAbstractListModel):
     def deserialize(self, arr, part_index):
         if not isinstance(arr, list):
             for i in range(2):
-                clip = zynthiloops_clip(self.__track__.id, i, part_index, self.__song__, self)
+                clip = zynthiloops_clip(self.__channel__.id, i, part_index, self.__song__, self)
                 self.add_clip(clip)
             raise Exception("Invalid json format for clips")
 
         if len(arr) == 0:
             for i in range(2):
-                clip = zynthiloops_clip(self.__track__.id, i, part_index, self.__song__, self)
+                clip = zynthiloops_clip(self.__channel__.id, i, part_index, self.__song__, self)
                 self.add_clip(clip)
             return
         for i, c in enumerate(arr):
-            clip = zynthiloops_clip(self.__track__.id, i, part_index, self.__song__, self)
+            clip = zynthiloops_clip(self.__channel__.id, i, part_index, self.__song__, self)
             clip.deserialize(c)
             self.add_clip(clip)
             #self.__song__.add_clip_to_part(clip, i)
@@ -107,9 +107,9 @@ class zynthiloops_clips_model(QAbstractListModel):
         self.__clips__.append(clip)
         self.endInsertRows()
         self.countChanged.emit()
-        if self.__track__ is not None and self.__partIndex__ > -1:
-            # The clips in a parts model contains the scene-related information for the track/clip
-            clip.enabled_changed.connect(lambda clipIndex=length: self.__track__.onClipEnabledChanged(clipIndex, self.__partIndex__))
+        if self.__channel__ is not None and self.__partIndex__ > -1:
+            # The clips in a parts model contains the scene-related information for the channel/clip
+            clip.enabled_changed.connect(lambda clipIndex=length: self.__channel__.onClipEnabledChanged(clipIndex, self.__partIndex__))
 
     @Slot(int, result=QObject)
     def getClip(self, row : int):
@@ -165,9 +165,9 @@ class zynthiloops_clips_model(QAbstractListModel):
         self.__samples__.clear()
         self.samples_changed.emit()
     @Slot(None)
-    def updateSamplesFromTrack(self):
-        if self.__track__ is not None:
-            if self.__track__.trackAudioType == "sample-trig" and self.__track__.keyZoneMode == "all-full":
+    def updateSamplesFromChannel(self):
+        if self.__channel__ is not None:
+            if self.__channel__.channelAudioType == "sample-trig" and self.__channel__.keyZoneMode == "all-full":
                 self.__samples__ = [self.__partIndex__] # A little odd seeming perhaps, but the indices line up (five parts, five samples, we want the sample for trig/full to match the part)
             else:
                 self.__samples__ = [0, 1, 2, 3, 4]

@@ -33,17 +33,17 @@ from . import zynthian_gui_selector
 from PySide2.QtCore import QMetaObject, Qt, QObject, Slot, Signal, Property
 
 #------------------------------------------------------------------------------
-# basically a proxy model to zynthian_fixed:tracks
+# basically a proxy model to zynthian_fixed:channels
 #------------------------------------------------------------------------------
 
-class zynthian_gui_layers_for_track(zynthian_gui_selector):
+class zynthian_gui_layers_for_channel(zynthian_gui_selector):
 
     def __init__(self, parent = None):
-        super(zynthian_gui_layers_for_track, self).__init__('TrackLayers', parent)
+        super(zynthian_gui_layers_for_channel, self).__init__('ChannelLayers', parent)
         self.__total_chains = 5
         self.__volume_ctrls = []
-        # self.zyngui.screens['session_dashboard'].selected_track_changed.connect(self.update_track_sounds)
-        self.zyngui.screens['layer'].layer_deleted.connect(self.update_track_sounds)
+        # self.zyngui.screens['session_dashboard'].selected_channel_changed.connect(self.update_channel_sounds)
+        self.zyngui.screens['layer'].layer_deleted.connect(self.update_channel_sounds)
 
     def fill_list(self):
         try:
@@ -53,8 +53,8 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             song = self.zyngui.screens['zynthiloops'].song
 
             if song is not None:
-                selected_track = song.tracksModel.getTrack(self.zyngui.screens['session_dashboard'].selectedTrack)
-                chain = selected_track.get_chained_sounds()
+                selected_channel = song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
+                chain = selected_channel.get_chained_sounds()
                 empty_channels_needed = 0
                 used_empty_channels = []
 
@@ -124,12 +124,12 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
             midi_chan = zyncoder.lib_zyncoder.get_midi_active_chan()
 
         for i, item in enumerate(self.list_data):
-            logging.debug("sync_index_from_curlayer of layers_for_track {} {}".format(midi_chan, item[1]))
+            logging.debug("sync_index_from_curlayer of layers_for_channel {} {}".format(midi_chan, item[1]))
             if midi_chan == item[1]:
                 self.current_index = i
                 return
 
-    def update_track_sounds(self):
+    def update_channel_sounds(self):
         self.fill_list()
         if not self.zyngui.screens["zynthiloops"].song:
             return
@@ -137,12 +137,12 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
 
     @Slot(None)
     def do_activate_midich_layer(self):
-        track = self.zyngui.screens["zynthiloops"].song.tracksModel.getTrack(
-            self.zyngui.screens['session_dashboard'].get_selected_track())
-        if track is not None:
-            logging.debug(f"Update Track Sounds : {track.connectedSound}")
-            if track.connectedSound >= 0:
-                self.zyngui.screens["layer"].activate_midichan_layer(track.connectedSound)
+        channel = self.zyngui.screens["zynthiloops"].song.channelsModel.getChannel(
+            self.zyngui.screens['session_dashboard'].get_selected_channel())
+        if channel is not None:
+            logging.debug(f"Update Channel Sounds : {channel.connectedSound}")
+            if channel.connectedSound >= 0:
+                self.zyngui.screens["layer"].activate_midichan_layer(channel.connectedSound)
             else:
                 self.select_action(0)
 
@@ -154,7 +154,7 @@ class zynthian_gui_layers_for_track(zynthian_gui_selector):
         if i < 0 or i >= len(self.list_data):
             return
         midichan = self.list_data[i][1]
-        logging.debug(f"### layers for track select action : {midichan}")
+        logging.debug(f"### layers for channel select action : {midichan}")
         self.zyngui.screens['fixed_layers'].select_action(midichan, t)
         self.select(i)
 

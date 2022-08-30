@@ -33,8 +33,8 @@ import Zynthian 1.0 as Zynthian
 
 QQC2.Popup {
     id: root
-    function pickChannel(track) {
-        _private.selectedTrack = track;
+    function pickChannel(channel) {
+        _private.selectedChannel = channel;
         open();
     }
 
@@ -71,11 +71,11 @@ QQC2.Popup {
         Kirigami.Heading {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedTrack ? _private.selectedTrack.name : "")
+            text: qsTr("Pick External Midi Channel For Channel %1").arg(_private.selectedChannel ? _private.selectedChannel.name : "")
  
             QtObject {
                 id: _private
-                property QtObject selectedTrack
+                property QtObject selectedChannel
             }
         }
         Rectangle {
@@ -90,19 +90,19 @@ QQC2.Popup {
             Layout.fillWidth: true
             columns: 4
             Repeater {
-                model: _private.selectedTrack ? 16 : 0
+                model: _private.selectedChannel ? 16 : 0
                 delegate: Zynthian.PlayGridButton {
                     id: channelDelegate
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                     Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-                    text: _private.selectedTrack.externalMidiChannel === model.index
+                    text: _private.selectedChannel.externalMidiChannel === model.index
                         ? qsTr("Reset to default from %1").arg(model.index + 1)
                         : qsTr("Set to channel %1").arg(model.index + 1)
                     onClicked: {
-                        if (_private.selectedTrack.externalMidiChannel === model.index) {
-                            _private.selectedTrack.externalMidiChannel = -1;
+                        if (_private.selectedChannel.externalMidiChannel === model.index) {
+                            _private.selectedChannel.externalMidiChannel = -1;
                         } else {
-                            _private.selectedTrack.externalMidiChannel = model.index;
+                            _private.selectedChannel.externalMidiChannel = model.index;
                         }
                         root.close();
                     }

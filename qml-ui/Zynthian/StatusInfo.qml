@@ -315,7 +315,7 @@ MouseArea {
                 Layout.preferredHeight: 24
                 source: Qt.resolvedUrl("../../img/metronome.svg")
                 color: "#ffffff"
-                opacity: zynthian.zynthiloops.clickTrackEnabled ? 1.0 : 0.0
+                opacity: zynthian.zynthiloops.clickChannelEnabled ? 1.0 : 0.0
             }
         }
     }
@@ -472,9 +472,9 @@ MouseArea {
                         implicitWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.zynthiloops.clickTrackEnabled
+                        checked: zynthian.zynthiloops.clickChannelEnabled
                         onToggled: {
-                            zynthian.zynthiloops.clickTrackEnabled = checked
+                            zynthian.zynthiloops.clickChannelEnabled = checked
                         }
                     }
                     Item {

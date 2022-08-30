@@ -291,10 +291,10 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 		self.stop_playing()
 
 		if fpath is None:
-			fpath = self.get_current_track_fpath()
+			fpath = self.get_current_channel_fpath()
 		
 		if fpath is None:
-			logging.info("No track to play!")
+			logging.info("No channel to play!")
 			return
 
 		logging.info("STARTING MIDI PLAY '{}' ...".format(fpath))
@@ -379,13 +379,13 @@ class zynthian_gui_midi_recorder(zynthian_gui_selector):
 			self.bpm_zgui_ctrl.plot_value()
 
 
-	def get_current_track_fpath(self):
+	def get_current_channel_fpath(self):
 		if not self.list_data:
 			self.fill_list()
-		#if selected track ...
+		#if selected channel ...
 		if self.list_data[self.index][1]>0:
 			return self.list_data[self.index][0]
-		#return last track if there is one ...
+		#return last channel if there is one ...
 		elif self.list_data[-1][1]>0:
 			return self.list_data[-1][0]
 		#else return None

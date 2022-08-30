@@ -34,7 +34,7 @@ ColumnLayout {
     anchors {
         fill: parent
     }
-    property QtObject selectedClip: tracksList.currentItem && tracksList.currentItem.selectedClip ? tracksList.currentItem.selectedClip : null
+    property QtObject selectedClip: channelsList.currentItem && channelsList.currentItem.selectedClip ? channelsList.currentItem.selectedClip : null
     Kirigami.Heading {
         Layout.fillWidth: true
         text: qsTr("Record Into A Clip");
@@ -45,7 +45,7 @@ ColumnLayout {
         text: qsTr("(not a thing yet - WIP) Recordings from this module will be stored as the contents of a clip selected by you here. Each time you hit record, the existing contents of the clip will be replaced by the new recording.")
     }
     ListView {
-        id: tracksList
+        id: channelsList
         Layout.fillWidth: true
         Layout.fillHeight: true
         clip: true
@@ -55,7 +55,7 @@ ColumnLayout {
             property QtObject selectedClip: contentItem.selectedClip
             contentItem: RowLayout {
                 id: delegate
-                property QtObject track: zynthian.zynthiloops.song.tracksModel.getTrack(index)
+                property QtObject channel: zynthian.zynthiloops.song.channelsModel.getChannel(index)
                 property QtObject selectedClip: null
                 property int thisIndex: index
                 QQC2.Label {
@@ -66,13 +66,13 @@ ColumnLayout {
                 Repeater {
                     model: 10
                     QQC2.Button {
-                        property QtObject clip: delegate.track.clipsModel.getClip(index)
+                        property QtObject clip: delegate.channel.clipsModel.getClip(index)
                         Layout.fillHeight: true
                         text: clip.name
                         checked: ListView.isCurrentItem && delegate.selectedClip === clip
                         onClicked: {
                             delegate.selectedClip = clip;
-                            tracksList.currentIndex = delegate.thisIndex;
+                            channelsList.currentIndex = delegate.thisIndex;
                         }
                     }
                 }

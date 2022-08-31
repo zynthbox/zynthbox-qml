@@ -34,7 +34,7 @@ import '../../Zynthian' 1.0 as Zynthian
 Zynthian.ScreenPage {
     readonly property QtObject copier: zynthian.sketch_copier
     readonly property QtObject session: zynthian.session_dashboard
-    readonly property QtObject curSketch: zynthian.zynthiloops.song
+    readonly property QtObject curSketch: zynthian.sketchpad.song
 
     id: root
 

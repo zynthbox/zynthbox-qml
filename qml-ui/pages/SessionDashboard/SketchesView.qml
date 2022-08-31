@@ -66,7 +66,7 @@ RowLayout {
                     height: root.itemHeight
                     contentItem: RowLayout {
                         QQC2.Label {
-                            text: "1. " + zynthian.zynthiloops.song.name
+                            text: "1. " + zynthian.sketchpad.song.name
                         }
                     }
                     background: Rectangle {

@@ -36,11 +36,11 @@ Zynthian.ScreenPage {
     id: root
 
     property bool isVisible: ["layer", "fixed_layers", "main_layers_view", "layers_for_channel", "bank", "preset"].indexOf(zynthian.current_screen_id) >= 0
-    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     backAction: Kirigami.Action {
         text: qsTr("Back")
-        onTriggered: zynthian.current_screen_id = "zynthiloops"
+        onTriggered: zynthian.current_screen_id = "sketchpad"
     }
     contextualActions: [
         Kirigami.Action {

@@ -114,7 +114,7 @@ class zynthian_gui_keybinding(QObject):
 
 			"SCREEN_MAIN": { "modifier": 0, "keysym": "m" },
 
-			"SCREEN_ZYNTHILOOPS": { "modifier": 0, "keysym": "F1" },
+			"SCREEN_SKETCHPAD": { "modifier": 0, "keysym": "F1" },
 			"SCREEN_PLAYGRID": { "modifier": 0, "keysym": "F2" },
 			"SCREEN_LAYER": { "modifier": 0, "keysym": "F3" },
 			"SCREEN_ARRANGER": { "modifier": 0, "keysym": "F4" },

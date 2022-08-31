@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to for storing channels in ZynthiLoops page
+# A model to for storing channels in Sketchpad page
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

@@ -65,16 +65,16 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 ListView {
                     id: scenesView
-                    model: zynthian.zynthiloops.song.scenesModel
+                    model: zynthian.sketchpad.song.scenesModel
                     delegate: Kirigami.AbstractListItem {
                         separatorVisible: false
                         width: scenesView.width
                         height: root.itemHeight
-                        highlighted: index === zynthian.zynthiloops.song.scenesModel.selectedSketchIndex
+                        highlighted: index === zynthian.sketchpad.song.scenesModel.selectedSketchIndex
                         contentItem: QQC2.Label {
                             text: model.scene.name
                         }
-                        onClicked: zynthian.zynthiloops.song.scenesModel.selectedSketchIndex = index
+                        onClicked: zynthian.sketchpad.song.scenesModel.selectedSketchIndex = index
                     }
                 }
             }
@@ -90,12 +90,12 @@ ColumnLayout {
                 text: qsTr("Channels")
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: zynthian.current_modal_screen_id = "zynthiloops"
+                    onClicked: zynthian.current_modal_screen_id = "sketchpad"
                 }
             }
 
             Repeater {
-                model: zynthian.zynthiloops.song.channelsModel
+                model: zynthian.sketchpad.song.channelsModel
                 delegate: DashboardListItem {
                     width: parent.width
                     patternConnections: index < 6 ? channelSoundConnections : channelPatternConnections

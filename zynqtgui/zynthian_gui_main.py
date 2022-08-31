@@ -77,7 +77,7 @@ class zynthian_gui_main(zynthian_gui_selector):
 
         if self.visibleCategory == "modules":
             # Main Apps
-            self.list_data.append((self.zynthiloops, 0, "Looper"))
+            self.list_data.append((self.sketchpad, 0, "Sketchpad"))
             self.list_metadata.append({"icon":"../../img/clipsview.svg"})
 
             self.list_data.append((self.playgrid, 0, "Playground"))
@@ -145,12 +145,12 @@ class zynthian_gui_main(zynthian_gui_selector):
                         logging.error(e)
 
         if self.visibleCategory == "sessions":
-            for sketch in self.zyngui.zynthiloops.get_sketch_folders():
+            for sketch in self.zyngui.sketchpad.get_sketch_folders():
                 self.list_data.append(("sketch", str(sketch), sketch.stem))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/folder.svg"})
 
         if self.visibleCategory == "sessions-versions":
-            for version in self.zyngui.zynthiloops.get_sketch_versions(self.__selected_sketch_folder__):
+            for version in self.zyngui.sketchpad.get_sketch_versions(self.__selected_sketch_folder__):
                 self.list_data.append(("sketch-version", str(version), version.name.replace(".sketch.json", "")))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/file.svg"})
 
@@ -158,19 +158,19 @@ class zynthian_gui_main(zynthian_gui_selector):
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
-            self.song_recordings_dir = self.zyngui.screens["zynthiloops"].song.sketch_folder + "wav"
+            self.song_recordings_dir = self.zyngui.screens["sketchpad"].song.sketch_folder + "wav"
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             Popen([self.list_data[i][1]])
 
-            # Open zynthiloops after opening appimage to mimic closing of menu after opening an app like other modules in main page
-            QTimer.singleShot(5000, lambda: self.zyngui.show_modal("zynthiloops"))
+            # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
+            QTimer.singleShot(5000, lambda: self.zyngui.show_modal("sketchpad"))
         elif self.list_data[i][0] and self.list_data[i][0] == "sketch":
             self.__selected_sketch_folder__ = self.list_data[i][1]
             self.visibleCategory = "sessions-versions"
         elif self.list_data[i][0] and self.list_data[i][0] == "sketch-version":
-            self.zyngui.zynthiloops.loadSketch(self.list_data[i][1], False)
-            self.zyngui.show_modal("zynthiloops")
+            self.zyngui.sketchpad.loadSketch(self.list_data[i][1], False)
+            self.zyngui.show_modal("sketchpad")
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
             self.last_action()
@@ -294,7 +294,7 @@ class zynthian_gui_main(zynthian_gui_selector):
         return "main"
 
     def back_action(self):
-        return "zynthiloops"
+        return "sketchpad"
 
     def layers(self):
         logging.info("Layers")
@@ -345,9 +345,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("Session")
         self.zyngui.show_modal("session_dashboard")
 
-    def zynthiloops(self):
-        logging.info("ZynthiLoops")
-        self.zyngui.show_modal("zynthiloops")
+    def sketchpad(self):
+        logging.info("Sketchpad")
+        self.zyngui.show_modal("sketchpad")
 
     def alsa_mixer(self):
         logging.info("ALSA Mixer")

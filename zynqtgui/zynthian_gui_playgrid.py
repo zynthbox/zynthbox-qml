@@ -41,7 +41,7 @@ from zyngine import zynthian_controller
 from . import zynthian_qt_gui_base
 from . import zynthian_gui_config
 from . import zynthian_gui_controller
-from .zynthiloops import zynthian_gui_zynthiloops
+from .sketchpad import zynthian_gui_sketchpad
 
 class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
@@ -50,7 +50,7 @@ class zynthian_gui_playgrid(zynthian_qt_gui_base.ZynGui):
 
     def __init__(self, parent=None):
         super(zynthian_gui_playgrid, self).__init__(parent)
-        zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.screens["zynthiloops"]
+        zynthian_gui_playgrid.__metronome_manager__: zynthian_gui_sketchpad = self.zyngui.screens["sketchpad"]
         self.__zselector = [None, None, None, None]
         self.__zselector_ctrl = [None, None, None, None]
         self.__bigknob_value__ = 0

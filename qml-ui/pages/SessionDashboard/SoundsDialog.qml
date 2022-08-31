@@ -34,7 +34,7 @@ import JuceGraphics 1.0
 
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
-import "../ZynthiLoops" as ZynthiLoops
+import "../Sketchpad" as Sketchpad
 
 
 QQC2.Dialog {
@@ -42,7 +42,7 @@ QQC2.Dialog {
 
     /* Disable Sounds Dialog as it is not used anymore
 
-    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
     property var chainedSoundsArr: selectedChannel ? selectedChannel.chainedSounds.slice() : []
 //     property var chainColors: ({
 //         t1: "#e6194B",
@@ -126,7 +126,7 @@ QQC2.Dialog {
 //                soundsDialog.selectedChannel.chainedSounds = [-1,-1,-1,-1, -1]
                 soundsDialog.selectedChannel.clearChainedSoundsWithoutCloning();
 //                if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+//                    var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
 //                    seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
 //                }
                 soundsDialog.accept();
@@ -267,9 +267,9 @@ QQC2.Dialog {
 //                                    }
 //                                }
 
-                                for (var i=0; i<zynthian.zynthiloops.song.channelsModel.count; i++) {
+                                for (var i=0; i<zynthian.sketchpad.song.channelsModel.count; i++) {
                                     var found = false;
-                                    var channel = zynthian.zynthiloops.song.channelsModel.getChannel(i);
+                                    var channel = zynthian.sketchpad.song.channelsModel.getChannel(i);
                                     var chains = zynthian.layer.chainForLayer(i);
 
                                     // console.log("Channel T"+(parseInt(k)+1))
@@ -314,7 +314,7 @@ QQC2.Dialog {
                         soundsDialog.selectedChannel.selectSound(index);
 
                         if (soundsDialog.selectedChannel.connectedPattern >= 0) {
-                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
+                            var seq = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName).getByPart(soundsDialog.selectedChannel.id, soundsDialog.selectedChannel.selectedPart);
                             seq.midiChannel = soundsDialog.selectedChannel.connectedSound;
                         }
 
@@ -366,7 +366,7 @@ QQC2.Dialog {
                         anchors.margins: Kirigami.Units.gridUnit*0.5
 
                         Repeater {
-                            model: zynthian.zynthiloops.song.channelsModel
+                            model: zynthian.sketchpad.song.channelsModel
                             delegate: QQC2.Label {
                                 font.pointSize: 10
                                 text: model.channel.name

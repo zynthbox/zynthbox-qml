@@ -27,7 +27,7 @@ from pathlib import Path
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, QObject, Qt, Property, Signal, Slot
 
-from zynqtgui.zynthiloops.libzl.zynthiloops_song import zynthiloops_song
+from zynqtgui.sketchpad.sketchpad_song import sketchpad_song
 
 
 class session_dashboard_session_sketches_model(QAbstractListModel):
@@ -90,7 +90,7 @@ class session_dashboard_session_sketches_model(QAbstractListModel):
             self.__sketches__[slot] = sketch
         else:
             sketch_path = Path(sketch)
-            self.__sketches__[slot] = zynthiloops_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self.__session_dashboard__.zyngui.zynthiloops)
+            self.__sketches__[slot] = sketchpad_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem), self.__session_dashboard__.zyngui.sketchpad)
             logging.debug(f"Session add sketch : {slot}, {sketch_path}, {self.__sketches__[slot]}")
 
         self.endInsertRows()

@@ -74,7 +74,7 @@ from zynqtgui.utils import file_properties_helper
 from zynqtgui.zynthian_gui_audio_settings import zynthian_gui_audio_settings
 from zynqtgui.zynthian_gui_led_config import zynthian_gui_led_config
 from zynqtgui.zynthian_gui_wifi_settings import zynthian_gui_wifi_settings
-from zynqtgui.zynthiloops.libzl import libzl
+from zynqtgui.sketchpad.libzl import libzl
 
 sys.path.insert(1, "/zynthian/zynthian-ui/")
 sys.path.insert(1, "./zynqtgui")
@@ -134,8 +134,8 @@ from zynqtgui.zynthian_gui_test_touchpoints import (
     zynthian_gui_test_touchpoints,
 )
 from zynqtgui.zynthian_gui_playgrid import zynthian_gui_playgrid
-from zynqtgui.zynthiloops.zynthian_gui_zynthiloops import (
-    zynthian_gui_zynthiloops,
+from zynqtgui.sketchpad.zynthian_gui_sketchpad import (
+    zynthian_gui_sketchpad,
 )
 
 # if "autoeq" in zynthian_gui_config.experimental_features:
@@ -348,7 +348,7 @@ class zynthian_gui(QObject):
 
     screens_sequence = (
         #"session_dashboard",  #FIXME or main? make this more configurable?
-        "zynthiloops",
+        "sketchpad",
         "layers_for_channel",
         "bank",
         "preset",
@@ -358,7 +358,7 @@ class zynthian_gui(QObject):
     )
     non_modal_screens = (
         #"session_dashboard",  #FIXME or main? make this more configurable?
-        "zynthiloops",
+        "sketchpad",
         "main",
         "layer",
         "fixed_layers",
@@ -449,7 +449,7 @@ class zynthian_gui(QObject):
 
         self.zynmidi = None
         self.screens = {}
-        self.__home_screen = "zynthiloops" #TODO: make this configurable, put same in static screens_sequence
+        self.__home_screen = "sketchpad" #TODO: make this configurable, put same in static screens_sequence
         self.active_screen = None
         self.modal_screen = None
         self.modal_screen_back = None
@@ -491,7 +491,7 @@ class zynthian_gui(QObject):
         # It will also allow us to be in sync with metronome when metronome is running
         self.wsleds_blink_timer = QTimer()
         # Set a random interval when initializing
-        # Will be updated by zynthiloops when bpm is set or changes
+        # Will be updated by sketchpad when bpm is set or changes
         self.wsleds_blink_timer.setInterval(500)
         self.wsleds_blink_timer.setSingleShot(False)
         self.wsleds_blink_timer.timeout.connect(self.increment_blink_count)
@@ -704,7 +704,7 @@ class zynthian_gui(QObject):
         # FIXME : Sometimes when this method is called, the value of zselector is 0
         #         which is causing division by zero error.
 
-        song = self.zynthiloops.song
+        song = self.sketchpad.song
         bpm = int(bpm)
         if song is not None and song.bpm != bpm:
             song.bpm = bpm
@@ -874,7 +874,7 @@ class zynthian_gui(QObject):
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
             else:
-                song = self.zynthiloops.song
+                song = self.sketchpad.song
                 if song is not None:
                     value = song.bpm
                     min_value = 50
@@ -1047,7 +1047,7 @@ class zynthian_gui(QObject):
     def set_song_bar_active(self, isActive):
         if self.song_bar_active != isActive:
             self.song_bar_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.songBarActiveChanged.emit()
 
     songBarActiveChanged = Signal()
@@ -1060,7 +1060,7 @@ class zynthian_gui(QObject):
     def set_sound_combinator_active(self, isActive):
         if self.sound_combinator_active != isActive:
             self.sound_combinator_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.soundCombinatorActiveChanged.emit()
 
     soundCombinatorActiveChanged = Signal()
@@ -1074,7 +1074,7 @@ class zynthian_gui(QObject):
     def set_channel_wave_editor_bar_active(self, isActive):
         if self.channel_wave_editor_bar_active != isActive:
             self.channel_wave_editor_bar_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.channelWaveEditorBarActiveChanged.emit()
 
     channelWaveEditorBarActiveChanged = Signal()
@@ -1088,7 +1088,7 @@ class zynthian_gui(QObject):
     def set_channel_samples_bar_active(self, isActive):
         if self.channel_samples_bar_active != isActive:
             self.channel_samples_bar_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.channelSamplesBarActiveChanged.emit()
 
     channelSamplesBarActiveChanged = Signal()
@@ -1102,7 +1102,7 @@ class zynthian_gui(QObject):
     def set_clip_wave_editor_bar_active(self, isActive):
         if self.clip_wave_editor_bar_active != isActive:
             self.clip_wave_editor_bar_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.clipWaveEditorBarActiveChanged.emit()
 
     clipWaveEditorBarActiveChanged = Signal()
@@ -1116,7 +1116,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_channel_active(self, isActive):
         if self.slots_bar_channel_active != isActive:
             self.slots_bar_channel_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarChannelActiveChanged.emit()
 
     slotsBarChannelActiveChanged = Signal()
@@ -1130,7 +1130,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_mixer_active(self, isActive):
         if self.slots_bar_mixer_active != isActive:
             self.slots_bar_mixer_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarMixerActiveChanged.emit()
 
     slotsBarMixerActiveChanged = Signal()
@@ -1144,7 +1144,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_part_active(self, isActive):
         if self.slots_bar_part_active != isActive:
             self.slots_bar_part_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarPartActiveChanged.emit()
 
     slotsBarPartActiveChanged = Signal()
@@ -1157,7 +1157,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_synths_active(self, isActive):
         if self.slots_bar_synths_active != isActive:
             self.slots_bar_synths_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarSynthsActiveChanged.emit()
 
     slotsBarSynthsActiveChanged = Signal()
@@ -1171,7 +1171,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_samples_active(self, isActive):
         if self.slots_bar_samples_active != isActive:
             self.slots_bar_samples_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarSamplesActiveChanged.emit()
 
     slotsBarSamplesActiveChanged = Signal()
@@ -1185,7 +1185,7 @@ class zynthian_gui(QObject):
     def set_slots_bar_fx_active(self, isActive):
         if self.slots_bar_fx_active != isActive:
             self.slots_bar_fx_active = isActive
-            self.screens["zynthiloops"].set_selector()
+            self.screens["sketchpad"].set_selector()
             self.slotsBarFxActiveChanged.emit()
 
     slotsBarFxActiveChanged = Signal()
@@ -1374,9 +1374,9 @@ class zynthian_gui(QObject):
 
         self.zynautoconnect(True)
 
-        if self.zynthiloops.song is not None:
-            for i in range(0, self.zynthiloops.song.channelsModel.count):
-                channel = self.zynthiloops.song.channelsModel.getChannel(i)
+        if self.sketchpad.song is not None:
+            for i in range(0, self.sketchpad.song.channelsModel.count):
+                channel = self.sketchpad.song.channelsModel.getChannel(i)
                 channel.update_jack_port()
 
     # ---------------------------------------------------------------------------
@@ -1502,19 +1502,19 @@ class zynthian_gui(QObject):
         self.screens["test_touchpoints"] = zynthian_gui_test_touchpoints(self)
 
         ###
-        # ZynthiLoops depends on master_alsa_mixer screen for master volume related functionalities
+        # Sketchpad depends on master_alsa_mixer screen for master volume related functionalities
         # and hence needs to be initialized before ZL page has been initialized
         ###
         self.screens["master_alsa_mixer"] = zynthian_gui_master_alsa_mixer(self)
 
-        self.screens["zynthiloops"] = zynthian_gui_zynthiloops(self)
+        self.screens["sketchpad"] = zynthian_gui_sketchpad(self)
 
         ###
         # Session Dashboard depends on ZL to load sketches and hence needs to be initialized after ZL page
         ###
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
         ###
-        # Fixed layers depends on zynthiloops and session_dashboard screens and hence needs to be initialized
+        # Fixed layers depends on sketchpad and session_dashboard screens and hence needs to be initialized
         # after those 2 pages
         ###
         self.screens["layers_for_channel"] = zynthian_gui_layers_for_channel(self)
@@ -1535,7 +1535,7 @@ class zynthian_gui(QObject):
         self.screens["sketch_downloader"] = zynthian_gui_newstuff(self)
 
         ###
-        # Playgrid depends on zynthiloops screen for metronome related functionalities
+        # Playgrid depends on sketchpad screen for metronome related functionalities
         # and hence needs to be initialized after ZL page has been initialized
         # TODO Make the metronome independant of ZL and more generic
         ###
@@ -2107,13 +2107,13 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCENE_UP":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex = max(0, self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex - 1)
+                self.screens["sketchpad"].song.scenesModel.selectedSketchIndex = max(0, self.screens["sketchpad"].song.scenesModel.selectedSketchIndex - 1)
             except:
                 pass
 
         elif cuia == "SCENE_DOWN":
             try:
-                self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex = min(self.screens["zynthiloops"].song.scenesModel.count - 1, self.screens["zynthiloops"].song.scenesModel.selectedSketchIndex + 1)
+                self.screens["sketchpad"].song.scenesModel.selectedSketchIndex = min(self.screens["sketchpad"].song.scenesModel.count - 1, self.screens["sketchpad"].song.scenesModel.selectedSketchIndex + 1)
             except:
                 pass
 
@@ -2183,8 +2183,8 @@ class zynthian_gui(QObject):
         elif cuia == "SCREEN_CONTROL":
             self.show_screen("control")
 
-        elif cuia == "SCREEN_ZYNTHILOOPS":
-            self.show_screen("zynthiloops")
+        elif cuia == "SCREEN_SKETCHPAD":
+            self.show_screen("sketchpad")
 
         elif cuia == "SCREEN_ARRANGER":
             self.show_modal("song_arranger")
@@ -2258,7 +2258,7 @@ class zynthian_gui(QObject):
             self.miniPlayGridToggle.emit()
 
         elif cuia == "ZL_PLAY":
-            zl = self.screens["zynthiloops"]
+            zl = self.screens["sketchpad"]
 
             # Toggle play/stop with play CUIA action
             if not zl.isMetronomeRunning:
@@ -2270,7 +2270,7 @@ class zynthian_gui(QObject):
 
         elif cuia == "START_RECORD":
             if self.recording_popup_active or self.altButtonPressed:
-                zl = self.screens["zynthiloops"]
+                zl = self.screens["sketchpad"]
                 if not zl.isRecording:
                     # No clips are currently being recorded
                     logging.info("CUIA Start Recording")
@@ -2300,7 +2300,7 @@ class zynthian_gui(QObject):
             logging.debug(f'self.channels_mod_active({self.channels_mod_active})')
 
         elif cuia == "SWITCH_METRONOME_SHORT" or cuia == "SWITCH_METRONOME_BOLD":
-            self.screens["zynthiloops"].clickChannelEnabled = not self.screens["zynthiloops"].clickChannelEnabled
+            self.screens["sketchpad"].clickChannelEnabled = not self.screens["sketchpad"].clickChannelEnabled
 
     def custom_switch_ui_action(self, i, t):
         try:
@@ -2923,7 +2923,7 @@ class zynthian_gui(QObject):
                 else:
                     if self.globalPopupOpened or self.altButtonPressed:
                         # When global popup is open, set song bpm with big knob
-                        if self.__zselector[0] and self.zynthiloops.song is not None:
+                        if self.__zselector[0] and self.sketchpad.song is not None:
                             self.__zselector[0].read_zyncoder()
                             QMetaObject.invokeMethod(self, "zyncoder_set_bpm", Qt.QueuedConnection)
 
@@ -3859,8 +3859,8 @@ class zynthian_gui(QObject):
         return self.screens["miniplaygrid"]
 
     @Property(QObject, constant=True)
-    def zynthiloops(self):
-        return self.screens["zynthiloops"]
+    def sketchpad(self):
+        return self.screens["sketchpad"]
 
     @Property(QObject, constant=True)
     def audio_settings(self):

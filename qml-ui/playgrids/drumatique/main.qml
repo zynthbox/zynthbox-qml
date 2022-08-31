@@ -296,7 +296,7 @@ Zynthian.BasePlayGrid {
         var patternObject = _private.sequence.get(patternIndex);
         if (patternObject.channelIndex > -1 && patternObject.partIndex > -1) {
             zynthian.session_dashboard.selectedChannel = patternObject.channelIndex;
-            var channel = zynthian.zynthiloops.song.channelsModel.getChannel(patternObject.channelIndex);
+            var channel = zynthian.sketchpad.song.channelsModel.getChannel(patternObject.channelIndex);
             channel.selectedPart = patternObject.partIndex;
         }
     }
@@ -330,7 +330,7 @@ Zynthian.BasePlayGrid {
         property var activeBar: sequence && sequence.activePatternObject ? sequence.activePatternObject.activeBar : -1
         property int bankOffset: sequence && sequence.activePatternObject ? sequence.activePatternObject.bankOffset : 0
         property string bankName: sequence && sequence.activePatternObject ? sequence.activePatternObject.bank : "?"
-        property string sceneName: zynthian.zynthiloops.song.scenesModel.selectedSketchName
+        property string sceneName: zynthian.sketchpad.song.scenesModel.selectedSketchName
         property QtObject associatedChannel;
         property int associatedChannelIndex;
 
@@ -343,7 +343,7 @@ Zynthian.BasePlayGrid {
             interval: 1;
             onTriggered: {
                 if (_private.activePatternModel) {
-                    _private.associatedChannel = zynthian.zynthiloops.song.channelsModel.getChannel(_private.activePatternModel.channelIndex);
+                    _private.associatedChannel = zynthian.sketchpad.song.channelsModel.getChannel(_private.activePatternModel.channelIndex);
                     _private.associatedChannelIndex =  _private.activePatternModel.channelIndex;
                 } else {
                     _private.updateChannel();
@@ -351,7 +351,7 @@ Zynthian.BasePlayGrid {
             }
         }
 
-        property QtObject currentChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+        property QtObject currentChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
         property string currentSoundName: {
             var text = "(no sound)";
             if (_private.currentChannel) {
@@ -459,7 +459,7 @@ Zynthian.BasePlayGrid {
         }
         function adoptSequence() {
             console.log("Adopting the scene sequence");
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName);
             if (_private.sequence != sequence) {
                 console.log("Scene has changed, switch places!");
                 _private.sequence = sequence;
@@ -470,7 +470,7 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: zynthian.zynthiloops.song.channelsModel
+        target: zynthian.sketchpad.song.channelsModel
         onConnectedSoundsCountChanged: _private.updateChannel()
         onConnectedPatternsCountChanged: _private.updateChannel()
     }
@@ -480,14 +480,14 @@ Zynthian.BasePlayGrid {
         onConnectedSoundChanged: _private.updateChannel()
     }
     Connections {
-        target: zynthian.zynthiloops
+        target: zynthian.sketchpad
         onSongChanged: {
             _private.adoptSequence();
             _private.updateChannel();
         }
     }
     Connections {
-        target: zynthian.zynthiloops.song.scenesModel
+        target: zynthian.sketchpad.song.scenesModel
         onSelectedSketchNameChanged: Qt.callLater(_private.adoptSequence) // Makes scene change look smoother
     }
     // on component completed
@@ -507,8 +507,8 @@ Zynthian.BasePlayGrid {
             if (component.dashboardModel === model) {
                 _private.sequence.activePattern = index;
                 var foundIndex = -1;
-                for(var i = 0; i < zynthian.zynthiloops.song.channelsModel.count; ++i) {
-                    var channel = zynthian.zynthiloops.song.channelsModel.getChannel(i);
+                for(var i = 0; i < zynthian.sketchpad.song.channelsModel.count; ++i) {
+                    var channel = zynthian.sketchpad.song.channelsModel.getChannel(i);
                     if (channel && channel.connectedPattern === index) {
                         foundIndex = i;
                         break;
@@ -1102,7 +1102,7 @@ Zynthian.BasePlayGrid {
                                     onCurrentMidiChannelChanged: sequenderPadNoteApplicator.restart();
                                 }
                                 Connections {
-                                    target: zynthian.zynthiloops
+                                    target: zynthian.sketchpad
                                     onSongChanged: sequenderPadNoteApplicator.restart();
                                 }
                             }
@@ -1397,7 +1397,7 @@ Zynthian.BasePlayGrid {
                                 property int thisPatternIndex: _private.sequence ? _private.sequence.indexOf(thisPattern) : -1
                                 property int activePattern: _private.activePattern
                                 property QtObject channelClipsModel: associatedChannel == null ? null : associatedChannel.clipsModel
-                                property QtObject associatedChannel: zynthian.zynthiloops.song && zynthian.zynthiloops.song.channelsModel ? zynthian.zynthiloops.song.channelsModel.getChannel(model.index) : null
+                                property QtObject associatedChannel: zynthian.sketchpad.song && zynthian.sketchpad.song.channelsModel ? zynthian.sketchpad.song.channelsModel.getChannel(model.index) : null
                                 property int associatedChannelIndex: model.index
                                 height: ListView.view.height * 0.2
                                 width: ListView.view.width - patternsMenuList.QQC2.ScrollBar.vertical.width - Kirigami.Units.smallSpacing
@@ -1449,7 +1449,7 @@ Zynthian.BasePlayGrid {
                                                     icon.name: "player-volume"
                                                     onClicked: {
                                                         if (_private.sequence && _private.sequence.soloPattern === -1) {
-                                                            var associatedClip = patternsMenuItem.associatedChannel.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
+                                                            var associatedClip = patternsMenuItem.associatedChannel.getClipsModelByPart(patternsMenuItem.thisPattern.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex);
                                                             // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                             associatedClip.enabled = !patternsMenuItem.thisPattern.enabled
                                                         }
@@ -1833,7 +1833,7 @@ Zynthian.BasePlayGrid {
                 x: Math.round(parent.width/2 - width/2)
                 y: Math.round(parent.height/2 - height/2)
                 property int associatedChannelIndex: -1
-                property QtObject associatedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(partPicker.associatedChannelIndex)
+                property QtObject associatedChannel: zynthian.sketchpad.song.channelsModel.getChannel(partPicker.associatedChannelIndex)
                 ColumnLayout {
                     anchors.fill: parent
                     implicitWidth: Kirigami.Units.gridUnit * 30
@@ -1870,7 +1870,7 @@ Zynthian.BasePlayGrid {
                                         icon.name: "player-volume"
                                         onClicked: {
                                             if (partDelegate.pattern.sequence && partDelegate.pattern.sequence.soloPattern === -1) {
-                                                var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
+                                                var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex);
                                                 // Seems slightly backwards, but tapping a bunch of times really super fast and you'd end up with something a bit odd and unexpected, so might as well not cause that
                                                 associatedClip.enabled = !partDelegate.pattern.enabled
                                             }
@@ -1892,7 +1892,7 @@ Zynthian.BasePlayGrid {
                                     readonly property var partNames: ["a", "b", "c", "d", "e"]
                                     text: qsTr("Pick Part %1%2").arg(partPicker.associatedChannelIndex + 1).arg(partNames[model.index])
                                     onClicked: {
-                                        var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex);
+                                        var associatedClip = partPicker.associatedChannel.getClipsModelByPart(partDelegate.pattern.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex);
                                         if (associatedClip.enabled) {
                                             partPicker.associatedChannel.selectedPart = model.index;
                                         } else {

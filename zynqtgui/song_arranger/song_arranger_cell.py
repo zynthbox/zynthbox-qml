@@ -1,9 +1,7 @@
-import logging
-
 from PySide2.QtCore import Property, QObject, Signal
 
-from zynqtgui.zynthiloops import zynthian_gui_zynthiloops
-from zynqtgui.zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
+from zynqtgui.sketchpad import zynthian_gui_sketchpad
+from zynqtgui.sketchpad.sketchpad_clip import sketchpad_clip
 
 
 class song_arranger_cell(QObject):
@@ -11,8 +9,8 @@ class song_arranger_cell(QObject):
         super(song_arranger_cell, self).__init__(channel)
 
         self.__bar__ = bar
-        self.__zl_clip__: zynthiloops_clip = None
-        self.__metronome_manager__: zynthian_gui_zynthiloops = metronome_manager
+        self.__zl_clip__: sketchpad_clip = None
+        self.__metronome_manager__: zynthian_gui_sketchpad = metronome_manager
         self.__is_playing__ = False
         self.__channel__ = channel
         self.__arranger__ = arranger
@@ -28,7 +26,7 @@ class song_arranger_cell(QObject):
     ### Property zlClip
     def get_zl_clip(self):
         return self.__zl_clip__
-    def set_zl_clip(self, clip: zynthiloops_clip):
+    def set_zl_clip(self, clip: sketchpad_clip):
         if clip is not None:
             clip.add_arranger_bar_position(self.__bar__)
         else:

@@ -52,7 +52,7 @@ Zynthian.BasePlayGrid {
 
     QtObject {
         id: _private
-        property QtObject currentSequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
+        property QtObject currentSequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName)
         property QtObject alternativeModel: currentSequence && currentSequence.activePatternObject && currentSequence.activePatternObject.noteDestination == ZynQuick.PatternModel.SampleSlicedDestination
             ? currentSequence.activePatternObject.clipSliceNotes
             : null
@@ -230,7 +230,7 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: zynthian.zynthiloops.song
+        target: zynthian.sketchpad.song
         onSelected_scale_index_changed: {
             populateStartNotesTimer.restart();
         }
@@ -239,7 +239,7 @@ Zynthian.BasePlayGrid {
         }
     }
     Connections {
-        target: zynthian.zynthiloops
+        target: zynthian.sketchpad
         onSongChanged: {
             populateStartNotesTimer.restart();
         }
@@ -250,9 +250,9 @@ Zynthian.BasePlayGrid {
         interval: 1; repeat: false; running: false;
         onTriggered: {
             // The logical octave is basically -1 indexed, because we go with 60 == C4 (in turn meaning that midi note 0 == C-1)
-            var songOctave = zynthian.zynthiloops.song.octave;
+            var songOctave = zynthian.sketchpad.song.octave;
             // The index here is really an offset in an array, but also it's equivalent to the notes from C through F inside one octave
-            var songScale = zynthian.zynthiloops.song.selectedScaleIndex;
+            var songScale = zynthian.sketchpad.song.selectedScaleIndex;
             var rootNote = (12 * (songOctave + 1)) + songScale;
             //console.log("Filling start notes with root note", rootNote, "based on song octave", songOctave, "and scale", songScale);
             component.populateStartNotes(rootNote);

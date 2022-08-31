@@ -37,7 +37,7 @@ Zynthian.ScreenPage {
         Kirigami.Heading {
             text: "Knob speed for lists"
         }
-        Zynthian.ZynthiloopsMultiSwitch {
+        Zynthian.SketchpadMultiSwitch {
             implicitWidth: 300
             implicitHeight: 300
             from: 0

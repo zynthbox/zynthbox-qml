@@ -547,7 +547,7 @@ def audio_autoconnect(force=False):
 
 	# Connect each channel's ports to either that channel's effects inputs ports, or to the system playback ports, depending on whether there are any effects for the channel
 	# If there's no song yet, we can't do a lot...
-	song = zynthian_gui_config.zyngui.screens["zynthiloops"].song
+	song = zynthian_gui_config.zyngui.screens["sketchpad"].song
 	if not song:
 		pass
 	else:
@@ -691,11 +691,11 @@ def audio_autoconnect(force=False):
 
 	### Connect synth engines to global effects
 	try:
-		if zynthian_gui_config.zyngui.zynthiloops.song:
+		if zynthian_gui_config.zyngui.sketchpad.song:
 			for midi_channel in zynthian_gui_config.zyngui.layer.layer_midi_map:
 				synth_engine = zynthian_gui_config.zyngui.layer.layer_midi_map[midi_channel]
 				for channel_index in range(0, 10):
-					channel = zynthian_gui_config.zyngui.zynthiloops.song.channelsModel.getChannel(channel_index)
+					channel = zynthian_gui_config.zyngui.sketchpad.song.channelsModel.getChannel(channel_index)
 
 					# Find which channel midichannel belongs to
 					if channel is not None and midi_channel in channel.chainedSounds:
@@ -820,9 +820,9 @@ def audio_autoconnect(force=False):
 					pass
 
 		# Connect to AudioLevels client
-		audiolevels_out = jclient.get_ports("zynthiloops_audio_levels_client:playback_port_", is_input=True, is_audio=True)
-		audiolevels_connected_ports_1 = jclient.get_all_connections("zynthiloops_audio_levels_client:playback_port_a")
-		audiolevels_connected_ports_2 = jclient.get_all_connections("zynthiloops_audio_levels_client:playback_port_b")
+		audiolevels_out = jclient.get_ports("sketchpad_audio_levels_client:playback_port_", is_input=True, is_audio=True)
+		audiolevels_connected_ports_1 = jclient.get_all_connections("sketchpad_audio_levels_client:playback_port_a")
+		audiolevels_connected_ports_2 = jclient.get_all_connections("sketchpad_audio_levels_client:playback_port_b")
 		# Disconnect ports (that is, any that aren't connected to the system playback ports)
 		for connected_port in audiolevels_connected_ports_1:
 			if connected_port in sysout_conports_1:

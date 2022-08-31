@@ -35,8 +35,8 @@ import Zynthian 1.0 as Zynthian
 Zynthian.ScreenPage {
     id: root
 
-    readonly property QtObject song: zynthian.zynthiloops.song
-    property QtObject selectedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
+    readonly property QtObject song: zynthian.sketchpad.song
+    property QtObject selectedChannel: zynthian.sketchpad.song.channelsModel.getChannel(zynthian.session_dashboard.selectedChannel)
 
     backAction: null
     contextualActions: [
@@ -52,7 +52,7 @@ Zynthian.ScreenPage {
                         fileNameDialog.fileName = "Sketch-1";
                         fileNameDialog.open();
                     } else {
-                        zynthian.zynthiloops.saveSketch();
+                        zynthian.sketchpad.saveSketch();
                     }
                 }
             }
@@ -84,7 +84,7 @@ Zynthian.ScreenPage {
             Kirigami.Action {
                 text: qsTr("New Sketch")
                 onTriggered: {
-                    zynthian.zynthiloops.newSketch()
+                    zynthian.sketchpad.newSketch()
                 }
             }
         },
@@ -157,12 +157,12 @@ Zynthian.ScreenPage {
             onTriggered: {
                 if (fileNameDialog.dialogType == "savecopy"
                     && fileNameDialog.fileName.length > 0
-                    && zynthian.zynthiloops.sketchExists(fileNameDialog.fileName)) {
+                    && zynthian.sketchpad.sketchExists(fileNameDialog.fileName)) {
                     // Sketch with name already exists
                     fileNameDialog.conflict = true;
                 } else if (fileNameDialog.dialogType === "saveas"
                            && fileNameDialog.fileName.length > 0
-                           && zynthian.zynthiloops.versionExists(fileNameDialog.fileName)) {
+                           && zynthian.sketchpad.versionExists(fileNameDialog.fileName)) {
                     fileNameDialog.conflict = true;
                 } else {
                     fileNameDialog.conflict = false;
@@ -174,12 +174,12 @@ Zynthian.ScreenPage {
             console.log("Accepted")
 
             if (dialogType === "save") {
-                zynthian.zynthiloops.createSketch(fileNameDialog.fileName)
+                zynthian.sketchpad.createSketch(fileNameDialog.fileName)
             } else if (dialogType === "saveas") {
                 root.song.name = fileNameDialog.fileName;
-                zynthian.zynthiloops.saveSketch();
+                zynthian.sketchpad.saveSketch();
             } else if (dialogType === "savecopy") {
-                zynthian.zynthiloops.saveCopy(fileNameDialog.fileName);
+                zynthian.sketchpad.saveCopy(fileNameDialog.fileName);
             }
         }
         onRejected: {
@@ -198,7 +198,7 @@ Zynthian.ScreenPage {
         }
         onFileSelected: {
             console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
-            zynthian.zynthiloops.loadSketch(file.filePath)
+            zynthian.sketchpad.loadSketch(file.filePath)
         }
     }
 
@@ -255,7 +255,7 @@ Zynthian.ScreenPage {
             Kirigami.Heading {
                 id: sketchHeader
                 Layout.alignment: Qt.AlignCenter
-                text: zynthian.zynthiloops.song.name
+                text: zynthian.sketchpad.song.name
             }
             Item {
                 Layout.fillWidth: true
@@ -301,9 +301,9 @@ Zynthian.ScreenPage {
                         Layout.preferredHeight: Kirigami.Units.gridUnit*2
                         Layout.alignment: Qt.AlignCenter
                         checkable: true
-                        checked: zynthian.zynthiloops.clickChannelEnabled
+                        checked: zynthian.sketchpad.clickChannelEnabled
                         onToggled: {
-                            zynthian.zynthiloops.clickChannelEnabled = checked
+                            zynthian.sketchpad.clickChannelEnabled = checked
                         }
                         
                         Kirigami.Icon {
@@ -319,8 +319,8 @@ Zynthian.ScreenPage {
                         Layout.alignment: Qt.AlignCenter
                         font.pointSize: 12
                         text: qsTr("%1 x Sounds | %2 x Midi")
-                        .arg(15 - zynthian.zynthiloops.song.channelsModel.connectedSoundsCount)
-                        .arg(5 - zynthian.zynthiloops.song.channelsModel.connectedPatternsCount)
+                        .arg(15 - zynthian.sketchpad.song.channelsModel.connectedSoundsCount)
+                        .arg(5 - zynthian.sketchpad.song.channelsModel.connectedPatternsCount)
                     }
 
                     Kirigami.Heading {

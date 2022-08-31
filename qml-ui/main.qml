@@ -33,14 +33,14 @@ import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 import "pages" as Pages
 import "pages/SessionDashboard" as SessionDashboard
-import "pages/ZynthiLoops" as Zynthiloops
+import "pages/Sketchpad" as Sketchpad
 
 Kirigami.AbstractApplicationWindow {
     id: root
 
     readonly property PageScreenMapping pageScreenMapping: PageScreenMapping {}
     readonly property Item currentPage: {
-        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "zynthiloops") {
+        if (zynthian.current_screen_id === "main" || zynthian.current_screen_id === "sketchpad") {
             return dashboardLayer.currentItem;
         } else if (modalScreensLayer.depth > 0) {
             return modalScreensLayer.currentItem;
@@ -51,16 +51,16 @@ Kirigami.AbstractApplicationWindow {
     readonly property Item playGrids: playGridsRepeater
     property bool headerVisible: true
     property var channels: [
-        zynthian.zynthiloops.song.channelsModel.getChannel(0),
-        zynthian.zynthiloops.song.channelsModel.getChannel(1),
-        zynthian.zynthiloops.song.channelsModel.getChannel(2),
-        zynthian.zynthiloops.song.channelsModel.getChannel(3),
-        zynthian.zynthiloops.song.channelsModel.getChannel(4),
-        zynthian.zynthiloops.song.channelsModel.getChannel(5),
-        zynthian.zynthiloops.song.channelsModel.getChannel(6),
-        zynthian.zynthiloops.song.channelsModel.getChannel(7),
-        zynthian.zynthiloops.song.channelsModel.getChannel(8),
-        zynthian.zynthiloops.song.channelsModel.getChannel(9),
+        zynthian.sketchpad.song.channelsModel.getChannel(0),
+        zynthian.sketchpad.song.channelsModel.getChannel(1),
+        zynthian.sketchpad.song.channelsModel.getChannel(2),
+        zynthian.sketchpad.song.channelsModel.getChannel(3),
+        zynthian.sketchpad.song.channelsModel.getChannel(4),
+        zynthian.sketchpad.song.channelsModel.getChannel(5),
+        zynthian.sketchpad.song.channelsModel.getChannel(6),
+        zynthian.sketchpad.song.channelsModel.getChannel(7),
+        zynthian.sketchpad.song.channelsModel.getChannel(8),
+        zynthian.sketchpad.song.channelsModel.getChannel(9),
     ]
     property QtObject selectedChannel: {
         return root.channels[0]
@@ -92,7 +92,7 @@ Kirigami.AbstractApplicationWindow {
         return result;
     }
 
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -127,8 +127,8 @@ Kirigami.AbstractApplicationWindow {
             icon.color: customTheme.Kirigami.Theme.textColor
             padding: Kirigami.Units.largeSpacing*1.5
             rightPadding: Kirigami.Units.largeSpacing*1.5
-            property string oldPage: "zynthiloops"
-            property string oldModalPage: "zynthiloops"
+            property string oldPage: "sketchpad"
+            property string oldModalPage: "sketchpad"
             onClicked: {
                 if (zynthian.current_screen_id === 'main') {
                     if (oldModalPage !== "") {
@@ -151,16 +151,16 @@ Kirigami.AbstractApplicationWindow {
         }
         Zynthian.BreadcrumbButton {
             id: homeButton
-            text: zynthian.zynthiloops.song.name
+            text: zynthian.sketchpad.song.name
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             padding: Kirigami.Units.largeSpacing*1.5
             rightPadding: Kirigami.Units.largeSpacing*1.5
             onClicked: {
-                zynthian.current_modal_screen_id = 'zynthiloops'
-                // print(zynthian.zynthiloops.song.scenesModel.getScene(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex).name)
+                zynthian.current_modal_screen_id = 'sketchpad'
+                // print(zynthian.sketchpad.song.scenesModel.getScene(zynthian.sketchpad.song.scenesModel.selectedSketchIndex).name)
             }
             //onPressAndHold: zynthian.current_screen_id = 'main'
-            highlighted: zynthian.current_screen_id === 'zynthiloops'
+            highlighted: zynthian.current_screen_id === 'sketchpad'
         }
        /* Zynthian.BreadcrumbButton {
             icon.color: customTheme.Kirigami.Theme.textColor
@@ -187,7 +187,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sceneButton
             icon.color: customTheme.Kirigami.Theme.textColor
-            text: qsTr("Scene %1 ˬ").arg(zynthian.zynthiloops.song.scenesModel.selectedSceneName)
+            text: qsTr("Scene %1 ˬ").arg(zynthian.sketchpad.song.scenesModel.selectedSceneName)
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
             onClicked: scenesMenu.visible = true
@@ -219,7 +219,7 @@ Kirigami.AbstractApplicationWindow {
                             switchTimer.index = index;
                             switchTimer.restart();
                         }
-                        highlighted: zynthian.zynthiloops.song.scenesModel.selectedSceneIndex === index
+                        highlighted: zynthian.sketchpad.song.scenesModel.selectedSceneIndex === index
 //                             implicitWidth: menuItemLayout.implicitWidth + leftPadding + rightPadding
                     }
                 }
@@ -240,7 +240,7 @@ Kirigami.AbstractApplicationWindow {
                 dim: false
                 Component.onCompleted: zynthian.fixed_layers.layers_count = 15;
                 Repeater {
-                    model: zynthian.zynthiloops.song.channelsModel
+                    model: zynthian.sketchpad.song.channelsModel
                     delegate: QQC2.MenuItem {
                         text: qsTr("Channel %1").arg(index + 1)
                         width: parent.width
@@ -290,7 +290,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sampleLoopButton
 
-            property QtObject clip: zynthian.zynthiloops.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+            property QtObject clip: zynthian.sketchpad.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
 
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
@@ -358,7 +358,7 @@ Kirigami.AbstractApplicationWindow {
                     zynthian.fixed_layers.activate_index(root.selectedChannel.connectedSound)
                     zynthian.control.single_effect_engine = null;
                     zynthian.current_screen_id = "control";
-                    zynthian.forced_screen_back = "zynthiloops"
+                    zynthian.forced_screen_back = "sketchpad"
                 }
             }
 
@@ -451,7 +451,7 @@ Kirigami.AbstractApplicationWindow {
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            enabled: !zynthian.zynthiloops.isMetronomeRunning
+            enabled: !zynthian.sketchpad.isMetronomeRunning
             onClicked: {
                 Zynthian.CommonUtils.startMetronomeAndPlayback();
             }
@@ -467,7 +467,7 @@ Kirigami.AbstractApplicationWindow {
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            enabled: zynthian.zynthiloops.isMetronomeRunning
+            enabled: zynthian.sketchpad.isMetronomeRunning
             onClicked: {
                 Zynthian.CommonUtils.stopMetronomeAndPlayback();
             }
@@ -610,9 +610,9 @@ Kirigami.AbstractApplicationWindow {
         id: countInOverlay
         parent: root.contentItem.parent
         anchors.fill: parent
-        visible: zynthian.zynthiloops.countInBars > 0 &&
-                 zynthian.zynthiloops.ongoingCountIn > 0 &&
-                 zynthian.zynthiloops.isRecording
+        visible: zynthian.sketchpad.countInBars > 0 &&
+                 zynthian.sketchpad.ongoingCountIn > 0 &&
+                 zynthian.sketchpad.isRecording
         z: 9999999
         color: "#cc000000"
 
@@ -620,12 +620,12 @@ Kirigami.AbstractApplicationWindow {
             anchors.centerIn: parent
             QQC2.Label {
                 font.pointSize: 35
-                text: zynthian.zynthiloops.ongoingCountIn
+                text: zynthian.sketchpad.ongoingCountIn
             }
             QQC2.Label {
                 Layout.alignment: Qt.AlignBottom
                 Layout.bottomMargin: 8
-                text: "/" + (4 - zynthian.zynthiloops.currentBeat)
+                text: "/" + (4 - zynthian.sketchpad.currentBeat)
             }
         }
     }
@@ -680,7 +680,7 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-    Zynthiloops.RecordingPopup {
+    Sketchpad.RecordingPopup {
         id: recordingPopup
     }
 
@@ -710,7 +710,7 @@ Kirigami.AbstractApplicationWindow {
             switch (cuia) {
                 case "CHANNEL_1":
                 case "CHANNEL_6":
-                    clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -718,7 +718,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_2":
                 case "CHANNEL_7":
-                    clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -726,7 +726,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_3":
                 case "CHANNEL_8":
-                    clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -734,7 +734,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_4":
                 case "CHANNEL_9":
-                    clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -742,7 +742,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_5":
                 case "CHANNEL_10":
-                    clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.zynthiloops.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -829,7 +829,7 @@ Kirigami.AbstractApplicationWindow {
                                     text: index + 1
                                     onClicked: {
                                         root.selectedChannel.selectedSlotRow = index
-                                        dashboardLayer.pageCache["zynthiloops"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
+                                        dashboardLayer.pageCache["sketchpad"].bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                                     }
 
                                     Rectangle {
@@ -906,7 +906,7 @@ Kirigami.AbstractApplicationWindow {
                             text: qsTr("Parts")
                         }
 
-                        Zynthiloops.PartBarDelegate {
+                        Sketchpad.PartBarDelegate {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             channel: slotSelectionDelegate.visible ? root.selectedChannel : null

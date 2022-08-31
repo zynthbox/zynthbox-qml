@@ -47,7 +47,7 @@ Item {
      */
     function loadSequenceFromFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedSketchName;
+            sequenceFilePicker.sequenceName = zynthian.sketchpad.song.scenesModel.selectedSketchName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -62,7 +62,7 @@ Item {
      */
     function saveSequenceToFile(sequenceName) {
         if (sequenceName == undefined || sequenceName == "") {
-            sequenceFilePicker.sequenceName = zynthian.zynthiloops.song.scenesModel.selectedSketchName;
+            sequenceFilePicker.sequenceName = zynthian.sketchpad.song.scenesModel.selectedSketchName;
         } else {
             sequenceFilePicker.sequenceName = sequenceName;
         }
@@ -77,7 +77,7 @@ Item {
      */
     function savePatternToFile(patternName) {
         if (patternName == undefined || patternName == "") {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName);
             if (sequence.activePattern > -1) {
                 sequenceFilePicker.patternName = sequence.activePatternObject.objectName;
             }
@@ -386,7 +386,7 @@ Item {
     }
 
     function applyLoadedSequence(repeaterObject) {
-        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName);
+        var globalSequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName);
         if (repeaterObject.model.hasOwnProperty("patterns")) {
             // Then it's a sequence, and we should apply all the options from the sequence as well (even if it's not much)
             var sequenceModel = repeaterObject.model;
@@ -402,8 +402,8 @@ Item {
                 // First, remove this pattern from whatever channel it was associated with, if any
                 var foundChannel = null;
                 var foundIndex = -1;
-                for(var i = 0; i < zynthian.zynthiloops.song.channelsModel.count; ++i) {
-                    var channel = zynthian.zynthiloops.song.channelsModel.getChannel(i);
+                for(var i = 0; i < zynthian.sketchpad.song.channelsModel.count; ++i) {
+                    var channel = zynthian.sketchpad.song.channelsModel.getChannel(i);
                     if (channel && channel.connectedPattern === theItem.importIndex) {
                         foundChannel = channel;
                         foundIndex = i;
@@ -420,14 +420,14 @@ Item {
 
                 // Then associate this pattern with the channel we requested, if requested
                 if (theItem.associatedChannelIndex > -1) {
-                    var channelToAssociate = zynthian.zynthiloops.song.channelsModel.getChannel(theItem.associatedChannelIndex);
+                    var channelToAssociate = zynthian.sketchpad.song.channelsModel.getChannel(theItem.associatedChannelIndex);
                     channelToAssociate.connectedPattern = theItem.importIndex;
                     console.log("Newly associated channel is", channelToAssociate);
 
                     // Finally, actually import the sound if requested
                     var jsonToLoad = theItem.patternObject.layerData;
                     if (jsonToLoad.length > 0 && theItem.importSound) {
-                        channelToAssociate = zynthian.zynthiloops.song.channelsModel.getChannel(theItem.associatedChannelIndex);
+                        channelToAssociate = zynthian.sketchpad.song.channelsModel.getChannel(theItem.associatedChannelIndex);
                         channelToAssociate.setChannelSoundFromSnapshotJson(jsonToLoad)
                     }
                 }
@@ -445,7 +445,7 @@ Item {
             property bool importPattern: patternObject.enabled
             property bool importSound: false
             property int associatedChannelIndex: 6 + model.index
-            property QtObject associatedChannel: zynthian.zynthiloops.song.channelsModel.getChannel(patternOptionsRoot.associatedChannelIndex)
+            property QtObject associatedChannel: zynthian.sketchpad.song.channelsModel.getChannel(patternOptionsRoot.associatedChannelIndex)
             property int importIndex: model.index
             property var soundInfo: patternObject.layerData.length > 0 ? zynthian.layer.sound_metadata_from_json(patternObject.layerData) : [];
             RowLayout {
@@ -537,7 +537,7 @@ Item {
                 Layout.fillWidth: true
                 columns: 4
                 Repeater {
-                    model: zynthian.zynthiloops.song.channelsModel
+                    model: zynthian.sketchpad.song.channelsModel
                     delegate: Zynthian.PlayGridButton {
                         Layout.fillWidth: true
                         Layout.preferredWidth: channelPicker.width / 4

@@ -55,11 +55,11 @@ Zynthian.ScreenPage {
         },
         Kirigami.Action {
             text: qsTr("Record Song")
-            enabled: zynthian.zynthiloops.song.mixesModel.songMode
-                ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0
+            enabled: zynthian.sketchpad.song.mixesModel.songMode
+                ? zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0
                 : true
             onTriggered: {
-                multichannelRecorderPopup.recordSong(zynthian.zynthiloops.song)
+                multichannelRecorderPopup.recordSong(zynthian.sketchpad.song)
             }
         }
     ]
@@ -78,9 +78,9 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 Layout.preferredWidth: component.width * 2 / 12
                 text: qsTr("Song Mode")
-                checked: zynthian.zynthiloops.song.mixesModel.songMode
+                checked: zynthian.sketchpad.song.mixesModel.songMode
                 onClicked: {
-                    zynthian.zynthiloops.song.mixesModel.songMode = !zynthian.zynthiloops.song.mixesModel.songMode;
+                    zynthian.sketchpad.song.mixesModel.songMode = !zynthian.sketchpad.song.mixesModel.songMode;
                 }
             }
             Repeater {
@@ -88,11 +88,11 @@ Zynthian.ScreenPage {
                 QQC2.Button {
                     Layout.fillWidth: true
                     Layout.preferredWidth: component.width / 12
-                    property QtObject mixObject: zynthian.zynthiloops.song.mixesModel.getMix(model.index)
+                    property QtObject mixObject: zynthian.sketchpad.song.mixesModel.getMix(model.index)
                     text: mixObject.name
-                    checked: zynthian.zynthiloops.song.mixesModel.selectedMixIndex == model.index
+                    checked: zynthian.sketchpad.song.mixesModel.selectedMixIndex == model.index
                     onClicked: {
-                        zynthian.zynthiloops.song.mixesModel.selectedMixIndex = model.index;
+                        zynthian.sketchpad.song.mixesModel.selectedMixIndex = model.index;
                     }
                 }
             }
@@ -105,7 +105,7 @@ Zynthian.ScreenPage {
 /// BEGIN Not-song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: !zynthian.zynthiloops.song.mixesModel.songMode
+            visible: !zynthian.sketchpad.song.mixesModel.songMode
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
@@ -117,24 +117,24 @@ Zynthian.ScreenPage {
 /// BEGIN Song-mode playbackery stuff
         RowLayout {
             Layout.fillWidth: true
-            visible: zynthian.zynthiloops.song.mixesModel.songMode && segmentsRepeater.count === 0
+            visible: zynthian.sketchpad.song.mixesModel.songMode && segmentsRepeater.count === 0
             QQC2.Label {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
-                text: qsTr("You've not built a song here yet - head on over to Looper to do that")
+                text: qsTr("You've not built a song here yet - head on over to Sketchpad to do that")
             }
         }
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-            visible: zynthian.zynthiloops.song.mixesModel.songMode && segmentsRepeater.count > 0
+            visible: zynthian.sketchpad.song.mixesModel.songMode && segmentsRepeater.count > 0
             spacing: 0
             Kirigami.Theme.inherit: false
             Kirigami.Theme.colorSet: Kirigami.Theme.Button
             Repeater {
                 id: segmentsRepeater
-                property int totalDuration: zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration : 0
-                model: component.visible && totalDuration > 0 ? zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel : 0
+                property int totalDuration: zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.count > 0 ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration : 0
+                model: component.visible && totalDuration > 0 ? zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel : 0
                 delegate: Item {
                     id: segmentDelegate
                     property QtObject segment: model.segment
@@ -181,7 +181,7 @@ Zynthian.ScreenPage {
             Layout.fillWidth: true
             Layout.minimumHeight: 1
             Layout.maximumHeight: 1
-            visible: zynthian.zynthiloops.song.mixesModel.songMode && segmentsRepeater.totalDuration > 0
+            visible: zynthian.sketchpad.song.mixesModel.songMode && segmentsRepeater.totalDuration > 0
             Item {
                 height: 1
                 width: 1

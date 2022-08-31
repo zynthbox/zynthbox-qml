@@ -97,8 +97,8 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
     def update_button_colors(self):
         try:
             channel = None
-            if self.zyngui.zynthiloops.song is not None:
-                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+            if self.zyngui.sketchpad.song is not None:
+                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
 
             # Menu
             if self.zyngui.modal_screen is None and self.zyngui.active_screen == "main":
@@ -117,7 +117,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 # If left sidebar is active, blink selected part buttons for sample modes or blink filled clips for loop mode
                 # This is global (i.e. for all screens)
                 if self.zyngui.leftSidebarActive:
-                    partClip = self.zyngui.zynthiloops.song.getClipByPart(channel.id, self.zyngui.zynthiloops.song.scenesModel.selectedSketchIndex, i-1)
+                    partClip = self.zyngui.sketchpad.song.getClipByPart(channel.id, self.zyngui.sketchpad.song.scenesModel.selectedSketchIndex, i-1)
 
                     if channel is not None and partClip.enabled:
                         if channel.channelAudioType == "synth":
@@ -304,7 +304,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                     }
 
             # Under screen button 1
-            if self.zyngui.modal_screen is None and self.zyngui.active_screen == "zynthiloops":
+            if self.zyngui.modal_screen is None and self.zyngui.active_screen == "sketchpad":
                 self.button_color_map[8] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -370,7 +370,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
             }
 
             # Recording Button
-            if not self.zyngui.zynthiloops.isRecording:
+            if not self.zyngui.sketchpad.isRecording:
                 self.button_color_map[14] = {
                     'color': self.led_color_light,
                     'blink': False
@@ -382,7 +382,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Play button
-            if self.zyngui.zynthiloops.isMetronomeRunning:
+            if self.zyngui.sketchpad.isMetronomeRunning:
                 self.button_color_map[15] = {
                     'color': self.led_color_active,
                     'blink': False
@@ -394,7 +394,7 @@ class zynthian_gui_led_config(zynthian_qt_gui_base.ZynGui):
                 }
 
             # Save button
-            if self.zyngui.zynthiloops.clickChannelEnabled:
+            if self.zyngui.sketchpad.clickChannelEnabled:
                 self.button_color_map[16] = {
                     'color': self.led_color_blue,
                     'blink': True

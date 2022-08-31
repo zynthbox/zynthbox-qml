@@ -32,7 +32,7 @@ import org.kde.kirigami 2.6 as Kirigami
 import Zynthian 1.0 as Zynthian
 import "pages" as Pages
 import "pages/SessionDashboard" as Dash
-import "pages/ZynthiLoops" as ZL
+import "pages/Sketchpad" as ZL
 
 Zynthian.Stack {
     id: root
@@ -46,13 +46,13 @@ Zynthian.Stack {
 
     property var pageCache: {
         //"session_dashboard": dashboard
-        "zynthiloops": zynthiloops
+        "sketchpad": sketchpad
     }
     //initialItem: Dash.Main {
         //id: dashboard
     //}
     initialItem: ZL.Main {
-        id: zynthiloops
+        id: sketchpad
     }
     data: [
         Timer {
@@ -61,7 +61,7 @@ Zynthian.Stack {
             running: true
             onTriggered: {
                 let file = ""
-                console.log("Caching zynthiloops")
+                console.log("Caching sketchpad")
                 if (!root.pageCache["main"]) {
                     file = applicationWindow().pageScreenMapping.pageForDashboardScreen("main");
                     var component = Qt.createComponent(file);

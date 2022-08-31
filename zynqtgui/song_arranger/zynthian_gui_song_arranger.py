@@ -30,10 +30,10 @@ from .song_arranger_cell import song_arranger_cell
 from .song_arranger_channel import song_arranger_channel
 from .song_arranger_channels_model import song_arranger_channels_model
 from .. import zynthian_qt_gui_base
-from ..zynthiloops import zynthian_gui_zynthiloops
-from ..zynthiloops.libzl.zynthiloops_clip import zynthiloops_clip
-from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
-from ..zynthiloops.libzl.zynthiloops_channel import zynthiloops_channel
+from ..sketchpad import zynthian_gui_sketchpad
+from zynqtgui.sketchpad.sketchpad_clip import sketchpad_clip
+from zynqtgui.sketchpad.sketchpad_song import sketchpad_song
+from zynqtgui.sketchpad.sketchpad_channel import sketchpad_channel
 
 
 class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
@@ -42,13 +42,13 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.__bars__ = 24
         self.__sketch__ = None
         self.__channels_model__ = song_arranger_channels_model(self)
-        self.__metronome_manager__: zynthian_gui_zynthiloops = self.zyngui.zynthiloops
+        self.__metronome_manager__: zynthian_gui_sketchpad = self.zyngui.sketchpad
         self.__is_playing__ = False
         self.__start_from_bar__ = 0
         self.__playing_bar__ = -1
 
         self.__metronome_manager__.current_bar_changed.connect(self.current_bar_changed_handler)
-        self.zyngui.zynthiloops.song_changed.connect(self.generate_channels_model)
+        self.zyngui.sketchpad.song_changed.connect(self.generate_channels_model)
 
     ### Property bars
     def get_bars(self):
@@ -105,9 +105,9 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
         self.playing_bar_changed.emit()
 
     def generate_channels_model(self):
-        logging.info(f"Generating channels model from Sketch({self.zyngui.zynthiloops.song})")
+        logging.info(f"Generating channels model from Sketch({self.zyngui.sketchpad.song})")
 
-        self.__sketch__:zynthiloops_song = self.zyngui.zynthiloops.song
+        self.__sketch__:sketchpad_song = self.zyngui.sketchpad.song
         self.__channels_model__.clear()
 
         try:
@@ -116,14 +116,14 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
             logging.error(f"Already disconnected : {str(e)}")
 
         # try:
-        #     self.zyngui.zynthiloops.song_changed.disconnect()
+        #     self.zyngui.sketchpad.song_changed.disconnect()
         # except Exception as e:
         #     logging.error(f"Already disconnected: {str(e)}")
 
         self.__sketch__.channelsModel.countChanged.connect(self.generate_channels_model)
 
         for i in range(self.__sketch__.channelsModel.count):
-            zl_channel: zynthiloops_channel = self.__sketch__.channelsModel.getChannel(i)
+            zl_channel: sketchpad_channel = self.__sketch__.channelsModel.getChannel(i)
             channel = song_arranger_channel(zl_channel, self.__channels_model__)
             self.__channels_model__.add_channel(channel)
 
@@ -132,7 +132,7 @@ class zynthian_gui_song_arranger(zynthian_qt_gui_base.ZynGui):
                 channel.cellsModel.add_cell(cell)
 
             for j in range(2):
-                zl_clip: zynthiloops_clip = self.__sketch__.getClip(zl_channel.id, j)
+                zl_clip: sketchpad_clip = self.__sketch__.getClip(zl_channel.id, j)
 
                 if zl_clip is not None:
                     for pos in zl_clip.arrangerBarPositions:

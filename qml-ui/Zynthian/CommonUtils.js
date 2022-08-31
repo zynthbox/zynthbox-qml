@@ -1,8 +1,8 @@
 .import org.zynthian.quick 1.0 as ZynQuick
 
 function startMetronomeAndPlayback() {
-    if (zynthian.zynthiloops.song.mixesModel.songMode) {
-        if (zynthian.zynthiloops.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0) {
+    if (zynthian.sketchpad.song.mixesModel.songMode) {
+        if (zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0) {
             ZynQuick.SegmentHandler.startPlayback(0, 0);
         }
     } else {
@@ -15,19 +15,19 @@ function startMetronomeAndPlayback() {
                 console.debug("Sequence could not be fetched, and playback could not be prepared");
             }
         }
-        if (zynthian.zynthiloops.clipToRecord) {
+        if (zynthian.sketchpad.clipToRecord) {
             ZynQuick.MidiRecorder.startRecording(ZynQuick.PlayGridManager.currentMidiChannel, true);
         }
-        zynthian.zynthiloops.startPlayback();
+        zynthian.sketchpad.startPlayback();
         console.log("Metronome and Playback Started");
     }
 }
 
 function stopMetronomeAndPlayback() {
-    if (zynthian.zynthiloops.song.mixesModel.songMode) {
-        zynthian.zynthiloops.stopAllPlayback();
+    if (zynthian.sketchpad.song.mixesModel.songMode) {
+        zynthian.sketchpad.stopAllPlayback();
         ZynQuick.SegmentHandler.stopPlayback();
-        zynthian.zynthiloops.resetMetronome();
+        zynthian.sketchpad.resetMetronome();
     } else {
         console.log("Stopping Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
@@ -39,18 +39,18 @@ function stopMetronomeAndPlayback() {
             }
         }
 
-        if (zynthian.zynthiloops.isRecording) {
+        if (zynthian.sketchpad.isRecording) {
             ZynQuick.MidiRecorder.stopRecording()
-            zynthian.zynthiloops.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
+            zynthian.sketchpad.lastRecordingMidi = ZynQuick.MidiRecorder.base64Midi()
 
-            if (zynthian.zynthiloops.recordingType === "audio") {
-                zynthian.zynthiloops.stopAudioRecording()
+            if (zynthian.sketchpad.recordingType === "audio") {
+                zynthian.sketchpad.stopAudioRecording()
             } else {
-                for (var clipIndex in zynthian.zynthiloops.clipsToRecord) {
-                    var clip = zynthian.zynthiloops.clipsToRecord[clipIndex]
+                for (var clipIndex in zynthian.sketchpad.clipsToRecord) {
+                    var clip = zynthian.sketchpad.clipsToRecord[clipIndex]
 
                     if (!clip.isChannelSample) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.zynthiloops.song.scenesModel.selectedSketchName)
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName)
                         var pattern = sequence.getByPart(clip.row, clip.part)
 
                         console.log("Applying pattern to", pattern, " for ", clip, clip.row, clip.col, clip.part)
@@ -59,13 +59,13 @@ function stopMetronomeAndPlayback() {
                 }
             }
 
-            zynthian.zynthiloops.stopRecording()
+            zynthian.sketchpad.stopRecording()
         }
 
-        zynthian.zynthiloops.stopAllPlayback();
+        zynthian.sketchpad.stopAllPlayback();
         zynthian.playgrid.stopMetronomeRequest();
         zynthian.song_arranger.stop();
-        zynthian.zynthiloops.resetMetronome();
+        zynthian.sketchpad.resetMetronome();
         console.log("Metronome and Playback Stopped");
     }
 }
@@ -83,7 +83,7 @@ function toggleLayerChaining(layer) {
 }
 
 function switchToScene(index) {
-    zynthian.zynthiloops.song.scenesModel.selectedSceneIndex = index
+    zynthian.sketchpad.song.scenesModel.selectedSceneIndex = index
 }
 
 function cuiaHandler(cuia, selectedChannel, bottomStack) {

@@ -69,13 +69,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 logging.info("Session dashboard Init Sketch CB (No restore)")
                 self.set_selected_channel(self.__selected_channel__, True)
 
-                selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.selectedChannel)
+                selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
                 selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
 
             self.__name__ = None
             self.__id__ = 0
 
-            self.zyngui.screens["zynthiloops"].init_sketch(None, cb)
+            self.zyngui.screens["sketchpad"].init_sketch(None, cb)
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -87,7 +87,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.show()
 
     def back_action(self):
-        return "zynthiloops"
+        return "sketchpad"
 
     def layer_created(self, index):
        QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
@@ -102,10 +102,10 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def emit_chained_sounds_changed(self):
-        selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.selectedChannel)
+        selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
         if selected_channel is not None:
             selected_channel.set_chained_sounds(selected_channel.get_chained_sounds())
-        self.zyngui.screens['zynthiloops'].song.channelsModel.connected_sounds_count_changed.emit()
+        self.zyngui.screens['sketchpad'].song.channelsModel.connected_sounds_count_changed.emit()
         # self.set_selected_channel(self.selectedChannel, True)
 
     @Slot(None)
@@ -148,7 +148,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
         self.__change_channel_sound_timer__.setInterval(1000)
-        self.zyngui.zynthiloops.set_selector()
+        self.zyngui.sketchpad.set_selector()
 
         self.schedule_save()
     def get_selected_channel(self):
@@ -161,7 +161,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             # Set is_set_selector_running way before set_selector is called so that
             # knob values are discarded. set_selector will be called by change_to_channel_sound
             # after 1000ms when active midi channel is switched
-            self.zyngui.zynthiloops.set_set_selector_active()
+            self.zyngui.sketchpad.set_set_selector_active()
 
             # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes
             # fill_list and emitting selected_channel_changed event is a bit on the heavier side and hence should go
@@ -192,7 +192,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     ### Property selectedChannelName
     def get_selected_channel_name(self):
-        channel = self.zyngui.screens["zynthiloops"].song.channelsModel.getChannel(self.__selected_channel__)
+        channel = self.zyngui.screens["sketchpad"].song.channelsModel.getChannel(self.__selected_channel__)
         if channel.connectedSound >= 0:
             return self.zyngui.screens["fixed_layers"].selector_list.getDisplayValue(channel.connectedSound)
         else:
@@ -283,9 +283,9 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
                 self.session_sketches_model_changed.emit()
             if "lastSelectedSketch" in session:
                 self.__last_selected_sketch__ = session["lastSelectedSketch"]
-                self.zyngui.screens["zynthiloops"].init_sketch(self.__last_selected_sketch__, sketch_loaded_cb)
+                self.zyngui.screens["sketchpad"].init_sketch(self.__last_selected_sketch__, sketch_loaded_cb)
             else:
-                self.zyngui.screens["zynthiloops"].init_sketch(None, sketch_loaded_cb)
+                self.zyngui.screens["sketchpad"].init_sketch(None, sketch_loaded_cb)
 
             return True
         except Exception as e:

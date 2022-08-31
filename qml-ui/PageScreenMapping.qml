@@ -124,6 +124,6 @@ QtObject {
 
     readonly property var dashboardScreens: {
         "main": "MainPage.qml",
-        "zynthiloops": "ZynthiLoops/Main.qml",
+        "sketchpad": "Sketchpad/Main.qml",
     }
 }

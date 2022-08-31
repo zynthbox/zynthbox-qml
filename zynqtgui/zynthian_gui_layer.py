@@ -486,7 +486,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def add_midichannel_to_channel(self, midich, position_in_channel = -1):
 		try:
-			selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
+			selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
 			chain = selected_channel.get_chained_sounds()
 			if midich not in chain:
 				if position_in_channel >= 0:
@@ -502,7 +502,7 @@ class zynthian_gui_layer(zynthian_gui_selector):
 
 	def remove_midichannel_from_channel(self, midich):
 		try:
-			selected_channel = self.zyngui.screens['zynthiloops'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
+			selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
 			chain = selected_channel.get_chained_sounds()
 			for i, el in enumerate(chain):
 				if el == midich:

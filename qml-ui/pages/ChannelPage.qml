@@ -34,7 +34,7 @@ import JuceGraphics 1.0
 Zynthian.ScreenPage {
     id: root
 
-    readonly property QtObject song: zynthian.zynthiloops.song
+    readonly property QtObject song: zynthian.sketchpad.song
     readonly property QtObject channel: zynthian.channel.channel
     readonly property QtObject part: zynthian.channel.part
     readonly property QtObject clip: channel.clipsModel.getClip(zynthian.channel.partId);
@@ -141,7 +141,7 @@ Zynthian.ScreenPage {
                             id: midiButton
                             text: qsTr("Load Voices")
                             onClicked: {
-                                zynthian.zynthiloops.restoreLayersFromChannel(zynthian.channel.channelId)
+                                zynthian.sketchpad.restoreLayersFromChannel(zynthian.channel.channelId)
                                 //zynthian.fixed_layers.activate_index(6)
                             }
                         }
@@ -234,7 +234,7 @@ Zynthian.ScreenPage {
                                             voiceCombo.updateText()
                                         }
                                         //zynthian.fixed_layers.activate_index(6)
-                                        zynthian.zynthiloops.saveLayersToChannel(zynthian.channel.channelId)
+                                        zynthian.sketchpad.saveLayersToChannel(zynthian.channel.channelId)
                                     }
                                     delegate: QQC2.MenuItem {
                                         text: model.display
@@ -322,11 +322,11 @@ Zynthian.ScreenPage {
                 contentItem: ColumnLayout {
                     QQC2.ToolButton {
                         Layout.alignment: Qt.AlignCenter
-                        icon.name: zynthian.zynthiloops.isRecording ? "media-playback-stop" : "media-record-symbolic"
+                        icon.name: zynthian.sketchpad.isRecording ? "media-playback-stop" : "media-record-symbolic"
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Layout.preferredWidth
                         onClicked: {
-                            if (!zynthian.zynthiloops.isRecording) {
+                            if (!zynthian.sketchpad.isRecording) {
                                 root.clip.clear();
                                 root.clip.queueRecording();
                                 Zynthian.CommonUtils.startMetronomeAndPlayback();
@@ -348,7 +348,7 @@ Zynthian.ScreenPage {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.zynthiloops.recordingSource = sourceComboModel.get(index).value
+                            zynthian.sketchpad.recordingSource = sourceComboModel.get(index).value
                         }
                     }
                     QQC2.ComboBox {
@@ -365,7 +365,7 @@ Zynthian.ScreenPage {
                         }
                         textRole: "text"
                         onActivated: {
-                            zynthian.zynthiloops.recordingChannel = channelComboModel.get(index).value
+                            zynthian.sketchpad.recordingChannel = channelComboModel.get(index).value
                         }
                     }
                 }

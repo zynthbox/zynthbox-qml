@@ -211,9 +211,9 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
             logging.debug(f"### Loading sound : {filepath}")
 
             if channelIndex == -1:
-                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
             else:
-                channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(channelIndex)
+                channel = self.zyngui.sketchpad.song.channelsModel.getChannel(channelIndex)
 
             source_channels = self.zyngui.layer.load_layer_channels_from_file(filepath)
             free_layers = channel.getFreeLayers()
@@ -309,7 +309,7 @@ class zynthian_gui_sound_categories(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None, result=str)
     def suggestedSoundFileName(self):
-        channel = self.zyngui.zynthiloops.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
+        channel = self.zyngui.sketchpad.song.channelsModel.getChannel(self.zyngui.session_dashboard.selectedChannel)
         suggested = ""
         try:
             # Get preset name of connectedSound

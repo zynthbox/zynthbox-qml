@@ -166,7 +166,7 @@ Zynthian.ScreenPage {
                 drag.filterChildren: true
                 onClicked: {
                     if (!gridMouseArea.blocked) {
-                        zynthian.show_modal("zynthiloops")
+                        zynthian.show_modal("sketchpad")
                     }
                 }
 
@@ -192,7 +192,7 @@ Zynthian.ScreenPage {
                         onReleased: gridMouseArea.blocked = false
                         onCanceled: gridMouseArea.blocked = false
                         onClicked: {
-                            // activate_index will start the appimage process and open zynthiloops after 5 seconds
+                            // activate_index will start the appimage process and open sketchpad after 5 seconds
                             // to mimic closing of menu after opening an app like other modules in main page
                             zynthian.main.activate_index(model.index);
 
@@ -232,7 +232,7 @@ Zynthian.ScreenPage {
     contextualActions: [
         Kirigami.Action {
             text: qsTr("Close")
-            onTriggered: Qt.callLater(function() { zynthian.show_modal("zynthiloops") })
+            onTriggered: Qt.callLater(function() { zynthian.show_modal("sketchpad") })
         },
         Kirigami.Action {
             enabled: false

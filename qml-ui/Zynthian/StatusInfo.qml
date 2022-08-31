@@ -295,8 +295,8 @@ MouseArea {
         QQC2.Label {
             id: metronomeLabel
             text: {
-                if (zynthian.zynthiloops.isMetronomeRunning && zynthian.zynthiloops.currentBeat >= 0 && zynthian.zynthiloops.currentBar >= 0) {
-                    return (zynthian.zynthiloops.currentBar+1) + "." + (zynthian.zynthiloops.currentBeat+1)
+                if (zynthian.sketchpad.isMetronomeRunning && zynthian.sketchpad.currentBeat >= 0 && zynthian.sketchpad.currentBar >= 0) {
+                    return (zynthian.sketchpad.currentBar+1) + "." + (zynthian.sketchpad.currentBeat+1)
                 } else {
                     return "1.1"
                 }
@@ -307,7 +307,7 @@ MouseArea {
             Layout.topMargin: parent.height  -height
             QQC2.Label {
                 id: bpmLabel
-                text: zynthian.zynthiloops.song.selectedScale +" "+ zynthian.zynthiloops.song.bpm
+                text: zynthian.sketchpad.song.selectedScale +" "+ zynthian.sketchpad.song.bpm
                 font.pointSize: 9
             }
             Kirigami.Icon {
@@ -315,7 +315,7 @@ MouseArea {
                 Layout.preferredHeight: 24
                 source: Qt.resolvedUrl("../../img/metronome.svg")
                 color: "#ffffff"
-                opacity: zynthian.zynthiloops.clickChannelEnabled ? 1.0 : 0.0
+                opacity: zynthian.sketchpad.clickChannelEnabled ? 1.0 : 0.0
             }
         }
     }
@@ -338,10 +338,10 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                contentItem: ZynthiloopsDial {
+                contentItem: SketchpadDial {
                     id: bpmDial
                     text: qsTr("BPM")
-                    controlObj: zynthian.zynthiloops.song
+                    controlObj: zynthian.sketchpad.song
                     controlProperty: "bpm"
 
                     dial {
@@ -372,7 +372,7 @@ MouseArea {
                             }
                             var average = sum / differences.length;
                             bpmDial.bpm = 60000 / average;
-                            zynthian.zynthiloops.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
+                            zynthian.sketchpad.song.bpm = Math.min(Math.max(bpmDial.bpm, 50), 200);
                         }
                     }
                 }
@@ -382,14 +382,14 @@ MouseArea {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
                 contentItem: ColumnLayout {
-                    ZynthiloopsMultiSwitch {
+                    SketchpadMultiSwitch {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        controlObj: zynthian.zynthiloops.song
+                        controlObj: zynthian.sketchpad.song
                         controlProperty: "selectedScaleIndex"
                         from: 0
                         to: 11
-                        text: zynthian.zynthiloops.song.selectedScale
+                        text: zynthian.sketchpad.song.selectedScale
                     }
                     QQC2.Label {
                         text: qsTr("Scale")
@@ -402,7 +402,7 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                contentItem: ZynthiloopsDial {
+                contentItem: SketchpadDial {
                     id: volumeDial
                     text: qsTr("Volume")
                     controlObj: zynthian.master_alsa_mixer
@@ -421,7 +421,7 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                contentItem: ZynthiloopsDial {
+                contentItem: SketchpadDial {
                     text: qsTr("Delay")
                     controlObj: zynthian
                     controlProperty: "delayKnobValue"
@@ -444,7 +444,7 @@ MouseArea {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
-                contentItem: ZynthiloopsDial {
+                contentItem: SketchpadDial {
                     text: qsTr("Reverb")
                     controlObj: zynthian
                     controlProperty: "reverbKnobValue"
@@ -472,9 +472,9 @@ MouseArea {
                         implicitWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredWidth: Kirigami.Units.gridUnit * 3
                         Layout.preferredHeight: Kirigami.Units.gridUnit * 2
-                        checked: zynthian.zynthiloops.clickChannelEnabled
+                        checked: zynthian.sketchpad.clickChannelEnabled
                         onToggled: {
-                            zynthian.zynthiloops.clickChannelEnabled = checked
+                            zynthian.sketchpad.clickChannelEnabled = checked
                         }
                     }
                     Item {

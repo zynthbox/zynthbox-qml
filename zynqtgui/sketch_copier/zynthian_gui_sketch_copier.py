@@ -23,13 +23,11 @@
 #
 # ******************************************************************************
 import logging
-from pathlib import Path
 
 from PySide2.QtCore import Property, QObject, Signal, Slot
 
 from .. import zynthian_qt_gui_base
-from ..zynthiloops.libzl.zynthiloops_song import zynthiloops_song
-from ..zynthiloops.libzl.zynthiloops_channel import zynthiloops_channel
+from zynqtgui.sketchpad.sketchpad_channel import sketchpad_channel
 
 
 class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
@@ -85,7 +83,7 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     def pasteChannel(self, sketch):
         logging.info(f"Pasting channel to sketch : {sketch.name}")
 
-        pasted_channel = zynthiloops_channel(sketch.channelsModel.count, sketch, self)
+        pasted_channel = sketchpad_channel(sketch.channelsModel.count, sketch, self)
         sketch.channelsModel.add_channel(pasted_channel)
         pasted_channel.deserialize(self.__channel_copy_cache__)
         self.__channel_copy_cache__ = None

@@ -55,7 +55,7 @@ ColumnLayout {
             property QtObject selectedClip: contentItem.selectedClip
             contentItem: RowLayout {
                 id: delegate
-                property QtObject channel: zynthian.zynthiloops.song.channelsModel.getChannel(index)
+                property QtObject channel: zynthian.sketchpad.song.channelsModel.getChannel(index)
                 property QtObject selectedClip: null
                 property int thisIndex: index
                 QQC2.Label {

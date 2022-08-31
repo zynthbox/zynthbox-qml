@@ -28,7 +28,7 @@ import QtQuick.Controls 2.2 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
 import Zynthian 1.0 as Zynthian
-import "ZynthiLoops" as ZynthiLoops
+import "Sketchpad" as Sketchpad
 
 Zynthian.ScreenPage {
     id: root
@@ -88,7 +88,7 @@ Zynthian.ScreenPage {
                 Repeater {
                     model: zynthian.audio_settings.channels
                     delegate: ColumnLayout {
-                        ZynthiLoops.VolumeControl {
+                        Sketchpad.VolumeControl {
                             id: volumeDelegate
                             Layout.fillWidth: true
                             Layout.fillHeight: true

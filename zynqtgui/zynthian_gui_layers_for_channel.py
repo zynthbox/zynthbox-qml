@@ -50,7 +50,7 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
             self.list_data = []
             self.list_metadata = []
             self.__volume_ctrls = []
-            song = self.zyngui.screens['zynthiloops'].song
+            song = self.zyngui.screens['sketchpad'].song
 
             if song is not None:
                 selected_channel = song.channelsModel.getChannel(self.zyngui.screens['session_dashboard'].selectedChannel)
@@ -89,14 +89,14 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
                         #self.__volume_ctrls.append(self.zyngui.screens['fixed_layers'].get_volume_controls()[i])
                         #used_empty_channels += 1
                 self.volume_controls_changed.emit()
-                self.zyngui.screens["zynthiloops"].connect_control_objects()
+                self.zyngui.screens["sketchpad"].connect_control_objects()
         except Exception as e:
             logging.error(e)
             pass
         super().fill_list()
 
     def back_action(self):
-        return "zynthiloops"
+        return "sketchpad"
 
     def layer_selection_consistency_check(self):
         if self.zyngui.screens['layer'].is_channel_valid(self.current_index):
@@ -131,13 +131,13 @@ class zynthian_gui_layers_for_channel(zynthian_gui_selector):
 
     def update_channel_sounds(self):
         self.fill_list()
-        if not self.zyngui.screens["zynthiloops"].song:
+        if not self.zyngui.screens["sketchpad"].song:
             return
         QMetaObject.invokeMethod(self, "do_activate_midich_layer", Qt.QueuedConnection)
 
     @Slot(None)
     def do_activate_midich_layer(self):
-        channel = self.zyngui.screens["zynthiloops"].song.channelsModel.getChannel(
+        channel = self.zyngui.screens["sketchpad"].song.channelsModel.getChannel(
             self.zyngui.screens['session_dashboard'].get_selected_channel())
         if channel is not None:
             logging.debug(f"Update Channel Sounds : {channel.connectedSound}")

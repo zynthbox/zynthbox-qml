@@ -625,7 +625,7 @@ don't want to have to dig too far...
     /*
      * TODO
      * The code below likely wants to live somewhere not here, like a central location for
-     * synchronising the behaviour of sequences with zynthiloops, but for now, this location
+     * synchronising the behaviour of sequences with sketchpad, but for now, this location
      * works (it's a single instance location which is always loaded)
      */
 
@@ -646,7 +646,7 @@ don't want to have to dig too far...
     Binding {
         target: ZynQuick.SegmentHandler
         property: "song"
-        value: zynthian.zynthiloops.song
+        value: zynthian.sketchpad.song
     }
     // Our basic structure is logically scene contains channels which contain patterns, and accessing them is done through the song's inverted-structure channels model
     // the channels contain clips models (each of which holds information for all channel/part combinations for that channel), and each clip in that model holds the data pertaining to one scene/part/channel
@@ -664,7 +664,7 @@ don't want to have to dig too far...
     // and fetched from PlayGridManager by asking for the sequence by name ("S1" for example), and then
     // calling getByPart(channelIndex, partIndex) to fetch the specific pattern
     Repeater {
-        model: zynthian.zynthiloops.song.channelsModel
+        model: zynthian.sketchpad.song.channelsModel
         delegate: Repeater {
             id: baseChannelDelegate
             property QtObject theChannel: channel
@@ -690,7 +690,7 @@ don't want to have to dig too far...
                             // This operation is potentially a bit pricy, as setting the song
                             // to something new will cause the global sequence to be reloaded
                             // to match what is in that song
-                            channelPartSceneDelegate.sequence.song = zynthian.zynthiloops.song;
+                            channelPartSceneDelegate.sequence.song = zynthian.sketchpad.song;
                         }
                     }
                     onPatternChanged: {

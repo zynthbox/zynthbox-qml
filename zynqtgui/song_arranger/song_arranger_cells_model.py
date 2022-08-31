@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store parts of a song in ZynthiLoops
+# A model to store parts of a song in Sketchpad
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #

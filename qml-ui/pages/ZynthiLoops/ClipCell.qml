@@ -43,16 +43,12 @@ QQC2.AbstractButton {
     property real backgroundOpacity: 0.05
     property bool highlighted: channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
                                channel.sceneClip.col === zynthian.zynthiloops.song.scenesModel.selectedSketchIndex // bottomBar.controlObj === channel.sceneClip
-    property color highlightColor: !highlighted &&
-                                   root.isInScene &&
-                                   ((channel.channelAudioType === "sample-loop" && channel.sceneClip.path && channel.sceneClip.path.length > 0) || pattern.hasNotes)
-                                       ? Qt.rgba(255,255,255,0.6)
-                                       : highlighted
-                                           ? root.isInScene
-                                               ? Kirigami.Theme.highlightColor
-                                               : "#aaf44336"
-                                           : "transparent"
-    property bool isInScene: channel.selectedPartNames.length > 0
+    property color highlightColor: highlighted
+                                       ? Kirigami.Theme.highlightColor
+                                       : "transparent"
+    property bool isInScene: channel.selectedPartNames
+                                ? channel.selectedPartNames.join("").length > 0
+                                : false
 
     property QtObject sequence
     property QtObject pattern
@@ -60,67 +56,74 @@ QQC2.AbstractButton {
     onPressed: forceActiveFocus()
 
     contentItem: Item {
-        Image {
-            id: patternVisualiser
-            anchors.fill: parent
-            anchors.margins: 2
-            smooth: false
+//        Connections {
+//            target: channel
+//            onSelectedPartNamesChanged: {
+//                console.log("### Selected part names for channel " + channel.name + " : " + channel.selectedPartNames + ", length : " + channel.selectedPartNames.length + ", joined length : ", channel.selectedPartNames.join("").length)
+//            }
+//        }
 
-            visible: false /*root.isInScene &&
-                     channel.channelAudioType !== "sample-loop" &&
-                     root.pattern &&
-                     root.pattern.hasNotes*/
-            source: root.pattern ? root.pattern.thumbnailUrl : ""
-            cache: false
-        }
+//        Image {
+//            id: patternVisualiser
+//            anchors.fill: parent
+//            anchors.margins: 2
+//            smooth: false
 
-        QQC2.Label {
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
-            }
-            visible: false /*root.isInScene &&
-                     channel.channelAudioType === "sample-loop" &&
-                     channel.sceneClip.path &&
-                     channel.sceneClip.path.length > 0*/
-            text: visible
-                ? qsTr("%1%2")
-                    .arg(channel.sceneClip.isPlaying &&
-                         channel.sceneClip.currentBeat >= 0
-                            ? (channel.sceneClip.currentBeat+1) + "/"
-                            : "")
-                    .arg(channel.sceneClip.snapLengthToBeat
-                            ? channel.sceneClip.length.toFixed(0)
-                            : channel.sceneClip.length.toFixed(2))
-                : ""
-        }
+//            visible: root.isInScene &&
+//                     channel.channelAudioType !== "sample-loop" &&
+//                     root.pattern &&
+//                     root.pattern.hasNotes
+//            source: root.pattern ? root.pattern.thumbnailUrl : ""
+//            cache: false
+//        }
 
-        QQC2.Label {
-            id: patternPlaybackLabel
-            anchors {
-                right: parent.right
-                bottom: parent.bottom
-            }
-            visible: false /*root.isInScene &&
-                     channel.channelAudioType !== "sample-loop" &&
-                     root.pattern &&
-                     root.pattern.hasNotes*/
-            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
-            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynthian.zynthiloops.isMetronomeRunning
-                    ? patternPlaybackLabel.playbackPosition + "/"
-                    : ""
-            property int playbackPosition: 1
-            Connections {
-                target: root.pattern
-                enabled: patternPlaybackLabel.visible
-                onBankPlaybackPositionChanged: {
-                    let playbackPosition = Math.floor(root.pattern.bankPlaybackPosition/4) + 1
-                    if (patternPlaybackLabel.playbackPosition != playbackPosition) {
-                        patternPlaybackLabel.playbackPosition = playbackPosition
-                    }
-                }
-            }
-        }
+//        QQC2.Label {
+//            anchors {
+//                right: parent.right
+//                bottom: parent.bottom
+//            }
+//            visible: root.isInScene &&
+//                     channel.channelAudioType === "sample-loop" &&
+//                     channel.sceneClip.path &&
+//                     channel.sceneClip.path.length > 0
+//            text: visible
+//                ? qsTr("%1%2")
+//                    .arg(channel.sceneClip.isPlaying &&
+//                         channel.sceneClip.currentBeat >= 0
+//                            ? (channel.sceneClip.currentBeat+1) + "/"
+//                            : "")
+//                    .arg(channel.sceneClip.snapLengthToBeat
+//                            ? channel.sceneClip.length.toFixed(0)
+//                            : channel.sceneClip.length.toFixed(2))
+//                : ""
+//        }
+
+//        QQC2.Label {
+//            id: patternPlaybackLabel
+//            anchors {
+//                right: parent.right
+//                bottom: parent.bottom
+//            }
+//            visible: root.isInScene &&
+//                     channel.channelAudioType !== "sample-loop" &&
+//                     root.pattern &&
+//                     root.pattern.hasNotes
+//            text: patternPlaybackLabel.visible ? playbackPositionString + root.pattern.availableBars*4 : ""
+//            property string playbackPositionString: patternPlaybackLabel.visible && root.pattern && root.pattern.hasNotes && root.pattern.isPlaying && root.sequence && root.sequence.isPlaying && zynthian.zynthiloops.isMetronomeRunning
+//                    ? patternPlaybackLabel.playbackPosition + "/"
+//                    : ""
+//            property int playbackPosition: 1
+//            Connections {
+//                target: root.pattern
+//                enabled: patternPlaybackLabel.visible
+//                onBankPlaybackPositionChanged: {
+//                    let playbackPosition = Math.floor(root.pattern.bankPlaybackPosition/4) + 1
+//                    if (patternPlaybackLabel.playbackPosition != playbackPosition) {
+//                        patternPlaybackLabel.playbackPosition = playbackPosition
+//                    }
+//                }
+//            }
+//        }
 
         QQC2.Label {
             anchors.centerIn: parent

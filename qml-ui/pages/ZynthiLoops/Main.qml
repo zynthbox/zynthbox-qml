@@ -1391,18 +1391,18 @@ Zynthian.ScreenPage {
                                             interval: 10
                                             onTriggered: {
                                                 // update color
-                                                if (channel.channelAudioType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
-                                                    // In scene
-                                                    clipCell.backgroundColor = "#3381d4fa";
-                                                } /*else if (channel.sceneClip && (!channel.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col))) {
-                                                    // Not in scene
-                                                    clipCell.backgroundColor = "#33f44336";
-                                                }*/ else if ((channel.connectedPattern >= 0 && clipCell.pattern.hasNotes)
-                                                    || (channel.channelAudioType === "sample-loop" && channel.sceneClip.path && channel.sceneClip.path.length > 0)) {
-                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
-                                                } else {
-                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
-                                                }
+//                                                if (channel.channelAudioType === "sample-loop" && channel.sceneClip && channel.sceneClip.inCurrentScene && channel.sceneClip.path && channel.sceneClip.path.length > 0) {
+//                                                    // In scene
+//                                                    clipCell.backgroundColor = "#3381d4fa";
+//                                                } /*else if (channel.sceneClip && (!channel.sceneClip.inCurrentScene && !root.song.scenesModel.isClipInScene(channel.sceneClip, channel.sceneClip.col))) {
+//                                                    // Not in scene
+//                                                    clipCell.backgroundColor = "#33f44336";
+//                                                }*/ else if ((channel.connectedPattern >= 0 && clipCell.pattern.hasNotes)
+//                                                    || (channel.channelAudioType === "sample-loop" && channel.sceneClip.path && channel.sceneClip.path.length > 0)) {
+//                                                    clipCell.backgroundColor =  Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.02)
+//                                                } else {
+//                                                    clipCell.backgroundColor =  Qt.rgba(0, 0, 0, 1);
+//                                                }
 
                                                 // update isPlaying
                                                 if (channel.connectedPattern < 0) {

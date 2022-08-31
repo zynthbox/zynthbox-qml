@@ -117,6 +117,10 @@ class zynthiloops_song(QObject):
                         clip = zynthiloops_clip(channel.id, j, i, self, clipsModel)
                         clipsModel.add_clip(clip)
 
+                        if i == 0:
+                            clip.enabled = True
+                            channel.selectedPart = 0
+
             # Add default Mixes and Segments
             for mix_index in range(10):
                 mix = zynthiloops_mix(mix_index, self)

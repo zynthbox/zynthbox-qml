@@ -503,7 +503,7 @@ def audio_autoconnect(force=False):
 				# Some engines only take mono input, but we want them to receive both our left and right outputs, so connect l and r both to that one input
 				if len(engineInPorts) == 1:
 					engineInPorts[1] = engineInPorts[0];
-				for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), engineInPorts):
+				for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), engineInPorts):
 					try:
 						jclient.connect(port[0], port[1])
 						hasGlobalEffects = True
@@ -516,13 +516,13 @@ def audio_autoconnect(force=False):
 				return
 	if hasGlobalEffects:
 		# Since there are effects, we don't want to send the output to playback directly, so disconnect those
-		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
+		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
 			try:
 				jclient.disconnect(port[0], port[1])
 			except: pass
 	else:
 		# If there are no global effects, connect the effected global ports directly to system playback
-		for port in zip(jclient.get_ports("SamplerSynth:global-effected", is_audio=True, is_output=True), playback_ports):
+		for port in zip(jclient.get_ports("SamplerSynth-global-effected", is_audio=True, is_output=True), playback_ports):
 			try:
 				jclient.connect(port[0], port[1])
 			except: pass
@@ -554,7 +554,7 @@ def audio_autoconnect(force=False):
 		for channelId in range(0, 10):
 			channel = song.channelsModel.getChannel(channelId)
 			if channel is not None:
-				channelPorts = jclient.get_ports(f"SamplerSynth:channel_{channelId + 1}_", is_audio=True, is_output=True)
+				channelPorts = jclient.get_ports(f"SamplerSynth-channel_{channelId + 1}:", is_audio=True, is_output=True)
 				# Firstly, attempt to connect the channel to any effects attached to the channel
 				channelHasEffects = False
 				if len(channel.chainedSounds) > 0:
@@ -839,13 +839,13 @@ def audio_autoconnect(force=False):
 		# Connect anything that is connected to the system playback ports to the audiolevels client, except for the global uneffected
 		# SamplerSynth port (which is used for system sound type stuff that shouldn't go in recordings and the like)
 		for port_to_connect in sysout_conports_1:
-			if not port_to_connect.name.startswith("SamplerSynth:global-uneffected"):
+			if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
 				try:
 					jclient.connect(port_to_connect, audiolevels_out[0])
 				except:
 					pass
 		for port_to_connect in sysout_conports_2:
-			if not port_to_connect.name.startswith("SamplerSynth:global-uneffected"):
+			if not port_to_connect.name.startswith("SamplerSynth-global-uneffected"):
 				try:
 					jclient.connect(port_to_connect, audiolevels_out[1])
 				except:

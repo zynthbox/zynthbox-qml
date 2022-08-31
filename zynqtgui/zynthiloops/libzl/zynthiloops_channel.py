@@ -388,7 +388,7 @@ class zynthiloops_channel(QObject):
                             logging.error(f"### update_jack_port Error : {str(e)}")
 
             try:
-                for port in zip([f"SamplerSynth:channel_{self.id + 1}_left", f"SamplerSynth:channel_{self.id + 1}_right"], [f"zynthiloops_audio_levels_client:Ch{self.id + 1}A", f"zynthiloops_audio_levels_client:Ch{self.id + 1}B"]):
+                for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"zynthiloops_audio_levels_client:Ch{self.id + 1}A", f"zynthiloops_audio_levels_client:Ch{self.id + 1}B"]):
                     try:
                         if channelHasEffects:
                             p = Popen(("jack_disconnect", port[1], port[0]))

@@ -48,7 +48,7 @@ Rectangle {
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
 
-    property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
+    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
 
     signal clicked()
 
@@ -223,7 +223,7 @@ Rectangle {
                         ColumnLayout {
                             id: segmentDetails
 
-                            property QtObject selectedSegment: zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegment
+                            property QtObject selectedSegment: zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment
 
                             anchors.fill: parent
                             visible: root.songMode
@@ -337,7 +337,7 @@ Rectangle {
                             QQC2.Button {
                                 text: qsTr("Add Before")
                                 onClicked: {
-                                    zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId);
+                                    zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId);
                                 }
                             }
                             QQC2.Button {
@@ -358,17 +358,17 @@ Rectangle {
                                     text: qsTr("Remove")
                                     onClicked: {
                                         confirmRemoval.visible = false;
-                                        if (zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.count === 1) {
+                                        if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count === 1) {
                                             // If there's only this single segment, don't actually delete it, just clear it
-                                            zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegment.clear();
+                                            zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clear();
                                         } else {
                                             // If there's more than one, we can remove the one we've got selected
-                                            if (zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex === zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.count - 1) {
+                                            if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex === zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.count - 1) {
                                                 // If we've got the last segment selected, and we're deleting that, we need to go back a step to avoid ouchies
-                                                zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 1;
-                                                zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.remove_segment(zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex + 1);
+                                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 1;
+                                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex + 1);
                                             } else {
-                                                zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.remove_segment(zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex);
+                                                zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.remove_segment(zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex);
                                             }
                                         }
                                     }
@@ -377,8 +377,8 @@ Rectangle {
                             QQC2.Button {
                                 text: qsTr("Add After")
                                 onClicked: {
-                                    zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
-                                    zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
+                                    zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.new_segment(segmentDetails.selectedSegment.segmentId + 1);
+                                    zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentDetails.selectedSegment.segmentId + 1;
                                 }
                             }
                         }

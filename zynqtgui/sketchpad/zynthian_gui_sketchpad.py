@@ -218,9 +218,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
-        if self.__big_knob_mode__ == "segment" and self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
+        if self.__big_knob_mode__ == "segment" and self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex != round(self.__zselector[0].value/self.big_knob_channel_multiplier):
             logging.debug(f"Setting segment from zyncoder {round(self.__zselector[0].value/self.big_knob_channel_multiplier)}")
-            self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_channel_multiplier)
+            self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = round(self.__zselector[0].value/self.big_knob_channel_multiplier)
             self.set_selector()
 
     @Slot(None)
@@ -495,13 +495,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
                 self.__zselector[0].custom_encoder_speed = 0
-            elif self.song.mixesModel.songMode:
+            elif self.song.sketchesModel.songMode:
                 # If sound combinator is not active and in song mode, Use Big knob to control selected segment
 
                 self.__big_knob_mode__ = "segment"
 
                 try:
-                    selected_segment = self.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex * self.big_knob_channel_multiplier
+                    selected_segment = self.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex * self.big_knob_channel_multiplier
                 except:
                     selected_segment = 0
 
@@ -520,7 +520,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
                 self.__zselector_ctrl[0].set_options(
                     {'symbol': 'sketchpad_segment', 'name': 'sketchpad_segment', 'short_name': 'sketchpad_segment', 'midi_cc': 0,
-                     'value_min': 0, 'value_max': (self.song.mixesModel.selectedMix.segmentsModel.count - 1) * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
+                     'value_min': 0, 'value_max': (self.song.sketchesModel.selectedSketch.segmentsModel.count - 1) * self.big_knob_channel_multiplier, 'value': selected_segment, 'step': 1})
 
                 self.__zselector[0].config(self.__zselector_ctrl[0])
 

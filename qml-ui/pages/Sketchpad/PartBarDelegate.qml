@@ -16,7 +16,7 @@ ColumnLayout {
     property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
-    property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
+    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
 
     signal clicked()
 
@@ -37,7 +37,7 @@ ColumnLayout {
             border{
                 color: Kirigami.Theme.highlightColor
                 width: root.songMode
-                        ? zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
+                        ? zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.clips.indexOf(partDelegate.clip) >= 0
                             ? 1
                             : 0
                         : partDelegate.clip && partDelegate.clip.inCurrentScene
@@ -107,7 +107,7 @@ ColumnLayout {
                 anchors.fill: parent
                 onClicked: {
                     if (root.songMode) {
-                        zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
+                        zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.toggleClip(partDelegate.clip)
                     } else {
                         partDelegate.clip.enabled = !partDelegate.clip.enabled;
                         root.channel.selectedPart = index;

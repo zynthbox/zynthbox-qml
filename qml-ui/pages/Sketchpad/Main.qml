@@ -43,7 +43,7 @@ Zynthian.ScreenPage {
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
     property bool displayTrackButtons: false
-    property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
+    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
 
     // Used to temporarily cache clip/channel object to be copied
     property var copySourceObj: null
@@ -823,10 +823,10 @@ Zynthian.ScreenPage {
                              id: sceneHeaderDelegate
 
                              property QtObject channel: root.song.channelsModel.getChannel(index)
-                             property QtObject mix: root.song.mixesModel.getMix(index)
+                             property QtObject sketch: root.song.sketchesModel.getSketch(index)
 
                              color: Kirigami.Theme.backgroundColor
-                             active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
+                             active: root.songMode ? !sceneHeaderDelegate.sketch.isEmpty : true
 
                              Layout.fillWidth: false
                              Layout.fillHeight: true
@@ -834,13 +834,13 @@ Zynthian.ScreenPage {
 
                              highlightOnFocus: false
                              highlighted: root.songMode
-                                             ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
+                                             ? sceneHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
                                              : root.displayTrackButtons
                                                  ? root.song.scenesModel.selectedTrackIndex === index
                                                  : zynthian.session_dashboard.selectedChannel === index
 
                              text: root.songMode
-                                     ? sceneHeaderDelegate.mix.name
+                                     ? sceneHeaderDelegate.sketch.name
                                      : root.displayTrackButtons
                                          ? qsTr("T%1").arg(index+1)
                                          : ""
@@ -848,8 +848,8 @@ Zynthian.ScreenPage {
 
                              onPressed: {
                                  if (root.songMode) {
-                                     root.song.mixesModel.selectedMixIndex = index
-                                     root.lastSelectedObj = sceneHeaderDelegate.mix
+                                     root.song.sketchesModel.selectedSketchIndex = index
+                                     root.lastSelectedObj = sceneHeaderDelegate.sketch
                                  } else if (root.displayTrackButtons) {
                                      root.lastSelectedObj = {
                                          className: "sketchpad_track",
@@ -972,22 +972,22 @@ Zynthian.ScreenPage {
                             if (zynthian.sketchpad.isMetronomeRunning) {
                                 applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
                             } else {
-                                zynthian.sketchpad.song.mixesModel.songMode = !zynthian.sketchpad.song.mixesModel.songMode
+                                zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode
                             }
                         }
                     }
 
                     Connections {
-                        target: root.song.mixesModel.selectedMix.segmentsModel
+                        target: root.song.sketchesModel.selectedSketch.segmentsModel
                         onSelectedSegmentIndexChanged: {
                             // When selectedSegmentIndex changes (i.e. being set with Big Knob), adjust visible segments so that selected segment is brought into view
                             if (root.songMode) {
-                                if (root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex > (channelsHeaderRepeater.segmentOffset+7)) {
-                                    console.log("selected segment is outside visible segments on the right :", root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex, channelsHeaderRepeater.segmentOffset, Math.min(channelsHeaderRepeater.maximumSegmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 7))
-                                    channelsHeaderRepeater.segmentOffset = Math.min(channelsHeaderRepeater.maximumSegmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex - 7)
-                                } else if (root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex < channelsHeaderRepeater.segmentOffset) {
-                                    console.log("selected segment is outside visible segments on the left :", root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex, channelsHeaderRepeater.segmentOffset, root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex)
-                                    channelsHeaderRepeater.segmentOffset = root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                if (root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex > (channelsHeaderRepeater.segmentOffset+7)) {
+                                    console.log("selected segment is outside visible segments on the right :", root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, channelsHeaderRepeater.segmentOffset, Math.min(channelsHeaderRepeater.maximumSegmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7))
+                                    channelsHeaderRepeater.segmentOffset = Math.min(channelsHeaderRepeater.maximumSegmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex - 7)
+                                } else if (root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex < channelsHeaderRepeater.segmentOffset) {
+                                    console.log("selected segment is outside visible segments on the left :", root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex, channelsHeaderRepeater.segmentOffset, root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex)
+                                    channelsHeaderRepeater.segmentOffset = root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                                 }
                             }
                         }
@@ -998,11 +998,11 @@ Zynthian.ScreenPage {
                         id: channelsHeaderRepeater
 
                         // Should show arrows is True when segment count is greater than 10 and hence needs arrows to scroll
-                        property bool shouldShowArrows: root.song.mixesModel.selectedMix.segmentsModel.count > 10
+                        property bool shouldShowArrows: root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
                         // Segment offset will determine what is the first segment to display when arrow keys are displayed
                         property int segmentOffset: 0
                         // Maximum segment offset allows the arrow keys to check if there are any more segments outside view
-                        property int maximumSegmentOffset: root.song.mixesModel.selectedMix.segmentsModel.count - 10 + 2
+                        property int maximumSegmentOffset: root.song.sketchesModel.selectedSketch.segmentsModel.count - 10 + 2
 
 
                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
@@ -1023,13 +1023,13 @@ Zynthian.ScreenPage {
                                                            (channelsHeaderRepeater.shouldShowArrows ? channelsHeaderRepeater.segmentOffset : 0) + // Offset index if arrows are visible else 0
                                                            (channelsHeaderRepeater.shouldShowArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
                             // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
-                            property QtObject segment: root.song.mixesModel.selectedMix.segmentsModel.count > 0
-                                                        ? root.song.mixesModel.selectedMix.segmentsModel.get_segment(channelHeaderDelegate.thisSegmentIndex)
+                            property QtObject segment: root.song.sketchesModel.selectedSketch.segmentsModel.count > 0
+                                                        ? root.song.sketchesModel.selectedSketch.segmentsModel.get_segment(channelHeaderDelegate.thisSegmentIndex)
                                                         : null
 
                             channel: root.song.channelsModel.getChannel(index)
                             text: root.songMode
-                                    ? root.song.mixesModel.selectedMix.segmentsModel.count > 10
+                                    ? root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
                                         ? index === 0
                                             ? "<"
                                             : index === 9
@@ -1176,7 +1176,7 @@ Zynthian.ScreenPage {
                                     }
 
                                     // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
-                                    return channelHeaderDelegate.thisSegmentIndex === root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex
+                                    return channelHeaderDelegate.thisSegmentIndex === root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
                                 } else {
                                     // If song mode is not active, highlight if current cell is selected channel
                                     return index === zynthian.session_dashboard.selectedChannel
@@ -1194,7 +1194,7 @@ Zynthian.ScreenPage {
                                     } else {
                                         // If song mode is active, clicking segment cells should activate that segment
                                         if (channelHeaderDelegate.segment) {
-                                            root.song.mixesModel.selectedMix.segmentsModel.selectedSegmentIndex = channelHeaderDelegate.thisSegmentIndex
+                                            root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = channelHeaderDelegate.thisSegmentIndex
                                             root.lastSelectedObj = channelHeaderDelegate.segment
                                         }
                                     }
@@ -1325,7 +1325,7 @@ Zynthian.ScreenPage {
                                         highlightOnFocus: false
                                         onPressed: {
                                             if (root.songMode) {
-                                                root.song.mixesModel.selectedMix.segmentsModel.selectedSegment.copyClipsFromScene(index)
+                                                root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegment.copyClipsFromScene(index)
                                             } else {
                                                 Zynthian.CommonUtils.switchToScene(index);
                                             }
@@ -1513,8 +1513,8 @@ Zynthian.ScreenPage {
                                                                           ? qsTr("Part")
                                                                           : root.lastSelectedObj.className === "sketchpad_segment"
                                                                             ? qsTr("Segment")
-                                                                            : root.lastSelectedObj.className === "sketchpad_mix"
-                                                                              ? qsTr("Mix")
+                                                                            : root.lastSelectedObj.className === "sketchpad_sketch"
+                                                                              ? qsTr("Sketch")
                                                                               : ""
                                                               : "")
                                     visible: root.copySourceObj == null
@@ -1568,11 +1568,11 @@ Zynthian.ScreenPage {
                                             } else if (root.copySourceObj.className === "sketchpad_segment" &&
                                                        root.copySourceObj !== root.lastSelectedObj &&
                                                        root.lastSelectedObj.className === "sketchpad_segment" &&
-                                                       root.copySourceObj.mixId === root.lastSelectedObj.mixId) {
+                                                       root.copySourceObj.sketchId === root.lastSelectedObj.sketchId) {
                                                return true
-                                            } else if (root.copySourceObj.className === "sketchpad_mix" &&
+                                            } else if (root.copySourceObj.className === "sketchpad_sketch" &&
                                                        root.copySourceObj !== root.lastSelectedObj &&
-                                                       root.lastSelectedObj.className === "sketchpad_mix") {
+                                                       root.lastSelectedObj.className === "sketchpad_sketch") {
                                                return true
                                             }
                                         }
@@ -1590,8 +1590,8 @@ Zynthian.ScreenPage {
                                                                                  ? qsTr("Part")
                                                                                  : root.lastSelectedObj.className === "sketchpad_segment"
                                                                                    ? qsTr("Segment")
-                                                                                   : root.lastSelectedObj.className === "sketchpad_mix"
-                                                                                     ? qsTr("Mix")
+                                                                                   : root.lastSelectedObj.className === "sketchpad_sketch"
+                                                                                     ? qsTr("Sketch")
                                                                                      : ""
                                                                    : "")
                                     onClicked: {
@@ -1661,7 +1661,7 @@ Zynthian.ScreenPage {
                                         } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_segment") {
                                             root.lastSelectedObj.copyFrom(root.copySourceObj)
                                             root.copySourceObj = null
-                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_mix") {
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_sketch") {
                                             root.lastSelectedObj.copyFrom(root.copySourceObj)
                                             root.copySourceObj = null
                                         }
@@ -1677,7 +1677,7 @@ Zynthian.ScreenPage {
                                              root.lastSelectedObj.className != null &&
                                              (root.lastSelectedObj.className === "sketchpad_clip" ||
                                               root.lastSelectedObj.className === "sketchpad_segment" ||
-                                              root.lastSelectedObj.className === "sketchpad_mix")
+                                              root.lastSelectedObj.className === "sketchpad_sketch")
                                     text: qsTr("Clear")
                                     onClicked: {
                                         if (root.lastSelectedObj.clear) {

@@ -71,7 +71,7 @@ QQC2.Popup {
             }
             ZL.AudioLevels.setChannelToRecord(channelIndex, shouldRecord);
         }
-        if (song.mixesModel.songMode) {
+        if (song.sketchesModel.songMode) {
             leadinSpin.value = 0;
             fadeoutSpin.value = 8;
         } else {
@@ -132,8 +132,8 @@ QQC2.Popup {
                 property double recordingProgress: -1
                 property QtObject song
 
-                property int songDurationInTicks: song && song.mixesModel.songMode
-                    ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * song.mixesModel.selectedMix.segmentsModel.totalBeatDuration
+                property int songDurationInTicks: song && song.sketchesModel.songMode
+                    ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration
                     : ZynQuick.PlayGridManager.syncTimer.getMultiplier() * songDurationSpin.value
                 property int leadinDurationInTicks: leadinSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
                 property int fadeoutDurationInTicks: fadeoutSpin.value * ZynQuick.PlayGridManager.syncTimer.getMultiplier()
@@ -365,7 +365,7 @@ QQC2.Popup {
             QQC2.SpinBox{
                 id: songDurationSpin
                 Layout.fillWidth: true
-                visible: _private.song && !_private.song.mixesModel.songMode
+                visible: _private.song && !_private.song.sketchesModel.songMode
                 Kirigami.FormData.label: qsTr("Recording duration in beats:")
                 enabled: !_private.isRecording
                 value: 32
@@ -398,14 +398,14 @@ QQC2.Popup {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: Kirigami.Units.gridUnit * 30
-            visible: _private.song && !_private.song.mixesModel.songMode
+            visible: _private.song && !_private.song.sketchesModel.songMode
             opacity: _private.recordingProgress > -1 ? 1 : 0.3
             value: _private.recordingProgress
         }
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit
-            visible: _private.song && _private.song.mixesModel.songMode && segmentsRepeater.count > 0
+            visible: _private.song && _private.song.sketchesModel.songMode && segmentsRepeater.count > 0
             Row {
                 id: songProgressRow
                 anchors.fill: parent
@@ -414,8 +414,8 @@ QQC2.Popup {
                 Kirigami.Theme.colorSet: Kirigami.Theme.Button
                 Repeater {
                     id: segmentsRepeater
-                    property double totalDuration: _private.song ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * _private.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration : 0
-                    model: component.visible && totalDuration > 0 ? _private.song.mixesModel.selectedMix.segmentsModel : 0
+                    property double totalDuration: _private.song ? ZynQuick.PlayGridManager.syncTimer.getMultiplier() * _private.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration : 0
+                    model: component.visible && totalDuration > 0 ? _private.song.sketchesModel.selectedSketch.segmentsModel : 0
                     delegate: Item {
                         id: segmentDelegate
                         property QtObject segment: model.segment

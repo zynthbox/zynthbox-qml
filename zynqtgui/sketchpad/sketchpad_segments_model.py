@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store mixes of a song in Sketchpad
+# A model to store sketches of a song in Sketchpad
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -32,12 +32,12 @@ from zynqtgui.sketchpad.sketchpad_segment import sketchpad_segment
 class sketchpad_segments_model(QAbstractListModel):
     SegmentRole = Qt.UserRole + 1
 
-    def __init__(self, song, mix):
+    def __init__(self, song, sketch):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
-        self.__mix = mix
+        self.__sketch = sketch
         self.__selected_segment_index = 0
         self.__segments = []
         self.totalBeatDurationThrottle = QTimer()
@@ -67,7 +67,7 @@ class sketchpad_segments_model(QAbstractListModel):
         self.__segments.clear()
 
         for index, segment_obj in enumerate(obj):
-            segment = sketchpad_segment(self.__mix, self, self.__song)
+            segment = sketchpad_segment(self.__sketch, self, self.__song)
             segment.deserialize(segment_obj)
             self.add_segment(index, segment)
 
@@ -117,7 +117,7 @@ class sketchpad_segments_model(QAbstractListModel):
     def new_segment(self, segment_index = -1):
         if segment_index == -1:
             segment_index = self.__segments.count()
-        newSegment = sketchpad_segment(self.__mix, self, self.__song)
+        newSegment = sketchpad_segment(self.__sketch, self, self.__song)
         self.__segments.insert(segment_index, newSegment)
         self.countChangedThrottle.start()
         self.totalBeatDurationThrottle.start()

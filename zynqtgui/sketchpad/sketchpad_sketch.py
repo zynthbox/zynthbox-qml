@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Sketchpad Part: An object to store mix
+# Sketchpad Part: An object to store sketch
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -30,59 +30,59 @@ from .sketchpad_segments_model import sketchpad_segments_model
 from zynqtgui import zynthian_gui_config
 
 
-class sketchpad_mix(QObject):
-    def __init__(self, mix_id, song):
+class sketchpad_sketch(QObject):
+    def __init__(self, sketch_id, song):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
-        self.__mix_id = mix_id
+        self.__sketch_id = sketch_id
         self.__segments_model = sketchpad_segments_model(song, self)
         self.__is_empty = True
 
     def serialize(self):
-        logging.debug("### Serializing Mix")
+        logging.debug("### Serializing Sketch")
 
         return {
-            "mixId": self.__mix_id,
+            "sketchId": self.__sketch_id,
             "segments": self.__segments_model.serialize(),
         }
 
     def deserialize(self, obj):
-        logging.debug("### Deserializing Mix")
+        logging.debug("### Deserializing Sketch")
 
-        if "mixId" in obj:
-            self.set_mixId(obj["mixId"], True)
+        if "sketchId" in obj:
+            self.set_sketchId(obj["sketchId"], True)
         if "segments" in obj:
             self.__segments_model.deserialize(obj["segments"])
 
     ### Property className
     def get_className(self):
-        return "sketchpad_mix"
+        return "sketchpad_sketch"
 
     className = Property(str, get_className, constant=True)
     ### END Property className
 
     ### Property name
     def get_name(self):
-        return f"Mix {self.__mix_id + 1}"
+        return f"Sketch {self.__sketch_id + 1}"
 
     name = Property(str, get_name, constant=True)
     ### END Property name
 
-    ### Property mixId
-    def get_mixId(self):
-        return self.__mix_id
+    ### Property sketchId
+    def get_sketchId(self):
+        return self.__sketch_id
 
-    def set_mixId(self, mix_id, force_set=False):
-        if self.__mix_id != mix_id or force_set:
-            self.__mix_id = mix_id
-            self.mixIdChanged.emit()
+    def set_sketchId(self, sketch_id, force_set=False):
+        if self.__sketch_id != sketch_id or force_set:
+            self.__sketch_id = sketch_id
+            self.sketchIdChanged.emit()
 
-    mixIdChanged = Signal()
+    sketchIdChanged = Signal()
 
-    mixId = Property(int, get_mixId, notify=mixIdChanged)
-    ### END Property mixId
+    sketchId = Property(int, get_sketchId, notify=sketchIdChanged)
+    ### END Property sketchId
 
     ### Property segmentsModel
     def get_segmentsModel(self):
@@ -123,8 +123,8 @@ class sketchpad_mix(QObject):
         self.set_isEmpty(is_empty)
 
     @Slot(QObject)
-    def copyFrom(self, dest_mix):
-        self.segmentsModel.copyFrom(dest_mix.segmentsModel)
+    def copyFrom(self, dest_sketch):
+        self.segmentsModel.copyFrom(dest_sketch.segmentsModel)
 
     @Slot()
     def clear(self):

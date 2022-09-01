@@ -32,8 +32,8 @@ from PySide2.QtCore import Qt, QTimer, Property, QObject, Signal, Slot
 
 import zynautoconnect
 from zynqtgui.sketchpad.libzl import libzl
-from .sketchpad_mix import sketchpad_mix
-from .sketchpad_mixes_model import sketchpad_mixes_model
+from .sketchpad_sketch import sketchpad_sketch
+from .sketchpad_sketches_model import sketchpad_sketches_model
 from .sketchpad_scenes_model import sketchpad_scenes_model
 from .sketchpad_segment import sketchpad_segment
 from .sketchpad_channel import sketchpad_channel
@@ -66,7 +66,7 @@ class sketchpad_song(QObject):
         self.__channels_model__ = sketchpad_channels_model(self)
         self.__parts_model__ = sketchpad_parts_model(self)
         self.__scenes_model__ = sketchpad_scenes_model(self)
-        self.__mixes_model__ = sketchpad_mixes_model(self)
+        self.__sketches_model__ = sketchpad_sketches_model(self)
         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
         self.__volume__ = 100
         self.__index__ = 0
@@ -100,7 +100,7 @@ class sketchpad_song(QObject):
             self.__parts_model__ = sketchpad_parts_model(self)
             self.__channels_model__ = sketchpad_channels_model(self)
             self.__scenes_model__ = sketchpad_scenes_model(self)
-            self.__mixes_model__ = sketchpad_mixes_model(self)
+            self.__sketches_model__ = sketchpad_sketches_model(self)
 
             # Add default parts
             for i in range(0, 10):
@@ -121,16 +121,16 @@ class sketchpad_song(QObject):
                 channel = self.__channels_model__.getChannel(channel_index)
                 channel.getClipsModelByPart(0).getClip(0).enabled = True
 
-            # Add default Mixes and Segments
-            for mix_index in range(10):
-                mix = sketchpad_mix(mix_index, self)
-                segment = sketchpad_segment(mix, mix.segmentsModel, self)
-                mix.segmentsModel.add_segment(0, segment)
+            # Add default Sketches and Segments
+            for sketch_index in range(10):
+                sketch = sketchpad_sketch(sketch_index, self)
+                segment = sketchpad_segment(sketch, sketch.segmentsModel, self)
+                sketch.segmentsModel.add_segment(0, segment)
 
-                self.__mixes_model__.add_mix(mix_index, mix)
+                self.__sketches_model__.add_sketch(sketch_index, sketch)
 
         self.bpm_changed.emit()
-        # Emit bpm changed to get bpm of selectedMix
+        # Emit bpm changed to get bpm of selectedSketch
         self.__scenes_model__.selected_track_index_changed.connect(self.bpm_changed.emit)
 
         # Create wav dir for recording
@@ -167,7 +167,7 @@ class sketchpad_song(QObject):
             "channels": self.__channels_model__.serialize(),
             "parts": self.__parts_model__.serialize(),
             "scenes": self.__scenes_model__.serialize(),
-            "mixes": self.__mixes_model__.serialize()
+            "sketches": self.__sketches_model__.serialize()
         }
 
     def save(self, cache=True):
@@ -338,8 +338,8 @@ class sketchpad_song(QObject):
                     self.__channels_model__.deserialize(sketchpad["channels"])
                 if "scenes" in sketchpad:
                     self.__scenes_model__.deserialize(sketchpad["scenes"])
-                if "mixes" in sketchpad:
-                    self.__mixes_model__.deserialize(sketchpad["mixes"])
+                if "sketches" in sketchpad:
+                    self.__sketches_model__.deserialize(sketchpad["sketches"])
                 if "bpm" in sketchpad:
                     # In older sketchpad files, bpm would still be an int instead of a list
                     # So if bpm is not a list, then generate a list and store it
@@ -512,14 +512,14 @@ class sketchpad_song(QObject):
         return self.__scenes_model__
     scenesModel = Property(QObject, scenesModel, notify=__scenes_model_changed__)
 
-    ### Property mixesModel
-    def get_mixesModel(self):
-        return self.__mixes_model__
+    ### Property sketchesModel
+    def get_sketchesModel(self):
+        return self.__sketches_model__
 
-    mixesModelChanged = Signal()
+    sketchesModelChanged = Signal()
 
-    mixesModel = Property(QObject, get_mixesModel, notify=mixesModelChanged)
-    ### END Property mixesModel
+    sketchesModel = Property(QObject, get_sketchesModel, notify=sketchesModelChanged)
+    ### END Property sketchesModel
 
     def isPlaying(self):
         return self.__is_playing__

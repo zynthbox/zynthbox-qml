@@ -29,7 +29,7 @@ import org.kde.kirigami 2.6 as Kirigami
 ColumnLayout {
     id: root
 
-    property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
+    property bool songMode: zynthian.sketchpad.song.sketchesModel.songMode
     property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
 
     QQC2.Button {

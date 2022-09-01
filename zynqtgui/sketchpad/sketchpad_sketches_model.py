@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# A model to store mixes of a song in Sketchpad
+# A model to store sketches of a song in Sketchpad
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -26,43 +26,43 @@ import logging
 
 from PySide2.QtCore import QAbstractListModel, QObject, Qt, Property, Signal, Slot
 from zynqtgui import zynthian_gui_config
-from zynqtgui.sketchpad.sketchpad_mix import sketchpad_mix
+from zynqtgui.sketchpad.sketchpad_sketch import sketchpad_sketch
 
 
-class sketchpad_mixes_model(QAbstractListModel):
-    MixRole = Qt.UserRole + 1
+class sketchpad_sketches_model(QAbstractListModel):
+    SketchRole = Qt.UserRole + 1
 
     def __init__(self, song):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
-        self.__selected_mix_index = 0
-        self.__mixes: dict[int, sketchpad_mix] = {}
+        self.__selected_sketch_index = 0
+        self.__sketches: dict[int, sketchpad_sketch] = {}
         self.__song_mode = False
 
     def serialize(self):
-        logging.debug("### Serializing Mixes Model")
+        logging.debug("### Serializing Sketches Model")
 
         return {
-            "selectedMixIndex": self.__selected_mix_index,
-            "mixes": [self.__mixes[mix_index].serialize() for mix_index in self.__mixes],
+            "selectedSketchIndex": self.__selected_sketch_index,
+            "sketches": [self.__sketches[sketch_index].serialize() for sketch_index in self.__sketches],
         }
 
     def deserialize(self, obj):
-        logging.debug("### Deserializing Mixes Model")
+        logging.debug("### Deserializing Sketches Model")
 
-        if "selectedMixIndex" in obj:
-            self.set_selectedMixIndex(obj["selectedMixIndex"], True)
-        if "mixes" in obj:
+        if "selectedSketchIndex" in obj:
+            self.set_selectedSketchIndex(obj["selectedSketchIndex"], True)
+        if "sketches" in obj:
             self.beginResetModel()
-            self.__mixes.clear()
+            self.__sketches.clear()
 
-            for mix_obj in obj["mixes"]:
-                mix = sketchpad_mix(-1, self.__song)
-                mix.deserialize(mix_obj)
+            for sketch_obj in obj["sketches"]:
+                sketch = sketchpad_sketch(-1, self.__song)
+                sketch.deserialize(sketch_obj)
 
-                self.add_mix(mix.mixId, mix)
+                self.add_sketch(sketch.sketchId, sketch)
 
             self.endResetModel()
 
@@ -70,18 +70,18 @@ class sketchpad_mixes_model(QAbstractListModel):
         if not index.isValid():
             return None
 
-        if index.row() > len(self.__mixes):
+        if index.row() > len(self.__sketches):
             return None
 
-        if role == self.MixRole:
-            return self.__mixes[index.row()]
+        if role == self.SketchRole:
+            return self.__sketches[index.row()]
         else:
             return None
 
     def roleNames(self):
         role_names = {
             Qt.DisplayRole: b'display',
-            self.MixRole: b"mix",
+            self.SketchRole: b"sketch",
         }
 
         return role_names
@@ -89,38 +89,38 @@ class sketchpad_mixes_model(QAbstractListModel):
     def rowCount(self, index):
         return self.get_count()
 
-    def add_mix(self, mix_index, mix: sketchpad_mix):
-        self.__mixes[mix_index] = mix
+    def add_sketch(self, sketch_index, sketch: sketchpad_sketch):
+        self.__sketches[sketch_index] = sketch
 
     ### Property count
     def get_count(self):
-        return len(self.__mixes)
+        return len(self.__sketches)
 
     countChanged = Signal()
 
     count = Property(int, get_count, notify=countChanged)
     ### END Property count
 
-    ### Property selectedMixIndex
-    def get_selectedMixIndex(self):
-        return self.__selected_mix_index
+    ### Property selectedSketchIndex
+    def get_selectedSketchIndex(self):
+        return self.__selected_sketch_index
 
-    def set_selectedMixIndex(self, index, force_set=False):
-        if self.__selected_mix_index != index or force_set:
-            self.__selected_mix_index = index
-            self.selectedMixIndexChanged.emit()
+    def set_selectedSketchIndex(self, index, force_set=False):
+        if self.__selected_sketch_index != index or force_set:
+            self.__selected_sketch_index = index
+            self.selectedSketchIndexChanged.emit()
 
-    selectedMixIndexChanged = Signal()
+    selectedSketchIndexChanged = Signal()
 
-    selectedMixIndex = Property(int, get_selectedMixIndex, set_selectedMixIndex, notify=selectedMixIndexChanged)
-    ### END Property selectedMixIndex
+    selectedSketchIndex = Property(int, get_selectedSketchIndex, set_selectedSketchIndex, notify=selectedSketchIndexChanged)
+    ### END Property selectedSketchIndex
 
-    ### Property selectedMix
-    def get_selectedMix(self):
-        return self.__mixes[self.__selected_mix_index]
+    ### Property selectedSketch
+    def get_selectedSketch(self):
+        return self.__sketches[self.__selected_sketch_index]
 
-    selectedMix = Property(QObject, get_selectedMix, notify=selectedMixIndexChanged)
-    ### END Property selectedMix
+    selectedSketch = Property(QObject, get_selectedSketch, notify=selectedSketchIndexChanged)
+    ### END Property selectedSketch
 
     ### Property songMode
     def get_songMode(self):
@@ -138,9 +138,9 @@ class sketchpad_mixes_model(QAbstractListModel):
     ### END Property songMode
 
     @Slot(int, result=QObject)
-    def getMix(self, mix_index):
+    def getSketch(self, sketch_index):
         try:
-            return self.__mixes[mix_index]
+            return self.__sketches[sketch_index]
         except:
             return None
 

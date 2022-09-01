@@ -1,8 +1,8 @@
 .import org.zynthian.quick 1.0 as ZynQuick
 
 function startMetronomeAndPlayback() {
-    if (zynthian.sketchpad.song.mixesModel.songMode) {
-        if (zynthian.sketchpad.song.mixesModel.selectedMix.segmentsModel.totalBeatDuration > 0) {
+    if (zynthian.sketchpad.song.sketchesModel.songMode) {
+        if (zynthian.sketchpad.song.sketchesModel.selectedSketch.segmentsModel.totalBeatDuration > 0) {
             ZynQuick.SegmentHandler.startPlayback(0, 0);
         }
     } else {
@@ -24,7 +24,7 @@ function startMetronomeAndPlayback() {
 }
 
 function stopMetronomeAndPlayback() {
-    if (zynthian.sketchpad.song.mixesModel.songMode) {
+    if (zynthian.sketchpad.song.sketchesModel.songMode) {
         zynthian.sketchpad.stopAllPlayback();
         ZynQuick.SegmentHandler.stopPlayback();
         zynthian.sketchpad.resetMetronome();

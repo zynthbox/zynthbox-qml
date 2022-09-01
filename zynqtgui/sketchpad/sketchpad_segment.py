@@ -29,12 +29,12 @@ from zynqtgui import zynthian_gui_config
 
 
 class sketchpad_segment(QObject):
-    def __init__(self, mix, segment_model, song):
+    def __init__(self, sketch, segment_model, song):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
 
         self.__song = song
-        self.__mix = mix
+        self.__sketch = sketch
         self.__bar_length = 0
         self.__beat_length = 0
         self.__clips = []
@@ -47,8 +47,8 @@ class sketchpad_segment(QObject):
         self.beatLengthChanged.connect(self.isEmptyChanged.emit)
         self.clipsChanged.connect(self.isEmptyChanged.emit)
 
-        # Update mix isEmpty when segment isEmpty is updated
-        self.isEmptyChanged.connect(self.__mix.segment_is_empty_changed_handler, Qt.QueuedConnection)
+        # Update sketch isEmpty when segment isEmpty is updated
+        self.isEmptyChanged.connect(self.__sketch.segment_is_empty_changed_handler, Qt.QueuedConnection)
 
         self.__song.scenesModel.selected_track_index_changed.connect(self.clipsChanged.emit)
         for channel_index in range(10):
@@ -108,14 +108,14 @@ class sketchpad_segment(QObject):
     name = Property(str, get_name, constant=True)
     ### END Property name
 
-    ### Property mixId
-    def get_mixId(self):
-        return self.__mix.mixId
+    ### Property sketchId
+    def get_sketchId(self):
+        return self.__sketch.sketchId
 
-    mixIdChanged = Signal()
+    sketchIdChanged = Signal()
 
-    mixId = Property(int, get_mixId, notify=mixIdChanged)
-    ### END Property mixId
+    sketchId = Property(int, get_sketchId, notify=sketchIdChanged)
+    ### END Property sketchId
 
     ### Property segmentId
     def get_segmentId(self):
@@ -209,7 +209,7 @@ class sketchpad_segment(QObject):
 
             logging.debug(f"Adding clip(row: {clip.row}, col: {clip.col}) to segment {self.segmentId}")
             self.__clips.append(clip)
-            self.zyngui.sketchpad.song.mixesModel.clipAdded.emit(self.__mix.mixId, self.segmentId, clip)
+            self.zyngui.sketchpad.song.sketchesModel.clipAdded.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
 
             if self.zyngui.sketchpad.song is not None:
@@ -224,7 +224,7 @@ class sketchpad_segment(QObject):
         if clip in self.__clips:
             logging.debug(f"Removing clip(row: {clip.row}, col: {clip.col}) from segment {self.segmentId}")
             self.__clips.remove(clip)
-            self.zyngui.sketchpad.song.mixesModel.clipRemoved.emit(self.__mix.mixId, self.segmentId, clip)
+            self.zyngui.sketchpad.song.sketchesModel.clipRemoved.emit(self.__sketch.sketchId, self.segmentId, clip)
             self.clipsChanged.emit()
 
             if self.zyngui.sketchpad.song is not None:
@@ -276,7 +276,7 @@ class sketchpad_segment(QObject):
 
         # Iterate all segments till current to determine offset in beats
         for segment_index in range(self.segmentId):
-            segment = self.__mix.segmentsModel.get_segment(segment_index)
+            segment = self.__sketch.segmentsModel.get_segment(segment_index)
             offset += segment.barLength * 4 + segment.beatLength
 
         return offset

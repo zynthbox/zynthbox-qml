@@ -673,7 +673,7 @@ def audio_autoconnect(force=False):
 						except:
 							pass
 				else:
-					#logger.debug(" => Disconnecting from {} : {}".format(ao,jrange))
+					logger.error(" => Disconnecting from {} : {}".format(ao,jrange))
 					for j in jrange:
 						try:
 							jclient.disconnect(ports[j%np],input_ports[ao][j%nip])
@@ -937,7 +937,7 @@ def get_audio_input_ports(exclude_system_playback=False):
 		for aip in jclient.get_ports(is_input=True, is_audio=True, is_physical=False):
 			parts=aip.name.split(':')
 			client_name=parts[0]
-			if client_name=="jack_capture" or client_name=="jackpeak" or client_name[:7]=="effect_":
+			if client_name=="jack_capture" or client_name=="jackpeak" or client_name[:7]=="effect_" or client_name.startswith("AudioLevels-"):
 				continue
 			if client_name=="system":
 				if exclude_system_playback:

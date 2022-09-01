@@ -820,9 +820,9 @@ def audio_autoconnect(force=False):
 					pass
 
 		# Connect to AudioLevels client
-		audiolevels_out = jclient.get_ports("sketchpad_audio_levels_client:playback_port_", is_input=True, is_audio=True)
-		audiolevels_connected_ports_1 = jclient.get_all_connections("sketchpad_audio_levels_client:playback_port_a")
-		audiolevels_connected_ports_2 = jclient.get_all_connections("sketchpad_audio_levels_client:playback_port_b")
+		audiolevels_out = jclient.get_ports("AudioLevels-SystemPlayback:", is_input=True, is_audio=True)
+		audiolevels_connected_ports_1 = jclient.get_all_connections("AudioLevels-SystemPlayback:left_in")
+		audiolevels_connected_ports_2 = jclient.get_all_connections("AudioLevels-SystemPlayback:right_in")
 		# Disconnect ports (that is, any that aren't connected to the system playback ports)
 		for connected_port in audiolevels_connected_ports_1:
 			if connected_port in sysout_conports_1:

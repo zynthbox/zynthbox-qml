@@ -389,7 +389,7 @@ class sketchpad_channel(QObject):
                             logging.error(f"### update_jack_port Error : {str(e)}")
 
             try:
-                for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"sketchpad_audio_levels_client:Ch{self.id + 1}A", f"sketchpad_audio_levels_client:Ch{self.id + 1}B"]):
+                for port in zip([f"SamplerSynth-channel_{self.id + 1}:left_out", f"SamplerSynth-channel_{self.id + 1}:right_out"], [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
                     try:
                         if channelHasEffects:
                             p = Popen(("jack_disconnect", port[1], port[0]))
@@ -410,10 +410,10 @@ class sketchpad_channel(QObject):
                     ports = [x.name for x in jack.Client("").get_ports(name_pattern=port_name, is_output=True, is_audio=True, is_physical=False)]
 
                     # Map first port from jack.Client.get_ports to channel A and second port to channel B
-                    for port in zip(ports, [f"Ch{self.id + 1}A", f"Ch{self.id + 1}B"]):
-                        logging.error(f"Connecting port sketchpad_audio_levels_client:{port[1]} -> {port[0]}")
+                    for port in zip(ports, [f"AudioLevels-Channel{self.id + 1}:left_in", f"AudioLevels-Channel{self.id + 1}:right_in"]):
+                        logging.error(f"Connecting port {port[0]} -> {port[1]}")
                         port_names.append(port[0])
-                        p = Popen(("jack_connect", f"sketchpad_audio_levels_client:{port[1]}", port[0]))
+                        p = Popen(("jack_connect", port[0], port[1]))
                         p.wait()
                 except Exception as e:
                     logging.error(f"Error processing jack port for Ch{self.id + 1} : {port}({str(e)})")

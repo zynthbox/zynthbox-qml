@@ -151,16 +151,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
     def init_jack_client(self):
         try:
-            jack.Client('').get_port_by_name("sketchpad_audio_levels_client:playback_port_a")
-            self.jack_client = jack.Client('sketchpad_audio_levels_client')
-            logging.info(f"*** sketchpad_audio_levels_client Jack client found. Continuing")
+            jack.Client('').get_port_by_name("AudioLevels-SystemPlayback:left_in")
+            self.jack_client = jack.Client('AudioLevels-SystemPlayback')
+            logging.info(f"*** AudioLevels-SystemPlayback Jack client found. Continuing")
 
             # Connect all jack ports of respective channel after jack client initialization is done.
             for i in range(0, self.__song__.channelsModel.count):
                 channel = self.__song__.channelsModel.getChannel(i)
                 channel.update_jack_port()
         except:
-            logging.info(f"*** sketchpad_audio_levels_client Jack client not found. Checking again in 1000ms")
+            logging.info(f"*** AudioLevels-SystemPlayback Jack client not found. Checking again in 1000ms")
             self.__jack_client_init_timer__.start()
 
     def connect_control_objects(self):

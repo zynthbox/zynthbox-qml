@@ -13,7 +13,7 @@ ColumnLayout {
     id: root
     property QtObject channel
     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the component, which is very slow
-    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName) : null
+    property QtObject sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject selectedPartClip
     property QtObject selectedPartPattern
     property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
@@ -28,7 +28,7 @@ ColumnLayout {
             id: partDelegate
             property int partIndex: index
             property QtObject pattern: root.sequence.getByPart(root.channel.id, model.index)
-            property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+            property QtObject clip: root.channel.getClipsModelByPart(partDelegate.partIndex).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
             property bool clipHasWav: partDelegate.clip && partDelegate.clip.path && partDelegate.clip.path.length > 0
 
             Layout.fillWidth: true

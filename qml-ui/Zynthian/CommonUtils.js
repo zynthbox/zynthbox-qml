@@ -8,7 +8,7 @@ function startMetronomeAndPlayback() {
     } else {
         console.log("Starting Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("T" + (i+1));
             if (sequence) {
                 sequence.prepareSequencePlayback();
             } else {
@@ -31,7 +31,7 @@ function stopMetronomeAndPlayback() {
     } else {
         console.log("Stopping Metronome and Playback");
         for (var i = 0; i < 10; ++i) {
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel("S" + (i+1));
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel("T" + (i+1));
             if (sequence) {
                 sequence.stopSequencePlayback();
             } else {
@@ -50,7 +50,7 @@ function stopMetronomeAndPlayback() {
                     var clip = zynthian.sketchpad.clipsToRecord[clipIndex]
 
                     if (!clip.isChannelSample) {
-                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName)
+                        var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
                         var pattern = sequence.getByPart(clip.row, clip.part)
 
                         console.log("Applying pattern to", pattern, " for ", clip, clip.row, clip.col, clip.part)

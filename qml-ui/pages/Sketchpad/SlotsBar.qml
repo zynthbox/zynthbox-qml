@@ -159,7 +159,7 @@ Rectangle {
             zynthian.fixed_layers.activate_index(root.selectedSlotRowItem.channel.connectedSound);
 
             if (root.selectedSlotRowItem.channel.connectedPattern >= 0) {
-                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
+                var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedSlotRowItem.channel.id, root.selectedSlotRowItem.channel.selectedPart);
                 pattern.midiChannel = root.selectedSlotRowItem.channel.connectedSound;
             }
         }
@@ -222,7 +222,7 @@ Rectangle {
             }
         } else if (type === "sample-loop") {
             if (root.selectedChannel.selectedSlotRow === 0) {
-                var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 
                 if (zynthian.backButtonPressed) {
                     clip.clear()
@@ -773,7 +773,7 @@ Rectangle {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex).path = file.filePath
+            root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
         }
     }
 

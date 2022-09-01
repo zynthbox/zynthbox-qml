@@ -123,7 +123,7 @@ QQC2.Dialog {
                 interval: 200
                 onTriggered: {
                     if (root.selectedChannel.connectedPattern >= 0) {
-                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
+                        var pattern = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName).getByPart(root.selectedChannel.id, root.selectedChannel.selectedPart);
                         pattern.midiChannel = root.selectedChannel.connectedSound;
                     }
                 }

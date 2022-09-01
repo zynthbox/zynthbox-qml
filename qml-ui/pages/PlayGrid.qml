@@ -661,7 +661,7 @@ don't want to have to dig too far...
     //   Each scene/part/channel combination is corresponds to one specific pattern
     // Synchronising the states means matching each pattern with the scene/part/channel leaf in the channel's tree of data
     // The specific pattern for a leaf can be deduced through the name of the scene, the channel's index, and the part's index in that channel
-    // and fetched from PlayGridManager by asking for the sequence by name ("S1" for example), and then
+    // and fetched from PlayGridManager by asking for the sequence by name ("T1" for example), and then
     // calling getByPart(channelIndex, partIndex) to fetch the specific pattern
     Repeater {
         model: zynthian.sketchpad.song.channelsModel
@@ -679,7 +679,7 @@ don't want to have to dig too far...
                     id: channelPartSceneDelegate
                     property QtObject sceneClip: model.clip
                     property int sceneIndex: model.index
-                    property string connectedSequenceName: "S" + (model.index + 1)
+                    property string connectedSequenceName: "T" + (model.index + 1)
                     property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(connectedSequenceName, false); // The bool parameter here makes the system not load the patterns
                     property int sequenceIndex: model.index;
                     property QtObject pattern: sequence && sequence.count > 0 ? channelPartSceneDelegate.sequence.getByPart(baseChannelDelegate.channelIndex, channelPartDelegate.partIndex) : null;

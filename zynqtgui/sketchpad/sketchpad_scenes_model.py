@@ -37,7 +37,7 @@ class sketchpad_scenes_model(QAbstractListModel):
         super().__init__(song)
         self.zyngui = zynthian_gui_config.zyngui
         self.__song__ = song
-        self.__selected_sketch_index__ = 0
+        self.__selected_track_index__ = 0
         self.__selected_scene_index__ = 0
         self.__scenes__ = {
             "0": {"name": "A", "clips": []},
@@ -52,10 +52,10 @@ class sketchpad_scenes_model(QAbstractListModel):
             "9": {"name": "J", "clips": []},
         }
 
-        self.__sketch_name_change_timer = QTimer(self)
-        self.__sketch_name_change_timer.setInterval(10)
-        self.__sketch_name_change_timer.setSingleShot(True)
-        self.__sketch_name_change_timer.timeout.connect(self.selected_sketch_name_changed)
+        self.__track_name_change_timer = QTimer(self)
+        self.__track_name_change_timer.setInterval(10)
+        self.__track_name_change_timer.setSingleShot(True)
+        self.__track_name_change_timer.timeout.connect(self.selected_track_name_changed)
 
         self.__new_name_change_timer = QTimer(self)
         self.__new_name_change_timer.setInterval(10)
@@ -80,7 +80,7 @@ class sketchpad_scenes_model(QAbstractListModel):
         # logging.error(f"{self.__scenes__}")
         return {
             "scenesData": scene_data,
-            "selectedSketchIndex": self.__selected_sketch_index__,
+            "selectedTrackIndex": self.__selected_track_index__,
             "selectedSceneIndex": self.__selected_scene_index__,
         }
 
@@ -95,9 +95,9 @@ class sketchpad_scenes_model(QAbstractListModel):
                                                                                        clip["part"])
             self.endResetModel()
 
-        if "selectedSketchIndex" in obj:
-            self.__selected_sketch_index__ = obj["selectedSketchIndex"]
-            self.selected_sketch_index_changed.emit()
+        if "selectedTrackIndex" in obj:
+            self.__selected_track_index__ = obj["selectedTrackIndex"]
+            self.selected_track_index_changed.emit()
 
         if "selectedSceneIndex" in obj:
             self.__selected_scene_index__ = obj["selectedSceneIndex"]
@@ -133,32 +133,32 @@ class sketchpad_scenes_model(QAbstractListModel):
     count = Property(int, count, notify=countChanged)
     ### END Property count
 
-    ### Property selectedSketchIndex
-    def get_selected_sketch_index(self):
-        return self.__selected_sketch_index__
-    def set_selected_sketch_index(self, index, force_set=False):
-        if self.__selected_sketch_index__ != index or force_set is True:
-            self.stopScene(self.selectedSceneIndex, self.selectedSketchIndex)
-            self.__selected_sketch_index__ = index
-            self.playScene(self.selectedSceneIndex, self.selectedSketchIndex)
+    ### Property selectedTrackIndex
+    def get_selected_track_index(self):
+        return self.__selected_track_index__
+    def set_selected_track_index(self, index, force_set=False):
+        if self.__selected_track_index__ != index or force_set is True:
+            self.stopScene(self.selectedSceneIndex, self.selectedTrackIndex)
+            self.__selected_track_index__ = index
+            self.playScene(self.selectedSceneIndex, self.selectedTrackIndex)
             self.__song__.schedule_save()
 
-            self.selected_sketch_index_changed.emit()
+            self.selected_track_index_changed.emit()
             self.syncClipsEnabledFromCurrentScene()
-            self.__sketch_name_change_timer.start()
+            self.__track_name_change_timer.start()
 
-    selected_sketch_index_changed = Signal()
-    selected_sketch_name_changed = Signal()
-    selectedSketchIndex = Property(int, get_selected_sketch_index, set_selected_sketch_index, notify=selected_sketch_index_changed)
-    ### END Property selectedSketchIndex
+    selected_track_index_changed = Signal()
+    selected_track_name_changed = Signal()
+    selectedTrackIndex = Property(int, get_selected_track_index, set_selected_track_index, notify=selected_track_index_changed)
+    ### END Property selectedTrackIndex
 
     ### Property selectedSceneIndex
     def get_selected_scene_index(self):
         return self.__selected_scene_index__
     def set_selected_scene_index(self, index):
-        self.stopScene(self.selectedSceneIndex, self.selectedSketchIndex)
+        self.stopScene(self.selectedSceneIndex, self.selectedTrackIndex)
         self.__selected_scene_index__ = index
-        self.playScene(self.selectedSceneIndex, self.selectedSketchIndex)
+        self.playScene(self.selectedSceneIndex, self.selectedTrackIndex)
         self.__song__.schedule_save()
 
         self.selected_scene_index_changed.emit()
@@ -168,14 +168,14 @@ class sketchpad_scenes_model(QAbstractListModel):
     selected_scene_index_changed = Signal()
     selected_scene_name_changed = Signal()
     selectedSceneIndex = Property(int, get_selected_scene_index, set_selected_scene_index, notify=selected_scene_index_changed)
-    ### END Property selectedSketchIndex
+    ### END Property selectedTrackIndex
 
-    ### Property selectedSketchName
-    def get_selected_sketch_name(self):
-        return f"S{self.__selected_sketch_index__ + 1}"
+    ### Property selectedTrackName
+    def get_selected_track_name(self):
+        return f"T{self.__selected_track_index__ + 1}"
 
-    selectedSketchName = Property(str, get_selected_sketch_name, notify=selected_sketch_name_changed)
-    ### END Property selectedSketchName
+    selectedTrackName = Property(str, get_selected_track_name, notify=selected_track_name_changed)
+    ### END Property selectedTrackName
 
     ### Property selectedSceneName
     def get_selected_scene_name(self):
@@ -188,7 +188,7 @@ class sketchpad_scenes_model(QAbstractListModel):
         # Sync enabled attribute for clips in scene
         for channel in range(10):
             for part in range(5):
-                clip = self.__song__.getClipByPart(channel, self.selectedSketchIndex, part)
+                clip = self.__song__.getClipByPart(channel, self.selectedTrackIndex, part)
 
                 if clip is not None and self.isClipInCurrentScene(clip):
                     clip.enabled = True
@@ -196,7 +196,7 @@ class sketchpad_scenes_model(QAbstractListModel):
                     clip.enabled = False
 
     @Slot(int)
-    def playScene(self, sceneIndex, sketchIndex=-1):
+    def playScene(self, sceneIndex, trackIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
@@ -205,16 +205,16 @@ class sketchpad_scenes_model(QAbstractListModel):
             # Start all clips except clip to be recorded
             if clip != self.zyngui.sketchpad.clipToRecord and \
                     clip.part == clip.clipChannel.selectedPart and \
-                    (sketchIndex < 0 or (0 <= sketchIndex == clip.col)):
+                    (trackIndex < 0 or (0 <= trackIndex == clip.col)):
                 clip.play()
 
     @Slot(int)
-    def stopScene(self, sceneIndex, sketchIndex=-1):
+    def stopScene(self, sceneIndex, trackIndex=-1):
         scene = self.getScene(sceneIndex)
 
         for i in range(0, len(scene["clips"])):
             clip = scene["clips"][i]
-            if sketchIndex < 0 or (0 <= sketchIndex == clip.col):
+            if trackIndex < 0 or (0 <= trackIndex == clip.col):
                 clip.stop()
 
     @Slot(int, result='QVariantMap')
@@ -274,10 +274,10 @@ class sketchpad_scenes_model(QAbstractListModel):
         return len(self.getScene(scene_index)["clips"])
 
     @Slot(int, int, result=None)
-    def copySketch(self, from_sketch, to_sketch):
+    def copyTrack(self, from_track, to_track):
         for i in range(0, self.__song__.channelsModel.count):
             channel = self.__song__.channelsModel.getChannel(i)
             for part in range(5):
-                channel.parts[part].getClip(to_sketch).copyFrom(channel.parts[part].getClip(from_sketch))
+                channel.parts[part].getClip(to_track).copyFrom(channel.parts[part].getClip(from_track))
 
     clipCountChanged = Signal()

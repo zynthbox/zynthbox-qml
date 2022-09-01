@@ -131,7 +131,7 @@ class sketchpad_song(QObject):
 
         self.bpm_changed.emit()
         # Emit bpm changed to get bpm of selectedMix
-        self.__scenes_model__.selected_sketch_index_changed.connect(self.bpm_changed.emit)
+        self.__scenes_model__.selected_track_index_changed.connect(self.bpm_changed.emit)
 
         # Create wav dir for recording
         (Path(self.sketchpad_folder) / 'wav').mkdir(parents=True, exist_ok=True)
@@ -347,9 +347,9 @@ class sketchpad_song(QObject):
                         self.__bpm__ = sketchpad["bpm"]
                     else:
                         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-                        self.__bpm__[self.__scenes_model__.selectedSketchIndex] = sketchpad["bpm"]
+                        self.__bpm__[self.__scenes_model__.selectedTrackIndex] = sketchpad["bpm"]
 
-                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex], True)
+                    self.set_bpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex], True)
 
                 self.__is_loading__ = False
                 self.isLoadingChanged.emit()
@@ -536,11 +536,11 @@ class sketchpad_song(QObject):
     #     self.schedule_save()
 
     def bpm(self):
-        return self.__bpm__[self.__scenes_model__.selectedSketchIndex]
+        return self.__bpm__[self.__scenes_model__.selectedTrackIndex]
 
     def set_bpm(self, bpm: int, force_set=False):
-        if self.__bpm__[self.__scenes_model__.selectedSketchIndex] != math.floor(bpm) or force_set is True:
-            self.__bpm__[self.__scenes_model__.selectedSketchIndex] = math.floor(bpm)
+        if self.__bpm__[self.__scenes_model__.selectedTrackIndex] != math.floor(bpm) or force_set is True:
+            self.__bpm__[self.__scenes_model__.selectedTrackIndex] = math.floor(bpm)
 
             # Update blink timer interval with change in bpm
             self.zyngui.wsleds_blink_timer.stop()
@@ -551,7 +551,7 @@ class sketchpad_song(QObject):
             if not self.zyngui.sketchpad.isMetronomeRunning:
                 self.zyngui.wsleds_blink_timer.start()
 
-            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex])
+            libzl.setBpm(self.__bpm__[self.__scenes_model__.selectedTrackIndex])
             # Call zyngui global set_selector when bpm changes as bpm is controlled by Big Knob
             # when global popup is opened
             self.zyngui.set_selector()

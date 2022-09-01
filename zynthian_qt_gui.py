@@ -2107,13 +2107,13 @@ class zynthian_gui(QObject):
 
         elif cuia == "SCENE_UP":
             try:
-                self.screens["sketchpad"].song.scenesModel.selectedSketchIndex = max(0, self.screens["sketchpad"].song.scenesModel.selectedSketchIndex - 1)
+                self.screens["sketchpad"].song.scenesModel.selectedTrackIndex = max(0, self.screens["sketchpad"].song.scenesModel.selectedTrackIndex - 1)
             except:
                 pass
 
         elif cuia == "SCENE_DOWN":
             try:
-                self.screens["sketchpad"].song.scenesModel.selectedSketchIndex = min(self.screens["sketchpad"].song.scenesModel.count - 1, self.screens["sketchpad"].song.scenesModel.selectedSketchIndex + 1)
+                self.screens["sketchpad"].song.scenesModel.selectedTrackIndex = min(self.screens["sketchpad"].song.scenesModel.count - 1, self.screens["sketchpad"].song.scenesModel.selectedTrackIndex + 1)
             except:
                 pass
 

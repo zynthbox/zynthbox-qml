@@ -34,8 +34,8 @@ import org.zynthian.quick 1.0 as ZynQuick
 
 QQC2.Popup {
     id: root
-    function bounce(sketchName, channel) {
-        _private.sketchName = sketchName;
+    function bounce(trackName, channel) {
+        _private.trackName = trackName;
         _private.selectedChannel = channel;
         open();
     }
@@ -75,7 +75,7 @@ QQC2.Popup {
  
             QtObject {
                 id: _private
-                property string sketchName
+                property string trackName
                 property QtObject selectedChannel
                 property double bounceProgress: -1
 
@@ -93,7 +93,7 @@ QQC2.Popup {
                 function performBounce() {
                     _private.bounceProgress = 0;
                     // Now everything is locked down, set up the sequence to do stuff for us (and store a few things so we can revert it as well)
-                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.sketchName);
+                    _private.sequence = ZynQuick.PlayGridManager.getSequenceModel(_private.trackName);
                     if (_private.sequence) {
                         _private.pattern = sequence.getByPart(_private.selectedChannel.connectedPattern, _private.selectedChannel.selectedPart);
                         if (_private.pattern) {
@@ -128,8 +128,8 @@ QQC2.Popup {
                             // Startrecordingandplaythethingletsgo!
                             _private.cumulativeBeats = 0;
                             _private.isRecording = true;
-                            var sceneIndices = { "S1": 0, "S2": 1, "S3": 2, "S4": 3, "S5": 4, "S6": 5, "S7": 6, "S8": 7, "S9": 8, "S10": 9};
-                            var clip = _private.selectedChannel.clipsModel.getClip(sceneIndices[_private.sketchName]);
+                            var sceneIndices = { "T1": 0, "T2": 1, "T3": 2, "T4": 3, "T5": 4, "T6": 5, "T7": 6, "T8": 7, "T9": 8, "T10": 9};
+                            var clip = _private.selectedChannel.clipsModel.getClip(sceneIndices[_private.trackName]);
                             zynthian.sketchpad.recordingSource = "internal"
                             zynthian.sketchpad.recordingChannel = ""
                             clip.queueRecording();

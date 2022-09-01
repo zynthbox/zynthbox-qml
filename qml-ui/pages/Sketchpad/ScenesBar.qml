@@ -56,7 +56,7 @@ Rectangle {
 
         Kirigami.Heading {
             id: heading
-            text: qsTr("Scenes : Scene %1").arg(scenesModel.getScene(scenesModel.selectedSketchIndex).name)
+            text: qsTr("Scenes : Scene %1").arg(scenesModel.getScene(scenesModel.selectedTrackIndex).name)
         }
 
         QQC2.ButtonGroup {
@@ -96,10 +96,10 @@ Rectangle {
                         radius: 12
                         font.pointSize: 28
                         checkable: true
-                        checked: index === scenesModel.selectedSketchIndex
+                        checked: index === scenesModel.selectedTrackIndex
                         onClicked: {
-//                            scenesModel.stopScene(scenesModel.selectedSketchIndex);
-//                            scenesModel.selectedSketchIndex = index;
+//                            scenesModel.stopScene(scenesModel.selectedTrackIndex);
+//                            scenesModel.selectedTrackIndex = index;
                             Zynthian.CommonUtils.switchToScene(index);
                         }
                         background: Rectangle {

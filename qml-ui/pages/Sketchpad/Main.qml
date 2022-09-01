@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.sketchpad.song
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
-    property bool displaySketchpadButtons: false
+    property bool displayTrackButtons: false
     property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
 
     // Used to temporarily cache clip/channel object to be copied
@@ -259,12 +259,12 @@ Zynthian.ScreenPage {
                         bottomStack.slotsBar.handleItemClick(root.selectedChannel.channelAudioType)
                     }
                 } else if (root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop") {
-                    var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 
                     // when loop and slot is active, goto wave editor or show popup when empty
                     if (clip && clip.path && clip.path.length > 0) {
                         bottomStack.bottomBar.controlType = BottomBar.ControlType.Pattern;
-                        bottomStack.bottomBar.controlObj = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex);
+                        bottomStack.bottomBar.controlObj = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex);
                         bottomStack.slotsBar.bottomBarButton.checked = true;
                         bottomStack.bottomBar.waveEditorAction.trigger();
                     } else {
@@ -577,7 +577,7 @@ Zynthian.ScreenPage {
                 RowLayout {
                     id: infoBar
 
-                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    property var clip: root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     property int topLayerIndex: 0
                     property int topLayer: -1
                     property int selectedSoundSlot: zynthian.soundCombinatorActive
@@ -784,165 +784,165 @@ Zynthian.ScreenPage {
                 Layout.fillWidth: true
                 spacing: 1
 
-                // HEADER ROW
-                // RowLayout {
-                    // id: variationsHeaderRow
+                 // HEADER ROW
+                 RowLayout {
+                     id: variationsHeaderRow
 
-                    // Layout.fillWidth: true
-                    // Layout.preferredHeight: privateProps.headerHeight
-                    // Layout.maximumHeight: privateProps.headerHeight
-                    // spacing: 1
+                     Layout.fillWidth: true
+                     Layout.preferredHeight: privateProps.headerHeight
+                     Layout.maximumHeight: privateProps.headerHeight
+                     spacing: 1
 
-                    // TableHeader {
-                        // id: songCell
-                        // Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
-                        // Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
-                        // Layout.fillHeight: true
+                     TableHeader {
+                         id: songCell
+                         Layout.preferredWidth: privateProps.headerWidth*1.5 + 8
+                         Layout.maximumWidth: privateProps.headerWidth*1.5 + 8
+                         Layout.fillHeight: true
 
-                        // highlightOnFocus: false
-                        // highlighted: !root.songMode && root.displaySketchpadButtons
-                        // text: root.song.name
-                        // subText: qsTr("Sketchpad S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
+                         highlightOnFocus: false
+                         highlighted: !root.songMode && root.displayTrackButtons
+                         text: root.song.name
+                         subText: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
 
-                        // textSize: 10
-                        // subTextSize: 8
+                         textSize: 10
+                         subTextSize: 8
 
-                        // onPressed: {
-                            // if (!root.songMode) {
-                                // root.displaySketchpadButtons = !root.displaySketchpadButtons
-                            // }
-                        // }
-                    // }
+                         onPressed: {
+                             if (!root.songMode) {
+                                 root.displayTrackButtons = !root.displayTrackButtons
+                             }
+                         }
+                     }
 
-                    // Repeater {
-                        // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                        // model: zynthian.isBootingComplete
-                                // ? 10
-                                // : 0
-                        // delegate: TableHeader {
-                            // id: sceneHeaderDelegate
+                     Repeater {
+                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                         model: zynthian.isBootingComplete
+                                 ? 10
+                                 : 0
+                         delegate: TableHeader {
+                             id: sceneHeaderDelegate
 
-                            // property QtObject channel: root.song.channelsModel.getChannel(index)
-                            // property QtObject mix: root.song.mixesModel.getMix(index)
+                             property QtObject channel: root.song.channelsModel.getChannel(index)
+                             property QtObject mix: root.song.mixesModel.getMix(index)
 
-                            // color: Kirigami.Theme.backgroundColor
-                            // active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
+                             color: Kirigami.Theme.backgroundColor
+                             active: root.songMode ? !sceneHeaderDelegate.mix.isEmpty : true
 
-                            // Layout.fillWidth: false
-                            // Layout.fillHeight: true
-                            // Layout.preferredWidth: privateProps.headerWidth
+                             Layout.fillWidth: false
+                             Layout.fillHeight: true
+                             Layout.preferredWidth: privateProps.headerWidth
 
-                            // highlightOnFocus: false
-                            // highlighted: root.songMode
-                                            // ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
-                                            // : root.displaySketchpadButtons
-                                                // ? root.song.scenesModel.selectedSketchIndex === index
-                                                // : zynthian.session_dashboard.selectedChannel === index
+                             highlightOnFocus: false
+                             highlighted: root.songMode
+                                             ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
+                                             : root.displayTrackButtons
+                                                 ? root.song.scenesModel.selectedTrackIndex === index
+                                                 : zynthian.session_dashboard.selectedChannel === index
 
-                            // text: root.songMode
-                                    // ? sceneHeaderDelegate.mix.name
-                                    // : root.displaySketchpadButtons
-                                        // ? qsTr("S%1").arg(index+1)
-                                        // : ""
-                            // textSize: 10
+                             text: root.songMode
+                                     ? sceneHeaderDelegate.mix.name
+                                     : root.displayTrackButtons
+                                         ? qsTr("T%1").arg(index+1)
+                                         : ""
+                             textSize: 10
 
-                            // onPressed: {
-                                // if (root.songMode) {
-                                    // root.song.mixesModel.selectedMixIndex = index
-                                    // root.lastSelectedObj = sceneHeaderDelegate.mix
-                                // } else if (root.displaySketchpadButtons) {
-                                    // root.lastSelectedObj = {
-                                        // className: "sketchpad_sketchpad",
-                                        // sketchIndex: index
-                                    // }
-                                    // root.song.scenesModel.selectedSketchIndex = index
-                                // } else {
-                                    // // Always open Sound combinator when clicking any indicator cell
-                                    // zynthian.session_dashboard.selectedChannel = sceneHeaderDelegate.channel.id
-                                    // Qt.callLater(function() {
-                                        // bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel
-                                        // bottomStack.bottomBar.controlObj = sceneHeaderDelegate.channel
+                             onPressed: {
+                                 if (root.songMode) {
+                                     root.song.mixesModel.selectedMixIndex = index
+                                     root.lastSelectedObj = sceneHeaderDelegate.mix
+                                 } else if (root.displayTrackButtons) {
+                                     root.lastSelectedObj = {
+                                         className: "sketchpad_track",
+                                         trackIndex: index
+                                     }
+                                     root.song.scenesModel.selectedTrackIndex = index
+                                 } else {
+                                     // Always open Sound combinator when clicking any indicator cell
+                                     zynthian.session_dashboard.selectedChannel = sceneHeaderDelegate.channel.id
+                                     Qt.callLater(function() {
+                                         bottomStack.bottomBar.controlType = BottomBar.ControlType.Channel
+                                         bottomStack.bottomBar.controlObj = sceneHeaderDelegate.channel
 
-                                        // bottomStack.slotsBar.bottomBarButton.checked = true
-                                        // // bottomStack.slotsBar.soundCombinatorButton.checked = true
-                                    // })
-                                // }
-                            // }
+                                         bottomStack.slotsBar.bottomBarButton.checked = true
+                                         // bottomStack.slotsBar.soundCombinatorButton.checked = true
+                                     })
+                                 }
+                             }
 
-                            // ColumnLayout {
-                                // anchors {
-                                    // centerIn: parent
-                                    // margins: Kirigami.Units.gridUnit
-                                // }
-                                // visible: !root.songMode &&
-                                         // !root.displaySketchpadButtons &&
-                                         // sceneHeaderDelegate.channel.channelAudioType === "synth"
+                             ColumnLayout {
+                                 anchors {
+                                     centerIn: parent
+                                     margins: Kirigami.Units.gridUnit
+                                 }
+                                 visible: !root.songMode &&
+                                          !root.displayTrackButtons &&
+                                          sceneHeaderDelegate.channel.channelAudioType === "synth"
 
-                                // Repeater {
-                                    // id: synthsOccupiedIndicatorRepeater
-                                    // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    // model: zynthian.isBootingComplete ? sceneHeaderDelegate.channel.occupiedSlots : 0
+                                 Repeater {
+                                     id: synthsOccupiedIndicatorRepeater
+                                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                     model: zynthian.isBootingComplete ? sceneHeaderDelegate.channel.occupiedSlots : 0
 
-                                    // delegate: Rectangle {
-                                        // width: 50
-                                        // height: 3
-                                        // radius: 100
-                                        // color: synthsOccupiedIndicatorRepeater.model[index] == null
-                                                // ? "transparent"
-                                                // : synthsOccupiedIndicatorRepeater.model[index]
-                                                    // ? "#ccbbbbbb"
-                                                    // : "#11ffffff"
-                                    // }
-                                // }
-                            // }
+                                     delegate: Rectangle {
+                                         width: 50
+                                         height: 3
+                                         radius: 100
+                                         color: synthsOccupiedIndicatorRepeater.model[index] == null
+                                                 ? "transparent"
+                                                 : synthsOccupiedIndicatorRepeater.model[index]
+                                                     ? "#ccbbbbbb"
+                                                     : "#11ffffff"
+                                     }
+                                 }
+                             }
 
-                            // RowLayout {
-                                // anchors {
-                                    // centerIn: parent
-                                    // margins: Kirigami.Units.gridUnit
-                                // }
-                                // visible: !root.songMode &&
-                                         // !root.displaySketchpadButtons &&
-                                         // ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.channel.channelAudioType) >= 0
+                             RowLayout {
+                                 anchors {
+                                     centerIn: parent
+                                     margins: Kirigami.Units.gridUnit
+                                 }
+                                 visible: !root.songMode &&
+                                          !root.displayTrackButtons &&
+                                          ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.channel.channelAudioType) >= 0
 
-                                // Repeater {
-                                    // id: samplesOccupiedIndicatorRepeater
-                                    // // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                    // model: zynthian.isBootingComplete ? sceneHeaderDelegate.channel.occupiedSlots : 0
+                                 Repeater {
+                                     id: samplesOccupiedIndicatorRepeater
+                                     // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
+                                     model: zynthian.isBootingComplete ? sceneHeaderDelegate.channel.occupiedSlots : 0
 
-                                    // delegate: Rectangle {
-                                        // width: 3
-                                        // height: 40
-                                        // Layout.alignment: Qt.AlignVCenter
-                                        // radius: 100
-                                        // color: samplesOccupiedIndicatorRepeater.model[index] == null
-                                                // ? "transparent"
-                                                // : samplesOccupiedIndicatorRepeater.model[index]
-                                                    // ? "#ccbbbbbb"
-                                                    // : "#11ffffff"
-                                    // }
-                                // }
-                            // }
+                                     delegate: Rectangle {
+                                         width: 3
+                                         height: 40
+                                         Layout.alignment: Qt.AlignVCenter
+                                         radius: 100
+                                         color: samplesOccupiedIndicatorRepeater.model[index] == null
+                                                 ? "transparent"
+                                                 : samplesOccupiedIndicatorRepeater.model[index]
+                                                     ? "#ccbbbbbb"
+                                                     : "#11ffffff"
+                                     }
+                                 }
+                             }
 
-                            // QQC2.Label {
-                                // anchors.centerIn: parent
-                                // visible: !root.songMode &&
-                                         // !root.displaySketchpadButtons &&
-                                         // sceneHeaderDelegate.channel.channelAudioType === "external"
-                                // text: qsTr("Midi %1").arg(sceneHeaderDelegate.channel.externalMidiChannel > -1 ? sceneHeaderDelegate.channel.externalMidiChannel + 1 : sceneHeaderDelegate.channel.id + 1)
-                            // }
+                             QQC2.Label {
+                                 anchors.centerIn: parent
+                                 visible: !root.songMode &&
+                                          !root.displayTrackButtons &&
+                                          sceneHeaderDelegate.channel.channelAudioType === "external"
+                                 text: qsTr("Midi %1").arg(sceneHeaderDelegate.channel.externalMidiChannel > -1 ? sceneHeaderDelegate.channel.externalMidiChannel + 1 : sceneHeaderDelegate.channel.id + 1)
+                             }
 
-                            // Rectangle {
-                                // anchors.fill: parent
-                                // color: "#2affffff"
-                                // visible: !root.songMode &&
-                                         // !root.displaySketchpadButtons &&
-                                         // zynthian.session_dashboard.selectedChannel === index
-                            // }
+                             Rectangle {
+                                 anchors.fill: parent
+                                 color: "#2affffff"
+                                 visible: !root.songMode &&
+                                          !root.displayTrackButtons &&
+                                          zynthian.session_dashboard.selectedChannel === index
+                             }
 
-                        // }
-                    // }
-                // }
+                         }
+                     }
+                 }
 
                 RowLayout {
                     id: channelsHeaderRow
@@ -1383,7 +1383,7 @@ Zynthian.ScreenPage {
                                         }
                                         Connections {
                                             target: root.song.scenesModel
-                                            onSelectedSketchIndexChanged: colorTimer.restart()
+                                            onSelectedTrackIndexChanged: colorTimer.restart()
                                         }
 
                                         Timer {
@@ -1422,7 +1422,7 @@ Zynthian.ScreenPage {
                                         }
 
                                         // Do not bind this property to visible, otherwise it will cause it to be rebuilt when switching to the page, which is very slow
-                                        sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName) : null
+                                        sequence: zynthian.isBootingComplete ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
                                         pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                         onPressed: {
@@ -1443,7 +1443,7 @@ Zynthian.ScreenPage {
                                             }
 //                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
                                             zynthian.session_dashboard.selectedChannel = channel.id;
-                                            zynthian.sketchpad.song.scenesModel.selectedSketchIndex = channel.sceneClip.col
+                                            zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
 
                                             Qt.callLater(function() {
                                                 if (channel.connectedPattern >= 0) {
@@ -1507,8 +1507,8 @@ Zynthian.ScreenPage {
                                                                 ? qsTr("Clip")
                                                                 : root.lastSelectedObj.className === "sketchpad_channel"
                                                                     ? qsTr("Channel")
-                                                                    : root.lastSelectedObj.className === "sketchpad_sketch"
-                                                                        ? qsTr("Sketch")
+                                                                    : root.lastSelectedObj.className === "sketchpad_track"
+                                                                        ? qsTr("Track")
                                                                         : root.lastSelectedObj.className === "sketchpad_part"
                                                                           ? qsTr("Part")
                                                                           : root.lastSelectedObj.className === "sketchpad_segment"
@@ -1553,13 +1553,13 @@ Zynthian.ScreenPage {
 
                                             // Check if source and destination are same
                                             if (root.copySourceObj.className === "sketchpad_clip" &&
-                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedSketchIndex)) {
+                                                root.copySourceObj !== root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)) {
                                                 return true
                                             } else if (root.copySourceObj.className === "sketchpad_channel" &&
                                                        root.copySourceObj.id !== zynthian.session_dashboard.selectedChannel) {
                                                 return true
-                                            } else if (root.copySourceObj.className === "sketchpad_sketch" &&
-                                                       root.copySourceObj.sketchIndex !== root.song.scenesModel.selectedSketchIndex) {
+                                            } else if (root.copySourceObj.className === "sketchpad_track" &&
+                                                       root.copySourceObj.trackIndex !== root.song.scenesModel.selectedTrackIndex) {
                                                 return true
                                             } else if (root.copySourceObj.className === "sketchpad_part" &&
                                                        root.copySourceObj.partClip !== root.lastSelectedObj.partClip &&
@@ -1584,8 +1584,8 @@ Zynthian.ScreenPage {
                                                                        ? qsTr("Clip")
                                                                        : root.copySourceObj.className === "sketchpad_channel"
                                                                            ? qsTr("Channel")
-                                                                           : root.copySourceObj.className === "sketchpad_sketch"
-                                                                               ? qsTr("Sketch")
+                                                                           : root.copySourceObj.className === "sketchpad_track"
+                                                                               ? qsTr("Track")
                                                                                : root.lastSelectedObj.className === "sketchpad_part"
                                                                                  ? qsTr("Part")
                                                                                  : root.lastSelectedObj.className === "sketchpad_segment"
@@ -1597,13 +1597,13 @@ Zynthian.ScreenPage {
                                     onClicked: {
                                         if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_clip") {
                                             var sourceClip = root.copySourceObj
-                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                                            var destClip = root.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 
                                             // Copy Clip
                                             destClip.copyFrom(sourceClip)
                                             // Copy pattern
-                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                             destPattern.cloneOther(sourcePattern)
 
                                             root.copySourceObj = null
@@ -1619,8 +1619,8 @@ Zynthian.ScreenPage {
                                                 for (var i=0; i<sourceChannel.clipsModel.count; i++) {
                                                     var sourceClip = sourceChannel.parts[part].getClip(i)
                                                     var destClip = destChannel.parts[part].getClip(i)
-                                                    var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, part)
-                                                    var destPattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, part)
+                                                    var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, part)
+                                                    var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, part)
 
                                                     destPattern.cloneOther(sourcePattern)
                                                 }
@@ -1629,16 +1629,16 @@ Zynthian.ScreenPage {
                                             root.copySourceObj = null
 
                                             zynthian.stop_loading()
-                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_sketch") {
+                                        } else if (root.copySourceObj.className && root.copySourceObj.className === "sketchpad_track") {
                                             zynthian.start_loading()
 
-                                            // Copy Sketch
-                                            root.song.scenesModel.copySketch(root.copySourceObj.sketchIndex, root.song.scenesModel.selectedSketchIndex)
+                                            // Copy Track
+                                            root.song.scenesModel.copyTrack(root.copySourceObj.trackIndex, root.song.scenesModel.selectedTrackIndex)
 
                                             for (var i=0; i<root.song.channelsModel.count; i++) {
                                                 var channel = root.song.channelsModel.getChannel(i)
-                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(root.copySourceObj.sketchIndex + 1)).getByPart(channel.id, channel.selectedPart)
-                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedSketchName).getByPart(channel.id, channel.selectedPart)
+                                                var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(root.copySourceObj.trackIndex + 1)).getByPart(channel.id, channel.selectedPart)
+                                                var destPattern = ZynQuick.PlayGridManager.getSequenceModel(root.song.scenesModel.selectedTrackName).getByPart(channel.id, channel.selectedPart)
 
                                                 destPattern.cloneOther(sourcePattern)
                                             }
@@ -1653,8 +1653,8 @@ Zynthian.ScreenPage {
                                             // Copy Clip
                                             destClip.copyFrom(sourceClip)
                                             // Copy pattern
-                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
-                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("S"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
+                                            var sourcePattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(sourceClip.col + 1)).getByPart(sourceClip.clipChannel.id, sourceClip.clipChannel.selectedPart)
+                                            var destPattern = ZynQuick.PlayGridManager.getSequenceModel("T"+(destClip.col + 1)).getByPart(destClip.clipChannel.id, destClip.clipChannel.selectedPart)
                                             destPattern.cloneOther(sourcePattern)
 
                                             root.copySourceObj = null
@@ -1688,7 +1688,7 @@ Zynthian.ScreenPage {
                                             // Try clearing pattern if exists.
                                             try {
                                                 if (root.lastSelectedObj.clipChannel.connectedPattern >= 0) {
-                                                    ZynQuick.PlayGridManager.getSequenceModel("S"+(root.song.scenesModel.selectedSketchIndex + 1)).getByPart(root.lastSelectedObj.clipChannel.id, root.lastSelectedObj.clipChannel.selectedPart).clear()
+                                                    ZynQuick.PlayGridManager.getSequenceModel("T"+(root.song.scenesModel.selectedTrackIndex + 1)).getByPart(root.lastSelectedObj.clipChannel.id, root.lastSelectedObj.clipChannel.selectedPart).clear()
                                                 }
                                             } catch(e) {}
                                         }

@@ -42,7 +42,7 @@ QQC2.AbstractButton {
     property color backgroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, root.backgroundOpacity)
     property real backgroundOpacity: 0.05
     property bool highlighted: channel.sceneClip.row === zynthian.session_dashboard.selectedChannel &&
-                               channel.sceneClip.col === zynthian.sketchpad.song.scenesModel.selectedSketchIndex // bottomBar.controlObj === channel.sceneClip
+                               channel.sceneClip.col === zynthian.sketchpad.song.scenesModel.selectedTrackIndex // bottomBar.controlObj === channel.sceneClip
     property color highlightColor: highlighted
                                        ? Kirigami.Theme.highlightColor
                                        : "transparent"

@@ -76,7 +76,7 @@ QQC2.Popup {
             fadeoutSpin.value = 8;
         } else {
             // No song mode, just play the current scene, with the longest pattern duration as the duration
-            var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedSketchName)
+            var sequence = ZynQuick.PlayGridManager.getSequenceModel(song.scenesModel.selectedTrackName)
             var longestPatternDuration = 0;
             // Assemble the duration of time we want to be recording for
             var noteLengths = { 1: 32, 2: 16, 3: 8, 4: 4, 5: 2, 6: 1 }

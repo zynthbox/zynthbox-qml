@@ -92,7 +92,7 @@ Kirigami.AbstractApplicationWindow {
         return result;
     }
 
-    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName)
+    property QtObject sequence: ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName)
 
     signal requestOpenLayerSetupDialog()
     signal requestCloseLayerSetupDialog()
@@ -157,7 +157,7 @@ Kirigami.AbstractApplicationWindow {
             rightPadding: Kirigami.Units.largeSpacing*1.5
             onClicked: {
                 zynthian.current_modal_screen_id = 'sketchpad'
-                // print(zynthian.sketchpad.song.scenesModel.getScene(zynthian.sketchpad.song.scenesModel.selectedSketchIndex).name)
+                // print(zynthian.sketchpad.song.scenesModel.getScene(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).name)
             }
             //onPressAndHold: zynthian.current_screen_id = 'main'
             highlighted: zynthian.current_screen_id === 'sketchpad'
@@ -290,7 +290,7 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: sampleLoopButton
 
-            property QtObject clip: zynthian.sketchpad.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+            property QtObject clip: zynthian.sketchpad.song.getClip(zynthian.session_dashboard.selectedChannel, zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
 
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
@@ -710,7 +710,7 @@ Kirigami.AbstractApplicationWindow {
             switch (cuia) {
                 case "CHANNEL_1":
                 case "CHANNEL_6":
-                    clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -718,7 +718,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_2":
                 case "CHANNEL_7":
-                    clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -726,7 +726,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_3":
                 case "CHANNEL_8":
-                    clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -734,7 +734,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_4":
                 case "CHANNEL_9":
-                    clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true
@@ -742,7 +742,7 @@ Kirigami.AbstractApplicationWindow {
 
                 case "CHANNEL_5":
                 case "CHANNEL_10":
-                    clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedSketchIndex)
+                    clip = root.selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
                     clip.enabled = !clip.enabled
 
                     returnVal = true

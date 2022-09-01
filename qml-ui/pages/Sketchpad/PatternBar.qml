@@ -40,7 +40,7 @@ GridLayout {
     rows: 1
     Layout.fillWidth: true
 
-    property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName) : null
+    property QtObject sequence: controlObj.clipChannel ? ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName) : null
     property QtObject pattern: root.sequence && controlObj.clipChannel ? root.sequence.getByPart(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart) : null
     property QtObject bottomBar: null
 
@@ -117,7 +117,7 @@ GridLayout {
                     zynthian.current_modal_screen_id = "playgrid";
                     zynthian.forced_screen_back = "sketchpad";
                     ZynQuick.PlayGridManager.setCurrentPlaygrid("playgrid", ZynQuick.PlayGridManager.sequenceEditorIndex);
-                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedSketchName);
+                    var sequence = ZynQuick.PlayGridManager.getSequenceModel(zynthian.sketchpad.song.scenesModel.selectedTrackName);
                     sequence.setActiveChannel(controlObj.clipChannel.id, controlObj.clipChannel.selectedPart);
                 }
             }

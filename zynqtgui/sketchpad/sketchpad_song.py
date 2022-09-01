@@ -54,12 +54,12 @@ from zynqtgui.zynthian_gui_config import zyngui
 class sketchpad_song(QObject):
     __instance__ = None
 
-    def __init__(self, sketch_folder: str, name, parent=None, load_history=True):
+    def __init__(self, sketchpad_folder: str, name, parent=None, load_history=True):
         super(sketchpad_song, self).__init__(parent)
 
         self.zyngui = zynthian_gui_config.zyngui
         self.__metronome_manager__ = parent
-        self.sketch_folder = sketch_folder
+        self.sketchpad_folder = sketchpad_folder
 
         self.__is_loading__ = True
         self.isLoadingChanged.emit()
@@ -117,9 +117,9 @@ class sketchpad_song(QObject):
                         clip = sketchpad_clip(channel.id, j, i, self, clipsModel)
                         clipsModel.add_clip(clip)
 
-                        if i == 0:
-                            clip.enabled = True
-                            channel.selectedPart = 0
+            for channel_index in range(10):
+                channel = self.__channels_model__.getChannel(channel_index)
+                channel.getClipsModelByPart(0).getClip(0).enabled = True
 
             # Add default Mixes and Segments
             for mix_index in range(10):
@@ -134,14 +134,14 @@ class sketchpad_song(QObject):
         self.__scenes_model__.selected_sketch_index_changed.connect(self.bpm_changed.emit)
 
         # Create wav dir for recording
-        (Path(self.sketch_folder) / 'wav').mkdir(parents=True, exist_ok=True)
+        (Path(self.sketchpad_folder) / 'wav').mkdir(parents=True, exist_ok=True)
         # Create sampleset dir if not exists
-        (Path(self.sketch_folder) / 'wav' / 'sampleset').mkdir(parents=True, exist_ok=True)
+        (Path(self.sketchpad_folder) / 'wav' / 'sampleset').mkdir(parents=True, exist_ok=True)
         # Finally, just in case something happened, make sure we're not loading any longer
         self.__is_loading__ = False
         self.isLoadingChanged.emit()
 
-        # Schedule a save after a sketch loads/restores to ensure sketch file is available after creating a new sketch
+        # Schedule a save after a sketchpad loads/restores to ensure sketchpad file is available after creating a new sketchpad
         self.schedule_save()
 
     ###
@@ -174,22 +174,22 @@ class sketchpad_song(QObject):
         if self.__to_be_deleted__:
             return
 
-        cache_dir = Path(self.sketch_folder) / ".cache"
+        cache_dir = Path(self.sketchpad_folder) / ".cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
 
         if self.isTemp or not cache:
             if not self.isTemp:
                 # Clear previous history and remove cache files if not temp
-                with open(self.sketch_folder + self.__initial_name__ + ".sketch.json", "r+") as f:
+                with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
                     obj = json.load(f)
                     f.seek(0)
 
                     if "history" in obj and len(obj["history"]) > 0:
                         for history in obj["history"]:
                             try:
-                                Path(cache_dir / (history + ".sketch.json")).unlink()
+                                Path(cache_dir / (history + ".sketchpad.json")).unlink()
                             except Exception as e:
-                                logging.error(f"Error while trying to remove cache file .cache/{history}.sketch.json : {str(e)}")
+                                logging.error(f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
 
                     obj["history"] = []
                     self.__history_length__ = 0
@@ -200,50 +200,50 @@ class sketchpad_song(QObject):
                     f.flush()
                     os.fsync(f.fileno())
 
-            filename = self.__name__ + ".sketch.json"
+            filename = self.__name__ + ".sketchpad.json"
             self.__initial_name__ = self.name
 
             logging.info(f"Storing to {filename} : {self}")
 
-            # Handle saving to sketch json file
+            # Handle saving to sketchpad json file
             try:
-                Path(self.sketch_folder).mkdir(parents=True, exist_ok=True)
+                Path(self.sketchpad_folder).mkdir(parents=True, exist_ok=True)
 
-                with open(self.sketch_folder + filename, "w") as f:
+                with open(self.sketchpad_folder + filename, "w") as f:
                     f.write(json.dumps(self.serialize()))
                     f.flush()
                     os.fsync(f.fileno())
             except Exception as e:
                 logging.error(e)
 
-            # Save snapshot with sketch if not temp
+            # Save snapshot with sketchpad if not temp
             if not self.isTemp:
                 try:
-                    soundsets_dir = Path(self.sketch_folder) / "soundsets"
+                    soundsets_dir = Path(self.sketchpad_folder) / "soundsets"
                     soundsets_dir.mkdir(parents=True, exist_ok=True)
 
                     self.__metronome_manager__.zyngui.screens["layer"].save_snapshot(
                         str(soundsets_dir) + "/" + self.__name__ + ".zss")
                 except Exception as e:
-                    logging.error(f"Error saving snapshot to sketch folder : {str(e)}")
+                    logging.error(f"Error saving snapshot to sketchpad folder : {str(e)}")
 
             self.versions_changed.emit()
         else:
-            filename = self.__initial_name__ + ".sketch.json"
+            filename = self.__initial_name__ + ".sketchpad.json"
 
             # Handle saving to cache
             cache_id = str(uuid.uuid1())
 
-            logging.info(f"Storing to cache {cache_id}.sketch.json")
+            logging.info(f"Storing to cache {cache_id}.sketchpad.json")
 
             try:
-                with open(self.sketch_folder + filename, "r+") as f:
+                with open(self.sketchpad_folder + filename, "r+") as f:
                     obj = json.load(f)
                     f.seek(0)
 
                     comparing_obj = {}
                     if "history" in obj and len(obj["history"]) > 0:
-                        with open(self.sketch_folder + filename, "r+") as f_last_cache:
+                        with open(self.sketchpad_folder + filename, "r+") as f_last_cache:
                             comparing_obj = json.load(f_last_cache)
                     else:
                         comparing_obj = obj
@@ -255,7 +255,7 @@ class sketchpad_song(QObject):
                     # logging.error(f"Comparing cache and saved dicts : {self.serialize() == comparing_obj}")
 
                     if self.serialize() != comparing_obj:
-                        with open(cache_dir / (cache_id + ".sketch.json"), "w") as f_cache:
+                        with open(cache_dir / (cache_id + ".sketchpad.json"), "w") as f_cache:
                             f_cache.write(json.dumps(self.serialize()))
                             f_cache.flush()
                             os.fsync(f_cache.fileno())
@@ -283,71 +283,71 @@ class sketchpad_song(QObject):
     def restore(self, load_history):
         self.__is_loading__ = True
         self.isLoadingChanged.emit()
-        filename = self.__name__ + ".sketch.json"
+        filename = self.__name__ + ".sketchpad.json"
 
-        self.zyngui.currentTaskMessage = f"Restoring sketch"
+        self.zyngui.currentTaskMessage = f"Restoring sketchpad"
 
         try:
-            logging.info(f"Restoring {self.sketch_folder + filename}, loadHistory({load_history})")
-            with open(self.sketch_folder + filename, "r") as f:
-                sketch = json.loads(f.read())
+            logging.info(f"Restoring {self.sketchpad_folder + filename}, loadHistory({load_history})")
+            with open(self.sketchpad_folder + filename, "r") as f:
+                sketchpad = json.loads(f.read())
 
                 try:
-                    cache_dir = Path(self.sketch_folder) / ".cache"
+                    cache_dir = Path(self.sketchpad_folder) / ".cache"
 
-                    if load_history and "history" in sketch and len(sketch["history"]) > 0:
+                    if load_history and "history" in sketchpad and len(sketchpad["history"]) > 0:
                         logging.info("Loading History")
-                        with open(cache_dir / (sketch["history"][-1] + ".sketch.json"), "r") as f_cache:
-                            sketch = json.load(f_cache)
+                        with open(cache_dir / (sketchpad["history"][-1] + ".sketchpad.json"), "r") as f_cache:
+                            sketchpad = json.load(f_cache)
                     else:
                         logging.info("Not loading History")
-                        for history in sketch["history"]:
+                        for history in sketchpad["history"]:
                             try:
-                                Path(cache_dir / (history + ".sketch.json")).unlink()
+                                Path(cache_dir / (history + ".sketchpad.json")).unlink()
                             except Exception as e:
                                 logging.error(
-                                    f"Error while trying to remove cache file .cache/{history}.sketch.json : {str(e)}")
+                                    f"Error while trying to remove cache file .cache/{history}.sketchpad.json : {str(e)}")
 
-                        sketch["history"] = []
+                        sketchpad["history"] = []
                 except:
-                    logging.error(f"Error loading cache file. Continuing with sketch loading")
+                    logging.error(f"Error loading cache file. Continuing with sketchpad loading")
 
-                if "name" in sketch and sketch["name"] != "":
-                    if self.__name__ != sketch["name"]:
-                        logging.info(f"Sketch filename changed from '{sketch['name']}' to '{self.__name__}'. "
+                if "name" in sketchpad and sketchpad["name"] != "":
+                    if self.__name__ != sketchpad["name"]:
+                        logging.info(f"Sketchpad filename changed from '{sketchpad['name']}' to '{self.__name__}'. "
                                       f"Trying to rename soundset file.")
-                        logging.info(f'Renaming {self.sketch_folder}/soundsets/{sketch["name"]}.zss to {self.sketch_folder}/soundsets/{self.__name__}.zss')
+                        logging.info(f'Renaming {self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss to {self.sketchpad_folder}/soundsets/{self.__name__}.zss')
 
                         try:
-                            shutil.move(f'{self.sketch_folder}/soundsets/{sketch["name"]}.zss', f'{self.sketch_folder}/soundsets/{self.__name__}.zss')
+                            shutil.move(f'{self.sketchpad_folder}/soundsets/{sketchpad["name"]}.zss', f'{self.sketchpad_folder}/soundsets/{self.__name__}.zss')
                         except Exception as e:
                             logging.error(f"Error renaming old soundset to new name : {str(e)}")
-                if "volume" in sketch:
-                    self.__volume__ = sketch["volume"]
+                if "volume" in sketchpad:
+                    self.__volume__ = sketchpad["volume"]
                     self.set_volume(self.__volume__, True)
 
-                    # Restore ALSA Mixer volume from sketch
+                    # Restore ALSA Mixer volume from sketchpad
                     # self.__metronome_manager__.zyngui.screens["master_alsa_mixer"].volume = self.__volume__
-                if "selectedScaleIndex" in sketch:
-                    self.set_selected_scale_index(sketch["selectedScaleIndex"], True)
-                if "octave" in sketch:
-                    self.set_octave(sketch["octave"], True)
-                if "parts" in sketch:
-                    self.__parts_model__.deserialize(sketch["parts"])
-                if "channels" in sketch:
-                    self.__channels_model__.deserialize(sketch["channels"])
-                if "scenes" in sketch:
-                    self.__scenes_model__.deserialize(sketch["scenes"])
-                if "mixes" in sketch:
-                    self.__mixes_model__.deserialize(sketch["mixes"])
-                if "bpm" in sketch:
-                    # In older sketch files, bpm would still be an int instead of a list
+                if "selectedScaleIndex" in sketchpad:
+                    self.set_selected_scale_index(sketchpad["selectedScaleIndex"], True)
+                if "octave" in sketchpad:
+                    self.set_octave(sketchpad["octave"], True)
+                if "parts" in sketchpad:
+                    self.__parts_model__.deserialize(sketchpad["parts"])
+                if "channels" in sketchpad:
+                    self.__channels_model__.deserialize(sketchpad["channels"])
+                if "scenes" in sketchpad:
+                    self.__scenes_model__.deserialize(sketchpad["scenes"])
+                if "mixes" in sketchpad:
+                    self.__mixes_model__.deserialize(sketchpad["mixes"])
+                if "bpm" in sketchpad:
+                    # In older sketchpad files, bpm would still be an int instead of a list
                     # So if bpm is not a list, then generate a list and store it
-                    if isinstance(sketch["bpm"], list):
-                        self.__bpm__ = sketch["bpm"]
+                    if isinstance(sketchpad["bpm"], list):
+                        self.__bpm__ = sketchpad["bpm"]
                     else:
                         self.__bpm__ = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-                        self.__bpm__[self.__scenes_model__.selectedSketchIndex] = sketch["bpm"]
+                        self.__bpm__[self.__scenes_model__.selectedSketchIndex] = sketchpad["bpm"]
 
                     self.set_bpm(self.__bpm__[self.__scenes_model__.selectedSketchIndex], True)
 
@@ -355,7 +355,7 @@ class sketchpad_song(QObject):
                 self.isLoadingChanged.emit()
                 return True
         except Exception as e:
-            logging.error(f"Error during sketch restoration: {e}")
+            logging.error(f"Error during sketchpad restoration: {e}")
             traceback.print_exception(None, e, e.__traceback__)
 
             self.__is_loading__ = False
@@ -363,7 +363,7 @@ class sketchpad_song(QObject):
             return False
 
     @Slot(int, int, result=QObject)
-    def getClip(self, channel: int, sketch: int):
+    def getClip(self, channel: int, sketchpad: int):
         # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
         if channel >= self.__channels_model__.count:
             return None
@@ -371,15 +371,15 @@ class sketchpad_song(QObject):
         channel = self.__channels_model__.getChannel(channel)
         # logging.error(channel.clipsModel.count)
 
-        if sketch >= channel.clipsModel.count:
+        if sketchpad >= channel.clipsModel.count:
             return None
 
-        clip = channel.clipsModel.getClip(sketch)
+        clip = channel.clipsModel.getClip(sketchpad)
         # logging.error(clip)
         return clip
 
     @Slot(int, int, result=QObject)
-    def getClipByPart(self, channel: int, sketch: int, part: int):
+    def getClipByPart(self, channel: int, sketchpad: int, part: int):
         # logging.error("GETCLIP {} {} count {}".format(channel, part, self.__channels_model__.count))
         if channel >= self.__channels_model__.count:
             return None
@@ -387,10 +387,10 @@ class sketchpad_song(QObject):
         channel = self.__channels_model__.getChannel(channel)
         # logging.error(channel.clipsModel.count)
 
-        if sketch >= channel.getClipsModelByPart(part).count:
+        if sketchpad >= channel.getClipsModelByPart(part).count:
             return None
 
-        clip = channel.getClipsModelByPart(part).getClip(sketch)
+        clip = channel.getClipsModelByPart(part).getClip(sketchpad)
         # logging.error(clip)
         return clip
 
@@ -423,7 +423,7 @@ class sketchpad_song(QObject):
         pass
 
     def get_versions(self):
-        versions = [f.name.replace(".sketch.json", "") for f in Path(self.sketch_folder).glob("*.sketch.json")]
+        versions = [f.name.replace(".sketchpad.json", "") for f in Path(self.sketchpad_folder).glob("*.sketchpad.json")]
         return versions
 
     versions = Property('QVariantList', get_versions, notify=versions_changed)
@@ -433,7 +433,7 @@ class sketchpad_song(QObject):
         pass
 
     def get_isTemp(self):
-        return self.sketch_folder == str(Path("/zynthian/zynthian-my-data/sketches/my-sketches/") / "temp") + "/"
+        return self.sketchpad_folder == str(Path("/zynthian/zynthian-my-data/sketchpads/my-sketchpads/") / "temp") + "/"
 
     isTemp = Property(bool, get_isTemp, notify=is_temp_changed)
 
@@ -583,10 +583,10 @@ class sketchpad_song(QObject):
 
     @Slot(None)
     def undo(self):
-        cache_dir = Path(self.sketch_folder) / ".cache"
+        cache_dir = Path(self.sketchpad_folder) / ".cache"
 
         try:
-            with open(self.sketch_folder + self.__initial_name__ + ".sketch.json", "r+") as f:
+            with open(self.sketchpad_folder + self.__initial_name__ + ".sketchpad.json", "r+") as f:
                 obj = json.load(f)
                 f.seek(0)
 
@@ -594,7 +594,7 @@ class sketchpad_song(QObject):
                     cache_file = obj["history"].pop()
 
                 try:
-                    Path(cache_dir / (cache_file + ".sketch.json")).unlink()
+                    Path(cache_dir / (cache_file + ".sketchpad.json")).unlink()
                 except:
                     pass
 
@@ -609,7 +609,7 @@ class sketchpad_song(QObject):
             logging.error(e)
             return False
 
-        self.__metronome_manager__.loadSketchVersion(self.__initial_name__)
+        self.__metronome_manager__.loadSketchpadVersion(self.__initial_name__)
 
     ### Property metronomeManager
     def get_metronomeManager(self):
@@ -659,17 +659,17 @@ class sketchpad_song(QObject):
     octave = Property(int, get_octave, set_octave, notify=octave_changed)
     ### END Property octave
 
-    ### Property sketchFolderName
-    def get_sketch_folder_name(self):
-        return Path(self.sketch_folder).stem
-    sketchFolderName = Property(str, get_sketch_folder_name, constant=True)
-    ### END Property sketchFolderName
+    ### Property sketchpadFolderName
+    def get_sketchpad_folder_name(self):
+        return Path(self.sketchpad_folder).stem
+    sketchpadFolderName = Property(str, get_sketchpad_folder_name, constant=True)
+    ### END Property sketchpadFolderName
 
-    ### Property sketchFolder
-    def get_sketch_folder(self):
-        return self.sketch_folder
-    sketchFolder = Property(str, get_sketch_folder, constant=True)
-    ### END Property sketchFolder
+    ### Property sketchpadFolder
+    def get_sketchpad_folder(self):
+        return self.sketchpad_folder
+    sketchpadFolder = Property(str, get_sketchpad_folder, constant=True)
+    ### END Property sketchpadFolder
 
     ### Property playChannelSolo
     def get_playChannelSolo(self):

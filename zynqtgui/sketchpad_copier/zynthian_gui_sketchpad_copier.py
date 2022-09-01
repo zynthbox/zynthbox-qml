@@ -3,7 +3,7 @@
 # ******************************************************************************
 # ZYNTHIAN PROJECT: Zynthian GUI
 #
-# Zynthian Arranger: A page to copy channels between sketches in a session
+# Zynthian Arranger: A page to copy channels between sketchpads in a session
 #
 # Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 #
@@ -30,12 +30,12 @@ from .. import zynthian_qt_gui_base
 from zynqtgui.sketchpad.sketchpad_channel import sketchpad_channel
 
 
-class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
+class zynthian_gui_sketchpad_copier(zynthian_qt_gui_base.ZynGui):
     def __init__(self, parent=None):
-        super(zynthian_gui_sketch_copier, self).__init__(parent)
+        super(zynthian_gui_sketchpad_copier, self).__init__(parent)
         self.__channel_copy_cache__ = None
         self.__channel_copy_source__ = None
-        self.__add_sketch_path__ = ""
+        self.__add_sketchpad_path__ = ""
 
     ### Property isCopyInProgress
     def get_is_copy_in_progress(self):
@@ -44,15 +44,15 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
     isCopyInProgress = Property(bool, get_is_copy_in_progress, notify=is_copy_in_progress_changed)
     ### END Property isCopyInProgress
 
-    ### Property addSketchPath
-    def get_add_sketch_path(self):
-        return self.__add_sketch_path__
-    def set_add_sketch_path(self, path):
-        self.__add_sketch_path__ = path
-        self.add_sketch_path_changed.emit()
-    add_sketch_path_changed = Signal()
-    addSketchPath = Property(str, get_add_sketch_path, set_add_sketch_path, notify=add_sketch_path_changed)
-    ### END Property addSketchPath
+    ### Property addSketchpadPath
+    def get_add_sketchpad_path(self):
+        return self.__add_sketchpad_path__
+    def set_add_sketchpad_path(self, path):
+        self.__add_sketchpad_path__ = path
+        self.add_sketchpad_path_changed.emit()
+    add_sketchpad_path_changed = Signal()
+    addSketchpadPath = Property(str, get_add_sketchpad_path, set_add_sketchpad_path, notify=add_sketchpad_path_changed)
+    ### END Property addSketchpadPath
 
     ### Property channelCopySource
     def get_channel_copy_source(self):
@@ -80,11 +80,11 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         logging.info(f"Channel Copy Cancelled")
 
     @Slot(QObject)
-    def pasteChannel(self, sketch):
-        logging.info(f"Pasting channel to sketch : {sketch.name}")
+    def pasteChannel(self, sketchpad):
+        logging.info(f"Pasting channel to sketchpad : {sketchpad.name}")
 
-        pasted_channel = sketchpad_channel(sketch.channelsModel.count, sketch, self)
-        sketch.channelsModel.add_channel(pasted_channel)
+        pasted_channel = sketchpad_channel(sketchpad.channelsModel.count, sketchpad, self)
+        sketchpad.channelsModel.add_channel(pasted_channel)
         pasted_channel.deserialize(self.__channel_copy_cache__)
         self.__channel_copy_cache__ = None
         self.__channel_copy_source__ = None
@@ -92,7 +92,7 @@ class zynthian_gui_sketch_copier(zynthian_qt_gui_base.ZynGui):
         self.channel_copy_source_changed.emit()
 
     @Slot(int)
-    def setSketchSlot(self, slot):
-        self.zyngui.session_dashboard.setSketchSlot(slot, self.__add_sketch_path__)
-        self.__add_sketch_path__ = ""
-        self.add_sketch_path_changed.emit()
+    def setSketchpadSlot(self, slot):
+        self.zyngui.session_dashboard.setSketchpadSlot(slot, self.__add_sketchpad_path__)
+        self.__add_sketchpad_path__ = ""
+        self.add_sketchpad_path_changed.emit()

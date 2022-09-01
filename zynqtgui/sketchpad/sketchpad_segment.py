@@ -247,10 +247,10 @@ class sketchpad_segment(QObject):
         Copy clips from a scene to current segment
         """
 
-        # Remove all previously selected clips of current sketch from this segment
+        # Remove all previously selected clips of current sketchpad from this segment
         self.__clips = [clip for clip in self.__clips if clip.col != self.zyngui.sketchpad.song.scenesModel.selectedSketchIndex]
 
-        # Add all clips of current sketch from selected scene to this segment
+        # Add all clips of current sketchpad from selected scene to this segment
         for scene_clip in self.zyngui.sketchpad.song.scenesModel.getScene(sceneIndex)["clips"]:
             if scene_clip.col == self.zyngui.sketchpad.song.scenesModel.selectedSketchIndex:
                 self.addClip(scene_clip)

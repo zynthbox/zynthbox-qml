@@ -41,7 +41,7 @@ Zynthian.ScreenPage {
             case "SWITCH_BACK_LONG":
             case "SWITCH_BACK_BOLD":
                 if (zynthian.main.visibleCategory === "sessions-versions") {
-                    // Mimic back to return to sketch folder view when versions are being displayed
+                    // Mimic back to return to sketchpad folder view when versions are being displayed
                     zynthian.main.visibleCategory = "sessions"
                     return true
                 }

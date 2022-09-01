@@ -42,7 +42,7 @@ Zynthian.ScreenPage {
     readonly property QtObject song: zynthian.sketchpad.song
     property QtObject selectedChannel: applicationWindow().selectedChannel
     property bool displaySceneButtons: zynthian.sketchpad.displaySceneButtons
-    property bool displaySketchButtons: false
+    property bool displaySketchpadButtons: false
     property bool songMode: zynthian.sketchpad.song.mixesModel.songMode
 
     // Used to temporarily cache clip/channel object to be copied
@@ -61,18 +61,18 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Sketch")
+            text: qsTr("Sketchpad")
 
             Kirigami.Action {
-                // Rename Save button as Save as for temp sketch
+                // Rename Save button as Save as for temp sketchpad
                 text: root.song.isTemp ? qsTr("Save As") : qsTr("Save")
                 onTriggered: {
                     if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
-                        fileNameDialog.fileName = "Sketch-1";
+                        fileNameDialog.fileName = "Sketchpad-1";
                         fileNameDialog.open();
                     } else {
-                        zynthian.sketchpad.saveSketch();
+                        zynthian.sketchpad.saveSketchpad();
                     }
                 }
             }
@@ -90,21 +90,21 @@ Zynthian.ScreenPage {
                 visible: !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "savecopy";
-                    fileNameDialog.fileName = song.sketchFolderName;
+                    fileNameDialog.fileName = song.sketchpadFolderName;
                     fileNameDialog.open();
                 }
             }
             Kirigami.Action {
-                text: qsTr("Load Sketch")
+                text: qsTr("Load Sketchpad")
                 onTriggered: {
-                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
-                    sketchPickerDialog.open();
+                    sketchpadPickerDialog.folderModel.folder = sketchpadPickerDialog.rootFolder;
+                    sketchpadPickerDialog.open();
                 }
             }
             Kirigami.Action {
-                text: qsTr("New Sketch")
+                text: qsTr("New Sketchpad")
                 onTriggered: {
-                    zynthian.sketchpad.newSketch()
+                    zynthian.sketchpad.newSketchpad()
                 }
             }
         },
@@ -125,9 +125,9 @@ Zynthian.ScreenPage {
         },
 
         Kirigami.Action {
-            text: "Get New Sketches"
+            text: "Get New Sketchpads"
             onTriggered: {
-                zynthian.show_modal("sketch_downloader")
+                zynthian.show_modal("sketchpad_downloader")
             }
         }
 
@@ -145,8 +145,8 @@ Zynthian.ScreenPage {
     cuiaCallback: function(cuia) {
         console.log("ZL Cuia Handler :", cuia)
 
-        if (sketchPickerDialog.opened) {
-            return sketchPickerDialog.cuiaCallback(cuia);
+        if (sketchpadPickerDialog.opened) {
+            return sketchpadPickerDialog.cuiaCallback(cuia);
         }
 
         // Forward CUIA actions to bottomBar only when bottomBar is open
@@ -457,15 +457,15 @@ Zynthian.ScreenPage {
 
         headerText: {
             if (fileNameDialog.dialogType == "savecopy")
-                return qsTr("Clone Sketch")
+                return qsTr("Clone Sketchpad")
             else if (fileNameDialog.dialogType === "saveas")
                 return qsTr("New version")
             else
-                return qsTr("New Sketch")
+                return qsTr("New Sketchpad")
         }
         conflictText: {
             if (dialogType == "savecopy")
-                return qsTr("Sketch Exists")
+                return qsTr("Sketchpad Exists")
             else if (dialogType == "saveas")
                 return qsTr("Version Exists")
             else
@@ -483,8 +483,8 @@ Zynthian.ScreenPage {
             onTriggered: {
                 if (fileNameDialog.dialogType == "savecopy"
                     && fileNameDialog.fileName.length > 0
-                    && zynthian.sketchpad.sketchExists(fileNameDialog.fileName)) {
-                    // Sketch with name already exists
+                    && zynthian.sketchpad.sketchpadExists(fileNameDialog.fileName)) {
+                    // Sketchpad with name already exists
                     fileNameDialog.conflict = true;
                 } else if (fileNameDialog.dialogType === "saveas"
                            && fileNameDialog.fileName.length > 0
@@ -493,7 +493,7 @@ Zynthian.ScreenPage {
                 } else if (fileNameDialog.dialogType === "save"
                            && root.song.isTemp
                            && fileNameDialog.fileName.length > 0
-                           && zynthian.sketchpad.sketchExists(fileNameDialog.fileName)) {
+                           && zynthian.sketchpad.sketchpadExists(fileNameDialog.fileName)) {
                     fileNameDialog.conflict = true;
                 } else {
                     fileNameDialog.conflict = false;
@@ -505,10 +505,10 @@ Zynthian.ScreenPage {
             console.log("Accepted")
 
             if (dialogType === "save") {
-                zynthian.sketchpad.createSketch(fileNameDialog.fileName)
+                zynthian.sketchpad.createSketchpad(fileNameDialog.fileName)
             } else if (dialogType === "saveas") {
                 root.song.name = fileNameDialog.fileName;
-                zynthian.sketchpad.saveSketch();
+                zynthian.sketchpad.saveSketchpad();
             } else if (dialogType === "savecopy") {
                 zynthian.sketchpad.saveCopy(fileNameDialog.fileName);
             }
@@ -519,17 +519,17 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.FilePickerDialog {
-        id: sketchPickerDialog
+        id: sketchpadPickerDialog
         parent: root
 
-        headerText: qsTr("Pick a sketch")
-        rootFolder: "/zynthian/zynthian-my-data/sketches/"
+        headerText: qsTr("Pick a sketchpad")
+        rootFolder: "/zynthian/zynthian-my-data/sketchpads/"
         folderModel {
-            nameFilters: ["*.sketch.json"]
+            nameFilters: ["*.sketchpad.json"]
         }
         onFileSelected: {
-            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
-            zynthian.sketchpad.loadSketch(file.filePath, false)
+            console.log("Selected Sketchpad : " + file.fileName + "("+ file.filePath +")")
+            zynthian.sketchpad.loadSketchpad(file.filePath, false)
         }
     }
 
@@ -800,16 +800,16 @@ Zynthian.ScreenPage {
                         // Layout.fillHeight: true
 
                         // highlightOnFocus: false
-                        // highlighted: !root.songMode && root.displaySketchButtons
+                        // highlighted: !root.songMode && root.displaySketchpadButtons
                         // text: root.song.name
-                        // subText: qsTr("Sketch S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
+                        // subText: qsTr("Sketchpad S%1").arg(root.song.scenesModel.selectedSketchIndex + 1)
 
                         // textSize: 10
                         // subTextSize: 8
 
                         // onPressed: {
                             // if (!root.songMode) {
-                                // root.displaySketchButtons = !root.displaySketchButtons
+                                // root.displaySketchpadButtons = !root.displaySketchpadButtons
                             // }
                         // }
                     // }
@@ -835,13 +835,13 @@ Zynthian.ScreenPage {
                             // highlightOnFocus: false
                             // highlighted: root.songMode
                                             // ? sceneHeaderDelegate.mix.mixId === root.song.mixesModel.selectedMixIndex
-                                            // : root.displaySketchButtons
+                                            // : root.displaySketchpadButtons
                                                 // ? root.song.scenesModel.selectedSketchIndex === index
                                                 // : zynthian.session_dashboard.selectedChannel === index
 
                             // text: root.songMode
                                     // ? sceneHeaderDelegate.mix.name
-                                    // : root.displaySketchButtons
+                                    // : root.displaySketchpadButtons
                                         // ? qsTr("S%1").arg(index+1)
                                         // : ""
                             // textSize: 10
@@ -850,9 +850,9 @@ Zynthian.ScreenPage {
                                 // if (root.songMode) {
                                     // root.song.mixesModel.selectedMixIndex = index
                                     // root.lastSelectedObj = sceneHeaderDelegate.mix
-                                // } else if (root.displaySketchButtons) {
+                                // } else if (root.displaySketchpadButtons) {
                                     // root.lastSelectedObj = {
-                                        // className: "sketchpad_sketch",
+                                        // className: "sketchpad_sketchpad",
                                         // sketchIndex: index
                                     // }
                                     // root.song.scenesModel.selectedSketchIndex = index
@@ -875,7 +875,7 @@ Zynthian.ScreenPage {
                                     // margins: Kirigami.Units.gridUnit
                                 // }
                                 // visible: !root.songMode &&
-                                         // !root.displaySketchButtons &&
+                                         // !root.displaySketchpadButtons &&
                                          // sceneHeaderDelegate.channel.channelAudioType === "synth"
 
                                 // Repeater {
@@ -902,7 +902,7 @@ Zynthian.ScreenPage {
                                     // margins: Kirigami.Units.gridUnit
                                 // }
                                 // visible: !root.songMode &&
-                                         // !root.displaySketchButtons &&
+                                         // !root.displaySketchpadButtons &&
                                          // ["sample-trig", "sample-slice"].indexOf(sceneHeaderDelegate.channel.channelAudioType) >= 0
 
                                 // Repeater {
@@ -927,7 +927,7 @@ Zynthian.ScreenPage {
                             // QQC2.Label {
                                 // anchors.centerIn: parent
                                 // visible: !root.songMode &&
-                                         // !root.displaySketchButtons &&
+                                         // !root.displaySketchpadButtons &&
                                          // sceneHeaderDelegate.channel.channelAudioType === "external"
                                 // text: qsTr("Midi %1").arg(sceneHeaderDelegate.channel.externalMidiChannel > -1 ? sceneHeaderDelegate.channel.externalMidiChannel + 1 : sceneHeaderDelegate.channel.id + 1)
                             // }
@@ -936,7 +936,7 @@ Zynthian.ScreenPage {
                                 // anchors.fill: parent
                                 // color: "#2affffff"
                                 // visible: !root.songMode &&
-                                         // !root.displaySketchButtons &&
+                                         // !root.displaySketchpadButtons &&
                                          // zynthian.session_dashboard.selectedChannel === index
                             // }
 

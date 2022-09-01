@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Zynthian Sketch CopierPage
+Zynthian Sketchpad CopierPage
 
 Copyright (C) 2021 Anupam Basak <anupam.basak27@gmail.com>
 
@@ -32,14 +32,14 @@ import org.kde.kirigami 2.4 as Kirigami
 import '../../Zynthian' 1.0 as Zynthian
 
 Zynthian.ScreenPage {
-    readonly property QtObject copier: zynthian.sketch_copier
+    readonly property QtObject copier: zynthian.sketchpad_copier
     readonly property QtObject session: zynthian.session_dashboard
-    readonly property QtObject curSketch: zynthian.sketchpad.song
+    readonly property QtObject curSketchpad: zynthian.sketchpad.song
 
     id: root
 
-    title: qsTr("Sketch Copier")
-    screenId: "sketch_copier"
+    title: qsTr("Sketchpad Copier")
+    screenId: "sketchpad_copier"
     leftPadding: 8
     rightPadding: 8
     topPadding: 8
@@ -47,24 +47,24 @@ Zynthian.ScreenPage {
 
     contextualActions: [
         Kirigami.Action {
-            text: "Sketch"
+            text: "Sketchpad"
 
             Kirigami.Action {
-                text: "Add New Sketch"
+                text: "Add New Sketchpad"
                 iconName: "document-new-symbolic"
                 onTriggered: {
                 }
             }
             Kirigami.Action {
-                text: "Add Existing Sketch"
+                text: "Add Existing Sketchpad"
                 iconName: "folder-new-symbolic"
                 onTriggered: {
-                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
-                    sketchPickerDialog.open();
+                    sketchpadPickerDialog.folderModel.folder = sketchpadPickerDialog.rootFolder;
+                    sketchpadPickerDialog.open();
                 }
             }
             Kirigami.Action {
-                text: "Remove Sketch"
+                text: "Remove Sketchpad"
                 iconName: "edit-delete-symbolic"
                 onTriggered: {
                 }
@@ -97,7 +97,7 @@ Zynthian.ScreenPage {
                 enabled: copier.isCopyInProgress
                 visible: copier.isCopyInProgress
                 onTriggered: {
-                    copier.pasteChannel(sketchesData.selectedSketch);
+                    copier.pasteChannel(sketchpadsData.selectedSketchpad);
                 }
             }
         },
@@ -134,7 +134,7 @@ Zynthian.ScreenPage {
     QtObject {
         id: privateProps
 
-        // 12 buttons for both sketches and channels
+        // 12 buttons for both sketchpads and channels
         property real buttonWidth: contentColumn.width/12 - contentColumn.spacing*2 - 10
         property real buttonHeight: Kirigami.Units.gridUnit*6
     }
@@ -154,16 +154,16 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.FilePickerDialog {
-        id: sketchPickerDialog
+        id: sketchpadPickerDialog
         parent: root
 
-        headerText: qsTr("Pick a sketch")
-        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        headerText: qsTr("Pick a sketchpad")
+        rootFolder: "/zynthian/zynthian-my-data/sketchpads"
         folderModel {
             nameFilters: ["*.json"]
         }
         onFileSelected: {
-            copier.addSketchPath = file.filePath;
+            copier.addSketchpadPath = file.filePath;
         }
     }
 
@@ -239,10 +239,10 @@ Zynthian.ScreenPage {
             Layout.preferredHeight: 1
         }
         ColumnLayout {
-            property var selectedSketch: curSketch
+            property var selectedSketchpad: curSketchpad
             property int selectedIndex: 0
 
-            id: sketchesData
+            id: sketchpadsData
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredHeight: 1
@@ -253,7 +253,7 @@ Zynthian.ScreenPage {
 
             RowLayout {
                 QQC2.Label {
-                    text: qsTr("Sketch %1: %2").arg(sketchesData.selectedIndex+1).arg(sketchesData.selectedSketch.name)
+                    text: qsTr("Sketchpad %1: %2").arg(sketchpadsData.selectedIndex+1).arg(sketchpadsData.selectedSketchpad.name)
                     opacity: 0.7
                 }
 
@@ -262,7 +262,7 @@ Zynthian.ScreenPage {
                 }
 
                 QQC2.Label {
-                    text: qsTr("%1 BPM").arg(sketchesData.selectedSketch.bpm)
+                    text: qsTr("%1 BPM").arg(sketchpadsData.selectedSketchpad.bpm)
                 }
             }
 
@@ -271,55 +271,55 @@ Zynthian.ScreenPage {
                     Layout.preferredWidth: privateProps.buttonWidth
                     Layout.preferredHeight: privateProps.buttonHeight
 
-                    enabled: copier.addSketchPath.length <= 0
-                    highlighted: sketchesData.selectedSketch == curSketch
+                    enabled: copier.addSketchpadPath.length <= 0
+                    highlighted: sketchpadsData.selectedSketchpad == curSketchpad
                     text: "1"
                     onClicked: {
-                        sketchesData.selectedSketch = curSketch;
-                        sketchesData.selectedIndex = 0;
+                        sketchpadsData.selectedSketchpad = curSketchpad;
+                        sketchpadsData.selectedIndex = 0;
                     }
                 }
 
                 Repeater {
-                    model: session.sessionSketchesModel
+                    model: session.sessionSketchpadsModel
                     delegate: CopierButton {
-                        property var sketch: model.sketch
+                        property var sketchpad: model.sketchpad
                         property int slot: model.slot
 
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
 
-                        highlighted: sketchesData.selectedSketch === sketch
-                        text: sketch ? (index+2) : ""
-                        enabled: copier.addSketchPath.length > 0 || (sketch ? true : false)
-                        dummy: sketch ? false : true
+                        highlighted: sketchpadsData.selectedSketchpad === sketchpad
+                        text: sketchpad ? (index+2) : ""
+                        enabled: copier.addSketchpadPath.length > 0 || (sketchpad ? true : false)
+                        dummy: sketchpad ? false : true
                         onClicked: {
-                            if (copier.addSketchPath.length > 0) {
-                                console.log("Set sketch to slot " + slot);
-                                copier.setSketchSlot(slot);
+                            if (copier.addSketchpadPath.length > 0) {
+                                console.log("Set sketchpad to slot " + slot);
+                                copier.setSketchpadSlot(slot);
                             } else {
-                                sketchesData.selectedSketch = sketch;
-                                sketchesData.selectedIndex = slot+1;
+                                sketchpadsData.selectedSketchpad = sketchpad;
+                                sketchpadsData.selectedIndex = slot+1;
                             }
                         }
                     }
                 }
 
                 ColumnLayout {
-                    id: sketchesInfoBar
+                    id: sketchpadsInfoBar
 
                     Layout.fillHeight: true
                     Layout.alignment: Qt.AlignVCenter
                     Layout.leftMargin: Kirigami.Units.gridUnit*2
 
                     QQC2.Label {
-                        text: qsTr("%1 BPM").arg(sketchesData.selectedSketch.bpm)
+                        text: qsTr("%1 BPM").arg(sketchpadsData.selectedSketchpad.bpm)
                     }
                     Item {
                         Layout.preferredHeight: Kirigami.Units.gridUnit
                     }
                     QQC2.Label {
-                        text: qsTr("%1 Channels").arg(sketchesData.selectedSketch.channelsModel.count)
+                        text: qsTr("%1 Channels").arg(sketchpadsData.selectedSketchpad.channelsModel.count)
                     }
                 }
             }
@@ -346,7 +346,7 @@ Zynthian.ScreenPage {
 
             RowLayout {
                 Repeater {
-                    model: sketchesData.selectedSketch.channelsModel
+                    model: sketchpadsData.selectedSketchpad.channelsModel
                     delegate: CopierButton {
                         Layout.preferredWidth: privateProps.buttonWidth
                         Layout.preferredHeight: privateProps.buttonHeight
@@ -362,8 +362,8 @@ Zynthian.ScreenPage {
                 }
 
                 Repeater {
-                    model: 12 - (sketchesData.selectedSketch.channelsModel.count
-                                   ? sketchesData.selectedSketch.channelsModel.count
+                    model: 12 - (sketchpadsData.selectedSketchpad.channelsModel.count
+                                   ? sketchpadsData.selectedSketchpad.channelsModel.count
                                    : 0)
                     delegate: CopierButton {
                         Layout.preferredWidth: privateProps.buttonWidth

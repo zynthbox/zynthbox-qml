@@ -2,7 +2,7 @@
 ******************************************************************************
 ZYNTHIAN PROJECT: Zynthian Qt GUI
 
-Download page for Zynthbox Sketches
+Download page for Zynthbox Sketchpads
 
 Copyright (C) 2022 Dan Leinir Turthra Jensen <admin@leinir.dk>
 
@@ -29,9 +29,9 @@ import Zynthian 1.0 as Zynthian
 
 Zynthian.NewStuffPage {
     id: component
-    screenId: "sketch_downloader"
-    title: qsTr("Sketch Downloader")
+    screenId: "sketchpad_downloader"
+    title: qsTr("Sketchpad Downloader")
     // The configFile entry is local-only and we need to strip the URL bits from the resolved version...
-    configFile: Qt.resolvedUrl("zynthian-sketches.knsrc").toString().slice(7)
+    configFile: Qt.resolvedUrl("zynthian-sketchpads.knsrc").toString().slice(7)
 }
 

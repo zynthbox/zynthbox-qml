@@ -42,7 +42,7 @@ from PySide2.QtCore import QTimer, Qt, QObject, Slot, Signal, Property, QMetaObj
 #------------------------------------------------------------------------------
 # Zynthian Session Dashboard GUI Class
 #------------------------------------------------------------------------------
-from zynqtgui.session_dashboard.session_dashboard_session_sketches_model import session_dashboard_session_sketches_model
+from zynqtgui.session_dashboard.session_dashboard_session_sketchpads_model import session_dashboard_session_sketchpads_model
 
 
 class zynthian_gui_session_dashboard(zynthian_gui_selector):
@@ -53,11 +53,11 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__sessionStartTime = datetime.now()
         self.__sessions_base_dir__ = Path("/zynthian/zynthian-my-data/sessions/")
         self.__save_timer__ = QTimer(self)
-        self.__session_sketches_model__ = session_dashboard_session_sketches_model(self)
+        self.__session_sketchpads_model__ = session_dashboard_session_sketchpads_model(self)
         self.__cache_json_path__ = self.__sessions_base_dir__ / ".cache.json"
         self.__visible_channels_start__ = 0
         self.__visible_channels_end__ = 5
-        self.__last_selected_sketch__ = None
+        self.__last_selected_sketchpad__ = None
         self.__change_channel_sound_timer__ = QTimer()
         self.__change_channel_sound_timer__.setInterval(1000)
         self.__change_channel_sound_timer__.setSingleShot(True)
@@ -66,7 +66,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
         if not self.restore():
             def cb():
-                logging.info("Session dashboard Init Sketch CB (No restore)")
+                logging.info("Session dashboard Init Sketchpad CB (No restore)")
                 self.set_selected_channel(self.__selected_channel__, True)
 
                 selected_channel = self.zyngui.screens['sketchpad'].song.channelsModel.getChannel(self.selectedChannel)
@@ -75,7 +75,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             self.__name__ = None
             self.__id__ = 0
 
-            self.zyngui.screens["sketchpad"].init_sketch(None, cb)
+            self.zyngui.screens["sketchpad"].init_sketchpad(None, cb)
 
         self.__save_timer__.setInterval(1000)
         self.__save_timer__.setSingleShot(True)
@@ -135,12 +135,12 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     id = Property(int, get_id, notify=id_changed)
     ### END Property name
 
-    ### Property sessionSketchesModel
-    def get_session_sketches_model(self):
-        return self.__session_sketches_model__
-    session_sketches_model_changed = Signal()
-    sessionSketchesModel = Property(QObject, get_session_sketches_model, notify=session_sketches_model_changed)
-    ### END Property sessionSketchesModel
+    ### Property sessionSketchpadsModel
+    def get_session_sketchpads_model(self):
+        return self.__session_sketchpads_model__
+    session_sketchpads_model_changed = Signal()
+    sessionSketchpadsModel = Property(QObject, get_session_sketchpads_model, notify=session_sketchpads_model_changed)
+    ### END Property sessionSketchpadsModel
 
     ### Property selectedChannel
     def change_to_channel_sound(self):
@@ -206,8 +206,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             "name": self.__name__,
             "id": self.__id__,
             "selectedChannel": self.__selected_channel__,
-            "sketches": self.__session_sketches_model__.serialize(),
-            "lastSelectedSketch": self.__last_selected_sketch__
+            "sketchpads": self.__session_sketchpads_model__.serialize(),
+            "lastSelectedSketchpad": self.__last_selected_sketchpad__
         }
 
     def schedule_save(self):
@@ -249,8 +249,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         except Exception as e:
             logging.error(f"Error deleting cache : {str(e)}")
 
-    def restore(self, sketch=""):
-        def sketch_loaded_cb():
+    def restore(self, sketchpad=""):
+        def sketchpad_loaded_cb():
             self.selected_channel_changed.emit()
             QMetaObject.invokeMethod(self, "emit_chained_sounds_changed", Qt.QueuedConnection)
             logging.info(f"Session Dashboard Initialization Complete")
@@ -258,8 +258,8 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         if self.__cache_json_path__.exists():
             logging.info(f"Cache found. Restoring Session from {self.__cache_json_path__}")
             session_json_path = self.__cache_json_path__
-        elif len(sketch) > 0 and Path(sketch).exists():
-            session_json_path = Path(sketch)
+        elif len(sketchpad) > 0 and Path(sketchpad).exists():
+            session_json_path = Path(sketchpad)
             logging.info(f"Cache not found. Restoring Session from {session_json_path}")
         else:
             logging.info("Nothing to restore session from")
@@ -278,14 +278,14 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             # if "selectedChannel" in session:
             #     self.__selected_channel__ = session["selectedChannel"]
             #     self.set_selected_channel(session["selectedChannel"], True)
-            if "sketches" in session:
-                self.__session_sketches_model__.deserialize(session["sketches"])
-                self.session_sketches_model_changed.emit()
-            if "lastSelectedSketch" in session:
-                self.__last_selected_sketch__ = session["lastSelectedSketch"]
-                self.zyngui.screens["sketchpad"].init_sketch(self.__last_selected_sketch__, sketch_loaded_cb)
+            if "sketchpads" in session:
+                self.__session_sketchpads_model__.deserialize(session["sketchpads"])
+                self.session_sketchpads_model_changed.emit()
+            if "lastSelectedSketchpad" in session:
+                self.__last_selected_sketchpad__ = session["lastSelectedSketchpad"]
+                self.zyngui.screens["sketchpad"].init_sketchpad(self.__last_selected_sketchpad__, sketchpad_loaded_cb)
             else:
-                self.zyngui.screens["sketchpad"].init_sketch(None, sketch_loaded_cb)
+                self.zyngui.screens["sketchpad"].init_sketchpad(None, sketchpad_loaded_cb)
 
             return True
         except Exception as e:
@@ -311,24 +311,24 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         super().set_select_path()
 
     @Slot(int, str)
-    def setSketchSlot(self, slot, sketch):
-        self.__session_sketches_model__.add_sketch(slot, sketch)
+    def setSketchpadSlot(self, slot, sketchpad):
+        self.__session_sketchpads_model__.add_sketchpad(slot, sketchpad)
         self.schedule_save()
 
     @Slot(str)
-    def load(self, sketch):
-        self.__session_sketches_model__.clear()
-        self.restore(sketch)
+    def load(self, sketchpad):
+        self.__session_sketchpads_model__.clear()
+        self.restore(sketchpad)
 
     @Slot(str, result=bool)
     def exists(self, filename):
         return (Path(self.__sessions_base_dir__) / (filename + ".json")).exists()
 
-    def get_last_selected_sketch(self):
-        return self.__last_selected_sketch__
+    def get_last_selected_sketchpad(self):
+        return self.__last_selected_sketchpad__
 
-    def set_last_selected_sketch(self, sketch):
-        self.__last_selected_sketch__ = sketch
+    def set_last_selected_sketchpad(self, sketchpad):
+        self.__last_selected_sketchpad__ = sketchpad
         self.schedule_save()
 
     @Slot(None)

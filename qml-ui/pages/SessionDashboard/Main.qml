@@ -41,18 +41,18 @@ Zynthian.ScreenPage {
     backAction: null
     contextualActions: [
         Kirigami.Action {
-            text: qsTr("Sketch")
+            text: qsTr("Sketchpad")
 
             Kirigami.Action {
-                // Rename Save button as Save as for temp sketch
+                // Rename Save button as Save as for temp sketchpad
                 text: root.song.isTemp ? qsTr("Save As") : qsTr("Save")
                 onTriggered: {
                     if (root.song.isTemp) {
                         fileNameDialog.dialogType = "save";
-                        fileNameDialog.fileName = "Sketch-1";
+                        fileNameDialog.fileName = "Sketchpad-1";
                         fileNameDialog.open();
                     } else {
-                        zynthian.sketchpad.saveSketch();
+                        zynthian.sketchpad.saveSketchpad();
                     }
                 }
             }
@@ -70,21 +70,21 @@ Zynthian.ScreenPage {
                 visible: !root.song.isTemp
                 onTriggered: {
                     fileNameDialog.dialogType = "savecopy";
-                    fileNameDialog.fileName = song.sketchFolderName;
+                    fileNameDialog.fileName = song.sketchpadFolderName;
                     fileNameDialog.open();
                 }
             }
             Kirigami.Action {
-                text: qsTr("Load Sketch")
+                text: qsTr("Load Sketchpad")
                 onTriggered: {
-                    sketchPickerDialog.folderModel.folder = sketchPickerDialog.rootFolder;
-                    sketchPickerDialog.open();
+                    sketchpadPickerDialog.folderModel.folder = sketchpadPickerDialog.rootFolder;
+                    sketchpadPickerDialog.open();
                 }
             }
             Kirigami.Action {
-                text: qsTr("New Sketch")
+                text: qsTr("New Sketchpad")
                 onTriggered: {
-                    zynthian.sketchpad.newSketch()
+                    zynthian.sketchpad.newSketchpad()
                 }
             }
         },
@@ -114,8 +114,8 @@ Zynthian.ScreenPage {
 
     cuiaCallback: function(cuia) {
         var result = false;
-        if (sketchPickerDialog.opened) {
-            result = sketchPickerDialog.cuiaCallback(cuia);
+        if (sketchpadPickerDialog.opened) {
+            result = sketchpadPickerDialog.cuiaCallback(cuia);
         }
         if (!result) {
             result = tabbedView.cuiaCallback(cuia);
@@ -131,15 +131,15 @@ Zynthian.ScreenPage {
 
         headerText: {
             if (fileNameDialog.dialogType == "savecopy")
-                return qsTr("Clone Sketch")
+                return qsTr("Clone Sketchpad")
             else if (fileNameDialog.dialogType === "saveas")
                 return qsTr("New version")
             else
-                return qsTr("New Sketch")
+                return qsTr("New Sketchpad")
         }
         conflictText: {
             if (dialogType == "savecopy")
-                return qsTr("Sketch Exists")
+                return qsTr("Sketchpad Exists")
             else if (dialogType == "saveas")
                 return qsTr("Version Exists")
             else
@@ -157,8 +157,8 @@ Zynthian.ScreenPage {
             onTriggered: {
                 if (fileNameDialog.dialogType == "savecopy"
                     && fileNameDialog.fileName.length > 0
-                    && zynthian.sketchpad.sketchExists(fileNameDialog.fileName)) {
-                    // Sketch with name already exists
+                    && zynthian.sketchpad.sketchpadExists(fileNameDialog.fileName)) {
+                    // Sketchpad with name already exists
                     fileNameDialog.conflict = true;
                 } else if (fileNameDialog.dialogType === "saveas"
                            && fileNameDialog.fileName.length > 0
@@ -174,10 +174,10 @@ Zynthian.ScreenPage {
             console.log("Accepted")
 
             if (dialogType === "save") {
-                zynthian.sketchpad.createSketch(fileNameDialog.fileName)
+                zynthian.sketchpad.createSketchpad(fileNameDialog.fileName)
             } else if (dialogType === "saveas") {
                 root.song.name = fileNameDialog.fileName;
-                zynthian.sketchpad.saveSketch();
+                zynthian.sketchpad.saveSketchpad();
             } else if (dialogType === "savecopy") {
                 zynthian.sketchpad.saveCopy(fileNameDialog.fileName);
             }
@@ -188,17 +188,17 @@ Zynthian.ScreenPage {
     }
 
     Zynthian.FilePickerDialog {
-        id: sketchPickerDialog
+        id: sketchpadPickerDialog
         parent: root
 
-        headerText: qsTr("Pick a sketch")
-        rootFolder: "/zynthian/zynthian-my-data/sketches"
+        headerText: qsTr("Pick a sketchpad")
+        rootFolder: "/zynthian/zynthian-my-data/sketchpads"
         folderModel {
-            nameFilters: ["*.sketch.json"]
+            nameFilters: ["*.sketchpad.json"]
         }
         onFileSelected: {
-            console.log("Selected Sketch : " + file.fileName + "("+ file.filePath +")")
-            zynthian.sketchpad.loadSketch(file.filePath)
+            console.log("Selected Sketchpad : " + file.fileName + "("+ file.filePath +")")
+            zynthian.sketchpad.loadSketchpad(file.filePath)
         }
     }
 
@@ -253,7 +253,7 @@ Zynthian.ScreenPage {
             }
             */
             Kirigami.Heading {
-                id: sketchHeader
+                id: sketchpadHeader
                 Layout.alignment: Qt.AlignCenter
                 text: zynthian.sketchpad.song.name
             }
@@ -347,9 +347,9 @@ Zynthian.ScreenPage {
                     page: Qt.resolvedUrl("ChannelsView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
-                    // Sketches tab renamed to sessions
+                    // Sketchpads tab renamed to sessions
                     text: qsTr("Sessions")
-                    page: Qt.resolvedUrl("SketchesView.qml")
+                    page: Qt.resolvedUrl("SketchpadsView.qml")
                 },
                 Zynthian.TabbedControlViewAction {
                     // Sessions tab renamed to Wiring

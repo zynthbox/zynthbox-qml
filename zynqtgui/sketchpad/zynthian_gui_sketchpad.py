@@ -89,7 +89,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.__current_bar__ = -1
         self.metronome_schedule_stop = False
         self.metronome_running_refcount = 0
-        self.__sketch_basepath__ = Path("/zynthian/zynthian-my-data/sketches/my-sketches/")
+        self.__sketchpad_basepath__ = Path("/zynthian/zynthian-my-data/sketchpads/my-sketchpads/")
         self.__clips_queue__: list[sketchpad_clip] = []
         self.is_recording = False
         self.recording_count_in_value = 0
@@ -180,7 +180,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def sync_selector_visibility(self):
         self.set_selector()
 
-    def init_sketch(self, sketch, cb=None):
+    def init_sketchpad(self, sketchpad, cb=None):
         def _cb():
             libzl.registerTimerCallback(libzlCb)
 
@@ -206,15 +206,15 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
 
         self.master_audio_level_timer.start()
 
-        if sketch is not None:
-            logging.debug(f"### Checking Sketch : {sketch} : exists({Path(sketch).exists()}) ")
+        if sketchpad is not None:
+            logging.debug(f"### Checking Sketchpad : {sketchpad} : exists({Path(sketchpad).exists()}) ")
         else:
-            logging.debug(f"### Checking Sketch : sketch is none ")
+            logging.debug(f"### Checking Sketchpad : sketchpad is none ")
 
-        if sketch is not None and Path(sketch).exists():
-            self.loadSketch(sketch, True, False, _cb)
+        if sketchpad is not None and Path(sketchpad).exists():
+            self.loadSketchpad(sketchpad, True, False, _cb)
         else:
-            self.newSketch(None, _cb)
+            self.newSketchpad(None, _cb)
 
     @Slot(None)
     def zyncoder_set_selected_segment(self):
@@ -1151,19 +1151,19 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def song(self):
         return self.__song__
 
-    def generate_unique_mysketch_name(self, name):
-        if not (self.__sketch_basepath__ / name).exists():
+    def generate_unique_mysketchpad_name(self, name):
+        if not (self.__sketchpad_basepath__ / name).exists():
             return name
         else:
             counter = 1
 
-            while (self.__sketch_basepath__ / f"{name}-{counter}").exists():
+            while (self.__sketchpad_basepath__ / f"{name}-{counter}").exists():
                 counter += 1
 
             return f"{name}-{counter}"
 
     @Slot(None)
-    def newSketch(self, base_sketch=None, cb=None):
+    def newSketchpad(self, base_sketchpad=None, cb=None):
         def task():
             try:
                 self.__song__.bpm_changed.disconnect()
@@ -1183,40 +1183,40 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             if self.__song__ is not None:
                 self.__song__.to_be_deleted()
 
-            if (self.__sketch_basepath__ / 'temp').exists():
-                self.zyngui.currentTaskMessage = "Removing existing temp sketch"
-                shutil.rmtree(self.__sketch_basepath__ / 'temp')
+            if (self.__sketchpad_basepath__ / 'temp').exists():
+                self.zyngui.currentTaskMessage = "Removing existing temp sketchpad"
+                shutil.rmtree(self.__sketchpad_basepath__ / 'temp')
 
-            if base_sketch is not None:
-                logging.info(f"Creating New Sketch from community sketch : {base_sketch}")
-                self.zyngui.currentTaskMessage = "Copying community sketch to my sketches"
+            if base_sketchpad is not None:
+                logging.info(f"Creating New Sketchpad from community sketchpad : {base_sketchpad}")
+                self.zyngui.currentTaskMessage = "Copying community sketchpad to my sketchpads"
 
-                base_sketch_path = Path(base_sketch)
+                base_sketchpad_path = Path(base_sketchpad)
 
-                # Copy community sketch to my sketches
+                # Copy community sketchpad to my sketchpads
 
-                new_sketch_name = self.generate_unique_mysketch_name(base_sketch_path.parent.name)
-                shutil.copytree(base_sketch_path.parent, self.__sketch_basepath__ / new_sketch_name)
+                new_sketchpad_name = self.generate_unique_mysketchpad_name(base_sketchpad_path.parent.name)
+                shutil.copytree(base_sketchpad_path.parent, self.__sketchpad_basepath__ / new_sketchpad_name)
 
-                logging.info(f"Loading new sketch from community sketch : {str(self.__sketch_basepath__ / new_sketch_name / base_sketch_path.name)}")
+                logging.info(f"Loading new sketchpad from community sketchpad : {str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name)}")
 
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketch_basepath__ / new_sketch_name) + "/",
-                                                                  base_sketch_path.stem.replace(".sketch", ""), self)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
-                    str(self.__sketch_basepath__ / new_sketch_name / base_sketch_path.name))
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / new_sketchpad_name) + "/",
+                                                                  base_sketchpad_path.stem.replace(".sketchpad", ""), self)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+                    str(self.__sketchpad_basepath__ / new_sketchpad_name / base_sketchpad_path.name))
 
-                # In case a base sketch is supplied, handle loading snapshot from the source
+                # In case a base sketchpad is supplied, handle loading snapshot from the source
 
                 self.__song__.bpm_changed.connect(self.update_timer_bpm_timer.start)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
             else:
-                logging.info(f"Creating New Sketch")
-                self.zyngui.currentTaskMessage = "Creating empty sketch as temp sketch"
+                logging.info(f"Creating New Sketchpad")
+                self.zyngui.currentTaskMessage = "Creating empty sketchpad as temp sketchpad"
 
-                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketch_basepath__ / "temp") + "/", "Sketch-1", self)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
-                    str(self.__sketch_basepath__ / 'temp' / 'Sketch-1.sketch.json'))
+                self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / "temp") + "/", "Sketchpad-1", self)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+                    str(self.__sketchpad_basepath__ / 'temp' / 'Sketchpad-1.sketchpad.json'))
 
                 if Path("/zynthian/zynthian-my-data/snapshots/default.zss").exists():
                     logging.info(f"Loading default snapshot")
@@ -1231,9 +1231,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.__song__.bpm_changed.connect(self.update_timer_bpm)
                 self.song_changed.emit()
                 self.zyngui.screens["session_dashboard"].set_selected_channel(0, True)
-                self.newSketchLoaded.emit()
+                self.newSketchpadLoaded.emit()
 
-            # Set ALSA Mixer volume to 100% when creating new sketch
+            # Set ALSA Mixer volume to 100% when creating new sketchpad
             self.zyngui.screens["master_alsa_mixer"].volume = 100
 
             # Update volume controls
@@ -1248,45 +1248,45 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             self.longOperationDecrement()
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Creating New Sketch"
+        self.zyngui.currentTaskMessage = "Creating New Sketchpad"
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
     @Slot(None)
-    def saveSketch(self):
+    def saveSketchpad(self):
         def task():
             self.__song__.save(False)
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Saving sketch"
+        self.zyngui.currentTaskMessage = "Saving sketchpad"
         self.zyngui.do_long_task(task)
 
     @Slot(str)
-    def createSketch(self, name):
+    def createSketchpad(self, name):
         def task():
             self.stopAllPlayback()
             self.zyngui.screens["playgrid"].stopMetronomeRequest()
             self.zyngui.screens["song_arranger"].stop()
             self.resetMetronome()
 
-            # Rename temp sketch folder to the user defined name
-            Path(self.__sketch_basepath__ / 'temp').rename(self.__sketch_basepath__ / name)
+            # Rename temp sketchpad folder to the user defined name
+            Path(self.__sketchpad_basepath__ / 'temp').rename(self.__sketchpad_basepath__ / name)
 
-            # Rename temp sketch json filename to user defined name
-            Path(self.__sketch_basepath__ / name / (self.__song__.name + ".sketch.json")).rename(self.__sketch_basepath__ / name / (name + ".sketch.json"))
+            # Rename temp sketchpad json filename to user defined name
+            Path(self.__sketchpad_basepath__ / name / (self.__song__.name + ".sketchpad.json")).rename(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"))
 
             obj = {}
 
-            # Read sketch json data to dict
+            # Read sketchpad json data to dict
             try:
-                with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "r") as f:
+                with open(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"), "r") as f:
                     obj = json.loads(f.read())
             except Exception as e:
                 logging.error(e)
 
-            # Update temp sketch name to user defined name and update clip paths to point to new sketch dir
+            # Update temp sketchpad name to user defined name and update clip paths to point to new sketchpad dir
             try:
-                with open(self.__sketch_basepath__ / name / (name + ".sketch.json"), "w") as f:
+                with open(self.__sketchpad_basepath__ / name / (name + ".sketchpad.json"), "w") as f:
                     obj["name"] = name
 
                     f.write(json.dumps(obj))
@@ -1295,9 +1295,9 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             except Exception as e:
                 logging.error(e)
 
-            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketch_basepath__ / name) + "/", name, self)
-            self.zyngui.screens["session_dashboard"].set_last_selected_sketch(
-                str(self.__sketch_basepath__ / name / f'{name}.sketch.json'))
+            self.__song__ = sketchpad_song.sketchpad_song(str(self.__sketchpad_basepath__ / name) + "/", name, self)
+            self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(
+                str(self.__sketchpad_basepath__ / name / f'{name}.sketchpad.json'))
             self.__song__.save(False)
 
             self.__song__.bpm_changed.connect(self.update_timer_bpm)
@@ -1312,25 +1312,25 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     @Slot(str)
     def saveCopy(self, name):
         def task():
-            old_folder = self.__song__.sketch_folder
-            shutil.copytree(old_folder, self.__sketch_basepath__ / name)
+            old_folder = self.__song__.sketchpad_folder
+            shutil.copytree(old_folder, self.__sketchpad_basepath__ / name)
 
             QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Saving a copy of the sketch"
+        self.zyngui.currentTaskMessage = "Saving a copy of the sketchpad"
         self.zyngui.do_long_task(task)
 
     @Slot(str, bool)
-    def loadSketch(self, sketch, load_history, load_snapshot=True, cb=None):
+    def loadSketchpad(self, sketchpad, load_history, load_snapshot=True, cb=None):
         def task():
-            logging.info(f"Loading sketch : {sketch}")
+            logging.info(f"Loading sketchpad : {sketchpad}")
 
             try:
                 self.__song__.bpm_changed.disconnect()
             except Exception as e:
                 logging.error(f"Already disconnected : {str(e)}")
 
-            sketch_path = Path(sketch)
+            sketchpad_path = Path(sketchpad)
 
             self.zyngui.currentTaskMessage = "Stopping playback"
             try:
@@ -1341,13 +1341,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
             except:
                 pass
 
-            if sketch_path.parent.match("*/zynthian-my-data/sketches/community-sketches/*"):
+            if sketchpad_path.parent.match("*/zynthian-my-data/sketchpads/community-sketchpads/*"):
                 def _cb():
-                    last_selected_sketch_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketch())
+                    last_selected_sketchpad_path = Path(self.zyngui.screens['session_dashboard'].get_last_selected_sketchpad())
 
                     if load_snapshot:
                         # Load snapshot
-                        snapshot_path = f"{str(last_selected_sketch_path.parent / 'soundsets')}/{last_selected_sketch_path.stem.replace('.sketch', '')}.zss"
+                        snapshot_path = f"{str(last_selected_sketchpad_path.parent / 'soundsets')}/{last_selected_sketchpad_path.stem.replace('.sketchpad', '')}.zss"
                         if Path(snapshot_path).exists():
                             self.zyngui.currentTaskMessage = "Loading snapshot"
                             logging.info(f"Loading snapshot : {snapshot_path}")
@@ -1369,16 +1369,16 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                     self.longOperationDecrement()
                     QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-                self.zyngui.currentTaskMessage = "Creating new sketch from community sketch"
-                self.newSketch(sketch, _cb)
+                self.zyngui.currentTaskMessage = "Creating new sketchpad from community sketchpad"
+                self.newSketchpad(sketchpad, _cb)
             else:
-                logging.info(f"Loading Sketch : {str(sketch_path.parent.absolute()) + '/'}, {str(sketch_path.stem)}")
-                self.zyngui.currentTaskMessage = "Loading sketch"
-                self.__song__ = sketchpad_song.sketchpad_song(str(sketch_path.parent.absolute()) + "/", str(sketch_path.stem.replace(".sketch", "")), self, load_history)
-                self.zyngui.screens["session_dashboard"].set_last_selected_sketch(str(sketch_path))
+                logging.info(f"Loading Sketchpad : {str(sketchpad_path.parent.absolute()) + '/'}, {str(sketchpad_path.stem)}")
+                self.zyngui.currentTaskMessage = "Loading sketchpad"
+                self.__song__ = sketchpad_song.sketchpad_song(str(sketchpad_path.parent.absolute()) + "/", str(sketchpad_path.stem.replace(".sketchpad", "")), self, load_history)
+                self.zyngui.screens["session_dashboard"].set_last_selected_sketchpad(str(sketchpad_path))
 
                 if load_snapshot:
-                    snapshot_path = str(sketch_path.parent.absolute()) + '/soundsets/' + str(sketch_path.stem.replace('.sketch', '')) + '.zss'
+                    snapshot_path = str(sketchpad_path.parent.absolute()) + '/soundsets/' + str(sketchpad_path.stem.replace('.sketchpad', '')) + '.zss'
                     # Load snapshot
                     if Path(snapshot_path).exists():
                         logging.info(f"Loading snapshot : {snapshot_path}")
@@ -1404,13 +1404,13 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
                 self.longOperationDecrement()
                 QTimer.singleShot(3000, self.zyngui.end_long_task)
 
-        self.zyngui.currentTaskMessage = "Loading Sketch"
+        self.zyngui.currentTaskMessage = "Loading Sketchpad"
         self.longOperationIncrement()
         self.zyngui.do_long_task(task)
 
     @Slot(str)
-    def loadSketchVersion(self, version):
-        sketch_folder = self.__song__.sketch_folder
+    def loadSketchpadVersion(self, version):
+        sketchpad_folder = self.__song__.sketchpad_folder
 
         try:
             self.__song__.bpm_changed.disconnect()
@@ -1422,23 +1422,23 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.zyngui.screens["song_arranger"].stop()
         self.resetMetronome()
 
-        self.__song__ = sketchpad_song.sketchpad_song(sketch_folder, version, self)
+        self.__song__ = sketchpad_song.sketchpad_song(sketchpad_folder, version, self)
         self.__song__.bpm_changed.connect(self.update_timer_bpm)
         self.song_changed.emit()
 
     @Slot(str, result=bool)
-    def sketchExists(self, name):
-        sketch_path = self.__sketch_basepath__ / name
-        return sketch_path.is_dir()
+    def sketchpadExists(self, name):
+        sketchpad_path = self.__sketchpad_basepath__ / name
+        return sketchpad_path.is_dir()
 
     @Slot(str, result=bool)
     def versionExists(self, name):
-        sketch_path = Path(self.__song__.sketch_folder)
-        return (sketch_path / (name+'.sketch.json')).exists()
+        sketchpad_path = Path(self.__song__.sketchpad_folder)
+        return (sketchpad_path / (name+'.sketchpad.json')).exists()
 
     @Slot(None, result=bool)
-    def sketchIsTemp(self):
-        return self.__song__.sketch_folder == str(self.__sketch_basepath__ / "temp") + "/"
+    def sketchpadIsTemp(self):
+        return self.__song__.sketchpad_folder == str(self.__sketchpad_basepath__ / "temp") + "/"
 
     @Slot(None)
     def stopAllPlayback(self):
@@ -1666,23 +1666,23 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def get_next_free_layer(self):
         logging.debug(self.zyngui.screens["layers"].layers)
 
-    def get_sketch_folders(self):
-        sketch_folders = []
+    def get_sketchpad_folders(self):
+        sketchpad_folders = []
 
-        for item in self.__sketch_basepath__.glob("./*"):
+        for item in self.__sketchpad_basepath__.glob("./*"):
             if item.is_dir():
-                sketch_folders.append(item)
+                sketchpad_folders.append(item)
 
-        return sketch_folders
+        return sketchpad_folders
 
     @staticmethod
-    def get_sketch_versions(sketch_folder):
-        sketch_versions = []
+    def get_sketchpad_versions(sketchpad_folder):
+        sketchpad_versions = []
 
-        for item in Path(sketch_folder).glob("./*.sketch.json"):
-            sketch_versions.append(item)
+        for item in Path(sketchpad_folder).glob("./*.sketchpad.json"):
+            sketchpad_versions.append(item)
 
-        return sketch_versions
+        return sketchpad_versions
 
     @Property(int, notify=current_beat_changed)
     def currentBeat(self):
@@ -1718,4 +1718,4 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     metronomeBeatUpdate128th = Signal(int)
 
     cannotRecordEmptyLayer = Signal()
-    newSketchLoaded = Signal()
+    newSketchpadLoaded = Signal()

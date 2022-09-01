@@ -126,7 +126,7 @@ Rectangle {
                         let text = root.controlObj ? root.controlObj.name : "";
                         switch (root.controlType) {
                         case BottomBar.ControlType.Song:
-                            return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                            return qsTr("Folder: %1  SKETCHPAD: %2").arg(root.controlObj.sketchpadFolderName).arg(text);
                         case BottomBar.ControlType.Clip:
                         case BottomBar.ControlType.Pattern:
                             return qsTr("CLIP: %1").arg(text);
@@ -292,7 +292,7 @@ Rectangle {
                                 let text = root.controlObj ? root.controlObj.name : "";
                                 switch (root.controlType) {
                                 case BottomBar.ControlType.Song:
-                                    return qsTr("Folder: %1  SKETCH: %2").arg(root.controlObj.sketchFolderName).arg(text);
+                                    return qsTr("Folder: %1  SKETCHPAD: %2").arg(root.controlObj.sketchpadFolderName).arg(text);
                                 case BottomBar.ControlType.Clip:
                                 case BottomBar.ControlType.Pattern:
                                     return qsTr("CLIP: %1").arg(text);

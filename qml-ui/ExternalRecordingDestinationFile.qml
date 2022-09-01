@@ -42,7 +42,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         wrapMode: Text.Wrap
-        text: qsTr("Recordings from this module will be stored in your current sketch's wav folder. They will be given the name of the module, with a timestamp so you can tell your recordings apart by when you made them.")
+        text: qsTr("Recordings from this module will be stored in your current sketchpad's wav folder. They will be given the name of the module, with a timestamp so you can tell your recordings apart by when you made them.")
     }
     QQC2.Label {
         Layout.fillWidth: true

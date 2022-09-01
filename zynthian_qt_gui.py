@@ -66,7 +66,7 @@ from pynput.keyboard import Key, Controller
 from timeit import default_timer as timer
 from datetime import timedelta
 
-from zynqtgui.sketch_copier import zynthian_gui_sketch_copier
+from zynqtgui.sketchpad_copier import zynthian_gui_sketchpad_copier
 from zynqtgui.song_arranger import zynthian_gui_song_arranger
 from zynqtgui.zynthian_gui_song_player import zynthian_gui_song_player
 from zynqtgui.sound_categories.zynthian_gui_sound_categories import zynthian_gui_sound_categories
@@ -1510,7 +1510,7 @@ class zynthian_gui(QObject):
         self.screens["sketchpad"] = zynthian_gui_sketchpad(self)
 
         ###
-        # Session Dashboard depends on ZL to load sketches and hence needs to be initialized after ZL page
+        # Session Dashboard depends on ZL to load sketchpads and hence needs to be initialized after ZL page
         ###
         self.screens["session_dashboard"] = zynthian_gui_session_dashboard(self)
         ###
@@ -1532,7 +1532,7 @@ class zynthian_gui(QObject):
         self.screens["soundfont_downloader"] = zynthian_gui_newstuff(self)
         self.screens["soundset_downloader"] = zynthian_gui_newstuff(self)
         self.screens["sequence_downloader"] = zynthian_gui_newstuff(self)
-        self.screens["sketch_downloader"] = zynthian_gui_newstuff(self)
+        self.screens["sketchpad_downloader"] = zynthian_gui_newstuff(self)
 
         ###
         # Playgrid depends on sketchpad screen for metronome related functionalities
@@ -1545,7 +1545,7 @@ class zynthian_gui(QObject):
 
         self.screens["song_arranger"] = zynthian_gui_song_arranger(self)
         self.screens["song_player"] = zynthian_gui_song_player(self)
-        self.screens["sketch_copier"] = zynthian_gui_sketch_copier(self)
+        self.screens["sketchpad_copier"] = zynthian_gui_sketchpad_copier(self)
 
         self.screens["led_config"] = zynthian_gui_led_config(self)
 
@@ -3840,8 +3840,8 @@ class zynthian_gui(QObject):
     def get_sequence_downloader(self):
         return self.screens["sequence_downloader"]
 
-    def get_sketch_downloader(self):
-        return self.screens["sketch_downloader"]
+    def get_sketchpad_downloader(self):
+        return self.screens["sketchpad_downloader"]
 
     def get_guioptions(self):
         return self.screens["guioptions"]
@@ -3907,8 +3907,8 @@ class zynthian_gui(QObject):
         return self.screens["song_player"]
 
     @Property(QObject, constant=True)
-    def sketch_copier(self):
-        return self.screens["sketch_copier"]
+    def sketchpad_copier(self):
+        return self.screens["sketchpad_copier"]
 
     @Property(QObject, constant=True)
     def sound_categories(self):
@@ -4438,7 +4438,7 @@ class zynthian_gui(QObject):
     soundfont_downloader = Property(QObject, get_soundfont_downloader, constant=True)
     soundset_downloader = Property(QObject, get_soundset_downloader, constant=True)
     sequence_downloader = Property(QObject, get_sequence_downloader, constant=True)
-    sketch_downloader = Property(QObject, get_sketch_downloader, constant=True)
+    sketchpad_downloader = Property(QObject, get_sketchpad_downloader, constant=True)
     guioptions = Property(QObject, get_guioptions, constant=True)
 
 # ------------------------------------------------------------------------------

@@ -77,9 +77,9 @@ class sketchpad_clip(QObject):
         self.__arranger_bar_positions__ = []
         self.audioSource: ClipAudioSource = None
         self.audio_metadata = None
-        self.recording_basepath = song.sketch_folder
+        self.recording_basepath = song.sketchpad_folder
         self.__started_solo__ = False
-        self.wav_path = Path(self.__song__.sketch_folder) / 'wav'
+        self.wav_path = Path(self.__song__.sketchpad_folder) / 'wav'
         self.__snap_length_to_beat__ = True
         self.__slices__ = 16
         self.__enabled__ = False
@@ -91,7 +91,7 @@ class sketchpad_clip(QObject):
             bank_name = [x.name for x in self.__base_samples_dir__.glob(f"*.{self.id + 1}")][0].split(".")[0]
         except:
             bank_name = "sample-bank"
-        self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
+        self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'{bank_name}.{self.row + 1}'
 
         self.__song__.bpm_changed.connect(self.song_bpm_changed, Qt.QueuedConnection)
         self.__song__.get_metronome_manager().current_beat_changed.connect(self.update_current_beat, Qt.QueuedConnection)
@@ -478,7 +478,7 @@ class sketchpad_clip(QObject):
 
         try:
             self.channel = self.__song__.channelsModel.getChannel(self.__row_index__)
-            self.bank_path = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset' / f'sample-bank.{new_index + 1}'
+            self.bank_path = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset' / f'sample-bank.{new_index + 1}'
         except:
             pass
         self.row_index_changed.emit()
@@ -655,7 +655,7 @@ class sketchpad_clip(QObject):
         else:
             if should_copy:
                 new_filename = self.generate_unique_filename(selected_path, self.wav_path)
-                logging.info(f"Copying clip({path}) into sketch folder ({self.wav_path / new_filename})")
+                logging.info(f"Copying clip({path}) into sketchpad folder ({self.wav_path / new_filename})")
                 shutil.copy2(selected_path, self.wav_path / new_filename)
 
         if new_filename == "" :
@@ -962,7 +962,7 @@ class sketchpad_clip(QObject):
         if self.wav_path.exists():
             return str(self.wav_path)
         else:
-            return self.__song__.sketch_folder
+            return self.__song__.sketchpad_folder
 
     def play_audio(self, loop=True):
         if self.audioSource is not None:

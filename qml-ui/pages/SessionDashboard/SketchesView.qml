@@ -48,10 +48,10 @@ RowLayout {
 
         Kirigami.Heading {
             level: 2
-            text: qsTr("Sketches")
+            text: qsTr("Sketchpads")
             MouseArea {
                 anchors.fill: parent
-                onClicked: zynthian.current_modal_screen_id = "sketch_copier"
+                onClicked: zynthian.current_modal_screen_id = "sketchpad_copier"
             }
         }
         QQC2.ScrollView {
@@ -60,7 +60,7 @@ RowLayout {
             Layout.preferredWidth: 1
             ListView {
                 id: projectView
-                model: zynthian.session_dashboard.sessionSketchesModel
+                model: zynthian.session_dashboard.sessionSketchpadsModel
                 header: QQC2.Control {
                     width: parent.width
                     height: root.itemHeight
@@ -78,7 +78,7 @@ RowLayout {
                     height: root.itemHeight
                     contentItem: RowLayout {
                         QQC2.Label {
-                            text: (model.slot + 2) + ". " + (model.sketch ? model.sketch.name : " - ")
+                            text: (model.slot + 2) + ". " + (model.sketchpad ? model.sketchpad.name : " - ")
                         }
                     }
                 }

@@ -57,9 +57,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         self.playback_process = None
         self.__most_recent_recording_file__ = ""
         self.__recording_file__ = ""
-        # Possible values : modules(all zynthian modules + appimages), appimages(only appimages), sessions(sketch folders), sessions-versions(sketch files inside sketch folders), templates, discover
+        # Possible values : modules(all zynthian modules + appimages), appimages(only appimages), sessions(sketchpad folders), sessions-versions(sketchpad files inside sketchpad folders), templates, discover
         self.__visible_category__ = "modules"
-        self.__selected_sketch_folder__ = None
+        self.__selected_sketchpad_folder__ = None
         self.recorder_process = None
         self.show()
 
@@ -100,8 +100,8 @@ class zynthian_gui_main(zynthian_gui_selector):
             self.list_data.append((self.snapshots_menu, 0, "Soundsets"))
             self.list_metadata.append({"icon":"../../img/snapshots.svg"})
 
-            self.list_data.append((self.sketch_copier, 0, "Sketch Copier"))
-            self.list_metadata.append({"icon":"../../img/sketch_copier.svg"})
+            self.list_data.append((self.sketchpad_copier, 0, "Sketchpad Copier"))
+            self.list_metadata.append({"icon":"../../img/sketchpad_copier.svg"})
 
             #self.list_data.append((self.session_dashboard, 0, "Channels"))
             #self.list_metadata.append({"icon":"../../img/channels.svg"})
@@ -145,31 +145,31 @@ class zynthian_gui_main(zynthian_gui_selector):
                         logging.error(e)
 
         if self.visibleCategory == "sessions":
-            for sketch in self.zyngui.sketchpad.get_sketch_folders():
-                self.list_data.append(("sketch", str(sketch), sketch.stem))
+            for sketchpad in self.zyngui.sketchpad.get_sketchpad_folders():
+                self.list_data.append(("sketchpad", str(sketchpad), sketchpad.stem))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/folder.svg"})
 
         if self.visibleCategory == "sessions-versions":
-            for version in self.zyngui.sketchpad.get_sketch_versions(self.__selected_sketch_folder__):
-                self.list_data.append(("sketch-version", str(version), version.name.replace(".sketch.json", "")))
+            for version in self.zyngui.sketchpad.get_sketchpad_versions(self.__selected_sketchpad_folder__):
+                self.list_data.append(("sketchpad-version", str(version), version.name.replace(".sketchpad.json", "")))
                 self.list_metadata.append({"icon": "/zynthian/zynthian-ui/img/file.svg"})
 
         super().fill_list()
 
     def select_action(self, i, t="S"):
         if self.list_data[i][0] and self.list_data[i][0] == "appimage":
-            self.song_recordings_dir = self.zyngui.screens["sketchpad"].song.sketch_folder + "wav"
+            self.song_recordings_dir = self.zyngui.screens["sketchpad"].song.sketchpad_folder + "wav"
             self.__current_recordings_file_base__ = self.song_recordings_dir + "/" + self.list_metadata[i]["recordings_file_base"]
             apps_folder = os.path.expanduser('~') + "/.local/share/zynthian/modules/"
             Popen([self.list_data[i][1]])
 
             # Open sketchpad after opening appimage to mimic closing of menu after opening an app like other modules in main page
             QTimer.singleShot(5000, lambda: self.zyngui.show_modal("sketchpad"))
-        elif self.list_data[i][0] and self.list_data[i][0] == "sketch":
-            self.__selected_sketch_folder__ = self.list_data[i][1]
+        elif self.list_data[i][0] and self.list_data[i][0] == "sketchpad":
+            self.__selected_sketchpad_folder__ = self.list_data[i][1]
             self.visibleCategory = "sessions-versions"
-        elif self.list_data[i][0] and self.list_data[i][0] == "sketch-version":
-            self.zyngui.sketchpad.loadSketch(self.list_data[i][1], False)
+        elif self.list_data[i][0] and self.list_data[i][0] == "sketchpad-version":
+            self.zyngui.sketchpad.loadSketchpad(self.list_data[i][1], False)
             self.zyngui.show_modal("sketchpad")
         elif self.list_data[i][0]:
             self.last_action = self.list_data[i][0]
@@ -369,9 +369,9 @@ class zynthian_gui_main(zynthian_gui_selector):
         logging.info("Song Player")
         self.zyngui.show_modal("song_player")
 
-    def sketch_copier(self):
-        logging.info("Sketch Copier")
-        self.zyngui.show_modal("sketch_copier")
+    def sketchpad_copier(self):
+        logging.info("Sketchpad Copier")
+        self.zyngui.show_modal("sketchpad_copier")
 
     def admin(self):
         logging.info("Admin")

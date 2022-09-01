@@ -86,13 +86,13 @@ Zynthian.Stack {
                     root.pageCache["playgrid"].visible = false;
                 }
 
-                console.log("Caching sketch_copier")
-                zynthian.currentTaskMessage = "Loading sketch copier page"
-                if (!root.pageCache["sketch_copier"]) {
-                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketch_copier");
+                console.log("Caching sketchpad_copier")
+                zynthian.currentTaskMessage = "Loading sketchpad copier page"
+                if (!root.pageCache["sketchpad_copier"]) {
+                    file = applicationWindow().pageScreenMapping.pageForModalScreen("sketchpad_copier");
                     var component = Qt.createComponent(file);
-                    root.pageCache["sketch_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
-                    root.pageCache["sketch_copier"].visible = false;
+                    root.pageCache["sketchpad_copier"] = component.createObject(root, {"width": root.width, "height": root.height});
+                    root.pageCache["sketchpad_copier"].visible = false;
                 }
 
                 console.log("Caching midi_key_range")

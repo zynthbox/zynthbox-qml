@@ -23,7 +23,7 @@ import Zynthian 1.0 as Zynthian
   *
   *      rootFolder: '/zynthian/zynthian-my-data'
   *      folderModel {
-  *          folder: '/zynthian/zynthian-my-data/sketches'
+  *          folder: '/zynthian/zynthian-my-data/sketchpads'
   *          nameFilters: ["*.wav"]
   *      }
   *      onFileSelected: {

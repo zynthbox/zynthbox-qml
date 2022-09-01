@@ -92,7 +92,7 @@ GridLayout {
                     label: modelData
                     highlighted: root.bottomBar.controlObj.name === modelData
                     onClicked: {
-                        zynthian.sketchpad.loadSketchVersion(modelData)
+                        zynthian.sketchpad.loadSketchpadVersion(modelData)
                     }
                 }
             }

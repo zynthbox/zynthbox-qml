@@ -68,7 +68,7 @@ class sketchpad_channel(QObject):
         self.__muted__ = False
         self.__samples__ = []
         self.__keyzone_mode__ = "all-full"
-        self.__base_samples_dir__ = Path(self.__song__.sketch_folder) / 'wav' / 'sampleset'
+        self.__base_samples_dir__ = Path(self.__song__.sketchpad_folder) / 'wav' / 'sampleset'
         self.__color__ = "#000000"
         self.__selected_slot_row__ = 0
         self.__selected_part__ = 0
@@ -129,17 +129,18 @@ class sketchpad_channel(QObject):
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
     def onClipEnabledChanged(self, sceneIndex, partNum):
         clip = self.__song__.getClipByPart(self.__id__, sceneIndex, partNum)
-        #logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
-        if clip and clip.enabled == True:
+        # logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
+        if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)
             allowMultipart = self.channelAudioType == "sample-trig" and self.keyZoneMode == "all-full"
-            #logging.error(f"Allowing multipart playback: {allowMultipart}")
+            # logging.error(f"Allowing multipart playback: {allowMultipart}")
             if not allowMultipart:
                 for part in range(0, 5):
                     if part != self.__selected_part__:
                         clipForDisabling = self.__song__.getClipByPart(self.__id__, sceneIndex, part)
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
-                        clipForDisabling.enabled = False
+                        if clipForDisabling is not None:
+                            clipForDisabling.enabled = False
 
         self.selectedPartNamesChanged.emit()
 
@@ -941,11 +942,11 @@ class sketchpad_channel(QObject):
 
     ### Property recordingDir
     def get_recording_dir(self):
-        wav_path = Path(self.__song__.sketch_folder) / 'wav'
+        wav_path = Path(self.__song__.sketchpad_folder) / 'wav'
         if wav_path.exists():
             return str(wav_path)
         else:
-            return self.__song__.sketch_folder
+            return self.__song__.sketchpad_folder
 
     recordingDir = Property(str, get_recording_dir, constant=True)
     ### END Property recordingDir

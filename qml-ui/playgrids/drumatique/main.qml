@@ -41,7 +41,7 @@ Zynthian.BasePlayGrid {
     settings: drumsGridSettings
     popup: drumsPopup
     sidebar: drumsGridSidebar
-    name:'Drumatique'
+    name:'Stepsequencer'
     dashboardModel: _private.sequence
     isSequencer: true
     defaults: {
@@ -2128,7 +2128,7 @@ Zynthian.BasePlayGrid {
         ColumnLayout {
             Kirigami.Heading {
                 Layout.fillWidth: true;
-                text: "Drumatique Quick Settings"
+                text: "Stepsequencer Quick Settings"
             }
             Kirigami.FormLayout {
                 objectName: "drumsPopup"

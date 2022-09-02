@@ -171,7 +171,7 @@ while true; do
         python3 -X faulthandler ./bootlog_window.py &
         ./zynthian_qt_gui.py
     else
-        export ZYNTHIAN_LOG_LEVEL=20
+        export ZYNTHIAN_LOG_LEVEL=10
         extra_args=""
 
         if [ "$ZYNTHBOX_DEBUG" = "block" ]; then

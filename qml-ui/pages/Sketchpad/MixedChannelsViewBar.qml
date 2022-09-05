@@ -189,19 +189,9 @@ Rectangle {
                                 Layout.preferredWidth: Kirigami.Units.gridUnit * 10
                                 Layout.fillHeight: false
                                 checkable: true
-                                checked: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                         root.selectedChannel.channelAudioType === "sample-slice"
+                                checked: root.selectedChannel.channelAudioType.startsWith("sample-")
                                 text: qsTr("Samples")
                                 onClicked: root.selectedChannel.channelAudioType = "sample-trig"
-                            }
-                            QQC2.Button {
-                                Layout.fillWidth: true
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-                                Layout.fillHeight: false
-                                checkable: true
-                                checked: root.selectedChannel.channelAudioType === "sample-loop"
-                                text: qsTr("Loop")
-                                onClicked: root.selectedChannel.channelAudioType = "sample-loop"
                             }
                             QQC2.Button {
                                 Layout.fillWidth: true
@@ -228,11 +218,18 @@ Rectangle {
                                     anchors.fill: parent
 
                                     RowLayout {
-                                        visible: root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                 root.selectedChannel.channelAudioType === "sample-slice"
+                                        visible: root.selectedChannel.channelAudioType.startsWith("sample-")
                                         Layout.fillHeight: true
                                         spacing: 0
 
+                                        QQC2.Button {
+                                            Layout.fillHeight: true
+                                            text: "Loop"
+                                            checked: root.selectedChannel && root.selectedChannel.channelAudioType === "sample-loop"
+                                            onClicked: {
+                                                root.selectedChannel.channelAudioType = "sample-loop"
+                                            }
+                                        }
                                         QQC2.Button {
                                             Layout.fillHeight: true
                                             text: "Trig"

@@ -34,33 +34,46 @@ QQC2.ToolBar {
     id: root
 
     property Item currentPage
-    padding: Kirigami.Units.smallSpacing
+    padding: 0
+    leftPadding: Kirigami.Units.smallSpacing
+    rightPadding: Kirigami.Units.smallSpacing
+    topPadding: Kirigami.Units.smallSpacing
+    bottomPadding: Kirigami.Units.smallSpacing
 
     position: QQC2.ToolBar.Footer
+
+    background: Rectangle {
+        color: Kirigami.Theme.backgroundColor
+    }
 
     contentItem: RowLayout {
         spacing: Kirigami.Units.smallSpacing
         ActionButton {
             id: backButton
-            visible: kirigamiAction && kirigamiAction.visible
+            Layout.fillWidth: true
             Layout.fillHeight: true
+            visible: kirigamiAction && kirigamiAction.visible
             kirigamiAction: root.currentPage && root.currentPage.backAction ? root.currentPage.backAction : null
         }
         ActionButton {
+            Layout.fillWidth: true
             Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 0 ? root.currentPage.contextualActions[0] : null
         }
         ActionButton {
+            Layout.fillWidth: true
             Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 1 ? root.currentPage.contextualActions[1] : null
         }
         ActionButton {
+            Layout.fillWidth: true
             Layout.fillHeight: true
             kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 2 ? root.currentPage.contextualActions[2] : null
         }
         ActionButton {
-            visible: !backButton.visible
+            Layout.fillWidth: true
             Layout.fillHeight: true
+            visible: !backButton.visible
             kirigamiAction: root.currentPage && root.currentPage.contextualActions && root.currentPage.contextualActions.length > 3 ? root.currentPage.contextualActions[3] : null
         }
     }

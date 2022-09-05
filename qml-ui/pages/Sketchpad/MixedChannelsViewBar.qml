@@ -97,13 +97,6 @@ Rectangle {
         return returnValue;
     }
 
-    QtObject {
-        id: privateProps
-
-        //Try to fit exactly 12 mixers + a master mixer
-        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
-    }
-
     QQC2.Popup {
         id: channelKeyZoneSetup
         parent: QQC2.Overlay.overlay
@@ -156,10 +149,10 @@ Rectangle {
 
                     BottomStackTabs {
                         id: buttonsColumn
-                        Layout.minimumWidth: privateProps.cellWidth*1.5 + 6
-                        Layout.maximumWidth: privateProps.cellWidth*1.5 + 6
-                        Layout.bottomMargin: 5
+                        Layout.fillWidth: false
                         Layout.fillHeight: true
+                        Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+                        Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     }
 
                     ColumnLayout {

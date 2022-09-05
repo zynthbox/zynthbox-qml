@@ -35,10 +35,6 @@ import Zynthian 1.0 as Zynthian
 QQC2.AbstractButton {
     id: root
 
-    Layout.preferredWidth: privateProps.headerWidth
-    Layout.maximumWidth: privateProps.headerWidth
-    Layout.fillHeight: true
-
     property alias subText: contents.text2
     property alias subSubText: contents.text3
 

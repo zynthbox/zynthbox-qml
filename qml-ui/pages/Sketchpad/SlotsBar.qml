@@ -233,14 +233,7 @@ Rectangle {
             }
         }
     }
-
-    QtObject {
-        id: privateProps
-
-        //Try to fit exactly 12 mixers + a master mixer
-        property int cellWidth: (tableLayout.width - loopGrid.columnSpacing)/13
-    }
-
+    
     GridLayout {
         rows: 1
         anchors.fill: parent
@@ -254,186 +247,174 @@ Rectangle {
                 text: qsTr("Slots : %1").arg(song.name)
             }
 
-            ColumnLayout {
-                Layout.fillHeight: true
+            RowLayout {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 spacing: 1
 
+                QQC2.ButtonGroup {
+                    buttons: buttonsColumn.children
+                }
+
+                ColumnLayout {
+                    id: buttonsColumn
+                    Layout.fillWidth: false
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
+
+                    //// INVISIBLE BUTTONS
+
+                    QQC2.Button {
+                        id: bottomBarButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        checked: bottomStack.currentIndex === 0
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("BottomBar")
+                        visible: false
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 0
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: mixerButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        visible: false
+                        text: qsTr("Mixer")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 1
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: soundCombinatorButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        visible: false
+                        text: qsTr("Sound Combinator")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 5
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    //// INVISIBLE BUTTONS
+
+                    QQC2.Button {
+                        id: channelButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        checked: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("Channel")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 3
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: partButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("Parts")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 4
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: synthsButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("Synths")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: samplesButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("Samples")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+
+                    QQC2.Button {
+                        id: fxButton
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        checkable: true
+                        enabled: !root.songMode && !root.displaySceneButtons
+                        text: qsTr("FX")
+                        onCheckedChanged: {
+                            if (checked) {
+                                bottomStack.currentIndex = 2
+                                updateLedVariablesTimer.restart()
+                            }
+                        }
+                    }
+                }
+
                 RowLayout {
+                    id: channelsSlotsRow
+
+                    property int currentIndex: 0
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: 1
 
-                    QQC2.ButtonGroup {
-                        buttons: buttonsColumn.children
-                    }
-
-                    ColumnLayout {
-                        id: buttonsColumn
-                        Layout.preferredWidth: privateProps.cellWidth*1.5 + 6
-                        Layout.maximumWidth: privateProps.cellWidth*1.5 + 6
-                        Layout.bottomMargin: 5
-                        Layout.fillHeight: true
-
-                        //// INVISIBLE BUTTONS
-
-                        QQC2.Button {
-                            id: bottomBarButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            checked: bottomStack.currentIndex === 0
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("BottomBar")
-                            visible: false
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 0
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: mixerButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            visible: false
-                            text: qsTr("Mixer")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 1
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: soundCombinatorButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            visible: false
-                            text: qsTr("Sound Combinator")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 5
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        //// INVISIBLE BUTTONS
-
-                        QQC2.Button {
-                            id: channelButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            checked: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("Channel")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 3
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: partButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("Parts")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 4
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: synthsButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("Synths")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: samplesButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("Samples")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-
-                        QQC2.Button {
-                            id: fxButton
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            checkable: true
-                            enabled: !root.songMode && !root.displaySceneButtons
-                            text: qsTr("FX")
-                            onCheckedChanged: {
-                                if (checked) {
-                                    bottomStack.currentIndex = 2
-                                    updateLedVariablesTimer.restart()
-                                }
-                            }
-                        }
-                    }
-
-                    Kirigami.Separator {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 1
-                        color: "#ff31363b"
-                    }
-
-                    ListView {
-                        id: channelsSlotsRow
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-
-                        clip: true
-                        spacing: 0
-                        orientation: Qt.Horizontal
-                        boundsBehavior: Flickable.StopAtBounds
-
+                    Repeater {
                         model: root.song.channelsModel
 
                         delegate: Rectangle {
                             id: channelDelegate
 
                             property bool highlighted: index === zynthian.session_dashboard.selectedChannel
-//                            property int selectedRow: 0
+    //                            property int selectedRow: 0
                             property int channelIndex: index
                             property QtObject channel: zynthian.sketchpad.song.channelsModel.getChannel(index)
 
-                            width: privateProps.cellWidth
-                            height: ListView.view.height
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
                             color: highlighted ? "#22ffffff" : "transparent"
                             radius: 2
                             border.width: 1
@@ -532,184 +513,182 @@ Rectangle {
                             }
                         }
                     }
+                }
 
-                    ColumnLayout {
+                ColumnLayout {
+                    Layout.fillWidth: false
+                    Layout.fillHeight: false
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.alignment: Qt.AlignTop
+
+                    QQC2.Label {
                         Layout.fillWidth: false
                         Layout.fillHeight: false
-                        Layout.alignment: Qt.AlignTop
-                        Layout.leftMargin: 2
-                        Layout.preferredWidth: privateProps.cellWidth*1.5 - 10
-                        Layout.bottomMargin: 5
-
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.alignment: Qt.AlignHCenter
-                            font.pointSize: 14
-                            text: qsTr("Ch%1-Slot%2")
-                                    .arg(zynthian.session_dashboard.selectedChannel + 1)
-                                    .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.alignment: Qt.AlignHCenter
-                            visible: synthsButton.checked
-                            font.pointSize: 12
-                            text: qsTr("Synth")
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.alignment: Qt.AlignHCenter
-                            font.pointSize: 12
-                            visible: fxButton.checked
-                            text: qsTr("Fx")
-                        }
-                        QQC2.Label {
-                            Layout.fillWidth: false
-                            Layout.fillHeight: false
-                            Layout.alignment: Qt.AlignHCenter
-                            font.pointSize: 12
-                            visible: samplesButton.checked
-                            text: qsTr("Sample")
-                        }
-
-                        Kirigami.Separator {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: 1
-                        }
-
-                        Rectangle {
-                            clip: true
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: detailsText.height + 20
-                            Layout.alignment: Qt.AlignHCenter
-
-                            Kirigami.Theme.inherit: false
-                            Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                            color: Kirigami.Theme.backgroundColor
-
-                            border.color: "#ff999999"
-                            border.width: 1
-                            radius: 4
-
-                            QQC2.Label {
-                                id: detailsText
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    left: parent.left
-                                    leftMargin: 10
-                                    right: parent.right
-                                    rightMargin: 10
-                                }
-                                wrapMode: "WrapAnywhere"
-                                font.pointSize: 10
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    handleItemClick()
-                                }
-                            }
-                        }
-
-                        QQC2.Slider {
-                            id: volumeSlider
-
-                            property QtObject volumeControlObject: null
-                            property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
-
-                            orientation: Qt.Horizontal
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
-
-                            visible: synthsButton.checked
-                            enabled: chainedSound >= 0 &&
-                                     root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) &&
-                                     volumeControlObject &&
-                                     volumeControlObject.controllable
-                            value: volumeControlObject ? volumeControlObject.value : 0
-                            stepSize: volumeControlObject ? volumeControlObject.step_size : 1
-                            from: volumeControlObject ? volumeControlObject.value_min : 0
-                            to: volumeControlObject ? volumeControlObject.value_max : 1
-                            onMoved: {
-                                volumeControlObject.value = value;
-                            }
-                        }
-
-                        Connections {
-                            target: bottomStack
-                            onCurrentIndexChanged: sidebarUpdateTimer.restart()
-                        }
-                        Connections {
-                            enabled: bottomStack.currentIndex === 2
-                            target: zynthian.session_dashboard
-                            onSelectedChannelChanged: sidebarUpdateTimer.restart()
-                        }
-                        // This depends on an explicitly commented-out property, so let's probably comment this out as well
-                        //Connections {
-                            //enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
-                            //target: root.selectedSlotRowItem
-                            //onSelectedRowChanged: sidebarUpdateTimer.restart()
-                        //}
-                        Connections {
-                            enabled: root.selectedSlotRowItem != null &&
-                                     root.selectedSlotRowItem.channel != null &&
-                                     bottomStack.currentIndex === 2
-                            target: enabled ? root.selectedSlotRowItem.channel : null
-                            onChainedSoundsChanged: sidebarUpdateTimer.restart()
-                            onSamplesChanged: sidebarUpdateTimer.restart()
-                        }
-                        Connections {
-                            enabled: bottomStack.currentIndex === 2
-                            target: synthsButton
-                            onCheckedChanged: sidebarUpdateTimer.restart()
-                        }
-                        Connections {
-                            enabled: bottomStack.currentIndex === 2
-                            target: fxButton
-                            onCheckedChanged: sidebarUpdateTimer.restart()
-                        }
-                        Connections {
-                            enabled: bottomStack.currentIndex === 2
-                            target: samplesButton
-                            onCheckedChanged: sidebarUpdateTimer.restart()
-                        }
-
-                        Timer {
-                            id: sidebarUpdateTimer
-                            interval: 0
-                            repeat: false
-                            onTriggered: {
-                                console.log("### Updating sidebar")
-                                detailsText.text = root.selectedSlotRowItem
-                                                    ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                        ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
-                                                        : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                            ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
-                                                            : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
-                                                                ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
-                                                                : ""
-                                                    : ""
-
-                                volumeSlider.volumeControlObject = zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
-                                                                    ? zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
-                                                                    : null
-                            }
-                        }
+                        Layout.alignment: Qt.AlignHCenter
+                        font.pointSize: 14
+                        text: qsTr("Ch%1-Slot%2")
+                                .arg(zynthian.session_dashboard.selectedChannel + 1)
+                                .arg(root.selectedSlotRowItem.channel.selectedSlotRow + 1)
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignHCenter
+                        visible: synthsButton.checked
+                        font.pointSize: 12
+                        text: qsTr("Synth")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignHCenter
+                        font.pointSize: 12
+                        visible: fxButton.checked
+                        text: qsTr("Fx")
+                    }
+                    QQC2.Label {
+                        Layout.fillWidth: false
+                        Layout.fillHeight: false
+                        Layout.alignment: Qt.AlignHCenter
+                        font.pointSize: 12
+                        visible: samplesButton.checked
+                        text: qsTr("Sample")
                     }
 
                     Kirigami.Separator {
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 1
-                        color: "#ff31363b"
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: 1
                     }
+
+                    Rectangle {
+                        clip: true
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: detailsText.height + 20
+                        Layout.alignment: Qt.AlignHCenter
+
+                        Kirigami.Theme.inherit: false
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                        color: Kirigami.Theme.backgroundColor
+
+                        border.color: "#ff999999"
+                        border.width: 1
+                        radius: 4
+
+                        QQC2.Label {
+                            id: detailsText
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                leftMargin: 10
+                                right: parent.right
+                                rightMargin: 10
+                            }
+                            wrapMode: "WrapAnywhere"
+                            font.pointSize: 10
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                handleItemClick()
+                            }
+                        }
+                    }
+
+                    QQC2.Slider {
+                        id: volumeSlider
+
+                        property QtObject volumeControlObject: null
+                        property int chainedSound: root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]
+
+                        orientation: Qt.Horizontal
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 1.5
+
+                        visible: synthsButton.checked
+                        enabled: chainedSound >= 0 &&
+                                 root.selectedSlotRowItem.channel.checkIfLayerExists(chainedSound) &&
+                                 volumeControlObject &&
+                                 volumeControlObject.controllable
+                        value: volumeControlObject ? volumeControlObject.value : 0
+                        stepSize: volumeControlObject ? volumeControlObject.step_size : 1
+                        from: volumeControlObject ? volumeControlObject.value_min : 0
+                        to: volumeControlObject ? volumeControlObject.value_max : 1
+                        onMoved: {
+                            volumeControlObject.value = value;
+                        }
+                    }
+
+                    Connections {
+                        target: bottomStack
+                        onCurrentIndexChanged: sidebarUpdateTimer.restart()
+                    }
+                    Connections {
+                        enabled: bottomStack.currentIndex === 2
+                        target: zynthian.session_dashboard
+                        onSelectedChannelChanged: sidebarUpdateTimer.restart()
+                    }
+                    // This depends on an explicitly commented-out property, so let's probably comment this out as well
+                    //Connections {
+                        //enabled: root.selectedSlotRowItem != null && bottomStack.currentIndex === 2
+                        //target: root.selectedSlotRowItem
+                        //onSelectedRowChanged: sidebarUpdateTimer.restart()
+                    //}
+                    Connections {
+                        enabled: root.selectedSlotRowItem != null &&
+                                 root.selectedSlotRowItem.channel != null &&
+                                 bottomStack.currentIndex === 2
+                        target: enabled ? root.selectedSlotRowItem.channel : null
+                        onChainedSoundsChanged: sidebarUpdateTimer.restart()
+                        onSamplesChanged: sidebarUpdateTimer.restart()
+                    }
+                    Connections {
+                        enabled: bottomStack.currentIndex === 2
+                        target: synthsButton
+                        onCheckedChanged: sidebarUpdateTimer.restart()
+                    }
+                    Connections {
+                        enabled: bottomStack.currentIndex === 2
+                        target: fxButton
+                        onCheckedChanged: sidebarUpdateTimer.restart()
+                    }
+                    Connections {
+                        enabled: bottomStack.currentIndex === 2
+                        target: samplesButton
+                        onCheckedChanged: sidebarUpdateTimer.restart()
+                    }
+
+                    Timer {
+                        id: sidebarUpdateTimer
+                        interval: 0
+                        repeat: false
+                        onTriggered: {
+                            console.log("### Updating sidebar")
+                            detailsText.text = root.selectedSlotRowItem
+                                                ? synthsButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                    ? root.selectedSlotRowItem.channel.getLayerNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow]).split(">")[0]
+                                                    : fxButton.checked && root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow] > -1 && root.selectedSlotRowItem.channel.checkIfLayerExists(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                        ? root.selectedSlotRowItem.channel.getEffectsNameByMidiChannel(root.selectedSlotRowItem.channel.chainedSounds[root.selectedSlotRowItem.channel.selectedSlotRow])
+                                                        : samplesButton.checked && root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path
+                                                            ? root.selectedSlotRowItem.channel.samples[root.selectedSlotRowItem.channel.selectedSlotRow].path.split("/").pop()
+                                                            : ""
+                                                : ""
+
+                            volumeSlider.volumeControlObject = zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
+                                                                ? zynthian.layers_for_channel.volume_controls[root.selectedSlotRowItem.channel.selectedSlotRow]
+                                                                : null
+                        }
+                    }
+                }
+
+                Kirigami.Separator {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 1
+                    color: "#ff31363b"
                 }
             }
         }

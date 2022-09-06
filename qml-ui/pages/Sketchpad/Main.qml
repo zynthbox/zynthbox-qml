@@ -1400,20 +1400,14 @@ Zynthian.ScreenPage {
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-
             StackLayout {
                 id: bottomStack
 
                 property alias bottomBar: bottomBar
                 property alias slotsBar: slotsBar
 
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 12
                 Layout.fillWidth: true
-                Layout.fillHeight: false
+                Layout.fillHeight: true
                 onCurrentIndexChanged: updateLedVariablesTimer.restart()
 
                 BottomBar {

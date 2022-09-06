@@ -455,9 +455,15 @@ Rectangle {
                                 }
                             }
 
-                            RowLayout {
+                            Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
+                                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
                                 spacing: Kirigami.Units.gridUnit / 2
 
                                 // Take 3/5 th of available width

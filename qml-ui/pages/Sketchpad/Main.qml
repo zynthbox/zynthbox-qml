@@ -565,9 +565,9 @@ Zynthian.ScreenPage {
                         text: root.song.name
                         subText: qsTr("Track T%1").arg(root.song.scenesModel.selectedTrackIndex + 1)
                         onPressed: {
-                            if (!root.songMode) {
-                                root.displayTrackButtons = !root.displayTrackButtons
-                            }
+                            root.displayTrackButtons = !root.displayTrackButtons
+                            zynthian.sketchpad.song.sketchesModel.songMode = false
+                            zynthian.sketchpad.displaySceneButtons = false
                         }
                     }
 
@@ -585,6 +585,8 @@ Zynthian.ScreenPage {
                                 applicationWindow().showPassiveNotification("Cannot switch song mode when timer is running", 1500)
                             } else {
                                 zynthian.sketchpad.song.sketchesModel.songMode = !zynthian.sketchpad.song.sketchesModel.songMode
+                                root.displayTrackButtons = false
+                                zynthian.sketchpad.displaySceneButtons = false
                             }
                         }
                     }
@@ -593,14 +595,18 @@ Zynthian.ScreenPage {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        text: qsTr("Scene")
-                        subText: root.song.scenesModel.selectedSceneName
+                        text: root.songMode ? qsTr("Sketch") : qsTr("Scene")
+                        subText: root.songMode ? root.song.sketchesModel.selectedSketch.name : root.song.scenesModel.selectedSceneName
                         highlightOnFocus: false
                         highlighted: !root.songMode &&
                                      root.displaySceneButtons
                         onPressed: {
-                            if (!root.songMode) {
-                                zynthian.sketchpad.displaySceneButtons = !zynthian.sketchpad.displaySceneButtons
+                            if (zynthian.sketchpad.displaySceneButtons) {
+                                zynthian.sketchpad.displaySceneButtons = false
+                            } else {
+                                zynthian.sketchpad.displaySceneButtons = true
+                                zynthian.sketchpad.song.sketchesModel.songMode = false
+                                root.displayTrackButtons = false
                             }
                         }
                     }
@@ -937,7 +943,7 @@ Zynthian.ScreenPage {
 
                                 TableHeader {
                                     anchors.fill: parent
-                                    visible: root.displaySceneButtons || root.songMode
+                                    visible: !root.songMode && root.displaySceneButtons
                                     text: String.fromCharCode(65+index).toUpperCase()
                                     highlighted: !root.songMode &&
                                                  index === root.song.scenesModel.selectedSceneIndex
@@ -951,11 +957,35 @@ Zynthian.ScreenPage {
                                     }
                                 }
 
+                                TableHeader {
+                                    id: sketchHeaderDelegate
+
+                                    property QtObject channel: root.song.channelsModel.getChannel(index)
+                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
+
+                                    visible: root.songMode
+                                    color: Kirigami.Theme.backgroundColor
+                                    active: !sketchHeaderDelegate.sketch.isEmpty
+
+                                    anchors.fill: parent
+
+                                    highlightOnFocus: false
+                                    highlighted: sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
+
+                                    text: sketchHeaderDelegate.sketch.name
+                                    textSize: 10
+
+                                    onPressed: {
+                                        root.song.sketchesModel.selectedSketchIndex = index
+                                        root.lastSelectedObj = sketchHeaderDelegate.sketch
+                                    }
+                                }
+
                                 ClipCell {
                                     id: clipCell
 
                                     anchors.fill: parent
-                                    visible: !root.displaySceneButtons && !root.songMode
+                                    visible: !root.songMode && !root.displaySceneButtons
 
                                     backgroundColor: "#000000"
                                     onHighlightedChanged: {

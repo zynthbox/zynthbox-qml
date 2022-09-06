@@ -715,7 +715,7 @@ Zynthian.ScreenPage {
 
                                 ChannelHeader2 {
                                     id: channelHeaderDelegate
-                                    visible: !root.songMode
+                                    visible: !root.songMode && !root.displayTrackButtons
                                     anchors.fill: parent
 
                                     channel: root.song.channelsModel.getChannel(index)

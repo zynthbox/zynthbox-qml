@@ -690,110 +690,26 @@ Zynthian.ScreenPage {
                                 }
 
                                 TableHeader {
-                                    id: segmentHeader
+                                    id: sketchHeaderDelegate
 
-                                    property bool startDrag: false
-                                    property point dragStartPosition
-                                    property int segmentOffsetAtDragStart
-
-                                    // Calculate current cell's segment index
-                                    // If arrow keys are visible, take into account that arrow keys will be visible no cells 0 and 9 respectively
-                                    property int thisSegmentIndex: index +
-                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? sketchpadClipsColumn.segmentOffset : 0) + // Offset index if arrows are visible else 0
-                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
-                                    // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
-                                    property QtObject segment: root.song.sketchesModel.selectedSketch.segmentsModel.count > 0
-                                                                ? root.song.sketchesModel.selectedSketch.segmentsModel.get_segment(segmentHeader.thisSegmentIndex)
-                                                                : null
+                                    property QtObject channel: root.song.channelsModel.getChannel(index)
+                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
 
                                     visible: root.songMode
+                                    color: Kirigami.Theme.backgroundColor
+                                    active: !sketchHeaderDelegate.sketch.isEmpty
+
                                     anchors.fill: parent
-                                    text: root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
-                                              ? index === 0
-                                                  ? "<"
-                                                  : index === 9
-                                                      ? ">"
-                                                      : segmentHeader.segment
-                                                          ? segmentHeader.segment.name
-                                                          : ""
-                                              : segmentHeader.segment
-                                                  ? segmentHeader.segment.name
-                                                  : ""
-                                    subText: {
-                                        if (root.song.sketchesModel.selectedSketch.segmentsModel.count > 10 && (index === 0 || index === 9)) {
-                                            return " "
-                                        } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
-                                            return " "
-                                        } else {
-                                            return segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
-                                        }
-                                    }
-
-                                    textSize: 10
-                                    subTextSize: 9
-
-                                    active: {
-                                        // If song mode is active, mark respective arrow key cell as active if there are segments outside view
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0 && sketchpadClipsColumn.segmentOffset > 0) {
-                                            return true
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9 && sketchpadClipsColumn.segmentOffset < sketchpadClipsColumn.maximumSegmentOffset) {
-                                            return true
-                                        }
-
-                                        // If song mode is active, mark segment cell as active if it has a segment
-                                        if (segmentHeader.segment != null) {
-                                            return true
-                                        } else {
-                                            return false
-                                        }
-                                    }
 
                                     highlightOnFocus: false
-                                    highlighted: {
-                                        // If song mode is active and arrow keys are visible, do not highlight arrow key cells
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
-                                            return false
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
-                                            return false
-                                        }
+                                    highlighted: sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
 
-                                        // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
-                                        return segmentHeader.thisSegmentIndex === root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
-                                    }
+                                    text: sketchHeaderDelegate.sketch.name
+                                    textSize: 10
 
                                     onPressed: {
-                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
-                                            // If song mode is active, clicking left arrow key cells should decrement segment offset to display out of view segments
-                                            sketchpadClipsColumn.segmentOffset = Math.max(0, sketchpadClipsColumn.segmentOffset - 1)
-                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
-                                            // If song mode is active, clicking right arrow key cells should increment segment offset to display out of view segments
-                                            sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, sketchpadClipsColumn.segmentOffset + 1)
-                                        } else {
-                                            // If song mode is active, clicking segment cells should activate that segment
-                                            if (segmentHeader.segment) {
-                                                root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentHeader.thisSegmentIndex
-                                                root.lastSelectedObj = segmentHeader.segment
-                                            }
-                                        }
-                                    }
-                                    onPressAndHold: {
-                                        startDrag = true
-                                        dragStartPosition = Qt.point(pressX, pressY)
-                                        segmentOffsetAtDragStart = segmentHeader.segmentOffset
-                                    }
-                                    onReleased: {
-                                        startDrag = false
-                                    }
-                                    onPressXChanged: {
-                                        if (startDrag) {
-                                            var offset = Math.round((pressX-dragStartPosition.x)/segmentHeader.width)
-
-                                            if (offset < 0) {
-                                                segmentHeader.segmentOffset = Math.min(channelsHeaderRepeater.maximumSegmentOffset, segmentOffsetAtDragStart + Math.abs(offset))
-                                            } else {
-                                                segmentHeader.segmentOffset = Math.max(0, segmentOffsetAtDragStart - Math.abs(offset))
-                                            }
-                                        }
+                                        root.song.sketchesModel.selectedSketchIndex = index
+                                        root.lastSelectedObj = sketchHeaderDelegate.sketch
                                     }
                                 }
 
@@ -946,26 +862,110 @@ Zynthian.ScreenPage {
                                 }
 
                                 TableHeader {
-                                    id: sketchHeaderDelegate
+                                    id: segmentHeader
 
-                                    property QtObject channel: root.song.channelsModel.getChannel(index)
-                                    property QtObject sketch: root.song.sketchesModel.getSketch(index)
+                                    property bool startDrag: false
+                                    property point dragStartPosition
+                                    property int segmentOffsetAtDragStart
+
+                                    // Calculate current cell's segment index
+                                    // If arrow keys are visible, take into account that arrow keys will be visible no cells 0 and 9 respectively
+                                    property int thisSegmentIndex: index +
+                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? sketchpadClipsColumn.segmentOffset : 0) + // Offset index if arrows are visible else 0
+                                                                   (sketchpadClipsColumn.shouldShowSegmentArrows ? -1 : 0) // if arrows are being displayed, display segment from 2nd slot onwards
+                                    // A little odd looking perhaps - we use the count changed signal here to ensure we refetch the segments when we add, remove, or otherwise change the model
+                                    property QtObject segment: root.song.sketchesModel.selectedSketch.segmentsModel.count > 0
+                                                                ? root.song.sketchesModel.selectedSketch.segmentsModel.get_segment(segmentHeader.thisSegmentIndex)
+                                                                : null
 
                                     visible: root.songMode
-                                    color: Kirigami.Theme.backgroundColor
-                                    active: !sketchHeaderDelegate.sketch.isEmpty
-
                                     anchors.fill: parent
+                                    text: root.song.sketchesModel.selectedSketch.segmentsModel.count > 10
+                                              ? index === 0
+                                                  ? "<"
+                                                  : index === 9
+                                                      ? ">"
+                                                      : segmentHeader.segment
+                                                          ? segmentHeader.segment.name
+                                                          : ""
+                                              : segmentHeader.segment
+                                                  ? segmentHeader.segment.name
+                                                  : ""
+                                    subText: {
+                                        if (root.song.sketchesModel.selectedSketch.segmentsModel.count > 10 && (index === 0 || index === 9)) {
+                                            return " "
+                                        } else if (!segmentHeader.segment || (segmentHeader.segment.barLength === 0 && segmentHeader.segment.beatLength === 0)) {
+                                            return " "
+                                        } else {
+                                            return segmentHeader.segment.barLength + "." + segmentHeader.segment.beatLength
+                                        }
+                                    }
+
+                                    textSize: 10
+                                    subTextSize: 9
+
+                                    active: {
+                                        // If song mode is active, mark respective arrow key cell as active if there are segments outside view
+                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0 && sketchpadClipsColumn.segmentOffset > 0) {
+                                            return true
+                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9 && sketchpadClipsColumn.segmentOffset < sketchpadClipsColumn.maximumSegmentOffset) {
+                                            return true
+                                        }
+
+                                        // If song mode is active, mark segment cell as active if it has a segment
+                                        if (segmentHeader.segment != null) {
+                                            return true
+                                        } else {
+                                            return false
+                                        }
+                                    }
 
                                     highlightOnFocus: false
-                                    highlighted: sketchHeaderDelegate.sketch.sketchId === root.song.sketchesModel.selectedSketchIndex
+                                    highlighted: {
+                                        // If song mode is active and arrow keys are visible, do not highlight arrow key cells
+                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
+                                            return false
+                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
+                                            return false
+                                        }
 
-                                    text: sketchHeaderDelegate.sketch.name
-                                    textSize: 10
+                                        // If song mode is active and cell is not an arrow key, then highlight if selected segment is current cell
+                                        return segmentHeader.thisSegmentIndex === root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex
+                                    }
 
                                     onPressed: {
-                                        root.song.sketchesModel.selectedSketchIndex = index
-                                        root.lastSelectedObj = sketchHeaderDelegate.sketch
+                                        if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 0) {
+                                            // If song mode is active, clicking left arrow key cells should decrement segment offset to display out of view segments
+                                            sketchpadClipsColumn.segmentOffset = Math.max(0, sketchpadClipsColumn.segmentOffset - 1)
+                                        } else if (sketchpadClipsColumn.shouldShowSegmentArrows && index === 9) {
+                                            // If song mode is active, clicking right arrow key cells should increment segment offset to display out of view segments
+                                            sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, sketchpadClipsColumn.segmentOffset + 1)
+                                        } else {
+                                            // If song mode is active, clicking segment cells should activate that segment
+                                            if (segmentHeader.segment) {
+                                                root.song.sketchesModel.selectedSketch.segmentsModel.selectedSegmentIndex = segmentHeader.thisSegmentIndex
+                                                root.lastSelectedObj = segmentHeader.segment
+                                            }
+                                        }
+                                    }
+                                    onPressAndHold: {
+                                        startDrag = true
+                                        dragStartPosition = Qt.point(pressX, pressY)
+                                        segmentOffsetAtDragStart = segmentHeader.segmentOffset
+                                    }
+                                    onReleased: {
+                                        startDrag = false
+                                    }
+                                    onPressXChanged: {
+                                        if (startDrag) {
+                                            var offset = Math.round((pressX-dragStartPosition.x)/segmentHeader.width)
+
+                                            if (offset < 0) {
+                                                segmentHeader.segmentOffset = Math.min(channelsHeaderRepeater.maximumSegmentOffset, segmentOffsetAtDragStart + Math.abs(offset))
+                                            } else {
+                                                segmentHeader.segmentOffset = Math.max(0, segmentOffsetAtDragStart - Math.abs(offset))
+                                            }
+                                        }
                                     }
                                 }
 

@@ -573,7 +573,9 @@ Zynthian.ScreenPage {
 
                     TableHeader {
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        Layout.fillHeight: false
+                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                        Layout.minimumHeight: Kirigami.Units.gridUnit * 3
 
                         text: qsTr("Song Mode")
                         highlightOnFocus: false
@@ -589,10 +591,11 @@ Zynthian.ScreenPage {
                     }
 
                     TableHeader {
-                        text: qsTr("Scene")
-                        subText: root.song.scenesModel.selectedSceneName
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+
+                        text: qsTr("Scene")
+                        subText: root.song.scenesModel.selectedSceneName
                         highlightOnFocus: false
                         highlighted: !root.songMode &&
                                      root.displaySceneButtons

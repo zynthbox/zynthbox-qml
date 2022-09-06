@@ -949,9 +949,9 @@ Zynthian.ScreenPage {
                                         }
                                     }
                                     onPressAndHold: {
-                                        startDrag = true
-                                        dragStartPosition = Qt.point(pressX, pressY)
-                                        segmentOffsetAtDragStart = segmentHeader.segmentOffset
+                                        segmentHeader.startDrag = true
+                                        segmentHeader.dragStartPosition = Qt.point(pressX, pressY)
+                                        segmentHeader.segmentOffsetAtDragStart = sketchpadClipsColumn.segmentOffset
                                     }
                                     onReleased: {
                                         startDrag = false
@@ -961,9 +961,9 @@ Zynthian.ScreenPage {
                                             var offset = Math.round((pressX-dragStartPosition.x)/segmentHeader.width)
 
                                             if (offset < 0) {
-                                                segmentHeader.segmentOffset = Math.min(channelsHeaderRepeater.maximumSegmentOffset, segmentOffsetAtDragStart + Math.abs(offset))
+                                                sketchpadClipsColumn.segmentOffset = Math.min(sketchpadClipsColumn.maximumSegmentOffset, segmentHeader.segmentOffsetAtDragStart + Math.abs(offset))
                                             } else {
-                                                segmentHeader.segmentOffset = Math.max(0, segmentOffsetAtDragStart - Math.abs(offset))
+                                                sketchpadClipsColumn.segmentOffset = Math.max(0, segmentHeader.segmentOffsetAtDragStart - Math.abs(offset))
                                             }
                                         }
                                     }

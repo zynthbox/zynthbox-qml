@@ -416,7 +416,6 @@ Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             color: highlighted ? "#22ffffff" : "transparent"
-                            radius: 2
                             border.width: 1
                             border.color: highlighted ? Kirigami.Theme.highlightColor : "transparent"
 
@@ -519,10 +518,11 @@ Rectangle {
                     Layout.fillWidth: false
                     Layout.fillHeight: false
                     Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                    Layout.maximumWidth: Kirigami.Units.gridUnit * 6
                     Layout.alignment: Qt.AlignTop
 
                     QQC2.Label {
-                        Layout.fillWidth: false
+                        Layout.fillWidth: true
                         Layout.fillHeight: false
                         Layout.alignment: Qt.AlignHCenter
                         font.pointSize: 14
@@ -685,11 +685,11 @@ Rectangle {
                     }
                 }
 
-                Kirigami.Separator {
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 1
-                    color: "#ff31363b"
-                }
+//                Kirigami.Separator {
+//                    Layout.fillHeight: true
+//                    Layout.preferredWidth: 1
+//                    color: "#ff31363b"
+//                }
             }
         }
     }

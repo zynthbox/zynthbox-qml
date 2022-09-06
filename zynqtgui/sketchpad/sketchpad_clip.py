@@ -770,15 +770,16 @@ class sketchpad_clip(QObject):
     @Slot(None)
     def play(self):
         if not self.__is_playing__:
-            if self.channel is not None:
-                clipsModel = self.channel.clipsModel
-
-                for clip_index in range(0, clipsModel.count):
-                    clip: sketchpad_clip = clipsModel.getClip(clip_index)
-                    logging.debug(f"Channel({self.channel}), Clip({clip}: isPlaying({clip.__is_playing__}))")
-
-                    if clip.__is_playing__:
-                        clip.stop()
+            # We will now allow playing multiple parts of a sample-loop channel and hence do not stop other clips in part when playing
+            # if self.channel is not None:
+            #     clipsModel = self.channel.clipsModel
+            #
+            #     for clip_index in range(0, clipsModel.count):
+            #         clip: sketchpad_clip = clipsModel.getClip(clip_index)
+            #         logging.debug(f"Channel({self.channel}), Clip({clip}: isPlaying({clip.__is_playing__}))")
+            #
+            #         if clip.__is_playing__:
+            #             clip.stop()
 
             if self.audioSource is None:
                 return

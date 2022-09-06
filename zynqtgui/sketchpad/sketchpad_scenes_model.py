@@ -204,8 +204,9 @@ class sketchpad_scenes_model(QAbstractListModel):
 
             # Start all clips except clip to be recorded
             if clip != self.zyngui.sketchpad.clipToRecord and \
-                    clip.part == clip.clipChannel.selectedPart and \
                     (trackIndex < 0 or (0 <= trackIndex == clip.col)):
+                # We will now allow playing multiple parts of a sample-loop channel and hence play all clips in part
+                # clip.part == clip.clipChannel.selectedPart and \
                 clip.play()
 
     @Slot(int)

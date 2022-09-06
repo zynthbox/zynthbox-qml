@@ -132,7 +132,8 @@ class sketchpad_channel(QObject):
         # logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
         if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)
-            allowMultipart = self.channelAudioType == "sample-trig" and self.keyZoneMode == "all-full"
+            # We will now allow playing multiple parts of a sample-loop channel
+            allowMultipart = (self.channelAudioType == "sample-loop" or self.channelAudioType == "sample-trig") and self.keyZoneMode == "all-full"
             # logging.error(f"Allowing multipart playback: {allowMultipart}")
             if not allowMultipart:
                 for part in range(0, 5):
@@ -1109,13 +1110,13 @@ class sketchpad_channel(QObject):
             old_selected_part = self.__selected_part__
             self.__selected_part__ = selected_part
 
-            old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, old_selected_part)
-            if old_clip is not None:
-                old_clip.stop()
-
-            clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, selected_part)
-            if clip is not None and clip.inCurrentScene:
-                clip.play()
+            # old_clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, old_selected_part)
+            # if old_clip is not None:
+            #     old_clip.stop()
+            #
+            # clip = self.__song__.getClipByPart(self.__id__, self.__song__.scenesModel.selectedTrackIndex, selected_part)
+            # if clip is not None and clip.inCurrentScene:
+            #     clip.play()
 
             self.selectedPartChanged.emit()
             self.__song__.schedule_save()

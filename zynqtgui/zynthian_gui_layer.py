@@ -275,10 +275,8 @@ class zynthian_gui_layer(zynthian_gui_selector):
 			self.zyngui.screens['preset'].set_select_path()
 		else:
 			self.zyngui.set_curlayer(None)
-			self.zyngui.screens['bank'].fill_list()
-			self.zyngui.screens['bank'].set_select_path()
-			self.zyngui.screens['preset'].fill_list()
-			self.zyngui.screens['preset'].set_select_path()
+			self.zyngui.add_screen_to_show_queue(self.zyngui.screens['bank'], False, True, False, True)
+			self.zyngui.add_screen_to_show_queue(self.zyngui.screens['preset'], False, True, False, True)
 			zyncoder.lib_zyncoder.set_midi_active_chan(midi_chan)
 			self.zyngui.active_midi_channel_changed.emit()
 			self.zyngui.screens['fixed_layers'].sync_index_from_curlayer()

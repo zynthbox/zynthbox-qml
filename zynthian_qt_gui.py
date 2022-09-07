@@ -667,8 +667,15 @@ class zynthian_gui(QObject):
     Add a screen to queue for processing and start timer
     Always enqueue show screen with this method to make sure timer is started when a screen is queued
     '''
-    def add_screen_to_show_queue(self, screen, select_first_action=False):
-        self.show_screens_queue.append((screen, select_first_action))
+    def add_screen_to_show_queue(self, screen, select_first_action=False, fill_list=False, show_screen=True, set_select_path=False):
+        screen_to_show = (screen, select_first_action, fill_list, show_screen, set_select_path)
+
+        if screen_to_show not in self.show_screens_queue:
+            logging.debug(f"Screen {screen} not in list. Appending")
+            self.show_screens_queue.append(screen_to_show)
+        else:
+            logging.debug(f"Screen {screen} already added to list. Not appending")
+
         self.show_screens_queue_timer.start()
 
     '''
@@ -679,14 +686,25 @@ class zynthian_gui(QObject):
     def show_screens_queue_timer_timeout(self):
         # Try calling show method of the screen and select first action if told to do so
         try:
-            for screen, select_first_action in self.show_screens_queue:
-                logging.debug(f"Showing screen : {screen}")
-                screen.show()
+            for screen, select_first_action, fill_list, show_screen, set_select_path in self.show_screens_queue:
+                if fill_list:
+                    screen.fill_list()
+                    QGuiApplication.instance().processEvents()
+
+                if show_screen:
+                    logging.debug(f"Showing screen : {screen}")
+                    screen.show()
+                    QGuiApplication.instance().processEvents()
+
+                if set_select_path:
+                    logging.debug(f"Setting select path for screen : {screen}")
+                    screen.set_select_path()
+                    QGuiApplication.instance().processEvents()
+
                 if select_first_action:
                     logging.debug(f"Selection first action for screen : {screen}")
                     screen.select_action(0)
-
-                QGuiApplication.instance().processEvents()
+                    QGuiApplication.instance().processEvents()
         except: pass
     ### END SHOW SCREEN QUEUE
 
@@ -1875,12 +1893,9 @@ class zynthian_gui(QObject):
             self.curlayer = None
         self.screens["fixed_layers"].sync_index_from_curlayer()
         self.screens["layers_for_channel"].sync_index_from_curlayer()
-        self.screens["bank"].fill_list()
-        self.screens["bank"].show()
-        self.screens["preset"].fill_list()
-        self.screens["preset"].show()
-        self.screens["control"].fill_list()
-        self.screens["control"].show()
+        self.add_screen_to_show_queue(self.screens["bank"], False, True)
+        self.add_screen_to_show_queue(self.screens["preset"], False, True)
+        self.add_screen_to_show_queue(self.screens["control"], False, True)
         if self.curlayer:
             self.screens["midi_key_range"].config(self.curlayer.midi_chan)
             midi_chan = self.curlayer.midi_chan

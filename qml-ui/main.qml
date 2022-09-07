@@ -151,16 +151,60 @@ Kirigami.AbstractApplicationWindow {
         }
         Zynthian.BreadcrumbButton {
             id: homeButton
-            text: zynthian.sketchpad.song.name
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             padding: Kirigami.Units.largeSpacing*1.5
             rightPadding: Kirigami.Units.largeSpacing*1.5
+            font.pointSize: 11
             onClicked: {
-                zynthian.current_modal_screen_id = 'sketchpad'
                 // print(zynthian.sketchpad.song.scenesModel.getScene(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).name)
+                //zynthian.current_modal_screen_id = 'sketchpad'
+                tracksMenu.open()
             }
             //onPressAndHold: zynthian.current_screen_id = 'main'
             highlighted: zynthian.current_screen_id === 'sketchpad'
+
+            ColumnLayout {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: Kirigami.Units.largeSpacing*1.5
+                spacing: 0
+
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    font.pointSize: 10
+                    opacity: 0.5
+                    text: zynthian.sketchpad.song.name
+                }
+
+                QQC2.Label {
+                    Layout.alignment: Qt.AlignHCenter
+                    font.pointSize: 10
+                    opacity: 0.5
+                    text: zynthian.sketchpad.song.scenesModel.selectedTrackName + "ˬ"
+                }
+            }
+
+
+            QQC2.Menu {
+                id: tracksMenu
+                y: parent.height
+                modal: true
+                dim: false
+                Repeater {
+                    model: 10
+                    delegate: QQC2.MenuItem {
+                        text: qsTr("Track T%1").arg(index+1)
+                        width: parent.width
+                        font.pointSize: 11
+                        onClicked: {
+                            tracksMenu.close();
+                            zynthian.sketchpad.song.scenesModel.selectedTrackIndex = index;
+                        }
+                        highlighted: zynthian.sketchpad.song.scenesModel.selectedTrackIndex === index
+                    }
+                }
+            }
         }
        /* Zynthian.BreadcrumbButton {
             icon.color: customTheme.Kirigami.Theme.textColor
@@ -188,8 +232,9 @@ Kirigami.AbstractApplicationWindow {
             id: sceneButton
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Scene %1 ˬ").arg(zynthian.sketchpad.song.scenesModel.selectedSceneName)
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
             onClicked: scenesMenu.visible = true
 
             Timer {
@@ -214,6 +259,7 @@ Kirigami.AbstractApplicationWindow {
                     delegate: QQC2.MenuItem {
                         text: qsTr("Scene %1").arg(String.fromCharCode(index+65).toUpperCase())
                         width: parent.width
+                        font.pointSize: 11
                         onClicked: {
                             scenesMenu.close();
                             switchTimer.index = index;
@@ -230,8 +276,9 @@ Kirigami.AbstractApplicationWindow {
             icon.color: customTheme.Kirigami.Theme.textColor
             text: qsTr("Channel %1 ˬ")
                     .arg(zynthian.session_dashboard.selectedChannel+1)
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
             onClicked: channelsMenu.visible = true
             QQC2.Menu {
                 id: channelsMenu
@@ -266,6 +313,7 @@ Kirigami.AbstractApplicationWindow {
                     .arg(selectedSample && selectedSample.path && selectedSample.path.length > 0 ? "" : ": none")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 11
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
             onClicked: samplesMenu.visible = true
             visible: ["sample-trig", "sample-slice"].indexOf(root.selectedChannel.channelAudioType) >= 0
 
@@ -296,14 +344,16 @@ Kirigami.AbstractApplicationWindow {
             text: qsTr("%1").arg(clip && clip.path ? clip.path.split("/").pop() : "")
             Layout.maximumWidth: Kirigami.Units.gridUnit * 10
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
             visible: root.selectedChannel.channelAudioType === "sample-loop" &&
                      clip && clip.path && clip.path.length >= 0
         }
         Zynthian.BreadcrumbButton {
             id: synthButton
             icon.color: customTheme.Kirigami.Theme.textColor
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
             visible: root.selectedChannel.channelAudioType === "synth"
 
             // Open preset screen on clicking this synth button
@@ -349,8 +399,9 @@ Kirigami.AbstractApplicationWindow {
         Zynthian.BreadcrumbButton {
             id: presetButton
             icon.color: customTheme.Kirigami.Theme.textColor
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 6
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
 
             // Open synth edit page whjen preset button is clicked
             onClicked: {
@@ -435,13 +486,15 @@ Kirigami.AbstractApplicationWindow {
             onClicked: zynthian.current_screen_id = effectScreen
             Layout.maximumWidth: Kirigami.Units.gridUnit * 8
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
         }
         Zynthian.BreadcrumbButton {
             icon.color: customTheme.Kirigami.Theme.textColor
             text: "EDIT"
             visible: zynthian.current_screen_id === "control"
-            Layout.maximumWidth: Kirigami.Units.gridUnit * 8
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 4
             rightPadding: Kirigami.Units.largeSpacing*2
+            font.pointSize: 11
         }
         Item {
             Layout.fillWidth: true

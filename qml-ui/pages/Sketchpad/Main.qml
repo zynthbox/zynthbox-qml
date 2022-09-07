@@ -817,12 +817,13 @@ Zynthian.ScreenPage {
                                         // If song mode is not active, clicking on cells should activate that channel
                                         root.lastSelectedObj = channelHeaderDelegate.channel
 
-                                        // Open MixedChannelsViewBar and switch to channel
-                                        bottomStack.slotsBar.channelButton.checked = true
+                                        zynthian.session_dashboard.selectedChannel = index;
 
                                         // zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                        zynthian.session_dashboard.selectedChannel = index;
+
                                         Qt.callLater(function() {
+                                            // Open MixedChannelsViewBar and switch to channel
+                                            bottomStack.slotsBar.channelButton.checked = true
                                             bottomBar.controlType = BottomBar.ControlType.Channel;
                                             bottomBar.controlObj = channelHeaderDelegate.channel;
                                         })

@@ -110,6 +110,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def set_selected_channel_complete(self):
+        self.zyngui.sketchpad.set_selector()
         self.zyngui.fixed_layers.fill_list()
         self.selected_channel_changed.emit()
         self.__change_channel_sound_timer__.start()
@@ -148,7 +149,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
         self.__change_channel_sound_timer__.setInterval(1000)
-        self.zyngui.sketchpad.set_selector()
 
         self.schedule_save()
     def get_selected_channel(self):

@@ -137,8 +137,15 @@ QQC2.AbstractButton {
             anchors.topMargin: spacing
             anchors.bottomMargin: spacing
 
+            Binding {
+                target: partNamesRepeater
+                delayed: true
+                property: "model"
+                value: channel.selectedPartNames
+            }
+
             Repeater {
-                model: channel.selectedPartNames
+                id: partNamesRepeater
                 delegate: RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true

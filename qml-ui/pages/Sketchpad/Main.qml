@@ -522,6 +522,18 @@ Zynthian.ScreenPage {
         }
     }
 
+    function resetBottomBar(toggleBottomBar) {
+        if (toggleBottomBar) {
+            if (bottomStack.slotsBar.channelButton.checked) {
+                bottomStack.slotsBar.partButton.checked = true
+            } else {
+                bottomStack.slotsBar.channelButton.checked = true
+            }
+        } else {
+            bottomStack.slotsBar.channelButton.checked = true
+        }
+    }
+
     contentItem : Item {
         id: content
 
@@ -823,7 +835,8 @@ Zynthian.ScreenPage {
 
                                         Qt.callLater(function() {
                                             // Open MixedChannelsViewBar and switch to channel
-                                            bottomStack.slotsBar.channelButton.checked = true
+                                            // bottomStack.slotsBar.channelButton.checked = true
+                                            root.resetBottomBar(false)
                                             bottomBar.controlType = BottomBar.ControlType.Channel;
                                             bottomBar.controlObj = channelHeaderDelegate.channel;
                                         })
@@ -982,15 +995,15 @@ Zynthian.ScreenPage {
                                             //console.log("Clip : (" + channel.sceneClip.row+", "+channel.sceneClip.col+")", "Selected Channel :"+ zynthian.session_dashboard.selectedChannel)
 
                                             // Switch to highlighted clip only if previous selected bottombar object was a clip/pattern
-                                            if (highlighted && (bottomBar.controlType === BottomBar.ControlType.Pattern || bottomBar.controlType === BottomBar.ControlType.Clip)) {
-                                                if (channel.connectedPattern >= 0) {
-                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
-                                                    bottomBar.controlObj = channel.sceneClip;
-                                                } else {
-                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
-                                                    bottomBar.controlObj = channel.sceneClip;
-                                                }
-                                            }
+//                                            if (highlighted && (bottomBar.controlType === BottomBar.ControlType.Pattern || bottomBar.controlType === BottomBar.ControlType.Clip)) {
+//                                                if (channel.connectedPattern >= 0) {
+//                                                    bottomBar.controlType = BottomBar.ControlType.Pattern;
+//                                                    bottomBar.controlObj = channel.sceneClip;
+//                                                } else {
+//                                                    bottomBar.controlType = BottomBar.ControlType.Clip;
+//                                                    bottomBar.controlObj = channel.sceneClip;
+//                                                }
+//                                            }
                                         });
                                     }
 
@@ -1075,18 +1088,7 @@ Zynthian.ScreenPage {
                                         }
 
                                         Qt.callLater(function() {
-                                            // Directly switch to channel instead of implementing muting on double click
-                                            // as we probably wont need muting anymore. Muting is handled by partsBar
-                                            // when  none of the parts are selected
-                                            if (toggleBottomBar) {
-                                                if (bottomStack.slotsBar.channelButton.checked) {
-                                                    bottomStack.slotsBar.partButton.checked = true
-                                                } else {
-                                                    bottomStack.slotsBar.channelButton.checked = true
-                                                }
-                                            } else {
-                                                bottomStack.slotsBar.channelButton.checked = true
-                                            }
+                                            root.resetBottomBar(toggleBottomBar)
                                             // zynthian.session_dashboard.disableNextSoundSwitchTimer();
 
                                             if (channel.connectedPattern >= 0) {

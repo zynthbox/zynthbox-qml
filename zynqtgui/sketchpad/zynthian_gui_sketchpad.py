@@ -808,7 +808,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         self.is_set_selector_running = True
 
     @Slot(None)
-    def set_selector(self, zs_hiden=False):
+    def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True,):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
         if self.__song__ is None or \
                 (self.zyngui.globalPopupOpened or self.zyngui.altButtonPressed) or \
@@ -840,16 +840,20 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
         ###
 
         # Configure Big Knob
-        self.configure_big_knob()
+        if big_knob:
+            self.configure_big_knob()
 
         # Configure small knob 1
-        self.configure_small_knob_1(selected_channel_obj, selected_clip)
+        if small_knob1:
+            self.configure_small_knob_1(selected_channel_obj, selected_clip)
 
         # Configure small knob 2
-        self.configure_small_knob_2(selected_channel_obj, selected_clip)
+        if small_knob2:
+            self.configure_small_knob_2(selected_channel_obj, selected_clip)
 
         # Configure small knob 3
-        self.configure_small_knob_3(selected_channel_obj, selected_clip)
+        if small_knob3:
+            self.configure_small_knob_3(selected_channel_obj, selected_clip)
 
         self.is_set_selector_running = False
 

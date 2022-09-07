@@ -110,9 +110,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
 
     @Slot(None)
     def set_selected_channel_complete(self):
-        self.zyngui.sketchpad.set_selector()
         self.zyngui.fixed_layers.fill_list()
-        self.selected_channel_changed.emit()
         self.__change_channel_sound_timer__.start()
 
     ### Property name
@@ -157,11 +155,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         if self.__selected_channel__ != channel or force_set is True:
             logging.debug(f"### Setting selected channel : channel({channel})")
             self.__selected_channel__ = channel
+            self.selected_channel_changed.emit()
 
             # Set is_set_selector_running way before set_selector is called so that
             # knob values are discarded. set_selector will be called by change_to_channel_sound
             # after 1000ms when active midi channel is switched
-            self.zyngui.sketchpad.set_set_selector_active()
+            # self.zyngui.sketchpad.set_set_selector_active()
+            self.zyngui.sketchpad.set_selector(True, False, False, False)
 
             # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes
             # fill_list and emitting selected_channel_changed event is a bit on the heavier side and hence should go

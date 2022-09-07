@@ -58,11 +58,16 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__visible_channels_start__ = 0
         self.__visible_channels_end__ = 5
         self.__last_selected_sketchpad__ = None
-        self.__change_channel_sound_timer__ = QTimer()
-        self.__change_channel_sound_timer__.setInterval(1000)
-        self.__change_channel_sound_timer__.setSingleShot(True)
-        self.__change_channel_sound_timer__.timeout.connect(self.change_to_channel_sound, Qt.QueuedConnection)
         self.__selected_channel__ = 0
+
+        # Sound changes even though change_to_channel_sound is not called.
+        # Someone else is doing the job and there is no point in doing it twice.
+        # Disabling for now but this is a HACK
+        # FIXME : Find the real place which actually switches sound
+        # self.__change_channel_sound_timer__ = QTimer()
+        # self.__change_channel_sound_timer__.setInterval(10000)
+        # self.__change_channel_sound_timer__.setSingleShot(True)
+        # self.__change_channel_sound_timer__.timeout.connect(self.change_to_channel_sound, Qt.QueuedConnection)
 
         if not self.restore():
             def cb():
@@ -111,7 +116,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(None)
     def set_selected_channel_complete(self):
         self.zyngui.fixed_layers.fill_list()
-        self.__change_channel_sound_timer__.start()
+        # self.__change_channel_sound_timer__.start()
 
     ### Property name
     def get_name(self):
@@ -146,7 +151,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.zyngui.screens["layers_for_channel"].update_channel_sounds()
         
         # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
-        self.__change_channel_sound_timer__.setInterval(1000)
+        # self.__change_channel_sound_timer__.setInterval(10000)
 
         self.schedule_save()
     def get_selected_channel(self):
@@ -161,7 +166,7 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
             # knob values are discarded. set_selector will be called by change_to_channel_sound
             # after 1000ms when active midi channel is switched
             # self.zyngui.sketchpad.set_set_selector_active()
-            self.zyngui.sketchpad.set_selector(True, False, False, False)
+            self.zyngui.sketchpad.set_selector() #(True, False, False, False)
 
             # Do heavy tasks in a slot invoked with QueuedConnection to not cause UI stutters when channel changes
             # fill_list and emitting selected_channel_changed event is a bit on the heavier side and hence should go
@@ -331,6 +336,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__last_selected_sketchpad__ = sketchpad
         self.schedule_save()
 
-    @Slot(None)
-    def disableNextSoundSwitchTimer(self):
-        self.__change_channel_sound_timer__.setInterval(0)
+    # @Slot(None)
+    # def disableNextSoundSwitchTimer(self):
+    #     self.__change_channel_sound_timer__.setInterval(0)

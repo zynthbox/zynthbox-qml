@@ -653,11 +653,11 @@ class zynthian_gui(QObject):
                 "ERROR initializing Controllers & MIDI-router: %s" % e
             )
 
-        if "zynseq" in zynthian_gui_config.experimental_features:
-            self.libseq = CDLL(
-                "/zynthian/zynthian-ui/zynlibs/zynseq/build/libzynseq.so"
-            )
-            self.libseq.init(True)
+        #if "zynseq" in zynthian_gui_config.experimental_features:
+            #self.libseq = CDLL(
+                #"/zynthian/zynthian-ui/zynlibs/zynseq/build/libzynseq.so"
+            #)
+            #self.libseq.init(True)
 
     def increment_blink_count(self):
         self.wsleds_blink_count = (self.wsleds_blink_count + 1) % 4

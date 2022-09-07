@@ -1064,26 +1064,31 @@ Zynthian.ScreenPage {
                                     pattern: channel.connectedPattern >= 0 && sequence && !sequence.isLoading && sequence.count > 0 ? sequence.getByPart(channel.id, channel.selectedPart) : null
 
                                     onPressed: {
+                                        var toggleBottomBar = false
                                         root.lastSelectedObj = channel.sceneClip
 
-                                        // Directly switch to channel instead of implementing muting on double click
-                                        // as we probably wont need muting anymore. Muting is handled by partsBar
-                                        // when  none of the parts are selected
                                         if (zynthian.session_dashboard.selectedChannel === channel.id) {
-                                            if (bottomStack.slotsBar.channelButton.checked) {
-                                                bottomStack.slotsBar.partButton.checked = true
+                                            toggleBottomBar = true
+                                        } else {
+                                            zynthian.session_dashboard.selectedChannel = channel.id;
+                                            zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
+                                        }
+
+                                        Qt.callLater(function() {
+                                            // Directly switch to channel instead of implementing muting on double click
+                                            // as we probably wont need muting anymore. Muting is handled by partsBar
+                                            // when  none of the parts are selected
+                                            if (toggleBottomBar) {
+                                                if (bottomStack.slotsBar.channelButton.checked) {
+                                                    bottomStack.slotsBar.partButton.checked = true
+                                                } else {
+                                                    bottomStack.slotsBar.channelButton.checked = true
+                                                }
                                             } else {
                                                 bottomStack.slotsBar.channelButton.checked = true
                                             }
+                                            // zynthian.session_dashboard.disableNextSoundSwitchTimer();
 
-                                        } else if (zynthian.session_dashboard.selectedChannel !== channel.id) {
-                                            bottomStack.slotsBar.channelButton.checked = true
-                                        }
-//                                                zynthian.session_dashboard.disableNextSoundSwitchTimer();
-                                        zynthian.session_dashboard.selectedChannel = channel.id;
-                                        zynthian.sketchpad.song.scenesModel.selectedTrackIndex = channel.sceneClip.col
-
-                                        Qt.callLater(function() {
                                             if (channel.connectedPattern >= 0) {
                                                 bottomBar.controlType = BottomBar.ControlType.Pattern;
                                                 bottomBar.controlObj = channel.sceneClip;

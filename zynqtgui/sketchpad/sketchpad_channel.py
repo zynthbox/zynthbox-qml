@@ -127,9 +127,12 @@ class sketchpad_channel(QObject):
         self.zyngui.layer.snapshotLoaded.connect(self.update_sound_snapshot_json)
 
     # Since signals can't carry parameters when defined in python (yay), we're calling this directly from clips_model
-    def onClipEnabledChanged(self, sceneIndex, partNum):
-        clip = self.__song__.getClipByPart(self.__id__, sceneIndex, partNum)
-        # logging.error(f"{clip} is enabled? {clip.enabled} for scene index {sceneIndex} and part {partNum}")
+    def onClipEnabledChanged(self, trackIndex, partNum):
+        clip = self.getClipsModelByPart(partNum).getClip(trackIndex)
+
+        # if clip is not None and clip.enabled is not None:
+            # logging.error(f"{clip} is enabled? {clip.enabled} for trackIndex {trackIndex} and part {partNum} for channel {self.id}")
+
         if clip is not None and clip.enabled is True:
             self.set_selected_part(partNum)
             # We will now allow playing multiple parts of a sample-loop channel
@@ -138,7 +141,7 @@ class sketchpad_channel(QObject):
             if not allowMultipart:
                 for part in range(0, 5):
                     if part != self.__selected_part__:
-                        clipForDisabling = self.__song__.getClipByPart(self.__id__, sceneIndex, part)
+                        clipForDisabling = self.getClipsModelByPart(part).getClip(trackIndex)
                         # NOTE This will cause an infinite loop if we assign True here (see: the rest of this function)
                         if clipForDisabling is not None:
                             clipForDisabling.enabled = False
@@ -901,9 +904,9 @@ class sketchpad_channel(QObject):
             self.__channel_audio_type__ = type
             self.zyngui.sketchpad.set_selector()
             self.channel_audio_type_changed.emit()
-            for scene in range(0, 10):
+            for track in range(0, 10):
                 for part in range(0, 5):
-                    self.onClipEnabledChanged(scene, part)
+                    self.onClipEnabledChanged(track, part)
             if not force_set:
                 self.__song__.schedule_save()
 
@@ -941,9 +944,9 @@ class sketchpad_channel(QObject):
         if self.__keyzone_mode__ != keyZoneMode:
             self.__keyzone_mode__ = keyZoneMode
             self.keyZoneModeChanged.emit()
-            for scene in range(0, 10):
+            for track in range(0, 10):
                 for part in range(0, 5):
-                    self.onClipEnabledChanged(scene, part)
+                    self.onClipEnabledChanged(track, part)
             self.__song__.schedule_save()
 
     keyZoneModeChanged = Signal()

@@ -119,7 +119,10 @@ class sketchpad_song(QObject):
 
             for channel_index in range(10):
                 channel = self.__channels_model__.getChannel(channel_index)
-                channel.getClipsModelByPart(0).getClip(0).enabled = True
+
+                # Add first part of channel of all tracks to current scene
+                for track_index in range(10):
+                    channel.getClipsModelByPart(0).getClip(track_index).enabled = True
 
             # Add default Sketches and Segments
             for sketch_index in range(10):

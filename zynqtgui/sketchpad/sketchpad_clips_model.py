@@ -109,7 +109,7 @@ class sketchpad_clips_model(QAbstractListModel):
         self.countChanged.emit()
         if self.__channel__ is not None and self.__partIndex__ > -1:
             # The clips in a parts model contains the scene-related information for the channel/clip
-            clip.enabled_changed.connect(lambda clipIndex=length: self.__channel__.onClipEnabledChanged(clipIndex, self.__partIndex__))
+            clip.enabled_changed.connect(lambda: self.__channel__.onClipEnabledChanged(clip.col, self.__partIndex__))
 
     @Slot(int, result=QObject)
     def getClip(self, row : int):

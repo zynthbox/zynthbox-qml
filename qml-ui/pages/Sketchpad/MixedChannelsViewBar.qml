@@ -271,7 +271,7 @@ Rectangle {
 
                                         QQC2.Label {
                                             Layout.fillHeight: true
-                                            text: "Auto Split:"
+                                            text: "Key Split"
                                         }
                                         RowLayout {
                                             Layout.fillHeight: true
@@ -284,14 +284,14 @@ Rectangle {
                                                     root.selectedChannel.keyZoneMode = "all-full";
                                                 }
                                             }
-                                            QQC2.Button {
-                                                Layout.fillHeight: true
-                                                text: "Auto"
-                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-full"
-                                                onClicked: {
-                                                    root.selectedChannel.keyZoneMode = "split-full";
-                                                }
-                                            }
+//                                            QQC2.Button {
+//                                                Layout.fillHeight: true
+//                                                text: "Auto"
+//                                                checked: root.selectedChannel && root.selectedChannel.keyZoneMode === "split-full"
+//                                                onClicked: {
+//                                                    root.selectedChannel.keyZoneMode = "split-full";
+//                                                }
+//                                            }
                                             QQC2.Button {
                                                 Layout.fillHeight: true
                                                 text: "Narrow"
@@ -301,13 +301,13 @@ Rectangle {
                                                 }
                                             }
                                         }
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            icon.name: "timeline-use-zone-on"
-                                            onClicked: {
-                                                channelKeyZoneSetup.open();
-                                            }
-                                        }
+//                                        QQC2.Button {
+//                                            Layout.fillHeight: true
+//                                            icon.name: "timeline-use-zone-on"
+//                                            onClicked: {
+//                                                channelKeyZoneSetup.open();
+//                                            }
+//                                        }
                                         Item {
                                             Layout.fillWidth: false
                                             Layout.fillHeight: false

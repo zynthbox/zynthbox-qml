@@ -504,33 +504,35 @@ Kirigami.AbstractApplicationWindow {
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            enabled: !zynthian.sketchpad.isMetronomeRunning
             onClicked: {
-                Zynthian.CommonUtils.startMetronomeAndPlayback();
+                if (zynthian.sketchpad.isMetronomeRunning) {
+                    Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                } else {
+                    Zynthian.CommonUtils.startMetronomeAndPlayback();
+                }
             }
 
             Kirigami.Icon {
                 width: Kirigami.Units.gridUnit
                 height: width
                 anchors.centerIn: parent
-                source: "media-playback-start"
-                color: parent.enabled ? "white" : "#99999999"
+                source: zynthian.sketchpad.isMetronomeRunning ? "media-playback-stop" : "media-playback-start"
+                color: "white"
             }
         }
         QQC2.Button {
             Layout.preferredWidth: Kirigami.Units.gridUnit*4
             Layout.preferredHeight: Kirigami.Units.gridUnit*2
-            enabled: zynthian.sketchpad.isMetronomeRunning
             onClicked: {
-                Zynthian.CommonUtils.stopMetronomeAndPlayback();
+                applicationWindow().openRecordingPopup()
             }
 
             Kirigami.Icon {
                 width: Kirigami.Units.gridUnit
                 height: width
                 anchors.centerIn: parent
-                source: "media-playback-stop"
-                color: parent.enabled ? "white" : "#99999999"
+                source: "media-record-symbolic"
+                color: zynthian.sketchpad.isRecording ? "#fff44336" : "white"
             }
         }
 

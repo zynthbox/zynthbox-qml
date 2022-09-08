@@ -529,6 +529,16 @@ class sketchpad_channel(QObject):
     clipsModelChanged = Signal()
     clipsModel = Property(QObject, clipsModel, notify=clipsModelChanged)
 
+    @Slot(result='QVariantList')
+    def getAllPartClips(self):
+        clips = []
+
+        for index in range(5):
+            clips_model = self.getClipsModelByPart(index)
+            clips.append(clips_model.getClip(self.__song__.scenesModel.selectedTrackIndex))
+
+        return clips
+
     ### BEGIN Property parts
     def getParts(self):
         return self.__clips_model__

@@ -350,7 +350,7 @@ Rectangle {
                                                 root.selectedChannel.channelAudioType === "sample-slice"
                                                     ? root.selectedChannel.samples
                                                     : root.selectedChannel.channelAudioType === "sample-loop"
-                                                        ? [root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
+                                                        ? root.selectedChannel.getAllPartClips()
                                                         : root.selectedChannel.channelAudioType === "external"
                                                             ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
                                                             : []
@@ -361,8 +361,7 @@ Rectangle {
                                     id: synthRepeater
 
                                     delegate: Rectangle {
-                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop" ||
-                                                                   root.selectedChannel.channelAudioType === "external"
+                                        property bool highlighted: root.selectedChannel.channelAudioType === "external"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
 
@@ -393,10 +392,9 @@ Rectangle {
                                             border.width: 1
                                             radius: 4
 
-                                            // For loop, slice and external modes only first slot is visible.
+                                            // For slice and external modes only first slot is visible.
                                             // For other modes all slots are visible
-                                            enabled: root.selectedChannel.channelAudioType === "sample-loop" ||
-                                                     root.selectedChannel.channelAudioType === "sample-slice" ||
+                                            enabled: root.selectedChannel.channelAudioType === "sample-slice" ||
                                                      root.selectedChannel.channelAudioType === "external"
                                                         ? index === 0
                                                         : true

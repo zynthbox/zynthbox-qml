@@ -342,43 +342,43 @@ Rectangle {
     //                    }
     //                }
 
-                    Binding {
-                        target: channelAudioTypeDropdown
-                        property: "currentIndex"
-                        delayed: true
-                        value: controlObj &&
-                               controlObj.channelAudioType
-                                 ? channelAudioTypeDropdown.findCurrentIndex(controlObj.channelAudioType)
-                                 : -1
-                    }
+//                    Binding {
+//                        target: channelAudioTypeDropdown
+//                        property: "currentIndex"
+//                        delayed: true
+//                        value: controlObj &&
+//                               controlObj.channelAudioType
+//                                 ? channelAudioTypeDropdown.findCurrentIndex(controlObj.channelAudioType)
+//                                 : -1
+//                    }
 
-                    QQC2.ComboBox {
-                        id: channelAudioTypeDropdown
+//                    QQC2.ComboBox {
+//                        id: channelAudioTypeDropdown
 
-                        function findCurrentIndex(val) {
-                            for (var i = 0; i < model.count; i++) {
-                                if (model.get(i).value === val) {
-                                    return i
-                                }
-                            }
+//                        function findCurrentIndex(val) {
+//                            for (var i = 0; i < model.count; i++) {
+//                                if (model.get(i).value === val) {
+//                                    return i
+//                                }
+//                            }
 
-                            return -1
-                        }
+//                            return -1
+//                        }
 
-                        // For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth"
-                        model: ListModel {
-                            ListElement { text: "Synth"; value: "synth" }
-                            ListElement { text: "Loop"; value: "sample-loop" }
-                            ListElement { text: "Smp: Trig"; value: "sample-trig" }
-                            ListElement { text: "Smp: Slice"; value: "sample-slice" }
-                            ListElement { text: "External"; value: "external" }
-                        }
-                        textRole: "text"
-                        currentIndex:  -1
-                        onActivated: {
-                            controlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
-                        }
-                    }
+//                        // For simplicity, channelAudioType is string in the format "sample-xxxx" or "synth"
+//                        model: ListModel {
+//                            ListElement { text: "Synth"; value: "synth" }
+//                            ListElement { text: "Loop"; value: "sample-loop" }
+//                            ListElement { text: "Smp: Trig"; value: "sample-trig" }
+//                            ListElement { text: "Smp: Slice"; value: "sample-slice" }
+//                            ListElement { text: "External"; value: "external" }
+//                        }
+//                        textRole: "text"
+//                        currentIndex:  -1
+//                        onActivated: {
+//                            controlObj.channelAudioType = channelAudioTypeDropdown.model.get(index).value;
+//                        }
+//                    }
                 }
 
                 initialAction: {

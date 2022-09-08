@@ -223,17 +223,19 @@ Rectangle {
                 samplePickerPopup.open()
             }
         } else if (type === "sample-loop") {
-            if (root.selectedChannel.selectedSlotRow === 0) {
-                var clip = root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            console.log("handleItemClick : Loop")
 
-                if (zynthian.backButtonPressed) {
-                    clip.clear()
-                } else {
-                    loopPickerDialog.folderModel.folder = clip.recordingDir
-                    loopPickerDialog.open()
-                }
+            var clip = root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+
+            if (zynthian.backButtonPressed) {
+                clip.clear()
+            } else {
+                loopPickerDialog.folderModel.folder = clip.recordingDir
+                loopPickerDialog.open()
             }
         } else if (type === "external") {
+            console.log("handleItemClick : External")
+
             externalMidiChannelPicker.pickChannel(root.selectedChannel);
         }
     }
@@ -756,7 +758,7 @@ Rectangle {
             nameFilters: ["*.wav"]
         }
         onFileSelected: {
-            root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
+            root.selectedChannel.getClipsModelByPart(root.selectedChannel.selectedSlotRow).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex).path = file.filePath
         }
     }
 

@@ -94,22 +94,11 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
         // selection
         case "CHANNEL_1":
         case "CHANNEL_6":
-            if (selectedChannel.channelAudioType === "sample-loop") {
-                if (selectedChannel.connectedPattern >= 0) {
-                    bottomStack.bottomBar.setControlObjByType(selectedChannel.sceneClip, "pattern")
-                } else {
-                    bottomStack.bottomBar.setControlObjByType(selectedChannel.sceneClip, "clip")
-                }
-
-                bottomStack.bottomBar.filePickerDialog.folderModel.folder = bottomStack.bottomBar.controlObj.recordingDir;
-                bottomStack.bottomBar.filePickerDialog.open();
-                bottomStack.bottomBar.filePickerDialog.open();
-
-                return true
-            } else if (selectedChannel.channelAudioType === "synth" ||
+            if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-loop" ||
                 selectedChannel.channelAudioType === "sample-trig" ||
                 selectedChannel.channelAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 0
+                selectedChannel.selectedSlotRow = 0
                 bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
@@ -118,12 +107,11 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 
         case "CHANNEL_2":
         case "CHANNEL_7":
-            if (selectedChannel.channelAudioType === "sample-loop") {
-                return true
-            } else if (selectedChannel.channelAudioType === "synth" ||
+            if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-loop" ||
                 selectedChannel.channelAudioType === "sample-trig" ||
                 selectedChannel.channelAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 1
+                selectedChannel.selectedSlotRow = 1
                 bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
@@ -132,12 +120,11 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 
         case "CHANNEL_3":
         case "CHANNEL_8":
-            if (selectedChannel.channelAudioType === "sample-loop") {
-                return true
-            } else if (selectedChannel.channelAudioType === "synth" ||
+            if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-loop" ||
                 selectedChannel.channelAudioType === "sample-trig" ||
                 selectedChannel.channelAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 2
+                selectedChannel.selectedSlotRow = 2
                 bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
@@ -146,12 +133,11 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 
         case "CHANNEL_4":
         case "CHANNEL_9":
-            if (selectedChannel.channelAudioType === "sample-loop") {
-                return true
-            } else if (selectedChannel.channelAudioType === "synth" ||
+            if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-loop" ||
                 selectedChannel.channelAudioType === "sample-trig" ||
                 selectedChannel.channelAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 3
+                selectedChannel.selectedSlotRow = 3
                 bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }
@@ -160,12 +146,11 @@ function cuiaHandler(cuia, selectedChannel, bottomStack) {
 
         case "CHANNEL_5":
         case "CHANNEL_10":
-            if (selectedChannel.channelAudioType === "sample-loop") {
-                return true
-            } else if (selectedChannel.channelAudioType === "synth" ||
+            if (selectedChannel.channelAudioType === "synth" ||
+                selectedChannel.channelAudioType === "sample-loop" ||
                 selectedChannel.channelAudioType === "sample-trig" ||
                 selectedChannel.channelAudioType === "sample-slice") {
-                bottomStack.slotsBar.selectedSlotRowItem.channel.selectedSlotRow = 4
+                selectedChannel.selectedSlotRow = 4
                 bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
                 return true
             }

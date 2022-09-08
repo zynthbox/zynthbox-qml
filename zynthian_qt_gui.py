@@ -711,7 +711,7 @@ class zynthian_gui(QObject):
     ### Global controller and selector
     @Slot(None)
     def zyncoder_set_bpm(self):
-        if self.globalPopupOpened or self.altButtonPressed:
+        if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_bpm_actual(np.clip(self.__zselector[0].value, 50, 200))
 
     def set_bpm_actual(self, bpm):
@@ -745,7 +745,7 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def zyncoder_set_volume(self):
-        if self.globalPopupOpened or self.altButtonPressed:
+        if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_volume_actual(self.__zselector[1].value)
 
     def set_volume_actual(self, volume):
@@ -777,7 +777,7 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def zyncoder_set_delay(self):
-        if self.globalPopupOpened or self.altButtonPressed:
+        if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_delay_actual(self.__zselector[2].value)
 
     def set_delay_actual(self, delay_percent):
@@ -813,7 +813,7 @@ class zynthian_gui(QObject):
 
     @Slot(None)
     def zyncoder_set_reverb(self):
-        if self.globalPopupOpened or self.altButtonPressed:
+        if self.globalPopupOpened or self.metronomeButtonPressed:
             self.set_reverb_actual(self.__zselector[3].value)
 
     def set_reverb_actual(self, reverb_percent):
@@ -1026,7 +1026,7 @@ class zynthian_gui(QObject):
                 self.__zselector[3].hide()
 
     def set_selector(self):
-        if self.globalPopupOpened or self.altButtonPressed:
+        if self.globalPopupOpened or self.metronomeButtonPressed:
             self.configure_big_knob()
             self.configure_small_knob1()
             self.configure_small_knob2()
@@ -2284,7 +2284,7 @@ class zynthian_gui(QObject):
             self.run_stop_metronome_and_playback.emit()
 
         elif cuia == "START_RECORD":
-            if self.recording_popup_active or self.altButtonPressed:
+            if self.recording_popup_active or self.metronomeButtonPressed:
                 zl = self.screens["sketchpad"]
                 if not zl.isRecording:
                     # No clips are currently being recorded
@@ -2936,7 +2936,7 @@ class zynthian_gui(QObject):
                     # This will make sure none of the gui updates while set_selector is in progress
                     logging.debug(f"Set selector in progress. Not setting value with encoder")
                 else:
-                    if self.globalPopupOpened or self.altButtonPressed:
+                    if self.globalPopupOpened or self.metronomeButtonPressed:
                         # When global popup is open, set song bpm with big knob
                         if self.__zselector[0] and self.sketchpad.song is not None:
                             self.__zselector[0].read_zyncoder()
@@ -3968,7 +3968,6 @@ class zynthian_gui(QObject):
             logging.debug(f"alt Button pressed : {pressed}")
             self.__alt_button_pressed__ = pressed
             self.alt_button_pressed_changed.emit()
-            self.run_set_selectors()
 
     alt_button_pressed_changed = Signal()
 
@@ -4014,6 +4013,7 @@ class zynthian_gui(QObject):
             logging.debug(f"metronome Button pressed : {pressed}")
             self.__metronome_button_pressed__ = pressed
             self.metronome_button_pressed_changed.emit()
+            self.run_set_selectors()
 
     metronome_button_pressed_changed = Signal()
 

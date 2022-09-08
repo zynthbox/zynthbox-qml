@@ -811,7 +811,7 @@ class zynthian_gui_sketchpad(zynthian_qt_gui_base.ZynGui):
     def set_selector(self, big_knob=True, small_knob1=True, small_knob2=True, small_knob3=True,):
         # Hide selectors and return if dependent variables is None or a long operation is in progress
         if self.__song__ is None or \
-                (self.zyngui.globalPopupOpened or self.zyngui.altButtonPressed) or \
+                (self.zyngui.globalPopupOpened or self.zyngui.metronomeButtonPressed) or \
                 (self.zyngui.get_current_screen_id() is not None and self.zyngui.get_current_screen() != self) or \
                 self.longOperation:
             if self.__zselector[0] is not None:

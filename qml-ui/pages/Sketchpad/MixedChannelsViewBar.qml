@@ -53,8 +53,6 @@ Rectangle {
         var returnValue = false;
         if (bouncePopup.opened) {
             returnValue = bouncePopup.cuiaCallback(cuia);
-        } if (externalMidiChannelPicker.opened) {
-            returnValue = externalMidiChannelPicker.cuiaCallback(cuia);
         } else {
             switch (cuia) {
                 case "SWITCH_CHANNELS_MOD_SHORT":
@@ -116,9 +114,6 @@ Rectangle {
 
     BouncePopup {
         id: bouncePopup
-    }
-    ExternalMidiChannelPicker {
-        id: externalMidiChannelPicker
     }
 
     GridLayout {
@@ -252,23 +247,23 @@ Rectangle {
                                         Layout.fillWidth: true
                                     }
 
-                                    RowLayout {
-                                        Layout.fillHeight: true
-                                        visible: root.selectedChannel.channelAudioType === "external"
+//                                    RowLayout {
+//                                        Layout.fillHeight: true
+//                                        visible: root.selectedChannel.channelAudioType === "external"
 
-                                        QQC2.Button {
-                                            Layout.fillHeight: true
-                                            text: qsTr("External Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : "")
-                                            onClicked: {
-                                                externalMidiChannelPicker.pickChannel(root.selectedChannel);
-                                            }
-                                        }
-                                        Item {
-                                            Layout.fillWidth: false
-                                            Layout.fillHeight: false
-                                            Layout.preferredWidth: Kirigami.Units.gridUnit
-                                        }
-                                    }
+//                                        QQC2.Button {
+//                                            Layout.fillHeight: true
+//                                            text: qsTr("External Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : "")
+//                                            onClicked: {
+//                                                externalMidiChannelPicker.pickChannel(root.selectedChannel);
+//                                            }
+//                                        }
+//                                        Item {
+//                                            Layout.fillWidth: false
+//                                            Layout.fillHeight: false
+//                                            Layout.preferredWidth: Kirigami.Units.gridUnit
+//                                        }
+//                                    }
 
                                     RowLayout {
                                         Layout.fillHeight: true
@@ -356,7 +351,9 @@ Rectangle {
                                                     ? root.selectedChannel.samples
                                                     : root.selectedChannel.channelAudioType === "sample-loop"
                                                         ? [root.selectedChannel.clipsModel.getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex), null, null, null, null]
-                                                        : []
+                                                        : root.selectedChannel.channelAudioType === "external"
+                                                            ? [qsTr("Midi Channel: %1").arg(root.selectedChannel ? (root.selectedChannel.externalMidiChannel > -1 ? root.selectedChannel.externalMidiChannel + 1 : root.selectedChannel.id + 1) : ""), null, null, null, null]
+                                                            : []
 
                                 }
 
@@ -364,7 +361,8 @@ Rectangle {
                                     id: synthRepeater
 
                                     delegate: Rectangle {
-                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop"
+                                        property bool highlighted: root.selectedChannel.channelAudioType === "sample-loop" ||
+                                                                   root.selectedChannel.channelAudioType === "external"
                                                                     ? index === 0
                                                                     : root.selectedChannel.selectedSlotRow === index
 
@@ -395,10 +393,11 @@ Rectangle {
                                             border.width: 1
                                             radius: 4
 
-                                            // For loop and slice modes only first slot is visible.
+                                            // For loop, slice and external modes only first slot is visible.
                                             // For other modes all slots are visible
                                             enabled: root.selectedChannel.channelAudioType === "sample-loop" ||
-                                                     root.selectedChannel.channelAudioType === "sample-slice"
+                                                     root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                     root.selectedChannel.channelAudioType === "external"
                                                         ? index === 0
                                                         : true
                                             opacity: enabled ? 1 : 0
@@ -435,7 +434,9 @@ Rectangle {
                                                             ? modelData.path
                                                               ? modelData.path.split("/").pop()
                                                               : ""
-                                                            : ""
+                                                            : root.selectedChannel.channelAudioType === "external"
+                                                                ? modelData
+                                                                : ""
 
                                                 elide: "ElideRight"
                                             }

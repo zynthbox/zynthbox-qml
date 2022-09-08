@@ -80,6 +80,8 @@ Rectangle {
             return bankPickerDialog.cuiaCallback(cuia);
         } else if (loopPickerDialog.opened) {
             return loopPickerDialog.cuiaCallback(cuia);
+        } else if (externalMidiChannelPicker.opened) {
+            return externalMidiChannelPicker.cuiaCallback(cuia);
         }
 
         switch (cuia) {
@@ -231,6 +233,8 @@ Rectangle {
                     loopPickerDialog.open()
                 }
             }
+        } else if (type === "external") {
+            externalMidiChannelPicker.pickChannel(root.selectedChannel);
         }
     }
     
@@ -822,5 +826,9 @@ Rectangle {
 
     Zynthian.LayerSetupDialog {
         id: layerSetupDialog
+    }
+
+    ExternalMidiChannelPicker {
+        id: externalMidiChannelPicker
     }
 }

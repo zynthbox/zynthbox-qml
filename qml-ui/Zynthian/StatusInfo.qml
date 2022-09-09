@@ -28,6 +28,7 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.4 as Kirigami
 
+import libzl 1.0 as ZL
 import Zynthian 1.0 as Zynthian
 import org.zynthian.quick 1.0 as ZynQuick
 
@@ -57,7 +58,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(zynthian.status_information.holdSignalA * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackAHold), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -84,7 +85,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: highSignalARect.peakSignalA * root.width
-                property double peakSignalA: zynthian.status_information.peakSignalA
+                property double peakSignalA: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackA / zynthian.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalARect
@@ -121,7 +122,7 @@ MouseArea {
                     bottom: parent.bottom
                 }
                 radius: 3
-                x: Math.floor(Math.min(zynthian.status_information.holdSignalB, 1) * root.width)
+                x: Math.floor(Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackBHold), 1) * root.width)
                 opacity: x === 0 ? 0 : 1
                 implicitWidth: Kirigami.Units.smallSpacing
                 color: Kirigami.Theme.negativeTextColor
@@ -148,7 +149,7 @@ MouseArea {
                 radius: 3
                 color: Kirigami.Theme.negativeTextColor
                 width: Math.min(highSignalBRect.peakSignalB, 1) * root.width
-                property double peakSignalB: zynthian.status_information.peakSignalB
+                property double peakSignalB: Math.min(Math.max(0, 1 + ZL.AudioLevels.playbackB / zynthian.status_information.rangedB), 1)
             }
             Rectangle {
                 id: mediumSignalBRect

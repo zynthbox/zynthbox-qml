@@ -82,7 +82,7 @@ sys.path.insert(1, "./zynqtgui")
 # Zynthian specific modules
 import zynconf
 import zynautoconnect
-from zynlibs.jackpeak import lib_jackpeak_init
+#from zynlibs.jackpeak import lib_jackpeak_init
 from zyncoder import *
 from zyncoder.zyncoder import lib_zyncoder_init
 from zyngine import zynthian_controller, zynthian_zcmidi
@@ -224,10 +224,10 @@ class zynthian_gui_status_data(QObject):
 
         self.status_info = status
         # Update a couple of extra bits we need
-        self.status_info["peakSignalA"] = min(max(0, 1 + status["peakA"] / self.dpm_rangedB), 1)
-        self.status_info["peakSignalB"] = min(max(0, 1 + status["peakB"] / self.dpm_rangedB), 1)
-        self.status_info["holdSignalA"] = min(max(0, 1 + status["holdA"] / self.dpm_rangedB), 1)
-        self.status_info["holdSignalB"] = min(max(0, 1 + status["holdB"] / self.dpm_rangedB), 1)
+        #self.status_info["peakSignalA"] = min(max(0, 1 + status["peakA"] / self.dpm_rangedB), 1)
+        #self.status_info["peakSignalB"] = min(max(0, 1 + status["peakB"] / self.dpm_rangedB), 1)
+        #self.status_info["holdSignalA"] = min(max(0, 1 + status["holdA"] / self.dpm_rangedB), 1)
+        #self.status_info["holdSignalB"] = min(max(0, 1 + status["holdB"] / self.dpm_rangedB), 1)
 
         self.status_changed.emit()
         if midi_recorder_has_changed is True:
@@ -629,14 +629,14 @@ class zynthian_gui(QObject):
         self.__bk_last_turn_time = None
 
         # Initialize peakmeter audio monitor if needed
-        if not zynthian_gui_config.show_cpu_status:
-            try:
-                global lib_jackpeak
-                lib_jackpeak = lib_jackpeak_init()
-                lib_jackpeak.setDecay(c_float(0.2))
-                lib_jackpeak.setHoldCount(10)
-            except Exception as e:
-                logging.error("ERROR initializing jackpeak: %s" % e)
+        #if not zynthian_gui_config.show_cpu_status:
+            #try:
+                #global lib_jackpeak
+                #lib_jackpeak = lib_jackpeak_init()
+                #lib_jackpeak.setDecay(c_float(0.2))
+                #lib_jackpeak.setHoldCount(10)
+            #except Exception as e:
+                #logging.error("ERROR initializing jackpeak: %s" % e)
 
         # Initialize Controllers (Rotary & Switches) & MIDI-router
         try:
@@ -3338,12 +3338,12 @@ class zynthian_gui(QObject):
                 self.status_info[
                     "cpu_load"
                 ] = zynautoconnect.get_jackd_cpu_load()
-            else:
-                # Get audio peak level
-                self.status_info["peakA"] = lib_jackpeak.getPeak(0)
-                self.status_info["peakB"] = lib_jackpeak.getPeak(1)
-                self.status_info["holdA"] = lib_jackpeak.getHold(0)
-                self.status_info["holdB"] = lib_jackpeak.getHold(1)
+            #else:
+                ## Get audio peak level
+                #self.status_info["peakA"] = lib_jackpeak.getPeak(0)
+                #self.status_info["peakB"] = lib_jackpeak.getPeak(1)
+                #self.status_info["holdA"] = lib_jackpeak.getHold(0)
+                #self.status_info["holdB"] = lib_jackpeak.getHold(1)
 
             # Get Status Flags (once each 5 refreshes)
             if self.status_counter > 5:

@@ -60,15 +60,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
         self.__last_selected_sketchpad__ = None
         self.__selected_channel__ = 0
 
-        # Sound changes even though change_to_channel_sound is not called.
-        # Someone else is doing the job and there is no point in doing it twice.
-        # Disabling for now but this is a HACK
-        # FIXME : Find the real place which actually switches sound
-        # self.__change_channel_sound_timer__ = QTimer()
-        # self.__change_channel_sound_timer__.setInterval(10000)
-        # self.__change_channel_sound_timer__.setSingleShot(True)
-        # self.__change_channel_sound_timer__.timeout.connect(self.change_to_channel_sound, Qt.QueuedConnection)
-
         if not self.restore():
             def cb():
                 logging.info("Session dashboard Init Sketchpad CB (No restore)")
@@ -116,7 +107,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     @Slot(None)
     def set_selected_channel_complete(self):
         self.zyngui.fixed_layers.fill_list()
-        # self.__change_channel_sound_timer__.start()
+
+        # Do make a call to switch sound (and eventually update bank and preset screens) when
+        # library page is open. Otherwise sound change is already reactive to selectedChannel and calling
+        # change_o_channel_sound causes UI stutters as showing bank and preset screen is a bit time consuming.
+        if self.zyngui.get_current_screen_id() is not None and \
+                self.zyngui.get_current_screen_id() in ["layers_for_channel", "bank", "preset"]:
+            QMetaObject.invokeMethod(self, "change_to_channel_sound", Qt.QueuedConnection)
 
     ### Property name
     def get_name(self):
@@ -147,13 +144,6 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     ### END Property sessionSketchpadsModel
 
     ### Property selectedChannel
-    def change_to_channel_sound(self):
-        self.zyngui.screens["layers_for_channel"].update_channel_sounds()
-        
-        # Set correct interval in case it was set to 0 when pressing a mixer column for immediate sound change
-        # self.__change_channel_sound_timer__.setInterval(10000)
-
-        self.schedule_save()
     def get_selected_channel(self):
         return self.__selected_channel__
     def set_selected_channel(self, channel, force_set=False):
@@ -329,13 +319,13 @@ class zynthian_gui_session_dashboard(zynthian_gui_selector):
     def exists(self, filename):
         return (Path(self.__sessions_base_dir__) / (filename + ".json")).exists()
 
+    @Slot()
+    def change_to_channel_sound(self):
+        self.zyngui.screens["layers_for_channel"].update_channel_sounds()
+
     def get_last_selected_sketchpad(self):
         return self.__last_selected_sketchpad__
 
     def set_last_selected_sketchpad(self, sketchpad):
         self.__last_selected_sketchpad__ = sketchpad
         self.schedule_save()
-
-    # @Slot(None)
-    # def disableNextSoundSwitchTimer(self):
-    #     self.__change_channel_sound_timer__.setInterval(0)

@@ -163,6 +163,7 @@ Rectangle {
                             channel: zynthian.sketchpad.song.channelsModel.getChannel(model.index)
                             onClicked: {
                                 if (!root.songMode) {
+                                    zynthian.session_dashboard.selectedChannel = model.index
                                     root.selectedPartChannel = partBarDelegate.channel
                                     root.selectedPartClip = partBarDelegate.selectedPartClip
                                     root.selectedPartPattern = partBarDelegate.selectedPartPattern

@@ -467,6 +467,10 @@ Rectangle {
 
                                 // Take 3/5 th of available width
                                 Rectangle {
+                                    property bool showWaveform: root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                                root.selectedChannel.channelAudioType === "sample-slice" ||
+                                                                root.selectedChannel.channelAudioType === "sample-loop"
+
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 3
@@ -474,6 +478,7 @@ Rectangle {
                                     border.width: 1
                                     border.color: "#ff999999"
                                     radius: 4
+                                    opacity: showWaveform ? 1 : 0
 
                                     WaveFormItem {
                                         property QtObject clip: root.selectedChannel.channelAudioType === "sample-loop"
@@ -484,10 +489,7 @@ Rectangle {
                                         color: Kirigami.Theme.textColor
                                         source: clip ? clip.path : ""
 
-                                        visible: (root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                  root.selectedChannel.channelAudioType === "sample-slice" ||
-                                                  root.selectedChannel.channelAudioType === "sample-loop") &&
-                                                 clip && clip.path && clip.path.length > 0
+                                        visible: clip && clip.path && clip.path.length > 0
 
                                         // Mask for wave part before start
                                         Rectangle {
@@ -598,6 +600,11 @@ Rectangle {
 
                                 // Take remaining available width
                                 Rectangle {
+                                    property bool showPattern: root.selectedChannel.channelAudioType === "synth" ||
+                                                               root.selectedChannel.channelAudioType === "external" ||
+                                                               root.selectedChannel.channelAudioType === "sample-trig" ||
+                                                               root.selectedChannel.channelAudioType === "sample-slice"
+
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     Layout.preferredWidth: Kirigami.Units.gridUnit * 2
@@ -607,16 +614,13 @@ Rectangle {
                                     radius: 4
                                     color: "#222222"
                                     clip: true
+                                    opacity: showPattern ? 1 : 0
 
                                     Image {
                                         id: patternVisualiser
 
                                         visible: root.selectedChannel &&
-                                                 root.selectedChannel.connectedPattern >= 0 &&
-                                                 (root.selectedChannel.channelAudioType === "synth" ||
-                                                  root.selectedChannel.channelAudioType === "external" ||
-                                                  root.selectedChannel.channelAudioType === "sample-trig" ||
-                                                  root.selectedChannel.channelAudioType === "sample-slice")
+                                                 root.selectedChannel.connectedPattern >= 0
 
                                         anchors {
                                             fill: parent

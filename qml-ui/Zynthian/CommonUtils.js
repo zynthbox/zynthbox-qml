@@ -87,76 +87,55 @@ function switchToScene(index) {
 }
 
 function cuiaHandler(cuia, selectedChannel, bottomStack) {
+    var clip
+    var returnVal = false
+
     switch (cuia) {
-        // Set respective selected row when button 1-5 is pressed or 6(mod)+1-5 is pressed
-        // and invoke respective handler when channelAudioType is synth, trig or slice
-        // Otherwise, when in loop mode, do not handle button to allow falling back to channel
-        // selection
         case "CHANNEL_1":
         case "CHANNEL_6":
-            if (selectedChannel.channelAudioType === "synth" ||
-                selectedChannel.channelAudioType === "sample-loop" ||
-                selectedChannel.channelAudioType === "sample-trig" ||
-                selectedChannel.channelAudioType === "sample-slice") {
-                selectedChannel.selectedSlotRow = 0
-                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
-                return true
-            }
+            bottomStack.slotsBar.partButton.checked = true
+            clip = selectedChannel.getClipsModelByPart(0).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.enabled = !clip.enabled
 
-            return false
+            returnVal = true
+            break
 
         case "CHANNEL_2":
         case "CHANNEL_7":
-            if (selectedChannel.channelAudioType === "synth" ||
-                selectedChannel.channelAudioType === "sample-loop" ||
-                selectedChannel.channelAudioType === "sample-trig" ||
-                selectedChannel.channelAudioType === "sample-slice") {
-                selectedChannel.selectedSlotRow = 1
-                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
-                return true
-            }
+            bottomStack.slotsBar.partButton.checked = true
+            clip = selectedChannel.getClipsModelByPart(1).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.enabled = !clip.enabled
 
-            return false
+            returnVal = true
+            break
 
         case "CHANNEL_3":
         case "CHANNEL_8":
-            if (selectedChannel.channelAudioType === "synth" ||
-                selectedChannel.channelAudioType === "sample-loop" ||
-                selectedChannel.channelAudioType === "sample-trig" ||
-                selectedChannel.channelAudioType === "sample-slice") {
-                selectedChannel.selectedSlotRow = 2
-                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
-                return true
-            }
+            bottomStack.slotsBar.partButton.checked = true
+            clip = selectedChannel.getClipsModelByPart(2).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.enabled = !clip.enabled
 
-            return false
+            returnVal = true
+            break
 
         case "CHANNEL_4":
         case "CHANNEL_9":
-            if (selectedChannel.channelAudioType === "synth" ||
-                selectedChannel.channelAudioType === "sample-loop" ||
-                selectedChannel.channelAudioType === "sample-trig" ||
-                selectedChannel.channelAudioType === "sample-slice") {
-                selectedChannel.selectedSlotRow = 3
-                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
-                return true
-            }
+            bottomStack.slotsBar.partButton.checked = true
+            clip = selectedChannel.getClipsModelByPart(3).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.enabled = !clip.enabled
 
-            return false
+            returnVal = true
+            break
 
         case "CHANNEL_5":
         case "CHANNEL_10":
-            if (selectedChannel.channelAudioType === "synth" ||
-                selectedChannel.channelAudioType === "sample-loop" ||
-                selectedChannel.channelAudioType === "sample-trig" ||
-                selectedChannel.channelAudioType === "sample-slice") {
-                selectedChannel.selectedSlotRow = 4
-                bottomStack.slotsBar.handleItemClick(selectedChannel.channelAudioType)
-                return true
-            }
+            bottomStack.slotsBar.partButton.checked = true
+            clip = selectedChannel.getClipsModelByPart(4).getClip(zynthian.sketchpad.song.scenesModel.selectedTrackIndex)
+            clip.enabled = !clip.enabled
 
-            return false
+            returnVal = true
+            break
     }
 
-    return false
+    return returnVal
 }
